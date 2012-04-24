@@ -1,0 +1,17 @@
+	@SuppressWarnings("unused")
+	private void generateSetter(String name, String dataType, StringBuilder autoCode)
+	{
+		String SETTER_TEMPLATE = "\tpublic void #settername# (#dataType# #name#) {\n\t this.#name# = #name# ; \n\t}";
+
+		String setterName = name.replace(name.charAt(0), name.toUpperCase().charAt(0));
+
+		setterName = SET + setterName;
+
+		SETTER_TEMPLATE = SETTER_TEMPLATE.replaceAll("#settername#", setterName);
+		SETTER_TEMPLATE = SETTER_TEMPLATE.replaceAll("#name#", name);
+		SETTER_TEMPLATE = SETTER_TEMPLATE.replaceAll("#dataType#", dataType);
+		autoCode.append(SETTER_TEMPLATE);
+		autoCode.append(NEW_LINE);
+		autoCode.append(NEW_LINE);
+	}
+

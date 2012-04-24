@@ -1,0 +1,35 @@
+	private ArrayList<Class> removeUnwantedClasses(ArrayList<Class> classes)
+	{
+		ArrayList<Class> tmpClasses = new ArrayList<Class>();
+		try
+		{
+			String annotation = getProperty("Annotation.Intefaces");
+
+			if (classes != null && !classes.isEmpty())
+			{
+				for (Class orgClass : classes)
+				{
+					Annotation[] classArray = orgClass.getAnnotations();
+					if (classArray != null)
+					{
+						for (Annotation annoted : classArray)
+						{
+							if (annoted.annotationType().getSimpleName().equals(annotation))
+							{
+								tmpClasses.add(orgClass);
+							}
+						}
+					}
+				}
+
+			}
+			System.out.println("list of class::" + tmpClasses);
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error while removing unwanted classes");
+			e.printStackTrace();
+		}
+		return tmpClasses;
+	}
+

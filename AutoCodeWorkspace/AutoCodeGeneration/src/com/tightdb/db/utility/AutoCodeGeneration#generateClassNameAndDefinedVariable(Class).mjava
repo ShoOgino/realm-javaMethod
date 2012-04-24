@@ -1,0 +1,61 @@
+	@SuppressWarnings("unused")
+	private void generateClassNameAndDefinedVariable(Class c)
+	{
+
+		String INTF = "";
+		String EXTN = "";
+		String CLASS_TMPLT = " public class #className# #interfce# ";
+
+		String postFix = getProperty(POSTFIX_FOR_CLASSNAME);
+
+		CLASS_TMPLT = CLASS_TMPLT.replaceAll("#className#", c.getSimpleName() + postFix);
+
+		Class[] intfs = c.getInterfaces();
+
+		int i = 0;
+		if (intfs != null && intfs.length > 0)
+		{
+			for (Class tmpIntfs : intfs)
+			{
+				autoCode.append("import ").append(tmpIntfs.getName()).append(";").append(NEW_LINE);
+
+				if (tmpIntfs.isInterface())
+				{
+					if (i > 0)
+						INTF += ",";
+					INTF = tmpIntfs.getSimpleName();
+				}
+				else
+				{
+					EXTN = tmpIntfs.getSimpleName();
+				}
+				i++;
+			}
+
+			if (INTF.endsWith(""))
+			{
+				CLASS_TMPLT = CLASS_TMPLT.replaceAll("#interfce#", "implements " + INTF);
+			}
+			else
+			{
+				CLASS_TMPLT = CLASS_TMPLT.replaceAll("#interfce#", "extends " + EXTN);
+			}
+		}
+
+		CLASS_TMPLT = CLASS_TMPLT.replaceAll("#interfce#", "");
+
+		autoCode.append(CLASS_TMPLT).append(START_CURLY_BRACKET);
+		autoCode.append(NEW_LINE);
+
+		Field fieldlist[] = c.getDeclaredFields();
+		for (Field fld : fieldlist)
+		{
+			String VAR_TMPLT = " #modifiers# #type# #name# ; ";
+			VAR_TMPLT = VAR_TMPLT.replaceAll("#type#", fld.getType().getSimpleName());
+			VAR_TMPLT = VAR_TMPLT.replaceAll("#name#", fld.getName());
+			int mod = fld.getModifiers();
+			VAR_TMPLT = VAR_TMPLT.replaceAll("#modifiers#", Modifier.toString(mod));
+			autoCode.append(TAB_SPACE).append(VAR_TMPLT).append(NEW_LINE);
+		}
+	}
+

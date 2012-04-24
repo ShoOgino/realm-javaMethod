@@ -1,0 +1,35 @@
+	@SuppressWarnings({ "unchecked", "unused" })
+	private static void findClasses(List<Class> classes, File directory, String packageName) throws ClassNotFoundException
+	{
+		if (!directory.exists())
+		{
+			System.out.println("Directory does not exists :: " + directory);
+			return;
+		}
+		File[] files = directory.listFiles();
+		for (File file : files)
+		{
+			if (file.isDirectory())
+			{
+				assert !file.getName().contains(".");
+				findClasses(classes, file, packageName);
+			}
+			else if (file.getName().endsWith(".java"))
+			{
+				String fileName = file.getName();
+				String filePath = file.getAbsolutePath();
+
+				filePath = filePath.substring(filePath.indexOf("src") + 4);
+				filePath = filePath.replace("\\", ".");
+				filePath = filePath.replaceAll(".java", "");
+				String className = filePath;
+				if (className.startsWith(packageName))
+				{
+					classes.add(Class.forName(className));
+				}
+
+			}
+		}
+
+	}
+
