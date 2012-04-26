@@ -1,4 +1,15 @@
 	public Person insert(long position, String firstName, String lastName, int salary) {
-		return null;
+		try {
+			int pos = (int) position; // FIXME: should be improved soon
+
+			table.insertString(0, pos, firstName);
+			table.insertString(1, pos, lastName);
+			table.insertLong(2, pos, salary);
+			table.insertDone();
+
+			return cursor(position);
+		} catch (Exception e) {
+			throw insertRowException(e);
+		}
 	}
 

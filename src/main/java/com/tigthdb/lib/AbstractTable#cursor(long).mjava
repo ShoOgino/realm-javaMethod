@@ -1,0 +1,12 @@
+	protected Cursor cursor(long position) {
+		Cursor cursor;
+
+		try {
+			cursor = cursorClass.getDeclaredConstructor(TableBase.class, long.class).newInstance(table, position);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to instantiate a cursor!", e);
+		}
+
+		return cursor;
+	}
+
