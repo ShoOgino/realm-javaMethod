@@ -1,0 +1,18 @@
+	public Person insert(long position, String firstName, String lastName, int salary, boolean driver, byte[] photo, Date birthdate,
+			Serializable extra) {
+		try {
+			insertString(0, position, firstName);
+			insertString(1, position, lastName);
+			insertLong(2, position, salary);
+			insertBoolean(3, position, driver);
+			insertBinary(4, position, photo);
+			insertDate(5, position, birthdate);
+			insertMixed(6, position, extra);
+			insertDone();
+
+			return cursor(position);
+		} catch (Exception e) {
+			throw insertRowException(e);
+		}
+	}
+
