@@ -1,0 +1,16 @@
+	private String getColumnType(JavaField field) {
+		String type = field.getType().getSimpleName().getText();
+
+		if (NUM_TYPES.contains(type)) {
+			type = "Long";
+		} else if ("boolean".equalsIgnoreCase(type)) {
+			type = "Boolean";
+		} else if ("byte[]".equalsIgnoreCase(type)) {
+			type = "Binary";
+		} else if (!OTHER_TYPES.contains(type)) {
+			type = "Mixed";
+		}
+
+		return type;
+	}
+
