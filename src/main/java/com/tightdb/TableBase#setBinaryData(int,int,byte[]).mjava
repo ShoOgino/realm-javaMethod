@@ -1,6 +1,17 @@
-	public void setBinaryData(int columnIndex, int rowIndex, byte[] data) {
-		if (data == null)
+	/**
+	 * Sets the binary value for a cell marked by the rowIndex and columnIndex.
+	 * @param columnIndex
+	 * @param rowIndex
+	 * @param data
+	 */
+	public void setBinaryData(int columnIndex, int rowIndex, byte[] data){
+		if(data == null)
 			throw new NullPointerException("Null array");
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			nativeSetBinaryDataFromRoot(getTopLevelTable(), columnRowIndexList, columnIndex, rowIndex, data);
+			return;
+		}
 		nativeSetBinaryData(columnIndex, rowIndex, data);
 	}
 

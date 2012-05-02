@@ -1,4 +1,18 @@
-	public void insertBoolean(int columnIndex, int rowIndex, boolean value) {
+	/**
+	 * Inserts a boolean value into the cell identified by the columnIndex and rowIndex
+	 * Note that after the insertion old value of that cell will vanish whose place is
+	 * taken by new value.
+	 * 
+	 * @param columnIndex 0 based columnIndex of the cell
+	 * @param rowIndex 0 based rowIndex of the cell
+	 * @param value value to be inserted.
+	 */
+	public void insertBoolean(int columnIndex, int rowIndex, boolean value){
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			nativeInsertBooleanFromRoot(getTopLevelTable(), columnRowIndexList, columnIndex, rowIndex, value);
+			return;
+		}
 		nativeInsertBoolean(columnIndex, rowIndex, value);
 	}
 

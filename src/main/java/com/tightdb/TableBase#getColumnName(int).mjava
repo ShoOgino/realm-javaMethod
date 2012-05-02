@@ -1,4 +1,13 @@
-	public String getColumnName(int columnIndex) {
+	/**
+	 * Returns the name of a column identified by columnIndex, which is 0 based.
+	 * @param columnIndex
+	 * @return
+	 */
+	public String getColumnName(int columnIndex){
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			return nativeGetColumnNameFromRoot(getTopLevelTable(), columnRowIndexList, columnIndex);
+		}
 		return nativeGetColumnName(columnIndex);
 	}
 

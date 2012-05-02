@@ -1,4 +1,14 @@
-	public String getString(int columnIndex, int rowIndex) {
+	/**
+	 * Returns the string of a cell identified by rowIndex and columnIndex.
+	 * @param columnIndex 0 based index value of the column
+	 * @param rowIndex 0 based index of the row.
+	 * @return value of the particular cell
+	 */
+	public String getString(int columnIndex, int rowIndex){
+		if(parentTable != null){
+			List<CellId> columnRowTreeList = getColumnRowPairForParents();
+			return nativeGetStringFromRoot(getTopLevelTable(), columnRowTreeList, columnIndex, rowIndex);
+		}
 		return nativeGetString(columnIndex, rowIndex);
 	}
 

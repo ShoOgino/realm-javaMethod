@@ -1,0 +1,17 @@
+	protected List<CellId>getColumnRowPairForParents(){
+		if(rowColTreeList != null)
+			return rowColTreeList;
+		TableBase currentBase = this;
+		while(currentBase.parentTable != null){
+			if(rowColTreeList == null){
+				rowColTreeList = new ArrayList<CellId>();
+			}
+			rowColTreeList.add(new CellId(currentBase.columnIndex, currentBase.rowIndex));
+			currentBase = currentBase.parentTable;
+		}
+		if(rowColTreeList != null){
+			Collections.reverse(rowColTreeList);
+		}
+		return rowColTreeList;
+	}
+

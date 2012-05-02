@@ -1,4 +1,19 @@
-	public void setString(int columnIndex, int rowIndex, String value) {
+	/**
+	 * Sets a string value for a cell identified by columnIndex and rowIndex. 
+	 * Note that if we call this method on the table for a particular column 
+	 * marked by the columnIndex, that column has to be an String based column
+	 * which means the type of the column must be ColumnType.ColumnTypeString.
+	 * 
+	 * @param columnIndex
+	 * @param rowIndex
+	 * @param value
+	 */
+	public void setString(int columnIndex, int rowIndex, String value){
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			nativeSetStringFromRoot(getTopLevelTable(), columnRowIndexList, columnIndex, rowIndex, value);
+			return;
+		}
 		nativeSetString(columnIndex, rowIndex, value);
 	}
 

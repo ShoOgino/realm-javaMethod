@@ -1,4 +1,12 @@
-	public void clear() {
+	/**
+	 * Clears this table. After this call all the row's of this table is deleted.
+	 */
+	public void clear(){
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			nativeClearFromRoot(getTopLevelTable(), columnRowIndexList);
+			return;
+		}
 		nativeClear();
 	}
 

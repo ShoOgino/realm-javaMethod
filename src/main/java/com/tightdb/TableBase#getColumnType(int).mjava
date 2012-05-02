@@ -1,5 +1,16 @@
-	public ColumnType getColumnType(int columnIndex) {
-		int columnType = nativeGetColumnType(columnIndex);
+	/**
+	 * Get the type of a column identified by the columnIdex. 
+	 * @param columnIndex 0 based index value of the column.
+	 * @return Type of the particular column.
+	 */
+	public ColumnType getColumnType(int columnIndex){
+		int columnType;
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			columnType = nativeGetColumnTypeFromRoot(getTopLevelTable(), columnRowIndexList, columnIndex);
+		}else{
+			columnType = nativeGetColumnType(columnIndex);
+		}
 		ColumnType[] columnTypes = ColumnType.values();
 		return columnTypes[columnType];
 	}

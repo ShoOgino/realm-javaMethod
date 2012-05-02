@@ -1,4 +1,15 @@
-	public void insertDone() {
+	/**
+	 * Once insertions are done "say for a particular row" or before switching to a new row
+	 * user must call this method to keep the stability of the system, allowing tightdb a chance 
+	 * to perform internal works and make it ready for a new insertion.
+	 * 
+	 */
+	public void insertDone(){
+		if(parentTable != null){
+			List<CellId> columnRowTree = getColumnRowPairForParents();
+			nativeInsertDoneFromRoot(getTopLevelTable(), columnRowTree);
+			return;
+		}
 		nativeInsertDone();
 	}
 

@@ -1,5 +1,12 @@
-	// Size based api
-	public int getCount() {
+	/**
+	 * Get the number of entires of this table. 
+	 * @return
+	 */
+	public int getCount(){
+		if(parentTable != null){
+			List<CellId> columnRowTree = getColumnRowPairForParents();
+			return nativeGetCountFromRoot(getTopLevelTable(), columnRowTree);
+		}
 		return nativeGetCount();
 	}
 

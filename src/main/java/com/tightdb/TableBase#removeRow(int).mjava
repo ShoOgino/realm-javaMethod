@@ -1,10 +1,15 @@
 	/**
-	 * Removes a row from the specific index. As of now the entry is simply
-	 * removed from the table. No Cascading delete for other table is not taken
-	 * care of.
+	 * Removes a row from the specific index. As of now the entry is simply 
+	 * removed from the table. No Cascading delete for other table is not 
+	 * taken care of.
 	 * 
 	 */
-	public void removeRow(int rowIndex) {
+	public void removeRow(int rowIndex){
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			nativeRemoveRowFromRoot(getTopLevelTable(), columnRowIndexList, rowIndex);
+			return;
+		}
 		nativeRemoveRow(rowIndex);
 	}
 

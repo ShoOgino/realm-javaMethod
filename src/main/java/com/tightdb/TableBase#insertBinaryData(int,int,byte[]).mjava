@@ -1,4 +1,18 @@
-	public void insertBinaryData(int columnIndex, int rowIndex, byte[] data) {
+	/**
+	 * Inserts a binary byte[] data into the cell identified by the columnIndex and rowIndex.
+	 * Note that after the insertion old value of that call will vanish whose place is
+	 * taken by new value.
+	 * 
+	 * @param columnIndex 0 based column index of the cell
+	 * @param rowIndex 0 based row index of the cell
+	 * @param data data to be inserted.
+	 */
+	public void insertBinaryData(int columnIndex, int rowIndex, byte[] data){
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			nativeInsertBinaryDataFromRoot(getTopLevelTable(), columnRowIndexList, columnIndex, rowIndex, data);
+			return;
+		}
 		nativeInsertBinaryData(columnIndex, rowIndex, data);
 	}
 

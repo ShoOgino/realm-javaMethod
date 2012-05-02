@@ -1,4 +1,16 @@
-	public void setLong(int columnIndex, int rowIndex, long value) {
+	/**
+	 * Sets the long value for a particular cell identified by rowIndex and columnIndex.
+	 * 
+	 * @param columnIndex
+	 * @param rowIndex
+	 * @param value
+	 */
+	public void setLong(int columnIndex, int rowIndex, long value){
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			nativeSetLongFromRoot(getTopLevelTable(), columnRowIndexList, columnIndex, rowIndex, value);
+			return;
+		}
 		nativeSetLong(columnIndex, rowIndex, value);
 	}
 

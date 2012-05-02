@@ -1,4 +1,15 @@
-	public void setBoolean(int columnIndex, int rowIndex, boolean value) {
+	/**
+	 * Sets boolean value for a particular cell marked by the rowIndex and columnIndex.
+	 * @param columnIndex
+	 * @param rowIndex
+	 * @param value
+	 */
+	public void setBoolean(int columnIndex, int rowIndex, boolean value){
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			nativeSetBooleanFromRoot(getTopLevelTable(), columnRowIndexList, columnIndex, rowIndex, value);
+			return;
+		}
 		nativeSetBoolean(columnIndex, rowIndex, value);
 	}
 

@@ -1,4 +1,15 @@
-	public long getLong(int columnIndex, int rowIndex) {
+	/**
+	 * Get the long value of the particular cell, identified by columnIndex and rowIndex.
+	 * 
+	 * @param columnIndex 0 based index value of the column.
+	 * @param rowIndex 0 based row value of the column.
+	 * @return value of the particular cell.
+	 */
+	public long getLong(int columnIndex, int rowIndex){
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			return nativeGetLongFromRoot(getTopLevelTable(), columnRowIndexList, columnIndex, rowIndex);
+		}
 		return nativeGetLong(columnIndex, rowIndex);
 	}
 

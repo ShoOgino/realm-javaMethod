@@ -1,4 +1,15 @@
-	public byte[] getBinaryData(int columnIndex, int rowIndex) {
+	/**
+	 * Get the binary byte[] based value of a cell identified by the columnIndex and rowIndex.
+	 * 
+	 * @param columnIndex 0 based index value of the cell column
+	 * @param rowIndex 0 based index value of the cell row
+	 * @return value of the particular cell.
+	 */
+	public byte[] getBinaryData(int columnIndex, int rowIndex){
+		if(parentTable != null){
+			List<CellId> columnRowIndexList = getColumnRowPairForParents();
+			return nativeGetBinaryDataFromRoot(getTopLevelTable(), columnRowIndexList, columnIndex, rowIndex);
+		}
 		return nativeGetBinaryData(columnIndex, rowIndex);
 	}
 
