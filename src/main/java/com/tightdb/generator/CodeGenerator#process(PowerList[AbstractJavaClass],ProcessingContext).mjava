@@ -1,6 +1,7 @@
 	@Override
 	public void process(PowerList<AbstractJavaClass> classes, ProcessingContext context) {
 		context.getLogger().info("Processing {} classes", classes.size());
+		prepareTables(classes, context);
 
 		for (AbstractJavaClass model : classes) {
 			PowerList<JavaField> fields = model.getFields();
@@ -20,7 +21,10 @@
 				JavaType type = getFieldType(field);
 				JavaField f = New.field(type, field.getName().getText());
 
-				Map<String, ? extends Object> fieldAttrs = Power.map("index", index++, "columnType", columnType);
+				boolean isSubtable = isNestedTable(type);
+				String subtable = isSubtable ? type.getSimpleName().getCapitalized() + "Table" : null;
+				PowerMap<String, ? extends Object> fieldAttrs = Power.map("index", index++, "columnType", columnType, "isSubtable", isSubtable).set(
+						"subtable", subtable);
 				f.getCode().setAttributes(fieldAttrs);
 				columns.add(f);
 			}
@@ -41,7 +45,9 @@
 			List<JavaParameter> addParams = Power.list();
 
 			for (JavaField field : fields) {
-				addParams.add(New.parameter(field.getType(), field.getName().getText()));
+				if (!isNestedTable(field.getType())) {
+					addParams.add(New.parameter(field.getType(), field.getName().getText()));
+				}
 			}
 
 			JavaMethod add = New.method(Methods.PUBLIC, New.type(entity), "add", addParams);
@@ -54,7 +60,9 @@
 			insertParams.add(New.parameter(long.class, "position"));
 
 			for (JavaField field : fields) {
-				insertParams.add(New.parameter(field.getType(), field.getName().getText()));
+				if (!isNestedTable(field.getType())) {
+					insertParams.add(New.parameter(field.getType(), field.getName().getText()));
+				}
 			}
 
 			JavaMethod insert = New.method(Methods.PUBLIC, New.type(entity), "insert", insertParams);
