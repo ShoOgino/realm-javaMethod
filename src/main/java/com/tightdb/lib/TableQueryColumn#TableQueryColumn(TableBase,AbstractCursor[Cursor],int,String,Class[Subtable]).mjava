@@ -1,0 +1,9 @@
+	public TableQueryColumn(TableBase table, AbstractCursor<Cursor> cursor, int index, String name, Class<Subtable> subtableClass) {
+		super(table, cursor, index, name);
+		try {
+			subtable = subtableClass.newInstance();
+		} catch (Exception e) {
+			throw new RuntimeException("Cannot create subtable instance!", e);
+		}
+	}
+
