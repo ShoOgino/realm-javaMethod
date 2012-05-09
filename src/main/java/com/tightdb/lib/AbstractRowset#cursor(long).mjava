@@ -1,0 +1,12 @@
+	protected Cursor cursor(long position) {
+		Cursor cursor;
+
+		try {
+			cursor = types.getCursorClass().getDeclaredConstructor(IRowsetBase.class, long.class).newInstance(rowset, position);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to instantiate a cursor!", e);
+		}
+
+		return cursor;
+	}
+
