@@ -1,5 +1,12 @@
 	protected TableViewBase getView() {
-		return new TableViewBase(table()); // FIXME: finish this for specified
-											// queries
+		if (rowset instanceof TableBase) {
+			TableBase tableBase = (TableBase) rowset;
+			return new TableViewBase(tableBase);
+		} else if (rowset instanceof TableViewBase) {
+			TableViewBase viewBase = (TableViewBase) rowset;
+			return viewBase;
+		} else {
+			throw new IllegalStateException("Unknown rowset type!");
+		}
 	}
 
