@@ -1,4 +1,12 @@
 	public Cursor findUnique() {
-		return null;
+		TableViewBase viewBase = query.findAll(table, 0, table.getCount(), 2);
+		switch (viewBase.getCount()) {
+		case 0:
+			throw new IllegalStateException("Expected exactly one result, but found none!");
+		case 1:
+			return cursor(viewBase, 0);
+		default:
+			throw new IllegalStateException("Expected exactly one result, but found more!");
+		}
 	}
 

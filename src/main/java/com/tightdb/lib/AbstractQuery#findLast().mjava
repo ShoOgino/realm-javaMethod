@@ -1,4 +1,11 @@
 	public Cursor findLast() {
-		return null;
+		// TODO: find more efficient way to search
+		TableViewBase viewBase = query.findAll(table, 0, table.getCount(), Integer.MAX_VALUE);
+		int count = viewBase.getCount();
+		if (count > 0) {
+			return cursor(viewBase, count - 1);
+		} else {
+			return null;
+		}
 	}
 
