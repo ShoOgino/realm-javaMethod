@@ -1,0 +1,8 @@
+	protected static <Q> Q createQuery(Class<Q> queryClass, TableBase tableBase, TableQuery tableQuery) {
+		try {
+			return queryClass.getConstructor(TableBase.class, TableQuery.class).newInstance(tableBase, tableQuery);
+		} catch (Exception e) {
+			throw new RuntimeException("Cannot create a query!", e);
+		}
+	}
+
