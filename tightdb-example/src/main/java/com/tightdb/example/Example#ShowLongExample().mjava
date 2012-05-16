@@ -1,17 +1,18 @@
-	static void showExample() {
+	static void ShowLongExample() {
 		EmployeeTable employees = new EmployeeTable();
 
 		/****************************** BASIC OPERATIONS *****************************/
 
 		Employee john = employees.add("John", "Doe", 10000, true, new byte[] { 1, 2, 3 }, new Date(), "extra");
-		Employee johny = employees.add("Johny", "Goe", 20000, true, new byte[] { 1, 2, 3 }, new Date(), true);
-		Employee nikolche = employees.insert(1, "Nikolche", "Mihajlovski", 30000, false, new byte[] { 4, 5 }, new Date(), 1234.56);
+		Employee johnny = employees.add("Johnny", "Goe", 20000, true, new byte[] { 1, 2, 3 }, new Date(), true);
+		Employee hansen = employees.insert(1, "Tom", "Hansen", 30000, false, new byte[] { 4, 5 }, new Date(), 1234.56);
+		//Employee tommy = employees.insert(1, "Tommy", "Hansen", 30000, false, new byte[] { 4, 5 }, new Date(), 1234.56);
 
 		TightDB.print("Employees", employees);
-		TightDB.print("Johny", johny);
+		TightDB.print("Johnny", johnny);
 
 		System.out.println("first record: " + john);
-		System.out.println("second record: " + nikolche);
+		System.out.println("third record: " + hansen);
 		System.out.println("some column: " + john.firstName);
 
 		/****************************** GETTERS AND SETTERS *****************************/
@@ -24,13 +25,13 @@
 		employees.at(2).lastName.set("NewName");
 		employees.at(2).setLastName("NewName");
 
-		Employee niko = employees.firstName.startsWith("Nik").findUnique();
-		System.out.println("Unique Niko: " + niko);
+		Employee someTom = employees.firstName.startsWith("Tom").findUnique();
+		System.out.println("Unique Tom: " + someTom);
 
 		/****************************** MANIPULATION OF ALL RECORDS *****************************/
 
 		// using explicit OR
-		TightDB.print("Search example", employees.firstName.is("Johnny").or().lastName.is("Mihajlovski").findFirst());
+		TightDB.print("Search example", employees.firstName.is("Johnny").or().lastName.is("Hansen").findFirst());
 
 		// using implicit AND
 		TightDB.print("Search example 2", employees.firstName.is("Johnny").lastName.startsWith("B").findLast());
@@ -53,13 +54,14 @@
 
 		/****************************** COMPLEX QUERY *****************************/
 
-		TightDB.print("Query 1", employees.firstName.startsWith("Nik").lastName.contains("vski").or().firstName.is("John").findAll());
+		TightDB.print("Query 1", employees.firstName.startsWith("To").lastName.contains("sen").or().firstName.is("John").findAll());
 
-		TightDB.print("Query 2a", employees.firstName.startsWith("Nik").startGroup().lastName.contains("vski").or().firstName.is("John").endGroup()
+		TightDB.print("Query 2a", employees.firstName.startsWith("To").startGroup().lastName.contains("sen").or().firstName.is("John").endGroup()
 				.findAll());
 
+		// Currently non functional!!!
 		TightDB.print("Query 2b",
-				employees.query().startGroup().lastName.contains("vski").or().firstName.is("John").endGroup().firstName.startsWith("Nik").findAll());
+				employees.query().startGroup().lastName.contains("sen").or().firstName.is("John").endGroup().firstName.startsWith("Tom").findAll());
 
 		/****************************** MANIPULATION OF ALL RECORDS *****************************/
 
@@ -74,22 +76,24 @@
 
 		System.out.print("- Columns:");
 		for (AbstractColumn<?, ?, ?> column : john.columns()) {
-			System.out.print(column.getName() + "=" + column.getReadableValue());
+			System.out.print(column.getName() + "=" + column.getReadableValue() + ", ");
 		}
 		System.out.println();
 
 		/****************************** SUBTABLES *****************************/
 
+		// Currently non functional!!!
+		
 		PhoneTable subtable = john.phones.get();
 		subtable.add("mobile", "111");
 		
 		john.getPhones().add("mobile", "111");
 		john.getPhones().add("home", "222");
 
-		johny.getPhones().add("mobile", "333");
+		johnny.getPhones().add("mobile", "333");
 
-		nikolche.getPhones().add("mobile", "444");
-		nikolche.getPhones().add("work", "555");
+		hansen.getPhones().add("mobile", "444");
+		hansen.getPhones().add("work", "555");
 
 		for (PhoneTable phoneTable : employees.phones.getAll()) {
 			TightDB.print(phoneTable);

@@ -1,0 +1,95 @@
+	public static void TestJavaArray(int totalRows) 
+	{
+		Timer 				timer = new Timer();
+		ArrayList<test2> 	table = new ArrayList<test2>();
+	
+		System.out.println("\nTest Java ArrayList: -------------------------");
+		
+		{
+			// Build large table
+			for (int i = 0; i < totalRows; ++i) {
+			    // create random string
+			    int n = (int) (rand() % 1000);
+			    String s = number_name(n);
+			
+			    table.add(new test2(n, s, 100, Wed));
+			}
+			table.add(new test2(0, "abcde", 100, Wed));
+			
+			System.out.printf("Added %d rows.\n", totalRows); 
+			System.out.printf("Memory usage (Java): ??? bytes\n");
+
+		}
+		
+        int index = 0;
+        
+		// Search small integer column
+		{
+		    timer.Start();
+		
+		    // Do a search over entire column (value not found)
+		    for (int i = 0; i < 100; ++i) {
+		    	for (index = 0; index < totalRows; index++) {
+		        	if (table.get(index).fourth == Tue) {
+		        		break;
+		        	}
+		        }
+		    	if (index != totalRows) {
+		            System.out.printf("error");
+		            break;
+		        }
+		    }
+		
+		    long search_time = timer.GetTimeInMs();
+		    System.out.printf("Search (small integer): %d ms\n", search_time);
+		}
+
+		// Search byte-size integer column
+		{
+		    timer.Start();
+		
+		    // Do a search over entire column (value not found)
+		    for (int i = 0; i < 100; ++i) {
+		    	for (index = 0; index < totalRows; index++) {
+		        	if (table.get(index).third == 50) {
+		        		break;
+		        	}
+		        }
+		    	if (index != totalRows) {
+		            System.out.printf("error");
+		            break;
+		        }
+		    }
+		
+		     long search_time = timer.GetTimeInMs();
+		    System.out.printf("Search (byte-size integer): %d ms\n", search_time);
+		}
+		
+		// Search string column
+		{
+		    timer.Start();
+		
+		    // Do a search over entire column (value not found)
+		    for (int i = 0; i < 100; ++i) {
+		    	for (index = 0; index < totalRows; index++) {
+		        	if (table.get(index).second.equalsIgnoreCase("abcde")) {
+		        		break;
+		        	}
+		        }
+		    	if (index != totalRows - 1) {
+		            System.out.printf("error %d != %d", index, totalRows);
+		            break;
+		        }
+		        /*
+		        TightDB.print("row: ", res);
+		        if (res.getPosition() != totalRows) {
+		            System.out.printf("error %d. ", res.getPosition());
+		            break;
+		        }
+		        */
+		    }
+		    long search_time = timer.GetTimeInMs();
+		    System.out.printf("Search (string): %d ms\n", search_time);
+		}
+	}
+
