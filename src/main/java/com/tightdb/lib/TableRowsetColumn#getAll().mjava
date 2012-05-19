@@ -1,9 +1,9 @@
 	@SuppressWarnings("unchecked")
 	public Subtable[] getAll() {
-		int count = rowset.getCount();
-		Subtable[] values = (Subtable[]) Array.newInstance(subtableClass, count);
+		long count = rowset.size();
+		Subtable[] values = (Subtable[]) Array.newInstance(subtableClass, (int) count);
 		for (int i = 0; i < count; i++) {
-			SubTableBase subTableBase = rowset.getSubTable(columnIndex, i);
+			TableBase subTableBase = rowset.getSubTable(columnIndex, i);
 			values[i] = AbstractSubtable.createSubtable(subtableClass, subTableBase);
 		}
 		return values;
