@@ -1,7 +1,9 @@
 	public static void loadLibrary() {
 		if (!loadedLibrary) {
-			System.loadLibrary("tightdb");
-			loadedLibrary = true;
+			loadedLibrary = loadCorrectLibrary("tightdbd", "tightdb32", "tightdb64");
+			if (!loadedLibrary) {
+				throw new RuntimeException("Couldn't load the TightDB library!");
+			}
 		}
 	}
 
