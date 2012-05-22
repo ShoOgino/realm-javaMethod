@@ -4,11 +4,29 @@
 		if(!(second instanceof Mixed))
 			return false;
 		Mixed secondMixed = (Mixed)second;
+		if(value == null){
+			if(secondMixed.value == null){
+				return true;
+			}else{
+				return false;
+			}
+		}
 		if(!getType().equals(secondMixed.getType())){
 			return false;
 		}
-		if(value instanceof byte[]){
-			return Arrays.equals((byte[])value, (byte[])secondMixed.value);
+		if(value instanceof ByteBuffer){
+			ByteBuffer firstByteBuffer = (ByteBuffer)value;
+			ByteBuffer secondByteBuffer = (ByteBuffer)secondMixed.value;
+			if(firstByteBuffer.capacity() != secondByteBuffer.capacity()){
+				return false;
+			}
+			for(int i=0; i < firstByteBuffer.capacity(); i++){
+				byte firstByte = firstByteBuffer.get(i);
+				byte secondByte = secondByteBuffer.get(i);
+				if(firstByte != secondByte)
+					return false;
+			}
+			return true;
 		}
 		return this.value.equals(secondMixed.value);
 	}
