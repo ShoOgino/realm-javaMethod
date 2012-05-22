@@ -1,7 +1,7 @@
 	protected void insertMixed(long columnIndex, long rowIndex, Object value) {
 		if (value instanceof Serializable) {
 			// FIXME: use real mixed type
-			table.insertBinary(columnIndex, rowIndex, ByteBuffer.wrap(TightDB.serialize((Serializable) value)));
+			insertMixed(columnIndex, rowIndex, (Serializable) value);
 		} else {
 			throw new RuntimeException("Cannot insert non-serializable value!");
 		}
