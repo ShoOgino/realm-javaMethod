@@ -2,13 +2,15 @@
 	{
 		Timer 		timer = new Timer();
 		TestTable 	table = new TestTable();
-		long 		dummy = 0;
+		int 		MAX_SIZE = totalRows;
 		
 		System.out.println("\nTest TightDB: -------------------------");
 		
 		{
+			timer.Start();
+			
 			// Build large table
-			for (int i = 0; i < totalRows; ++i) {
+			for (int i = 0; i < MAX_SIZE; ++i) {
 			    // create random string
 			     int n = (int) (rand() % 1000);
 			     String s = number_name(n);
@@ -17,11 +19,15 @@
 			}
 			table.add(0, "abcde", 123, Thu);
 			
-			System.out.printf("Added %d rows.\n", totalRows); 
-			System.out.printf("Memory usage (tigthdb): 10176 bytes\n"); // in Tightdb without Java
-
-			//for (long i = 0; i < Math.min(100, table.size()); ++i)
-			//	TightDB.print("row: ", table.at(i));
+			long add_time = timer.GetTimeInMs();
+			System.out.printf("Added %d rows in %d ms.\n", MAX_SIZE, add_time); 
+			System.out.printf("Memory usage: %d bytes\n", 0); //, (long long)GetMemUsage()); // %zu doesn't work in vc
+			
+			if (false) {
+				for (long i = 0; i < Math.min(100, table.size()); ++i) {
+					TightDB.print("row: ", table.at(i));
+				}
+			}
 		}
 		
 		// Search small integer column
@@ -62,6 +68,7 @@
 		// Search string column
 		{
 		    timer.Start();
+		    long dummy = 0;
 		    
 		    // Do a search over entire column (value not found)
 		    for (int i = 0; i < 100; ++i) {
@@ -70,16 +77,16 @@
 		        //TightDB.print("row: ", res);
 		        long row = res.getPosition();
 		        dummy += row;
-		        if (row != totalRows) {
+		        if (row != MAX_SIZE) {
 		        	//  System.out.printf("error %d. ", res.getPosition());
 		          //  break;
 		        }
 		    }
 		
 		    long search_time = timer.GetTimeInMs();
-		    System.out.printf("Search (string): %d ms.\n", search_time);
+		    System.out.printf("Search (string): %d ms.   %d\n", search_time, dummy);
 		}
-/*		
+		
 		// Add index
 		{
 		    timer.Start();
@@ -90,7 +97,7 @@
 		    System.out.printf("Add index: %dms\n", search_time);
 		}
 		
-		//System.out.printf("Memory usage2: %d bytes\n", (long long)GetMemUsage());
+		//System.out.printf("Memory usage2: %lld bytes\n", (long long)GetMemUsage()); // %zu doesn't work in vc
 		
 		// Search with index
 		{
@@ -107,6 +114,5 @@
 		    long search_time = timer.GetTimeInMs();
 		    System.out.printf("Search index: %d ms.  %d\n", search_time, dummy);
 		}
-*/
 	}
 

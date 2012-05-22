@@ -2,12 +2,15 @@
 	{
 		Timer 				timer = new Timer();
 		ArrayList<test2> 	table = new ArrayList<test2>();
-	
+		int 				MAX_SIZE = totalRows;
+		
 		System.out.println("\nTest Java ArrayList: -------------------------");
 		
 		{
+			timer.Start();
+			
 			// Build large table
-			for (int i = 0; i < totalRows; ++i) {
+			for (int i = 0; i < MAX_SIZE; ++i) {
 			    // create random string
 			    int n = (int) (rand() % 1000);
 			    String s = number_name(n);
@@ -16,11 +19,13 @@
 			}
 			table.add(new test2(0, "abcde", 100, Wed));
 			
-			System.out.printf("Added %d rows.\n", totalRows); 
-			System.out.printf("Memory usage (Java): ??? bytes\n");
+			long add_time = timer.GetTimeInMs();
+			System.out.printf("Added %d rows in %d ms.\n", MAX_SIZE, add_time); 
+			System.out.printf("Memory usage: %d bytes\n", 0); //, (long long)GetMemUsage()); // %zu doesn't work in vc
 
 		}
 		
+		int totalElements = table.size();
         int index = 0;
         
 		// Search small integer column
@@ -29,12 +34,12 @@
 		
 		    // Do a search over entire column (value not found)
 		    for (int i = 0; i < 100; ++i) {
-		    	for (index = 0; index < totalRows; index++) {
+		    	for (index = 0; index < totalElements; index++) {
 		        	if (table.get(index).fourth == Tue) {
 		        		break;
 		        	}
 		        }
-		    	if (index != totalRows) {
+		    	if (index != totalElements) {
 		            System.out.printf("error");
 		            break;
 		        }
@@ -50,12 +55,12 @@
 		
 		    // Do a search over entire column (value not found)
 		    for (int i = 0; i < 100; ++i) {
-		    	for (index = 0; index < totalRows; index++) {
+		    	for (index = 0; index < totalElements; index++) {
 		        	if (table.get(index).third == 50) {
 		        		break;
 		        	}
 		        }
-		    	if (index != totalRows) {
+		    	if (index != totalElements) {
 		            System.out.printf("error");
 		            break;
 		        }
@@ -71,18 +76,18 @@
 		
 		    // Do a search over entire column (value not found)
 		    for (int i = 0; i < 100; ++i) {
-		    	for (index = 0; index < totalRows; index++) {
+		    	for (index = 0; index < totalElements; index++) {
 		        	if (table.get(index).second.equalsIgnoreCase("abcde")) {
 		        		break;
 		        	}
 		        }
-		    	if (index != totalRows - 1) {
-		            System.out.printf("error %d != %d", index, totalRows);
+		    	if (index != totalElements - 1) {
+		            System.out.printf("error %d != %d", index, totalElements);
 		            break;
 		        }
 		        /*
 		        TightDB.print("row: ", res);
-		        if (res.getPosition() != totalRows) {
+		        if (res.getPosition() != MAX_SIZE) {
 		            System.out.printf("error %d. ", res.getPosition());
 		            break;
 		        }
