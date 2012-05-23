@@ -14,6 +14,22 @@
 		if(!getType().equals(secondMixed.getType())){
 			return false;
 		}
+		if(value instanceof byte[]){
+			if(!(secondMixed.value instanceof byte[])){
+				return false;
+			}
+			byte[] firstBytes = (byte[])value;
+			byte[] secondBytes = (byte[])secondMixed.value;
+			if(firstBytes.length != secondBytes.length){
+				return false;
+			}
+			for(int i=0; i<firstBytes.length; i++){
+				if(firstBytes[i] != secondBytes[i]){
+					return false;
+				}
+			}
+			return true;
+		}
 		if(value instanceof ByteBuffer){
 			ByteBuffer firstByteBuffer = (ByteBuffer)value;
 			ByteBuffer secondByteBuffer = (ByteBuffer)secondMixed.value;
