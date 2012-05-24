@@ -1,0 +1,15 @@
+	@Test
+	public void shouldMatchOnCriteriaBeginingWithGroup() {
+		EmployeeView niko = employees.where()
+		.group()
+			.lastName.contains("vski")
+			.or()
+			.firstName.is("John")
+		.endGroup()
+		.firstName.startsWith("Nik")
+		.salary.is(30000)
+		.findAll();
+
+		assertEquals(1, niko.size());
+	}
+
