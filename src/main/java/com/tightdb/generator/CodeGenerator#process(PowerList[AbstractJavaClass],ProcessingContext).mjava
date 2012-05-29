@@ -21,7 +21,7 @@
 				JavaType type = getFieldType(field);
 				JavaField f = New.field(type, field.getName().getText());
 
-				boolean isSubtable = isNestedTable(type);
+				boolean isSubtable = isSubtable(type);
 				String subtype = isSubtable ? type.getSimpleName().getCapitalized() : null;
 				PowerMap<String, ? extends Object> fieldAttrs = Power.map("index", index++, "columnType", columnType, "isSubtable", isSubtable).set(
 						"subtype", subtype);
@@ -31,7 +31,7 @@
 
 			/* Set the attributes */
 
-			boolean isNested = isNestedTable(model.getType());
+			boolean isNested = isSubtable(model.getType());
 			Map<String, ? extends Object> attributes = Power.map("entity", New.name(model.getName().getCapitalized()), "columns", columns,
 					"isNested", isNested);
 
@@ -47,7 +47,7 @@
 			List<JavaParameter> addParams = Power.list();
 
 			for (JavaField field : fields) {
-				if (!isNestedTable(field.getType())) {
+				if (!isSubtable(field.getType())) {
 					addParams.add(New.parameter(field.getType(), field.getName().getText()));
 				}
 			}
@@ -62,7 +62,7 @@
 			insertParams.add(New.parameter(long.class, "position"));
 
 			for (JavaField field : fields) {
-				if (!isNestedTable(field.getType())) {
+				if (!isSubtable(field.getType())) {
 					insertParams.add(New.parameter(field.getType(), field.getName().getText()));
 				}
 			}
