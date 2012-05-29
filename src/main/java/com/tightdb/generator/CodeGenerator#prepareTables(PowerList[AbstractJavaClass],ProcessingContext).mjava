@@ -1,15 +1,13 @@
 	private void prepareTables(PowerList<AbstractJavaClass> classes, ProcessingContext context) {
 		for (AbstractJavaClass model : classes) {
 			String name = model.getQualifiedName().getText();
-			for (JavaMetadata metadata : model.getAllMetadata()) {
-				Class<?> annotation = metadata.getAnnotation().getTypeClass();
-				if (Table.class.equals(annotation)) {
-					context.getLogger().info("- detected root table {}, annotated: {}", name, annotation);
-					tables.put(name, model);
-				} else if (NestedTable.class.equals(annotation)) {
-					context.getLogger().info("- detected nested table {}, annotated: {}", name, annotation);
-					subtables.put(name, model);
-				}
+
+			if (isReferencedBy(model, classes)) {
+				context.getLogger().info("- detected subtable: {}", name);
+				subtables.put(name, model);
+			} else {
+				context.getLogger().info("- detected top-level table: {}", name);
+				tables.put(name, model);
 			}
 		}
 	}
