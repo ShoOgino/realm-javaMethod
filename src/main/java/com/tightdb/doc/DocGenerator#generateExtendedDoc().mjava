@@ -1,0 +1,19 @@
+	private static String generateExtendedDoc() throws Exception {
+		StringBuilder sb = new StringBuilder();
+		ExampleReader exampleReader = new ExampleReader("DocExamples.java");
+
+		for (Method method : methods) {
+			Context context = new VelocityContext();
+			context.put("class", "Table");
+			context.put("ret", method.ret);
+			context.put("name", method.name);
+			context.put("doc", method.doc);
+			context.put("name", method.name);
+			context.put("params", method.params);
+			context.put("example", exampleReader.getExample(method.name));
+			sb.append(renderer.render("method-details.vm", context));
+		}
+		
+		return sb.toString();
+	}
+

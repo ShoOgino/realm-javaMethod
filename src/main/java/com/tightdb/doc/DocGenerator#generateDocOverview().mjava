@@ -1,0 +1,14 @@
+	private static String generateDocOverview() throws Exception {
+		StringBuilder sb = new StringBuilder();
+		for (Method method : methods) {
+			Context context = new VelocityContext();
+			context.put("ret", method.ret);
+			context.put("name", method.name);
+			context.put("doc", method.doc);
+			context.put("name", method.name);
+			context.put("params", method.params);
+			sb.append(renderer.render("method.vm", context));
+		}
+		return sb.toString();
+	}
+
