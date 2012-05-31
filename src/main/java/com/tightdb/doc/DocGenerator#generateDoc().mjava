@@ -1,0 +1,16 @@
+	private static void generateDoc() throws Exception {
+		Writer writer = new OutputStreamWriter(System.out);
+		for (Method method : methods) {
+			InputStream st = DocGenerator.class.getClassLoader().getResourceAsStream("method.vm");
+			InputStreamReader reader = new InputStreamReader(st);
+			Context context = new VelocityContext();
+			context.put("ret", method.ret);
+			context.put("name", method.name);
+			context.put("doc", method.doc);
+			context.put("name", method.name);
+			context.put("params", method.params);
+			Velocity.evaluate(context, writer, "", reader);
+		}
+		writer.close();
+	}
+
