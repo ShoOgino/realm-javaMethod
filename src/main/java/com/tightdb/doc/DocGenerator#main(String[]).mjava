@@ -1,6 +1,15 @@
 	public static void main(String[] args) throws Exception {
 		Velocity.init();
-		describeTable();
-		generateDoc();
+		Context context = new VelocityContext();
+		
+		describeAndGen(new TableDesc(methods), "Table", context);
+		describeAndGen(new ViewDesc(methods), "Row", context);
+		describeAndGen(new ViewDesc(methods), "Query", context);
+		describeAndGen(new ViewDesc(methods), "View", context);
+		describeAndGen(new ViewDesc(methods), "Group", context);
+		
+		String docs = renderer.render("reference.vm", context);
+		// FIXME: hard-coded path (temporary)
+		FileUtils.writeStringToFile(new File("D:/docs/reference/reference.html"), docs);
 	}
 
