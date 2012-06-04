@@ -1,0 +1,46 @@
+	public static void main(String[] args) {
+		TightDB.addNativeLibraryPath("lib-sqlite");
+		
+		int numOfValues = 250000;
+		
+		System.out.println("Performance tests with " + numOfValues + " rows. Search repeated " 
+				+ REPEAT_SEARCH + " times.");
+		
+		System.out.print("Performance testing TightDB: ");
+		long time_Tightdb[] = TestPerformance(new Tightdb(), numOfValues);
+		
+		System.out.print("\nPerformance testing Java ArrayList: ");
+		long time_Array[] = TestPerformance(new JavaArrayList(), numOfValues);
+		
+		System.out.print("\nPerformance testing SQLite: ");
+		long time_Sqlite[] = TestPerformance(new SQLite(), numOfValues);
+	
+		System.out.println("\n\nRESULTS:");
+		String[] testText = {
+				"Search for small integer:\t",
+				"Search for byte sized integer:\t",
+				"Search for string:\t\t",
+				"Add Index:\t\t\t",
+				"Search for byte (indexed):\t"
+		};
+		System.out.println("\t\t\t\t   Tightdb\tArrayList\tSQLite");
+		for (int test = 0; test < TESTS; ++test) {
+			System.out.print( testText[test] );
+			printTime(time_Tightdb[test], " ms (x1)", "\t");
+			
+			printTime(time_Array[test], " ms ", "");
+			if (time_Tightdb[test] > 0)
+				System.out.print( "(x" + time_Array[test] / time_Tightdb[test] + ")\t");
+			else
+				System.out.print("\t");
+			
+			printTime(time_Sqlite[test], " ms ", "");
+			if (time_Tightdb[test] > 0)
+				System.out.print( "(x" + time_Sqlite[test] / time_Tightdb[test] + ")\t");
+			else
+				System.out.print("\t");
+			
+			System.out.println();
+		}
+	}
+

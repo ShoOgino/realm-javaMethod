@@ -1,0 +1,89 @@
+   	public static long[] TestPerformance(PerformanceTest test, int rows) 
+	{
+   		Timer 		timer = new Timer();
+		long[]		durations = new long[TESTS];
+		int			testNo = 0;
+		
+		test.buildTable(rows);
+		// System.out.printf("Memory usage: %d bytes\n", 0); //, (long long)GetMemUsage()); 
+		
+		// Search small integer column
+		{
+		    // Do a search over entire column (value not found)
+		    test.begin_findSmallInt(SMALL_TEST_VAL + 1);
+		    timer.Start();
+		    for (int i = 0; i < REPEAT_SEARCH; ++i) {
+		    	if (test.findSmallInt(SMALL_TEST_VAL + 1)) {
+		    		System.out.println("Error - found value.");
+		    		break;
+		    	}
+		    }
+		    durations[testNo++] = timer.GetTimeInMs();
+		    test.end_findSmallInt();
+		    System.out.printf("*");
+		}
+
+		// Search byte-size integer column
+		{
+			test.begin_findByteInt(BYTE_TEST_VAL + 1);
+		    timer.Start();
+		    // Do a search over entire column (value not found)
+		    for (int i = 0; i < REPEAT_SEARCH; ++i) {
+		        if (test.findByteInt(BYTE_TEST_VAL + 1)) {
+		            System.out.printf("Error - found value.");
+		            break;
+		        }
+		    }
+		    durations[testNo++] = timer.GetTimeInMs();
+		    test.end_findByteInt();
+		    System.out.printf("*");
+		}
+		
+		// Search string column
+		{
+			test.begin_findString("abcde");
+		    timer.Start();
+		    // Do a search over entire column (value not found)
+		    for (int i = 0; i < REPEAT_SEARCH; ++i) {
+		        if (test.findString("abcde")) {
+		           	  System.out.printf("error - found value.");
+		              break;
+		        }
+		    }
+		    durations[testNo++] = timer.GetTimeInMs();
+		    test.end_findString();
+		    System.out.printf("*");
+		}
+/*
+		// Add index, and search
+		{
+		    timer.Start();
+
+		    boolean indexSupported = test.addIndex();
+		    
+		    if (indexSupported) {
+		    	durations[testNo++] = timer.GetTimeInMs();
+		    	System.out.printf("*");
+			    //System.out.printf("Memory usage2: %lld bytes\n", (long long)GetMemUsage());
+			
+				// Search with index
+				test.begin_findIntWithIndex();
+			    timer.Start();
+			    for (int i = 0; i < REPEAT_SEARCH; ++i) {
+			        int n = Util.getRandNumber();
+			        if (test.findIntWithIndex(n) != n) {
+			        	System.out.printf("error - didn't find value.");
+			            break;
+			        }
+			    }
+			    durations[testNo++] = timer.GetTimeInMs();
+			    test.end_findIntWithIndex();
+			    System.out.printf("*");
+			}
+		}
+*/		
+		test.closeTable();
+		
+		return durations;
+	}
+
