@@ -1,0 +1,8 @@
+	@Override
+	public void afterCodeGeneration(LifecycleEvent event) {
+		event.getContext().getLogger().info("Handling 'after code generation' event");
+		GeneratedCodeCleaner cleaner = new GeneratedCodeCleaner();
+		int count = cleaner.removeObsoleteGeneratedCode(event.getContext(), start);
+		event.getContext().getLogger().info("Total {} obsolete generated files will be deleted...", count);
+	}
+
