@@ -1,0 +1,22 @@
+	public static long getUsedMemory() {
+		long usedMemoryBeforeGC = internalUsedMemory();
+		while(true){
+			for (int i = 0; i < GC_TIMES; ++i) {
+				//System.gc();
+				gc3();
+				System.runFinalization();
+				//Thread.yield();
+				try {
+					Thread.currentThread().sleep(100);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			long usedMemoryAfterGC = internalUsedMemory();
+			if(usedMemoryAfterGC >= usedMemoryBeforeGC){
+				return usedMemoryBeforeGC;
+			}
+			usedMemoryBeforeGC = usedMemoryAfterGC;
+		}
+	}
+
