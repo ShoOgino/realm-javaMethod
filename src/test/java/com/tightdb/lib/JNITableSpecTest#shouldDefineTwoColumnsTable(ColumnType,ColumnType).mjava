@@ -1,0 +1,12 @@
+	@Test(dataProvider = "twoColumns")
+	public void shouldDefineTwoColumnsTable(ColumnType columnType, ColumnType columnType2) {
+		TableSpec spec = new TableSpec();
+		spec.addColumn(columnType, "foo");
+
+		TableSpec subspec = spec.addSubtableColumn("bar");
+		subspec.addColumn(columnType2, "subbar");
+
+		TableBase table = new TableBase();
+		table.updateFromSpec(spec);
+	}
+
