@@ -1,0 +1,18 @@
+	@Test
+	public void shouldStoreValuesOfMixedType() throws Exception {
+		TableBase table = new TableBase();
+
+		TableSpec tableSpec = new TableSpec();
+		tableSpec.addColumn(ColumnType.ColumnTypeMixed, "foo");
+		table.updateFromSpec(tableSpec);
+
+		table.insertMixed(0, 0, new Mixed("str1"));
+		table.insertDone();
+
+		checkMixedCell(table, 0, 0, ColumnType.ColumnTypeString, "str1");
+
+		table.setMixed(0, 0, new Mixed(true));
+
+		checkMixedCell(table, 0, 0, ColumnType.ColumnTypeBool, true);
+	}
+
