@@ -1,7 +1,8 @@
 	public static void main(String[] args) {
 		TightDB.addNativeLibraryPath("lib-sqlite");
 		
-		testmem();
+		// Measuring memory is not very reliable in Java...
+		// Util.test_getMemUsed();
 		
 		int numOfValues = 250000;
 		
@@ -9,13 +10,13 @@
 				+ REPEAT_SEARCH + " times.");
 		
 		System.out.print("Performance testing TightDB: ");
-		long time_Tightdb[] = TestPerformance(new Tightdb(), numOfValues);
+		TestResult tightdb = TestPerformance(new Tightdb(), numOfValues);
 		
 		System.out.print("\nPerformance testing Java ArrayList: ");
-		long time_Array[] = TestPerformance(new JavaArrayList(), numOfValues);
+		TestResult javaArray = TestPerformance(new JavaArrayList(), numOfValues);
 		
 		System.out.print("\nPerformance testing SQLite: ");
-		long time_Sqlite[] = TestPerformance(new SQLiteTest(), numOfValues);
+		TestResult sqlite = TestPerformance(new SQLiteTest(), numOfValues);
 	
 		System.out.println("\n\nRESULTS:");
 		String[] testText = {
@@ -28,21 +29,30 @@
 		System.out.println("\t\t\t\t   Tightdb\tArrayList\tSQLite");
 		for (int test = 0; test < TESTS; ++test) {
 			System.out.print( testText[test] );
-			printTime(time_Tightdb[test], " ms (x1)", "\t");
+			printTime(tightdb.testTime[test], " ms (x1)", "\t");
 			
-			printTime(time_Array[test], " ms ", "");
-			if (time_Tightdb[test] > 0)
-				System.out.print( "(x" + time_Array[test] / time_Tightdb[test] + ")\t");
+			printTime(javaArray.testTime[test], " ms ", "");
+			if (tightdb.testTime[test] > 0)
+				System.out.print( "(x" + javaArray.testTime[test] / tightdb.testTime[test] + ")\t");
 			else
 				System.out.print("\t");
 			
-			printTime(time_Sqlite[test], " ms ", "");
-			if (time_Tightdb[test] > 0)
-				System.out.print( "(x" + time_Sqlite[test] / time_Tightdb[test] + ")\t");
+			printTime(sqlite.testTime[test], " ms ", "");
+			if (tightdb.testTime[test] > 0)
+				System.out.print( "(x" + sqlite.testTime[test] / tightdb.testTime[test] + ")\t");
 			else
 				System.out.print("\t");
-			
+			 
 			System.out.println();
 		}
+		long tightTotal  = tightdb.javaDBMemUsed + tightdb.nativeDBMemUsed;
+		long javaTotal   = javaArray.javaDBMemUsed + javaArray.nativeDBMemUsed;
+		long sqliteTotal = sqlite.javaDBMemUsed + sqlite.nativeDBMemUsed;
+		System.out.printf("Memory use (java+native):\t%5d KB (x1)\t%5d KB (x%d)\t%5d KB (x%x)\n",
+				toKB(tightTotal),
+				toKB(javaTotal), javaTotal/tightTotal,
+				toKB(sqliteTotal), sqliteTotal/tightTotal);
+		
+		System.out.println("\nDONE.");
 	}
 
