@@ -1,0 +1,11 @@
+	// TODO: handle wrap ByteBuffers
+	@Test (enabled = false)
+	public void shouldStoreValuesOfBinaryType_ByteBuffer_wrap() throws Exception {
+		// This way of using ByteBuffer fails. It's not a "DirectBuffer"
+		ByteBuffer bufWrap = ByteBuffer.wrap(testArray);
+		table.insertBinary(0,  2, bufWrap);
+		table.insertDone();
+
+		checkBinaryCell(table, 0, 2, ColumnType.ColumnTypeBinary, testArray);
+	}
+

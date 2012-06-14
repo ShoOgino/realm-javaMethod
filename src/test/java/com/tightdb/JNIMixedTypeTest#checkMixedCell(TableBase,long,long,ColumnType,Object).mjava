@@ -1,8 +1,19 @@
 	private void checkMixedCell(TableBase table, long col, long row, ColumnType columnType, Object value) throws IllegalAccessException {
 		ColumnType mixedType = table.getMixedType(col, row);
 		assertEquals(columnType, mixedType);
-
+	
 		Mixed mixed = table.getMixed(col, row);
-		assertEquals(value, mixed.getValue());
+		if (columnType == ColumnType.ColumnTypeBinary) {
+			if (mixed.getBinaryType() == Mixed.BINARY_TYPE_BYTE_ARRAY) {
+				byte[] bin = mixed.getBinaryByteArray();
+				assertEquals(Mixed.mixedValue(value), bin);
+			} else {
+				// TODO: This is not fully working...
+				ByteBuffer binBuf = mixed.getBinaryValue();
+				assertEquals(Mixed.mixedValue(value), binBuf);
+			}
+		} else {		
+			assertEquals(value, mixed.getValue());
+		}	
 	}
 

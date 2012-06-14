@@ -1,5 +1,6 @@
 	public static Mixed mixedValue(Object value) {
 		Mixed mixed;
+		// TODO: Isn't it a slow way to convert? Can it be done faster?
 		if (value instanceof String) {
 			mixed = new Mixed((String) value);
 		} else if (value instanceof Long) {
@@ -13,7 +14,15 @@
 		} else if (value instanceof ByteBuffer) {
 			mixed = new Mixed((ByteBuffer) value);
 		} else if (value instanceof byte[]) {
-			mixed = new Mixed(ByteBuffer.wrap((byte[]) value));
+			mixed = new Mixed((byte[]) value);
+			// TODO : cleanup
+			//mixed = new Mixed(ByteBuffer.wrap((byte[]) value));
+			/*
+			byte [] array = (byte[] )value;
+			ByteBuffer buffer = ByteBuffer.allocateDirect(array.length);
+			buffer.put(array);
+			mixed = new Mixed(buffer);
+			*/
 		} else {
 			throw new IllegalArgumentException("The value is of unsupported type: " + value.getClass());
 		}
