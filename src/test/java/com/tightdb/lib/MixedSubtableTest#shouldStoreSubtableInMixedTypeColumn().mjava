@@ -1,7 +1,12 @@
 	@Test
 	public void shouldStoreSubtableInMixedTypeColumn() {
 		Employee employee = employees.at(0);
-		PhoneTable ss = employee.extra.createSubtable(PhoneTable.class);
-		System.out.println("res: " + ss);
+		PhoneTable phones = employee.extra.createSubtable(PhoneTable.class);
+
+		phones.add("mobile", "123");
+		assertEquals(1, phones.size());
+
+		PhoneTable phones2 = employee.extra.getSubtable(PhoneTable.class);
+		assertEquals(1, phones2.size());
 	}
 

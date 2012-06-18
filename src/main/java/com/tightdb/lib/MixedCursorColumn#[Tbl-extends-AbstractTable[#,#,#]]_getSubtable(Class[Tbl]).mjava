@@ -1,0 +1,13 @@
+	public <Tbl extends AbstractTable<?, ?, ?>> Tbl getSubtable(Class<Tbl> tableClass) {
+		if (get() != null) {
+			throw new IllegalArgumentException("The mixed value doesn't contain a sub-table!");
+		}
+
+		if (!hasSubtable(tableClass)) {
+			throw new IllegalArgumentException("Wrong subtable type!");
+		}
+
+		TableBase subtableBase = cursor.rowset.getSubTable(columnIndex, cursor.getPosition());
+		return AbstractSubtable.createSubtable(tableClass, subtableBase);
+	}
+
