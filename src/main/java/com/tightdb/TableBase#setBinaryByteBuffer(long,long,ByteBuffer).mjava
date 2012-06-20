@@ -6,10 +6,14 @@
 	 * @param rowIndex
 	 *            row index of the cell
 	 * @param data
+	 * 			  the ByteBuffer must be allocated with ByteBuffer.allocateDirect(len)
 	 */
 	public void setBinaryByteBuffer(long columnIndex, long rowIndex, ByteBuffer data) {
 		if (data == null)
 			throw new NullPointerException("Null array");
-		nativeSetBinary(nativePtr, columnIndex, rowIndex, data);
+		if (data.isDirect())
+			nativeSetBinary(nativePtr, columnIndex, rowIndex, data);
+		else
+			throw new RuntimeException("Currently ByteBuffer must be allocateDirect()."); // FIXME: support other than allocateDirect
 	}
 
