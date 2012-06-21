@@ -4,6 +4,7 @@
    		Timer 		timer = new Timer();
 		int			testNo = 0;
 		
+		if (pause) util.waitForEnter();
 		long memBefore = Util.getUsedMemory(); memBefore = Util.getUsedMemory();
 		
 		// Build the test database
@@ -11,8 +12,6 @@
 		
 		result.javaDBMemUsed = Math.max(Util.getUsedMemory() - memBefore, 1);
 		result.nativeDBMemUsed = test.usedNativeMemory();
-		
-		//System.out.printf("Database memory: java: %d KB + native: %d KB.\n", toKB(result.javaDBMemUsed), toKB(result.nativeDBMemUsed)); 
 		
 		// Search small integer column
 		{
@@ -89,6 +88,7 @@
 			}
 		}
 */		
+		if (pause) util.waitForEnter();
 		test.closeTable();
 		
 		return result;
