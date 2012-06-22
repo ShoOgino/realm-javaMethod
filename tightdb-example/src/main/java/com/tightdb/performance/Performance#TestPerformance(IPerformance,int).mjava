@@ -45,6 +45,22 @@
 		    System.out.printf("*");
 		}
 		
+		// Search long-size integer column
+		{
+			test.begin_findLongInt(LONG_TEST_VAL + 1);
+		    timer.Start();
+		    // Do a search over entire column (value not found)
+		    for (int i = 0; i < REPEAT_SEARCH; ++i) {
+		        if (test.findLongInt(LONG_TEST_VAL + 1)) {
+		            System.out.printf("Error - found value.");
+		            break;
+		        }
+		    }
+		    result.testTime[testNo++] = timer.GetTimeInMs();
+		    test.end_findLongInt();
+		    System.out.printf("*");
+		}
+		
 		// Search string column
 		{
 			test.begin_findString("abcde");
