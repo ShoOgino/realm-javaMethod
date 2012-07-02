@@ -10,10 +10,10 @@
 	 *            data to be inserted.
 	 */
 	public void insertBinary(long columnIndex, long rowIndex, ByteBuffer data) {
-		//System.out.printf("\ninsertBinary(col %d, row %d, ByteBuffer)\n", columnIndex, rowIndex);
-		//System.out.println("-- HasArray: " + (data.hasArray() ? "yes":"no") + " len= " + data.array().length);
+		//System.err.printf("\ninsertBinary(col %d, row %d, ByteBuffer)\n", columnIndex, rowIndex);
+		//System.err.println("-- HasArray: " + (data.hasArray() ? "yes":"no") + " len= " + data.array().length);
 		if (data.isDirect())
-			nativeInsertBinary(nativePtr, columnIndex, rowIndex, data);
+			nativeInsertByteBuffer(nativePtr, columnIndex, rowIndex, data);
 		else
 			throw new RuntimeException("Currently ByteBuffer must be allocateDirect().");	// FIXME: support other than allocateDirect
 	}
