@@ -1,0 +1,17 @@
+	@Override
+	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+		info("Entering annotation processor...");
+		if (!env.processingOver()) {
+			info("Processing resources...");
+			try {
+				processAnnotations(annotations, env);
+				info("Successfully finished processing.");
+			} catch (Exception e) {
+				throw new RuntimeException("Unexpected error occured", e);
+			}
+		} else {
+			info("Last round, processing is done.");
+		}
+		return true;
+	}
+
