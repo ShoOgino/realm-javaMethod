@@ -1,0 +1,16 @@
+	private void prepareTables(Set<? extends Element> elements) {
+		for (Element element : elements) {
+			if (element instanceof TypeElement) {
+				TypeElement model = (TypeElement) element;
+				String name = model.getQualifiedName().toString();
+				if (isReferencedBy(model, elements)) {
+					info("- detected subtable: " + name);
+					subtables.put(name, model);
+				} else {
+					info("- detected top-level table: " + name);
+					tables.put(name, model);
+				}
+			}
+		}
+	}
+

@@ -1,5 +1,5 @@
-	private String getColumnType(JavaField field) {
-		String type = field.getType().getSimpleName().getText();
+	private String getColumnType(VariableElement field) {
+		String type = field.asType().toString();
 
 		if (NUM_TYPES.contains(type)) {
 			type = "Long";
@@ -7,7 +7,7 @@
 			type = "Boolean";
 		} else if ("byte[]".equalsIgnoreCase(type) || "ByteBuffer".equalsIgnoreCase(type)) {
 			type = "Binary";
-		} else if (isSubtable(field.getType())) {
+		} else if (isSubtable(type)) {
 			type = "Table";
 		} else if (!OTHER_TYPES.contains(type)) {
 			type = "Mixed";

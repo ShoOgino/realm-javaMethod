@@ -1,0 +1,26 @@
+	private boolean isReferencedBy(TypeElement model, Set<? extends Element> elements) {
+		String modelType = model.getQualifiedName().toString();
+
+		for (Element element : elements) {
+			for (Element enclosedElement : element.getEnclosedElements()) {
+				if (enclosedElement.getKind().equals(ElementKind.FIELD)) {
+					if (enclosedElement instanceof VariableElement) {
+						VariableElement field = (VariableElement) enclosedElement;
+						TypeMirror fieldType = field.asType();
+						if (fieldType.getKind().equals(TypeKind.DECLARED)) {
+							Element typeAsElement = typeUtils.asElement(fieldType);
+							if (typeAsElement instanceof TypeElement) {
+								TypeElement typeElement = (TypeElement) typeAsElement;
+								if (typeElement.getQualifiedName().toString().equals(modelType)) {
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+

@@ -1,6 +1,19 @@
 	@Override
-	public void processAnnotations(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+	public void processAnnotations(Set<? extends TypeElement> annotations, RoundEnvironment env) throws Exception {
+		//renderer.init(null, false);
+		
+        Properties props = new Properties();
+        VelocityEngine ve = new VelocityEngine(props);
+        ve.init();		
+		
 		for (TypeElement annotation : annotations) {
+			String annotationName = annotation.getQualifiedName().toString();
+			if (annotationName.equals(Table.class.getCanonicalName())) {
+				Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
+				//processAnnotatedElements(elements);
+			} else {
+				warn("Unexpected annotation: " + annotationName);
+			}
 		}
 	}
 

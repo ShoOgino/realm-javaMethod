@@ -1,0 +1,112 @@
+	private void processAnnotatedElements(Set<? extends Element> elements) throws IOException {
+		info("Processing " + elements.size() + " elements...");
+		prepareTables(elements);
+
+		for (Element element : elements) {
+			if (element instanceof TypeElement) {
+				TypeElement model = (TypeElement) element;
+				String modelType = model.getQualifiedName().toString();
+
+				List<VariableElement> fields = getFields(element);
+
+				info("Generating code for entity with " + fields.size() + " columns...");
+
+				// get the capitalized model name
+				String entity = StringUtils.capitalize(model.getSimpleName().toString());
+
+				/*********** Prepare the attributes for the templates ****************/
+
+				/* Construct the list of columns */
+
+				int index = 0;
+				final List<Field> columns = new ArrayList<Field>();
+				for (VariableElement field : fields) {
+					String columnType = getColumnType(field);
+					String fieldType = getFieldType(field);
+					String fieldName = field.getSimpleName().toString();
+
+					boolean isSubtable = isSubtable(fieldType);
+					String subtype = isSubtable ? getSubtableType(field) : null;
+
+					Map<String, Object> fieldAttrs = new HashMap<String, Object>();
+					fieldAttrs.put("index", index++);
+					fieldAttrs.put("columnType", columnType);
+					fieldAttrs.put("isSubtable", isSubtable);
+					fieldAttrs.put("subtype", subtype);
+
+					columns.add(new Field(fieldType, fieldName, fieldAttrs));
+				}
+
+				/* Set the attributes */
+
+				boolean isNested = isSubtable(modelType);
+				Map<String, Object> attributes = new HashMap<String, Object>();
+				attributes.put("entity", entity);
+				attributes.put("columns", columns);
+				attributes.put("isNested", isNested);
+				attributes.put("info", INFO_GENERATED);
+
+				/*********** Construct the table class ****************/
+
+				Model table = new Model();
+				List<Model> tableMethods = new ArrayList<Model>();
+
+				table.put("name", entity + "Table");
+				table.put("macro", "table");
+				table.put("attributes", attributes);
+				table.put("methods", tableMethods);
+
+				/* Construct the "add" method in the table class */
+
+				List<Model> addParams = new ArrayList<Model>();
+
+				for (VariableElement field : fields) {
+					if (!isSubtable(fieldType(field))) {
+						Model param = new Model();
+						param.put("type", fieldType(field));
+						param.put("name", field.getSimpleName().toString());
+						addParams.add(param);
+					}
+				}
+
+				Model methodAdd = new Model();
+				methodAdd.put("macro", "table_add");
+				methodAdd.put("params", addParams);
+				tableMethods.add(methodAdd);
+
+				/* Construct the "insert" method in the table class */
+
+				Model methodInsert = new Model();
+				methodInsert.put("macro", "table_insert");
+				methodInsert.put("params", addParams);
+				tableMethods.add(methodInsert);
+
+				/*********** Construct the cursor class ****************/
+
+				Model cursor = new Model();
+				cursor.put("name", entity);
+				cursor.put("macro", "cursor");
+				cursor.put("attributes", attributes);
+
+				/*********** Construct the view class ****************/
+
+				Model view = new Model();
+				view.put("name", entity + "View");
+				view.put("macro", "view");
+				view.put("attributes", attributes);
+
+				/*********** Construct the query class ****************/
+
+				Model query = new Model();
+				query.put("name", entity + "Query");
+				query.put("macro", "query");
+				query.put("attributes", attributes);
+			}
+		}
+
+		Context context = new VelocityContext();
+		context.put("x", "foo");
+		String content = renderer.render("test.vm", context);
+		writeToFile("com.tightdb.newgenerated", "Test.java", content);
+	}
+
