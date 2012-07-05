@@ -1,10 +1,8 @@
 	@Override
 	public void processAnnotations(Set<? extends TypeElement> annotations, RoundEnvironment env) throws Exception {
-		//renderer.init(null, false);
-		
-        Properties props = new Properties();
-        VelocityEngine ve = new VelocityEngine(props);
-        ve.init();		
+		CodeRenderer renderer = new CodeRenderer();
+		String content = renderer.test();
+		writeToFile("a.b", "Test.java", content + new Date());
 		
 		for (TypeElement annotation : annotations) {
 			String annotationName = annotation.getQualifiedName().toString();

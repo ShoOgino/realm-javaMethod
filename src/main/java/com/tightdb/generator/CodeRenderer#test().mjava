@@ -1,0 +1,22 @@
+	public String test() throws Exception {
+		Configuration cfg = new Configuration();
+		TemplateLoader loader = new StringTemplateLoader();
+
+		// /cfg.setDirectoryForTemplateLoading(new
+		// File("C:/Users/nikuco/tightdb_java2/src/main/resources"));
+		cfg.setTemplateLoader(loader);
+		cfg.setObjectWrapper(new DefaultObjectWrapper());
+
+		Map root = new HashMap();
+		root.put("foo", "ABC");
+
+		// Template tmpl = cfg.getTemplate("test.ftl");
+		Template tmpl = new Template("name", new StringReader("Test ${user}"), new Configuration());
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		Writer writer = new OutputStreamWriter(outputStream);
+		tmpl.process(root, writer);
+
+		return outputStream.toString();
+	}
+
