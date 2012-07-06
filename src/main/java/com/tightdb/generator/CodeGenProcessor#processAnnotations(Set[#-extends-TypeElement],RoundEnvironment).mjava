@@ -1,14 +1,10 @@
 	@Override
 	public void processAnnotations(Set<? extends TypeElement> annotations, RoundEnvironment env) throws Exception {
-		CodeRenderer renderer = new CodeRenderer();
-		String content = renderer.test();
-		writeToFile("a.b", "Test.java", content + new Date());
-		
 		for (TypeElement annotation : annotations) {
 			String annotationName = annotation.getQualifiedName().toString();
 			if (annotationName.equals(Table.class.getCanonicalName())) {
 				Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
-				//processAnnotatedElements(elements);
+				processAnnotatedElements(elements);
 			} else {
 				warn("Unexpected annotation: " + annotationName);
 			}

@@ -1,0 +1,16 @@
+	public String render(String template, Model model) {
+		try {
+			Template tmpl = cfg.getTemplate(template);
+			// Template tmpl = new Template("name", new
+			// StringReader("Test ${user}"), new Configuration());
+
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			Writer writer = new OutputStreamWriter(outputStream);
+			tmpl.process(model, writer);
+
+			return outputStream.toString();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+

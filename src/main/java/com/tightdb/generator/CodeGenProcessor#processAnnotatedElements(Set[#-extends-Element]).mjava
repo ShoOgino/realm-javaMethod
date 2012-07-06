@@ -9,10 +9,10 @@
 
 				List<VariableElement> fields = getFields(element);
 
-				info("Generating code for entity with " + fields.size() + " columns...");
-
 				// get the capitalized model name
 				String entity = StringUtils.capitalize(model.getSimpleName().toString());
+
+				info("Generating code for entity '" + entity + "' with " + fields.size() + " columns...");
 
 				/*********** Prepare the attributes for the templates ****************/
 
@@ -49,12 +49,9 @@
 				/*********** Construct the table class ****************/
 
 				Model table = new Model();
-				List<Model> tableMethods = new ArrayList<Model>();
-
 				table.put("name", entity + "Table");
 				table.put("macro", "table");
 				table.put("attributes", attributes);
-				table.put("methods", tableMethods);
 
 				/* Construct the "add" method in the table class */
 
@@ -70,16 +67,17 @@
 				}
 
 				Model methodAdd = new Model();
-				methodAdd.put("macro", "table_add");
 				methodAdd.put("params", addParams);
-				tableMethods.add(methodAdd);
+				table.put("add", renderer.render("table_add.ftl", methodAdd));
 
 				/* Construct the "insert" method in the table class */
 
 				Model methodInsert = new Model();
-				methodInsert.put("macro", "table_insert");
 				methodInsert.put("params", addParams);
-				tableMethods.add(methodInsert);
+				table.put("insert", renderer.render("table_insert.ftl", methodInsert));
+
+				String tableContent = renderer.render("table.ftl", table);
+				writeToFile("com.tightdb.newgenerated", entity + "Table.java", tableContent);
 
 				/*********** Construct the cursor class ****************/
 
@@ -88,6 +86,9 @@
 				cursor.put("macro", "cursor");
 				cursor.put("attributes", attributes);
 
+				String cursorContent = renderer.render("cursor.ftl", cursor);
+				writeToFile("com.tightdb.newgenerated", entity + ".java", cursorContent);
+
 				/*********** Construct the view class ****************/
 
 				Model view = new Model();
@@ -95,18 +96,19 @@
 				view.put("macro", "view");
 				view.put("attributes", attributes);
 
+				String viewContent = renderer.render("view.ftl", view);
+				writeToFile("com.tightdb.newgenerated", entity + "View.java", viewContent);
+
 				/*********** Construct the query class ****************/
 
 				Model query = new Model();
 				query.put("name", entity + "Query");
 				query.put("macro", "query");
 				query.put("attributes", attributes);
+
+				String queryContent = renderer.render("query.ftl", query);
+				writeToFile("com.tightdb.newgenerated", entity + "Query.java", queryContent);
 			}
 		}
-
-		Context context = new VelocityContext();
-		context.put("x", "foo");
-		String content = renderer.render("test.vm", context);
-		writeToFile("com.tightdb.newgenerated", "Test.java", content);
 	}
 
