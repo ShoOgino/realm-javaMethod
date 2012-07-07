@@ -1,12 +1,11 @@
 	private String getFieldType(VariableElement field) {
 		String type = fieldType(field);
-		String simpleType = fieldSimpleType(field);
 
-		if (NUM_TYPES.contains(simpleType)) {
+		if (NUM_TYPES.contains(type)) {
 			type = "long";
-		} else if (simpleType.equals("byte[]")) {
+		} else if (type.equals("byte[]")) {
 			type = "java.nio.ByteBuffer";
-		} else if (simpleType.equals("Object")) {
+		} else if (type.equals("java.lang.Object")) {
 			type = "com.tightdb.Mixed";
 		}
 
