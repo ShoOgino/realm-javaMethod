@@ -1,14 +1,8 @@
 	private List<VariableElement> getFields(Element element) {
 		List<VariableElement> fields = new ArrayList<VariableElement>();
 
-		List<? extends Element> dd = elementUtils.getAllMembers((TypeElement) element);
-		for (Element e : dd) {
-			info("el: " + e.getSimpleName());
-		}
-		
 		for (Element enclosedElement : element.getEnclosedElements()) {
 			if (enclosedElement.getKind().equals(ElementKind.FIELD)) {
-				info("field: " + enclosedElement.getSimpleName());
 				if (enclosedElement instanceof VariableElement) {
 					VariableElement field = (VariableElement) enclosedElement;
 					fields.add(field);

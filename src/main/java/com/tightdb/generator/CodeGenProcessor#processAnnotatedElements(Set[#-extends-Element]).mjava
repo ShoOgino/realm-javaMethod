@@ -1,5 +1,10 @@
 	private void processAnnotatedElements(Set<? extends Element> elements) throws IOException {
-		info("Processing " + elements.size() + " elements...");
+		logger.info("Processing " + elements.size() + " elements...");
+
+		URI uri = filer.getResource(StandardLocation.SOURCE_OUTPUT, "", "foo").toUri();
+		File file = new File(uri);
+		File sourcesPath = file.getParentFile();
+
 		prepareTables(elements);
 
 		for (Element element : elements) {
@@ -9,10 +14,13 @@
 
 				List<VariableElement> fields = getFields(element);
 
+				// sort the fields, due to unresolved bug in Eclipse APT
+				fieldSorter.sortFields(fields, model, sourcesPath);
+
 				// get the capitalized model name
 				String entity = StringUtils.capitalize(model.getSimpleName().toString());
 
-				info("Generating code for entity '" + entity + "' with " + fields.size() + " columns...");
+				logger.info("Generating code for entity '" + entity + "' with " + fields.size() + " columns...");
 
 				/*********** Prepare the attributes for the templates ****************/
 
@@ -21,8 +29,10 @@
 				int index = 0;
 				final List<Model> columns = new ArrayList<Model>();
 				for (VariableElement field : fields) {
+					String originalType = fieldType(field);
 					String columnType = getColumnType(field);
 					String fieldType = getAdjustedFieldType(field);
+					String paramType = getParamType(field);
 					String fieldName = field.getSimpleName().toString();
 
 					boolean isSubtable = isSubtable(fieldType);
@@ -31,7 +41,9 @@
 					Model column = new Model();
 					column.put("name", fieldName);
 					column.put("type", columnType);
+					column.put("originalType", originalType);
 					column.put("fieldType", fieldType);
+					column.put("paramType", paramType);
 					column.put("index", index++);
 					column.put("isSubtable", isSubtable);
 					column.put("subtype", subtype);
@@ -41,7 +53,7 @@
 
 				/* Set the attributes */
 
-				String packageName = "com.tightdb.newgenerated";
+				String packageName = "com.tightdb.generated";
 				boolean isNested = isSubtable(modelType);
 
 				Map<String, Object> commonAttr = new HashMap<String, Object>();
@@ -61,12 +73,14 @@
 
 				Model methodAdd = new Model();
 				methodAdd.put("columns", columns);
+				methodAdd.put("entity", entity);
 				table.put("add", renderer.render("table_add.ftl", methodAdd));
 
 				/* Generate the "insert" method in the table class */
 
 				Model methodInsert = new Model();
 				methodInsert.put("columns", columns);
+				methodInsert.put("entity", entity);
 				table.put("insert", renderer.render("table_insert.ftl", methodInsert));
 
 				/* Generate the table class */
