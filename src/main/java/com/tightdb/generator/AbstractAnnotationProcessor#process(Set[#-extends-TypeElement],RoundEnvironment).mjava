@@ -1,11 +1,11 @@
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-		info("Entering annotation processor...");
+		logger.info("Entering annotation processor...");
 		if (!env.processingOver()) {
-			info("Processing resources...");
+			logger.info("Processing resources...");
 			try {
 				processAnnotations(annotations, env);
-				info("Successfully finished processing.");
+				logger.info("Successfully finished processing.");
 			} catch (Exception e) {
 				String info = e.getMessage() != null ? e.getMessage() : "";
 				String msg = "ERROR: " + info + "\n\n" + StringUtils.join(e.getStackTrace(), "\n");
@@ -17,10 +17,10 @@
 					cause = cause.getCause();
 				}
 
-				error(msg);
+				logger.error(msg);
 			}
 		} else {
-			info("Last round, processing is done.");
+			logger.info("Last round, processing is done.");
 		}
 		return true;
 	}
