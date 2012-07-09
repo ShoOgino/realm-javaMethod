@@ -1,0 +1,25 @@
+	private String getColumnType(VariableElement field) {
+		String type = fieldType(field);
+
+		String columnType;
+		if (NUM_TYPES.contains(type)) {
+			columnType = "Long";
+		} else if ("boolean".equals(type) || "java.lang.Boolean".equals(type)) {
+			columnType = "Boolean";
+		} else if ("java.lang.String".equals(type)) {
+			columnType = "String";
+		} else if ("java.util.Date".equals(type)) {
+			columnType = "Date";
+		} else if ("byte[]".equals(type) || "java.nio.ByteBuffer".equals(type)) {
+			columnType = "Binary";
+		} else if (isSubtable(type)) {
+			columnType = "Table";
+		} else if ("java.lang.Object".equals(type)) {
+			columnType = "Mixed";
+		} else {
+			columnType = "UNSUPPORTED_TYPE";
+		}
+
+		return columnType;
+	}
+

@@ -1,0 +1,15 @@
+	@Override
+	public void processAnnotations(Set<? extends TypeElement> annotations, RoundEnvironment env) throws Exception {
+		fieldSorter = new FieldSorter(logger);
+
+		for (TypeElement annotation : annotations) {
+			String annotationName = annotation.getQualifiedName().toString();
+			if (annotationName.equals(Table.class.getCanonicalName())) {
+				Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
+				processAnnotatedElements(elements);
+			} else {
+				logger.warn("Unexpected annotation: " + annotationName);
+			}
+		}
+	}
+

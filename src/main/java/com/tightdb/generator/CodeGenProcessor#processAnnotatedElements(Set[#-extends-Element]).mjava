@@ -1,0 +1,121 @@
+	private void processAnnotatedElements(Set<? extends Element> elements) throws IOException {
+		logger.info("Processing " + elements.size() + " elements...");
+
+		URI uri = filer.getResource(StandardLocation.SOURCE_OUTPUT, "", "foo").toUri();
+		File file = new File(uri);
+		File sourcesPath = file.getParentFile();
+
+		prepareTables(elements);
+
+		for (Element element : elements) {
+			if (element instanceof TypeElement) {
+				TypeElement model = (TypeElement) element;
+				String modelType = model.getQualifiedName().toString();
+
+				List<VariableElement> fields = getFields(element);
+
+				// sort the fields, due to unresolved bug in Eclipse APT
+				fieldSorter.sortFields(fields, model, sourcesPath);
+
+				// get the capitalized model name
+				String entity = StringUtils.capitalize(model.getSimpleName().toString());
+
+				logger.info("Generating code for entity '" + entity + "' with " + fields.size() + " columns...");
+
+				/*********** Prepare the attributes for the templates ****************/
+
+				/* Construct the list of columns */
+
+				int index = 0;
+				final List<Model> columns = new ArrayList<Model>();
+				for (VariableElement field : fields) {
+					String originalType = fieldType(field);
+					String columnType = getColumnType(field);
+					String fieldType = getAdjustedFieldType(field);
+					String paramType = getParamType(field);
+					String fieldName = field.getSimpleName().toString();
+
+					boolean isSubtable = isSubtable(fieldType);
+					String subtype = isSubtable ? getSubtableType(field) : null;
+
+					Model column = new Model();
+					column.put("name", fieldName);
+					column.put("type", columnType);
+					column.put("originalType", originalType);
+					column.put("fieldType", fieldType);
+					column.put("paramType", paramType);
+					column.put("index", index++);
+					column.put("isSubtable", isSubtable);
+					column.put("subtype", subtype);
+
+					columns.add(column);
+				}
+
+				/* Set the attributes */
+
+				String packageName = calculatePackageName(model);
+
+				boolean isNested = isSubtable(modelType);
+
+				Map<String, Object> commonAttr = new HashMap<String, Object>();
+				commonAttr.put("entity", entity);
+				commonAttr.put("columns", columns);
+				commonAttr.put("isNested", isNested);
+				commonAttr.put("packageName", packageName);
+				commonAttr.put("java_header", INFO_GENERATED);
+
+				/*********** Generate the table class ****************/
+
+				Model table = new Model();
+				table.put("name", entity + "Table");
+				table.putAll(commonAttr);
+
+				/* Generate the "add" method in the table class */
+
+				Model methodAdd = new Model();
+				methodAdd.put("columns", columns);
+				methodAdd.put("entity", entity);
+				table.put("add", renderer.render("table_add.ftl", methodAdd));
+
+				/* Generate the "insert" method in the table class */
+
+				Model methodInsert = new Model();
+				methodInsert.put("columns", columns);
+				methodInsert.put("entity", entity);
+				table.put("insert", renderer.render("table_insert.ftl", methodInsert));
+
+				/* Generate the table class */
+
+				String tableContent = renderer.render("table.ftl", table);
+				writeToFile(packageName, entity + "Table.java", tableContent, model);
+
+				/*********** Generate the cursor class ****************/
+
+				Model cursor = new Model();
+				cursor.put("name", entity);
+				cursor.putAll(commonAttr);
+
+				String cursorContent = renderer.render("cursor.ftl", cursor);
+				writeToFile(packageName, entity + ".java", cursorContent, model);
+
+				/*********** Generate the view class ****************/
+
+				Model view = new Model();
+				view.put("name", entity + "View");
+				view.putAll(commonAttr);
+
+				String viewContent = renderer.render("view.ftl", view);
+				writeToFile(packageName, entity + "View.java", viewContent, model);
+
+				/*********** Generate the query class ****************/
+
+				Model query = new Model();
+				query.put("name", entity + "Query");
+				query.putAll(commonAttr);
+
+				String queryContent = renderer.render("query.ftl", query);
+				writeToFile(packageName, entity + "Query.java", queryContent, model);
+			}
+		}
+	}
+

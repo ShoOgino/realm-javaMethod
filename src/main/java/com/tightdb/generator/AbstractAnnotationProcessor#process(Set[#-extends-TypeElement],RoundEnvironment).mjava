@@ -1,0 +1,27 @@
+	@Override
+	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+		logger.info("Entering annotation processor...");
+		if (!env.processingOver()) {
+			logger.info("Processing resources...");
+			try {
+				processAnnotations(annotations, env);
+				logger.info("Successfully finished processing.");
+			} catch (Exception e) {
+				String info = e.getMessage() != null ? "(" + e.getMessage() + ")" : "";
+				String msg = "ERROR: " + e.getClass().getCanonicalName() + " " + info + "\n\n" + StringUtils.join(e.getStackTrace(), "\n");
+
+				Throwable cause = e.getCause();
+				while (cause != null) {
+					info = cause.getMessage() != null ? cause.getMessage() : "";
+					msg += "\n\nCause: " + info + "\n" + StringUtils.join(cause.getStackTrace(), "\n");
+					cause = cause.getCause();
+				}
+
+				logger.error(msg);
+			}
+		} else {
+			logger.info("Last round, processing is done.");
+		}
+		return true;
+	}
+
