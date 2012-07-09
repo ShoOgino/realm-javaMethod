@@ -1,9 +1,9 @@
-	protected void writeToFile(String pkg, String filename, String content) {
+	protected void writeToFile(String pkg, String filename, String content, Element... originatingElements) {
 		final Location location = StandardLocation.SOURCE_OUTPUT;
 
 		Writer writer = null;
 		try {
-			FileObject fileRes = filer.createResource(location, pkg, filename);
+			FileObject fileRes = filer.createResource(location, pkg, filename, originatingElements);
 			writer = fileRes.openWriter();
 			writer.write(content);
 		} catch (IOException e) {
