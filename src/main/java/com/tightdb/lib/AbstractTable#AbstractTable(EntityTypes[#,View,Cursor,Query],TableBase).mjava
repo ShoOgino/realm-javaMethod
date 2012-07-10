@@ -1,10 +1,11 @@
+	@SuppressWarnings("unchecked")
 	protected AbstractTable(EntityTypes<?, View, Cursor, Query> types, TableBase table) {
 		super(types, table);
 		this.table = table;
 		if (table != null && table.getTableSpec().getColumnCount() <= 0) {
 			// Build table schema
 			final TableSpec spec = new TableSpec();
-			specifyStructure(spec);
+			specifyTableStructure((Class<? extends AbstractTable<?, ?, ?>>) types.getTableClass(), spec);
 			table.updateFromSpec(spec);
 		}
 	}
