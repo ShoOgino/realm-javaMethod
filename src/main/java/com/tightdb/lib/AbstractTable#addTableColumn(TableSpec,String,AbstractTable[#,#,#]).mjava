@@ -1,5 +1,6 @@
-	protected void addTableColumn(TableSpec spec, String name, AbstractTable<?, ?, ?> subtable) {
+	@SuppressWarnings("unchecked")
+	protected static void addTableColumn(TableSpec spec, String name, AbstractTable<?, ?, ?> subtable) {
 		TableSpec subspec = spec.addSubtableColumn(name);
-		subtable.specifyStructure(subspec);
+		specifyTableStructure((Class<? extends AbstractTable<?, ?, ?>>) subtable.getClass(), subspec);
 	}
 
