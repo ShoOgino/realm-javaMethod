@@ -1,12 +1,30 @@
 	@Test
 	public void shouldFindFirstRecordByColumnValue() throws IllegalAccessException {
-		Employee record1 = employees.firstName.findFirst(EmployeesFixture.EMPLOYEE1.firstName);
-		assertEquals(1, record1.getPosition());
+		Employee record = null;
+		
+		record = employees.firstName.findFirst(EmployeesFixture.EMPLOYEE[1].firstName);
+		assertEquals(1, record.getPosition());
 
-		Employee record2 = employees.salary.findFirst(10000);
-		assertEquals(0, record2.getPosition());
+		record = employees.salary.findFirst(EmployeesFixture.EMPLOYEE[0].salary);
+		assertEquals(0, record.getPosition());
 
-		Employee record3 = employees.salary.findFirst(12345);
-		assertNull(record3);
+		record = employees.salary.findFirst(12345);
+		assertNull(record);
+
+		record = employees.driver.findFirst(EmployeesFixture.EMPLOYEE[0].driver);
+		assertEquals(0, record.getPosition());
+
+		record = employees.driver.findFirst(EmployeesFixture.EMPLOYEE[1].driver);
+		assertEquals(1, record.getPosition());
+
+		record = employees.birthdate.findFirst(EmployeesFixture.EMPLOYEE[1].birthdate);
+		assertEquals(1, record.getPosition());
+
+		record = employees.birthdate.findFirst(EmployeesFixture.EMPLOYEE[2].birthdate);
+		assertEquals(2, record.getPosition());
+
+		record = employees.birthdate.findFirst(new Date(12345));
+		assertNull(record);
+
 	}
 
