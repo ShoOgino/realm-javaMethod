@@ -1,0 +1,32 @@
+	@Test
+	public void shouldSetAllColumnValues() {
+		employees.firstName.setAll("A");
+		assertSameArrayElement("A", employees.firstName.getAll());
+
+		employees.lastName.setAll("B");
+		assertSameArrayElement("B", employees.lastName.getAll());
+
+		Long num = 12345L;
+		employees.salary.setAll(num);
+		assertSameArrayElement(num, employees.salary.getAll());
+
+		employees.driver.setAll(true);
+		assertSameArrayElement(true, employees.driver.getAll());
+
+		ByteBuffer buf = ByteBuffer.allocateDirect(2);
+		buf.put(new byte[] { 10, 20 });
+		employees.photo.setAll(buf);
+		for (ByteBuffer buffer : employees.photo.getAll()) {
+			ByteBuffer buf2 = ByteBuffer.wrap(new byte[] { 10, 20 });
+			assertEquals(buf2, buffer);
+		}
+
+		Date date = new Date(13579);
+		employees.birthdate.setAll(date);
+		assertSameArrayElement(date, employees.birthdate.getAll());
+
+		Mixed extra = Mixed.mixedValue("extra");
+		employees.extra.setAll(extra);
+		assertSameArrayElement(extra, employees.extra.getAll());
+	}
+
