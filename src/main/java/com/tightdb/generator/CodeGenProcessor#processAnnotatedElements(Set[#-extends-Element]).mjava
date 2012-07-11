@@ -29,26 +29,34 @@
 				int index = 0;
 				final List<Model> columns = new ArrayList<Model>();
 				for (VariableElement field : fields) {
-					String originalType = fieldType(field);
 					String columnType = getColumnType(field);
-					String fieldType = getAdjustedFieldType(field);
-					String paramType = getParamType(field);
-					String fieldName = field.getSimpleName().toString();
+					if (columnType != null) {
+						String originalType = fieldType(field);
+						String fieldType = getAdjustedFieldType(field);
+						String paramType = getParamType(field);
+						String fieldName = field.getSimpleName().toString();
 
-					boolean isSubtable = isSubtable(fieldType);
-					String subtype = isSubtable ? getSubtableType(field) : null;
+						boolean isSubtable = isSubtable(fieldType);
+						String subtype = isSubtable ? getSubtableType(field) : null;
 
-					Model column = new Model();
-					column.put("name", fieldName);
-					column.put("type", columnType);
-					column.put("originalType", originalType);
-					column.put("fieldType", fieldType);
-					column.put("paramType", paramType);
-					column.put("index", index++);
-					column.put("isSubtable", isSubtable);
-					column.put("subtype", subtype);
+						Model column = new Model();
+						column.put("name", fieldName);
+						column.put("type", columnType);
+						column.put("originalType", originalType);
+						column.put("fieldType", fieldType);
+						column.put("paramType", paramType);
+						column.put("index", index++);
+						column.put("isSubtable", isSubtable);
+						column.put("subtype", subtype);
 
-					columns.add(column);
+						columns.add(column);
+					} else {
+						logger.error(MSG_INCORRECT_TYPE, field);
+					}
+				}
+				
+				if (columns.isEmpty()) {
+					logger.warn(MSG_NO_COLUMNS, model);
 				}
 
 				/* Set the attributes */
