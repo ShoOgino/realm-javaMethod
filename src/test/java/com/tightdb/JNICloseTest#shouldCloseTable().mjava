@@ -1,19 +1,11 @@
-	@Test (enabled=true)
+	@Test (enabled=true, expectedExceptions = IllegalArgumentException.class)
 	public void shouldCloseTable() {
 		// util.setDebugLevel(1);
-		
 		TableBase table = new TableBase();
 		table.close();
 		
-		boolean gotException = false;
-		try {
-			@SuppressWarnings("unused")
-			long s = table.size();
-		} catch (IllegalArgumentException e) {
-			// TODO: a more specific Exception must be thrown from JNI..
-			gotException = true;
-		}
-		assertEquals(true, gotException);
-		
+		@SuppressWarnings("unused")
+		long s = table.size();
+		// TODO: a more specific Exception must be thrown from JNI..
 	}
 
