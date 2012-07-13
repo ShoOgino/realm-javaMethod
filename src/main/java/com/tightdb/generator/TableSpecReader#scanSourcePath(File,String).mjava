@@ -1,0 +1,18 @@
+	private File scanSourcePath(File sourcePath, String modelName) {
+		logger.debug("Scanning source path '" + sourcePath + "' for table spec '" + modelName + "'");
+		IOFileFilter fileFilter = new AndFileFilter(new SuffixFileFilter(".java"), new SpecSourceFileFilter(specMatcher, modelName, logger));
+		IOFileFilter dirFilter = FalseFileFilter.FALSE;
+		Collection<File> files = FileUtils.listFiles(sourcePath, fileFilter, dirFilter);
+
+		switch (files.size()) {
+		case 0:
+			return null;
+		case 1:
+			return files.iterator().next();
+		default:
+			logger.warn("More than one source files were found containing the table specs with the same name!");
+			return files.iterator().next();
+		}
+
+	}
+
