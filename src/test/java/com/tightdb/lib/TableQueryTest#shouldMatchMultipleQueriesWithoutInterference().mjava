@@ -1,10 +1,11 @@
 	@Test
 	public void shouldMatchMultipleQueriesWithoutInterference() {
-		EmployeeView niko1 = employees.firstName.startsWith("Nik").group().lastName.contains("vski")
-				.or().firstName.eq("John").endGroup().findAll();
-		EmployeeView niko2 = employees.where().group().lastName.contains("vski")
-				.or().firstName.eq("John").endGroup().firstName.startsWith("Nik")
+		TestEmployeeView niko1 = employees.firstName.startsWith("Nik").group().lastName
+				.contains("vski").or().firstName.eq("John").endGroup()
 				.findAll();
+		TestEmployeeView niko2 = employees.where().group().lastName.contains(
+				"vski").or().firstName.eq("John").endGroup().firstName
+				.startsWith("Nik").findAll();
 
 		assertEquals(1, niko1.size());
 		assertEquals(1, niko2.size());
