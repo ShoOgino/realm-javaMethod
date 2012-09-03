@@ -1,12 +1,12 @@
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void shouldFailOnOnWrongSubtableRetrievalFromMixedTypeColumn() {
 		TestEmployeeRow employee = employees.at(0);
-		PhoneTable phones = employee.extra.createSubtable(PhoneTable.class);
+		TestPhoneTable phones = employee.extra.createSubtable(TestPhoneTable.class);
 
 		phones.add("mobile", "123");
 		assertEquals(1, phones.size());
 
 		// should fail - since we try to get the wrong subtable class
-		employee.extra.getSubtable(EmployeeTable.class);
+		employee.extra.getSubtable(TestEmployeeTable.class);
 	}
 
