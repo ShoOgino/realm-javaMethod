@@ -1,8 +1,12 @@
 	private File scanSourcePath(File sourcePath, String modelName) {
-		logger.debug("Scanning source path '" + sourcePath + "' for table spec '" + modelName + "'");
-		IOFileFilter fileFilter = new AndFileFilter(new SuffixFileFilter(".java"), new SpecSourceFileFilter(specMatcher, modelName, logger));
+		logger.debug("Scanning source path '" + sourcePath
+				+ "' for table spec '" + modelName + "'");
+		IOFileFilter fileFilter = new AndFileFilter(new SuffixFileFilter(
+				".java"), new SpecSourceFileFilter(specMatcher, modelName,
+				logger));
 		IOFileFilter dirFilter = FalseFileFilter.FALSE;
-		Collection<File> files = FileUtils.listFiles(sourcePath, fileFilter, dirFilter);
+		Collection<File> files = FileUtils.listFiles(sourcePath, fileFilter,
+				dirFilter);
 
 		switch (files.size()) {
 		case 0:

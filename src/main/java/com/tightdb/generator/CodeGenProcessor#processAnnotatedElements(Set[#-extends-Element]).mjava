@@ -9,8 +9,23 @@
 					"The path of the Java source and generated files must be configured as source output! (see -s option of javac)");
 		}
 
+		List<File> sourcesPath = new LinkedList<File>();
+
 		File file = new File(uri);
-		File sourcesPath = file.getParentFile();
+		File generatedSourcesPath = file.getParentFile();
+		sourcesPath.add(generatedSourcesPath);
+
+		String[] sourceFolders = getSourceFolders();
+		while (generatedSourcesPath != null) {
+			for (String sourceFolder : sourceFolders) {
+				File potentialPath = new File(generatedSourcesPath, sourceFolder);
+				if (potentialPath.exists()) {
+					sourcesPath.add(potentialPath);
+					logger.info("Configured source folder: " + potentialPath);
+				}
+			}
+			generatedSourcesPath = generatedSourcesPath.getParentFile();
+		}
 
 		prepareTables(elements);
 
@@ -20,13 +35,12 @@
 				setupModelInfo(model);
 			}
 		}
-		
+
 		for (Element element : elements) {
 			if (element instanceof TypeElement) {
 				TypeElement model = (TypeElement) element;
 				processModel(sourcesPath, model);
 			}
 		}
-		
 	}
 

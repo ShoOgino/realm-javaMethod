@@ -1,0 +1,29 @@
+	public String getSpecFields(TypeElement model, List<File> sourcesPath) {
+		String modelName = model.toString();
+
+		File sourceFile = findSourceFile(sourcesPath, modelName);
+		if (sourceFile == null) {
+			logger.warn("Table spec retrieval failed!");
+			return null;
+		}
+
+		logger.info("Searching table spec in file: " + sourceFile);
+		String source;
+		try {
+			source = FileUtils.readFileToString(sourceFile);
+		} catch (IOException e) {
+			logger.warn("Table spec retrieval failed, couldn't read file: "
+					+ sourceFile);
+			return null;
+		}
+
+		String spec = specMatcher.matchSpec(model.getSimpleName().toString(),
+				source);
+		if (spec == null) {
+			logger.warn("Table spec retrieval failed, couldn't find table spec: "
+					+ modelName);
+		}
+		return spec;
+
+	}
+

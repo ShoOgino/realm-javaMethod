@@ -1,10 +1,10 @@
-	private void processModel(File sourcesPath, TypeElement model) {
+	private void processModel(List<File> sourceFolders, TypeElement model) {
 		String modelType = model.getQualifiedName().toString();
 
 		List<VariableElement> fields = getFields(model);
 
 		// sort the fields, due to unresolved bug in Eclipse APT
-		fieldSorter.sortFields(fields, model, sourcesPath);
+		fieldSorter.sortFields(fields, model, sourceFolders);
 
 		// get the capitalized model name
 		String entity = StringUtils
