@@ -1,4 +1,4 @@
-	private void processAnnotatedElements(Set<? extends Element> elements)
+	private void processAnnotatedElements(Set<? extends Element> elements, boolean insideEclipse)
 			throws IOException {
 		logger.info("Processing " + elements.size() + " elements...");
 
@@ -11,13 +11,8 @@
 
 		List<File> sourcesPath = new LinkedList<File>();
 
-		// FIXME: Workaround for OS X 
-		try {
-			if (uri.getScheme() == null) uri = new URI("file", uri.getSchemeSpecificPart(), uri.getFragment());
-		}
-		catch (URISyntaxException e) {
-			logger.error("Failed to add 'file:' schema to schema-less URI '"+uri+"'");
-		}
+		// FIXME: Workaround for OS X - resolve relative URIs against current working directory
+		uri = new File(".").getAbsoluteFile().toURI().resolve(uri);
 
 		File file = new File(uri);
 		File outputFolder = file.getParentFile();
@@ -51,7 +46,7 @@
 		for (Element element : elements) {
 			if (element instanceof TypeElement) {
 				TypeElement model = (TypeElement) element;
-				processModel(sourcesPath, model);
+				processModel(sourcesPath, model, insideEclipse);
 			}
 		}
 	}

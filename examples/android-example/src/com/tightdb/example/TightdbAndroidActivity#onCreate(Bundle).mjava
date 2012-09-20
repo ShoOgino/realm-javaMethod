@@ -1,0 +1,64 @@
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		s = new StockChartView(this);
+
+		AxisRange ar = new AxisRange();
+		ar.setMovable(true);
+		ar.setZoomable(true);
+
+		s.enableGlobalAxisRange(Axis.Side.BOTTOM, ar);
+
+		Area a1 = new Area();
+		Area a2 = new Area();
+		a1.getRightAxis().setLabelFormatProvider(new ILabelFormatProvider()
+		{
+			@Override
+			public String getAxisLabel(Axis sender, double value) {
+				return String.valueOf(value);
+			}
+		});
+
+		a2.setAutoHeight(false);
+		a2.setHeightInPercents(0.2f);
+		a2.getBottomAxis().setLabelFormatProvider(new ILabelFormatProvider() 
+		{
+			@Override
+			public String getAxisLabel(Axis sender, double value) 
+			{			
+				Area a = sender.getParent();
+
+				for(int i=0;i<a.getSeriesCount();i++)
+				{
+					AbstractSeries s = a.getSeriesAt(i);
+
+					int index = s.convertToArrayIndex(value);
+					if(index >=0 && index < s.getPointCount())
+					{
+						Object id = s.getPointAt(index).getID();
+
+						if(null != id)
+							return id.toString();
+					}
+				}
+				return null;
+			}
+		});
+
+		a1.getLeftAxis().setVisible(false);
+		a1.getTopAxis().setVisible(false);
+
+		a2.getLeftAxis().setVisible(false);
+		a2.getTopAxis().setVisible(false);
+
+		a1.addSeries(s1);
+
+		s.addArea(a1);
+
+		setContentView(s, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+
+		mHandler.removeCallbacks(mUpdateTimeTask);
+		mHandler.postDelayed(mUpdateTimeTask, 100);
+	}
+
