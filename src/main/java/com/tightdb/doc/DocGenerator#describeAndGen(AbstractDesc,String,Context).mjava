@@ -1,8 +1,16 @@
-	private static void describeAndGen(AbstractDesc desc, String cls, Context context) throws Exception {
+	private static void describeAndGen(AbstractDesc desc, String cls,
+			Context context) throws Exception {
+		constructors.clear();
 		methods.clear();
-		desc.describe(); 
-		context.put(cls.toLowerCase() + "_method_list", generateDocList(cls));
-		context.put(cls.toLowerCase() + "_method_overview", generateDocOverview(cls));
-		context.put(cls.toLowerCase() + "_method_details", generateExtendedDoc(cls));
+		desc.describe();
+		context.put(cls.toLowerCase() + "_method_list", generateMethodList(cls));
+		context.put(cls.toLowerCase() + "_constructor_overview",
+				generateConstructorOverview(cls));
+		context.put(cls.toLowerCase() + "_method_overview",
+				generateMethodOverview(cls));
+		context.put(cls.toLowerCase() + "_constructor_details",
+				generateConstructorDetails(cls));
+		context.put(cls.toLowerCase() + "_method_details",
+				generateMethodDetails(cls));
 	}
 

@@ -1,0 +1,21 @@
+	private static String generateConstructorDetails(String cls)
+			throws Exception {
+		StringBuilder sb = new StringBuilder();
+		ExampleReader exampleReader = new ExampleReader(cls + "Examples.java");
+
+		for (Constructor constructor : constructors) {
+			Context context = new VelocityContext();
+			context.put("class", cls);
+			context.put("id", constructor.getId());
+			context.put("order", constructor.order);
+			context.put("name", constructor.getName());
+			context.put("doc", constructor.doc);
+			context.put("params", constructor.params);
+			context.put("example", exampleReader.getExample("constructor-"
+					+ constructor.order));
+			sb.append(renderer.render("constructor-ref.vm", context));
+		}
+
+		return sb.toString();
+	}
+

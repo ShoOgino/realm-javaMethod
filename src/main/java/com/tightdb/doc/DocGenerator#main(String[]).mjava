@@ -1,16 +1,20 @@
 	public static void main(String[] args) throws Exception {
 		Velocity.init();
 		Context context = new VelocityContext();
-		
-		describeAndGen(new TableDesc(methods), "Table", context);
-		describeAndGen(new RowDesc(methods), "Row", context);
-		describeAndGen(new QueryDesc(methods), "Query", context);
-		describeAndGen(new ViewDesc(methods), "View", context);
-		describeAndGen(new GroupDesc(methods), "Group", context);
+
+		describeAndGen(new TableDesc(constructors, methods), "Table", context);
+		describeAndGen(new RowDesc(constructors, methods), "Row", context);
+		describeAndGen(new QueryDesc(constructors, methods), "Query", context);
+		describeAndGen(new ViewDesc(constructors, methods), "View", context);
+		describeAndGen(new GroupDesc(constructors, methods), "Group", context);
+
+		context.put("table_or_view_columns", generateTableOrViewColumns());
+		context.put("query_columns", generateQueryColumns());
 		
 		String docs = renderer.render("reference.vm", context);
 		// FIXME: hard-coded path (temporary)
-		FileUtils.writeStringToFile(new File("x:/tightdb/tightdb_java2/doc/reference/reference.html"), docs);
+		FileUtils.writeStringToFile(new File("doc/reference/reference.html"),
+				docs);
 		System.out.println("Documentation updated.");
 	}
 
