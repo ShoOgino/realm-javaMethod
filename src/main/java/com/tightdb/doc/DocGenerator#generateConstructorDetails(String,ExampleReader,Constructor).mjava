@@ -1,0 +1,16 @@
+	private static String generateConstructorDetails(String cls,
+			ExampleReader exampleReader, Constructor constructor)
+			throws IOException {
+		Context context = new VelocityContext();
+		context.put("class", cls);
+		context.put("id", constructor.getId());
+		context.put("order", constructor.order);
+		context.put("name", constructor.getName());
+		context.put("doc", constructor.doc);
+		context.put("params", constructor.params);
+		context.put("example",
+				exampleReader.getExample("constructor-" + constructor.order));
+		String doc = renderer.render("constructor-ref.vm", context);
+		return doc;
+	}
+
