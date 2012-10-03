@@ -1,0 +1,18 @@
+	void init() {
+		table = new TableBase();
+		TableSpec tableSpec = new TableSpec();
+		tableSpec.addColumn(ColumnType.ColumnTypeInt, "number");
+		tableSpec.addColumn(ColumnType.ColumnTypeString, "name");
+		table.updateFromSpec(tableSpec);
+
+		long i = 0;
+		table.insertLong(0, i, i); table.insertString(1, i++, "A"); table.insertDone();
+		table.insertLong(0, i, i); table.insertString(1, i++, "B"); table.insertDone();
+		table.insertLong(0, i, i); table.insertString(1, i++, "C"); table.insertDone();
+		table.insertLong(0, i, i); table.insertString(1, i++, "B"); table.insertDone();
+		table.insertLong(0, i, i); table.insertString(1, i++, "D"); table.insertDone();
+		table.insertLong(0, i, i); table.insertString(1, i++, "D"); table.insertDone();
+		table.insertLong(0, i, i); table.insertString(1, i++, "D"); table.insertDone();
+		assertEquals(7, table.size());
+	}
+
