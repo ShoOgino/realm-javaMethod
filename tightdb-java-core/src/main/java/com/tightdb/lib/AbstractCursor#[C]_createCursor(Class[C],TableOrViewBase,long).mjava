@@ -1,0 +1,10 @@
+	protected static <C> C createCursor(Class<C> cursorClass,
+			TableOrViewBase targetTableOrView, long position) {
+		try {
+			return cursorClass.getDeclaredConstructor(TableOrViewBase.class,
+					long.class).newInstance(targetTableOrView, position);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to instantiate a cursor!", e);
+		}
+	}
+
