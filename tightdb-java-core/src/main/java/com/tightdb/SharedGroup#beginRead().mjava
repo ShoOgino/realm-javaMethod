@@ -1,9 +1,9 @@
-    public WriteTransaction beginWrite()
+    public ReadTransaction beginRead()
     {
         if (activeTransaction) 
         	throw new IllegalStateException("Active transaction");
         // FIXME: throw from nativeMethod in case of error
-        WriteTransaction t = new WriteTransaction(this, nativeBeginWrite(nativePtr));
+        ReadTransaction t = new ReadTransaction(this, nativeBeginRead(nativePtr));
         activeTransaction = true;
         return t;
     }
