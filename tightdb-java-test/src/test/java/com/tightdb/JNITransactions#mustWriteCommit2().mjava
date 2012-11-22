@@ -1,36 +1,34 @@
 	@Test
 	public void mustWriteCommit2() {
-	    try {
-	    	// Write to DB
-	        WriteTransaction wt = db.beginWrite();
-	        try {
-	            EmployeeTable employees = new EmployeeTable(wt);
-	            employees.clear();
-	            employees.add("John", "Doe", 10000, true);
-	    		assertEquals(1, employees.size());
-	            wt.commit();
-	    		// assertEquals(1, employees.size()); must set exception as employees is invalid now.
-	        }
-	        catch (Throwable e) {
-	            wt.rollback();
-	            throw new RuntimeException(e);
-	        }
+		try {
+			// Write to DB
+			WriteTransaction wt = db.beginWrite();
+			try {
+				EmployeeTable employees = new EmployeeTable(wt);
+				employees.clear();
+				employees.add("John", "Doe", 10000, true);
+				assertEquals(1, employees.size());
+				wt.commit();
+				// assertEquals(1, employees.size()); must set exception as
+				// employees is invalid now.
+			} catch (Throwable e) {
+				wt.rollback();
+				throw new RuntimeException(e);
+			}
 
-	        // Read from DB
-	        ReadTransaction rt = db.beginRead();
-		    try {
-		    	EmployeeTable employees = new EmployeeTable(rt);
-		    	assertEquals(1, employees.size());
-		    	rt.endRead();
-		    }
-		    catch (Throwable e) {
-	            rt.endRead();
-	            throw new RuntimeException(e);
-	        }
+			// Read from DB
+			ReadTransaction rt = db.beginRead();
+			try {
+				EmployeeTable employees = new EmployeeTable(rt);
+				assertEquals(1, employees.size());
+				rt.endRead();
+			} catch (Throwable e) {
+				rt.endRead();
+				throw new RuntimeException(e);
+			}
 
-	    }
-	    finally {
-	        db.close();
-	    }	    
+		} finally {
+			db.close();
+		}
 	}
 
