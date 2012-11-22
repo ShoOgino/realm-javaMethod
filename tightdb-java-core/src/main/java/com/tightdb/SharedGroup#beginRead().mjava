@@ -1,0 +1,10 @@
+    public ReadTransaction beginRead()
+    {
+        if (activeTransaction) 
+        	throw new IllegalStateException("Active transaction");
+        // FIXME: throw from nativeMethod in case of error
+        ReadTransaction t = new ReadTransaction(this, nativeBeginRead(nativePtr));
+        activeTransaction = true;
+        return t;
+    }
+

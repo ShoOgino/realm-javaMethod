@@ -9,6 +9,7 @@
 	 * 			  the ByteBuffer must be allocated with ByteBuffer.allocateDirect(len)
 	 */
 	public void setBinaryByteBuffer(long columnIndex, long rowIndex, ByteBuffer data) {
+		if (immutable) throwImmutable();
 		if (data == null)
 			throw new NullPointerException("Null array");
 		if (data.isDirect())

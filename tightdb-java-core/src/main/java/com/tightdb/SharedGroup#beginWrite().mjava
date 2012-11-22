@@ -1,6 +1,8 @@
     public WriteTransaction beginWrite()
     {
-        // FIXME: Can we throw from a native method? If not, we need to have a different way of reporting an error.
+        if (activeTransaction) 
+        	throw new IllegalStateException("Active transaction");
+        // FIXME: throw from nativeMethod in case of error
         WriteTransaction t = new WriteTransaction(this, nativeBeginWrite(nativePtr));
         activeTransaction = true;
         return t;
