@@ -4,7 +4,10 @@
      * @param name The name of the table.
      * @return The table if it exists, otherwise create it.
      */
-    public TableBase getTable(String name){
-        return new TableBase(this, nativeGetTableNativePtr(nativePtr, name), immutable);
+    public TableBase getTable(String name) {
+    	if (immutable)
+    		if (!hasTable(name))
+    			throwImmutable();
+    	return new TableBase(this, nativeGetTableNativePtr(nativePtr, name), immutable);
     }
 
