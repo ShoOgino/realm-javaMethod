@@ -1,40 +1,44 @@
-	// Test: exception at all mutable methods in TableBase, TableView,
-	// TableQuery.... in ReadTransactions
-	@Test
+	@Test(enabled=true)
 	public void mustFailOnWriteInReadTransactions() {
-		ReadTransaction t = db.beginRead();
-		TableBase table = t.getTable("Tbl");
+		writeOneTransaction();
 
-		// all the methods that will be tested are specified here:
-		Object[][] cases = {
-				{ "insertLong", 0, 0, 123 },
-				{ "insertBoolean", 0, 0, true },
-				// etc.
-		};
+ 		ReadTransaction t = db.beginRead(); 
+ 		long cnt = t.getTableCount();
+ 		for (int i=0; i< cnt; ++i)
+ 			System.out.println(i  + ":" + t.getTableName(i));
+ 		TableBase table = t.getTable("com.tightdb.EmployeeTable");
 
-		Method[] methods = table.getClass().getMethods();
-		for (Method method : methods) {
-			String name = method.getName();
-			for (Object[] c : cases) {
-				if (c[0].equals(name)) {
-					// we have a match, call the method
-					Object[] args = Arrays.copyOfRange(c, 1, c.length);
-					
-					try {
-						method.invoke(table, args);
-					} catch (IllegalArgumentException e) {
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
-					} catch (InvocationTargetException e) {
-						e.printStackTrace();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-
+ 		ByteBuffer buf = ByteBuffer.allocate(1);
+		try { table.insertBoolean(0, 0, false); assert(false);} catch (IllegalStateException e) {}		
+		try { table.addEmptyRow(); assert(false);} catch (IllegalStateException e) {}
+		try { table.addEmptyRows(1); assert(false);} catch (IllegalStateException e) {}
+		try { table.addLong(0,0);	assert(false);} catch (IllegalStateException e) {}
+		try { table.clear();	assert(false);} catch (IllegalStateException e) {}
+		try { table.clearSubTable(0,0);	assert(false);} catch (IllegalStateException e) {}
+		try { table.insertBinary(0,0,new byte[0]);	assert(false);} catch (IllegalStateException e) {}
+		try { table.insertBinary(0,0,buf);	assert(false);} catch (IllegalStateException e) {}
+		try { table.insertBoolean(0,0,true);	assert(false);} catch (IllegalStateException e) {}
+		try { table.insertDate(0,0,new Date(0));	assert(false);} catch (IllegalStateException e) {}
+		try { table.insertDone();	assert(false);} catch (IllegalStateException e) {}
+		try { table.insertLong(0,0,0);	assert(false);} catch (IllegalStateException e) {}
+		try { table.insertMixed(0,0,null);	assert(false);} catch (IllegalStateException e) {}
+		try { table.insertString(0,0,"");	assert(false);} catch (IllegalStateException e) {}
+		try { table.insertSubTable(0,0);	assert(false);} catch (IllegalStateException e) {}
+		try { table.optimize();	assert(false);} catch (IllegalStateException e) {}
+		try { table.remove(0);	assert(false);} catch (IllegalStateException e) {}
+		try { table.removeLast();	assert(false);} catch (IllegalStateException e) {}
+		try { table.setBinaryByteArray(0,0,new byte[0]);	assert(false);} catch (IllegalStateException e) {}
+		try { table.setBinaryByteBuffer(0,0,buf);	assert(false);} catch (IllegalStateException e) {}
+		try { table.setBoolean(0,0,false);	assert(false);} catch (IllegalStateException e) {}
+		try { table.setDate(0,0,new Date(0));	assert(false);} catch (IllegalStateException e) {}
+		try { table.setIndex(0);	assert(false);} catch (IllegalStateException e) {}
+		try { table.setLong(0,0,0);	assert(false);} catch (IllegalStateException e) {}
+		try { table.setMixed(0,0,null);	assert(false);} catch (IllegalStateException e) {}
+		try { table.setString(0,0,"");	assert(false);} catch (IllegalStateException e) {}
+		try { table.updateFromSpec(null);	assert(false);} catch (IllegalStateException e) {}
+//		try { table.();	assert(false);} catch (IllegalStateException e) {}
+		
 		t.endRead();
+		clear();
 	}
 

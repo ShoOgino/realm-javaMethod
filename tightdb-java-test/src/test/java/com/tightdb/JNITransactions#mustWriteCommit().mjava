@@ -1,17 +1,9 @@
 	@Test
 	public void mustWriteCommit() {
-		// Write to DB
-		{
-			WriteTransaction t = db.beginWrite();
-			EmployeeTable employees = new EmployeeTable(t);
-			employees.add("John", "Doe", 10000, true);
-			assertEquals(1, employees.size());
-			t.commit();
-			// assertEquals(1, employees.size()); must set exception as
-			// employees is invalid now.
-		}
-		// Read from DB
+		writeOneTransaction();
+		
 		checkRead(1);
-
+		
+		clear();
 	}
 
