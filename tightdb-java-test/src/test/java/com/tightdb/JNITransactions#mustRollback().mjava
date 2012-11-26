@@ -1,0 +1,16 @@
+	@Test
+	public void mustRollback() {
+		writeOneTransaction(1);
+		
+        WriteTransaction trans = db.beginWrite();
+        TableBase tbl = trans.getTable("EmployeeTable");
+
+        tbl.addEmptyRow(); tbl.setString(0, 0, "Hello"); tbl.setLong(1, 0, 1);
+		assertEquals(2, tbl.size());
+		trans.rollback();
+		
+		checkRead(1); // Only 1 row now.
+		
+		clear();
+	}
+
