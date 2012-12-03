@@ -1,5 +1,6 @@
 	@Test(enabled = true)
 	public void shouldCreateTablesInGroup() {
+		//util.setDebugLevel(2);
 		Group group = new Group();
 
 		TestEmployeeTable employees = new TestEmployeeTable(group);
@@ -11,7 +12,6 @@
 				5 }, new Date(), 1234);
 
 		byte[] data = group.writeToMem();
-		// data is currently disposed after group.close() !
 		
 		// check table info retrieval
 		assertEquals(1, group.getTableCount());
@@ -24,6 +24,7 @@
 		assertEquals(employees.size(),
 				group.getTable(TestEmployeeTable.class.getSimpleName()).size());
 		employees.clear();
+		group.close();
 
 		// Make new group based on same data.
 		Group group2 = new Group(data);
@@ -42,7 +43,5 @@
 		employees3.clear();
 		group3.close();
 
-		group.close();
-		System.out.println("Done");
 	}
 
