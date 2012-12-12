@@ -1,0 +1,66 @@
+	public void insertRow(long rowIndex, Object... values) {
+		if (immutable) throwImmutable();
+		
+		// Check values types
+		int columns = (int)getColumnCount();
+		ColumnType colTypes[] = new ColumnType[columns]; 
+		if (columns != values.length) {
+			throw new IllegalArgumentException("The number of value parameters (" + 
+					String.valueOf(values.length) + 
+					") does not match the number of columns in the table (" + 
+					String.valueOf(columns) + ").");
+		}
+		for (int columnIndex = 0; columnIndex < columns; columnIndex++) {  
+		    Object value = values[columnIndex];
+			ColumnType colType = getColumnType(columnIndex);
+			colTypes[columnIndex] = colType;
+			if (!colType.matchObject(value)) {
+				throw new IllegalArgumentException("Invalid argument no " + String.valueOf(1 + columnIndex) + 
+						". Expected a value compatible with column type " + colType + ", but got " + value.getClass() + ".");
+			}
+		}
+
+		// Insert values
+		for (long columnIndex = 0; columnIndex < columns; columnIndex++) {  
+			Object value = values[(int)columnIndex];
+			switch (colTypes[(int)columnIndex]) { 
+			case ColumnTypeBool:	
+				nativeInsertBoolean(nativePtr, columnIndex, rowIndex, (Boolean)value);
+				break;
+			case ColumnTypeInt:	
+				nativeInsertLong(nativePtr, columnIndex, rowIndex, ((Number)value).longValue());
+				break;
+			case ColumnTypeString:
+				nativeInsertString(nativePtr, columnIndex, rowIndex, (String)value);
+				break;
+			case ColumnTypeDate:
+				nativeInsertDate(nativePtr, columnIndex, rowIndex, ((Date)value).getTime()/1000);
+				break;
+			case ColumnTypeMixed:	
+				nativeInsertMixed(nativePtr, columnIndex, rowIndex, (Mixed)value);
+				break;
+			case ColumnTypeBinary:
+				if (value instanceof byte[])
+					nativeInsertByteArray(nativePtr, columnIndex, rowIndex, (byte[])value);
+				else if (value instanceof ByteBuffer)
+					nativeInsertByteBuffer(nativePtr, columnIndex, rowIndex, (ByteBuffer)value);
+				break;
+			case ColumnTypeTable:
+				nativeInsertSubTable(nativePtr, columnIndex, rowIndex);
+				if (value != null) {
+					// insert subtable(s) recursively
+					TableBase subtable = getSubTable(columnIndex, rowIndex);
+					int len = ((Object[])value).length;
+					for (int i=0; i<len; ++i) {
+						Object rowArr = ((Object[])value)[i];
+						subtable.insertRow(i, (Object[])rowArr);
+					}
+				}
+				break;
+			default:
+				throw new RuntimeException("Unexpected columnType: " + String.valueOf(colTypes[(int)columnIndex]));
+			}
+		}
+		insertDone();
+	}
+

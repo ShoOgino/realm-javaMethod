@@ -1,0 +1,76 @@
+	@Test()
+	public void ShouldFailInsert() {
+		TableBase table = new TableBase();
+		TableSpec tableSpec = new TableSpec();
+		tableSpec.addColumn(ColumnType.ColumnTypeBool, "bool");
+		tableSpec.addColumn(ColumnType.ColumnTypeInt, "number");
+		tableSpec.addColumn(ColumnType.ColumnTypeString, "string");
+		tableSpec.addColumn(ColumnType.ColumnTypeBinary, "Bin");
+		tableSpec.addColumn(ColumnType.ColumnTypeDate, "date");
+		tableSpec.addColumn(ColumnType.ColumnTypeMixed, "mix");
+		TableSpec subspec = tableSpec.addSubtableColumn("sub");
+		subspec.addColumn(ColumnType.ColumnTypeInt, "sub-num");
+		table.updateFromSpec(tableSpec);
+
+		// Wrong number of parameters
+		ByteBuffer buf = ByteBuffer.allocateDirect(23);
+		try {
+			table.insertRow(0, false);
+			assertTrue(false);
+		} catch (IllegalArgumentException e) {}
+		
+		// Wrong type of parameter (999 instead of bool)
+		try {
+			table.insertRow(0, 999, 1, "hi", buf, new Date(), new Mixed(123), null);
+			assertTrue(false);
+		} catch (IllegalArgumentException e) {}
+
+		// Wrong type of parameter (bool instead of 1)
+		try {
+			table.insertRow(0, true, false, "hi", buf, new Date(), new Mixed(123), null);
+			assertTrue(false);
+		} catch (IllegalArgumentException e) {}
+
+		// Wrong type of parameter (999 instead of string)
+		try {
+			table.insertRow(0, false, 1, 999, buf, new Date(), new Mixed(123), null);
+			assertTrue(false);
+		} catch (IllegalArgumentException e) {}
+
+		// Wrong type of parameter (999 instead of Binary)
+		try {
+			table.insertRow(0, false, 1, "hi", 999, new Date(), new Mixed(123), null);
+			assertTrue(false);
+		} catch (IllegalArgumentException e) {}
+
+		// Wrong type of parameter (999 instead of Date)
+		try {
+			table.insertRow(0, false, 1, "hi", buf, 999, new Mixed(123), null);
+			assertTrue(false);
+		} catch (IllegalArgumentException e) {}
+
+		// Wrong type of parameter (999 instead of Mixed)
+		try {
+			table.insertRow(0, false, 1, "hi", buf, new Date(), 999, null);
+			assertTrue(false);
+		} catch (IllegalArgumentException e) {}
+
+		// Wrong type of parameter (999 instead of subtable)
+		try {
+			table.insertRow(0, false, 1, "hi", buf, new Date(), new Mixed(123), 999);
+			assertTrue(false);
+		} catch (IllegalArgumentException e) {}		
+
+		// Wrong type of parameter (String instead of subtable-Int)
+		try {
+			table.insertRow(0, false, 1, "hi", buf, new Date(), new Mixed(123), new Object[][] { {"err",2,3}} );
+			assertTrue(false);
+		} catch (IllegalArgumentException e) {}		
+
+		// Wrong type of parameter (String instead of subtable-Int)
+		try {
+			table.insertRow(0, false, 1, "hi", buf, new Date(), new Mixed(123), new Object[] {1,2,3} );
+			assertTrue(false);
+		} catch (IllegalArgumentException e) {}		
+	}
+

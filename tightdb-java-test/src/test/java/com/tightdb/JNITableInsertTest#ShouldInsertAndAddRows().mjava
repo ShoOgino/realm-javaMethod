@@ -1,0 +1,40 @@
+	@Test()
+	public void ShouldInsertAndAddRows() {
+		TableBase table = new TableBase();
+		TableSpec tableSpec = new TableSpec();
+		tableSpec.addColumn(ColumnType.ColumnTypeBool, "bool");
+		tableSpec.addColumn(ColumnType.ColumnTypeInt, "number");
+		tableSpec.addColumn(ColumnType.ColumnTypeString, "string");
+		tableSpec.addColumn(ColumnType.ColumnTypeBinary, "Bin");
+		tableSpec.addColumn(ColumnType.ColumnTypeDate, "date");
+		tableSpec.addColumn(ColumnType.ColumnTypeMixed, "mix");
+		TableSpec subspec = tableSpec.addSubtableColumn("sub");
+		subspec.addColumn(ColumnType.ColumnTypeInt, "sub-num");
+		subspec.addColumn(ColumnType.ColumnTypeString, "sub-str");
+		table.updateFromSpec(tableSpec);
+		
+		ByteBuffer buf = ByteBuffer.allocateDirect(23);
+		Mixed mixedSubTable = new Mixed(ColumnType.ColumnTypeTable);
+		Date date = new Date();
+		Mixed mixed = new Mixed(123);
+
+		// Check subtable
+		Object[][] subTblData = new Object[][] {{234, "row0"},
+					 						 	{345, "row1"},
+					 						 	{456, "row2"} };
+		Object[] rowData0 = new Object[] {false, (short)2, "hi", buf, date, mixed, subTblData};
+		table.addRow(rowData0);
+		verifyRow(table, 0, rowData0);
+
+		Object[] rowData1 = new Object[] {false, 7, "hi1", new byte[] {0,2,3}, date, new Mixed("mix1"), null};
+		Object[] rowData2 = new Object[] {true, 12345567789L, "hello", new byte[] {0}, date, new Mixed(buf), null};
+		Object[] rowData3 = new Object[] {false, (byte)17, "hi3", buf, date, mixedSubTable, null};
+		table.insertRow(1, rowData1);
+		table.addRow(rowData2);
+		table.insertRow(3, rowData3);
+		
+		verifyRow(table, 1, rowData1);
+		verifyRow(table, 2, rowData2);
+		verifyRow(table, 3, rowData3);	
+	}
+
