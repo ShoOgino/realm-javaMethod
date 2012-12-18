@@ -1,5 +1,12 @@
-	public void insertRow(long rowIndex, Object... values) {
+	public void insert(long rowIndex, Object... values) {
 		if (immutable) throwImmutable();
+		
+		// Check index
+		long size = size();
+		if (rowIndex > size) {
+			throw new IllegalArgumentException("rowIndex " + String.valueOf(rowIndex) + 
+					" must be <= table.size() " + String.valueOf(size) + ".");
+		}
 		
 		// Check values types
 		int columns = (int)getColumnCount();
@@ -36,8 +43,8 @@
 			case ColumnTypeDate:
 				nativeInsertDate(nativePtr, columnIndex, rowIndex, ((Date)value).getTime()/1000);
 				break;
-			case ColumnTypeMixed:	
-				nativeInsertMixed(nativePtr, columnIndex, rowIndex, (Mixed)value);
+			case ColumnTypeMixed:
+				nativeInsertMixed(nativePtr, columnIndex, rowIndex, Mixed.mixedValue(value));
 				break;
 			case ColumnTypeBinary:
 				if (value instanceof byte[])
@@ -48,12 +55,12 @@
 			case ColumnTypeTable:
 				nativeInsertSubTable(nativePtr, columnIndex, rowIndex);
 				if (value != null) {
-					// insert subtable(s) recursively
-					TableBase subtable = getSubTable(columnIndex, rowIndex);
-					int len = ((Object[])value).length;
-					for (int i=0; i<len; ++i) {
+					// insert rows in subtable recursively
+					TableBase subtable = getSubTableDuringInsert(columnIndex, rowIndex);
+					int rows = ((Object[])value).length;
+					for (int i=0; i<rows; ++i) {
 						Object rowArr = ((Object[])value)[i];
-						subtable.insertRow(i, (Object[])rowArr);
+						subtable.insert(i, (Object[])rowArr);
 					}
 				}
 				break;

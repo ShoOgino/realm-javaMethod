@@ -1,4 +1,4 @@
-	@Test(enabled = true)
+	@Test()
 	public void shouldSynchronizeNestedTables() {
 		Group group = new Group();
 		TableBase table = group.getTable("emp");
@@ -11,14 +11,11 @@
 
 		table.updateFromSpec(tableSpec);
 
-		table.insertString(0, 0, "Foo");
-		table.insertSubTable(1, 0);
-		table.insertDone();
+		table.add("Foo", null);
 		assertEquals(1, table.size());
 
 		TableBase subtable1 = table.getSubTable(1, 0);
-		subtable1.insertLong(0, 0, 123);
-		subtable1.insertDone();
+		subtable1.add(123);
 		assertEquals(1, subtable1.size());
 		subtable1.close();
 		
