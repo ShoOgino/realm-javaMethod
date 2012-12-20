@@ -1,9 +1,7 @@
-	private void processAnnotatedElements(Set<? extends Element> elements, boolean insideEclipse)
-			throws IOException {
+	private void processAnnotatedElements(Set<? extends Element> elements, boolean insideEclipse) throws IOException {
 		logger.info("Processing " + elements.size() + " elements...");
 
-		URI uri = filer.getResource(StandardLocation.SOURCE_OUTPUT, "", "foo")
-				.toUri();
+		URI uri = filer.getResource(StandardLocation.SOURCE_OUTPUT, "", "foo").toUri();
 		if (uri.toString().equals("foo")) {
 			throw new RuntimeException(
 					"The path of the Java source and generated files must be configured as source output! (see -s option of javac)");
@@ -11,7 +9,8 @@
 
 		List<File> sourcesPath = new LinkedList<File>();
 
-		// FIXME: Workaround for OS X - resolve relative URIs against current working directory
+		// FIXME: Workaround for OS X - resolve relative URIs against current
+		// working directory
 		uri = new File(".").getAbsoluteFile().toURI().resolve(uri);
 
 		File file = new File(uri);
