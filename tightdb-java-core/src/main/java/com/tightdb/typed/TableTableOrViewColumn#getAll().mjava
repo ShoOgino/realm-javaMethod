@@ -1,0 +1,11 @@
+	@SuppressWarnings("unchecked")
+	public Subtable[] getAll() {
+		long count = tableOrView.size();
+		Subtable[] values = (Subtable[]) Array.newInstance(subtableClass, (int) count);
+		for (int i = 0; i < count; i++) {
+			Table subTableBase = tableOrView.getSubTable(columnIndex, i);
+			values[i] = AbstractSubtable.createSubtable(subtableClass, subTableBase);
+		}
+		return values;
+	}
+
