@@ -1,0 +1,24 @@
+	@Test()
+	public void shouldInsertNestedTablesNested() {
+		Group group = new Group();
+		Table table = group.getTable("emp");
+
+		// Define table
+		TableSpec tableSpec = new TableSpec();
+		tableSpec.addColumn(ColumnType.ColumnTypeString, "name");
+		
+		TableSpec subspec = tableSpec.addSubtableColumn("sub");
+		subspec.addColumn(ColumnType.ColumnTypeInt, "num");
+		
+		tableSpec.addColumn(ColumnType.ColumnTypeInt, "Int");
+		table.updateFromSpec(tableSpec);
+
+		// Insert values
+		table.add("Foo", null, 123456);
+		table.getSubTable(1, 0).add(123);
+		assertEquals(1, table.getSubTable(1, 0).size());
+		assertEquals(123, table.getSubTable(1, 0).getLong(0,0));
+
+		assertEquals(1, table.size());
+	}
+
