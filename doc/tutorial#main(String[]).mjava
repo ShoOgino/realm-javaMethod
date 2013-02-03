@@ -18,7 +18,7 @@
 	
 	// @@Example: number_of_rows @@
 	if (!peopletable.isEmpty()) {
-		long s = peopletable.size(); // s => 6
+	    long s = peopletable.size(); // s => 6
 	}
 	// @@EndExample@@
 	
@@ -72,13 +72,13 @@
 	// @@Example: advanced_search @@
 	// Define the query
 	PeopleQuery query = peopletable
-			.age.between(20, 35)		// Implicit AND with below
-			.name.contains("a")		// Implicit AND with below
-			.group()			// "("
-				.hired.equal(true)
-				.or()			// or
-				.name.endsWith("y")
-			.endGroup();			// ")"
+	                       .age.between(20, 35)    // Implicit AND with below
+	                       .name.contains("a")     // Implicit AND with below
+	                       .group()                // "("
+	                           .hired.equal(true)
+	                           .or()               // or
+	                           .name.endsWith("y")
+	                       .endGroup();            // ")"
 	// Count matches
 	PeopleView match = query.findAll();
 	System.out.println(match.size() + " person(s) match query.");
@@ -88,7 +88,7 @@
 	
 	// Perform query and use the result
 	for (PeopleRow person : match) {
-		// ... do something with matching 'person'
+	    // ... do something with matching 'person'
 	}
 	// @@EndExample
 	System.out.println("");
@@ -106,9 +106,9 @@
 	
 	// Write to disk
 	try {
-		group.writeToFile("people.tightdb");
+	    group.writeToFile("people.tightdb");
 	} catch (IOException e) {
-		e.printStackTrace();
+	    e.printStackTrace();
 	}
 	
 	// Load a group from disk (and print contents)
@@ -116,7 +116,7 @@
 	PeopleTable people2 = new PeopleTable(fromDisk);
 	
 	for (PeopleRow person : people2) {
-		System.out.println(person.getName() + " is " + person.getAge() + " years old");
+	    System.out.println(person.getName() + " is " + person.getAge() + " years old");
 	}
 	
 	// Write same group to memory buffer
@@ -127,7 +127,7 @@
 	PeopleTable people3 = new PeopleTable(fromMem);
 	
 	for (PeopleRow person : people3) {
-		System.out.println(person.getName() + " is " + person.getAge() + " years old");
+	    System.out.println(person.getName() + " is " + person.getAge() + " years old");
 	}
 	// @@EndExample@@
 	}
