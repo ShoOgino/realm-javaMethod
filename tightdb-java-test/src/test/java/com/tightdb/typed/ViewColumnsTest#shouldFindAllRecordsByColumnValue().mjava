@@ -1,0 +1,34 @@
+	@Test
+	public void shouldFindAllRecordsByColumnValue()
+			throws IllegalAccessException {
+		TestEmployeeView view = null;
+
+		view = employeesView.firstName
+				.findAll(EmployeesFixture.EMPLOYEES[1].firstName);
+		assertEquals(1, view.size());
+
+		view = employeesView.salary
+				.findAll(EmployeesFixture.EMPLOYEES[0].salary);
+		assertEquals(2, view.size());
+
+		view = employeesView.salary.findAll(12345);
+		assertEquals(0, view.size());
+
+		view = employeesView.driver.findAll(false);
+		assertEquals(1, view.size());
+
+		view = employeesView.driver.findAll(true);
+		assertEquals(2, view.size());
+
+		view = employeesView.birthdate
+				.findAll(EmployeesFixture.EMPLOYEES[2].birthdate);
+		assertEquals(1, view.size());
+
+		view = employeesView.birthdate
+				.findAll(EmployeesFixture.EMPLOYEES[1].birthdate);
+		assertEquals(1, view.size());
+
+		view = employeesView.birthdate.findAll(new Date(0));
+		assertEquals(0, view.size());
+	}
+
