@@ -1,21 +1,17 @@
 	private void setupModelInfo(TypeElement model) {
-		AnnotationMirror annotationMirror = getAnnotationInfo(model,
-				Table.class);
+		AnnotationMirror annotationMirror = getAnnotationInfo(model, DefineTable.class);
 		String tableName = getAttribute(annotationMirror, "table");
 		String cursorName = getAttribute(annotationMirror, "row");
 		String viewName = getAttribute(annotationMirror, "view");
 		String queryName = getAttribute(annotationMirror, "query");
 
-		String entity = StringUtils
-				.capitalize(model.getSimpleName().toString());
+		String entity = StringUtils.capitalize(model.getSimpleName().toString());
 
 		tableName = tableName == null ? calculateTableName(entity) : tableName;
-		cursorName = cursorName == null ? calculateCursorName(entity)
-				: cursorName;
+		cursorName = cursorName == null ? calculateCursorName(entity) : cursorName;
 		viewName = viewName == null ? calculateViewName(entity) : viewName;
 		queryName = queryName == null ? calculateQueryName(entity) : queryName;
 
-		modelsInfo.put(entity, new ModelInfo(tableName, cursorName, viewName,
-				queryName));
+		modelsInfo.put(entity, new ModelInfo(tableName, cursorName, viewName, queryName));
 	}
 

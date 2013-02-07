@@ -1,0 +1,12 @@
+	private void insertSubtableValues(long rowIndex, long columnIndex, Object value) {
+		if (value != null) {
+			// insert rows in subtable recursively
+			Table subtable = getSubTableDuringInsert(columnIndex, rowIndex);
+			int rows = ((Object[])value).length;
+			for (int i=0; i<rows; ++i) {
+				Object rowArr = ((Object[])value)[i];
+				subtable.insert(i, (Object[])rowArr);
+			}
+		}
+	}
+
