@@ -1,0 +1,19 @@
+	TightdbGraphStore(String filename) {
+		db = new SharedGroup(filename);
+
+		// Create initial tables
+		WriteTransaction tr = db.beginWrite();
+		try {
+			if (tr.size() == 0) {
+				NodeTable nodes = new NodeTable(tr);
+				LinkTable links = new LinkTable(tr);
+				DeletedTable deletedNodes = new DeletedTable(tr);
+				DeletedTable deletedLinks = new DeletedTable(tr);
+				tr.commit();
+			}
+		} catch (Exception e) {
+			System.err.println("Exception");
+			tr.rollback();
+		}	
+	}
+
