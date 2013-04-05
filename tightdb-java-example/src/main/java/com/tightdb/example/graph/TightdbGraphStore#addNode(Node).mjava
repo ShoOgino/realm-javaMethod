@@ -1,13 +1,30 @@
 	long addNode(Node node) {
+		long free_row_ndx = 0;
 		WriteTransaction tr = db.beginWrite();
 		try {						
-			tr.getTable(NODES);
+			NodeTable nodes = new NodeTable(tr);
+			NodeDeletedTable deleted_nodes = new NodeDeletedTable(tr);
+			if (deleted_nodes.isEmpty()) {
+				nodes.add(node.node_type, node.version, node.time, node.data, false, null, null);
+				free_row_ndx = nodes.size() - 1; // inserted at end
+			} else {
+				 free_row_ndx = deleted_nodes.at(0).getId();
+				 // (set() method is not yet implemented in typed interface
+				 nodes.at(free_row_ndx).setNode_type(node.node_type);
+				 nodes.at(free_row_ndx).setVersion(node.version);
+				 nodes.at(free_row_ndx).setTime(node.time);
+				 nodes.at(free_row_ndx).setData(node.data);
+				 nodes.at(free_row_ndx).setDeleted(false);
+				 nodes.at(free_row_ndx).setLink_in(null);
+				 nodes.at(free_row_ndx).setLink_out(null);
+				 
+				 deleted_nodes.remove(0);
+			}
 			tr.commit();
 		} catch (Exception e) {
 			System.err.println("Exception");
 			tr.rollback();
 		}
-		
-		return 0;
+		return free_row_ndx;
 	}
 

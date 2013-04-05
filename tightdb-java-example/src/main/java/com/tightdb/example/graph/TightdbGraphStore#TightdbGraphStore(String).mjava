@@ -5,15 +5,17 @@
 		WriteTransaction tr = db.beginWrite();
 		try {
 			if (tr.size() == 0) {
-				NodeTable nodes = new NodeTable(tr);
-				LinkTable links = new LinkTable(tr);
-				DeletedTable deletedNodes = new DeletedTable(tr);
-				DeletedTable deletedLinks = new DeletedTable(tr);
-				tr.commit();
+				new NodeTable(tr);
+				new LinkTable(tr);
+				new NodeDeletedTable(tr);
+				new LinkDeletedTable(tr);
+				for (int i=0; i<tr.size(); i++)
+					System.out.println(" Table: '" + tr.getTableName(i) + "' created.");
+				tr.commit();		
 			}
 		} catch (Exception e) {
-			System.err.println("Exception");
 			tr.rollback();
-		}	
+			System.err.println("Exception");
+		}
 	}
 
