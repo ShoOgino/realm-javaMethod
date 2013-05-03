@@ -1,18 +1,18 @@
-   	public static TestResult TestPerformance(IPerformance test, int rows) 
+   	public static TestResult TestPerformance(IPerformance test, int rows)
 	{
    		TestResult	result = new TestResult();
    		Timer 		timer = new Timer();
 		int			testNo = 0;
-		
+
 		if (pause) util.waitForEnter();
 		long memBefore = Util.getUsedMemory(); memBefore = Util.getUsedMemory();
-		
+
 		// Build the test database
 		test.buildTable(rows);
-		
+
 		result.javaDBMemUsed = Math.max(Util.getUsedMemory() - memBefore, 1);
 		result.nativeDBMemUsed = test.usedNativeMemory();
-		
+
 		// Search small integer column
 		{
 		    // Do a search over entire column (value not found)
@@ -44,7 +44,7 @@
 		    test.end_findByteInt();
 		    System.out.printf("*");
 		}
-		
+
 		// Search long-size integer column
 		{
 			test.begin_findLongInt(LONG_TEST_VAL + 1);
@@ -60,7 +60,7 @@
 		    test.end_findLongInt();
 		    System.out.printf("*");
 		}
-		
+
 		// Search string column
 		{
 			test.begin_findString("abcde");
@@ -82,12 +82,12 @@
 		    timer.Start();
 
 		    boolean indexSupported = test.addIndex();
-		    
+
 		    if (indexSupported) {
 		    	result.testTime[testNo++] = timer.GetTimeInMs();
 		    	System.out.printf("*");
 			    //System.out.printf("Memory usage2: %lld bytes\n", (long long)GetMemUsage());
-			
+
 				// Search with index
 				test.begin_findIntWithIndex();
 			    timer.Start();
@@ -103,10 +103,10 @@
 			    System.out.printf("*");
 			}
 		}
-*/		
+*/
 		if (pause) util.waitForEnter();
 		test.closeTable();
-		
+
 		return result;
 	}
 
