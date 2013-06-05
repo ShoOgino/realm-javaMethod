@@ -1,23 +1,23 @@
-	private static void describeAndGen(AbstractDesc desc, String cls,
-			Context context) throws Exception {
-		constructors.clear();
-		methods.clear();
-		desc.describe();
+    private static void describeAndGen(AbstractDesc desc, String cls,
+            Context context) throws Exception {
+        constructors.clear();
+        methods.clear();
+        desc.describe();
 
-		context.put("class", cls);
-		context.put("method_list", generateMethodList(cls));
-		context.put("constructor_overview", generateConstructorOverview(cls));
-		context.put("method_overview", generateMethodOverview(cls));
-		context.put("constructor_details", generateConstructorsDetails(cls));
-		context.put("method_details", generateMethodsDetails(cls));
+        context.put("class", cls);
+        context.put("method_list", generateMethodList(cls));
+        context.put("constructor_overview", generateConstructorOverview(cls));
+        context.put("method_overview", generateMethodOverview(cls));
+        context.put("constructor_details", generateConstructorsDetails(cls));
+        context.put("method_details", generateMethodsDetails(cls));
 
-		if (cls.equalsIgnoreCase("table") || cls.equalsIgnoreCase("view")) {
-			context.put("columns", generateTableOrViewColumns());
-		} else if (cls.equalsIgnoreCase("query")) {
-			context.put("columns", generateQueryColumns());
-		}
+        if (cls.equalsIgnoreCase("table") || cls.equalsIgnoreCase("view")) {
+            context.put("columns", generateTableOrViewColumns());
+        } else if (cls.equalsIgnoreCase("query")) {
+            context.put("columns", generateQueryColumns());
+        }
 
-		String doc = renderer.render(cls.toLowerCase() + "-ref.vm", context);
-		writeFile("method-ref/" + cls.toLowerCase(), doc);
-	}
+        String doc = renderer.render(cls.toLowerCase() + "-ref.vm", context);
+        writeFile("method-ref/" + cls.toLowerCase(), doc);
+    }
 

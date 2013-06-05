@@ -1,39 +1,39 @@
-	private List<Model> getColumns(List<VariableElement> fields) {
-		int index = 0;
-		final List<Model> columns = new ArrayList<Model>();
-		for (VariableElement field : fields) {
-			String columnType = getColumnType(field);
-			if (columnType != null) {
-				String originalType = fieldType(field);
-				String fieldType = getAdjustedFieldType(field);
-				String paramType = getParamType(field);
-				String fieldName = field.getSimpleName().toString();
+    private List<Model> getColumns(List<VariableElement> fields) {
+        int index = 0;
+        final List<Model> columns = new ArrayList<Model>();
+        for (VariableElement field : fields) {
+            String columnType = getColumnType(field);
+            if (columnType != null) {
+                String originalType = fieldType(field);
+                String fieldType = getAdjustedFieldType(field);
+                String paramType = getParamType(field);
+                String fieldName = field.getSimpleName().toString();
 
-				boolean isSubtable = isSubtable(fieldType);
-				String subtype = isSubtable ? getSubtableType(field) : null;
+                boolean isSubtable = isSubtable(fieldType);
+                String subtype = isSubtable ? getSubtableType(field) : null;
 
-				Model column = new Model();
-				column.put("name", fieldName);
-				column.put("type", columnType);
-				column.put("originalType", originalType);
-				column.put("fieldType", fieldType);
-				column.put("paramType", paramType);
-				column.put("index", index++);
-				column.put("isSubtable", isSubtable);
+                Model column = new Model();
+                column.put("name", fieldName);
+                column.put("type", columnType);
+                column.put("originalType", originalType);
+                column.put("fieldType", fieldType);
+                column.put("paramType", paramType);
+                column.put("index", index++);
+                column.put("isSubtable", isSubtable);
 
-				if (isSubtable) {
-					ModelInfo subModelInfo = modelsInfo.get(subtype);
-					column.put("subTableName", subModelInfo.getTableName());
-					column.put("subCursorName", subModelInfo.getCursorName());
-					column.put("subViewName", subModelInfo.getViewName());
-					column.put("subQueryName", subModelInfo.getQueryName());
-				}
+                if (isSubtable) {
+                    ModelInfo subModelInfo = modelsInfo.get(subtype);
+                    column.put("subTableName", subModelInfo.getTableName());
+                    column.put("subCursorName", subModelInfo.getCursorName());
+                    column.put("subViewName", subModelInfo.getViewName());
+                    column.put("subQueryName", subModelInfo.getQueryName());
+                }
 
-				columns.add(column);
-			} else {
-				logger.error(MSG_INCORRECT_TYPE, field);
-			}
-		}
-		return columns;
-	}
+                columns.add(column);
+            } else {
+                logger.error(MSG_INCORRECT_TYPE, field);
+            }
+        }
+        return columns;
+    }
 

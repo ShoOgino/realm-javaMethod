@@ -1,23 +1,23 @@
     protected void writeOneTransaction(long rows)
-	{
+    {
         WriteTransaction trans = db.beginWrite();
         Table tbl = trans.getTable("EmployeeTable");
-		TableSpec tableSpec = new TableSpec();
-		tableSpec.addColumn(ColumnType.ColumnTypeString, "name");
-		tableSpec.addColumn(ColumnType.ColumnTypeInt, "number");
-		tbl.updateFromSpec(tableSpec);
+        TableSpec tableSpec = new TableSpec();
+        tableSpec.addColumn(ColumnType.ColumnTypeString, "name");
+        tableSpec.addColumn(ColumnType.ColumnTypeInt, "number");
+        tbl.updateFromSpec(tableSpec);
 
-		for (long row=0; row < rows; row++)
-			tbl.add("Hi", 1);
-		assertEquals(rows, tbl.size());
+        for (long row=0; row < rows; row++)
+            tbl.add("Hi", 1);
+        assertEquals(rows, tbl.size());
         trans.commit();
         
         // must throw exception as table is invalid now.
         try {
-        	assertEquals(1, tbl.size());
-        	assert(false);
+            assertEquals(1, tbl.size());
+            assert(false);
         } catch (IllegalArgumentException e) {
         }
         
-	}
+    }
 

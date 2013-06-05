@@ -1,53 +1,53 @@
-	private void generateSources(TypeElement model, String tableName, String cursorName, String viewName,
-			String queryName, String packageName, Map<String, Object> commonAttr) {
-		/*********** Generate the table class ****************/
+    private void generateSources(TypeElement model, String tableName, String cursorName, String viewName,
+            String queryName, String packageName, Map<String, Object> commonAttr) {
+        /*********** Generate the table class ****************/
 
-		Model table = new Model();
-		table.put("name", tableName);
-		table.putAll(commonAttr);
+        Model table = new Model();
+        table.put("name", tableName);
+        table.putAll(commonAttr);
 
-		/* Generate the "add" method in the table class */
+        /* Generate the "add" method in the table class */
 
-		Model methodAdd = new Model();
-		methodAdd.putAll(commonAttr);
-		table.put("add", renderer.render("table_add.ftl", methodAdd));
+        Model methodAdd = new Model();
+        methodAdd.putAll(commonAttr);
+        table.put("add", renderer.render("table_add.ftl", methodAdd));
 
-		/* Generate the "insert" method in the table class */
+        /* Generate the "insert" method in the table class */
 
-		Model methodInsert = new Model();
-		methodInsert.putAll(commonAttr);
-		table.put("insert", renderer.render("table_insert.ftl", methodInsert));
+        Model methodInsert = new Model();
+        methodInsert.putAll(commonAttr);
+        table.put("insert", renderer.render("table_insert.ftl", methodInsert));
 
-		/* Generate the table class */
+        /* Generate the table class */
 
-		String tableContent = renderer.render("table.ftl", table);
-		writeToSourceFile(packageName, tableName, tableContent, model);
+        String tableContent = renderer.render("table.ftl", table);
+        writeToSourceFile(packageName, tableName, tableContent, model);
 
-		/*********** Generate the cursor class ****************/
+        /*********** Generate the cursor class ****************/
 
-		Model cursor = new Model();
-		cursor.put("name", cursorName);
-		cursor.putAll(commonAttr);
+        Model cursor = new Model();
+        cursor.put("name", cursorName);
+        cursor.putAll(commonAttr);
 
-		String cursorContent = renderer.render("cursor.ftl", cursor);
-		writeToSourceFile(packageName, cursorName, cursorContent, model);
+        String cursorContent = renderer.render("cursor.ftl", cursor);
+        writeToSourceFile(packageName, cursorName, cursorContent, model);
 
-		/*********** Generate the view class ****************/
+        /*********** Generate the view class ****************/
 
-		Model view = new Model();
-		view.put("name", viewName);
-		view.putAll(commonAttr);
+        Model view = new Model();
+        view.put("name", viewName);
+        view.putAll(commonAttr);
 
-		String viewContent = renderer.render("view.ftl", view);
-		writeToSourceFile(packageName, viewName, viewContent, model);
+        String viewContent = renderer.render("view.ftl", view);
+        writeToSourceFile(packageName, viewName, viewContent, model);
 
-		/*********** Generate the query class ****************/
+        /*********** Generate the query class ****************/
 
-		Model query = new Model();
-		query.put("name", queryName);
-		query.putAll(commonAttr);
+        Model query = new Model();
+        query.put("name", queryName);
+        query.putAll(commonAttr);
 
-		String queryContent = renderer.render("query.ftl", query);
-		writeToSourceFile(packageName, queryName, queryContent, model);
-	}
+        String queryContent = renderer.render("query.ftl", query);
+        writeToSourceFile(packageName, queryName, queryContent, model);
+    }
 

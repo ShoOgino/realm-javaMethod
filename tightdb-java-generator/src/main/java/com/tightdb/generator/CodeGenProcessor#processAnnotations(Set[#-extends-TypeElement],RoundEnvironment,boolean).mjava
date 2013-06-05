@@ -1,16 +1,16 @@
-	@Override
-	public void processAnnotations(Set<? extends TypeElement> annotations, RoundEnvironment env, boolean insideEclipse)
-			throws Exception {
-		fieldSorter = new FieldSorter(logger, getSourceFolders());
+    @Override
+    public void processAnnotations(Set<? extends TypeElement> annotations, RoundEnvironment env, boolean insideEclipse)
+            throws Exception {
+        fieldSorter = new FieldSorter(logger, getSourceFolders());
 
-		for (TypeElement annotation : annotations) {
-			String annotationName = annotation.getQualifiedName().toString();
-			if (annotationName.equals(DefineTable.class.getCanonicalName())) {
-				Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
-				processAnnotatedElements(elements, insideEclipse);
-			} else {
-				logger.warn("Unexpected annotation: " + annotationName);
-			}
-		}
-	}
+        for (TypeElement annotation : annotations) {
+            String annotationName = annotation.getQualifiedName().toString();
+            if (annotationName.equals(DefineTable.class.getCanonicalName())) {
+                Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
+                processAnnotatedElements(elements, insideEclipse);
+            } else {
+                logger.warn("Unexpected annotation: " + annotationName);
+            }
+        }
+    }
 

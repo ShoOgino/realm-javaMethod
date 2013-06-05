@@ -1,52 +1,52 @@
-	private void processAnnotatedElements(Set<? extends Element> elements, boolean insideEclipse) throws IOException {
-		logger.info("Processing " + elements.size() + " elements...");
+    private void processAnnotatedElements(Set<? extends Element> elements, boolean insideEclipse) throws IOException {
+        logger.info("Processing " + elements.size() + " elements...");
 
-		URI uri = filer.getResource(StandardLocation.SOURCE_OUTPUT, "", "foo").toUri();
-		if (uri.toString().equals("foo")) {
-			throw new RuntimeException(
-					"The path of the Java source and generated files must be configured as source output! (see -s option of javac)");
-		}
+        URI uri = filer.getResource(StandardLocation.SOURCE_OUTPUT, "", "foo").toUri();
+        if (uri.toString().equals("foo")) {
+            throw new RuntimeException(
+                    "The path of the Java source and generated files must be configured as source output! (see -s option of javac)");
+        }
 
-		List<File> sourcesPath = new LinkedList<File>();
+        List<File> sourcesPath = new LinkedList<File>();
 
-		// FIXME: Workaround for OS X - resolve relative URIs against current
-		// working directory
-		uri = new File(".").getAbsoluteFile().toURI().resolve(uri);
+        // FIXME: Workaround for OS X - resolve relative URIs against current
+        // working directory
+        uri = new File(".").getAbsoluteFile().toURI().resolve(uri);
 
-		File file = new File(uri);
-		File outputFolder = file.getParentFile();
-		File generatedSourcesPath = outputFolder;
+        File file = new File(uri);
+        File outputFolder = file.getParentFile();
+        File generatedSourcesPath = outputFolder;
 
-		String[] sourceFolders = getSourceFolders();
-		while (generatedSourcesPath != null) {
-			for (String sourceFolder : sourceFolders) {
-				File potentialPath = new File(generatedSourcesPath, sourceFolder);
-				if (potentialPath.exists()) {
-					sourcesPath.add(potentialPath);
-					logger.info("Configured source folder: " + potentialPath);
-				}
-			}
-			generatedSourcesPath = generatedSourcesPath.getParentFile();
-		}
+        String[] sourceFolders = getSourceFolders();
+        while (generatedSourcesPath != null) {
+            for (String sourceFolder : sourceFolders) {
+                File potentialPath = new File(generatedSourcesPath, sourceFolder);
+                if (potentialPath.exists()) {
+                    sourcesPath.add(potentialPath);
+                    logger.info("Configured source folder: " + potentialPath);
+                }
+            }
+            generatedSourcesPath = generatedSourcesPath.getParentFile();
+        }
 
-		// add the sources output folder as the last option to search sources
-		sourcesPath.add(outputFolder);
-		logger.info("Configured destination folder: " + outputFolder);
+        // add the sources output folder as the last option to search sources
+        sourcesPath.add(outputFolder);
+        logger.info("Configured destination folder: " + outputFolder);
 
-		prepareTables(elements);
+        prepareTables(elements);
 
-		for (Element element : elements) {
-			if (element instanceof TypeElement) {
-				TypeElement model = (TypeElement) element;
-				setupModelInfo(model);
-			}
-		}
+        for (Element element : elements) {
+            if (element instanceof TypeElement) {
+                TypeElement model = (TypeElement) element;
+                setupModelInfo(model);
+            }
+        }
 
-		for (Element element : elements) {
-			if (element instanceof TypeElement) {
-				TypeElement model = (TypeElement) element;
-				processModel(sourcesPath, model, insideEclipse);
-			}
-		}
-	}
+        for (Element element : elements) {
+            if (element instanceof TypeElement) {
+                TypeElement model = (TypeElement) element;
+                processModel(sourcesPath, model, insideEclipse);
+            }
+        }
+    }
 
