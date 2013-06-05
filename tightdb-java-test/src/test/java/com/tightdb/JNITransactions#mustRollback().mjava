@@ -4,16 +4,16 @@
             return;
 
         writeOneTransaction(1);
-        
+
         WriteTransaction trans = db.beginWrite();
         Table tbl = trans.getTable("EmployeeTable");
 
         tbl.add("Hello", 1);
         assertEquals(2, tbl.size());
         trans.rollback();
-        
+
         checkRead(1); // Only 1 row now.
-        
+
         clear();
     }
 

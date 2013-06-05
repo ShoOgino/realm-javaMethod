@@ -5,11 +5,11 @@
 
         writeOneTransaction(1);
 
-        ReadTransaction t = db.beginRead(); 
+        ReadTransaction t = db.beginRead();
         Table table = t.getTable("EmployeeTable");
 
-        try { table.insert(0, 0, false);        assert(false);} catch (IllegalStateException e) {}      
-        try { table.add(0, false);              assert(false);} catch (IllegalStateException e) {}      
+        try { table.insert(0, 0, false);        assert(false);} catch (IllegalStateException e) {}
+        try { table.add(0, false);              assert(false);} catch (IllegalStateException e) {}
         try { table.addEmptyRow();                  assert(false);} catch (IllegalStateException e) {}
         try { table.addEmptyRows(1);                assert(false);} catch (IllegalStateException e) {}
         try { table.addLong(0,0);                   assert(false);} catch (IllegalStateException e) {}
@@ -27,7 +27,7 @@
         try { table.setMixed(0,0,null);             assert(false);} catch (IllegalStateException e) {}
         try { table.setString(0,0,"");              assert(false);} catch (IllegalStateException e) {}
         try { table.updateFromSpec(null);           assert(false);} catch (IllegalStateException e) {}
-        
+
         TableQuery q = table.where();
         try { q.remove();       assert(false);} catch (IllegalStateException e) {}
         try { q.remove(0,0);    assert(false);} catch (IllegalStateException e) {}
