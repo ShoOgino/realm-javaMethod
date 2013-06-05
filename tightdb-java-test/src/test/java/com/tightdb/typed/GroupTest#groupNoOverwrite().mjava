@@ -1,0 +1,43 @@
+    @Test(enabled = true)
+    public void groupNoOverwrite() throws NullPointerException, IOException {
+        {
+            Group group = new Group();
+            try {
+                group.writeToFile("test_no_overwrite.tightdb");
+                try {
+                    group.writeToFile("test_no_overwrite.tightdb");
+                    fail("Expected exception did not occur");
+                }
+                catch (Throwable t) {} // FIXME: What exception exactly is expected here?
+            }
+            finally {
+                group.close();
+            }
+        }
+
+        {
+            Group group = new Group("test_no_overwrite.tightdb");
+            try {
+                try {
+                    group.writeToFile("test_no_overwrite.tightdb");
+                    fail("Expected exception did not occur");
+                }
+                catch (Throwable t) {} // FIXME: What exception exactly is expected here?
+            }
+            finally {
+                group.close();
+            }
+        }
+
+        {
+            Group group = new Group();
+            try {
+                (new File(System.getProperty("user.dir"), "test_no_overwrite.tightdb")).delete();
+                group.writeToFile("test_no_overwrite.tightdb");
+            }
+            finally {
+                group.close();
+            }
+        }
+    }
+
