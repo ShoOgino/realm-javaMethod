@@ -1,37 +1,37 @@
     public void insert(long rowIndex, Object... values) {
         if (immutable) throwImmutable();
-        
+
         // Check index
         long size = size();
         if (rowIndex > size) {
-            throw new IllegalArgumentException("rowIndex " + String.valueOf(rowIndex) + 
+            throw new IllegalArgumentException("rowIndex " + String.valueOf(rowIndex) +
                     " must be <= table.size() " + String.valueOf(size) + ".");
         }
-        
+
         // Check values types
         int columns = (int)getColumnCount();
         if (columns != values.length) {
-            throw new IllegalArgumentException("The number of value parameters (" + 
-                    String.valueOf(values.length) + 
-                    ") does not match the number of columns in the table (" + 
+            throw new IllegalArgumentException("The number of value parameters (" +
+                    String.valueOf(values.length) +
+                    ") does not match the number of columns in the table (" +
                     String.valueOf(columns) + ").");
-        }       
+        }
         ColumnType colTypes[] = new ColumnType[columns];
-        for (int columnIndex = 0; columnIndex < columns; columnIndex++) {  
+        for (int columnIndex = 0; columnIndex < columns; columnIndex++) {
             Object value = values[columnIndex];
             ColumnType colType = getColumnType(columnIndex);
             colTypes[columnIndex] = colType;
             if (!colType.matchObject(value)) {
-                throw new IllegalArgumentException("Invalid argument no " + String.valueOf(1 + columnIndex) + 
+                throw new IllegalArgumentException("Invalid argument no " + String.valueOf(1 + columnIndex) +
                         ". Expected a value compatible with column type " + colType + ", but got " + value.getClass() + ".");
             }
-        }       
-        
+        }
+
         // Insert values
-        for (long columnIndex = 0; columnIndex < columns; columnIndex++) {  
+        for (long columnIndex = 0; columnIndex < columns; columnIndex++) {
             Object value = values[(int)columnIndex];
-            switch (colTypes[(int)columnIndex]) { 
-            case ColumnTypeBool:    
+            switch (colTypes[(int)columnIndex]) {
+            case ColumnTypeBool:
                 nativeInsertBoolean(nativePtr, columnIndex, rowIndex, (Boolean)value);
                 break;
             case ColumnTypeInt:
