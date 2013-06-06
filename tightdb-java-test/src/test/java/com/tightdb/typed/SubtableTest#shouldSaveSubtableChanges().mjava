@@ -1,6 +1,6 @@
     @Test
     public void shouldSaveSubtableChanges() {
-        TestEmployeeRow employee = employees.at(0);
+		TestEmployeeRow employee = employees.get(0);
 
         // check the basic operations
         TestPhoneTable phones1 = employee.getPhones();
@@ -33,7 +33,7 @@
 
         TestPhoneView all = phoneQuery.findAll();
         assertEquals(1, all.size());
-        checkPhone(all.at(0), "mobile", "111");
+		checkPhone(all.get(0), "mobile", "111");
 
         checkPhone(phoneQuery.findFirst(), "mobile", "111");
         checkPhone(phoneQuery.findLast(), "mobile", "111");
@@ -41,9 +41,9 @@
         assertEquals(null, phoneQuery.findNext());
 
         // make sure the other sub-tables and independent and were not changed
-        assertEquals(EmployeesFixture.PHONES[1].length, employees.at(1)
+		assertEquals(EmployeesFixture.PHONES[1].length, employees.get(1)
                 .getPhones().size());
-        assertEquals(EmployeesFixture.PHONES[2].length, employees.at(2)
+		assertEquals(EmployeesFixture.PHONES[2].length, employees.get(2)
                 .getPhones().size());
 
         // check the clear operation on the query
