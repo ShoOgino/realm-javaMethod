@@ -1,28 +1,28 @@
     public static void loadLibrary() {
-        if (!loadedLibrary) {
-            initTightDB();
-            try {
-                addNativeLibraryPath(BINARIES_PATH);
-                resetLibraryPath();
-            }
-            catch (Throwable e) {
-                // Above can't be used on Android.
-            }
-            // Load debug library first - if available
-            loadedLibrary = loadCorrectLibrary("tightdb-jnid", "tightdb_jni32d", "tightdb_jni64d");
-            if (loadedLibrary) {
-                System.out.println("!!! TightDB debug version loaded. !!!\n");
-            } else {
-                loadedLibrary = loadCorrectLibrary("tightdb-jni", "tightdb_jni32", "tightdb_jni64");
-            }
-            if (!loadedLibrary) {
-                System.err.println("Searched JAVA_LIBRARY_PATH=" + System.getProperty(JAVA_LIBRARY_PATH));
-                throw new RuntimeException("Couldn't load the TightDB JNI library '" + getJniFileName() +
-                        "'. Please include the directory to the library in java.library.path.");
-            }
+        // FIXME: How is this thread-safe?
+        if (libraryIsLoaded) return;
+
+        // FIXME: How exactly does this help? Why is it done?
+        initTightDB();
+
+        String jnilib;
+        if (osIsWindows()) {
+            loadLibraryWindows();
         }
+        else {
+            String debug = System.getenv("TIGHTDB_JAVA_DEBUG");
+            if (debug == null || debug.isEmpty()) {
+                jnilib = "tightdb-jni";
+            }
+            else {
+                jnilib = "tightdb-jni-dbg";
+            }
+            System.loadLibrary(jnilib);
+        }
+        libraryIsLoaded = true;
+
         if (!util.versionCompatible()) {
-            throw new RuntimeException("tightdb-jni jar and tightdb-jni lib are incompatible. Please check your installation.");
+            throw new RuntimeException("Version mismatch between tightdb.jar and native JNI library.");
         }
     }
 
