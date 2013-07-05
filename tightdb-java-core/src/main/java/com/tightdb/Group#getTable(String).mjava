@@ -6,10 +6,10 @@
      * @return The table if it exists, otherwise create it.
      */
     public Table getTable(String name) {
+    	verifyGroupIsValid();
         if (immutable)
             if (!hasTable(name))
                 throwImmutable();
-        return new Table(this, nativeGetTableNativePtr(nativePtr, name),
-                immutable);
+        return new Table(this, nativeGetTableNativePtr(nativePtr, name), immutable);
     }
 

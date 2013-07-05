@@ -1,4 +1,4 @@
-    @Test(enabled = true)
+    @Test
     public void shouldCreateTablesInGroup() {
         //util.setDebugLevel(2);
         Group group = new Group();
@@ -8,15 +8,14 @@
                 new Date(), "extra", null);
         employees.add(NAME2, "B. Good", 20000, true, new byte[] { 1, 2, 3 },
                 new Date(), true, null);
-        employees.insert(1, NAME1, "Mihajlovski", 30000, false, new byte[] { 4,
+        employees.insert(1, NAME1, "Hansen", 30000, false, new byte[] { 4,
                 5 }, new Date(), 1234, null);
 
         byte[] data = group.writeToMem();
 
         // check table info retrieval
         assertEquals(1, group.size());
-        assertEquals(TestEmployeeTable.class.getSimpleName(),
-                group.getTableName(0));
+        assertEquals(TestEmployeeTable.class.getSimpleName(), group.getTableName(0));
         assertTrue(group.hasTable(TestEmployeeTable.class.getSimpleName()));
         assertFalse(group.hasTable("xxxxxx"));
 
