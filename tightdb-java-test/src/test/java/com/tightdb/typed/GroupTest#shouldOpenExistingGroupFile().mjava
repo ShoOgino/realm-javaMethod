@@ -1,11 +1,21 @@
     @Test 
     public void shouldOpenExistingGroupFile() throws IOException {
     	new File(FILENAME).delete();
+    	
     	Group group = new Group();
         group.writeToFile(FILENAME);
         group.close();
         
     	Group group2 = new Group(FILENAME);
     	group2.close();
+
+    	Group group3 = new Group(FILENAME, OpenMode.READ_ONLY);
+    	group3.close();
+
+    	Group group4 = new Group(FILENAME, OpenMode.READ_WRITE);
+    	group4.close();
+
+    	Group group5 = new Group(FILENAME, OpenMode.READ_WRITE_NO_CREATE);
+    	group5.close();
     }
 
