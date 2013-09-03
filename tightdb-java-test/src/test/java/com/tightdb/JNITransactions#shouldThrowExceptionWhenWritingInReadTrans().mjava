@@ -1,0 +1,16 @@
+    @Test(expectedExceptions=IllegalStateException.class)
+    public void shouldThrowExceptionWhenWritingInReadTrans() {
+        if (TightDB.osIsWindows())
+            return;
+        
+        ReadTransaction rt = db.beginRead();
+
+        try{
+       Table tbl = rt.getTable("newTable");
+       rt.endRead();
+        } finally{
+            rt.endRead();
+            clear();
+        }
+    }
+

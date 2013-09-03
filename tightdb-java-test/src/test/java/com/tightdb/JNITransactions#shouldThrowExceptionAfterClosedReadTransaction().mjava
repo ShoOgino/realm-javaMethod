@@ -1,0 +1,16 @@
+    @Test(expectedExceptions=IllegalStateException.class)
+    public void shouldThrowExceptionAfterClosedReadTransaction() {
+        if (TightDB.osIsWindows())
+            return;
+       ReadTransaction rt = db.beginRead();
+       
+       try{
+       Table tbl = rt.getTable("EmployeeTable");
+       rt.endRead();
+       tbl.getColumnCount();
+       } finally{
+           rt.endRead();
+           clear();
+       }
+    }
+
