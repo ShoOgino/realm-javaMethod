@@ -1,16 +1,14 @@
     @Test(expectedExceptions=IllegalStateException.class)
     public void shouldThrowExceptionAfterClosedReadTransactionWhenWriting() {
-        if (TightDB.osIsWindows())
-            return;
-       ReadTransaction rt = db.beginRead();
-       
-       try{
-       Table tbl = rt.getTable("EmployeeTable");
-       rt.endRead();
-       tbl.addColumn(ColumnType.STRING, "newString");
-       } finally{
-           rt.endRead();
-           clear();
-       }
+        ReadTransaction rt = db.beginRead();
+
+        try {
+            Table tbl = rt.getTable("EmployeeTable");
+            rt.endRead();
+            tbl.addColumn(ColumnType.STRING, "newString"); //Should throw exception, as adding a column is not allowed in read transaction
+        } finally {
+            rt.endRead();
+            clear();
+        }
     }
 

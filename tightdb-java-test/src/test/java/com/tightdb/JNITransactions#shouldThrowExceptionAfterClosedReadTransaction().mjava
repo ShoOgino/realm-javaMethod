@@ -1,16 +1,14 @@
     @Test(expectedExceptions=IllegalStateException.class)
     public void shouldThrowExceptionAfterClosedReadTransaction() {
-        if (TightDB.osIsWindows())
-            return;
-       ReadTransaction rt = db.beginRead();
-       
-       try{
-       Table tbl = rt.getTable("EmployeeTable");
-       rt.endRead();
-       tbl.getColumnCount();
-       } finally{
-           rt.endRead();
-           clear();
-       }
+        ReadTransaction rt = db.beginRead();
+
+        try {
+            Table tbl = rt.getTable("EmployeeTable");
+            rt.endRead();
+            tbl.getColumnCount(); //Should throw exception, the table is invalid when transaction has been closed
+        } finally {
+            rt.endRead();
+            clear();
+        }
     }
 
