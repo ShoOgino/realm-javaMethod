@@ -1,0 +1,16 @@
+    @Test(expectedExceptions=IllegalArgumentException.class)
+    public void incrementInColumnOnUnsupportedColumnTypeTest() {
+
+        Table table = new Table();
+        table.addColumn(ColumnType.STRING, "col0");
+        table.addColumn(ColumnType.LONG, "col1");
+        
+        table.add("row0", 0);
+        table.add("row1", 10);
+        table.add("row2", 20);
+        table.add("row3", 30);
+        table.add("row4", 40);
+        
+        table.incrementInColumn(0, 1); //We except this method to throw an exception, if it is called on column with unsupported column type
+    }
+
