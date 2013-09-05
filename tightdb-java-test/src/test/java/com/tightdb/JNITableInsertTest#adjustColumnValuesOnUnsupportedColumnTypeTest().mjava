@@ -1,0 +1,19 @@
+    @Test
+    public void adjustColumnValuesOnUnsupportedColumnTypeTest() {
+
+        Table table = TestHelper.getTableWithAllColumnTypes();
+
+        for (long c=0;c<table.getColumnCount();c++){
+
+            if(table.getColumnType(c).equals(ColumnType.LONG) == false){ // Do not check if it is a Long column
+                try{ 
+                    table.adjustColumnValues(c, 10); 
+                    assertTrue(false); //We should never get here, as an exception is thrown above
+                } 
+                catch (IllegalArgumentException e){ 
+                    assertTrue(true); // All other column types than long will throw exception
+                } 
+            }
+        }
+    }
+
