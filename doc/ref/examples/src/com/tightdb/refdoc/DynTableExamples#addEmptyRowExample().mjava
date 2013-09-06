@@ -1,5 +1,5 @@
-    public static void removeLastExample(){
-        // @@Example: ex_java_dyn_table_remove_last_row @@
+    public static void addEmptyRowExample(){
+        // @@Example: ex_java_dyn_table_add_empty_row @@
         // @@Show@@
         // Creates table with 2 columns
         Table table = new Table();
@@ -9,14 +9,16 @@
         // Add data to the table
         table.add(100, "Washington");
         table.add(200, "Los Angeles");
-        table.add(300, "New York");
-        table.add(400, "Miami");
+        
+        // Add an empty row with default values
+        table.addEmptyRow();
 
-        // Removes the the last row
-        table.removeLast();
-
-        //Table.size is now 3
+        // Table.size is now 3
         Assert(table.size() == 3);
+        
+        //Default values check
+        Assert(table.getLong(0, 2) == 0);
+        Assert(table.getString(1, 2).equals(""));
         // @@EndShow@@
         // @@EndExample@@
     }
