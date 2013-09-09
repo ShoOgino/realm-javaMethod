@@ -1,0 +1,16 @@
+    @Test()
+    public void closeTableShouldThrowExceptionWhenAccessingView(){
+        
+        Table table = TestHelper.getTableWithAllColumnTypes();
+        
+        TableQuery query = table.where();
+        
+        TableView view = query.findAll();
+        
+        table.close(); //Closes the table, should not be allowed to access the view
+        
+        try{ view.size(); assert(false); } catch (IllegalStateException e){} //size() should throw exception, as table is invalid
+        
+        
+    }
+
