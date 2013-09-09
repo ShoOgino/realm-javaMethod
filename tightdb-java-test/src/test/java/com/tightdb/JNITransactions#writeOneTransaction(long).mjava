@@ -2,21 +2,20 @@
     {
         WriteTransaction trans = db.beginWrite();
         Table tbl = trans.getTable("EmployeeTable");
-        TableSpec tableSpec = new TableSpec();
-        tableSpec.addColumn(ColumnType.ColumnTypeString, "name");
-        tableSpec.addColumn(ColumnType.ColumnTypeInt, "number");
-        tbl.updateFromSpec(tableSpec);
+        tbl.addColumn(ColumnType.ColumnTypeString, "name");
+        tbl.addColumn(ColumnType.ColumnTypeInt, "number");
 
         for (long row=0; row < rows; row++)
             tbl.add("Hi", 1);
         assertEquals(rows, tbl.size());
         trans.commit();
+        
 
         // must throw exception as table is invalid now.
         try {
             assertEquals(1, tbl.size());
             assert(false);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalStateException e) {
         }
 
     }

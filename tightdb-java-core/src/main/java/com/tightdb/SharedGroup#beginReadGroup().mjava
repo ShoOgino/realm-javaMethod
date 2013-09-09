@@ -1,8 +1,8 @@
     long beginReadGroup() {
-        if (activeTransaction)
+        if (inActiveTransaction)
             throw new IllegalStateException(
                     "Can't beginReadGroup() during another active transaction");
-        activeTransaction = true;
+        inActiveTransaction = true;
         return nativeBeginRead(nativePtr);
     }
 
