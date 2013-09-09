@@ -1,0 +1,61 @@
+    @Test
+    public void columnIndexOutOfBounds() {
+        Table table = new Table();
+
+        table.addColumn(ColumnType.ColumnTypeBinary, "binary");     // 0
+        table.addColumn(ColumnType.ColumnTypeBool, "boolean");      // 1
+        table.addColumn(ColumnType.ColumnTypeDate, "date");         // 2
+        table.addColumn(ColumnType.ColumnTypeDouble, "double");     // 3
+        table.addColumn(ColumnType.ColumnTypeFloat, "float");       // 4
+        table.addColumn(ColumnType.ColumnTypeInt, "long");          // 5
+        table.addColumn(ColumnType.ColumnTypeMixed, "mixed");       // 6
+        table.addColumn(ColumnType.ColumnTypeString, "string");     // 7
+        table.addColumn(ColumnType.ColumnTypeTable, "table");       // 8
+
+        // Query the table
+        TableQuery query = table.where();
+
+        // Compare strings in non string columns
+        try { query.equal(9, "string");                 assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.notEqual(9, "string");              assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.beginsWith(9, "string");            assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.endsWith(9, "string");              assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.contains(9, "string");              assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+
+
+        // Compare integer in non integer columns
+        try { query.equal(9, 123);                      assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.notEqual(9, 123);                   assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.lessThan(9, 123);                   assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.lessThanOrEqual(9, 123);            assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.greaterThan(9, 123);                assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.greaterThanOrEqual(9, 123);         assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.between(9, 123, 321);               assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+
+
+        // Compare float in non float columns
+        try { query.equal(9, 123F);                     assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.notEqual(9, 123F);                  assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.lessThan(9, 123F);                  assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.lessThanOrEqual(9, 123F);           assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.greaterThan(9, 123F);               assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.greaterThanOrEqual(9, 123F);        assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.between(9, 123F, 321F);             assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+
+
+        // Compare double in non double columns
+
+        try { query.equal(9, 123D);                     assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.notEqual(9, 123D);                  assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.lessThan(9, 123D);                  assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.lessThanOrEqual(9, 123D);           assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.greaterThan(9, 123D);               assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.greaterThanOrEqual(9, 123D);        assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+        try { query.between(9, 123D, 321D);             assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+
+
+        // Compare boolean in non boolean columns
+        try { query.equal(9, true);                       assert(false); } catch(ArrayIndexOutOfBoundsException e) {}
+
+    }
+
