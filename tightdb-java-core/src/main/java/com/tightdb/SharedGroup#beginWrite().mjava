@@ -1,11 +1,11 @@
     public WriteTransaction beginWrite() {
-        if (activeTransaction)
+        if (inActiveTransaction)
             throw new IllegalStateException(
                     "Can't beginWrite() during another active transaction");
         // FIXME: throw from nativeMethod in case of error
         WriteTransaction t = new WriteTransaction(this,
                 nativeBeginWrite(nativePtr));
-        activeTransaction = true;
+        inActiveTransaction = true;
         return t;
     }
 
