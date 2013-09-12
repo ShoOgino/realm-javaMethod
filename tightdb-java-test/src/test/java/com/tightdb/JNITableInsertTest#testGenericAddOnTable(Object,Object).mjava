@@ -1,0 +1,17 @@
+  //Generates a table with a a column with column typed determined from the first parameter, and then puts in a value from the second parameter.
+    //In cases, where the 2 parameter types do not match, we expect an IllegalArgumentException
+    @Test(expectedExceptions=IllegalArgumentException.class, dataProvider = "columnTypesProvider")
+    public void testGenericAddOnTable(Object colTypeObject, Object o) {
+        Table t  = new Table();
+        
+        //If the objects matches it will not fail, therefore we throw an exception as it should not be tested
+        if (o.getClass().equals(colTypeObject.getClass())){
+            throw new IllegalArgumentException();
+        }
+        //Add column, set name to the simplename of the class
+        t.addColumn(TestHelper.getColumnType(colTypeObject), colTypeObject.getClass().getSimpleName());
+        
+        //Add object
+        t.add(o);
+    }
+
