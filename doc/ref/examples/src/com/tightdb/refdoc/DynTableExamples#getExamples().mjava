@@ -1,0 +1,40 @@
+    public static void getExamples(){
+        // @@Example: ex_java_dyn_table_get @@
+        // @@Show@@
+        // Create table with 2 columns and add data
+        Table table = new Table();
+        table.addColumn(ColumnType.STRING, "username");
+        table.addColumn(ColumnType.INTEGER, "score");
+        table.add("user1", 420);
+        table.add("user2", 770);
+        
+        // Get String value of cell at position 0,0
+        String user1 = table.getString(0, 0);
+
+        // Get long value value of cell at position 1,1
+        // NB! Column type in tightdb is INTEGER
+        // In java it is accessed by getLong(col, row);
+        long score2 = table.getLong(1, 1); 
+
+        // Check values
+        Assert(user1.equals("user1"));
+        Assert(score2 == 770);
+        
+        
+        // Throws exception if column or row index is out of range
+        try {
+            long score = table.getLong(1, 3);
+        } catch (ArrayIndexOutOfBoundsException e){
+            // ...
+        }
+        
+        // Throws exception if accessor method and column type do not match
+        try {
+            boolean bool = table.getBoolean(0, 0);
+        } catch (IllegalArgumentException e){
+            // ...
+        }
+        // @@EndShow@@
+        // @@EndExample@@
+    }
+
