@@ -6,7 +6,11 @@
                 employees.lastName.getAll());
         assertArrayEquals(EmployeesFixture.getAll(2), employees.salary.getAll());
         assertArrayEquals(EmployeesFixture.getAll(3), employees.driver.getAll());
-        assertArrayEquals(EmployeesFixture.getAll(4), employees.photo.getAll());
+        byte[][] bActual = employees.photo.getAll();
+        Object[] bExpected = EmployeesFixture.getAll(4);
+        for(int i = 0; i < bActual.length; i++) {
+            assertEquals(((java.nio.ByteBuffer)(bExpected[i])).array(), bActual[i]);
+        }
         assertDateArrayEquals(EmployeesFixture.getAll(5), employees.birthdate.getAll());
         assertArrayEquals(EmployeesFixture.getAll(6), employees.extra.getAll());
 
