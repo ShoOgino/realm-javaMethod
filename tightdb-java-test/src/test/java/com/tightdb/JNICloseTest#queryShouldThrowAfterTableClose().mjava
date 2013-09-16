@@ -1,0 +1,14 @@
+    /**
+     * Make sure, that an illegalStateException is thrown when trying to do queries on a closed table
+     */
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void queryShouldThrowAfterTableClose(){
+        
+        Table table = TestHelper.getTableWithAllColumnTypes();
+        TableQuery query = table.where();
+        table.private_debug_close(); //Table is being closed
+        
+        query.findAll(); //Should throw exception, as table has been closed
+        // TODO: add a lot of methods
+    }  
+
