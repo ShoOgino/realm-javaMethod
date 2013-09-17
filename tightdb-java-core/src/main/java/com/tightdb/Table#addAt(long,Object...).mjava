@@ -27,8 +27,15 @@
             ColumnType colType = getColumnType(columnIndex);
             colTypes[columnIndex] = colType;
             if (!colType.matchObject(value)) {
+                //String representation of the provided value type
+                String providedType;
+                if (value == null) 
+                    providedType = "null";
+                else
+                    providedType = value.getClass().toString();
+                
                 throw new IllegalArgumentException("Invalid argument no " + String.valueOf(1 + columnIndex) +
-                        ". Expected a value compatible with column type " + colType + ", but got " + value.getClass() + ".");
+                        ". Expected a value compatible with column type " + colType + ", but got " + providedType + ".");
             }
         }
 
@@ -58,10 +65,7 @@
                 nativeInsertMixed(nativePtr, columnIndex, rowIndex, Mixed.mixedValue(value));
                 break;
             case BINARY:
-                if (value instanceof byte[])
-                    nativeInsertByteArray(nativePtr, columnIndex, rowIndex, (byte[])value);
-                else if (value instanceof ByteBuffer)
-                    nativeInsertByteBuffer(nativePtr, columnIndex, rowIndex, (ByteBuffer)value);
+                nativeInsertByteArray(nativePtr, columnIndex, rowIndex, (byte[])value);
                 break;
             case TABLE:
                 nativeInsertSubTable(nativePtr, columnIndex, rowIndex);
