@@ -27,8 +27,16 @@
             ColumnType colType = getColumnType(columnIndex);
             colTypes[columnIndex] = colType;
             if (!colType.matchObject(value)) {
+                //String representation of the provided value type
+                String providedType;
+                if (value == null) {
+                    providedType = "null";
+                } else {
+                    providedType = value.getClass().toString();
+                }
+                
                 throw new IllegalArgumentException("Invalid argument no " + String.valueOf(1 + columnIndex) +
-                        ". Expected a value compatible with column type " + colType + ", but got " + value.getClass() + ".");
+                        ". Expected a value compatible with column type " + colType + ", but got " + providedType + ".");
             }
         }
 
