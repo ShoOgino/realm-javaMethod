@@ -1,0 +1,14 @@
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void shouldFailWhenModifyingTablesOnClosedGroup() {
+        Group group = new Group();
+        Table tbl = group.getTable("test");
+        tbl.addColumn(ColumnType.ColumnTypeInt, "number");
+        tbl.add(1);
+        
+        //Close the group
+        group.close();
+        
+        //Try to add data to table in group
+        tbl.add(2);
+    }
+
