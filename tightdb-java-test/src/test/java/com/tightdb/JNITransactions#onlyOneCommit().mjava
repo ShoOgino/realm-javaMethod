@@ -1,0 +1,21 @@
+    @Test
+    public void onlyOneCommit() { 
+        WriteTransaction trans = db.beginWrite();
+        
+        try{
+            
+       
+        Table tbl = trans.getTable("EmployeeTable");
+        tbl.addColumn(ColumnType.ColumnTypeString, "name");
+
+        trans.commit();
+        
+        try {   trans.commit(); assert(false); } catch (IllegalStateException e){}
+        
+        } catch (Throwable t){
+            trans.rollback();
+        }
+
+        
+    }
+

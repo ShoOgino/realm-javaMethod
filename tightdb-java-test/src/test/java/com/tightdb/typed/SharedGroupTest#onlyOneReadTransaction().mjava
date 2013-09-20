@@ -1,0 +1,14 @@
+    @Test
+    public void onlyOneReadTransaction() {
+
+        ReadTransaction rt0 = db.beginRead();
+
+        try {
+            db.beginRead(); //Except exception. Only 1 exception is allowed
+            
+        } catch (IllegalStateException e){
+            rt0.endRead();
+            clear(); // Important to clear
+        }
+    }
+

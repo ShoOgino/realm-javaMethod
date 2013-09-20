@@ -1,0 +1,15 @@
+    @Test
+    public void onlyOneWriteTransaction() {
+
+        WriteTransaction wt0 = db.beginWrite();
+
+        try {
+            db.beginWrite(); //Except exception. Only 1 exception is allowed
+            assert(false);
+            
+        } catch (IllegalStateException e){
+            wt0.rollback();
+            clear(); // Important to clear
+        }
+    }
+
