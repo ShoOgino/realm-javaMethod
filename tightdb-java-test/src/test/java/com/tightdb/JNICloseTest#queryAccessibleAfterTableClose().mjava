@@ -1,22 +1,22 @@
     /**
-     * Make sure, that an illegalStateException is thrown when trying to do queries on a closed table
+     * Make sure, that it's possible use the query on a closed table
      */
     @Test()
-    public void queryShouldThrowAfterTableClose(){
+    public void queryAccessibleAfterTableClose() throws Throwable{
         Table table = TestHelper.getTableWithAllColumnTypes();
         table.addEmptyRows(10);
         for (long i=0; i<table.size(); i++)
         	table.setLong(5, i, i);
         TableQuery query = table.where(); 
-        // Closes the table, it should not be allowed to access the view thereafter
-        table.private_debug_close();
+        // Closes the table, it _should_ be allowed to access the query thereafter
+        table.finalize();
         table = null;
         Table table2 = TestHelper.getTableWithAllColumnTypes();
         table2.addEmptyRows(10);
         for (int i=0; i<table2.size(); i++)
         	table2.setLong(5, i, 117+i);
 
-        TableView tv = query.findAll(); //Should throw exception, as table has been closed
+        TableView tv = query.findAll(); 
         assertEquals(10, tv.size());
 
         // TODO: add a lot of methods
