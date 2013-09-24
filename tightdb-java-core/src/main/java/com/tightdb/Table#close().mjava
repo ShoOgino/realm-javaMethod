@@ -1,9 +1,14 @@
     private void close() {
         synchronized (CloseMutex.getInstance()) {
-            if (DEBUG) System.err.println("==== CLOSE " + tableNo + " ptr= " + nativePtr + " remaining " + (TableCount-1));
-            if (nativePtr == 0)
+            if (nativePtr == 0) {
+                if (DEBUG)
+                    System.err.println(".... CLOSE ignored.");
                 return;
-            if (DEBUG) TableCount--;
+            }
+            if (DEBUG) {
+                TableCount--;
+                System.err.println("==== CLOSE " + tableNo + " ptr= " + nativePtr + " remaining " + TableCount);
+            }
             nativeClose(nativePtr);
             nativePtr = 0;
         }
