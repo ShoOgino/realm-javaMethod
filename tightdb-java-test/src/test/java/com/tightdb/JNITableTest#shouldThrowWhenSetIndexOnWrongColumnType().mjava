@@ -1,0 +1,18 @@
+    @Test()
+    public void shouldThrowWhenSetIndexOnWrongColumnType() {
+        for (long colIndex = 0; colIndex < t.getColumnCount(); colIndex++) {
+            boolean exceptionExpected = (t.getColumnType(colIndex) != ColumnType.ColumnTypeString);
+
+            // Try to setIndex()
+            try {
+                t.setIndex(colIndex);
+                if (exceptionExpected)
+                    fail("expected exception for colIndex " + colIndex);
+            } catch (IllegalArgumentException e) {
+            }
+
+            // Try to hasIndex() for all columnTypes
+            t.hasIndex(colIndex);
+        }
+    }
+
