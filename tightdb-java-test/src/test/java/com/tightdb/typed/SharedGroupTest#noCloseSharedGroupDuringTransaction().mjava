@@ -1,0 +1,14 @@
+    @Test
+    public void noCloseSharedGroupDuringTransaction() {
+
+        ReadTransaction rt0 = db.beginRead();
+
+        try {
+            db.close(); //Except exception. Must not close shared group during active transaction
+            
+        } catch (IllegalStateException e){
+            rt0.endRead();
+            clear(); // Important to clear
+        }
+    }
+
