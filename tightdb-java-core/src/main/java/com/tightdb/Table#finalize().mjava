@@ -1,6 +1,10 @@
     @Override
-    public void finalize() {
+    public void finalize() throws Throwable {
         if (DEBUG) System.err.println("==== FINALIZE " + tableNo + "...");
-        close();
+        try {
+            close();
+        } finally {
+            super.finalize();
+        }
     }
 
