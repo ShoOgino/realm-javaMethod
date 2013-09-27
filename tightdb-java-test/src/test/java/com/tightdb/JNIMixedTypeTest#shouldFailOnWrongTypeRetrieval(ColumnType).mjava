@@ -1,29 +1,29 @@
     @Test(expectedExceptions = IllegalAccessException.class, dataProvider = "columnTypesProvider")
     public void shouldFailOnWrongTypeRetrieval(ColumnType columnType)
             throws Exception {
-        Object value = columnType != ColumnType.ColumnTypeString ? "abc" : 123;
+        Object value = columnType != ColumnType.STRING ? "abc" : 123;
         Mixed mixed = Mixed.mixedValue(value);
 
         switch (columnType) {
-        case ColumnTypeBinary:
+        case BINARY:
             mixed.getBinaryByteArray();
             break;
-        case ColumnTypeDate:
+        case DATE:
             mixed.getDateValue();
             break;
-        case ColumnTypeBool:
+        case BOOLEAN:
             mixed.getBooleanValue();
             break;
-        case ColumnTypeInt:
+        case INTEGER:
             mixed.getLongValue();
             break;
-        case ColumnTypeFloat:
+        case FLOAT:
             mixed.getFloatValue();
             break;
-        case ColumnTypeDouble:
+        case DOUBLE:
             mixed.getDoubleValue();
             break;
-        case ColumnTypeString:
+        case STRING:
             mixed.getStringValue();
             break;
 
