@@ -1,8 +1,8 @@
-    @Test(expectedExceptions = NullPointerException.class)
+    @Test
     public void getNullColumn() {
         Table t = new Table();
         t.addColumn(ColumnType.INTEGER, "");
         TableView view = t.where().findAll();
-        view.getColumnIndex(null);
+        try { view.getColumnIndex(null); fail("Getting null column"); } catch(NullPointerException e) { }
     }
 
