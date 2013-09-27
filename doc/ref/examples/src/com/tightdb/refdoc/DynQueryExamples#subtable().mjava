@@ -1,0 +1,29 @@
+    public void subtable() {
+        // @@Example: ex_java_dyn_query_subtable @@
+        // @@Show@@
+        // Create a table
+        Table table = new Table();
+
+        table.addColumn(ColumnType.STRING, "username");
+        table.addColumn(ColumnType.TABLE, "tasks");
+
+        TableDefinition tasks = table.getSubTableDefinition(1);
+        tasks.addColumn(ColumnType.STRING, "name");
+        tasks.addColumn(ColumnType.INTEGER, "score");
+        tasks.addColumn(ColumnType.BOOLEAN, "completed");
+
+        // Insert some values
+        table.add("Arnold", new Object[][] {{"task1", 120, false}, {"task2", 321, true}, {"task3", 78, false}});
+        table.add("Jane", new Object[][] {{"task2", 400, true}, {"task3", 375, true}});
+        table.add("Erik", new Object[][] {{"task1", 562, true}, {"task3", 14, false}});
+
+
+        // Query the table
+        TableView view = table.where().subTable(1).equal(2, true).endSubTable().findAll();
+
+        System.out.println(view);
+
+        // @@EndShow@@
+        // @@EndExample@@
+    }
+
