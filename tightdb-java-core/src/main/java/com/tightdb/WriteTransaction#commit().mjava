@@ -1,5 +1,10 @@
     public void commit() {
-        db.commit();
-        commited = true;
+    	if (!committed) {
+    		db.commit();
+        	committed = true;
+    	} 
+    	else {
+    		throw new IllegalStateException("You can only commit once after a WriteTransaction has been made.");
+    	}
     }
 
