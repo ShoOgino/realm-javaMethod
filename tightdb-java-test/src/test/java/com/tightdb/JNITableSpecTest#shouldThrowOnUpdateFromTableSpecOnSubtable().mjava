@@ -1,4 +1,4 @@
-    @Test(expectedExceptions=UnsupportedOperationException.class)
+    @Test
     public void shouldThrowOnUpdateFromTableSpecOnSubtable() {
 
         // Table definition
@@ -21,9 +21,7 @@
         TableSpec spec = new TableSpec();
         spec.addColumn(ColumnType.INTEGER, "foo");
 
-        // Should throw
-        address.updateFromSpec(spec);
-
-
+        
+       try { address.updateFromSpec(spec); fail("Address is subtable. Not allowed to update from spec"); } catch (UnsupportedOperationException e) { }
     }
 
