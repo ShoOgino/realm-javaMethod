@@ -1,0 +1,23 @@
+    public static void adjustExample() {
+        // @@Example: ex_java_dyn_view_adjust @@
+        // @@Show@@
+        // Create table with 2 columns and add data
+        Table table = new Table();
+        table.addColumn(ColumnType.STRING, "username");
+        table.addColumn(ColumnType.INTEGER, "score");
+        table.add("user1", 420);
+        table.add("user2", 770);
+
+        // Get a view of the complete unfiltered table
+        TableView view = table.where().findAll();
+
+        // Reward all users 100 extra points using the adjust method
+        view.adjust(1, 100);
+
+        // Check that all scores are increased by 100
+        Assert(view.getLong(1, 0) == 520);
+        Assert(view.getLong(1, 1) == 870);
+        // @@EndShow@@
+        // @@EndExample@@
+    }
+

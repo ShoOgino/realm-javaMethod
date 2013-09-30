@@ -7,7 +7,7 @@
         table.addColumn(ColumnType.STRING, "username");
         table.addColumn(ColumnType.TABLE, "tasks");
 
-        TableDefinition tasks = table.getSubTableDefinition(1);
+        TableSchema tasks = table.getSubTableSchema(1);
         tasks.addColumn(ColumnType.STRING, "name");
         tasks.addColumn(ColumnType.INTEGER, "score");
         tasks.addColumn(ColumnType.BOOLEAN, "completed");
@@ -19,7 +19,7 @@
 
 
         // Query the table
-        TableView view = table.where().subTable(1).equal(2, true).endSubTable().findAll();
+        TableView view = table.where().subTable(1).equalTo(2, true).endSubTable().findAll();
 
         System.out.println(view);
 
