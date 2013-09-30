@@ -17,10 +17,12 @@
         table.add("Janet", 875, false);
 
         // Iterates through the table and sets all tasks with a score > 600 to completed
-        long index = table.where().greaterThan(1, 600).findNext();
-        while((index = table.where().greaterThan(1, 600).findNext(index)) != -1) {
+        TableQuery query = table.where().greaterThan(1, 600);
+
+        long index = query.findNext();
+        do {
             table.setBoolean(2, index, true);
-        }
+        } while((index = query.findNext(index)) != -1);
         System.out.println(table);
         // @@EndShow@@
         // @@EndExample@@
