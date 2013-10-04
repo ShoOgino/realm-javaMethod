@@ -4,17 +4,18 @@
         // Table definition
         Table persons = new Table();
 
-        persons.addColumn(ColumnType.ColumnTypeString, "name");
-        persons.addColumn(ColumnType.ColumnTypeString, "email");
-        persons.addColumn(ColumnType.ColumnTypeTable, "addresses");
+        persons.addColumn(ColumnType.STRING, "name");
+        persons.addColumn(ColumnType.STRING, "email");
+        persons.addColumn(ColumnType.TABLE, "addresses");
+
 
         TableSchema addresses = persons.getSubTableSchema(2);
-        addresses.addColumn(ColumnType.ColumnTypeString, "street");
-        addresses.addColumn(ColumnType.ColumnTypeInt, "zipcode");
-        addresses.addColumn(ColumnType.ColumnTypeTable, "phone_numbers");
+        addresses.addColumn(ColumnType.STRING, "street");
+        addresses.addColumn(ColumnType.INTEGER, "zipcode");
+        addresses.addColumn(ColumnType.TABLE, "phone_numbers");
 
         TableSchema phone_numbers = addresses.getSubTableSchema(2);
-        phone_numbers.addColumn(ColumnType.ColumnTypeInt, "number");
+        phone_numbers.addColumn(ColumnType.INTEGER, "number");
 
         // Inserting data
         persons.add(new Object[] {"Mr X", "xx@xxxx.com", new Object[][] {{ "X Street", 1234, new Object[][] {{ 12345678 }} }} });

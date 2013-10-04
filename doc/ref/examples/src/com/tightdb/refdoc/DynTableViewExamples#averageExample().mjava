@@ -1,0 +1,23 @@
+    public static void averageExample() {
+        // @@Example: ex_java_dyn_view_average @@
+        // @@Show@@
+        // Create table with 3 columns and add data
+        Table table = new Table();
+        table.addColumn(ColumnType.STRING, "username");
+        table.addColumn(ColumnType.INTEGER, "score");
+        table.addColumn(ColumnType.BOOLEAN, "completed");
+        table.add("user1", 420, false);
+        table.add("user2", 770, false);
+        table.add("user3", 325, false);
+
+        // Get a view of the complete unfiltered table
+        TableView view = table.where().findAll();
+
+        // The average score in column 1
+        double avgScore = view.averageInt(1); // Returns a double
+
+        Assert(avgScore == 505);
+        // @@EndShow@@
+        // @@EndExample@@
+    }
+

@@ -1,0 +1,30 @@
+    public void findNext() {
+        // @@Example: ex_java_dyn_query_findNext @@
+        // @@Show@@
+        // Create a table
+        Table table = new Table();
+
+        table.addColumn(ColumnType.STRING, "username");
+        table.addColumn(ColumnType.INTEGER, "score");
+        table.addColumn(ColumnType.BOOLEAN, "completed");
+
+        // Insert some values
+        table.add("Arnold", 420, false);
+        table.add("Jane", 770, false);
+        table.add("Erik", 327, false);
+        table.add("Henry", 770, false);
+        table.add("Bill", 564, true);
+        table.add("Janet", 875, false);
+
+        // Iterates through the table and sets all tasks with a score > 600 to completed
+        TableQuery query = table.where().greaterThan(1, 600);
+
+        long index = query.findNext();
+        do {
+            table.setBoolean(2, index, true);
+        } while((index = query.findNext(index)) != -1);
+        System.out.println(table);
+        // @@EndShow@@
+        // @@EndExample@@
+    }
+
