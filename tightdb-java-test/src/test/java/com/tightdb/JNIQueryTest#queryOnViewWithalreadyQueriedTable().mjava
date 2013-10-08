@@ -1,5 +1,5 @@
     @Test
-    public void queryOnView() {
+    public void queryOnViewWithalreadyQueriedTable() {
         Table table = new Table();
 
         // Specify the column types and names
@@ -14,14 +14,10 @@
         table.add("Erik", "Lee", 30000);
         table.add("Henry", "Anderson", 10000);
 
-        TableView view = table.where().findAll();
+        TableView view = table.where().equalTo(0, "John").findAll();
 
-        TableView view2 = view.where().equalTo(0, "John").findAll();
+        TableView view2 = view.where().equalTo(1, "Anderson").findAll();
 
-        assertEquals(2, view2.size());
-
-        TableView view3 = view2.where().equalTo(1, "Anderson").findAll();
-
-        assertEquals(1, view3.size());
+        assertEquals(1, view2.size());
     }
 
