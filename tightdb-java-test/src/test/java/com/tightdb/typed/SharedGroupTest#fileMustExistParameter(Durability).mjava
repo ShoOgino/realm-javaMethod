@@ -1,0 +1,30 @@
+    @Test(enabled=false, dataProvider = "durabilityProvider")
+    public void fileMustExistParameter(Durability durability) {
+    	// test not applicable for MEM_ONLY
+    	if (durability == Durability.MEM_ONLY)
+    		return;
+
+		String mustExistFile = "mustexistcheck.tightdb";
+
+		// Check that SharedGroup asserts when there is no file
+		deleteFile(mustExistFile);
+		try {
+		    db = new SharedGroup(mustExistFile, durability, true);
+		    assert(false);
+		} catch (com.tightdb.IOException e){
+			// expected
+		} catch (Exception e) {
+			assert(false);
+		}
+		// Don't expect anything to close due to failure.
+
+		// Create file and see that it can be opened now
+		db = new SharedGroup(mustExistFile, durability, false);
+		db.close();
+		// Then set fileMustExist=true, and it should work
+		db = new SharedGroup(mustExistFile, durability, true);
+		db.close();
+
+		deleteFile(mustExistFile);
+    }
+
