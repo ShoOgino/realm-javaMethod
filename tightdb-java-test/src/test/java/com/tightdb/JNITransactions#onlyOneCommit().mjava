@@ -2,14 +2,14 @@
     public void onlyOneCommit() { 
         WriteTransaction trans = db.beginWrite();
 
-        try{
-
+        try {
             Table tbl = trans.getTable("EmployeeTable");
             tbl.addColumn(ColumnType.STRING, "name");
-
             trans.commit();
-
-            try {   trans.commit(); assert(false); } catch (IllegalStateException e){}
+            try { 
+            	trans.commit(); // should throw 
+            	assert(false); 
+            } catch (IllegalStateException e){}
 
         } catch (Throwable t){
             trans.rollback();
