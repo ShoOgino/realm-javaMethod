@@ -1,0 +1,27 @@
+    @Test
+    public void queryAggregates() {
+
+        TestQueryTableTable table = new TestQueryTableTable();
+        table.add(10, 10f, 10d, "s10");
+        table.add(20, 20f, 20d, "s20");
+        table.add(20, 20f, 20d, "s20");
+        table.add(100, 100f, 100d, "s100");
+        table.add(1000, 1000f, 1000d, "s1000");
+
+        long res1 = table.where().longNum.greaterThan(10).count();
+        assertEquals(4, res1 );
+
+        long res2 = table.where().longNum.greaterThan(10).longNum.sum();
+        assertEquals(1140, res2 );
+
+        long res3 = table.where().longNum.greaterThan(10).longNum.maximum();
+        assertEquals(1000, res3 );
+
+        long res4 = table.where().longNum.greaterThan(10).longNum.minimum();
+        assertEquals(20, res4 );
+
+        double res5 = table.where().longNum.greaterThan(10).longNum.average();
+        System.out.println("res: " + res5);
+        assertEquals(285d, res5 );
+    }
+
