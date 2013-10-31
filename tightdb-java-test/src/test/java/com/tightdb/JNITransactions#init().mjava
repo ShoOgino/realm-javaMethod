@@ -1,8 +1,6 @@
     @BeforeMethod
     public void init() {
-        if (TightDB.osIsWindows())
-            return;
         deleteFile(testFile);
-        db = new SharedGroup(testFile);
+        db = new SharedGroup(testFile, SharedGroup.Durability.ASYNC);
     }
 

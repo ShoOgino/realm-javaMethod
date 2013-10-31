@@ -1,0 +1,25 @@
+    /**
+     * Checkd that Index can be set on multiple columns, with the String
+     * @param index
+     */
+    public void shouldTestSettingIndexOnMultipleColumns() {
+        
+        //Create a table only with String type columns
+        Table t = new Table();
+        t.addColumn(ColumnType.STRING, "col1");
+        t.addColumn(ColumnType.STRING, "col2");
+        t.addColumn(ColumnType.STRING, "col3");
+        t.addColumn(ColumnType.STRING, "col4");
+        t.addColumn(ColumnType.STRING, "col5");
+        t.add("row1", "row2", "row3", "row4", "row5");
+        t.add("row1", "row2", "row3", "row4", "row5");
+        t.add("row1", "row2", "row3", "row4", "row5");
+        t.add("row1", "row2", "row3", "row4", "row5");
+        t.add("row1", "row2", "row3", "row4", "row5");
+        
+        for (long c=0;c<t.getColumnCount();c++){
+            t.setIndex(c);
+            assertEquals(true, t.hasIndex(c));
+        }
+    }
+

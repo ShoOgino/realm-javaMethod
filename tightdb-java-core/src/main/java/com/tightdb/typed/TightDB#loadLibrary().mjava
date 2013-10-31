@@ -1,13 +1,13 @@
     public static void loadLibrary() {
-        // FIXME: How is this thread-safe?
-        if (libraryIsLoaded) return;
+        if (libraryIsLoaded.get())
+        	// only load library once
+        	return;
 
-        // FIXME: How exactly does this help? Why is it done?
         initTightDB();
 
         String jnilib;
         if (osIsWindows()) {
-            loadLibraryWindows();
+            jnilib = loadLibraryWindows();
         }
         else {
             String debug = System.getenv("TIGHTDB_JAVA_DEBUG");
@@ -19,10 +19,10 @@
             }
             System.loadLibrary(jnilib);
         }
-        libraryIsLoaded = true;
+        libraryIsLoaded.set(true);
 
-        if (!util.versionCompatible()) {
-            throw new RuntimeException("Version mismatch between tightdb.jar and native JNI library.");
+        if (!Util.versionCompatible()) {
+            throw new RuntimeException("Version mismatch between tightdb.jar and native JNI library " + jnilib);
         }
     }
 

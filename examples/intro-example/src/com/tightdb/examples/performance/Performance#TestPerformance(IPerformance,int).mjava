@@ -4,13 +4,13 @@
         Timer       timer = new Timer();
         int         testNo = 0;
 
-        if (pause) util.waitForEnter();
-        long memBefore = Util.getUsedMemory(); memBefore = Util.getUsedMemory();
+        if (pause) Util.waitForEnter();
+        long memBefore = ExampleHelper.getUsedMemory(); memBefore = ExampleHelper.getUsedMemory();
 
         // Build the test database
         test.buildTable(rows);
 
-        result.javaDBMemUsed = Math.max(Util.getUsedMemory() - memBefore, 1);
+        result.javaDBMemUsed = Math.max(ExampleHelper.getUsedMemory() - memBefore, 1);
         result.nativeDBMemUsed = test.usedNativeMemory();
 
         // Search small integer column
@@ -104,7 +104,7 @@
             }
         }
 */
-        if (pause) util.waitForEnter();
+        if (pause) Util.waitForEnter();
         test.closeTable();
 
         return result;

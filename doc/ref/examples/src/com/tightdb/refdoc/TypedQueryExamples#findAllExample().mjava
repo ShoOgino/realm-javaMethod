@@ -1,0 +1,21 @@
+    public static void findAllExample() {
+    // @@Example: ex_java_typed_query_find_all @@
+        // Create a new table
+        EmployeeTable employees = new EmployeeTable();
+        employees.add("John", "Lee", 10000);
+        employees.add("Jane", "Lee", 15000);
+        employees.add("John", "Anderson", 20000);
+        employees.add("Erik", "Lee", 30000);
+        employees.add("Henry", "Anderson", 10000);
+
+        // Search for a all employees with a given salary
+        EmployeeView view = employees.where().salary.greaterThan(15000).findAll();
+        Assert(view.size() == 2);
+
+        // Show all matching employees
+        for (EmployeeRow employee : view) {
+            System.out.println(employee.getFirstName() + " earns " + employee.getSalary());
+        }
+    //@@EndExample@@
+    }
+

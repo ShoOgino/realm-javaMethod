@@ -1,0 +1,15 @@
+    @Test(expectedExceptions=IllegalStateException.class)
+    public void shouldThrowExceptionAfterClosedReadTransaction() {
+        ReadTransaction rt = db.beginRead();
+
+        try {
+            Table tbl = rt.getTable("EmployeeTable");
+            rt.endRead();
+            tbl.getColumnCount(); //Should throw exception, the table is invalid when transaction has been closed
+            assert(false);
+        } finally {
+            rt.endRead();
+            clear();
+        }
+    }
+
