@@ -1,0 +1,35 @@
+    @Test
+    public void subtableTest() {    
+
+        Table persons = new Table();
+
+        persons.addColumn(ColumnType.STRING, "name");
+        persons.addColumn(ColumnType.STRING, "email");
+        persons.addColumn(ColumnType.TABLE, "addresses");
+
+        TableSchema addresses = persons.getSubTableSchema(2);
+        addresses.addColumn(ColumnType.STRING, "street");
+        addresses.addColumn(ColumnType.INTEGER, "zipcode");
+        addresses.addColumn(ColumnType.TABLE, "phone_numbers");
+
+        TableSchema phone_numbers = addresses.getSubTableSchema(2);
+        phone_numbers.addColumn(ColumnType.INTEGER, "number");
+
+        // Inserting data
+        persons.add(new Object[] {"Mr X", "xx@xxxx.com", new Object[][] {
+                                                                            { "X Street", 1234, new Object[][] {{ 12345678 }} },
+                                                                            { "Y Street", 1234, new Object[][] {{ 12345678 }} }
+                                                                                                                                    } });
+        
+        TableView personsView = persons.where().findAll();
+        
+        assertEquals(2, personsView.getSubTableSize(2, 0));
+        
+        Table address = personsView.getSubTable(2, 0);
+        assertEquals(2, address.size());
+        assertEquals(3, address.getColumnCount());
+        
+        personsView.clearSubTable(2, 0);
+        assertEquals(0, personsView.getSubTableSize(2, 0));
+    }
+

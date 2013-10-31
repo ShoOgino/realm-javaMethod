@@ -1,11 +1,8 @@
-    protected void writeOneTransaction(long rows)
-    {
+    protected void writeOneTransaction(long rows) {
         WriteTransaction trans = db.beginWrite();
         Table tbl = trans.getTable("EmployeeTable");
-        TableSpec tableSpec = new TableSpec();
-        tableSpec.addColumn(ColumnType.STRING, "name");
-        tableSpec.addColumn(ColumnType.INTEGER, "number");
-        tbl.updateFromSpec(tableSpec);
+        tbl.addColumn(ColumnType.STRING, "name");
+        tbl.addColumn(ColumnType.INTEGER, "number");
 
 
         for (long row=0; row < rows; row++)

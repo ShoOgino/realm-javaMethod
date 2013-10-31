@@ -1,0 +1,15 @@
+    @Test(dataProvider = "durabilityProvider")
+    public void expectExceptionWhenMultipleBeginWrite(Durability durability) {
+        init(durability);
+
+        WriteTransaction wt = db.beginWrite();
+        try {
+            db.beginWrite(); //Expect exception. Only 1 beginWrite() is allowed
+        } catch (IllegalStateException e){
+            wt.rollback();
+            clear();
+            return;
+        }
+        assert(false);        
+    }
+

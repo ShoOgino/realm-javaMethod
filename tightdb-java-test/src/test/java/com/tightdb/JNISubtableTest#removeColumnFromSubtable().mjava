@@ -1,0 +1,28 @@
+    @Test
+    public void removeColumnFromSubtable() {
+
+        // Table definition
+        Table persons = new Table();
+
+        persons.addColumn(ColumnType.STRING, "name");
+        persons.addColumn(ColumnType.STRING, "email");
+        persons.addColumn(ColumnType.TABLE, "addresses");
+
+
+        TableSchema addresses = persons.getSubTableSchema(2);
+        addresses.addColumn(ColumnType.STRING, "street");
+        addresses.addColumn(ColumnType.INTEGER, "zipcode");
+        addresses.addColumn(ColumnType.TABLE, "phone_numbers");
+
+        TableSchema phone_numbers = addresses.getSubTableSchema(2);
+        phone_numbers.addColumn(ColumnType.INTEGER, "number");
+
+        // Inserting data
+        persons.add(new Object[] {"Mr X", "xx@xxxx.com", new Object[][] {{ "X Street", 1234, new Object[][] {{ 12345678 }} }} });
+
+        // Assertions
+        assertEquals(persons.getSubTable(2,0).getColumnCount(), 3);
+        addresses.removeColumn(1);
+        assertEquals(persons.getSubTable(2,0).getColumnCount(), 2);
+    }
+
