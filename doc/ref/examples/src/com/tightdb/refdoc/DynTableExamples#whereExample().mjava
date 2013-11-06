@@ -5,21 +5,25 @@
         Table table = new Table();
         table.addColumn(ColumnType.STRING, "username");
         table.addColumn(ColumnType.INTEGER, "score");
-        table.addColumn(ColumnType.BOOLEAN, "completed");
+        table.addColumn(ColumnType.BOOLEAN, "completed"); // column 2
         table.add("user1", 420, false);
-        table.add("user2", 770, false);
+        table.add("user2", 770, true);
         table.add("user3", 327, false);
-        table.add("user4", 770, false);
-        table.add("user5", 564, true);
-        table.add("user6", 875, false);
-        table.add("user7", 420, true);
-        table.add("user8", 770, true);
         
-        // Get a query from the table
+        // where() returns a Query
         TableQuery query = table.where();
         
-        // USe the query object to query the table and get a table view with the results
-        TableView view = query.equalTo(2, false).findAll();
+        // You can continue to build the query
+        // Here you want all the rows where
+        // column 2 contains false, and column 1 > 400
+        query = query.equalTo(2, false);
+        query = query.greaterThan(1, 400);
+        // Now execute the query, and get the results in a TableView
+        TableView view = query.findAll();
+
+        // Expect 1 match
+        Assert(view.size() == 1);
+        Assert(view.getString(0,0).equals("user3"));
         // @@EndShow@@
         // @@EndExample@@
     }
