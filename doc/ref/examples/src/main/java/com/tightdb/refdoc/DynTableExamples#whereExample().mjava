@@ -1,0 +1,30 @@
+    public static void whereExample(){
+        // @@Example: ex_java_dyn_table_where @@
+        // @@Show@@
+        // Create table with 3 columns and add data
+        Table table = new Table();
+        table.addColumn(ColumnType.STRING, "username");
+        table.addColumn(ColumnType.INTEGER, "score");
+        table.addColumn(ColumnType.BOOLEAN, "completed"); // column 2
+        table.add("user1", 420, false);
+        table.add("user2", 770, true);
+        table.add("user3", 327, false);
+    
+        // where() returns a Query
+        TableQuery query = table.where();
+        
+        // You can continue to build the query
+        // Here you want all the rows where
+        // column 2 contains false, and column 1 > 400
+        query = query.equalTo(2, false);
+        query = query.greaterThan(1, 400);
+        // Now execute the query, and get the results in a TableView
+        TableView view = query.findAll();
+
+        // Expect 1 match
+        Assert(view.size() == 1);
+        Assert(view.getString(0,0).equals("user1"));
+        // @@EndShow@@
+        // @@EndExample@@
+    }
+
