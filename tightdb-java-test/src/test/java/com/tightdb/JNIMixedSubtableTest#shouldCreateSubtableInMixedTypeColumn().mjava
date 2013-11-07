@@ -1,3 +1,4 @@
+    // Test uses TableSpec..
     @Test
     public void shouldCreateSubtableInMixedTypeColumn() {
         Table table = new Table();
@@ -18,14 +19,7 @@
         {
             table.addEmptyRow();
 
-            boolean gotException = false;
-            try {
-                @SuppressWarnings("unused")
-                Table subtable = table.getSubTable(1, 0);
-            } catch (IllegalArgumentException e) {
-                gotException = true;
-            }
-            assertEquals(true, gotException);
+            try { Table subtable = table.getSubTable(1, 0); fail("Mixed contains 0, not a subtable");  } catch (IllegalArgumentException e) {}
             table.removeLast();
         }
 

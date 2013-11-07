@@ -1,0 +1,68 @@
+    public static void addColumnExample(){
+        // @@Example: ex_java_dyn_table_add_column_1 @@
+        Table table1 = new Table();
+
+        // Add a String column called 'name' and an int column called 'age'
+        table1.addColumn(ColumnType.STRING, "name");
+        table1.addColumn(ColumnType.INTEGER, "age");
+        // @@EndExample@@
+
+        // @@Example: ex_java_dyn_table_add_column_2 @@
+        Table table2 = new Table();
+
+        table2.addColumn(ColumnType.STRING, "colName0");
+        table2.addColumn(ColumnType.INTEGER, "colName1"); // Converts to a long in java
+        table2.addColumn(ColumnType.FLOAT, "colName2");
+        table2.addColumn(ColumnType.DOUBLE, "colName3");
+        table2.addColumn(ColumnType.BOOLEAN, "colName4");
+        table2.addColumn(ColumnType.DATE, "colName5");
+        table2.addColumn(ColumnType.BINARY, "colName6");
+        table2.addColumn(ColumnType.TABLE, "colName7"); // Subtables
+        table2.addColumn(ColumnType.MIXED, "colName8"); // Any of the above values
+        // @@EndExample@@
+
+        // @@Example: ex_java_dyn_table_add_column_3 @@
+        Table table3 = new Table();
+
+        table3.addColumn(ColumnType.INTEGER, "id");
+        long subtableColIndex = table3.addColumn(ColumnType.TABLE, "events");
+
+        // To add columns to the subtable use TableSchema
+        TableSchema subtableSchema = table3.getSubTableSchema(subtableColIndex);
+
+        // Now simply add columns using addColumn on the TableSchema object
+        subtableSchema.addColumn(ColumnType.STRING, "desc");
+        subtableSchema.addColumn(ColumnType.DATE, "date");
+        // @@EndExample@@
+
+        // @@Example: ex_java_dyn_table_add_column_4 @@
+        Table table4 = new Table();
+
+        for (long i=0; i<10000;i++){
+            table4.addColumn(ColumnType.INTEGER, "col" + i);
+        }
+        // @@EndExample@@
+
+        // @@Example: ex_java_dyn_table_add_column_5 @@
+        Table table5 = new Table();
+        
+        // Although it's possible to have empty names or the same names multiple times, 
+        // looking up columns based on the name, will only give you the first column 
+        // with that name. 
+        // But if you don't care about looking up columns by name, 
+        // you don't have to set a name.
+        table5.addColumn(ColumnType.STRING, "val");
+        table5.addColumn(ColumnType.INTEGER, "val");
+        table5.addColumn(ColumnType.DOUBLE, "val");
+        table5.addColumn(ColumnType.STRING, ""); // Empty string are also allowed
+        table5.addColumn(ColumnType.STRING, ""); 
+        
+        try { 
+            table5.addColumn(ColumnType.STRING, null); // Null are not allowed as column name
+        } 
+        catch(NullPointerException e) { 
+            table5.addColumn(ColumnType.STRING, "notNullName"); 
+        } 
+        // @@EndExample@@
+    }
+
