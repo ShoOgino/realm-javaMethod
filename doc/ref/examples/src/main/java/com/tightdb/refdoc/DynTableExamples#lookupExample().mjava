@@ -1,0 +1,24 @@
+    public static void lookupExample(){
+        // @@Example: ex_java_dyn_table_lookup @@
+        // @@Show@@
+        // Create a table with 2 column, the first being a String column containing map keys
+        Table tableMap = new Table();
+        long KEY_COLUMN_INDEX = tableMap.addColumn(ColumnType.STRING, "key");
+        long VALUE_COLUMN_INDEX = tableMap.addColumn(ColumnType.INTEGER, "value");
+        
+        // Put some values into the table map
+        for (long i=0; i<1000;i++){
+            String key = "key" + i;
+            long value = i*1000;
+            tableMap.add(key, value);
+        }
+        
+        // Lookup returns the row index of the matched key
+        long keyIndex = tableMap.lookup("key49");
+        
+        // Use the row index to retrieve the value from other columns
+        Assert(tableMap.getLong(VALUE_COLUMN_INDEX, keyIndex) == 49000);
+        // @@EndShow@@
+        // @@EndExample@@
+    }
+

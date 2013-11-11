@@ -1,0 +1,26 @@
+    public static void setIndexExample(){
+        // @@Example: ex_java_dyn_table_set_index @@
+        // @@Show@@
+        Table table = new Table();
+        long ID_COLUMN_INDEX = table.addColumn(ColumnType.INTEGER, "ID");
+        long CITY_COLUMN_INDEX = table.addColumn(ColumnType.STRING, "City");
+        long STATE_COLUMN_INDEX = table.addColumn(ColumnType.STRING, "State");
+        
+        // Index can be set before data is added to table.
+        // Insert operations will be a little slower from this point
+        table.setIndex(CITY_COLUMN_INDEX);
+        
+        // Add data
+        table.add(100, "Washington DC", "District of Columbia");
+        table.add(200, "Los Angeles", "California");
+
+        // Index can also be set after data has been added. 
+        // This might take a while if the dataset is very large
+        table.setIndex(STATE_COLUMN_INDEX);
+
+        Assert(table.hasIndex(CITY_COLUMN_INDEX));
+        Assert(table.hasIndex(STATE_COLUMN_INDEX));
+        // @@EndShow@@
+        // @@EndExample@@
+    }
+
