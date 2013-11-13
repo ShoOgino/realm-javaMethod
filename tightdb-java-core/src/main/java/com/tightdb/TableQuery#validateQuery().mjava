@@ -1,12 +1,13 @@
+    /**
+     * Checks in core if query syntax is valid. Throws exception, if not.
+     */
     private void validateQuery(){
-        // If query has not been checked yet
         if(dirty){ // If dirty, check if syntax is valid
             String invalidMessage = nativeValidateQuery(nativePtr);
-            if(invalidMessage.equals("")) {
-                dirty = false; // If no error message, then set dirt to false
-            } else { // Otherwise throw exception and return false
+            if(invalidMessage.equals("")) 
+                dirty = false; // If no error message, query is valid. Set dirty flag to false
+            else // Otherwise throw exception
                 throw new UnsupportedOperationException(invalidMessage);
-            }
         }
     }
 
