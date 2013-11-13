@@ -1,0 +1,12 @@
+    private void checkQuerySyntax(){
+        // If query has not been checked yet
+        if(dirty){ // If dirty, check if syntax is valid
+            String invalidMessage = nativeValidateQuery(nativePtr);
+            if(invalidMessage.equals("")) {
+                dirty = false; // If no error message, then set dirt to false
+            } else { // Otherwise throw exception and return false
+                throw new UnsupportedOperationException(invalidMessage);
+            }
+        }
+    }
+
