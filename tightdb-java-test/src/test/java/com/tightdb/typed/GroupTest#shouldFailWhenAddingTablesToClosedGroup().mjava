@@ -1,4 +1,4 @@
-    @Test(expectedExceptions = IllegalStateException.class)
+    @Test
     public void shouldFailWhenAddingTablesToClosedGroup() {
         Group group = new Group();
         Table tbl = group.getTable("test");
@@ -9,6 +9,6 @@
         group.close();
 
         //Try to add data to table in group
-        Table newTable = group.getTable("test2");
+        try { Table newTable = group.getTable("test2"); fail("Group closed"); } catch (IllegalStateException e) { }
     }
 
