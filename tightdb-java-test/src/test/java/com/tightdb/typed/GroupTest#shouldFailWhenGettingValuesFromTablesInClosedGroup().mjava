@@ -1,4 +1,4 @@
-    @Test(expectedExceptions = IllegalStateException.class)
+    @Test
     public void shouldFailWhenGettingValuesFromTablesInClosedGroup() {
         Group group = new Group();
         Table tbl = group.getTable("test");
@@ -8,6 +8,6 @@
         //Close the group
         group.close();
 
-        tbl.getLong(0, 0);
+        try { tbl.getLong(0, 0); fail("group closed"); } catch (IllegalStateException e) { }
     }
 
