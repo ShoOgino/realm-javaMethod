@@ -1,9 +1,9 @@
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void setDataWithWrongColumnTypes() {
         Table t = new Table();
         t.addColumn(ColumnType.STRING, "colName");
         t.add("String val");
         
-        t.set(0, 100); // Exception expected. Table has string column, and here an integer is inserted
+        try { t.set(0, 100); fail("Table has string column, and here an integer is inserted"); } catch (IllegalArgumentException e) { }
     }
 

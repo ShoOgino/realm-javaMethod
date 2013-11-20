@@ -1,9 +1,9 @@
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void setDataWithWrongColumnAmountParameters() {
         Table t = new Table();
         t.addColumn(ColumnType.STRING, "colName");
         t.add("String val");
         
-        t.set(0, "new string val", "This column does not exist"); // Exception expected. Table only has 1 column
+        try { t.set(0, "new string val", "This column does not exist"); fail("Table only has 1 column"); } catch (IllegalArgumentException e) { }
     }
 
