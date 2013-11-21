@@ -1,0 +1,35 @@
+    @Test
+    public void testPivotTableView(){
+
+        Table result = new Table();
+
+        TableView dataView = data.where().equalTo(BOOLEAN_COL_INDEX, true ).findAll();
+
+        long current = System.currentTimeMillis();
+        dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.COUNT, result);
+        System.out.println("COUNT");
+        for (long i=0;i<result.size();i++){
+            System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
+        }
+        result = new Table();
+        dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.SUM, result);
+        System.out.println("SUM");
+        for (long i=0;i<result.size();i++){
+            System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
+        }
+        assertEquals(true, result.size() > 0);
+
+        result = new Table();
+        dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.AVG, result);
+        System.out.println("AVG");
+        for (long i=0;i<result.size();i++){
+            System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
+        }
+        
+        System.out.println("Time for pivot : " + ( System.currentTimeMillis() - current) );
+        System.out.println("column in results " + result.getColumnCount());
+        System.out.println("Names: " + result.getColumnName(0) + result.getColumnName(1));
+        System.out.println("rows in results " + result.size());
+
+    }
+
