@@ -2,7 +2,7 @@
     public void testPivotTableView(){
 
 
-        TableView dataView = data.where().equalTo(BOOLEAN_COL_INDEX, true ).findAll();
+        TableView dataView = data.where().equalTo(INTEGER_COL_INDEX, 20).findAll();
 
         long current = System.currentTimeMillis();
         Table result = dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.COUNT);
@@ -15,10 +15,20 @@
         for (long i=0;i<result.size();i++){
             System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
         }
-        assertEquals(true, result.size() > 0);
-
         result = dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.AVG);
         System.out.println("AVG");
+        for (long i=0;i<result.size();i++){
+            System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
+        }
+        
+        result = dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.MIN);
+        System.out.println("MIN");
+        for (long i=0;i<result.size();i++){
+            System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
+        }
+        
+        result = dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.MAX);
+        System.out.println("MAX");
         for (long i=0;i<result.size();i++){
             System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
         }
