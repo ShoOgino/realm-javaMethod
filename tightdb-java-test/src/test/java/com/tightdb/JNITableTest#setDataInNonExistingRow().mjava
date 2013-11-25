@@ -1,9 +1,8 @@
-    @Test(expectedExceptions = IllegalArgumentException.class)
     public void setDataInNonExistingRow() {
         Table t = new Table();
         t.addColumn(ColumnType.STRING, "colName");
         t.add("String val");
         
-        t.set(7, "new string val"); // Exception expected. Row 7 does not exist
+        try { t.set(1, "new string val"); fail("Row 1 does not exist"); } catch (IllegalArgumentException e) { }
     }
 
