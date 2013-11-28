@@ -1,9 +1,9 @@
-    @Test(expectedExceptions = NullPointerException.class)
+    @Test
     public void addNullInMixedColumn() {
         Table t = new Table();
         t.addColumn(ColumnType.MIXED, "mixed");
         t.add(new Mixed(true));
         
-        t.setMixed(0, 0, null); // Argument is null, Throws exception
+        try { t.setMixed(0, 0, null); fail("Argument is null"); } catch (NullPointerException e) { }
     }
 
