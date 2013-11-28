@@ -1,39 +1,20 @@
     @Test
     public void testPivotTable(){
-
-
-        long current = System.currentTimeMillis();
-        Table result = data.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.COUNT);
-        /*System.out.println("COUNT");
-        for (long i=0;i<result.size();i++){
-            System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
-        }
-        result = data.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.SUM);
-        System.out.println("SUM");
-        for (long i=0;i<result.size();i++){
-            System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
-        }
-        result = data.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.AVG);
-        System.out.println("AVG");
-        for (long i=0;i<result.size();i++){
-            System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
-        }
-        result = data.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.MIN);
-        System.out.println("MIN");
-        for (long i=0;i<result.size();i++){
-            System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
-        }
         
-        result = data.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.MAX);
-        System.out.println("MAX");
-        for (long i=0;i<result.size();i++){
-            System.out.println(result.getString(0, i) + " " + result.getLong(1, i));
-        }
-
-        System.out.println("Time for pivot : " + ( System.currentTimeMillis() - current) );
-        System.out.println("column in results " + result.getColumnCount());
-        System.out.println("Names: " + result.getColumnName(0) + result.getColumnName(1));
-        System.out.println("rows in results " + result.size());*/
-        assertEquals(true, result.size() > 0);
+        Table resultCount = t.pivot(colIndexSex, colIndexAge, PivotType.COUNT);
+        assertEquals(2, resultCount.size());
+        assertEquals(2500000, resultCount.getLong(1, 0));
+        assertEquals(2500000, resultCount.getLong(1, 1));
+        
+        Table resultMin = t.pivot(colIndexSex, colIndexAge, PivotType.MIN);
+        assertEquals(20, resultMin.getLong(1, 0));
+        assertEquals(21, resultMin.getLong(1, 1));
+        
+        Table resultMax = t.pivot(colIndexSex, colIndexAge, PivotType.MAX);
+        assertEquals(38, resultMax.getLong(1, 0));
+        assertEquals(39, resultMax.getLong(1, 1));
+        
+        try { t.pivot(colIndexHired, colIndexAge, PivotType.SUM); fail("Group by not a String column"); } catch (UnsupportedOperationException e) { }
+        try { t.pivot(colIndexSex, colIndexHired, PivotType.SUM); fail("Aggregation not an int column"); } catch (UnsupportedOperationException e) { }
     }
 

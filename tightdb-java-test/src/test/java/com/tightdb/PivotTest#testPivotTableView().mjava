@@ -1,27 +1,23 @@
     @Test
     public void testPivotTableView(){
-
-        // Smallest value is 0
-        TableView dataView = data.where().lessThan(INTEGER_COL_INDEX, 20).findAll();
-        Table res = dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.MIN);
-        assertEquals(0, res.minimumInt(1));
         
-        // Largest value is 19
-        dataView = data.where().lessThan(INTEGER_COL_INDEX, 20).findAll();
-        res = dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.MAX);
-        assertEquals(19, res.maximumInt(1));
+        TableView view = t.getSortedView(colIndexAge);
         
-        // Largest and smallest value is 20
-        dataView = data.where().equalTo(INTEGER_COL_INDEX, 20).findAll();
-        res = dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.MAX);
-        assertEquals(20, res.minimumInt(1));
-        assertEquals(20, res.maximumInt(1));
-        res = dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.MIN);
-        assertEquals(20, res.minimumInt(1));
-        assertEquals(20, res.maximumInt(1));
+        Table resultCount = view.pivot(colIndexSex, colIndexAge, PivotType.COUNT);
+        assertEquals(2, resultCount.size());
+        assertEquals(2500000, resultCount.getLong(1, 0));
+        assertEquals(2500000, resultCount.getLong(1, 1));
+        
+        Table resultMin = view.pivot(colIndexSex, colIndexAge, PivotType.MIN);
+        assertEquals(20, resultMin.getLong(1, 0));
+        assertEquals(21, resultMin.getLong(1, 1));
+        
+        Table resultMax = view.pivot(colIndexSex, colIndexAge, PivotType.MAX);
+        assertEquals(38, resultMax.getLong(1, 0));
+        assertEquals(39, resultMax.getLong(1, 1));
         
         
-        res = dataView.pivot(STRING_COL_INDEX, INTEGER_COL_INDEX, PivotType.COUNT);
-        res.getColumnName(1).contains("COUNT:");
+        try { view.pivot(colIndexHired, colIndexAge, PivotType.SUM); fail("Group by not a String column"); } catch (UnsupportedOperationException e) { }
+        try { view.pivot(colIndexSex, colIndexHired, PivotType.SUM); fail("Aggregation not an int column"); } catch (UnsupportedOperationException e) { }
     }
 
