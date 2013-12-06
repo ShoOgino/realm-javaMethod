@@ -1,0 +1,16 @@
+    @Test
+    public void getSubtableOutOfRange() {
+        Group group = new Group();
+        Table table = group.getTable("emp");
+
+        table.addColumn(ColumnType.TABLE, "table");
+        
+        // No rows added
+        try { table.getSubTable(0, 0); fail("rowIndex > available rows."); } catch (ArrayIndexOutOfBoundsException e) { }
+        try { table.getSubTable(1, 0); fail("columnIndex > available columns."); } catch (ArrayIndexOutOfBoundsException e) { }
+        
+        table.addEmptyRow();
+        
+        try { table.getSubTable(1, 0); fail("columnIndex > available columns."); } catch (ArrayIndexOutOfBoundsException e) { }
+    }
+
