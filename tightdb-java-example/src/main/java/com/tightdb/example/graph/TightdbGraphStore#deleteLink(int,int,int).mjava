@@ -1,31 +1,31 @@
-	// this is very inefficient, in practice I would assume that
+    // this is very inefficient, in practice I would assume that
     // you would always have a link id, so that you could delete directly
     boolean deleteLink(int id1, int link_type, int id2) {
-		WriteTransaction tr = db.beginWrite();
-		try {						
-			NodeTable nodes = new NodeTable(tr);
-			LinkTable links = new LinkTable(tr);
-			LinkDeletedTable deleted_links = new LinkDeletedTable(tr);
+        WriteTransaction tr = db.beginWrite();
+        try {                       
+            NodeTable nodes = new NodeTable(tr);
+            LinkTable links = new LinkTable(tr);
+            LinkDeletedTable deleted_links = new LinkDeletedTable(tr);
             
             // we don't want to search over all links, so we go through the source node
             NodeRow srcNode = nodes.at(id1);
-			LinktypeQuery query = srcNode.getLink_out().where().type.equalTo(link_type);
+            LinktypeQuery query = srcNode.getLink_out().where().type.equalTo(link_type);
             for (LinktypeRow ref : query.findAll()) {
-            	long refLink = ref.getLink();
-            	LinkRow l = links.at(refLink);
-            	if (l.getId2() == id2) {
-            		l.setDeleted(true);
-            		deleted_links.add((int) refLink);
-            		srcNode.getLink_out().where().type.equalTo(refLink).remove();
-            		nodes.at(id2).getLink_in().where().type.equalTo(link_type).link.equalTo(refLink).remove();
-            		tr.commit();
-            		return true;
-            	}
-            }	
+                long refLink = ref.getLink();
+                LinkRow l = links.at(refLink);
+                if (l.getId2() == id2) {
+                    l.setDeleted(true);
+                    deleted_links.add((int) refLink);
+                    srcNode.getLink_out().where().type.equalTo(refLink).remove();
+                    nodes.at(id2).getLink_in().where().type.equalTo(link_type).link.equalTo(refLink).remove();
+                    tr.commit();
+                    return true;
+                }
+            }   
         } catch (Exception e) {
-			System.err.println("Exception");
-		}
-		tr.rollback();
+            System.err.println("Exception");
+        }
+        tr.rollback();
         return false;  // not found
     }
 

@@ -1,26 +1,26 @@
     @Test
     public void shouldCommitToDisk() throws IOException {
-    	new File(FILENAME).delete();
+        new File(FILENAME).delete();
 
-    	// Write a DB to file
-    	Group group = new Group(FILENAME, OpenMode.READ_WRITE);
-    	group.commit();
-  	
-      	Table tbl = group.getTable("test");
-    	tbl.addColumn(ColumnType.INTEGER, "number");
-    	tbl.add(1);
-    	group.commit();
-    	assertEquals(tbl.getLong(0, 0), 1);
-    	
-    	// Update, commit and close file.
-    	tbl.set(0, 27);
-    	group.commit();
-    	group.close();
-    	
-    	// Open file again and verify content
-    	Group readGrp = new Group(FILENAME);
-    	Table tbl2 = readGrp.getTable("test");
-    	assertEquals(tbl2.getLong(0, 0), 27);
-    	readGrp.close();
+        // Write a DB to file
+        Group group = new Group(FILENAME, OpenMode.READ_WRITE);
+        group.commit();
+    
+        Table tbl = group.getTable("test");
+        tbl.addColumn(ColumnType.INTEGER, "number");
+        tbl.add(1);
+        group.commit();
+        assertEquals(tbl.getLong(0, 0), 1);
+        
+        // Update, commit and close file.
+        tbl.set(0, 27);
+        group.commit();
+        group.close();
+        
+        // Open file again and verify content
+        Group readGrp = new Group(FILENAME);
+        Table tbl2 = readGrp.getTable("test");
+        assertEquals(tbl2.getLong(0, 0), 27);
+        readGrp.close();
     }
 

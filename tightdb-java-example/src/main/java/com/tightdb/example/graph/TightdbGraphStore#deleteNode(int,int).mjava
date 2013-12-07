@@ -1,19 +1,19 @@
-	boolean deleteNode(int node_type, int node_id) {
-		WriteTransaction tr = db.beginWrite();
-		try {						
-			NodeTable nodes = new NodeTable(tr);
-			NodeDeletedTable deleted_nodes = new NodeDeletedTable(tr);
-			NodeRow row = nodes.at(node_id);
-			if (row.getDeleted() == false && row.getNode_type() == node_type) {
-				row.setDeleted(true);
-				tr.commit();
-				deleted_nodes.add(node_id);
-				return true;
-			}			
-		} catch (Exception e) {
-			System.err.println("Exception");
-		}
-		tr.rollback();
-		return false;
-	}
+    boolean deleteNode(int node_type, int node_id) {
+        WriteTransaction tr = db.beginWrite();
+        try {                       
+            NodeTable nodes = new NodeTable(tr);
+            NodeDeletedTable deleted_nodes = new NodeDeletedTable(tr);
+            NodeRow row = nodes.at(node_id);
+            if (row.getDeleted() == false && row.getNode_type() == node_type) {
+                row.setDeleted(true);
+                tr.commit();
+                deleted_nodes.add(node_id);
+                return true;
+            }           
+        } catch (Exception e) {
+            System.err.println("Exception");
+        }
+        tr.rollback();
+        return false;
+    }
 

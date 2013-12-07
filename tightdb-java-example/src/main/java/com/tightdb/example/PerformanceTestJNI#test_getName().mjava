@@ -1,28 +1,28 @@
     static void test_getName() {
-    	final int COLUMNS = 1000;
-    	final int ROWS = 1000;
-    	final int LOOPS = 100000;
-    	
-    	Table tbl = new Table();
-    	Map<String, Long> map = new HashMap<String, Long>();
+        final int COLUMNS = 1000;
+        final int ROWS = 1000;
+        final int LOOPS = 100000;
+        
+        Table tbl = new Table();
+        Map<String, Long> map = new HashMap<String, Long>();
 
-    	for (long i=0; i<COLUMNS; i++) {
-    		String name = "column"+i;
-    		tbl.addColumn(ColumnType.BOOLEAN, name);
-    		map.put(name, i);
-    	}
-    	tbl.addEmptyRows(ROWS);
-    	
-    	long columns = tbl.getColumnCount();
-    	boolean bool = false;
-		Object col = (Object)0L;
-    	for (int j=0; j<LOOPS; j++) {
-    		for (long i=0; i<columns; i++) {
-    			String name = tbl.getColumnName((Long)col);
-    			bool = tbl.getBoolean(i, 5);
-				col = map.get(name);
-    		}
-    	}
-    	System.out.println("Done." + bool + col);
+        for (long i=0; i<COLUMNS; i++) {
+            String name = "column"+i;
+            tbl.addColumn(ColumnType.BOOLEAN, name);
+            map.put(name, i);
+        }
+        tbl.addEmptyRows(ROWS);
+        
+        long columns = tbl.getColumnCount();
+        boolean bool = false;
+        Object col = (Object)0L;
+        for (int j=0; j<LOOPS; j++) {
+            for (long i=0; i<columns; i++) {
+                String name = tbl.getColumnName((Long)col);
+                bool = tbl.getBoolean(i, 5);
+                col = map.get(name);
+            }
+        }
+        System.out.println("Done." + bool + col);
     }
 
