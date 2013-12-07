@@ -1,7 +1,7 @@
     long addNode(Node node) {
         long free_row_ndx = 0;
         WriteTransaction tr = db.beginWrite();
-        try {                       
+        try {
             NodeTable nodes = new NodeTable(tr);
             NodeDeletedTable deleted_nodes = new NodeDeletedTable(tr);
             if (deleted_nodes.isEmpty()) {
@@ -17,7 +17,7 @@
                  nodes.at(free_row_ndx).setDeleted(false);
                  nodes.at(free_row_ndx).setLink_in(null);
                  nodes.at(free_row_ndx).setLink_out(null);
-                 
+
                  deleted_nodes.remove(0);
             }
             tr.commit();

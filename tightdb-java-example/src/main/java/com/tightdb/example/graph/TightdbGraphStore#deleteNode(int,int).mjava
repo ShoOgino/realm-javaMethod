@@ -1,6 +1,6 @@
     boolean deleteNode(int node_type, int node_id) {
         WriteTransaction tr = db.beginWrite();
-        try {                       
+        try {
             NodeTable nodes = new NodeTable(tr);
             NodeDeletedTable deleted_nodes = new NodeDeletedTable(tr);
             NodeRow row = nodes.at(node_id);
@@ -9,7 +9,7 @@
                 tr.commit();
                 deleted_nodes.add(node_id);
                 return true;
-            }           
+            }
         } catch (Exception e) {
             System.err.println("Exception");
         }
