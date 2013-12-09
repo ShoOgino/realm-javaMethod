@@ -1,18 +1,18 @@
     // This is a bonus method (not in linkbench)
     ArrayList<Link> getBacklinkList(int id1, int link_type) {
-    	ArrayList<Link> link_list = new ArrayList<Link>();
-    	
-    	ReadTransaction tr = db.beginRead();
-		NodeTable nodes = new NodeTable(tr);
-		LinkTable links = new LinkTable(tr);
+        ArrayList<Link> link_list = new ArrayList<Link>();
 
-		LinktypeView view = nodes.at(id1).getLink_in().where().type.equalTo(link_type).findAll();
-		for (LinktypeRow r : view) {
-			LinkRow link = links.at(r.getLink()); 
-			link_list.add(clone_link(link));
-		}
-		
-    	tr.endRead();
-		return link_list;		
+        ReadTransaction tr = db.beginRead();
+        NodeTable nodes = new NodeTable(tr);
+        LinkTable links = new LinkTable(tr);
+
+        LinktypeView view = nodes.at(id1).getLink_in().where().type.equalTo(link_type).findAll();
+        for (LinktypeRow r : view) {
+            LinkRow link = links.at(r.getLink());
+            link_list.add(clone_link(link));
+        }
+
+        tr.endRead();
+        return link_list;
     }
 
