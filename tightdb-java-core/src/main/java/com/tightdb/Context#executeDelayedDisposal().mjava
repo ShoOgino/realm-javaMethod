@@ -1,18 +1,20 @@
-    public void executeDelayedDisposal()
-    {
+    public void executeDelayedDisposal() {
         synchronized (this) {
-            for (long nativePointer: abandonedTables)
-                if(Table.nativeIsValid(nativePointer)){
+            for (long nativePointer: abandonedSubtables){
+                if(Table.nativeIsValid(nativePointer)){ // Make sure table is valid before closing it
                     Table.nativeClose(nativePointer);
                 }
-            abandonedTables.clear();
-            for (long nativePointer: abandonedTableViews)
-                //if(TableView.nativeIsValid(nativePointer)){
-                    TableView.nativeClose(nativePointer);
-               // }
+            }
+            abandonedSubtables.clear();
+
+            for (long nativePointer: abandonedTableViews){
+                TableView.nativeClose(nativePointer);
+            }
+
             abandonedTableViews.clear();
-            for (long nativePointer: abandonedQueries)
+            for (long nativePointer: abandonedQueries){
                 TableQuery.nativeClose(nativePointer);
+            }
             abandonedQueries.clear();
         }
     }
