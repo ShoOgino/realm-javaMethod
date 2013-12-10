@@ -5,6 +5,7 @@
      * @return
      */
     public TableView getSortedView(long columnIndex, Order order){
-        return new TableView(nativeGetSortedView(nativePtr, columnIndex, (order == Order.ascending)), immutable);
+        context.executeDelayedDisposal();
+        return new TableView(this.context, nativeGetSortedView(nativePtr, columnIndex, (order == Order.ascending)), immutable);
     }
 

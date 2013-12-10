@@ -1,5 +1,6 @@
     @Override
     public TableView findAllDate(long columnIndex, Date date) {
-        return new TableView(nativeFindAllDate(nativePtr, columnIndex, date.getTime() / 1000), immutable);
+        context.executeDelayedDisposal();
+        return new TableView(this.context, nativeFindAllDate(nativePtr, columnIndex, date.getTime() / 1000), immutable);
     }
 

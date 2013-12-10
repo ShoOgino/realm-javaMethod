@@ -1,5 +1,8 @@
     public TableView findAll(){
         validateQuery();
-        return new TableView(nativeFindAll(nativePtr, 0, Table.INFINITE, Table.INFINITE), immutable);
+        context.executeDelayedDisposal();
+        long nativeViewPtr = nativeFindAll(nativePtr, 0, Table.INFINITE, Table.INFINITE);
+
+        return new TableView(this.context, nativeViewPtr, immutable);
     }
 

@@ -12,6 +12,18 @@
         if (immutable)
             if (!hasTable(name))
                 throwImmutable();
-        return new Table(this, nativeGetTableNativePtr(nativePtr, name), immutable);
+        
+        context.executeDelayedDisposal();
+        long nativeTablePointer = nativeGetTableNativePtr(nativePtr, name);
+        try {
+            // Copy context reference from parent
+            return new Table(context, this, nativeTablePointer, immutable);
+        }
+        catch (RuntimeException e) {
+            Table.nativeClose(nativeTablePointer);
+            throw e;
+        }
+        
+        //return new Table(this, nativeGetTableNativePtr(nativePtr, name), immutable);
     }
 

@@ -3,7 +3,8 @@
             throw new IllegalStateException(
                     "Can't beginRead() during another active transaction");
         // FIXME: throw from nativeMethod in case of error
-        ReadTransaction t = new ReadTransaction(this, nativeBeginRead(nativePtr));
+        long nativeGroupPointer = nativeBeginRead(nativePtr);
+        ReadTransaction t = new ReadTransaction(context, this, nativeGroupPointer);
         activeTransaction = true;
         return t;
     }

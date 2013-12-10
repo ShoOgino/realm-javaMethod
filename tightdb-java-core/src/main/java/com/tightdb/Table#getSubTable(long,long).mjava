@@ -10,6 +10,15 @@
      */
     @Override
     public Table getSubTable(long columnIndex, long rowIndex) {
-        return new Table(this, nativeGetSubTable(nativePtr, columnIndex, rowIndex), immutable);
-    }
+        context.executeDelayedDisposal();
+        long nativeSubtablePointer = nativeGetSubTable(nativePtr, columnIndex, rowIndex);
+        try {
+            // Copy context reference from parent
+            return new Table(context, this, nativeSubtablePointer, immutable);
+        }
+        catch (RuntimeException e) {
+            nativeClose(nativeSubtablePointer);
+            throw e;
+        }
+        }
 
