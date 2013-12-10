@@ -1,17 +1,16 @@
-    @Override
-    public void close() {
-        synchronized (CloseMutex.getInstance()) {
-            if (nativePtr == 0) {
-                if (DEBUG)
-                    System.err.println(".... CLOSE ignored.");
-                return;
-            }
+    public void close()
+    {
+        if (nativePtr != 0) {
+            nativeClose(nativePtr);
+            nativePtr = 0;
+            
             if (DEBUG) {
                 TableCount--;
                 System.err.println("==== CLOSE " + tableNo + " ptr= " + nativePtr + " remaining " + TableCount);
             }
-            nativeClose(nativePtr);
-            nativePtr = 0;
+        } else {
+            if (DEBUG)
+                System.err.println(".... CLOSE ignored.");
         }
     }
 
