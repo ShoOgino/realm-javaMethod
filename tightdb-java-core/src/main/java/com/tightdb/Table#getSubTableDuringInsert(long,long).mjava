@@ -1,4 +1,5 @@
     private Table getSubTableDuringInsert(long columnIndex, long rowIndex) {
-        return new Table(this, nativeGetSubTableDuringInsert(nativePtr, columnIndex, rowIndex), immutable);
+        context.executeDelayedDisposal();
+        return new Table(this.context, this, nativeGetSubTableDuringInsert(nativePtr, columnIndex, rowIndex), immutable);
     }
 
