@@ -1,4 +1,4 @@
-    @Test(enabled=false)
+    @Test
     public void testMemoryManagement() throws Throwable {
 
         //System.out.println("Begin mem test");
@@ -13,11 +13,11 @@
 
             TableView view = query.notEqualTo(0, 2).findAll();
             AssertJUnit.assertEquals(i, table.getLong(0,0) );
-            //view.finalize();
+            view.close();
 
-          //  query.finalize();
+            query.close();
 
-           // table.finalize();
+            table.close();
         }
         // System.out.println("End mem test");
     }
