@@ -12,13 +12,13 @@
     public Table getSubTable(long columnIndex, long rowIndex) {
         // Execute the disposal of abandoned tightdb objects each time a new tightdb object is created
         context.executeDelayedDisposal();
-        long nativeSubtablePointer = nativeGetSubTable(nativePtr, columnIndex, rowIndex);
+        long nativeSubtablePtr = nativeGetSubTable(nativePtr, columnIndex, rowIndex);
         try {
             // Copy context reference from parent
-            return new Table(context, this, nativeSubtablePointer, immutable);
+            return new Table(context, this, nativeSubtablePtr, immutable);
         }
         catch (RuntimeException e) {
-            nativeClose(nativeSubtablePointer);
+            nativeClose(nativeSubtablePtr);
             throw e;
         }
     }
