@@ -7,12 +7,13 @@
      */
     public Table getTable(String name) {
         verifyGroupIsValid();
-        if (name == null || name == "")
-            throw new IllegalArgumentException("Invalid name. Name must be a non-empty string.");
+        if (name == null || name.equals(""))
+            throw new IllegalArgumentException("Invalid name. Name must be a non-empty String.");
         if (immutable)
             if (!hasTable(name))
                 throwImmutable();
         
+        // Execute the disposal of abandoned tightdb objects each time a new tightdb object is created
         context.executeDelayedDisposal();
         long nativeTablePointer = nativeGetTableNativePtr(nativePtr, name);
         try {

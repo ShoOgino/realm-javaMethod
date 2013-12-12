@@ -1,5 +1,20 @@
     @Override
     public TableQuery where() {
-        return new TableQuery(this.context, nativeWhere(nativePtr), immutable);
+        
+        //System.out.println("where1");
+        // return new TableQuery(this.context, nativeWhere(nativePtr), immutable);
+        // Execute the disposal of abandoned tightdb objects each time a new tightdb object is created
+        context.executeDelayedDisposal();
+        //System.out.println("where2");
+
+        long nativeQueryPtr = nativeWhere(nativePtr);
+        try {
+            // Copy context reference from parent
+            return new TableQuery(this.context, nativeQueryPtr, immutable);
+        }
+        catch (RuntimeException e) {
+            TableQuery.nativeClose(nativeQueryPtr);
+            throw e;
+        }
     }
 
