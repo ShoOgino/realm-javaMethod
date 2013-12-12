@@ -1,6 +1,11 @@
     public Group(String filepath, OpenMode mode) {
         context = new Context();
         this.nativePtr = createNative(filepath, mode.value);
-        checkNativePtr();
+        try { 
+            checkNativePtr();
+        } catch (RuntimeException e) {
+            nativeClose(nativePtr);
+            throw e;
+        }
     }
 

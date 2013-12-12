@@ -2,7 +2,12 @@
         context = new Context();
         if (buffer != null) {
             this.nativePtr = createNative(buffer);
-            checkNativePtr();
+            try { 
+                checkNativePtr();
+            } catch (RuntimeException e) {
+                nativeClose(nativePtr);
+                throw e;
+            }
         } else {
             throw new IllegalArgumentException();
         }

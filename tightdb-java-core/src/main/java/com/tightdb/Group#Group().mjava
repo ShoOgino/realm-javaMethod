@@ -1,6 +1,11 @@
     public Group() {
-        this.nativePtr = createNative();
-        checkNativePtr();
         context = new Context();
+        this.nativePtr = createNative();
+        try {
+            checkNativePtr();
+        } catch (RuntimeException e) {
+            nativeClose(nativePtr);
+            throw e;
+        }
     }
 
