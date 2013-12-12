@@ -10,6 +10,7 @@
      */
     @Override
     public Table getSubTable(long columnIndex, long rowIndex) {
+        // Execute the disposal of abandoned tightdb objects each time a new tightdb object is created
         context.executeDelayedDisposal();
         long nativeSubtablePointer = nativeGetSubTable(nativePtr, columnIndex, rowIndex);
         try {

@@ -1,5 +1,12 @@
     public TableView getDistinctView(long columnIndex) {
+        // Execute the disposal of abandoned tightdb objects each time a new tightdb object is created
         this.context.executeDelayedDisposal();
-        return new TableView(this.context, nativeGetDistinctView(nativePtr, columnIndex), immutable);
+        long nativeViewPtr = nativeGetDistinctView(nativePtr, columnIndex);
+        try {
+            return new TableView(this.context, nativeViewPtr, immutable);
+        } catch (RuntimeException e) {
+            TableView.nativeClose(nativeViewPtr);
+            throw e;
+        }
     }
 
