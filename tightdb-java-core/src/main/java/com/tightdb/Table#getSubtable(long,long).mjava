@@ -9,10 +9,10 @@
      * @return TableBase the subtable at the requested cell
      */
     @Override
-    public Table getSubTable(long columnIndex, long rowIndex) {
+    public Table getSubtable(long columnIndex, long rowIndex) {
         // Execute the disposal of abandoned tightdb objects each time a new tightdb object is created
         context.executeDelayedDisposal();
-        long nativeSubtablePtr = nativeGetSubTable(nativePtr, columnIndex, rowIndex);
+        long nativeSubtablePtr = nativeGetSubtable(nativePtr, columnIndex, rowIndex);
         try {
             // Copy context reference from parent
             return new Table(context, this, nativeSubtablePtr, immutable);
