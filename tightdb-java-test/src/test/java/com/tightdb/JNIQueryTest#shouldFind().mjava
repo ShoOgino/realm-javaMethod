@@ -8,15 +8,15 @@
         table.addColumn(ColumnType.BOOLEAN, "completed");
 
         // Insert some values
-        table.add("Arnold", 420, false);	// 0
-        table.add("Jane", 770, false);		// 1 *
-        table.add("Erik", 600, false);		// 2
-        table.add("Henry", 601, false);		// 3 *
-        table.add("Bill", 564, true);		// 4
-        table.add("Janet", 875, false);		// 5 *
+        table.add("Arnold", 420, false);    // 0
+        table.add("Jane", 770, false);      // 1 *
+        table.add("Erik", 600, false);      // 2
+        table.add("Henry", 601, false);     // 3 *
+        table.add("Bill", 564, true);       // 4
+        table.add("Janet", 875, false);     // 5 *
 
         TableQuery query = table.where().greaterThan(1, 600);
-        
+
         // find first match
         assertEquals(1, query.find());
         assertEquals(1, query.find());
@@ -35,7 +35,7 @@
         assertEquals(3, query.find(2));
         assertEquals(1, query.find(1));
         assertEquals(1, query.find(0));
-        
+
         // test out of range
         assertEquals(-1, query.find(6));
         try {  query.find(7);  fail("Exception expected");  } catch (ArrayIndexOutOfBoundsException e) {  }

@@ -28,7 +28,7 @@
         long SUBTABLE_COL_INDEX = table3.addColumn(ColumnType.TABLE, "events");
 
         // To add columns to the subtable use TableSchema
-        TableSchema subtableSchema = table3.getSubTableSchema(SUBTABLE_COL_INDEX);
+        TableSchema subtableSchema = table3.getSubtableSchema(SUBTABLE_COL_INDEX);
 
         // Now simply add columns using addColumn on the TableSchema object
         subtableSchema.addColumn(ColumnType.STRING, "desc");
@@ -45,38 +45,38 @@
 
         // @@Example: ex_java_dyn_table_add_column_5 @@
         Table table5 = new Table();
-        
-        // Although it's possible to have empty names or the same names multiple times, 
-        // looking up columns based on the name, will only give you the first column 
-        // with that name. 
-        // But if you don't care about looking up columns by name, 
+
+        // Although it's possible to have empty names or the same names multiple times,
+        // looking up columns based on the name, will only give you the first column
+        // with that name.
+        // But if you don't care about looking up columns by name,
         // you don't have to set a name.
         table5.addColumn(ColumnType.STRING, "val");
         table5.addColumn(ColumnType.INTEGER, "val");
         table5.addColumn(ColumnType.DOUBLE, "val");
         table5.addColumn(ColumnType.STRING, ""); // Empty string are also allowed
-        table5.addColumn(ColumnType.STRING, ""); 
-        
-        try { 
+        table5.addColumn(ColumnType.STRING, "");
+
+        try {
             table5.addColumn(ColumnType.STRING, null); // Null are not allowed as column name
-        } 
-        catch(NullPointerException e) { 
-            table5.addColumn(ColumnType.STRING, "notNullName"); 
-        } 
+        }
+        catch(NullPointerException e) {
+            table5.addColumn(ColumnType.STRING, "notNullName");
+        }
         // @@EndExample@@
-        
+
         // @@Example: ex_java_dyn_table_add_column_6 @@
         Table table6 = new Table();
         table6.addColumn(ColumnType.STRING, "StringCol");
-        
+
         // Adding 1.000.000 rows with string values to the table
         for (long l=0;l<1000000;l++){
             table6.add("s" + l);
         }
-        
+
         // Adding a new int column. Default values in all 1.000.000 rows for that column is 0
         table6.addColumn(ColumnType.INTEGER, "IntCol");
-        
+
         Assert(table6.getLong(1, 5000) == 0);
         // @@EndExample@@
     }

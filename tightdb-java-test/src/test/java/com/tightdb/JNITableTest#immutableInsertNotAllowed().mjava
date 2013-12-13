@@ -1,6 +1,6 @@
     @Test
     public void immutableInsertNotAllowed() {
-        
+
         String FILENAME = "only-test-file.tightdb";
         String TABLENAME = "tableName";
 
@@ -13,7 +13,7 @@
             Table table = wt.getTable(TABLENAME);
             table.addColumn(ColumnType.STRING, "col0");
             table.add("value0");
-            table.add("value1");  
+            table.add("value1");
             table.add("value2");
 
             wt.commit();
@@ -24,7 +24,7 @@
         ReadTransaction rt = group.beginRead();
         try{
             Table table = rt.getTable(TABLENAME);
-            
+
             try {  table.addAt(1, "NewValue"); fail("Exception expected when inserting in read transaction"); } catch (IllegalStateException e) { }
 
         } finally {
