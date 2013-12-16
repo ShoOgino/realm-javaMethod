@@ -1,8 +1,10 @@
-    @Test (enabled=false)
-    public void shouldCloseGroup() { // TODO!
+    @Test
+    public void shouldCloseGroup() { 
 
-        //Group group = new Group();
+        Group group = new Group();
+        group.close();
 
-        //  EmployeeTable employees = new EmployeeTable(group);
+        try { group.getTable("t");    fail("Group is closed"); } catch (IllegalStateException e) { }
+        try { group.size();                     fail("Group is closed"); } catch (IllegalStateException e) { }
     }
 

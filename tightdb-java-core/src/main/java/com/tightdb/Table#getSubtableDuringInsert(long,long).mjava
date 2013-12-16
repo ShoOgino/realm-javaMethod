@@ -1,4 +1,13 @@
     private Table getSubtableDuringInsert(long columnIndex, long rowIndex) {
-        return new Table(this, nativeGetSubtableDuringInsert(nativePtr, columnIndex, rowIndex), immutable);
+        // Execute the disposal of abandoned tightdb objects each time a new tightdb object is created
+        context.executeDelayedDisposal();
+        long nativeSubtablePtr =  nativeGetSubtableDuringInsert(nativePtr, columnIndex, rowIndex);
+        try {
+            return new Table(context, this, nativeSubtablePtr, immutable);
+        }
+        catch (RuntimeException e) {
+            nativeClose(nativeSubtablePtr);
+            throw e;
+        }
     }
 

@@ -1,7 +1,11 @@
     public Group(String filepath, OpenMode mode) {
         if (mode.equals(OpenMode.READ_ONLY))
-            this.immutable = true; // Group immutable
+            this.immutable = true;
+        else
+            this.immutable = false;
+        
+        this.context = new Context();
         this.nativePtr = createNative(filepath, mode.value);
-        checkNativePtr();
+        checkNativePtrNotZero();
     }
 

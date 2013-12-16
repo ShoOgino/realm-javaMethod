@@ -5,6 +5,14 @@
      * @return
      */
     public TableView getSortedView(long columnIndex, Order order){
-        return new TableView(nativeGetSortedView(nativePtr, columnIndex, (order == Order.ascending)), immutable);
+        // Execute the disposal of abandoned tightdb objects each time a new tightdb object is created
+        context.executeDelayedDisposal();
+        long nativeViewPtr = nativeGetSortedView(nativePtr, columnIndex, (order == Order.ascending));
+        try {
+            return new TableView(this.context, this, nativeViewPtr, immutable);
+        } catch (RuntimeException e) {
+            TableView.nativeClose(nativeViewPtr);
+            throw e;
+        }
     }
 

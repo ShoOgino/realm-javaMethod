@@ -1,11 +1,11 @@
-    @Test (enabled=true, expectedExceptions = IllegalStateException.class)
+    @Test
     public void shouldCloseTable() throws Throwable {
-        // util.setDebugLevel(1);
         Table table = new Table();
-        table.finalize();
+        table.close();
 
-        @SuppressWarnings("unused")
-        long s = table.size();
+        try { table.size();                            fail("Table is closed"); } catch (IllegalStateException e) { }
+        try { table.getColumnCount();                  fail("Table is closed"); } catch (IllegalStateException e) { }
+        try { table.addColumn(ColumnType.STRING, "");  fail("Table is closed"); } catch (IllegalStateException e) { }
 
         // TODO: Test all methods...
     }

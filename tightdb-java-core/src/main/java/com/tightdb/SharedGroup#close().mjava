@@ -1,8 +1,13 @@
     public void close() {
         if (activeTransaction)
             throw new IllegalStateException(
-                    "Can't close() SharedGroup during an active transaction");
+                    "Can't close the SharedGroup during an active transaction");
 
-        doClose();
+        synchronized (context) {
+            if (nativePtr != 0) {
+                nativeClose(nativePtr);
+                nativePtr = 0; 
+            }
+        }
     }
 

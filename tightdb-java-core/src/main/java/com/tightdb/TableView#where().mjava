@@ -1,5 +1,13 @@
     @Override
     public TableQuery where() {
-        return new TableQuery(nativeWhere(nativePtr), immutable);
+        // Execute the disposal of abandoned tightdb objects each time a new tightdb object is created
+        this.context.executeDelayedDisposal();
+        long nativeQueryPtr = nativeWhere(nativePtr);
+        try {
+            return new TableQuery(this.context, this.parent, nativeQueryPtr, immutable);
+        } catch (RuntimeException e) {
+            TableQuery.nativeClose(nativeQueryPtr);
+            throw e;
+        }
     }
 
