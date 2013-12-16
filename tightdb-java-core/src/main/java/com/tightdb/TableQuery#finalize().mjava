@@ -1,9 +1,9 @@
-    @Override
-    public void finalize() throws Throwable {
-        try {
-            close();
-        } finally {
-            super.finalize();
+    protected void finalize() {
+        synchronized (context) {
+            if (nativePtr != 0) {
+                context.asyncDisposeQuery(nativePtr); 
+                nativePtr = 0; // Set to 0 if finalize is called before close() for some reason
+            }
         }
     }
 

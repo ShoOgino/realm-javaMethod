@@ -1,6 +1,9 @@
     protected void finalize() {
-        // System.err.println("FINALIZE GROUP -------------- this " + this +
-        // "   native " + nativePtr);
-        close();
+        synchronized (context) {
+            if (nativePtr != 0) {
+                context.asyncDisposeGroup(nativePtr);
+                nativePtr = 0; // Set to 0 if finalize is called before close() for some reason
+            }
+        }
     }
 

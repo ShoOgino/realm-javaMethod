@@ -1,5 +1,13 @@
     @Override
     public TableView findAllDouble(long columnIndex, double value) {
-        return new TableView(this, nativeFindAllDouble(nativePtr, columnIndex, value), immutable);
+        // Execute the disposal of abandoned tightdb objects each time a new tightdb object is created
+        context.executeDelayedDisposal();
+        long nativeViewPtr = nativeFindAllDouble(nativePtr, columnIndex, value);
+        try { 
+            return new TableView(this.context, this.parent, nativeViewPtr, immutable);
+        } catch (RuntimeException e) {
+            TableView.nativeClose(nativeViewPtr);
+            throw e;
+        }   
     }
 

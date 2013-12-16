@@ -1,6 +1,7 @@
 /*
     SharedGroup(String databaseFile, Durability durability, boolean no_create, boolean enableReplication) {
-        this.nativePtr = createNative(databaseFile, durability.getValue(), no_create, enableReplication);
+        context = new Context();
+        this.nativePtr = createNative(databaseFile, durability.value, no_create, enableReplication);
         checkNativePtr();
     }
 */
@@ -9,9 +10,17 @@
             throw new IllegalStateException(
                     "Can't beginWrite() during another active transaction");
         // FIXME: throw from nativeMethod in case of error
-        WriteTransaction t = new WriteTransaction(this,
-                nativeBeginWrite(nativePtr));
-        activeTransaction = true;
-        return t;
+       
+        long nativeWritePtr = nativeBeginWrite(nativePtr);
+        try {
+            // Copy context reference from parent
+            WriteTransaction t = new WriteTransaction(context, this, nativeWritePtr);
+            activeTransaction = true;
+            return t;
+        }
+        catch (RuntimeException e) {
+            Group.nativeClose(nativeWritePtr);
+            throw e;
+        }
     }
 
