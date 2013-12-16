@@ -1,11 +1,6 @@
     public SharedGroup(String databaseFile) {
         context = new Context();
         this.nativePtr = createNative(databaseFile, Durability.FULL.value, false, false);
-        try { 
-            checkNativePtr();
-        } catch (RuntimeException e) {
-            nativeClose(nativePtr);
-            throw e;
-        }
+        checkNativePtrNotZero();
     }
 

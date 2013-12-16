@@ -2,12 +2,7 @@
         context = new Context();
         if (data != null) {
             this.nativePtr = createNative(data);
-            try {
-                checkNativePtr();
-            } catch (RuntimeException e) {
-                nativeClose(nativePtr);
-                throw e;
-            }
+            checkNativePtrNotZero();
         } else {
             throw new IllegalArgumentException();
         }
