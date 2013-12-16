@@ -1,11 +1,9 @@
     public void asyncDisposeTableView(long nativePointer) {
-        synchronized (this) {
-            if (isFinalized) {
-                TableView.nativeClose(nativePointer);
-            }
-            else {
-                abandonedTableViews.add(nativePointer);
-            }
+        if (isFinalized) {
+            TableView.nativeClose(nativePointer);
+        }
+        else {
+            abandonedTableViews.add(nativePointer);
         }
     }
 

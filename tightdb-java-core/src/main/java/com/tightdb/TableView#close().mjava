@@ -1,10 +1,14 @@
     @Override
     public void close(){
-        if (DEBUG) 
-            System.err.println("==== TableView CLOSE, ptr= " + nativePtr);
-        if (nativePtr != 0) {
-            nativeClose(nativePtr);
-            nativePtr = 0;
+        synchronized (context) {
+            if (nativePtr != 0) {
+                nativeClose(nativePtr);
+                
+                if (DEBUG) 
+                    System.err.println("==== TableView CLOSE, ptr= " + nativePtr);
+              
+                nativePtr = 0;
+            } 
         }
     }
 

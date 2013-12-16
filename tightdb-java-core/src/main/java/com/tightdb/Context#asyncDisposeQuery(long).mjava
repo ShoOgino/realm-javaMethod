@@ -1,11 +1,9 @@
     public void asyncDisposeQuery(long nativePointer) {
-        synchronized (this) {
-            if (isFinalized) {
-                TableQuery.nativeClose(nativePointer);
-            }
-            else {
-                abandonedQueries.add(nativePointer);
-            }
+        if (isFinalized) {
+            TableQuery.nativeClose(nativePointer);
+        }
+        else {
+            abandonedQueries.add(nativePointer);
         }
     }
 

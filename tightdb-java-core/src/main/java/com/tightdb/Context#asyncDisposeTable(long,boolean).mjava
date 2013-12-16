@@ -1,11 +1,9 @@
     public void asyncDisposeTable(long nativePointer, boolean isRoot) {
-        synchronized (this) {
-            if (isRoot || isFinalized) {
-                Table.nativeClose(nativePointer);
-            }
-            else {
-                abandonedTables.add(nativePointer);
-            }
+        if (isRoot || isFinalized) {
+            Table.nativeClose(nativePointer);
+        }
+        else {
+            abandonedTables.add(nativePointer);
         }
     }
 

@@ -3,9 +3,11 @@
             throw new IllegalStateException(
                     "Can't close the SharedGroup during an active transaction");
 
-        if (nativePtr == 0)
-            return;
-        nativeClose(nativePtr);
-        nativePtr = 0;
+        synchronized (context) {
+            if (nativePtr != 0) {
+                nativeClose(nativePtr);
+                nativePtr = 0; 
+            }
+        }
     }
 
