@@ -1,5 +1,6 @@
     @Test()
     public void mustAllowDoubleCommitAndRollback() {
+        SharedGroup db = new SharedGroup(createDBFileName(), SharedGroup.Durability.ASYNC);
         {
             WriteTransaction trans = db.beginWrite();
             Table tbl = trans.getTable("EmployeeTable");
@@ -28,7 +29,5 @@
             assertEquals(1, tbl.size());
             trans.endRead();
         }
-
-        clear();
     }
 

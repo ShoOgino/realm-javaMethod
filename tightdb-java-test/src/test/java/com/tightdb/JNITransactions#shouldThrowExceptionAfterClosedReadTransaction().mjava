@@ -1,5 +1,6 @@
     @Test(expectedExceptions=IllegalStateException.class)
     public void shouldThrowExceptionAfterClosedReadTransaction() {
+        SharedGroup db = new SharedGroup(createDBFileName(), SharedGroup.Durability.ASYNC);
         ReadTransaction rt = db.beginRead();
 
         try {
@@ -9,7 +10,6 @@
             assert(false);
         } finally {
             rt.endRead();
-            clear();
         }
     }
 
