@@ -1,6 +1,7 @@
     @Test
     public void mustRollback() {
-        writeOneTransaction(1);
+        SharedGroup db = new SharedGroup(createDBFileName(), SharedGroup.Durability.ASYNC);
+        writeOneTransaction(db, 1);
         WriteTransaction trans = db.beginWrite();
         Table tbl = trans.getTable("EmployeeTable");
 
@@ -8,8 +9,6 @@
         assertEquals(2, tbl.size());
         trans.rollback();
 
-        checkRead(1); // Only 1 row now.
-
-        clear();
+        checkRead(db, 1); // Only 1 row now.
     }
 
