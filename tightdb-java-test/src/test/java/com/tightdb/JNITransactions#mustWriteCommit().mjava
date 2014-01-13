@@ -1,7 +1,7 @@
     @Test
     public void mustWriteCommit() {
-        writeOneTransaction(10);
-        checkRead(10);
-        clear();
+        SharedGroup db = new SharedGroup(createDBFileName(), SharedGroup.Durability.ASYNC);
+        writeOneTransaction(db, 10);
+        checkRead(db, 10);
     }
 

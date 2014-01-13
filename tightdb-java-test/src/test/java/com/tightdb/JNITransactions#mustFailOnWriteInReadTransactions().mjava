@@ -1,7 +1,8 @@
     @Test
     public void mustFailOnWriteInReadTransactions() {
+        SharedGroup db = new SharedGroup(createDBFileName(), SharedGroup.Durability.ASYNC);
 
-        writeOneTransaction(1);
+        writeOneTransaction(db, 1);
 
         ReadTransaction t = db.beginRead();
         Table table = t.getTable("EmployeeTable");
@@ -43,6 +44,5 @@
         try { v.setMixed(0, 0, null);               assert(false);} catch (IllegalStateException e) {}
 
         t.endRead();
-        clear();
     }
 
