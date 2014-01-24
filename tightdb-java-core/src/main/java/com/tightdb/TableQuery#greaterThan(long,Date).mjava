@@ -1,4 +1,6 @@
     public TableQuery greaterThan(long columnIndex, Date value){
+        if(value == null)
+            throw new IllegalArgumentException("Date value in query criteria must not be null.");
         nativeGreaterDateTime(nativePtr, columnIndex, value.getTime()/1000);
         queryValidated = false;
         return this;

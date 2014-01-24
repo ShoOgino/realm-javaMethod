@@ -1,4 +1,6 @@
     public TableQuery lessThanOrEqual(long columnIndex, Date value){
+        if(value == null)
+            throw new IllegalArgumentException("Date value in query criteria must not be null.");
         nativeLessEqualDateTime(nativePtr, columnIndex, value.getTime()/1000);
         queryValidated = false;
         return this;
