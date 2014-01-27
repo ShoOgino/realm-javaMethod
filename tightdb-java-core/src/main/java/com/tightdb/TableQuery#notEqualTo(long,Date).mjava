@@ -1,4 +1,6 @@
     public TableQuery notEqualTo(long columnIndex, Date value){
+        if (value == null)
+            throw new IllegalArgumentException(DATE_NULL_ERROR_MESSAGE);
         nativeNotEqualDateTime(nativePtr, columnIndex, value.getTime()/1000);
         queryValidated = false;
         return this;
