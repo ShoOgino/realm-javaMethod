@@ -1,0 +1,38 @@
+    public boolean add(T obj) {
+        long rowIndex = table.addEmptyRow();
+
+        // Inspect fields and add them
+        for(Field f : obj.getClass().getDeclaredFields()) {
+
+            Class<?> fieldType = f.getType();
+
+            long columnIndex = table.getColumnIndex(f.getName());
+
+            f.setAccessible(true);
+
+            try {
+                if (fieldType.equals(String.class)) {
+                    table.setString(columnIndex, rowIndex, (String) f.get(obj));
+                } else if (fieldType.equals(int.class) || fieldType.equals(long.class) || fieldType.equals(Integer.class) || fieldType.equals(Long.class)) {
+                    table.setLong(columnIndex, rowIndex, f.getLong(obj));
+                } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
+                    table.setDouble(columnIndex, rowIndex, f.getDouble(obj));
+                } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
+                    table.setFloat(columnIndex, rowIndex, f.getFloat(obj));
+                } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
+                    table.setBoolean(columnIndex, rowIndex, f.getBoolean(obj));
+                } else if (fieldType.equals(Date.class)) {
+                    table.setDate(columnIndex, rowIndex, (Date) f.get(obj));
+                } else {
+                    System.err.println("Type not supported: " + fieldType.getName());
+                }
+            } catch(IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return true;
+
+    }
+

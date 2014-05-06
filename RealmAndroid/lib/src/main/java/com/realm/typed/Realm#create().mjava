@@ -1,0 +1,12 @@
+    public T create() {
+        try {
+            return ProxyBuilder.forClass(this.type)
+                    .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
+                    .handler(new RealmProxy<T>(table, -1))
+                    .build();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
