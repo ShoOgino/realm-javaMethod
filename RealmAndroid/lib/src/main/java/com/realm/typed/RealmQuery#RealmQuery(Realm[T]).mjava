@@ -1,0 +1,11 @@
+    public RealmQuery(Realm<T> realm) {
+        this.realm = realm;
+
+        TableOrView dataStore = realm.getDataStore();
+        this.query = dataStore.where();
+
+        for(int i = 0; i < dataStore.getColumnCount(); i++) {
+            this.columns.put(dataStore.getColumnName(i), i);
+        }
+    }
+

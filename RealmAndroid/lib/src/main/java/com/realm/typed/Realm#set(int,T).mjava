@@ -11,24 +11,24 @@
             Class<?> fieldType = f.getType();
 
             System.out.println(f.getName());
-            long columnIndex = table.getColumnIndex(f.getName());
+            long columnIndex = this.dataStore.getColumnIndex(f.getName());
 
             f.setAccessible(true);
 
             try {
 
                 if (fieldType.equals(String.class)) {
-                    table.setString(columnIndex, rowIndex, (String) f.get(element));
+                    this.dataStore.setString(columnIndex, rowIndex, (String) f.get(element));
                 } else if (fieldType.equals(int.class) || fieldType.equals(long.class) || fieldType.equals(Integer.class) || fieldType.equals(Long.class)) {
-                    table.setLong(columnIndex, rowIndex, f.getLong(element));
+                    this.dataStore.setLong(columnIndex, rowIndex, f.getLong(element));
                 } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
-                    table.setDouble(columnIndex, rowIndex, f.getDouble(element));
+                    this.dataStore.setDouble(columnIndex, rowIndex, f.getDouble(element));
                 } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
-                    table.setFloat(columnIndex, rowIndex, f.getFloat(element));
+                    this.dataStore.setFloat(columnIndex, rowIndex, f.getFloat(element));
                 } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
-                    table.setBoolean(columnIndex, rowIndex, f.getBoolean(element));
+                    this.dataStore.setBoolean(columnIndex, rowIndex, f.getBoolean(element));
                 } else if (fieldType.equals(Date.class)) {
-                    table.setDate(columnIndex, rowIndex, (Date) f.get(element));
+                    this.dataStore.setDate(columnIndex, rowIndex, (Date) f.get(element));
                 } else {
                     System.err.println("Type not supported: " + fieldType.getName());
                 }

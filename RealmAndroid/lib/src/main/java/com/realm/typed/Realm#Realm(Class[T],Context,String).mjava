@@ -4,8 +4,7 @@
 
         this.type = type;
 
-        this.table = new Table();
-
+        this.dataStore = new Table();
 
 
         for(Field f : this.type.getDeclaredFields()) {
@@ -14,17 +13,17 @@
 
 
             if(fieldType.equals(String.class)) {
-                table.addColumn(ColumnType.STRING, f.getName());
+                ((Table)dataStore).addColumn(ColumnType.STRING, f.getName());
             } else if(fieldType.equals(int.class) || fieldType.equals(long.class) || fieldType.equals(Integer.class) || fieldType.equals(Long.class)) {
-                table.addColumn(ColumnType.INTEGER, f.getName());
+                ((Table)dataStore).addColumn(ColumnType.INTEGER, f.getName());
             } else if(fieldType.equals(double.class) || fieldType.equals(Double.class)) {
-                table.addColumn(ColumnType.DOUBLE, f.getName());
+                ((Table)dataStore).addColumn(ColumnType.DOUBLE, f.getName());
             } else if(fieldType.equals(float.class) || fieldType.equals(Float.class)) {
-                table.addColumn(ColumnType.FLOAT, f.getName());
+                ((Table)dataStore).addColumn(ColumnType.FLOAT, f.getName());
             } else if(fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
-                table.addColumn(ColumnType.BOOLEAN, f.getName());
+                ((Table)dataStore).addColumn(ColumnType.BOOLEAN, f.getName());
             } else if(fieldType.equals(Date.class)) {
-                table.addColumn(ColumnType.DATE, f.getName());
+                ((Table)dataStore).addColumn(ColumnType.DATE, f.getName());
             } else {
                 System.err.println("Type not supported: " + fieldType.getName());
             }
