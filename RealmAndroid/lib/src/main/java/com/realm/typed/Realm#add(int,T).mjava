@@ -1,5 +1,27 @@
     @Override
-    public void add(int i, T t) {
+    public void add(int rowIndex, T element) {
+
+        Field[] fields = element.getClass().getDeclaredFields();
+
+        Object[] row = new Object[fields.length];
+
+        // Inspect fields and add them
+        for(int i = 0; i < fields.length; i++) {
+
+            Field f = fields[i];
+            f.setAccessible(true);
+
+            try {
+
+                row[i] = f.get(element);
+
+            } catch(IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        table.addAt(rowIndex, row);
 
     }
 
