@@ -1,0 +1,34 @@
+    @Test
+    public void immutableInsertNotAllowed() {
+
+        String FILENAME = "only-test-file.realm";
+        String TABLENAME = "tableName";
+
+      //  new File(FILENAME).delete();
+        SharedGroup group = new SharedGroup(FILENAME);
+
+        // Write transaction must be run so where are sure a db exists with the correct table
+        WriteTransaction wt = group.beginWrite();
+        try {
+            Table table = wt.getTable(TABLENAME);
+            table.addColumn(ColumnType.STRING, "col0");
+            table.add("value0");
+            table.add("value1");
+            table.add("value2");
+
+            wt.commit();
+        } catch (Throwable t) {
+            wt.rollback();
+        }
+
+        ReadTransaction rt = group.beginRead();
+        try {
+            Table table = rt.getTable(TABLENAME);
+
+            try {  table.addAt(1, "NewValue"); fail("Exception expected when inserting in read transaction"); } catch (IllegalStateException e) { }
+
+        } finally {
+            rt.endRead();
+        }
+    }
+
