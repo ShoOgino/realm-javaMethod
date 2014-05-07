@@ -1,0 +1,9 @@
+    @Test
+    public void endReadTransactionOnClosedGroup() {
+        SharedGroup g = new SharedGroup("closeTest.realm");
+        ReadTransaction rt = g.beginRead();
+        rt.endRead(); // Close transaction
+        g.close(); // then close group, possible only if no active transactions exist
+        try { rt.endRead(); fail("Group is closed, illegal read transaction"); } catch (IllegalStateException e ) { } // try closing the transaction again
+    }
+

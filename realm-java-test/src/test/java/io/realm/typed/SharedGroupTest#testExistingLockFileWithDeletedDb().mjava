@@ -1,0 +1,27 @@
+    @Test(enabled=false)
+    public void testExistingLockFileWithDeletedDb() {
+        String uniqueName = "test991UniqueName.realm";
+
+        SharedGroup sg = new SharedGroup(uniqueName);
+
+        WriteTransaction wt = sg.beginWrite();
+        try {
+            wt.getTable("tableName");
+            wt.commit();
+        } catch (Throwable t){
+            wt.rollback();
+        }
+
+        wt = sg.beginWrite();
+        wt.getTable("tableName");
+        // Do not end the write transaction - leaving the .lock file there
+        // Delete realm file, but NOT .lock file
+        new File(uniqueName).delete();
+
+        // If the lock file still exist (which it does until garbage collector has been run)
+        if(new File(uniqueName + ".lock").exists()) {
+            // Try creating new shared group, while lock file is still there
+            try { SharedGroup sg2 = new SharedGroup(uniqueName); fail("The database file is missing, but a .lock file is present."); } catch(IOException e) { }
+        }
+    }
+

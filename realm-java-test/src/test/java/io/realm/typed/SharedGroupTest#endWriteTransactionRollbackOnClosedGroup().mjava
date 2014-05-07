@@ -1,0 +1,9 @@
+    @Test
+    public void endWriteTransactionRollbackOnClosedGroup() {
+        SharedGroup g = new SharedGroup("closeTest.realm");
+        WriteTransaction wt = g.beginWrite();
+        wt.rollback(); // Close transaction
+        g.close(); // then close group, possible only if no active transactions exist
+        try { wt.rollback(); fail("Group is closed, illegal write transaction"); } catch (IllegalStateException e ) { } // try closing the transaction again
+    }
+

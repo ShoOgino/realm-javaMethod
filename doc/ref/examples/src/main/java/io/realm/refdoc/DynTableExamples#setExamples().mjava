@@ -1,0 +1,40 @@
+    public static void setExamples(){
+        // @@Example: ex_java_dyn_table_set @@
+        // @@Show@@
+        // Create table with 2 columns and add data
+        Table table = new Table();
+        table.addColumn(ColumnType.STRING, "username");
+        table.addColumn(ColumnType.INTEGER, "score");
+        table.add("user1", 420);
+        table.add("user2", 770);
+
+        // Set a new username in cell at position 0,0
+        table.setString(0, 0, "Liquid Droid");
+
+        // Reset the users score to 0 in cell 1,1
+        // NB. Column type in realm is INTEGER
+        // In java it is set by setLong(col, row, value);
+        table.setLong(1, 1, 0);
+
+        // Check values
+        Assert(table.getString(0, 0).equals("Liquid Droid"));
+        Assert(table.getLong(1,1) == 0);
+
+
+        // Throws exception if column or row index is out of range
+        try {
+            table.setLong(1, 50, 200);
+        } catch (ArrayIndexOutOfBoundsException e){
+            // ...
+        }
+
+        // Throws exception if mutator method and column type do not match
+        try {
+            table.setBoolean(0, 0, true);
+        } catch (IllegalArgumentException e){
+            // ...
+        }
+        // @@EndShow@@
+        // @@EndExample@@
+    }
+

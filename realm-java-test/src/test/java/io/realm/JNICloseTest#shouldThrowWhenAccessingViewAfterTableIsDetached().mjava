@@ -1,0 +1,32 @@
+    public void shouldThrowWhenAccessingViewAfterTableIsDetached() {
+        final String testFile = "closetest.realm";
+        SharedGroup db;
+        File f = new File(testFile);
+        if (f.exists())
+            f.delete();
+        db = new SharedGroup(testFile);
+
+        WriteTransaction trans = db.beginWrite();
+        Table tbl = trans.getTable("EmployeeTable");
+        tbl.addColumn(ColumnType.STRING, "name");
+        tbl.addColumn(ColumnType.INTEGER, "number");
+        TableView view = tbl.where().findAll();
+
+        trans.commit();
+
+        //methods below should throw exception, as table is invalid after commit
+        try{ view.size();                       assert(false); } catch (IllegalStateException e){}
+        try{ view.getBinaryByteArray(0, 0);     assert(false); } catch (IllegalStateException e){}
+        try{ view.getBoolean(1, 0);             assert(false); } catch (IllegalStateException e){}
+        try{ view.getDate(2, 0);                assert(false); } catch (IllegalStateException e){}
+        try{ view.getDouble(3, 0);              assert(false); } catch (IllegalStateException e){}
+        try{ view.getFloat(4, 0);               assert(false); } catch (IllegalStateException e){}
+        try{ view.getLong(5, 0);                assert(false); } catch (IllegalStateException e){}
+        try{ view.getMixed(6, 0);               assert(false); } catch (IllegalStateException e){}
+        try{ view.getString(7, 0);              assert(false); } catch (IllegalStateException e){}
+// TODO: Add more methods
+
+        db.close();
+        f.delete();
+    }
+

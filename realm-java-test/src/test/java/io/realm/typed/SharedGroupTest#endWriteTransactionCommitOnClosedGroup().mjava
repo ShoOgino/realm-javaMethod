@@ -1,0 +1,9 @@
+    @Test
+    public void endWriteTransactionCommitOnClosedGroup() {
+        SharedGroup g = new SharedGroup("closeTest.realm");
+        WriteTransaction wt = g.beginWrite();
+        wt.commit(); // Close transaction
+        g.close(); // then close group, possible only if no active transactions exist
+        try { wt.commit(); fail("Group is closed, illegal write transaction"); } catch (IllegalStateException e ) { } // try closing the transaction again
+    }
+

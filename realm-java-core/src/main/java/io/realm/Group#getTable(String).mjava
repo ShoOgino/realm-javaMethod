@@ -1,0 +1,28 @@
+    /**
+     * Returns a table with the specified name.
+     *
+     * @param name
+     *            The name of the table.
+     * @return The table if it exists, otherwise create it.
+     */
+    public Table getTable(String name) {
+        verifyGroupIsValid();
+        if (name == null || name.equals(""))
+            throw new IllegalArgumentException("Invalid name. Name must be a non-empty String.");
+        if (immutable)
+            if (!hasTable(name))
+                throwImmutable();
+        
+        // Execute the disposal of abandoned realm objects each time a new realm object is created
+        context.executeDelayedDisposal();
+        long nativeTablePointer = nativeGetTableNativePtr(nativePtr, name);
+        try {
+            // Copy context reference from parent
+            return new Table(context, this, nativeTablePointer, immutable);
+        }
+        catch (RuntimeException e) {
+            Table.nativeClose(nativeTablePointer);
+            throw e;
+        }
+    }
+
