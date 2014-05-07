@@ -1,7 +1,7 @@
     @Override
     public void add(int rowIndex, T element) {
 
-        Field[] fields = element.getClass().getDeclaredFields();
+        Field[] fields = element.getClass().getSuperclass().getDeclaredFields();
 
         Object[] row = new Object[fields.length];
 
@@ -10,6 +10,7 @@
 
             Field f = fields[i];
             f.setAccessible(true);
+
 
             try {
 
@@ -22,6 +23,9 @@
         }
 
         ((Table)this.dataStore).addAt(rowIndex, row);
+
+        ((RealmProxy)ProxyBuilder.getInvocationHandler(element)).realmSetRowIndex(rowIndex);
+
 
     }
 
