@@ -1,0 +1,16 @@
+    @BeforeMethod
+    public void init() {
+        employees = new TestEmployeeTable();
+
+        addEmployee(employees, EmployeesFixture.EMPLOYEES[0]);
+        addEmployee(employees, EmployeesFixture.EMPLOYEES[2]);
+        insertEmployee(employees, 1, EmployeesFixture.EMPLOYEES[1]);
+        assertEquals(3, employees.size());
+
+        TestEmployeeTable employeesTbl = new TestEmployeeTable();
+        addEmployee(employeesTbl, EmployeesFixture.EMPLOYEES[0]);
+        addEmployee(employeesTbl, EmployeesFixture.EMPLOYEES[2]);
+        insertEmployee(employeesTbl, 1, EmployeesFixture.EMPLOYEES[1]);
+        employeesView = employeesTbl.where().findAll();
+    }
+

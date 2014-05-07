@@ -4,10 +4,10 @@
      * @param order
      * @return
      */
-    public TableView getSortedView(long columnIndex, Order order){
+    public TableView getSortedView(long columnIndex, TableView.Order order){
         // Execute the disposal of abandoned realm objects each time a new realm object is created
         context.executeDelayedDisposal();
-        long nativeViewPtr = nativeGetSortedView(nativePtr, columnIndex, (order == Order.ascending));
+        long nativeViewPtr = nativeGetSortedView(nativePtr, columnIndex, (order == TableView.Order.ascending));
         try {
             return new TableView(this.context, this, nativeViewPtr, immutable);
         } catch (RuntimeException e) {
