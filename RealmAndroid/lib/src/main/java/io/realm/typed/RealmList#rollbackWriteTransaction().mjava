@@ -1,0 +1,6 @@
+    void rollbackWriteTransaction() {
+        ((WriteTransaction)this.transaction).rollback();
+        this.transaction = this.sg.beginRead();
+        this.dataStore = this.transaction.getTable(this.type.getName());
+    }
+

@@ -3,7 +3,7 @@
         try {
             T obj = ProxyBuilder.forClass(this.type)
                     .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
-                    .handler(new RealmProxy<T>(this.dataStore, rowIndex))
+                    .handler(new RealmProxy<T>(this, rowIndex))
                     .build();
             ((RealmProxy)ProxyBuilder.getInvocationHandler(obj)).realmSetRowIndex(rowIndex);
             return obj;

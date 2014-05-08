@@ -22,10 +22,19 @@
 
         }
 
-        ((Table)this.dataStore).addAt(rowIndex, row);
+        beginWriteTransaction();
+        try {
 
-        ((RealmProxy)ProxyBuilder.getInvocationHandler(element)).realmSetRowIndex(rowIndex);
+            ((Table)this.dataStore).addAt(rowIndex, row);
 
+            ((RealmProxy)ProxyBuilder.getInvocationHandler(element)).realmSetRowIndex(rowIndex);
+
+            commitWriteTransaction();
+
+        } catch(Throwable t) {
+            t.printStackTrace();
+            rollbackWriteTransaction();
+        }
 
     }
 
