@@ -1,8 +1,13 @@
-    public T create() {
+    /**
+     * Instantiates and adds a new object to the list
+     *
+     * @return          The new object
+     */
+    public E create() {
         try {
-            T obj = ProxyBuilder.forClass(this.type)
+            E obj = ProxyBuilder.forClass(this.type)
                     .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
-                    .handler(new RealmProxy<T>(this, -1))
+                    .handler(new RealmProxy<E>(this, -1))
                     .build();
             return obj;
         } catch(IOException e) {
