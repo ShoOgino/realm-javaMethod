@@ -6,7 +6,7 @@
     @Override
     public void add(int rowIndex, E element) {
 
-        Field[] fields = element.getClass().getSuperclass().getDeclaredFields();
+        Field[] fields = element.getClass().getDeclaredFields();
 
         Object[] row = new Object[fields.length];
 
@@ -27,19 +27,7 @@
 
         }
 
-        beginWriteTransaction();
-        try {
-
-            ((Table)this.dataStore).addAt(rowIndex, row);
-
-            ((RealmProxy)ProxyBuilder.getInvocationHandler(element)).realmSetRowIndex(rowIndex);
-
-            commitWriteTransaction();
-
-        } catch(Throwable t) {
-            t.printStackTrace();
-            rollbackWriteTransaction();
-        }
+        ((Table)this.getDataStore()).addAt(rowIndex, row);
 
     }
 

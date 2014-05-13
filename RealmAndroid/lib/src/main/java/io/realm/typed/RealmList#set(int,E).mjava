@@ -9,51 +9,44 @@
 
         Field[] fields = element.getClass().getDeclaredFields();
 
-        beginWriteTransaction();
-        try {
+        TableOrView dataStore = getDataStore();
 
-            // Inspect fields and add them
-            for (int i = 0; i < fields.length; i++) {
+        // Inspect fields and add them
+        for (int i = 0; i < fields.length; i++) {
 
-                Field f = fields[i];
+            Field f = fields[i];
 
-                Class<?> fieldType = f.getType();
+            Class<?> fieldType = f.getType();
 
-                System.out.println(f.getName());
-                long columnIndex = this.dataStore.getColumnIndex(f.getName());
+            System.out.println(f.getName());
+            long columnIndex = getColumnIndex(f.getName());
 
-                f.setAccessible(true);
+            f.setAccessible(true);
 
-                try {
+            try {
 
-                    if (fieldType.equals(String.class)) {
-                        this.dataStore.setString(columnIndex, rowIndex, (String) f.get(element));
-                    } else if (fieldType.equals(int.class) || fieldType.equals(long.class) || fieldType.equals(Integer.class) || fieldType.equals(Long.class)) {
-                        this.dataStore.setLong(columnIndex, rowIndex, f.getLong(element));
-                    } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
-                        this.dataStore.setDouble(columnIndex, rowIndex, f.getDouble(element));
-                    } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
-                        this.dataStore.setFloat(columnIndex, rowIndex, f.getFloat(element));
-                    } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
-                        this.dataStore.setBoolean(columnIndex, rowIndex, f.getBoolean(element));
-                    } else if (fieldType.equals(Date.class)) {
-                        this.dataStore.setDate(columnIndex, rowIndex, (Date) f.get(element));
-                    } else {
-                        System.err.println("Type not supported: " + fieldType.getName());
-                    }
-
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                if (fieldType.equals(String.class)) {
+                    dataStore.setString(columnIndex, rowIndex, (String) f.get(element));
+                } else if (fieldType.equals(int.class) || fieldType.equals(long.class) || fieldType.equals(Integer.class) || fieldType.equals(Long.class)) {
+                    dataStore.setLong(columnIndex, rowIndex, f.getLong(element));
+                } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
+                    dataStore.setDouble(columnIndex, rowIndex, f.getDouble(element));
+                } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
+                    dataStore.setFloat(columnIndex, rowIndex, f.getFloat(element));
+                } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
+                    dataStore.setBoolean(columnIndex, rowIndex, f.getBoolean(element));
+                } else if (fieldType.equals(Date.class)) {
+                    dataStore.setDate(columnIndex, rowIndex, (Date) f.get(element));
+                } else {
+                    System.err.println("Type not supported: " + fieldType.getName());
                 }
 
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
 
-            commitWriteTransaction();
-
-        } catch(Throwable t) {
-            t.printStackTrace();
-            rollbackWriteTransaction();
         }
+
 
         return this.get(rowIndex);
 

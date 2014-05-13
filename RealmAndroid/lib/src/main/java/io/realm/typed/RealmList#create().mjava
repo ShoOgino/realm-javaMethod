@@ -5,9 +5,10 @@
      */
     public E create() {
         try {
+            long index = ((Table)this.getDataStore()).addEmptyRow();
             E obj = ProxyBuilder.forClass(this.type)
                     .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
-                    .handler(new RealmProxy(this, -1))
+                    .handler(new RealmProxy(this, index))
                     .build();
             return obj;
         } catch(IOException e) {
