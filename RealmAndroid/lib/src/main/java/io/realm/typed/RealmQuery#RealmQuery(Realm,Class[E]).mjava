@@ -1,7 +1,8 @@
-    public RealmQuery(RealmList<E> realmList) {
-        this.realm = realmList;
+    public RealmQuery(Realm realm, Class<E> classSpec) {
+        this.realm = realm;
+        this.classSpec = classSpec;
 
-        TableOrView dataStore = realmList.getDataStore();
+        TableOrView dataStore = realm.getTable(classSpec);
         this.query = dataStore.where();
 
         for(int i = 0; i < dataStore.getColumnCount(); i++) {

@@ -1,0 +1,55 @@
+    /**
+     * Instantiates and adds a new object to the realm
+     *
+     * @return              The new object
+     * @param <E>
+     */
+    public <E> E create(Class<E> classSpec) {
+
+        // Check for table existence
+        if(!this.transaction.hasTable(classSpec.getName())) {
+            // Create the table
+            beginWrite();
+            Table table = this.transaction.getTable(classSpec.getName());
+
+            for (Field f : classSpec.getDeclaredFields()) {
+
+                Class<?> fieldType = f.getType();
+
+
+                if (fieldType.equals(String.class)) {
+                    table.addColumn(ColumnType.STRING, f.getName().toLowerCase());
+                } else if (fieldType.equals(int.class) || fieldType.equals(long.class) || fieldType.equals(Integer.class) || fieldType.equals(Long.class)) {
+                    table.addColumn(ColumnType.INTEGER, f.getName().toLowerCase());
+                } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
+                    table.addColumn(ColumnType.DOUBLE, f.getName().toLowerCase());
+                } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
+                    table.addColumn(ColumnType.FLOAT, f.getName().toLowerCase());
+                } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
+                    table.addColumn(ColumnType.BOOLEAN, f.getName().toLowerCase());
+                } else if (fieldType.equals(Date.class)) {
+                    table.addColumn(ColumnType.DATE, f.getName().toLowerCase());
+                } else {
+                    System.err.println("Type not supported: " + fieldType.getName());
+                }
+
+            }
+
+        }
+
+        Table table = this.transaction.getTable(classSpec.getName());
+
+        try {
+            long index = table.addEmptyRow();
+            E obj = ProxyBuilder.forClass(classSpec)
+                    .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
+                    .handler(new RealmProxy(this, index))
+                    .build();
+            return obj;
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+

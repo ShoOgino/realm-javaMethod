@@ -1,13 +1,13 @@
     /**
      *
-     * @param rowIndex  The objects index in the list
-     * @return          An object of type T, which is backed by Realm
+     * @param rowIndex      The objects index in the list
+     * @return              An object of type E, which is backed by Realm
      */
     @Override
     public E get(int rowIndex) {
         try {
-            E obj = ProxyBuilder.forClass(this.type)
-                    .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
+            E obj = ProxyBuilder.forClass(classSpec)
+                    .dexCache(realm.getContext().getDir("dx", Context.MODE_PRIVATE))
                     .handler(new RealmProxy(this, rowIndex))
                     .build();
             return obj;

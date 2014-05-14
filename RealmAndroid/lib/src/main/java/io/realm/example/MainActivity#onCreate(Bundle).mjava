@@ -3,8 +3,10 @@
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize  the Realm
-        this.users = Realms.list(this, User.class);
+        // Initialize the Realm
+        Realm realm = new Realm(this);
+
+        this.users = realm.where(User.class).findAll();
 
 
         // Setup the ListView

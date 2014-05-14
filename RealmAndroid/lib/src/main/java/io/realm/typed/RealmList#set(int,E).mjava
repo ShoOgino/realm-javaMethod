@@ -1,15 +1,15 @@
     /**
      *
-     * @param rowIndex  The index position where the object should be inserted
-     * @param element   The object to insert
-     * @return          The inserted object
+     * @param rowIndex      The index position where the object should be inserted
+     * @param element       The object to insert
+     * @return              The inserted object
      */
     @Override
     public E set(int rowIndex, E element) {
 
         Field[] fields = element.getClass().getDeclaredFields();
 
-        TableOrView dataStore = getDataStore();
+        TableOrView dataStore = getTable();
 
         // Inspect fields and add them
         for (int i = 0; i < fields.length; i++) {
@@ -19,7 +19,7 @@
             Class<?> fieldType = f.getType();
 
             System.out.println(f.getName());
-            long columnIndex = getColumnIndex(f.getName());
+            long columnIndex = dataStore.getColumnIndex(f.getName());
 
             f.setAccessible(true);
 

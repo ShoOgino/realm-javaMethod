@@ -1,0 +1,45 @@
+    /**
+     * Adds an object to the realm, and returns a new instance which is backed by the Realm
+     *
+     * @param element           The element to add to this realm.
+     * @param <E>
+     * @return
+     */
+    public <E> E add(E element) {
+
+        Field[] fields = element.getClass().getDeclaredFields();
+
+        Object[] row = new Object[fields.length];
+
+        // Inspect fields and add them
+        for(int i = 0; i < fields.length; i++) {
+
+            Field f = fields[i];
+            f.setAccessible(true);
+
+
+            try {
+
+                row[i] = f.get(element);
+
+            } catch(IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        long index = ((Table)getTable(element.getClass())).add(row);
+
+        E proxiedObject = null;
+        try {
+            proxiedObject = (E)ProxyBuilder.forClass((element).getClass())
+                    .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
+                    .handler(new RealmProxy(this, index))
+                    .build();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return proxiedObject;
+    }
+
