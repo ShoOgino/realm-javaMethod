@@ -1,15 +1,7 @@
-    /**
-     * Instantiates and adds a new object to the realm
-     *
-     * @return              The new object
-     * @param <E>
-     */
-    public <E> E create(Class<E> classSpec) {
-
+    private <E> void initTable(Class<E> classSpec) {
         // Check for table existence
         if(!this.transaction.hasTable(classSpec.getName())) {
             // Create the table
-            beginWrite();
             Table table = this.transaction.getTable(classSpec.getName());
 
             for (Field f : classSpec.getDeclaredFields()) {
@@ -29,6 +21,10 @@
                     table.addColumn(ColumnType.BOOLEAN, f.getName().toLowerCase());
                 } else if (fieldType.equals(Date.class)) {
                     table.addColumn(ColumnType.DATE, f.getName().toLowerCase());
+                } else if (fieldType.equals(byte[].class)) {
+                    table.addColumn(ColumnType.BINARY, f.getName().toLowerCase());
+                } else if (fieldType.equals(RealmObject.class.equals(fieldType.getSuperclass()))) {
+                    // Link
                 } else {
                     System.err.println("Type not supported: " + fieldType.getName());
                 }
@@ -37,19 +33,5 @@
 
         }
 
-        Table table = this.transaction.getTable(classSpec.getName());
-
-        try {
-            long index = table.addEmptyRow();
-            E obj = ProxyBuilder.forClass(classSpec)
-                    .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
-                    .handler(new RealmProxy(this, index))
-                    .build();
-            return obj;
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 

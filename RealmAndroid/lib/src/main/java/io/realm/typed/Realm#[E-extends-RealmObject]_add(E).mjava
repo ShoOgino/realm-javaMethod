@@ -5,7 +5,9 @@
      * @param <E>
      * @return
      */
-    public <E> E add(E element) {
+    public <E extends RealmObject> E add(E element) {
+
+        initTable(element.getClass());
 
         Field[] fields = element.getClass().getDeclaredFields();
 
@@ -39,6 +41,7 @@
         } catch (IOException e) {
             e.printStackTrace();
         }
+
 
         return proxiedObject;
     }

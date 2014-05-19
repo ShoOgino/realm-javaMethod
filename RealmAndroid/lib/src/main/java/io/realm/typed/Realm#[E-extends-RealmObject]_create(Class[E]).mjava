@@ -1,0 +1,26 @@
+    /**
+     * Instantiates and adds a new object to the realm
+     *
+     * @return              The new object
+     * @param <E>
+     */
+    public <E extends RealmObject> E create(Class<E> classSpec) {
+
+        initTable(classSpec);
+
+        Table table = this.transaction.getTable(classSpec.getName());
+
+        try {
+            long index = table.addEmptyRow();
+            E obj = ProxyBuilder.forClass(classSpec)
+                    .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
+                    .handler(new RealmProxy(this, index))
+                    .build();
+            return obj;
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+

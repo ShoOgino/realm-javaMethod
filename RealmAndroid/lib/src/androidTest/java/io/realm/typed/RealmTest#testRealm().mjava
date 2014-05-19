@@ -7,7 +7,7 @@
 
 
             // Clear everything of this type, to do a clean test
-            realm.clear(User.class);
+            realm.clear();
 
             // Insert
             for (int i = 0; i < 120; i++) {
@@ -31,9 +31,11 @@
 
         RealmList<User> users = realm.where(User.class).findAll();
 
+
         // Get
         User user1 = users.get(100);
         assertEquals("Rasmus", user1.getName());
+
 
         try {
 
@@ -64,7 +66,8 @@
         try {
 
             realm.beginWrite();
-
+            users = realm.where(User.class).findAll();
+            user1 = users.get(100);
             user1.setId(100);
 
             realm.commit();

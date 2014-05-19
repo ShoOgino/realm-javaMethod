@@ -1,0 +1,26 @@
+    public void testAllColumnsCreate() {
+
+        Realm realm = new Realm(this.getContext());
+
+        realm.beginWrite();
+
+        realm.clear();
+
+        AllColumns obj = realm.create(AllColumns.class);
+
+        obj.setColumnString("dsfs");
+        obj.setColumnLong(1);
+        obj.setColumnFloat(1.1F);
+        obj.setColumnDouble(1.1);
+        obj.setColumnBoolean(true);
+        obj.setColumnDate(new Date());
+        obj.setColumnBinary(new byte[20]);
+
+        realm.commit();
+
+        RealmList<AllColumns> result = realm.where(AllColumns.class).findAll();
+
+        assertEquals(1, result.size());
+
+    }
+
