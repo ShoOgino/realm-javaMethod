@@ -8,12 +8,12 @@
 
         initTable(classSpec);
 
-        Table table = this.transaction.getTable(classSpec.getName());
+        Table table = getTable(classSpec);
 
         try {
             long index = table.addEmptyRow();
             E obj = ProxyBuilder.forClass(classSpec)
-                    .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
+                    .dexCache(getBytecodeCache())
                     .handler(new RealmProxy(this, index))
                     .build();
             return obj;

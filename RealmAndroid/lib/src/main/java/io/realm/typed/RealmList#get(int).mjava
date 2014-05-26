@@ -5,15 +5,20 @@
      */
     @Override
     public E get(int rowIndex) {
+
+        E obj = null;
+
         try {
-            E obj = ProxyBuilder.forClass(classSpec)
-                    .dexCache(realm.getContext().getDir("dx", Context.MODE_PRIVATE))
+            obj = ProxyBuilder.forClass(classSpec)
+                    .parentClassLoader(this.getClass().getClassLoader())
+                    .dexCache(realm.getBytecodeCache())
                     .handler(new RealmProxy(this, rowIndex))
                     .build();
-            return obj;
-        } catch(IOException e) {
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+
+        return obj;
     }
 

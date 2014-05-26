@@ -1,12 +1,20 @@
     private <E> void initTable(Class<E> classSpec) {
         // Check for table existence
-        if(!this.transaction.hasTable(classSpec.getName())) {
+        if(!this.transaction.hasTable(classSpec.getSimpleName())) {
             // Create the table
-            Table table = this.transaction.getTable(classSpec.getName());
+            Table table = this.transaction.getTable(classSpec.getSimpleName());
 
-            for (Field f : classSpec.getDeclaredFields()) {
+            System.out.println(classSpec.getSimpleName());
+
+            Field[] fields = classSpec.getDeclaredFields();
+
+            for (int i = 0; i < fields.length; i++) {
+
+                Field f = fields[i];
 
                 Class<?> fieldType = f.getType();
+
+                System.out.println(f.getName() + " - " + fieldType.getName());
 
 
                 if (fieldType.equals(String.class)) {
@@ -23,12 +31,20 @@
                     table.addColumn(ColumnType.DATE, f.getName().toLowerCase());
                 } else if (fieldType.equals(byte[].class)) {
                     table.addColumn(ColumnType.BINARY, f.getName().toLowerCase());
-                } else if (fieldType.equals(RealmObject.class.equals(fieldType.getSuperclass()))) {
+                } else if (RealmObject.class.equals(fieldType.getSuperclass())) {
                     // Link
+                    // Check if the table representing the object which is linked to exists
+                    System.out.println("Creating linked objects table");
+                    initTable(fieldType);
                 } else {
                     System.err.println("Type not supported: " + fieldType.getName());
                 }
 
+            }
+
+            System.out.println("Tables in realm: ");
+            for(int i = 0; i < transaction.size(); i++) {
+                System.out.println(transaction.getTableName(i));
             }
 
         }

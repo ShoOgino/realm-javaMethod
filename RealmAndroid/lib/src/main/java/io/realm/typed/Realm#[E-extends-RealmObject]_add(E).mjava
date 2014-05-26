@@ -5,34 +5,76 @@
      * @param <E>
      * @return
      */
-    public <E extends RealmObject> E add(E element) {
+    public <E extends RealmObject> void add(E element) {
 
         initTable(element.getClass());
 
-        Field[] fields = element.getClass().getDeclaredFields();
+        String className = element.getClass().getSimpleName();
 
-        Object[] row = new Object[fields.length];
+        if(!cache.containsKey(className)) {
+
+
+            List<Field> fields = Arrays.asList(element.getClass().getDeclaredFields());
+            List<Field> persistedFields = new ArrayList<Field>();
+            for(Field f : fields) {
+                if(f.getType().equals(String.class) ||
+                        f.getType().equals(int.class) ||
+                        f.getType().equals(Integer.class) ||
+                        f.getType().equals(long.class) ||
+                        f.getType().equals(Long.class) ||
+                        f.getType().equals(float.class) ||
+                        f.getType().equals(Float.class) ||
+                        f.getType().equals(double.class) ||
+                        f.getType().equals(Double.class) ||
+                        f.getType().equals(boolean.class) ||
+                        f.getType().equals(Boolean.class) ||
+                        f.getType().equals(Date.class) ||
+                        f.getType().equals(byte[].class)) {
+                    f.setAccessible(true);
+                    persistedFields.add(f);
+                }
+            }
+
+            cache.put(className, persistedFields);
+
+        }
+
+
+        List<Field> fields = cache.get(className);
+
+        List<Object> rows = new ArrayList<Object>(fields.size());
 
         // Inspect fields and add them
-        for(int i = 0; i < fields.length; i++) {
-
-            Field f = fields[i];
-            f.setAccessible(true);
-
+        for(Field f : fields) {
 
             try {
 
-                row[i] = f.get(element);
 
+
+                rows.add(f.get(element));
+/*
+                } else if(RealmObject.class.equals(f.getType().getSuperclass())) {
+                    // This is a link, should add in different table and update the link
+                    System.out.println("Insert linked object in corresponding table");
+                    RealmObject linkedObject = (RealmObject)f.get(element);
+                    if(linkedObject != null) {
+                        add(linkedObject);
+                        System.out.println("Object added");
+                    }
+
+                    // Add link
+                }
+*/
             } catch(IllegalAccessException e) {
                 e.printStackTrace();
             }
 
         }
 
-        long index = ((Table)getTable(element.getClass())).add(row);
+        ((Table)getTable(element.getClass())).add(rows.toArray());
 
-        E proxiedObject = null;
+     //   E proxiedObject = null;
+        /*
         try {
             proxiedObject = (E)ProxyBuilder.forClass((element).getClass())
                     .dexCache(this.context.getDir("dx", Context.MODE_PRIVATE))
@@ -41,8 +83,8 @@
         } catch (IOException e) {
             e.printStackTrace();
         }
+*/
 
-
-        return proxiedObject;
+        //return proxiedObject;
     }
 
