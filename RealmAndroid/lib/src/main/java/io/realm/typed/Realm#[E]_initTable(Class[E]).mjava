@@ -1,8 +1,14 @@
     private <E> void initTable(Class<E> classSpec) {
+
+        System.out.println("Begin inittable");
+        for(int i = 0; i < transaction.size(); i++) {
+            System.out.println(transaction.getTableName(i));
+        }
+
         // Check for table existence
-        if(!this.transaction.hasTable(classSpec.getSimpleName())) {
+        if(!transaction.hasTable(classSpec.getSimpleName())) {
             // Create the table
-            Table table = this.transaction.getTable(classSpec.getSimpleName());
+            Table table = transaction.getTable(classSpec.getSimpleName());
 
             System.out.println(classSpec.getSimpleName());
 
@@ -34,8 +40,10 @@
                 } else if (RealmObject.class.equals(fieldType.getSuperclass())) {
                     // Link
                     // Check if the table representing the object which is linked to exists
-                    System.out.println("Creating linked objects table");
+                    System.out.println("Creating linked "+fieldType.getSimpleName()+" table");
+
                     initTable(fieldType);
+                    table.addColumnLink(ColumnType.LINK, f.getName().toLowerCase(), getTable(fieldType));
                 } else {
                     System.err.println("Type not supported: " + fieldType.getName());
                 }
@@ -47,6 +55,8 @@
                 System.out.println(transaction.getTableName(i));
             }
 
+        } else {
+            System.out.println("Already had " + classSpec.getSimpleName());
         }
 
     }

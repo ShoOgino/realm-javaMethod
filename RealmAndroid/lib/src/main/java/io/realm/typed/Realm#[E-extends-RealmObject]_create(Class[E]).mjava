@@ -10,17 +10,8 @@
 
         Table table = getTable(classSpec);
 
-        try {
-            long index = table.addEmptyRow();
-            E obj = ProxyBuilder.forClass(classSpec)
-                    .dexCache(getBytecodeCache())
-                    .handler(new RealmProxy(this, index))
-                    .build();
-            return obj;
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
+        long rowIndex = table.addEmptyRow();
 
-        return null;
+        return get(classSpec, rowIndex);
     }
 

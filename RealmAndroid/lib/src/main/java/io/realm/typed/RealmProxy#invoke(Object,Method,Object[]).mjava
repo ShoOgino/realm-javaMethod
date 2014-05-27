@@ -31,7 +31,7 @@
                             }
                         });
 
-                        return table.getString(table.getColumnIndex(name), rowIndex);
+                        return table.getString(columnIndex, rowIndex);
                     } else if (type.equals(int.class) || type.equals(Integer.class)) {
 
                         getters.put(clazz.getSimpleName()+methodName, new RealmGetter() {
@@ -41,7 +41,7 @@
                             }
                         });
 
-                        return ((Long) table.getLong(table.getColumnIndex(name), rowIndex)).intValue();
+                        return ((Long) table.getLong(columnIndex, rowIndex)).intValue();
                     } else if (type.equals(long.class) || type.equals(Long.class)) {
                         return table.getLong(table.getColumnIndex(name), rowIndex);
                     } else if (type.equals(double.class) || type.equals(Double.class)) {
@@ -55,6 +55,9 @@
                     } else if (type.equals(byte[].class)) {
                         // Binary
                     } else if (RealmObject.class.equals(type.getSuperclass())) {
+
+                        System.out.println("Prox: " + type.getName());
+                        return realm.get(type, table.getLink(columnIndex));
                     /*
                     *
                     * Link

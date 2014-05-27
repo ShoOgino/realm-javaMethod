@@ -1,0 +1,18 @@
+    <E extends RealmObject> E get(Class<E> clazz, long rowIndex) {
+
+        E obj = null;
+
+        try {
+            obj = ProxyBuilder.forClass(clazz)
+                    .parentClassLoader(clazz.getClassLoader())
+                    .dexCache(getBytecodeCache())
+                    .handler(new RealmProxy(this, rowIndex))
+                    .build();
+            obj.realmSetRowIndex(rowIndex);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return obj;
+    }
+
