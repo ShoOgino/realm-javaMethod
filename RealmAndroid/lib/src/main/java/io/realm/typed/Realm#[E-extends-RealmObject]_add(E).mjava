@@ -74,14 +74,11 @@
                     table.setBinaryByteArray(columnIndex, rowIndex, (byte[])f.get(element));
                 } else if(RealmObject.class.equals(f.getType().getSuperclass())) {
                     // This is a link, should add in different table and update the link
-                    System.out.println("Insert linked "+f.getType().getSimpleName()+" in corresponding table");
                     RealmObject linkedObject = (RealmObject)f.get(element);
                     if(linkedObject != null) {
                         if(linkedObject.realmGetRowIndex() == -1) {
                             add(linkedObject);
-                            System.out.println("Object added");
                         }
-                        System.out.println("Object linked " + linkedObject.realmGetRowIndex());
                         // Add link
                         table.setLink(columnIndex, rowIndex, linkedObject.realmGetRowIndex());
                     }

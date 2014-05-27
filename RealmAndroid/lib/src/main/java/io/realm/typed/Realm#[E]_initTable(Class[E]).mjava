@@ -1,9 +1,5 @@
     private <E> void initTable(Class<E> classSpec) {
 
-        System.out.println("Begin inittable");
-        for(int i = 0; i < transaction.size(); i++) {
-            System.out.println(transaction.getTableName(i));
-        }
 
         // Check for table existence
         if(!transaction.hasTable(classSpec.getSimpleName())) {
@@ -39,9 +35,6 @@
                     table.addColumn(ColumnType.BINARY, f.getName().toLowerCase());
                 } else if (RealmObject.class.equals(fieldType.getSuperclass())) {
                     // Link
-                    // Check if the table representing the object which is linked to exists
-                    System.out.println("Creating linked "+fieldType.getSimpleName()+" table");
-
                     initTable(fieldType);
                     table.addColumnLink(ColumnType.LINK, f.getName().toLowerCase(), getTable(fieldType));
                 } else {
@@ -50,13 +43,6 @@
 
             }
 
-            System.out.println("Tables in realm: ");
-            for(int i = 0; i < transaction.size(); i++) {
-                System.out.println(transaction.getTableName(i));
-            }
-
-        } else {
-            System.out.println("Already had " + classSpec.getSimpleName());
         }
 
     }
