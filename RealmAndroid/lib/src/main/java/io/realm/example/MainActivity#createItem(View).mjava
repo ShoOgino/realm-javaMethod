@@ -1,11 +1,17 @@
     public void createItem(View v) {
 
+        Realm wrRealm = new Realm(this);
+        wrRealm.beginWrite();
+
         User user = new User();
 
         user.setId(0);
         user.setName("Username " + this.users.size());
         user.setEmail("");
 
-        this.adapter.add(user);
+        wrRealm.add(user);
+        wrRealm.commit();
+
+
     }
 

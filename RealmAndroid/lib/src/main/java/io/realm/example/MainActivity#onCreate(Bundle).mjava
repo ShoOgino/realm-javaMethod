@@ -4,15 +4,32 @@
         setContentView(R.layout.activity_main);
 
         // Initialize the Realm
-        Realm realm = new Realm(this);
+        if(realm == null) {
+            realm = new Realm(this);
+        } else {
+            System.out.println("Already inited");
+        }
 
-        this.users = realm.where(User.class).findAll();
+      //  realm.clear();
+
+
+        users = new ArrayList<User>();
 
 
         // Setup the ListView
         ListView listView = (ListView)findViewById(R.id.listView);
         this.adapter = new ArrayAdapter<User>(this, R.layout.list_item, this.users);
         listView.setAdapter(this.adapter);
+
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                realm.refresh();
+                users = realm.where(User.class).findAll();
+                adapter.notifyDataSetChanged();
+                System.out.println("Updated list");
+            }
+        });
 
 
     }

@@ -3,6 +3,10 @@
      */
     public void commit() {
         ((WriteTransaction)this.transaction).commit();
+
+        // Send notifications because we did a local change
+        sendNotifications();
+
         beginRead();
     }
 
