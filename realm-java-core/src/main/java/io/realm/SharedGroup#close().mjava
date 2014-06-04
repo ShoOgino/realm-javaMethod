@@ -3,10 +3,20 @@
             throw new IllegalStateException(
                     "Can't close the SharedGroup during an active transaction");
 
-        synchronized (context) {
+            synchronized (context) {
             if (nativePtr != 0) {
                 nativeClose(nativePtr);
-                nativePtr = 0; 
+                nativePtr = 0;
+                if (implicistTransactionsEnabled) {
+                    if (nativeTransactLogRegistryPtr != 0) {
+                        nativeCloseTransactRegistryLog(nativeTransactLogRegistryPtr);
+                        nativeTransactLogRegistryPtr = 0;
+                    }
+                    if (nativeReplicationPtr != 0) {
+                        nativeCloseReplication(nativeReplicationPtr);
+                        nativeReplicationPtr = 0;
+                    }
+                }
             }
         }
     }
