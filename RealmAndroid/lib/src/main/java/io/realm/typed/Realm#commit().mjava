@@ -2,11 +2,10 @@
      * Commits a write transaction
      */
     public void commit() {
-        ((WriteTransaction)this.transaction).commit();
+        transaction.commitAndContinueAsRead();
 
         // Send notifications because we did a local change
         sendNotifications();
 
-        beginRead();
     }
 
