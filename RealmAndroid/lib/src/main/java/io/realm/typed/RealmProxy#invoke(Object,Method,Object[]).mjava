@@ -54,13 +54,13 @@
                     } else if (type.equals(byte[].class)) {
                         // Binary
                     } else if (RealmObject.class.equals(type.getSuperclass())) {
-                        /*
+
                         if(!row.isNullLink(columnIndex)) {
                             return realm.get((Class<? extends RealmObject>) type, row.getLink(columnIndex));
                         } else {
                             return null;
                         }
-                        */
+
                     } else if (RealmList.class.equals(type)) {
                         Field f = m.getDeclaringClass().getDeclaredField(name);
                         Type genericType = f.getGenericType();
@@ -111,7 +111,7 @@
                 } else if (RealmObject.class.equals(type.getSuperclass())) {
                     // Link
                     RealmObject linkedObject = (RealmObject)args[0];
-                    /*
+
                     if(linkedObject != null) {
                         if(linkedObject.realmGetRowIndex() == -1) {
                             realm.add(linkedObject);
@@ -121,13 +121,15 @@
                     } else {
                         row.nullifyLink(columnIndex);
                     }
-                    */
+
                 } else {
                     return null;
                 }
 
                 return null;
 
+            } else if(methodName.startsWith("realmGetRowIndex")) {
+                return row.getIndex();
             }
 
         }

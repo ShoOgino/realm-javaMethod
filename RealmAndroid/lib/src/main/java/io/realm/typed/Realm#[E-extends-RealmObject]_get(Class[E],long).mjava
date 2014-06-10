@@ -6,9 +6,9 @@
             obj = ProxyBuilder.forClass(clazz)
                     .parentClassLoader(clazz.getClassLoader())
                     .dexCache(getBytecodeCache())
-                    .handler(new RealmProxy(transaction.getTable(clazz.getSimpleName()).getRow(rowIndex)))
+                    .handler(new RealmProxy(this, transaction.getTable(clazz.getSimpleName()).getRow(rowIndex)))
                     .build();
-            obj.realmSetRowIndex(rowIndex);
+            obj.realmSetInStore(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
