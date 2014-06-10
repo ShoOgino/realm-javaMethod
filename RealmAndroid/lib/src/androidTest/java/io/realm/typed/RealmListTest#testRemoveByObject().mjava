@@ -1,0 +1,19 @@
+    public void testRemoveByObject() {
+
+        addObjectsToRealm();
+
+        realm.beginWrite();
+
+        RealmList<AllColumns> allColumnsList = realm.allObjects(AllColumns.class);
+
+        try {
+
+            allColumnsList.remove(allColumnsList.get(5));
+            fail("Should throw UnsupportedOperationException");
+            realm.commit();
+
+        } catch(UnsupportedOperationException e) {
+        }
+
+    }
+

@@ -1,0 +1,30 @@
+    public void testAddObject() {
+
+        AllColumns allColumns = new AllColumns();
+
+        allColumns.setColumnString("dsfs");
+        allColumns.setColumnLong(1);
+        allColumns.setColumnFloat(1.1F);
+        allColumns.setColumnDouble(1.1);
+        allColumns.setColumnBoolean(true);
+        allColumns.setColumnDate(new Date());
+        allColumns.setColumnBinary(new byte[20]);
+
+
+        realm.beginWrite();
+
+        RealmList<AllColumns> list = realm.allObjects(AllColumns.class);
+
+        assertEquals(0, list.size());
+
+        try {
+            list.add(allColumns);
+            fail("Should throw UnsupportedOperationException");
+            realm.commit();
+
+        } catch (UnsupportedOperationException e) {
+            e.printStackTrace();
+        }
+
+    }
+

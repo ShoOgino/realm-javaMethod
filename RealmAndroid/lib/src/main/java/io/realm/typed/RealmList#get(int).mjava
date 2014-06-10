@@ -1,0 +1,20 @@
+    /**
+     *
+     * @param rowIndex      The objects index in the list
+     * @return              An object of type E, which is backed by Realm
+     */
+    @Override
+    public E get(int rowIndex) {
+
+        E obj;
+
+        TableOrView table = getTable();
+        if(table instanceof TableView) {
+            obj = realm.get(classSpec, ((TableView)table).getSourceRowIndex(rowIndex));
+        } else {
+            obj = realm.get(classSpec, rowIndex);
+        }
+
+        return obj;
+    }
+
