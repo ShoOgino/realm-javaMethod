@@ -3,12 +3,13 @@
         E obj = null;
 
         try {
+            Row row = transaction.getTable(clazz.getSimpleName()).getRow(rowIndex);
             obj = ProxyBuilder.forClass(clazz)
                     .parentClassLoader(clazz.getClassLoader())
                     .dexCache(getBytecodeCache())
-                    .handler(new RealmProxy(this, transaction.getTable(clazz.getSimpleName()).getRow(rowIndex)))
+                    .handler(new RealmProxy(this, row))
                     .build();
-            obj.realmSetInStore(true);
+            obj.realmSetRow(row);
         } catch (IOException e) {
             e.printStackTrace();
         }

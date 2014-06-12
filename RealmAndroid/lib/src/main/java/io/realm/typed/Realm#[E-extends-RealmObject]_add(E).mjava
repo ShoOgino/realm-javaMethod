@@ -31,6 +31,7 @@
                         f.getType().equals(Date.class) ||
                         f.getType().equals(byte[].class) ||
                         RealmObject.class.equals(f.getType().getSuperclass())
+
                         ) {
 
                     f.setAccessible(true);
@@ -46,8 +47,7 @@
         long rowIndex = table.addEmptyRow();
         long columnIndex = 0;
 
-        element.realmSetInStore(true);
-        element.realmRowIndex = rowIndex;
+        element.realmAddedAtRowIndex = rowIndex;
 
         List<Field> fields = cache.get(className);
 
@@ -77,11 +77,12 @@
 
                     RealmObject linkedObject = (RealmObject)f.get(element);
                     if(linkedObject != null) {
-                        if(!linkedObject.realmIsInStore()) {
+                        if(linkedObject.realmGetRow() == null) {
                             add(linkedObject);
+                            table.setLink(columnIndex, rowIndex, linkedObject.realmAddedAtRowIndex);
+                        } else {
+                            table.setLink(columnIndex, rowIndex, linkedObject.realmGetRow().getIndex());
                         }
-                        // Add link
-                        table.setLink(columnIndex, rowIndex, linkedObject.realmRowIndex);
                     }
 
                 }
