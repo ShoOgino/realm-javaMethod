@@ -38,7 +38,7 @@
 
                     f.setAccessible(true);
                     persistedFields.add(f);
-                } else if (List.class.isAssignableFrom(f.getType())) {
+                } else if (RealmList.class.isAssignableFrom(f.getType())) {
                     // Link List
                     Type genericType = f.getGenericType();
                     if (genericType instanceof ParameterizedType) {
@@ -100,17 +100,13 @@
                         }
                     }
 
-                } else if (List.class.isAssignableFrom(f.getType())) {
+                } else if (RealmList.class.isAssignableFrom(f.getType())) {
                     // Link List
                     Type genericType = f.getGenericType();
                     if (genericType instanceof ParameterizedType) {
                         ParameterizedType pType = (ParameterizedType) genericType;
                         Class<?> actual = (Class<?>) pType.getActualTypeArguments()[0];
                         if(RealmObject.class.equals(actual.getSuperclass())) {
-
-                            System.out.println(rowIndex + "persisting list " + table.size());
-                            table.insertLinkList(columnIndex, rowIndex);
-                            System.out.println(rowIndex + "persisting list " + table.size());
 
                             LinkView links = table.getRow(rowIndex).getLinkList(columnIndex);
 
@@ -126,9 +122,6 @@
                                     links.add(linkedObject.realmGetRow().getIndex());
                                 }
                             }
-
-
-
                         }
                     }
                 }
