@@ -7,6 +7,8 @@
      */
     public <E extends RealmObject> void add(E element) {
 
+        System.out.println("Adding " + element.getClass().getName());
+
         initTable(element.getClass());
 
         String className = element.getClass().getSimpleName();
@@ -31,10 +33,22 @@
                         f.getType().equals(Date.class) ||
                         f.getType().equals(byte[].class) ||
                         RealmObject.class.equals(f.getType().getSuperclass())
+
                         ) {
 
                     f.setAccessible(true);
                     persistedFields.add(f);
+                } else if (List.class.isAssignableFrom(f.getType())) {
+                    // Link List
+                    Type genericType = f.getGenericType();
+                    if (genericType instanceof ParameterizedType) {
+                        ParameterizedType pType = (ParameterizedType) genericType;
+                        Class<?> actual = (Class<?>) pType.getActualTypeArguments()[0];
+                        if(RealmObject.class.equals(actual.getSuperclass())) {
+                            f.setAccessible(true);
+                            persistedFields.add(f);
+                        }
+                    }
                 }
             }
 
@@ -46,8 +60,7 @@
         long rowIndex = table.addEmptyRow();
         long columnIndex = 0;
 
-        element.realmSetInStore(true);
-        element.realmRowIndex = rowIndex;
+        element.realmAddedAtRowIndex = rowIndex;
 
         List<Field> fields = cache.get(className);
 
@@ -77,13 +90,47 @@
 
                     RealmObject linkedObject = (RealmObject)f.get(element);
                     if(linkedObject != null) {
-                        if(!linkedObject.realmIsInStore()) {
-                            add(linkedObject);
+                        if(linkedObject.realmGetRow() == null) {
+                            if(linkedObject.realmAddedAtRowIndex == -1) {
+                                add(linkedObject);
+                            }
+                            table.setLink(columnIndex, rowIndex, linkedObject.realmAddedAtRowIndex);
+                        } else {
+                            table.setLink(columnIndex, rowIndex, linkedObject.realmGetRow().getIndex());
                         }
-                        // Add link
-                        table.setLink(columnIndex, rowIndex, linkedObject.realmRowIndex);
                     }
 
+                } else if (List.class.isAssignableFrom(f.getType())) {
+                    // Link List
+                    Type genericType = f.getGenericType();
+                    if (genericType instanceof ParameterizedType) {
+                        ParameterizedType pType = (ParameterizedType) genericType;
+                        Class<?> actual = (Class<?>) pType.getActualTypeArguments()[0];
+                        if(RealmObject.class.equals(actual.getSuperclass())) {
+
+                            System.out.println(rowIndex + "persisting list " + table.size());
+                            table.insertLinkList(columnIndex, rowIndex);
+                            System.out.println(rowIndex + "persisting list " + table.size());
+
+                            LinkView links = table.getRow(rowIndex).getLinkList(columnIndex);
+
+                            // Loop through list and add them to the link list and possibly to the realm
+                            for(RealmObject linkedObject : (List<RealmObject>)f.get(element)) {
+
+                                if(linkedObject.realmGetRow() == null) {
+                                    if(linkedObject.realmAddedAtRowIndex == -1) {
+                                        add(linkedObject);
+                                    }
+                                    links.add(linkedObject.realmAddedAtRowIndex);
+                                } else {
+                                    links.add(linkedObject.realmGetRow().getIndex());
+                                }
+                            }
+
+
+
+                        }
+                    }
                 }
 
             } catch(IllegalAccessException e) {

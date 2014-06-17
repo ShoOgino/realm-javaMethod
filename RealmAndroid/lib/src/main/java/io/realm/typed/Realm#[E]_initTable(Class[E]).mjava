@@ -36,9 +36,21 @@
                     // Link
                     initTable(fieldType);
                     table.addColumnLink(ColumnType.LINK, f.getName().toLowerCase(), getTable(fieldType));
+                } else if (List.class.isAssignableFrom(fieldType)) {
+                    // Link List
+                    Type genericType = f.getGenericType();
+                    if (genericType instanceof ParameterizedType) {
+                        ParameterizedType pType = (ParameterizedType) genericType;
+                        Class<?> actual = (Class<?>) pType.getActualTypeArguments()[0];
+                        if(RealmObject.class.equals(actual.getSuperclass())) {
+                            initTable(actual);
+                            table.addColumnLink(ColumnType.LINK_LIST, f.getName().toLowerCase(), getTable(actual));
+                        }
+                    }
                 } else {
                     System.err.println("Type not supported: " + fieldType.getName());
                 }
+
 
             }
 
