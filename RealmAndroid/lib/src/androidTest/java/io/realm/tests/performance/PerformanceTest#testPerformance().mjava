@@ -34,7 +34,13 @@
         System.out.println("################################ Testing new interface");
 
         Realm.setDefaultDurability(SharedGroup.Durability.FULL);
-        Realm realm = new Realm(getContext());
+        Realm realm = null;
+        try {
+            realm = new Realm(getContext().getFilesDir());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
 
         realm.clear();
 
