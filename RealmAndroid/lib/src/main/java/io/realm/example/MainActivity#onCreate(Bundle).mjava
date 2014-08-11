@@ -5,7 +5,11 @@
 
         // Initialize the Realm
         if(realm == null) {
-            realm = new Realm(this);
+            try {
+                realm = new Realm(this.getFilesDir());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             System.out.println("Already inited");
         }
