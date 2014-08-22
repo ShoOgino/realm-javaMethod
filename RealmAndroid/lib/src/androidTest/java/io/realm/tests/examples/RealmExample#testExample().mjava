@@ -8,7 +8,13 @@
         System.out.println(myDog.getName());
 
         // Realms are used to group data together
-        Realm realm = new Realm(getContext());
+        Realm realm = null;
+        try {
+            realm = new Realm(getContext().getFilesDir());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
 
         // Save your object
         realm.beginWrite();
@@ -37,7 +43,13 @@
         new Thread() {
             public void run() {
 
-                Realm realm = new Realm(getContext());
+                Realm realm = null;
+                try {
+                    realm = new Realm(getContext().getFilesDir());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
                 realm.where(Dog.class).contains("name", "x").findAll();
 
             }

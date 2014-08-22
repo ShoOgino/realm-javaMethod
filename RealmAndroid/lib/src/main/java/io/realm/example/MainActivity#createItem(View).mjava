@@ -1,6 +1,11 @@
     public void createItem(View v) {
 
-        Realm wrRealm = new Realm(this);
+        Realm wrRealm = null;
+        try {
+            wrRealm = new Realm(this.getFilesDir());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         wrRealm.beginWrite();
 
         User user = new User();
