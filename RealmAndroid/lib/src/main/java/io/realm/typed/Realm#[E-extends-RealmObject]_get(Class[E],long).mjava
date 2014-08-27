@@ -4,13 +4,14 @@
 
         try {
             Row row = transaction.getTable(clazz.getSimpleName()).getRow(rowIndex);
-            obj = ProxyBuilder.forClass(clazz)
-                    .parentClassLoader(clazz.getClassLoader())
-                    .dexCache(getBytecodeCache())
-                    .handler(new RealmProxy(this, row))
-                    .build();
+
+            String className = clazz.getName()+"_PROXY";
+
+            Class cl = Class.forName(className);
+            Constructor con = cl.getConstructor();
+            obj = (E)con.newInstance();
             obj.realmSetRow(row);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
