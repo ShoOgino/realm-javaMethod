@@ -4,15 +4,43 @@
      * @return              The new object
      * @param <E>
      */
-    public <E extends RealmObject> E create(Class<E> classSpec) {
+//    public <E extends RealmObject> E create(Class<E> classSpec) {
+//
+//        initTable(classSpec);
+//
+//        Table table = getTable(classSpec);
+//
+//        long rowIndex = table.addEmptyRow();
+//        E obj = get(classSpec, rowIndex);
+//        obj.realmAddedAtRowIndex = rowIndex;
+//        return obj;
+//    }
 
-        initTable(classSpec);
+      public <E extends RealmObject> E create(Class<E> classSpec) {
 
-        Table table = getTable(classSpec);
+        E obj = null;
 
-        long rowIndex = table.addEmptyRow();
-        E obj = get(classSpec, rowIndex);
-        obj.realmAddedAtRowIndex = rowIndex;
+        try {
+            String className = classSpec.getName()+"RealmProxy";
+            Class cl = Class.forName(className);
+            Constructor con = cl.getConstructor();
+            obj = (E)con.newInstance();
+
+
+            initTable(obj);
+
+            Table table = getTable(classSpec);
+
+            long rowIndex = table.addEmptyRow();
+
+            obj.realmAddedAtRowIndex = rowIndex;
+
+            obj.row = transaction.getTable(classSpec.getSimpleName()).getRow(rowIndex);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
         return obj;
     }
 

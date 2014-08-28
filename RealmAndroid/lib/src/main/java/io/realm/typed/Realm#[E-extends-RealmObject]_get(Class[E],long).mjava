@@ -5,12 +5,12 @@
         try {
             Row row = transaction.getTable(clazz.getSimpleName()).getRow(rowIndex);
 
-            String className = clazz.getName()+"_PROXY";
+            String className = clazz.getName()+"RealmProxy";
 
             Class cl = Class.forName(className);
             Constructor con = cl.getConstructor();
             obj = (E)con.newInstance();
-            obj.realmSetRow(row);
+            obj.row = row;
         } catch (Exception e) {
             e.printStackTrace();
         }

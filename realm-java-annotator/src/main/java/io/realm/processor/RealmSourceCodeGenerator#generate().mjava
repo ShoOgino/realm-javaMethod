@@ -6,13 +6,17 @@
 		Iterator<String> it = keys.iterator();
 		String _fieldTable = "";
 		String _typeTable = "";
+		
+		int fieldIndex = 0;
 
 		while (it.hasNext())
 		{
 			String k = it.next();
 
-			_bw.append(generateMethod(_codeGetter, k));
-			_bw.append(generateMethod(_codeSetter, k));
+			_bw.append(generateMethod(_codeGetter, k, fieldIndex));
+			_bw.append(generateMethod(_codeSetter, k, fieldIndex));
+			
+			fieldIndex++;
 			
 			Element e = _methods.get(k);
 			if (_fieldTable.length() > 0) _fieldTable += " ,";
