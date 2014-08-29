@@ -1,0 +1,27 @@
+    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
+    public static void loadLibrary() {
+        if (libraryIsLoaded.get())
+            // only load library once
+            return;
+
+        initTightDB();
+
+        String jnilib;
+        if (osIsWindows()) {
+            jnilib = loadLibraryWindows();
+        }
+        else {
+            String debug = System.getenv("TIGHTDB_JAVA_DEBUG");
+            if (debug == null || debug.isEmpty()) {
+                jnilib = "tightdb-jni";
+            }
+            else {
+                jnilib = "tightdb-jni-dbg";
+            }
+            System.loadLibrary(jnilib);
+        }
+        libraryIsLoaded.set(true);
+
+        Version.coreLibVersionCompatible(true);
+    }
+

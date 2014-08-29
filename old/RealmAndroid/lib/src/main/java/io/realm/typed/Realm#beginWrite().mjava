@@ -1,0 +1,13 @@
+    /**
+     * Starts a write transaction, this must be closed with either commit() or rollback()
+     */
+    public void beginWrite() {
+
+        // If we are moving the transaction forward, send local notifications
+        if (sg.hasChanged()) {
+            sendNotifications();
+        }
+
+        transaction.promoteToWrite();
+    }
+

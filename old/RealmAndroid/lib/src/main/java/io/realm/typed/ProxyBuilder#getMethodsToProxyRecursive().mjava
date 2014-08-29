@@ -1,0 +1,27 @@
+    /**
+     * Gets all {@link Method} objects we can proxy in the hierarchy of the
+     * supplied class.
+     */
+    private Method[] getMethodsToProxyRecursive() {
+        Set<MethodSetEntry> methodsToProxy = new HashSet<MethodSetEntry>();
+        Set<MethodSetEntry> seenFinalMethods = new HashSet<MethodSetEntry>();
+        for (Class<?> c = baseClass; c != null; c = c.getSuperclass()) {
+            getMethodsToProxy(methodsToProxy, seenFinalMethods, c);
+        }
+        for (Class<?> c = baseClass; c != null; c = c.getSuperclass()) {
+            for (Class<?> i : c.getInterfaces()) {
+                getMethodsToProxy(methodsToProxy, seenFinalMethods, i);
+            }
+        }
+        for (Class<?> c : interfaces) {
+            getMethodsToProxy(methodsToProxy, seenFinalMethods, c);
+        }
+
+        Method[] results = new Method[methodsToProxy.size()];
+        int i = 0;
+        for (MethodSetEntry entry : methodsToProxy) {
+            results[i++] = entry.originalMethod;
+        }
+        return results;
+    }
+
