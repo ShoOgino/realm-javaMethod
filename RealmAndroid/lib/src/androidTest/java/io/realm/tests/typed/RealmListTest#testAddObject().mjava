@@ -1,6 +1,8 @@
     public void testAddObject() {
 
-        AllColumns allColumns = new AllColumns();
+        realm.beginWrite();
+
+        AllColumns allColumns = realm.create(AllColumns.class);
 
         allColumns.setColumnString("dsfs");
         allColumns.setColumnLong(1);
@@ -11,15 +13,10 @@
         allColumns.setColumnBinary(new byte[20]);
 
 
-        realm.beginWrite();
-
         RealmTableOrViewList<AllColumns> list = realm.allObjects(AllColumns.class);
-
-        assertEquals(0, list.size());
+        assertEquals(1, list.size());
 
         try {
-            list.add(allColumns);
-            fail("Should throw UnsupportedOperationException");
             realm.commit();
 
         } catch (UnsupportedOperationException e) {

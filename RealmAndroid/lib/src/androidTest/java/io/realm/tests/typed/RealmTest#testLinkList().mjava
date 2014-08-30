@@ -1,11 +1,12 @@
     public void testLinkList() {
+        realm.beginWrite();
 
-        User user1 = new User();
+        User user1 = realm.create(User.class);
         user1.setName("Rasmus");
         user1.setEmail("ra@realm.io");
         user1.setId(0);
 
-        User user2 = new User();
+        User user2 = realm.create(User.class);
         user2.setName("Morten");
         user2.setEmail("mk@realm.io");
         user2.setId(1);
@@ -17,7 +18,7 @@
         assertEquals(false, realm.contains(Dog.class));
         assertEquals(false, realm.contains(User.class));
 
-        realm.beginWrite();
+        //realm.beginWrite();
 
         Dog dog = realm.create(Dog.class);
         dog.setName("Fido");
@@ -40,12 +41,11 @@
         assertEquals(2, realm.allObjects(User.class).size());
 
 
-        Dog vuf = new Dog();
+        realm.beginWrite();
+        Dog vuf = realm.create(Dog.class);
         vuf.setName("Vuf");
         vuf.getOwners().add(user1);
 
-        realm.beginWrite();
-        realm.add(vuf);
         realm.commit();
 
         assertEquals(2, realm.allObjects(Dog.class).size());
