@@ -1,0 +1,17 @@
+    /**
+     * Instantiates and adds a new object to the realm
+     *
+     * @return              The new object
+     * @param <E>
+     */
+    public <E extends RealmObject> E create(Class<E> classSpec) {
+
+        initTable(classSpec);
+
+        Table table = getTable(classSpec);
+
+        long rowIndex = table.addEmptyRow();
+
+        return get(classSpec, rowIndex);
+    }
+
