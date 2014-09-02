@@ -1,84 +1,43 @@
-	public boolean generate() throws Exception
+	public boolean generate() throws IOException
 	{
-		_bw.append(generateFragment(_codeHeader));
-		
-		Set<String> keys = _methods.keySet();
-		Iterator<String> it = keys.iterator();
-		String _fieldTable = "";
-		String _typeTable = "";
-		
-		int fieldIndex = 0;
+		JavaWriter writer = new JavaWriter(_bw);
 
-		while (it.hasNext())
+		writer.emitPackage(_values.get("package")).beginType(_values.get("package")+"."+_values.get("class")+"RealmProxy", "class", EnumSet.of(Modifier.PUBLIC,Modifier.FINAL),_values.get("class"));
+
+		Iterator<String> methodNamesIterator = _methods.keySet().iterator();
+
+		while (methodNamesIterator.hasNext())
 		{
-			String k = it.next();
-			
-			
-			if (ignoreFields.contains(k))
+			String fieldName = methodNamesIterator.next();
+			if (ignoreFields.contains(fieldName))
 			{
 				continue;
 			}
+			
+			Element e = _methods.get(fieldName);
+			String fullType =  convertSimpleTypesToObject(e.asType().toString());
+			String returnCast = "";
+			String camelCase = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+			String fieldId = camelCase+"Index";
 
-			_bw.append(generateMethod(_codeGetter, k, fieldIndex));
-			_bw.append(generateMethod(_codeSetter, k, fieldIndex));
+			if (fullType.compareTo("Integer") == 0)
+			{
+				fullType = "Long";
+				returnCast ="(int)";
+			}
 			
-			fieldIndex++;
-			
-			Element e = _methods.get(k);
-			if (_fieldTable.length() > 0) _fieldTable += " ,";
-			_fieldTable += "\""+k+"\"";
-			
-			if (_typeTable.length() > 0) _typeTable += " ,";
-			
-			if (e.asType().toString().compareTo("java.lang.String") == 0)
-			{
-				_typeTable += ColumnType.STRING.getValue();
-			}
-			else if (e.asType().toString().compareTo("int") == 0 || e.asType().toString().compareTo("long") == 0 || 
-					 e.asType().toString().compareTo("java.lang.Integer") == 0 || e.asType().toString().compareTo("java.lang.Long") == 0)
-			{
-				_typeTable += ColumnType.INTEGER.getValue();
-			}
-			else if (e.asType().toString().compareTo("double") == 0 || e.asType().toString().compareTo("java.lang.Double") == 0)
-			{
-				_typeTable += ColumnType.DOUBLE.getValue();
-			}
-			else if (e.asType().toString().compareTo("float") == 0 || e.asType().toString().compareTo("java.lang.Float") == 0)
-			{
-				_typeTable += ColumnType.FLOAT.getValue();
-			}
-			else if (e.asType().toString().compareTo("boolean")  == 0 || e.asType().toString().compareTo("java.lang.Boolean") == 0)
-			{
-				_typeTable += ColumnType.BOOLEAN.getValue();				
-			}
-			else if (e.asType().toString().compareTo("java.util.Date") == 0)
-			{
-				_typeTable += ColumnType.DATE.getValue();
-			}
-//			else if (e.asType().equals(byte[].class) )
-//			{
-//				_typeTable += ColumnType.BINARY.getValue();				
-//			}
-			else
-			{
-				_typeTable += e.asType().toString()+" - "+String.class.toString();				
-			}
+			String getterStmt = "return "+returnCast+"row.get"+fullType+"( "+fieldId+" )";
+
+			writer.emitField("int", fieldId, EnumSet.of(Modifier.PUBLIC,Modifier.FINAL,Modifier.STATIC));
+
+			writer.beginMethod(fullType, "get"+camelCase, EnumSet.of(Modifier.PUBLIC))
+    		  .emitStatement(getterStmt)
+    	      .endMethod();
 		}
 		
-		_bw.append(_fieldTableHeader);
-		_bw.append(_fieldTable);
-		_bw.append(_fieldTableFooter);
-
-		_bw.append(_typeTableHeader);
-		_bw.append(_typeTable);
-		_bw.append(_typeTableFooter);
+		writer.endType();
+		writer.close();
 		
-		_bw.append(_getTableName);
-		
-		_bw.append(generateFragment(_codeFooter));
-		
-		_methods.clear();
-
 		return true;
 	}
 
