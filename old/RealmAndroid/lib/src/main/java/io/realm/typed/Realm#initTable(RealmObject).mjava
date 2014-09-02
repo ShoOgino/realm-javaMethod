@@ -1,0 +1,16 @@
+    private void initTable(RealmObject object) {
+        String tableName = object.getTableName();
+        // Check for table existence
+        if(!transaction.hasTable(tableName)) {
+            // Create the table
+            Table table = transaction.getTable(tableName);
+
+            String[] tableNames = object.getTableRowNames();
+            int[] tableTypes = object.getTableRowTypes();
+
+            for (int i = 0; i < tableNames.length; i++) {
+                table.addColumn(columnTypeFromInt(tableTypes[i]), tableNames[i].toLowerCase(Locale.getDefault()));
+            }
+        }
+    }
+

@@ -2,7 +2,7 @@
         realm.beginWrite();
 
         for(int i = 0; i < 10; i++) {
-            AllColumns allColumns = new AllColumns();
+            AllColumns allColumns = realm.create(AllColumns.class);
 
             allColumns.setColumnString("dsfs");
             allColumns.setColumnLong(i);
@@ -12,14 +12,12 @@
             allColumns.setColumnDate(new Date());
             allColumns.setColumnBinary(new byte[20]);
 
-            User user = new User();
+            User user = realm.create(User.class);
             user.setId(i);
             user.setName("Test User");
             user.setEmail("user@test.com");
 
             allColumns.setColumnRealmObject(user);
-
-            realm.add(allColumns);
         }
 
         realm.commit();
