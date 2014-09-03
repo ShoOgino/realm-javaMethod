@@ -1,10 +1,10 @@
 	public boolean setPackageName(String packageName) throws IOException
 	{
-		if (!checkState(0)) return false;
+		if (!checkState(GeneratorStates.PACKAGE)) return false;
 		
 		this.packageName = packageName;
-		writer.emitPackage(packageName).emitEmptyLine();
-		state = 1;
+		writer.emitPackage(packageName).emitEmptyLine().emitImports("java.lang.reflect.Field");
+		generatorState = GeneratorStates.CLASS;
 		return true;
 	}
 

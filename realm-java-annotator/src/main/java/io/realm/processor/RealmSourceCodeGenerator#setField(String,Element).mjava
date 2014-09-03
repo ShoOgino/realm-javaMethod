@@ -1,14 +1,14 @@
-	public boolean add_Field(String fieldName, Element e) throws IOException
+	public boolean setField(String fieldName, Element e) throws IOException
 	{
-		if (!checkState(2)) return false;
+		if (!checkState(GeneratorStates.METHODS)) return false;
 
 		String originalType = e.asType().toString();
 		String fullType =  convertSimpleTypesToObject(originalType);
 		String shortType = fullType.substring(fullType.lastIndexOf(".") + 1);
 		
 		String returnCast = "";
-		String camelCase = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
-		String fieldId = "rowIndex"+camelCase;
+		String camelCaseFieldName = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+		String fieldId = "index_"+fieldName;
 
 		if (originalType.compareTo("int") == 0)
 		{
@@ -28,15 +28,15 @@
 		
 		String setterStmt = "row.set"+shortType+"( "+fieldId+", value )";
 
-		writer.emitField("int", fieldId, EnumSet.of(Modifier.PRIVATE,Modifier.FINAL,Modifier.STATIC),
-				Integer.toString(fieldIndex));
-		fieldIndex++;
+		writer.emitField("int", fieldId, EnumSet.of(Modifier.PRIVATE/*,Modifier.FINAL*/,Modifier.STATIC));
 
-		writer.emitAnnotation("Override").beginMethod(originalType, "get"+camelCase, EnumSet.of(Modifier.PUBLIC))
+		fields.add(fieldId);
+		
+		writer.emitAnnotation("Override").beginMethod(originalType, "get"+camelCaseFieldName, EnumSet.of(Modifier.PUBLIC))
 		  .emitStatement(getterStmt)
 	      .endMethod();
 
-		writer.emitAnnotation("Override").beginMethod("void", "set"+camelCase, EnumSet.of(Modifier.PUBLIC),
+		writer.emitAnnotation("Override").beginMethod("void", "set"+camelCaseFieldName, EnumSet.of(Modifier.PUBLIC),
 				originalType, "value")
 		       .emitStatement(setterStmt)
 	           .endMethod().emitEmptyLine();

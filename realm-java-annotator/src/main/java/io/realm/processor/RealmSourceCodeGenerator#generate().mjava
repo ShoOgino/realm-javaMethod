@@ -1,10 +1,27 @@
 	public boolean generate() throws IOException
 	{
-		if (!checkState(2)) return false;
+		if (!checkState(GeneratorStates.METHODS)) return false;
+		
+		writer.beginInitializer(true).emitStatement("Field[] fields="+className+".class.getDeclaredFields()").emitStatement("int i = 0");
+		
+		writer.beginControlFlow("for (Field f : fields)");
+		
+		for (String field : fields)
+		{
+			String fieldName = field.substring("index_".length());
+			writer.beginControlFlow("if (f.getName().compareTo(\"%s\") == 0)",fieldName)
+			        .emitStatement("%s = i", field).endControlFlow();
+		}
+		writer.emitStatement("++i;");
+		writer.endControlFlow();
+		writer.endInitializer();
 		writer.endType();
 		writer.close();
+		
 		ignoreFields.clear();
-		state = 0;
+		fields.clear();
+
+		generatorState = GeneratorStates.PACKAGE;
 		return true;
 	}
 
