@@ -1,0 +1,16 @@
+  /** Emit a list of enum values followed by a semi-colon ({@code ;}). */
+  public JavaWriter emitEnumValues(Iterable<String> names) throws IOException {
+    Iterator<String> iterator = names.iterator();
+
+    while (iterator.hasNext()) {
+      String name = iterator.next();
+      if (iterator.hasNext()) {
+        emitEnumValue(name);
+      } else {
+        emitLastEnumValue(name);
+      }
+    }
+
+    return this;
+  }
+

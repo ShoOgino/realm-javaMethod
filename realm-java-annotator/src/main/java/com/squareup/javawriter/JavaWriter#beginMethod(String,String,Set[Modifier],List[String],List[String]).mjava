@@ -1,0 +1,57 @@
+  /**
+   * Emit a method declaration.
+   *
+   * <p>A {@code null} return type may be used to indicate a constructor, but
+   * {@link #beginConstructor(Set, List, List)} should be preferred. This behavior may be removed in
+   * a future release.
+   *
+   * @param returnType the method's return type, or null for constructors.
+   * @param name the method name, or the fully qualified class name for constructors.
+   * @param modifiers the set of modifiers to be applied to the method
+   * @param parameters alternating parameter types and names.
+   * @param throwsTypes the classes to throw, or null for no throws clause.
+   */
+  public JavaWriter beginMethod(String returnType, String name, Set<Modifier> modifiers,
+      List<String> parameters, List<String> throwsTypes) throws IOException {
+    indent();
+    emitModifiers(modifiers);
+    if (returnType != null) {
+      emitCompressedType(returnType);
+      out.write(" ");
+      out.write(name);
+    } else {
+      emitCompressedType(name);
+    }
+    out.write("(");
+    if (parameters != null) {
+      for (int p = 0; p < parameters.size();) {
+        if (p != 0) {
+          out.write(", ");
+        }
+        emitCompressedType(parameters.get(p++));
+        out.write(" ");
+        emitCompressedType(parameters.get(p++));
+      }
+    }
+    out.write(")");
+    if (throwsTypes != null && throwsTypes.size() > 0) {
+      out.write("\n");
+      indent();
+      out.write("    throws ");
+      for (int i = 0; i < throwsTypes.size(); i++) {
+        if (i != 0) {
+          out.write(", ");
+        }
+        emitCompressedType(throwsTypes.get(i));
+      }
+    }
+    if (modifiers.contains(ABSTRACT) || Scope.INTERFACE_DECLARATION.equals(scopes.peek())) {
+      out.write(";\n");
+      scopes.push(Scope.ABSTRACT_METHOD);
+    } else {
+      out.write(" {\n");
+      scopes.push(returnType == null ? Scope.CONSTRUCTOR : Scope.NON_ABSTRACT_METHOD);
+    }
+    return this;
+  }
+
