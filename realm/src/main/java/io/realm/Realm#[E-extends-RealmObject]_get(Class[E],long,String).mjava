@@ -11,30 +11,36 @@
 
         Row row = transaction.getTable(simpleClassName).getRow(rowIndex);
 
-        Class<?> generatedClass;
-        try {
-            if (generatedClasses.containsKey(generatedClassName)) {
-                generatedClass = generatedClasses.get(generatedClassName);
-            } else {
-                generatedClass = Class.forName(generatedClassName);
-                generatedClasses.put(generatedClassName, generatedClass);
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null; // TODO: throw RealmException
-        }
+        Constructor constructor;
+        if (generatedConstructors.containsKey(clazz)) {
+            constructor = generatedConstructors.get(clazz);
+        } else {
 
-        Constructor constructor = null;
-        try {
-            if (constructors.containsKey(generatedClass)) {
-                constructor = constructors.get(generatedClass);
-            } else {
-                constructor = generatedClass.getConstructor();
-                constructors.put(generatedClass, constructor);
+            Class<?> generatedClass;
+            try {
+                if (generatedClasses.containsKey(generatedClassName)) {
+                    generatedClass = generatedClasses.get(generatedClassName);
+                } else {
+                    generatedClass = Class.forName(generatedClassName);
+                    generatedClasses.put(generatedClassName, generatedClass);
+                }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                return null; // TODO: throw RealmException
             }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            return null; // TODO: throw RealmException
+
+            try {
+                if (constructors.containsKey(generatedClass)) {
+                    constructor = constructors.get(generatedClass);
+                } else {
+                    constructor = generatedClass.getConstructor();
+                    constructors.put(generatedClass, constructor);
+                    generatedConstructors.put(clazz, constructor);
+                }
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+                return null; // TODO: throw RealmException
+            }
         }
 
         try {
