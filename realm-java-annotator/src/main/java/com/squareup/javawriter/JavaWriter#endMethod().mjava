@@ -1,0 +1,13 @@
+  /** Completes the current method declaration. */
+  public JavaWriter endMethod() throws IOException {
+    Scope popped = scopes.pop();
+    // support calling a constructor a "method" to support the legacy code
+    if (popped == Scope.NON_ABSTRACT_METHOD || popped == Scope.CONSTRUCTOR) {
+      indent();
+      out.write("}\n");
+    } else if (popped != Scope.ABSTRACT_METHOD) {
+      throw new IllegalStateException();
+    }
+    return this;
+  }
+

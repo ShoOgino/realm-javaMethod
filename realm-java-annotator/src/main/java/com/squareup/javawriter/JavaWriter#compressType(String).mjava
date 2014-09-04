@@ -1,0 +1,51 @@
+  /** Try to compress a fully-qualified class name to only the class name. */
+  public String compressType(String type) {
+    Matcher trailer = TYPE_TRAILER.matcher(type);
+    if (trailer.matches()) {
+      type = trailer.group(1);
+    }
+
+    StringBuilder sb = new StringBuilder();
+    if (this.packagePrefix == null) {
+      throw new IllegalStateException();
+    }
+
+    Matcher m = TYPE_PATTERN.matcher(type);
+    int pos = 0;
+    while (true) {
+      boolean found = m.find(pos);
+
+      // Copy non-matching characters like "<".
+      int typeStart = found ? m.start() : type.length();
+      sb.append(type, pos, typeStart);
+
+      if (!found) {
+        break;
+      }
+
+      // Copy a single class name, shortening it if possible.
+      String name = m.group(0);
+      String imported = importedTypes.get(name);
+      if (imported != null) {
+        sb.append(imported);
+      } else if (isClassInPackage(name, packagePrefix)) {
+        String compressed = name.substring(packagePrefix.length());
+        if (isAmbiguous(compressed)) {
+          sb.append(name);
+        } else {
+          sb.append(compressed);
+        }
+      } else if (isClassInPackage(name, "java.lang.")) {
+        sb.append(name.substring("java.lang.".length()));
+      } else {
+        sb.append(name);
+      }
+      pos = m.end();
+    }
+
+    if (trailer.matches()) {
+      sb.append(trailer.group(2));
+    }
+    return sb.toString();
+  }
+

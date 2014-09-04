@@ -1,0 +1,10 @@
+    public boolean setPackageName(String packageName) throws IOException {
+        if (!checkState(GeneratorStates.PACKAGE)) return false;
+
+        this.packageName = packageName;
+        writer.emitPackage(packageName).emitEmptyLine().
+                emitImports("io.realm.ColumnType", "io.realm.Table").emitEmptyLine();
+        generatorState = GeneratorStates.CLASS;
+        return true;
+    }
+
