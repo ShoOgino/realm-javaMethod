@@ -1,4 +1,11 @@
-    public Table getTable(Class<?> classSpec) {
-        return transaction.getTable(classSpec.getSimpleName());
+    public Table getTable(Class<?> clazz) {
+        String simpleClassName;
+        if (simpleClassNames.containsKey(clazz)) {
+            simpleClassName = simpleClassNames.get(clazz);
+        } else {
+            simpleClassName = clazz.getSimpleName();
+            simpleClassNames.put(clazz, simpleClassName);
+        }
+        return transaction.getTable(simpleClassName);
     }
 

@@ -2,8 +2,13 @@
         if (!checkState(GeneratorStates.PACKAGE)) return false;
 
         this.packageName = packageName;
-        writer.emitPackage(packageName).emitEmptyLine().
-                emitImports("io.realm.ColumnType", "io.realm.Table").emitEmptyLine();
+        writer.emitPackage(packageName)
+                .emitEmptyLine()
+                .emitImports(
+                        "io.realm.internal.ColumnType",
+                        "io.realm.internal.Table",
+                        "io.realm.internal.ImplicitTransaction")
+                .emitEmptyLine();
         generatorState = GeneratorStates.CLASS;
         return true;
     }
