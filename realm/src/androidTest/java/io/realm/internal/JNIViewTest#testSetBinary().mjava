@@ -1,0 +1,18 @@
+    public void testSetBinary() {
+
+        Table table = new Table();
+        table.addColumn(ColumnType.BINARY, "binary");
+
+        byte[] arr1 = new byte[] {1,2,3};
+        table.add(arr1);
+        assertEquals(arr1, table.getBinaryByteArray(0, 0));
+
+        TableView view = table.where().findAll();
+
+        byte[] arr2 = new byte[] {1,2,3, 4, 5};
+
+        view.setBinaryByteArray(0, 0, arr2);
+
+        assertEquals(arr2, view.getBinaryByteArray(0, 0));
+    }
+
