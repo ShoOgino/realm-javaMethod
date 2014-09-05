@@ -1,0 +1,26 @@
+    public void testAdd() {
+
+        realm.beginWrite();
+
+        AllColumns obj = realm.create(AllColumns.class);
+
+        obj.setColumnString("dsfs");
+        obj.setColumnLong(1);
+        obj.setColumnFloat(1.1F);
+        obj.setColumnDouble(1.1);
+        obj.setColumnBoolean(true);
+        obj.setColumnDate(new Date());
+        //obj.setColumnBinary(new byte[20]);
+
+        User user = realm.create(User.class);
+        user.setName("Rasmus");
+        user.setEmail("ra@realm.io");
+        user.setId(0);
+
+        realm.commit();
+
+        assertEquals(1, realm.allObjects(AllColumns.class).size());
+        assertEquals(1, realm.allObjects(User.class).size());
+
+    }
+

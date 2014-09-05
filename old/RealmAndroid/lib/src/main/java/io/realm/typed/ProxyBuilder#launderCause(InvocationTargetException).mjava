@@ -1,0 +1,14 @@
+    private static RuntimeException launderCause(InvocationTargetException e) {
+        Throwable cause = e.getCause();
+        // Errors should be thrown as they are.
+        if (cause instanceof Error) {
+            throw (Error) cause;
+        }
+        // RuntimeException can be thrown as-is.
+        if (cause instanceof RuntimeException) {
+            throw (RuntimeException) cause;
+        }
+        // Declared exceptions will have to be wrapped.
+        throw new UndeclaredThrowableException(cause);
+    }
+

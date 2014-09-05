@@ -1,0 +1,16 @@
+/*
+    public static void print(String caption, AbstractCursor<?> cursor) {
+        System.out.println(caption + ": " + cursor);
+    }
+*/
+    /**
+     * Guarantee gc is done.
+     */
+    public static void gcGuaranteed(){
+        Object obj = new Object();
+        WeakReference<Object> ref = new WeakReference<Object>(obj);
+        obj = null;
+        while(ref.get()!=null)
+            System.gc();
+    }
+

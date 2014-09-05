@@ -1,0 +1,23 @@
+    /**
+     * Instantiates and adds a new object to the realm
+     *
+     * @return              The new object
+     * @param <E>
+     */
+    public <E extends RealmObject> E create(Class<E> classSpec) {
+        Table table = null;
+        try {
+            String className = classSpec.getName() + "RealmProxy";
+            Class cl = Class.forName(className);
+            Method method = cl.getMethod("initTable", new Class[] {io.realm.ImplicitTransaction.class});
+            table = (Table)method.invoke(null, new Object[] {transaction});
+            long rowIndex = table.addEmptyRow();
+            E obj = get(classSpec, rowIndex);
+            obj.realmAddedAtRowIndex = rowIndex;
+            return obj;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+

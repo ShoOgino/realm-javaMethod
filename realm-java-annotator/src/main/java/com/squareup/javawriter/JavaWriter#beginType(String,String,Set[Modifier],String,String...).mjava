@@ -1,0 +1,34 @@
+  /**
+   * Emits a type declaration.
+   *
+   * @param kind such as "class", "interface" or "enum".
+   * @param extendsType the class to extend, or null for no extends clause.
+   */
+  public JavaWriter beginType(String type, String kind, Set<Modifier> modifiers, String extendsType,
+      String... implementsTypes) throws IOException {
+    indent();
+    emitModifiers(modifiers);
+    out.write(kind);
+    out.write(" ");
+    emitCompressedType(type);
+    if (extendsType != null) {
+      out.write(" extends ");
+      emitCompressedType(extendsType);
+    }
+    if (implementsTypes.length > 0) {
+      out.write("\n");
+      indent();
+      out.write("    implements ");
+      for (int i = 0; i < implementsTypes.length; i++) {
+        if (i != 0) {
+          out.write(", ");
+        }
+        emitCompressedType(implementsTypes[i]);
+      }
+    }
+    out.write(" {\n");
+    scopes.push("interface".equals(kind) ? Scope.INTERFACE_DECLARATION : Scope.TYPE_DECLARATION);
+    types.push(type);
+    return this;
+  }
+

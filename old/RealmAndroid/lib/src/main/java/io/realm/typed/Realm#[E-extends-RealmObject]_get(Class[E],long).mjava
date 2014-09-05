@@ -1,0 +1,21 @@
+    <E extends RealmObject> E get(Class<E> clazz, long rowIndex) {
+
+        E obj = null;
+
+        try {
+            Row row = transaction.getTable(clazz.getSimpleName()).getRow(rowIndex);
+
+            String className = clazz.getName()+"RealmProxy";
+
+            Class cl = Class.forName(className);
+            Constructor con = cl.getConstructor();
+            obj = (E)con.newInstance();
+            obj.row = row;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return obj;
+    }
+

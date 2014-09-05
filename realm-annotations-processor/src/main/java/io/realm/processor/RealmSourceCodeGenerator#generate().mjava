@@ -1,0 +1,30 @@
+    public boolean generate() throws IOException {
+        if (!checkState(GeneratorStates.METHODS)) return false;
+
+        writer.beginMethod("Table", "initTable", EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
+                "ImplicitTransaction", "transaction").
+                beginControlFlow("if(!transaction.hasTable(\"" + this.className + "\"))").
+                emitStatement("Table table = transaction.getTable(\"" + this.className + "\")");
+
+        for (int index = 0; index < fields.size(); ++index) {
+            FieldInfo field = fields.get(index);
+            String fieldName = field.name.substring("index_".length());
+            writer.emitStatement(field.name + "  = " + Integer.toString(index));
+            writer.emitStatement("table.addColumn( %s, \"%s\" )", field.columnType, fieldName.toLowerCase(Locale.getDefault()));
+        }
+
+        writer.emitStatement("return table");
+        writer.endControlFlow();
+        writer.emitStatement("return transaction.getTable(\"" + this.className + "\")");
+        writer.endMethod().emitEmptyLine();
+
+        writer.endType();
+        writer.close();
+
+        ignoreFields.clear();
+        fields.clear();
+
+        generatorState = GeneratorStates.PACKAGE;
+        return true;
+    }
+

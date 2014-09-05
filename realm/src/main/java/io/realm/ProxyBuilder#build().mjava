@@ -1,0 +1,40 @@
+    /**
+     * Create a new instance of the class to proxy.
+     *
+     * @throws UnsupportedOperationException if the class we are trying to create a proxy for is
+     *     not accessible.
+     * @throws IOException if an exception occurred writing to the {@code dexCache} directory.
+     * @throws UndeclaredThrowableException if the constructor for the base class to proxy throws
+     *     a declared exception during construction.
+     * @throws IllegalArgumentException if the handler is null, if the constructor argument types
+     *     do not match the constructor argument values, or if no such constructor exists.
+     */
+    public T build() throws IOException {
+        check(handler != null, "handler == null");
+        check(constructorArgTypes.length == constructorArgValues.length,
+                "constructorArgValues.length != constructorArgTypes.length");
+        Class<? extends T> proxyClass = buildProxyClass();
+        Constructor<? extends T> constructor;
+        try {
+            constructor = proxyClass.getConstructor(constructorArgTypes);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException("No constructor for " + baseClass.getName()
+                    + " with parameter types " + Arrays.toString(constructorArgTypes));
+        }
+        T result;
+        try {
+            result = constructor.newInstance(constructorArgValues);
+        } catch (InstantiationException e) {
+            // Should not be thrown, generated class is not abstract.
+            throw new AssertionError(e);
+        } catch (IllegalAccessException e) {
+            // Should not be thrown, the generated constructor is accessible.
+            throw new AssertionError(e);
+        } catch (InvocationTargetException e) {
+            // Thrown when the base class constructor throws an exception.
+            throw launderCause(e);
+        }
+        setHandlerInstanceField(result, handler);
+        return result;
+    }
+
