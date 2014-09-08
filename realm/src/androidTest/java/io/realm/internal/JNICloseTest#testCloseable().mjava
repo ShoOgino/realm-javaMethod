@@ -1,8 +1,14 @@
     public void testCloseable() {
-        String testFile = "closeableTest.realm";
+
+        String testFile = new File(
+                this.getContext().getFilesDir(),
+                "closeableTest.realm").toString();
         File f = new File(testFile);
         if (f.exists()) {
-            f.delete();
+            boolean result = f.delete();
+            if (!result) {
+                fail();
+            }
         }
 
         List<Closeable> resources = new ArrayList<Closeable>();

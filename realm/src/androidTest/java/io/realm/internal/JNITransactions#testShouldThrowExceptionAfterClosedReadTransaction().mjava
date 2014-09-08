@@ -1,5 +1,6 @@
     public void testShouldThrowExceptionAfterClosedReadTransaction() {
-        SharedGroup db = new SharedGroup(createDBFileName(), SharedGroup.Durability.ASYNC);
+        SharedGroup db = new SharedGroup(testFile, SharedGroup.Durability.FULL);
+        writeOneTransaction(db, 10);
         ReadTransaction rt = db.beginRead();
 
         try {
@@ -9,7 +10,8 @@
                 tbl.getColumnCount(); //Should throw exception, the table is invalid when transaction has been closed
                 fail();
             } catch (IllegalStateException e) {
-                assertNotNull(e);
+                assert(false);
+                //assertNotNull(e);
             }
         } finally {
             rt.endRead();

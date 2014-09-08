@@ -1,12 +1,12 @@
     public void testShouldThrowExceptionWhenWritingInReadTrans() {
-        SharedGroup db = new SharedGroup(createDBFileName(), SharedGroup.Durability.ASYNC);
+        SharedGroup db = new SharedGroup(testFile, SharedGroup.Durability.FULL);
         ReadTransaction rt = db.beginRead();
 
         try {
             try {
                 rt.getTable("newTable");  //Should throw exception, as this method creates a new table, if the table does not exists, thereby making it a mutable operation
                 fail();
-            } catch (Exception e) {
+            } catch (IllegalStateException e) {
                 assertNotNull(e);
             }
         } finally {
