@@ -1,0 +1,20 @@
+    public void testOnlyOneCommit() {
+        SharedGroup db = new SharedGroup(testFile, SharedGroup.Durability.FULL);
+        WriteTransaction trans = db.beginWrite();
+
+        try {
+            Table tbl = trans.getTable("EmployeeTable");
+            tbl.addColumn(ColumnType.STRING, "name");
+            trans.commit();
+            try {
+                trans.commit(); // should throw
+                fail();
+            } catch (IllegalStateException e){
+                assertNotNull(e);
+            }
+
+        } catch (Throwable t){
+            trans.rollback();
+        }
+    }
+

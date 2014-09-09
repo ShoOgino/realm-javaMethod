@@ -1,0 +1,36 @@
+    public void testShouldThrowOnGetSubtableDefinitionFromSubtable() {
+        // Table definition
+        Table persons = new Table();
+        persons.addColumn(ColumnType.STRING, "name");
+        persons.addColumn(ColumnType.STRING, "email");
+        persons.addColumn(ColumnType.TABLE, "addresses");
+
+        TableSchema addresses = persons.getSubtableSchema(2);
+        addresses.addColumn(ColumnType.STRING, "street");
+        addresses.addColumn(ColumnType.INTEGER, "zipcode");
+        addresses.addColumn(ColumnType.TABLE, "phone_numbers");
+
+        TableSchema phone_numbers = addresses.getSubtableSchema(2);
+        phone_numbers.addColumn(ColumnType.INTEGER, "number");
+
+        // Inserting data
+        persons.add("Mr X", "xx@xxxx.com", new Object[][] {{ "X Street", 1234, new Object[][] {{ 12345678 }} }});
+
+        try {
+            // Should throw
+            persons.getSubtable(2,0).addColumn(ColumnType.INTEGER, "i");
+            fail("expected exception.");
+        } catch (UnsupportedOperationException e) {
+            assertNotNull(e);
+        }
+
+        try {
+            // Should throw
+            persons.getSubtable(2,0).getSubtableSchema(2);
+            fail("expected exception.");
+        } catch (UnsupportedOperationException e) {
+            assertNotNull(e);
+        }
+
+    }
+
