@@ -1,0 +1,21 @@
+    /**
+     * Calculate the sum of a property.
+     *
+     * @param propName    The property to sum. Only int, float, and double are supported.
+     * @return            The sum.
+     */
+
+    public Number sum(String propName) {
+        long columnIndex = table.getColumnIndex(propName);
+        switch (table.getColumnType(columnIndex)) {
+            case INTEGER:
+                return Number(table.sumLong(columnIndex));
+            case FLOAT:
+                return Number(table.sumFloat(columnIndex));
+            case DOUBLE:
+                return Number(table.sumDouble(columnIndex));
+            default:
+                throw new RuntimeException("Wrong type");
+        }
+    }
+

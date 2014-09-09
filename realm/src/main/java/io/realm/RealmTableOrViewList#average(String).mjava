@@ -1,21 +1,20 @@
     /**
      * Returns the average of a given property for objects in a RealmList.
      *
-     * @param attrName   The property to calculate average on. Only properties of type int,
+     * @param propName   The property to calculate average on. Only properties of type int,
      *                   float and double are supported.
      * @return           The average for the given property amongst objects in an RealmList. This
      *                   will be of type double for both float and double properties.
      */
-    public double average(String attrName) {
-        long columnIndex;
-        columnIndex = this.table.getColumnIndex(attrName);
-        switch (this.table.getColumnType(columnIndex)) {
+    public double average(String propName) {
+        long columnIndex = table.getColumnIndex(propName);
+        switch (table.getColumnType(columnIndex)) {
             case INTEGER:
-                return this.table.averageLong(columnIndex);
+                return table.averageLong(columnIndex);
             case DOUBLE:
-                return this.table.averageDouble(columnIndex);
+                return table.averageDouble(columnIndex);
             case FLOAT:
-                return this.table.averageFloat(columnIndex);
+                return table.averageFloat(columnIndex);
             default:
                 throw new RuntimeException("Wrong type");
         }
