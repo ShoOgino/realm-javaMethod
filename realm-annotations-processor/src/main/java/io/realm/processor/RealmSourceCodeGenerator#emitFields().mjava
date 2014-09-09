@@ -1,0 +1,41 @@
+    public boolean emitFields() throws IOException {
+    	
+    	for (FieldInfo field : fields) {
+	        String originalType = field.fieldElement.asType().toString();
+	        String fullType = convertSimpleTypesToObject(originalType);
+	        String shortType = fullType.substring(fullType.lastIndexOf(".") + 1);
+	
+	        String returnCast = "";
+	        String camelCaseFieldName = Character.toUpperCase(field.fieldName.charAt(0)) + field.fieldName.substring(1);
+	
+	        if (originalType.compareTo("int") == 0) {
+	            fullType = "long";
+	            shortType = "Long";
+	            returnCast = "(" + originalType + ")";
+	        }
+	
+	        if (shortType.compareTo("Integer") == 0) {
+	            fullType = "long";
+	            shortType = "Long";
+	            returnCast = "(int)";
+	        }
+	
+	        String getterStmt = "return " + returnCast + "row.get" + shortType + "( " + field.fieldId + " )";
+	
+	        String setterStmt = "row.set" + shortType + "( " + field.fieldId + ", value )";
+	
+	        writer.emitField("int", field.fieldId, EnumSet.of(Modifier.PRIVATE, Modifier.STATIC));
+	
+	        writer.emitAnnotation("Override").beginMethod(originalType, "get" + camelCaseFieldName, EnumSet.of(Modifier.PUBLIC))
+	              .emitStatement(getterStmt)
+	              .endMethod();
+	
+	        writer.emitAnnotation("Override").beginMethod("void", "set" + camelCaseFieldName, EnumSet.of(Modifier.PUBLIC),
+	                originalType, "value")
+	              .emitStatement(setterStmt)
+	              .endMethod().emitEmptyLine();
+    	}
+    	
+        return true;
+    }
+
