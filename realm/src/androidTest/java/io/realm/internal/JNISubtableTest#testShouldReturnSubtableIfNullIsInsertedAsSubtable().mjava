@@ -1,0 +1,11 @@
+    public void testShouldReturnSubtableIfNullIsInsertedAsSubtable() {
+        Group group = new Group();
+        Table table = group.getTable("emp");
+
+        table.addColumn(ColumnType.STRING, "string");
+        long subtableColIndex = table.addColumn(ColumnType.TABLE, "table");
+
+        table.add("val", null);
+        assertEquals(0,  table.getSubtable(subtableColIndex, 0).getColumnCount());
+    }
+
