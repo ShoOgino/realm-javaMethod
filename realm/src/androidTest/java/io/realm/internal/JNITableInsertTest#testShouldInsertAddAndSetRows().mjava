@@ -1,0 +1,61 @@
+    public void testShouldInsertAddAndSetRows() {
+        Table table = new Table();
+        TableSpec tableSpec = new TableSpec();
+        tableSpec.addColumn(ColumnType.BOOLEAN, "bool");
+        tableSpec.addColumn(ColumnType.INTEGER, "number");
+        tableSpec.addColumn(ColumnType.STRING, "string");
+        tableSpec.addColumn(ColumnType.BINARY, "Bin");
+        tableSpec.addColumn(ColumnType.DATE, "date");
+        tableSpec.addColumn(ColumnType.MIXED, "mix");
+        TableSpec subspec = tableSpec.addSubtableColumn("sub");
+        subspec.addColumn(ColumnType.INTEGER, "sub-num");
+        subspec.addColumn(ColumnType.STRING, "sub-str");
+        table.updateFromSpec(tableSpec);
+
+        byte[] buf = new byte[23];
+        Mixed mixedSubtable = new Mixed(ColumnType.TABLE);
+        Date date = new Date();
+        long mixed = 123;
+
+        // Check subtable
+        Object[][] subTblData = new Object[][] {{234, "row0"},
+                {345, "row1"},
+                {456, "row2"} };
+        Object[] rowData0 = new Object[] {false, (short)2, "hi", buf, date, mixed, subTblData};
+        long index = table.add(rowData0);
+        assertEquals(0, index);
+        verifyRow(table, 0, rowData0);
+
+        Object[] rowData1 = new Object[] {false, 7, "hi1", new byte[] {0,2,3}, date, "mix1", null};
+        Object[] rowData2 = new Object[] {true, 12345567789L, "hello", new byte[] {0}, date, buf, null};
+        Object[] rowData3 = new Object[] {false, (byte)17, "hi3", buf, date, mixedSubtable, null};
+        // TODO: support insert of mixed subtable
+
+        table.addAt(1, rowData1);
+        index = table.add(rowData2);
+        assertEquals(2, index);
+        table.addAt(0, rowData3);
+
+        verifyRow(table, 0, rowData3);
+        verifyRow(table, 1, rowData0);
+        verifyRow(table, 2, rowData1);
+        verifyRow(table, 3, rowData2);
+
+        // Same test - but a one-liner...
+        table.add(false, (short)2, "hi", buf, date, mixed, new Object[][] {{234, "row0"},
+            {345, "row1"},
+            {456, "row2"} });
+        verifyRow(table, 4, rowData0);
+
+        // Test set()
+        Date date2 = new Date(123);
+        Object[] newRowData = new Object[] {true, 321, "new", new byte[] {5}, 
+                date2, "hey", new Object[][] {{432, "new"}} };
+        table.set(2, newRowData);
+        verifyRow(table, 0, rowData3);
+        verifyRow(table, 1, rowData0);
+        verifyRow(table, 2, newRowData);
+        verifyRow(table, 3, rowData2);
+
+    }
+
