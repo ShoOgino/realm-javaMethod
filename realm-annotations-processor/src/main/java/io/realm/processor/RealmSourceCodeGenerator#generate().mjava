@@ -1,5 +1,10 @@
     public boolean generate() throws IOException {
-        if (!checkState(GeneratorStates.METHODS)) return false;
+
+        writer.setIndent("    ");
+
+        if (!emitPackage()) return false;
+        if (!emitClass()) return false;
+        if (!emitFields()) return false;
 
         writer.beginMethod("Table", "initTable", EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
                 "ImplicitTransaction", "transaction").
@@ -8,8 +13,8 @@
 
         for (int index = 0; index < fields.size(); ++index) {
             FieldInfo field = fields.get(index);
-            String fieldName = field.name.substring("index_".length());
-            writer.emitStatement(field.name + "  = " + Integer.toString(index));
+            String fieldName = field.fieldId.substring("index_".length());
+            writer.emitStatement(field.fieldId + " = " + Integer.toString(index));
             writer.emitStatement("table.addColumn( %s, \"%s\" )", field.columnType, fieldName.toLowerCase(Locale.getDefault()));
         }
 
@@ -21,10 +26,10 @@
         writer.endType();
         writer.close();
 
-        ignoreFields.clear();
         fields.clear();
 
         generatorState = GeneratorStates.PACKAGE;
+
         return true;
     }
 

@@ -1,0 +1,21 @@
+    /**
+     * Calculate the sum of a field.
+     *
+     * @param fieldName   The field to sum. Only int, float, and double are supported.
+     * @return            The sum.
+     */
+
+    public Number sum(String fieldName) {
+        long columnIndex = table.getColumnIndex(fieldName);
+        switch (table.getColumnType(columnIndex)) {
+            case INTEGER:
+                return new Long(table.sumLong(columnIndex));
+            case FLOAT:
+                return new Float(table.sumFloat(columnIndex));
+            case DOUBLE:
+                return new Double(table.sumDouble(columnIndex));
+            default:
+                throw new RuntimeException("Wrong type");
+        }
+    }
+
