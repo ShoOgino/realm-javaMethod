@@ -1,43 +1,13 @@
-    public boolean setField(String fieldName, Element e) throws IOException {
+    public boolean setField(String fieldName, Element fieldElement) {
         if (!checkState(GeneratorStates.METHODS)) return false;
 
-        String originalType = e.asType().toString();
-        String fullType = convertSimpleTypesToObject(originalType);
-        String shortType = fullType.substring(fullType.lastIndexOf(".") + 1);
-
-        String returnCast = "";
-        String camelCaseFieldName = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
         String fieldId = "index_" + fieldName;
 
-        if (originalType.compareTo("int") == 0) {
-            fullType = "long";
-            shortType = "Long";
-            returnCast = "(" + originalType + ")";
-        }
+        String shortType = convertSimpleTypesToObject(fieldElement.asType().toString());
+        shortType = shortType.substring(shortType.lastIndexOf(".") + 1);
 
-        if (shortType.compareTo("Integer") == 0) {
-            fullType = "long";
-            shortType = "Long";
-            returnCast = "(int)";
-        }
+        fields.add(new FieldInfo(fieldName, fieldId, convertTypesToColumnType(shortType), fieldElement));
 
-        String getterStmt = "return " + returnCast + "row.get" + shortType + "( " + fieldId + " )";
-
-        String setterStmt = "row.set" + shortType + "( " + fieldId + ", value )";
-
-        writer.emitField("int", fieldId, EnumSet.of(Modifier.PRIVATE/*,Modifier.FINAL*/, Modifier.STATIC));
-
-        fields.add(new FieldInfo(fieldId, convertTypesToColumnType(shortType)));
-
-        writer.emitAnnotation("Override").beginMethod(originalType, "get" + camelCaseFieldName, EnumSet.of(Modifier.PUBLIC))
-                .emitStatement(getterStmt)
-                .endMethod();
-
-        writer.emitAnnotation("Override").beginMethod("void", "set" + camelCaseFieldName, EnumSet.of(Modifier.PUBLIC),
-                originalType, "value")
-                .emitStatement(setterStmt)
-                .endMethod().emitEmptyLine();
         return true;
-
     }
 
