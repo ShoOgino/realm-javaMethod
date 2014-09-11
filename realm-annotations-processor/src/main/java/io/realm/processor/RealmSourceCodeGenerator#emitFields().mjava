@@ -1,8 +1,10 @@
     public boolean emitFields() throws IOException {
 
+        int columnIndex = 0;
+    	
         for (FieldInfo field : fields) {
             String originalType = field.fieldElement.asType().toString();
-            String fullType = convertSimpleTypesToObject(originalType);
+            String fullType = objectTypes.get(originalType);
             String shortType = fullType.substring(fullType.lastIndexOf(".") + 1);
 
             String returnCast = "";
@@ -18,10 +20,10 @@
                 returnCast = "(int)";
             }
 
-            String getterStmt = String.format("return %s row.get%s(%s)", returnCast, shortType, field.fieldId);
-            String setterStmt = String.format("row.set%s(%s, value)", shortType, field.fieldId);
+            String getterStmt = String.format("return %s row.get%s(%s)", returnCast, shortType, columnIndex);
+            String setterStmt = String.format("row.set%s(%s, value)", shortType, columnIndex);
 
-            writer.emitField("int", field.fieldId, EnumSet.of(Modifier.PRIVATE, Modifier.STATIC));
+            columnIndex++;
 
             writer.emitAnnotation("Override").beginMethod(originalType, "get" + camelCaseFieldName, EnumSet.of(Modifier.PUBLIC))
                     .emitStatement(getterStmt)
