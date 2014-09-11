@@ -1,16 +1,9 @@
     public void updateCities() {
         try {
-            //For performance reasons you may not want to requery
-            //the Realm for each onscreen update in your "real app".
-            Realm r = new Realm(getFilesDir());
-            RealmTableOrViewList<City> rList = r.where(City.class).findAll();
-            ArrayList cities = new ArrayList<City>();
-            for(City c : rList) {
-                Log.d(TAG, "CITY ACQUIRED: " + c.getName() + "," + c.getVotes());
-                cities.add(c);
-            }
+            Realm realm = new Realm(getFilesDir());
+            RealmTableOrViewList<City> cities = realm.where(City.class).findAll();
             mAdapter.setData(cities);
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             Log.e(TAG, "Realm failed to retrieve and update the User list");
         }
 

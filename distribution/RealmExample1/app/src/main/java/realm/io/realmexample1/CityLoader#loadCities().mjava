@@ -1,18 +1,19 @@
-  public List<City> loadCities() {
-    List<City> items = null;
+    public List<City> loadCities() {
+        List<City> items = null;
 
-    //In this case we're loading from local assets.
-    //NOTE: could alternatively easily load from network
+        //In this case we're loading from local assets.
+        //NOTE: could alternatively easily load from network
 
-    try {
-        InputStream stream = null;
-        stream = context.getAssets().open("cities.json");
-        items = getGson().fromJson(new InputStreamReader(stream), new TypeToken<List<City>>(){}.getType());
-    } catch(IOException ioe) {
-        ioe.printStackTrace();
-        Log.e(TAG, "Could not load cities information");
+        try {
+            InputStream stream = null;
+            stream = context.getAssets().open("cities.json");
+            items = getGson().fromJson(new InputStreamReader(stream), new TypeToken<List<City>>() {
+            }.getType());
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            Log.e(TAG, "Could not load cities information");
+        }
+
+        return items;
     }
-
-    return items;
-  }
 
