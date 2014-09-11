@@ -1,10 +1,10 @@
     public boolean setField(String fieldName, Element fieldElement) {
         if (!checkState(GeneratorStates.METHODS)) return false;
 
-        String shortType = objectTypes.get(fieldElement.asType().toString());
+        String shortType = convertSimpleTypesToObject(fieldElement.asType().toString());
         shortType = shortType.substring(shortType.lastIndexOf(".") + 1);
 
-        fields.add(new FieldInfo(fieldName, columnTypes.get(shortType), fieldElement));
+        fields.add(new FieldInfo(fieldName, convertTypesToColumnType(shortType), fieldElement));
 
         return true;
     }
