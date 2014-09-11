@@ -1,0 +1,22 @@
+    public void QueryYourObjects() {
+        Realm realm;
+        try {
+            realm = new Realm(activity.getFilesDir());
+        } catch (Exception e) {
+            return;
+        }
+
+        Log.i(TAG, "Number of persons: " + realm.allObjects(Person.class).size());
+
+        // Find all objects where age > 5
+        RealmList<Person> result = realm.where(Person.class).greaterThan("age", 5).findAll();
+        Log.i(TAG, "Size of result set: " + result.size());
+
+        // Remove oldest persons
+        realm.beginWrite();
+        result.clear();
+        realm.commit();
+
+        Log.i(TAG, "Number of persons: " + realm.allObjects(Person.class).size());
+    }
+
