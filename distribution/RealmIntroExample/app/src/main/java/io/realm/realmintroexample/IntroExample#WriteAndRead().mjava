@@ -1,0 +1,27 @@
+    public void WriteAndRead() {
+        // open a default realm
+        Realm realm;
+        try {
+            realm = new Realm(activity.getFilesDir());
+        } catch (java.io.IOException e) {
+            return;
+        }
+
+        // Add ten persons in small transactions
+        for (int i = 0; i<10; i++) {
+            realm.beginWrite();
+            Person person = realm.create(Person.class);
+            person.setName("Person no. " + i);
+            person.setAge(i);
+            realm.commit();
+        }
+
+        // Implicit read transactions allow you to access your objects
+        Log.i(TAG, "Number of persons: " + realm.allObjects(Person.class).size());
+
+        // Iterate over all objects
+        for (Person p : realm.allObjects(Person.class)) {
+            Log.i(TAG, p.getName() + ":" + p.getAge());
+        }
+    }
+
