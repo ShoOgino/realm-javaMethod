@@ -1,5 +1,7 @@
     public boolean emitFields() throws IOException {
 
+    	int columnIndex = 0;
+    	
         for (FieldInfo field : fields) {
             String originalType = field.fieldElement.asType().toString();
             String fullType = convertSimpleTypesToObject(originalType);
@@ -24,8 +26,9 @@
 
             String setterStmt = "row.set" + shortType + "( " + field.fieldId + ", value )";
 
-            writer.emitField("int", field.fieldId, EnumSet.of(Modifier.PRIVATE, Modifier.STATIC));
-
+            writer.emitField("int", field.fieldId, EnumSet.of(Modifier.PRIVATE, Modifier.STATIC),Integer.toString(columnIndex));
+            columnIndex++;
+            
             writer.emitAnnotation("Override").beginMethod(originalType, "get" + camelCaseFieldName, EnumSet.of(Modifier.PUBLIC))
                     .emitStatement(getterStmt)
                     .endMethod();
