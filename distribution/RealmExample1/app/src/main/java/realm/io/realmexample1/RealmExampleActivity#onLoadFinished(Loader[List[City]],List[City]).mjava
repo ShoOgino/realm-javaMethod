@@ -1,0 +1,15 @@
+    @Override
+    public void onLoadFinished(Loader<List<City>> loader, List<City> response) {
+        if(response == null) {
+            Log.e(TAG, "Loader did not acquire any useful information");
+        } else {
+            mAdapter = new CityAdapter(this);
+            mGrid = (GridView)findViewById(R.id.cities_list);
+            mGrid.setAdapter(mAdapter);
+            mGrid.setOnItemClickListener(RealmExampleActivity.this);
+
+            //Pull the acquired JSON information from the Realm
+            updateCities();
+        }
+    }
+
