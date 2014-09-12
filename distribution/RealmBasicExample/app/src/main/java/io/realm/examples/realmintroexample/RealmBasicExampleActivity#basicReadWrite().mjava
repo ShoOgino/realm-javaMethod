@@ -1,0 +1,18 @@
+    private void basicReadWrite() throws java.io.IOException {
+        showStatus("Performing basic Read/Write operation...");
+
+        // open a default realm
+        Realm realm = new Realm(getFilesDir());
+
+        // Add ten persons in one write transaction
+        realm.beginWrite();
+        Person person = realm.create(Person.class);
+        person.setName("Happy Person");
+        person.setAge(14);
+        realm.commit();
+
+        // Iterate over all objects
+        person = realm.where(Person.class).findFirst();
+        showStatus(person.getName() + ":" + person.getAge());
+    }
+
