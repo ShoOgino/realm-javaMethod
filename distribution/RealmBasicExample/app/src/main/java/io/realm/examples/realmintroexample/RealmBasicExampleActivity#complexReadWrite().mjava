@@ -1,0 +1,26 @@
+    private String complexReadWrite() throws IOException {
+        String status = "\nPerforming complex Read/Write operation...";
+
+        // open a default realm
+        Realm realm = new Realm(getFilesDir());
+
+        // Add ten persons in one write transaction
+        realm.beginWrite();
+        for (int i = 0; i < 10; i++) {
+            Person person = realm.create(Person.class);
+            person.setName("Person no. " + i);
+            person.setAge(i);
+        }
+        realm.commit();
+
+        // Implicit read transactions allow you to access your objects
+        status += "\nNumber of persons: " + realm.allObjects(Person.class).size();
+
+        // Iterate over all objects
+        for (Person pers : realm.allObjects(Person.class)) {
+            status += "\n" + pers.getName() + ":" + pers.getAge();
+        }
+
+        return status;
+    }
+
