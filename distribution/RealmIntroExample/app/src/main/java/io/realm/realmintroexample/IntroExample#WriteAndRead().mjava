@@ -12,6 +12,7 @@
             person.setName("Person no. " + i);
             person.setAge(i);
             person.setDog(dog);
+            person.setData(new byte[] {1,2,3});
         }
         realm.commit();
 
@@ -20,7 +21,7 @@
 
         // Iterate over all objects
         for (Person p : realm.allObjects(Person.class)) {
-            Log.i(TAG, String.format("%s : %d : %s", p.getName(), p.getAge(), p.getDog().getName()));
+            Log.i(TAG, String.format("%s : %d : %s : %b", p.getName(), p.getAge(), p.getDog().getName(), Arrays.equals(p.getData(), new byte[] {1,2,3})));
         }
     }
 
