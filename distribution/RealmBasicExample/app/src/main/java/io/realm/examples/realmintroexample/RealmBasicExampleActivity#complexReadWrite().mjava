@@ -6,10 +6,13 @@
 
         // Add ten persons in one write transaction
         realm.beginWrite();
+        Dog fido = realm.create(Dog.class);
+        fido.setName("fido");
         for (int i = 0; i < 10; i++) {
             Person person = realm.create(Person.class);
             person.setName("Person no. " + i);
             person.setAge(i);
+            person.setDog(fido);
         }
         realm.commit();
 
@@ -18,7 +21,13 @@
 
         // Iterate over all objects
         for (Person pers : realm.allObjects(Person.class)) {
-            status += "\n" + pers.getName() + ":" + pers.getAge();
+            String dogName;
+            if (pers.getDog() == null) {
+                dogName = "None";
+            } else {
+                dogName = pers.getDog().getName();
+            }
+            status += "\n" + pers.getName() + ":" + pers.getAge() + " : " + dogName;
         }
 
         return status;
