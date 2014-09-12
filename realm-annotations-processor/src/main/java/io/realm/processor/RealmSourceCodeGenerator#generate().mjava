@@ -1,43 +1,187 @@
-    public boolean generate() throws IOException {
+    public void generate() throws IOException, UnsupportedOperationException {
+        String qualifiedGeneratedClassName = String.format("%s.%sRealmProxy", packageName, className);
+        JavaFileObject sourceFile = processingEnvironment.getFiler().createSourceFile(qualifiedGeneratedClassName);
+        JavaWriter writer = new JavaWriter(new BufferedWriter(sourceFile.openWriter()));
 
-    	// Set source code indent to 4 spaces
+        Elements elementUtils = processingEnvironment.getElementUtils();
+        Types typeUtils = processingEnvironment.getTypeUtils();
+
+        TypeMirror realmObject = elementUtils.getTypeElement("io.realm.RealmObject").asType();
+        DeclaredType realmList = typeUtils.getDeclaredType(elementUtils.getTypeElement("io.realm.RealmList"), typeUtils.getWildcardType(null, null));
+
+        // Set source code indent to 4 spaces
         writer.setIndent("    ");
 
-        // Emit java writer code in sections: 
-        
-        //   1. Package Header and imports
-        emitPackage();
-        
-        //   2. class definition
-        emitClass();
-        
-        //   3. public setters and getters for each field
-        emitFields();
+        writer.emitPackage(packageName)
+                .emitEmptyLine();
 
-        // Generate initTable method, which is used to create the datqbase table
-        writer.beginMethod("Table", "initTable", EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
-                "ImplicitTransaction", "transaction").
-                beginControlFlow("if(!transaction.hasTable(\"" + this.className + "\"))").
-                emitStatement("Table table = transaction.getTable(\"" + this.className + "\")");
+        writer.emitImports(
+                "io.realm.internal.ColumnType",
+                "io.realm.internal.Table",
+                "io.realm.internal.ImplicitTransaction",
+                "io.realm.internal.Row",
+                "io.realm.internal.LinkView",
+                "io.realm.RealmLinkList",
+                "io.realm.RealmObject",
+                "io.realm.RealmList")
+                .emitEmptyLine();
+
+        // Begin the class definition
+        writer.beginType(
+                qualifiedGeneratedClassName, // full qualified name of the item to generate
+                "class",                     // the type of the item
+                EnumSet.of(Modifier.PUBLIC), // modifiers to apply
+                className)                   // class to extend
+                .emitEmptyLine();
+
+        // Accessors
+        ListIterator<VariableElement> iterator = fields.listIterator();
+        while (iterator.hasNext()) {
+            int columnNumber = iterator.nextIndex();
+            VariableElement field = iterator.next();
+
+            String fieldName = field.getSimpleName().toString();
+            String fieldTypeCanonicalName = field.asType().toString();
+
+            if (JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
+                /**
+                 * Primitives and boxed types
+                 */
+                String realmType = JAVA_TO_REALM_TYPES.get(fieldTypeCanonicalName);
+                String castingType = "String".equals(realmType) ? "String" : realmType.toLowerCase(Locale.getDefault());
+
+                // Getter
+                writer.emitAnnotation("Override");
+                writer.beginMethod(fieldTypeCanonicalName, "get" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC));
+                writer.emitStatement(
+                        "return (%s) row.get%s(%d)",
+                        fieldTypeCanonicalName, realmType, columnNumber);
+                writer.endMethod();
+                writer.emitEmptyLine();
+
+                // Setter
+                writer.emitAnnotation("Override");
+                writer.beginMethod("void", "set" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+                writer.emitStatement(
+                        "row.set%s(%d, (%s) value)",
+                        realmType, columnNumber, castingType);
+                writer.endMethod();
+            } else if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                /**
+                 * Links
+                 */
+
+                // Getter
+                writer.emitAnnotation("Override");
+                writer.beginMethod(fieldTypeCanonicalName, "get" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC));
+                writer.beginControlFlow("if (realmGetRow().isNullLink(%d))", columnNumber);
+                writer.emitStatement("return null");
+                writer.endControlFlow();
+                writer.emitStatement(
+                        "return realm.get(%s.class, realmGetRow().getLink(%d))",
+                        fieldTypeCanonicalName, columnNumber);
+                writer.endMethod();
+                writer.emitEmptyLine();
+
+                // Setter
+                writer.emitAnnotation("Override");
+                writer.beginMethod("void", "set" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+                writer.beginControlFlow("if (value == null)");
+                writer.emitStatement("realmGetRow().nullifyLink(%d)", columnNumber);
+                writer.endControlFlow();
+                writer.emitStatement("realmGetRow().setLink(%d, value.realmGetRow().getIndex())", columnNumber);
+                writer.endMethod();
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+                /**
+                 * LinkLists
+                 */
+                String genericCanonicalType = ((DeclaredType) field.asType()).getTypeArguments().get(0).toString();
+                String genericType;
+                if (genericCanonicalType.contains(".")) {
+                    genericType = genericCanonicalType.substring(genericCanonicalType.lastIndexOf('.') + 1);
+                } else {
+                    genericType = genericCanonicalType;
+                }
+
+                // Getter
+                writer.emitAnnotation("Override");
+                writer.beginMethod(fieldTypeCanonicalName, "get" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC));
+                writer.emitStatement(
+                        "return new RealmLinkList(%s.class, realmGetRow().getLinkList(%d), realm)",
+                        genericType, columnNumber);
+                writer.endMethod();
+                writer.emitEmptyLine();
+
+                // Setter
+                writer.emitAnnotation("Override");
+                writer.beginMethod("void", "set" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+                writer.emitStatement("LinkView links = realmGetRow().getLinkList(%d)", columnNumber);
+                writer.beginControlFlow("if (value == null)");
+                writer.emitStatement("return"); // TODO: delete all the links instead
+                writer.endControlFlow();
+                writer.beginControlFlow("for (RealmObject linkedObject : (RealmList<? extends RealmObject>) value)");
+                writer.emitStatement("links.add(linkedObject.realmGetRow().getIndex())");
+                writer.endControlFlow();
+                writer.endMethod();
+            } else {
+                throw new UnsupportedOperationException(
+                        String.format("Type %s of field %s is not supported", fieldTypeCanonicalName, fieldName));
+            }
+            writer.emitEmptyLine();
+        }
+
+        /**
+         * initTable method
+         */
+        writer.beginMethod(
+                "Table", // Return type
+                "initTable", // Method name
+                EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
+                "ImplicitTransaction", "transaction"); // Argument type & argument name
+
+        writer.beginControlFlow("if(!transaction.hasTable(\"" + this.className + "\"))");
+        writer.emitStatement("Table table = transaction.getTable(\"%s\")", this.className);
 
         // For each field generate corresponding table index constant
-        for (FieldInfo field : fields) {
-            writer.emitStatement("table.addColumn( %s, \"%s\" )", field.columnType, field.fieldName.toLowerCase(Locale.getDefault()));
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            String fieldTypeCanonicalName = field.asType().toString();
+            String fieldTypeName;
+            if (fieldTypeCanonicalName.contains(".")) {
+                fieldTypeName = fieldTypeCanonicalName.substring(fieldTypeCanonicalName.lastIndexOf('.') + 1);
+            } else {
+                fieldTypeName = fieldTypeCanonicalName;
+            }
+
+            if (JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
+                writer.emitStatement("table.addColumn(%s, \"%s\")",
+                        JAVA_TO_COLUMN_TYPES.get(fieldTypeCanonicalName),
+                        fieldName.toLowerCase(Locale.getDefault()));
+            } else if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                writer.emitStatement("table.addColumnLink(ColumnType.LINK, \"%s\", transaction.getTable(\"%s\"))",
+                        fieldName.toLowerCase(Locale.getDefault()), fieldTypeName.toLowerCase(Locale.getDefault()));
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+                String genericCanonicalType = ((DeclaredType) field.asType()).getTypeArguments().get(0).toString();
+                String genericType;
+                if (genericCanonicalType.contains(".")) {
+                    genericType = genericCanonicalType.substring(genericCanonicalType.lastIndexOf('.') + 1);
+                } else {
+                    genericType = genericCanonicalType;
+                }
+
+                writer.emitStatement("table.addColumnLink(ColumnType.LINK_LIST, \"%s\", transaction.getTable(\"%s\"))",
+                        fieldName.toLowerCase(Locale.getDefault()), genericType);
+            }
         }
 
         writer.emitStatement("return table");
         writer.endControlFlow();
-        writer.emitStatement("return transaction.getTable(\"" + this.className + "\")");
-        writer.endMethod().emitEmptyLine();
+        writer.emitStatement("return transaction.getTable(\"%s\")", this.className);
+        writer.endMethod();
+        writer.emitEmptyLine();
 
-        // End the class definition 
+        // End the class definition
         writer.endType();
         writer.close();
-
-        fields.clear();
-
-        generatorState = GeneratorStates.PACKAGE;
-
-        return true;
     }
 
