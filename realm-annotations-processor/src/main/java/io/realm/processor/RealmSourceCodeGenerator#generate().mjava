@@ -1,18 +1,27 @@
     public boolean generate() throws IOException {
 
+    	// Set source code indent to 4 spaces
         writer.setIndent("    ");
 
-        if (!emitPackage()) return false;
-        if (!emitClass()) return false;
-        if (!emitFields()) return false;
+        // Emit java writer code in sections: 
+        
+        //   1. Package Header and imports
+        emitPackage();
+        
+        //   2. class definition
+        emitClass();
+        
+        //   3. public setters and getters for each field
+        emitFields();
 
+        // Generate initTable method, which is used to create the datqbase table
         writer.beginMethod("Table", "initTable", EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
                 "ImplicitTransaction", "transaction").
                 beginControlFlow("if(!transaction.hasTable(\"" + this.className + "\"))").
                 emitStatement("Table table = transaction.getTable(\"" + this.className + "\")");
 
-        for (int index = 0; index < fields.size(); ++index) {
-            FieldInfo field = fields.get(index);
+        // For each field generate corresponding table index constant
+        for (FieldInfo field : fields) {
             writer.emitStatement("table.addColumn( %s, \"%s\" )", field.columnType, field.fieldName.toLowerCase(Locale.getDefault()));
         }
 
@@ -21,6 +30,7 @@
         writer.emitStatement("return transaction.getTable(\"" + this.className + "\")");
         writer.endMethod().emitEmptyLine();
 
+        // End the class definition 
         writer.endType();
         writer.close();
 
