@@ -13,6 +13,11 @@
             person.setName("Person no. " + i);
             person.setAge(i);
             person.setDog(fido);
+            for (int j = 0; j < i; j++) {
+                Cat cat = realm.create(Cat.class);
+                cat.setName("Cat_" + j);
+                person.getCats().add(cat);
+            }
         }
         realm.commit();
 
@@ -27,7 +32,7 @@
             } else {
                 dogName = pers.getDog().getName();
             }
-            status += "\n" + pers.getName() + ":" + pers.getAge() + " : " + dogName;
+            status += "\n" + pers.getName() + ":" + pers.getAge() + " : " + dogName + " : " + pers.getCats().size();
         }
 
         return status;

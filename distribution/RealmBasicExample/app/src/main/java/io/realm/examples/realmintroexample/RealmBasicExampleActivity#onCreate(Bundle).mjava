@@ -18,9 +18,9 @@
 
         //More complex operations should not be
         //executed on the UI thread.
-        new AsyncTask() {
+        new AsyncTask<Void, Void, String>() {
             @Override
-            protected String doInBackground(Object[] params) {
+            protected String doInBackground(Void... voids) {
                 String info = null;
                 try {
                     info = complexReadWrite();
@@ -32,8 +32,8 @@
             }
 
             @Override
-            protected void onPostExecute(Object result) {
-                showStatus((String) result);
+            protected void onPostExecute(String result) {
+                showStatus(result);
             }
         }.execute();
     }
