@@ -4,9 +4,11 @@
         Realm realm = getTestRealm();
         buildAllColumnsTestData(realm);
 
+        realm.beginWrite();
         realm.clear(AllColumns.class);
+        realm.commit();
 
-        realm.contains(AllColumns.class);
-        assertFalse("Realm.clear does not remove table", realm.contains(AllColumns.class));
+        Boolean objectIsStillThere = realm.contains(AllColumns.class);
+        assertFalse("Realm.clear does not remove table", objectIsStillThere);
     }
 

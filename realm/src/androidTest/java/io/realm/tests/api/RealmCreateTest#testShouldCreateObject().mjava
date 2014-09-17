@@ -2,8 +2,10 @@
     public void testShouldCreateObject() {
         Realm testRealm = getTestRealm();
 
+        testRealm.beginWrite();
         RealmObject allColumns = testRealm.create(AllColumns.class);
         boolean instanceMatch = allColumns instanceof AllColumnsRealmProxy;
+        testRealm.commit();
         assertTrue("Realm.create is returning wrong object type", instanceMatch);
     }
 

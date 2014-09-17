@@ -1,12 +1,13 @@
-    private Realm getTestRealm() {
+    protected Realm getTestRealm() {
         setupSharedGroup();
         
         Realm testRealm = null;
         try {
             testRealm = new Realm(getContext().getFilesDir());
-        } catch (IOException ex) {
+        } catch (IOException ioe) {
+        } catch (Exception ex) {
             ex.printStackTrace();
-            fail("Unexpected exception while initializing test case");
+            fail("Unexpected exception while initializing test case: "+ex.getMessage());
         }
         return testRealm;
     }

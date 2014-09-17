@@ -1,5 +1,11 @@
-    private void buildAllColumnsTestData(Realm realm) {
+    // <E> void remove(Class<E> clazz, long objectIndex)
+    public void testShouldRemoveRow() {
+        Realm realm = getTestRealm();
+        //buildAllColumnsTestData(realm);
+
+
         realm.clear();
+
         realm.beginWrite();
 
         AllColumns allColumns = null;
@@ -23,5 +29,15 @@
         allColumns.setColumnLong(46);
 
         realm.commit();
+
+        realm.beginWrite();
+
+        realm.remove(AllColumns.class,0);
+
+        realm.commit();
+
+        RealmList<AllColumns> realmList = realm.where(AllColumns.class).findAll();
+        boolean checkListSize = realmList.size() == TEST_DATA_SIZE - 1;
+        assertTrue("Realm.delete has not deleted record correctly",checkListSize);
     }
 
