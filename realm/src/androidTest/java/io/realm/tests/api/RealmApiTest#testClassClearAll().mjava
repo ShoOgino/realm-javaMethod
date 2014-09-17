@@ -1,0 +1,19 @@
+    //void clear()
+    public void testClassClearAll()
+    {
+        Realm realm = getTestRealm();
+        buildAllColumnsTestData(realm);
+
+        realm.beginWrite();
+
+        Dog dog = null;
+        dog = getTestObject(realm, Dog.class);
+        dog.setName("Castro");
+        realm.commit();
+
+        realm.clear();
+
+        boolean allNotGone = realm.contains(AllColumns.class) || realm.contains(Dog.class);
+        assertTrue("Realm.clear does not remove table", allNotGone);
+    }
+

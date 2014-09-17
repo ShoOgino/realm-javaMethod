@@ -1,7 +1,5 @@
-    //void addChangeListener(RealmChangeListener listener)
     public void testChangeNotify() {
         Realm realm = getTestRealm();
-        int testCount = 0;
 
         realm.addChangeListener(new RealmChangeListener() {
             @Override
@@ -19,6 +17,7 @@
             }
 
             realm.commit();
+            assertTrue("Have not received the expected number of events in ChangeListener", 5 == testCount);
 
         } catch (Throwable t) {
             t.printStackTrace();

@@ -4,5 +4,9 @@
         buildAllColumnsTestData(realm);
 
         realm.remove(AllColumns.class,0);
+
+        RealmList<AllColumns> realmList = realm.where(AllColumns.class).findAll();
+        boolean checkListSize = realmList.size() == TEST_DATA_SIZE - 1;
+        assertTrue("Realm.delete has not deleted record correctly",checkListSize);
     }
 
