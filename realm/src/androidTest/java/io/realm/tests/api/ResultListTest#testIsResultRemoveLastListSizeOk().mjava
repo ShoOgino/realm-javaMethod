@@ -1,0 +1,17 @@
+    public void testIsResultRemoveLastListSizeOk() throws IOException {
+        Realm realm = getTestRealm();
+        buildAllTypesTestData(realm, TEST_DATA_SIZE);
+
+        realm.beginWrite();
+
+        ResultList<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        resultList.removeLast();
+
+        realm.commit();
+
+        assertEquals("ResultList.removeLast did not remove record", TEST_DATA_SIZE - 1, resultList.size());
+
+        AllTypes allTypes = resultList.get(resultList.size() - 1);
+        assertEquals("ResultList.removeLast unexpected last record", TEST_DATA_SIZE - 2, allTypes.getColumnLong());
+    }
+

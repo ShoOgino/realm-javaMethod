@@ -1,0 +1,10 @@
+    //<E extends RealmObject> E create(Class<E> clazz)
+    public void testShouldCreateObject() throws IOException {
+        Realm testRealm = getTestRealm();
+
+        testRealm.beginWrite();
+        RealmObject allTypes = testRealm.create(AllTypes.class);
+        testRealm.commit();
+        assertTrue("Realm.create is returning wrong object type", allTypes instanceof AllTypesRealmProxy);
+    }
+

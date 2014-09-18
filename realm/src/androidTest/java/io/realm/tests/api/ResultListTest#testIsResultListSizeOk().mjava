@@ -1,0 +1,11 @@
+    //void clear(Class<?> classSpec)
+    public void testIsResultListSizeOk() throws IOException {
+        Realm realm = getTestRealm();
+        buildAllTypesTestData(realm, TEST_DATA_SIZE);
+
+        ResultList<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+
+        assertNotNull("ResultList.where has returned null", resultList);
+        assertEquals("ResultList.where unexpected number of objects returned", TEST_DATA_SIZE, resultList.size());
+    }
+

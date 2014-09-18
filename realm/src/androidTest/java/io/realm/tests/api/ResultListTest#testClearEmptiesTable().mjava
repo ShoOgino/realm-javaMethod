@@ -1,0 +1,16 @@
+    //void clear(Class<?> classSpec)
+    public void testClearEmptiesTable() throws IOException {
+        Realm realm = getTestRealm();
+        buildAllTypesTestData(realm, TEST_DATA_SIZE);
+
+        realm.beginWrite();
+
+        ResultList<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        assertEquals("ResultList.clear test setup did not produce required test data", TEST_DATA_SIZE, resultList.size());
+
+        resultList.clear();
+        assertEquals("ResultList.clear did not remove records", 0, resultList.size());
+
+        realm.commit();
+    }
+

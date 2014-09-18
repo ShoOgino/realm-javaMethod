@@ -1,0 +1,14 @@
+    // <E> void remove(Class<E> clazz, long objectIndex)
+    public void testShouldRemoveRow() throws IOException {
+        Realm realm = getTestRealm();
+
+        buildAllTypesTestData(realm, TEST_DATA_SIZE);
+        realm.beginWrite();
+
+        realm.remove(AllTypes.class, 0);
+
+        realm.commit();
+        ResultList<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        assertEquals("Realm.delete has not deleted record correctly", TEST_DATA_SIZE - 1, resultList.size());
+    }
+

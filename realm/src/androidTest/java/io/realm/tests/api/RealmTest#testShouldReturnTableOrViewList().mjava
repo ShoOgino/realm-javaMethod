@@ -1,0 +1,11 @@
+    // <E extends RealmObject> RealmTableOrViewList<E> allObjects(Class<E> clazz)
+    public void testShouldReturnTableOrViewList() throws IOException {
+        Realm realm = getTestRealm();
+        buildAllTypesTestData(realm, TEST_DATA_SIZE);
+
+        realm.beginWrite();
+        ResultList<AllTypes> resultList = realm.allObjects(AllTypes.class);
+        assertEquals("Realm.get is returning wrong result set", TEST_DATA_SIZE, resultList.size());
+        realm.commit();
+    }
+

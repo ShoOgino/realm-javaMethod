@@ -1,0 +1,11 @@
+    public void testResultListGet() throws IOException {
+        Realm realm = getTestRealm();
+        buildAllTypesTestData(realm, TEST_DATA_SIZE);
+
+        ResultList<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+
+        AllTypes allTypes = resultList.get(0);
+        assertNotNull("ResultList.get has returned null", allTypes);
+        assertTrue("ResultList.get returned invalid data", allTypes.getColumnString().startsWith("test data"));
+    }
+
