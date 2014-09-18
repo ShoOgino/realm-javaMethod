@@ -1,0 +1,14 @@
+    //void clear(Class<?> classSpec)
+    public void testClassClear() {
+
+        testRealm.beginWrite();
+
+        testRealm.clear(AllTypes.class);
+
+        testRealm.commit();
+
+
+        ResultList<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
+        assertEquals("Realm.clear does not empty table", 0, resultList.size());
+    }
+

@@ -1,0 +1,20 @@
+    public void testChangeNotify() {
+
+        testRealm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                testCount++;
+            }
+        });
+
+        testRealm.beginWrite();
+        for (int i = 0; i < 5; i++) {
+
+            Dog dog = testRealm.create(Dog.class);
+            dog.setName("King "+Integer.toString(testCount) );
+        }
+
+        testRealm.commit();
+        assertEquals("Have not received the expected number of events in ChangeListener", 1, testCount);
+    }
+

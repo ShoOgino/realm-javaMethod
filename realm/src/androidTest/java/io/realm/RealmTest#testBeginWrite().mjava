@@ -1,0 +1,15 @@
+    //void beginWrite()
+    public void testBeginWrite() throws IOException {
+
+        testRealm.beginWrite();
+
+        AllTypes allTypes = testRealm.create(AllTypes.class);
+        allTypes.setColumnString("Test data");
+        testRealm.commit();
+
+        ResultList<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
+        assertEquals("Change has not been committed", TEST_DATA_SIZE + 1, resultList.size());
+        //tableInit();
+
+    }
+
