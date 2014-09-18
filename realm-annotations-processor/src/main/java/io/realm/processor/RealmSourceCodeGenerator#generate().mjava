@@ -53,7 +53,7 @@
                 writer.emitAnnotation("Override");
                 writer.beginMethod(fieldTypeCanonicalName, "get" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC));
                 writer.emitStatement(
-                        "return (%s) row.get%s(%d)",
+                        "return (%s) realmGetRow().get%s(%d)",
                         fieldTypeCanonicalName, realmType, columnNumber);
                 writer.endMethod();
                 writer.emitEmptyLine();
@@ -62,7 +62,7 @@
                 writer.emitAnnotation("Override");
                 writer.beginMethod("void", "set" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
                 writer.emitStatement(
-                        "row.set%s(%d, (%s) value)",
+                        "realmGetRow().set%s(%d, (%s) value)",
                         realmType, columnNumber, castingType);
                 writer.endMethod();
             } else if (typeUtils.isAssignable(field.asType(), realmObject)) {
@@ -177,12 +177,27 @@
                         fieldName.toLowerCase(Locale.getDefault()), genericType);
             }
         }
-
         writer.emitStatement("return table");
         writer.endControlFlow();
         writer.emitStatement("return transaction.getTable(\"%s\")", this.className);
         writer.endMethod();
         writer.emitEmptyLine();
+
+        /**
+         * toString method
+         */
+        writer.emitAnnotation("Override");
+        writer.beginMethod("String", "toString", EnumSet.of(Modifier.PUBLIC));
+        writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = [\")", className);
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
+            writer.emitStatement("stringBuilder.append(get%s())", capitaliseFirstChar(fieldName));
+            writer.emitStatement("stringBuilder.append(\"} \")", fieldName);
+        }
+        writer.emitStatement("stringBuilder.append(\"]\")");
+        writer.emitStatement("return stringBuilder.toString()");
+        writer.endMethod();
 
         // End the class definition
         writer.endType();

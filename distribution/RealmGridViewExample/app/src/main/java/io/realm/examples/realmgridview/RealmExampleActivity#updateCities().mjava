@@ -1,11 +1,7 @@
     public void updateCities() {
-        try {
-            Realm realm = new Realm(getFilesDir());
-            RealmTableOrViewList<City> cities = realm.where(City.class).findAll();
-            mAdapter.setData(cities);
-        } catch (IOException ioe) {
-            Log.e(TAG, "Realm failed to retrieve and update the User list");
-        }
+        Realm realm = new Realm(this);
+        ResultList<City> cities = realm.where(City.class).findAll();
+        mAdapter.setData(cities);
 
         mAdapter.notifyDataSetChanged();
     }
