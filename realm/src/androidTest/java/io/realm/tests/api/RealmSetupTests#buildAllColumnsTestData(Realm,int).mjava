@@ -1,0 +1,18 @@
+    protected void buildAllColumnsTestData(Realm realm, int numberOfRecords) {
+        realm.clear();
+        realm.beginWrite();
+
+        for (int i = 0; i < numberOfRecords; ++i) {
+            AllColumns allColumns = null;
+            allColumns = getTestObject(realm, AllColumns.class);
+            allColumns.setColumnBoolean((i % 3) == 0);
+            allColumns.setColumnBinary(new byte[]{1, 2, 3});
+            allColumns.setColumnDate(new Date());
+            allColumns.setColumnDouble(3.1415 + i);
+            allColumns.setColumnFloat(1.234567f + i);
+            allColumns.setColumnString("test data " + i);
+            allColumns.setColumnLong(45 + i);
+        }
+        realm.commit();
+    }
+

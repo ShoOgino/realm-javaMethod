@@ -2,13 +2,17 @@
     public void testClassClear()
     {
         Realm realm = getTestRealm();
-        buildAllColumnsTestData(realm);
+        buildAllColumnsTestData(realm, TEST_DATA_SIZE);
 
         realm.beginWrite();
         realm.clear(AllColumns.class);
         realm.commit();
 
-        Boolean objectIsStillThere = realm.contains(AllColumns.class);
-        assertFalse("Realm.clear does not remove table", objectIsStillThere);
+        //Boolean objectIsStillThere = realm.contains(AllColumns.class);
+
+        RealmList<AllColumns> realmList = realm.where(AllColumns.class).findAll();
+        boolean checkListSize = realmList.size() == 0;
+
+        assertTrue("Realm.clear does not remove rows", checkListSize);
     }
 
