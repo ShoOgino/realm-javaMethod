@@ -3,9 +3,11 @@
 
         Realm realm = new Realm(this);
         status += "\nNumber of persons: " + realm.allObjects(Person.class).size();
-        // Find all persons where age > 5
+
+        // Find all persons where age between 7 and 9 and name begins with "Person".
         RealmResults<Person> results = realm.where(Person.class)
-                .greaterThan("age", 5).between("age", 7, 9).beginsWith("name", "Person").findAll();
+                .between("age", 7, 9)       // Notice implicit "and" operation
+                .beginsWith("name", "Person").findAll();
         status += "\nSize of result set: " + results.size();
         return status;
     }
