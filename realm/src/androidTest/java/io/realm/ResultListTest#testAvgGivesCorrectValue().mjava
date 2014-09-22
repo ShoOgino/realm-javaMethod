@@ -1,0 +1,15 @@
+    public void testAvgGivesCorrectValue() throws IOException {
+
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
+
+        Double avg = resultList.average("columndouble");
+
+        Double checkAvg = 0.0;
+        for (int i = 0; i < TEST_DATA_SIZE; ++i) {
+            checkAvg += 3.1415 + i;
+        }
+        checkAvg /= TEST_DATA_SIZE;
+
+        assertEquals("ResultList.sum returned wrong sum", checkAvg ,avg);
+    }
+
