@@ -5,7 +5,7 @@
         Realm realm = Realm.getInstance(this);
 
         // Add ten persons in one write transaction
-        realm.beginWrite();
+        realm.beginTransaction();
         Dog fido = realm.createObject(Dog.class);
         fido.setName("fido");
         for (int i = 0; i < 10; i++) {
@@ -26,7 +26,7 @@
                 person.getCats().add(cat);
             }
         }
-        realm.commit();
+        realm.commitTransaction();
 
         // Implicit read transactions allow you to access your objects
         status += "\nNumber of persons: " + realm.allObjects(Person.class).size();
