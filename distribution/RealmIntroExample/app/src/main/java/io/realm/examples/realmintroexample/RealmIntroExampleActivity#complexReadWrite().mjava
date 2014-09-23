@@ -2,14 +2,14 @@
         String status = "\nPerforming complex Read/Write operation...";
 
         // Open a default realm
-        Realm realm = new Realm(this);
+        Realm realm = Realm.getInstance(this);
 
         // Add ten persons in one write transaction
         realm.beginWrite();
-        Dog fido = realm.create(Dog.class);
+        Dog fido = realm.createObject(Dog.class);
         fido.setName("fido");
         for (int i = 0; i < 10; i++) {
-            Person person = realm.create(Person.class);
+            Person person = realm.createObject(Person.class);
             person.setName("Person no. " + i);
             person.setAge(i);
             person.setDog(fido);
@@ -21,7 +21,7 @@
             person.setTempReference(42);
 
             for (int j = 0; j < i; j++) {
-                Cat cat = realm.create(Cat.class);
+                Cat cat = realm.createObject(Cat.class);
                 cat.setName("Cat_" + j);
                 person.getCats().add(cat);
             }
