@@ -248,8 +248,42 @@
         writer.beginMethod("boolean", "equals", EnumSet.of(Modifier.PUBLIC), "Object", "o");
         writer.emitStatement("if (this == o) return true");
         writer.emitStatement("if (o == null || getClass() != o.getClass()) return false");
-        writer.emitStatement(className + " a" + className + " = (" + className + ")o");  // Foo aFoo = (Foo)o
-        writer.emitStatement("return (hashCode() == a" + className + ".hashCode())"); // return (hashCode() == aFoo.hashCode())
+        writer.emitStatement("%s a%s = (%s)o", className, className, className);  // Foo aFoo = (Foo)o
+
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            String capFieldName = capitaliseFirstChar(fieldName);
+            String fieldTypeCanonicalName = field.asType().toString();
+            switch (HOW_TO_EQUAL.get(fieldTypeCanonicalName)) {
+                case 0: // if (getField() != aFoo.getField()) return false
+                    writer.emitStatement("if (get%s() != a%s.get%s()) return false", capFieldName, className, capFieldName);
+                    break;
+                case 1: // if (getField() != null = !getField().equals(aFoo.getField()) : aFoo.getField() != null) return false
+                    writer.emitStatement("if (get%s() != null ? !get%s().equals(a%s.get%s()) : a%s.get%s() != null) return false",
+                            capFieldName,
+                            capFieldName, className, capFieldName,
+                            className, capFieldName);
+                    break;
+                case 2: // if (!Array.equals(getField(), aFoo.getField()) return false
+                    writer.emitStatement("if (!Array.equals(get%s(), a%s.get%s()) return false",
+                            capFieldName,
+                            className, capFieldName);
+                    break;
+                case 3:
+                    writer.emitStatement("if (%s.compare(get%s, %s.get%s) != 0) return false", capitaliseFirstChar(fieldName), className, capitaliseFirstChar(fieldName));
+                    break;
+            }
+
+            // TODO: Can object and list be added to HOW_TO_EQUAL?
+            if (typeUtils.isAssignable(field.asType(), realmObject) || typeUtils.isAssignable(field.asType(), realmList)) {
+                writer.emitStatement("if (get%s() != null ? !get%s().equals(%s.get%s()) : %s.get%s() != null) return false",
+                        capFieldName,
+                        capFieldName, className, capFieldName,
+                        className, capFieldName);
+
+            }
+        }
+        writer.emitStatement("return true");
         writer.endMethod();
         writer.emitEmptyLine();
 
