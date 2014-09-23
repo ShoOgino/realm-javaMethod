@@ -1,0 +1,24 @@
+    /**
+     * Delete all Realm related files from the filesystem for a custom Realm
+     * @param context an Android context
+     * @param fileName the name of the custom Realm (i.e. "myCustomRealm.realm")
+     * @return false if any of the files could not be deleted. The failing file will be logged.
+     */
+    public static boolean deleteRealmFiles(Context context, String fileName) {
+        boolean result = true;
+        File writableFolder = context.getFilesDir();
+        List<File> filesToDelete = Arrays.asList(
+                new File(writableFolder, fileName),
+                new File(writableFolder, fileName + ".lock"));
+        for (File fileToDelete : filesToDelete) {
+            if (fileToDelete.exists()) {
+                boolean deleteResult = fileToDelete.delete();
+                if (!deleteResult) {
+                    result = false;
+                    Log.w(TAG, "Could not delete the file " + fileToDelete);
+                }
+            }
+        }
+        return result;
+    }
+
