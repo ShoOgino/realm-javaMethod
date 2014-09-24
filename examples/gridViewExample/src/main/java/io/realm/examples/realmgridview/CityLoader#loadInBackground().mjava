@@ -10,17 +10,7 @@
         dataIsReady = true;
 
         // Delete realm files
-        File writablePath = context.getFilesDir();
-        for (File file : Arrays.asList(
-                new File(writablePath, Realm.DEFAULT_REALM_NAME),
-                new File(writablePath, Realm.DEFAULT_REALM_NAME + ".lock"))) {
-            if (file.exists()) {
-                boolean deleteResult = file.delete();
-                if (!deleteResult) {
-                    throw new AssertionError("Could not delete file: " + file.getAbsolutePath());
-                }
-            }
-        }
+        Realm.deleteRealmFile(context);
 
         //Store the retrieved items to the Realm
         Realm realm = Realm.getInstance(context);
