@@ -5,25 +5,12 @@
         handler = new Handler() {
             @Override
             public void handleMessage(Message message) {
-                if (message.obj instanceof Handler) {
-                    // message.obj contains the handler
-                    // message.arg1 contains the operation type (add/remove)
-                    // message.arg2 contains the realm id
-                    Handler messageHandler = (Handler) message.obj;
-                    switch (message.arg1) {
-                        case ADD_HANDLER:
-                            handlers.put(messageHandler, message.arg2);
-                            break;
-                        case REMOVE_HANDLER:
-                            handlers.remove(messageHandler);
-                            break;
-                        default:
-                            break;
-                    }
-                } else if(message.arg1 == REALM_CHANGED) {
+                if(message.arg1 == REALM_CHANGED) {
                     for (Map.Entry<Handler, Integer> entry : handlers.entrySet()) {
                         if (entry.getValue() == message.arg2) {
-                            entry.getKey().sendEmptyMessage(REALM_CHANGED);
+                            if (!entry.getKey().hasMessages(REALM_CHANGED)) {
+                                entry.getKey().sendEmptyMessage(REALM_CHANGED);
+                            }
                         }
                     }
                 }
