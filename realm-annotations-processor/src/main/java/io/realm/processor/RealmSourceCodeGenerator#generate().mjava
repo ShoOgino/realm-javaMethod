@@ -1,5 +1,5 @@
     public void generate() throws IOException, UnsupportedOperationException {
-        String qualifiedGeneratedClassName = String.format("%s.%sRealmProxy", packageName, className);
+        String qualifiedGeneratedClassName = String.format("%s.%sRealmProxy", realmPackageName, className);
         JavaFileObject sourceFile = processingEnvironment.getFiler().createSourceFile(qualifiedGeneratedClassName);
         JavaWriter writer = new JavaWriter(new BufferedWriter(sourceFile.openWriter()));
 
@@ -12,7 +12,7 @@
         // Set source code indent to 4 spaces
         writer.setIndent("    ");
 
-        writer.emitPackage(packageName)
+        writer.emitPackage(realmPackageName)
                 .emitEmptyLine();
 
         writer.emitImports(
@@ -23,7 +23,8 @@
                 "io.realm.internal.LinkView",
                 "io.realm.RealmList",
                 "io.realm.RealmObject",
-                "java.util.Date")
+                "java.util.Date",
+                packageName + ".*")
                 .emitEmptyLine();
 
         // Begin the class definition
@@ -160,7 +161,7 @@
                         fieldName.toLowerCase(Locale.getDefault()));
             } else if (typeUtils.isAssignable(field.asType(), realmObject)) {
                 writer.beginControlFlow("if (!transaction.hasTable(\"%s\"))", fieldTypeName);
-                writer.emitStatement("%sRealmProxy.initTable(transaction)", fieldTypeCanonicalName);
+                writer.emitStatement("%sRealmProxy.initTable(transaction)", fieldTypeName);
                 writer.endControlFlow();
                 writer.emitStatement("table.addColumnLink(ColumnType.LINK, \"%s\", transaction.getTable(\"%s\"))",
                         fieldName.toLowerCase(Locale.getDefault()), fieldTypeName);
@@ -173,7 +174,7 @@
                     genericType = genericCanonicalType;
                 }
                 writer.beginControlFlow("if (!transaction.hasTable(\"%s\"))", genericType);
-                writer.emitStatement("%sRealmProxy.initTable(transaction)", genericCanonicalType);
+                writer.emitStatement("%sRealmProxy.initTable(transaction)", genericType);
                 writer.endControlFlow();
                 writer.emitStatement("table.addColumnLink(ColumnType.LINK_LIST, \"%s\", transaction.getTable(\"%s\"))",
                         fieldName.toLowerCase(Locale.getDefault()), genericType);
@@ -254,33 +255,36 @@
             String fieldName = field.getSimpleName().toString();
             String capFieldName = capitaliseFirstChar(fieldName);
             String fieldTypeCanonicalName = field.asType().toString();
-            switch (HOW_TO_EQUAL.get(fieldTypeCanonicalName)) {
-                case 0: // if (getField() != aFoo.getField()) return false
-                    writer.emitStatement("if (get%s() != a%s.get%s()) return false", capFieldName, className, capFieldName);
-                    break;
-                case 1: // if (getField() != null = !getField().equals(aFoo.getField()) : aFoo.getField() != null) return false
+            if (HOW_TO_EQUAL.containsKey(fieldTypeCanonicalName)) {
+                switch (HOW_TO_EQUAL.get(fieldTypeCanonicalName)) {
+                    case equals_direct: // if (getField() != aFoo.getField()) return false
+                        String getterPrefix = fieldTypeCanonicalName.equals("boolean") ? "is" : "get";
+                        writer.emitStatement("if (get%s() != a%s.%s%s()) return false", capFieldName, className, getterPrefix, capFieldName);
+                        break;
+                    case equals_null: // if (getField() != null = !getField().equals(aFoo.getField()) : aFoo.getField() != null) return false
+                        writer.emitStatement("if (get%s() != null ? !get%s().equals(a%s.get%s()) : a%s.get%s() != null) return false",
+                                capFieldName,
+                                capFieldName, className, capFieldName,
+                                className, capFieldName);
+                        break;
+                    case equals_array: // if (!Array.equals(getField(), aFoo.getField()) return false
+                        writer.emitStatement("if (!Array.equals(get%s(), a%s.get%s()) return false",
+                                capFieldName,
+                                className, capFieldName);
+                        break;
+                    case equals_compare:
+                        writer.emitStatement("if (%s.compare(get%s, a%s.get%s) != 0) return false", capitaliseFirstChar(fieldName), className, capitaliseFirstChar(fieldName));
+                        break;
+                }
+            }
+            else {
+                if (typeUtils.isAssignable(field.asType(), realmObject) || typeUtils.isAssignable(field.asType(), realmList)) {
                     writer.emitStatement("if (get%s() != null ? !get%s().equals(a%s.get%s()) : a%s.get%s() != null) return false",
                             capFieldName,
                             capFieldName, className, capFieldName,
                             className, capFieldName);
-                    break;
-                case 2: // if (!Array.equals(getField(), aFoo.getField()) return false
-                    writer.emitStatement("if (!Array.equals(get%s(), a%s.get%s()) return false",
-                            capFieldName,
-                            className, capFieldName);
-                    break;
-                case 3:
-                    writer.emitStatement("if (%s.compare(get%s, %s.get%s) != 0) return false", capitaliseFirstChar(fieldName), className, capitaliseFirstChar(fieldName));
-                    break;
-            }
 
-            // TODO: Can object and list be added to HOW_TO_EQUAL?
-            if (typeUtils.isAssignable(field.asType(), realmObject) || typeUtils.isAssignable(field.asType(), realmList)) {
-                writer.emitStatement("if (get%s() != null ? !get%s().equals(%s.get%s()) : %s.get%s() != null) return false",
-                        capFieldName,
-                        capFieldName, className, capFieldName,
-                        className, capFieldName);
-
+                }
             }
         }
         writer.emitStatement("return true");
