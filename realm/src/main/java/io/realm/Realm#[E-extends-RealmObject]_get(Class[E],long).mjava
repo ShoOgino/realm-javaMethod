@@ -1,64 +1,51 @@
-    public <E extends RealmObject> E get(Class<E> clazz, long rowIndex) {
+    <E extends RealmObject> E get(Class<E> clazz, long rowIndex) {
         E result;
 
-        String generatedClassName = null;
         Table table = tables.get(clazz);
         if (table == null) {
-            if (generatedClassNames.containsKey(clazz)) {
-                generatedClassName = generatedClassNames.get(clazz);
-            } else {
-                generatedClassName = clazz.getName() + "RealmProxy";
-                generatedClassNames.put(clazz, generatedClassName);
-            }
-
-            String simpleClassName;
-            if (simpleClassNames.containsKey(clazz)) {
-                simpleClassName = simpleClassNames.get(clazz);
-            } else {
+            String simpleClassName = simpleClassNames.get(clazz);
+            if (simpleClassName == null) {
                 simpleClassName = clazz.getSimpleName();
                 simpleClassNames.put(clazz, simpleClassName);
             }
+
             table = transaction.getTable(simpleClassName);
             tables.put(clazz, table);
         }
 
         Row row = table.getRow(rowIndex);
 
-        Constructor constructor;
-        constructor = generatedConstructors.get(clazz);
+        Constructor constructor = generatedConstructors.get(clazz);
         if (constructor == null) {
-            if (generatedClassName == null) {
-                generatedClassName = generatedClassNames.get(clazz);
-                if (generatedClassName == null) {
-                    generatedClassName = clazz.getName() + "RealmProxy";
-                    generatedClassNames.put(clazz, generatedClassName);
-                }
+            String simpleClassName = simpleClassNames.get(clazz);
+            if (simpleClassName == null) {
+                simpleClassName = clazz.getSimpleName();
+                simpleClassNames.put(clazz, simpleClassName);
             }
+            String generatedClassName = "io.realm." + simpleClassName + "RealmProxy";
 
-            Class<?> generatedClass;
-            try {
-                if (generatedClasses.containsKey(generatedClassName)) {
-                    generatedClass = generatedClasses.get(generatedClassName);
-                } else {
+
+            Class<?> generatedClass = generatedClasses.get(generatedClassName);
+            if (generatedClass == null) {
+                try {
                     generatedClass = Class.forName(generatedClassName);
-                    generatedClasses.put(generatedClassName, generatedClass);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                    return null; // TODO: throw RealmException
                 }
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                return null; // TODO: throw RealmException
+                generatedClasses.put(generatedClassName, generatedClass);
             }
 
-            try {
-                if (constructors.containsKey(generatedClass)) {
-                    constructor = constructors.get(generatedClass);
-                } else {
+            constructor = constructors.get(generatedClass);
+            if (constructor == null) {
+                try {
                     constructor = generatedClass.getConstructor();
-                    constructors.put(generatedClass, constructor);
-                    generatedConstructors.put(clazz, constructor);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                    return null; // TODO: throw RealmException
                 }
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-                return null; // TODO: throw RealmException
+                constructors.put(generatedClass, constructor);
+                generatedConstructors.put(clazz, constructor);
             }
         }
 
