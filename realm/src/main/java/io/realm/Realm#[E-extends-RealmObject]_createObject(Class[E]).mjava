@@ -1,45 +1,38 @@
     /**
      * Instantiates and adds a new object to the realm
-     *
-     * @return              The new object
-     * @param <E>
+     * @return The new object
+     * @param clazz The Class of the object to create
      */
     public <E extends RealmObject> E createObject(Class<E> clazz) {
         Table table;
         table = tables.get(clazz);
         if (table == null) {
-            String generatedClassName;
-            if (generatedClassNames.containsKey(clazz)) {
-                generatedClassName = generatedClassNames.get(clazz);
-            } else {
+            String generatedClassName = generatedClassNames.get(clazz);
+            if (generatedClassName == null) {
                 generatedClassName = clazz.getName() + "RealmProxy";
                 generatedClassNames.put(clazz, generatedClassName);
             }
 
-            Class<?> generatedClass;
-            try {
-                if (generatedClasses.containsKey(generatedClassName)) {
-                    generatedClass = generatedClasses.get(generatedClassName);
-                } else {
+            Class<?> generatedClass = generatedClasses.get(generatedClassName);
+            if (generatedClass == null) {
+                try {
                     generatedClass = Class.forName(generatedClassName);
-                    generatedClasses.put(generatedClassName, generatedClass);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                    return null; // TODO: throw RealmException
                 }
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                return null; // TODO: throw RealmException
+                generatedClasses.put(generatedClassName, generatedClass);
             }
 
-            Method method;
-            try {
-                if (initTableMethods.containsKey(generatedClass)) {
-                    method = initTableMethods.get(generatedClass);
-                } else {
+            Method method = initTableMethods.get(generatedClass);
+            if (method == null) {
+                try {
                     method = generatedClass.getMethod("initTable", new Class[]{ImplicitTransaction.class});
-                    initTableMethods.put(generatedClass, method);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                    return null; // TODO: throw RealmException
                 }
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-                return null; // TODO: throw RealmException
+                initTableMethods.put(generatedClass, method);
             }
 
             try {
