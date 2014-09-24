@@ -1,7 +1,11 @@
     public void removeChangeListener(RealmChangeListener listener) {
         changeListeners.remove(listener);
-        if(runEventHandler && changeListeners.isEmpty()) {
-            runEventHandler = false;
+        if (changeListeners.isEmpty()) {
+            Message message = Message.obtain();
+            message.obj = handler;
+            message.arg1 = LooperThread.REMOVE_HANDLER;
+            message.arg2 = id;
+            looperThread.handler.sendMessage(message);
         }
     }
 

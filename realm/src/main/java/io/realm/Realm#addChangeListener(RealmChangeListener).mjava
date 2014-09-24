@@ -1,8 +1,10 @@
     // Notifications
     public void addChangeListener(RealmChangeListener listener) {
         changeListeners.add(listener);
-        if(!runEventHandler) {
-            startEventHandler();
-        }
+        Message message = Message.obtain();
+        message.obj = handler;
+        message.arg1 = LooperThread.ADD_HANDLER;
+        message.arg2 = id;
+        looperThread.handler.sendMessage(message);
     }
 

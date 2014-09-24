@@ -2,5 +2,24 @@
     private Realm(String absolutePath) {
         this.sharedGroup = new SharedGroup(absolutePath, defaultDurability);
         this.transaction = sharedGroup.beginImplicitTransaction();
+        this.id = absolutePath.hashCode();
+        if (!looperThread.isAlive()) {
+            looperThread.start();
+        }
+
+        if (!Looper.myLooper().equals(Looper.getMainLooper())) {
+            Looper.prepare();
+        }
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message message) {
+                if (message.arg1 == LooperThread.REALM_CHANGED) {
+                    sendNotifications();
+                }
+            }
+        };
+        if (!Looper.myLooper().equals(Looper.getMainLooper())) {
+            Looper.loop();
+        }
     }
 

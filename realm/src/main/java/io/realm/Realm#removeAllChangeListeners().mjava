@@ -1,4 +1,9 @@
     public void removeAllChangeListeners() {
         changeListeners.clear();
+        Message message = Message.obtain();
+        message.obj = handler;
+        message.arg1 = LooperThread.REMOVE_HANDLER;
+        message.arg2 = id;
+        looperThread.handler.sendMessage(message);
     }
 
