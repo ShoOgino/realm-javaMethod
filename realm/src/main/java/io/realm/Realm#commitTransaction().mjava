@@ -4,7 +4,9 @@
     public void commitTransaction() {
         transaction.commitAndContinueAsRead();
 
-        // Send notifications because we did a local change
-        sendNotifications();
+        Message message = Message.obtain();
+        message.arg1 = LooperThread.REALM_CHANGED;
+        message.arg2 = id;
+        looperThread.handler.sendMessage(message);
     }
 

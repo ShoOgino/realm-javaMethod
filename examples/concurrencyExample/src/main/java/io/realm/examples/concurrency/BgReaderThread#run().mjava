@@ -1,0 +1,15 @@
+    public void run() {
+        realm = Realm.getInstance(context);
+
+        while (running) {
+            try {
+                RealmQuery realmQuery = realm.where(Person.class);
+                List<Person> list = realmQuery.findAll();
+                Log.d(TAG, "First item: " + realmQuery.findFirst());
+            } catch (Exception e) {
+                e.printStackTrace();
+                terminate();
+            }
+        }
+    }
+
