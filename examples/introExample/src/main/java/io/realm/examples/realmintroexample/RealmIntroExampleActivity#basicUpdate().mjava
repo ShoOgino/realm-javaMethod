@@ -1,0 +1,18 @@
+    private void basicUpdate() throws IOException {
+        showStatus("\nPerforming basic Update operation...");
+
+        // Open a default realm
+        Realm realm = Realm.getInstance(this);
+
+        // Get the first object
+        Person person = realm.where(Person.class).findFirst();
+
+        // Update person in a write transaction
+        realm.beginTransaction();
+        person.setName("Senior Person");
+        person.setAge(99);
+        realm.commitTransaction();
+
+        showStatus(person.getName() + ":" + person.getAge());
+    }
+

@@ -1,12 +1,9 @@
-    public boolean contains(Class<?> clazz) {
-        String simpleClassName;
-        if (simpleClassNames.containsKey(clazz)) {
-            simpleClassName = simpleClassNames.get(clazz);
-            simpleClassNames.put(clazz, simpleClassName);
-        } else {
+    boolean contains(Class<?> clazz) {
+        String simpleClassName = simpleClassNames.get(clazz);
+        if (simpleClassName == null) {
             simpleClassName = clazz.getSimpleName();
+            simpleClassNames.put(clazz, simpleClassName);
         }
-
         return transaction.hasTable(simpleClassName);
     }
 

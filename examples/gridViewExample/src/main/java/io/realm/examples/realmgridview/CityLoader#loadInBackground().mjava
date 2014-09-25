@@ -1,0 +1,28 @@
+    @Override
+    public List<City> loadInBackground() throws RuntimeException {
+        List<City> items = loadCities();
+
+        if (items == null) {
+            Log.e(TAG, "No cities found");
+            return null;
+        }
+
+        dataIsReady = true;
+        
+        // Delete previous database in case it's there from a previous run.
+        Realm.deleteRealmFile(context);
+
+        // Store the retrieved items to the Realm
+        Realm realm = Realm.getInstance(context);
+
+        realm.beginTransaction();
+        for (City city : items) {
+            City realmCity = realm.createObject(City.class);
+            realmCity.setName(city.getName());
+            realmCity.setVotes(city.getVotes());
+        }
+        realm.commitTransaction();
+
+        return items;
+    }
+
