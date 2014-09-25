@@ -261,7 +261,7 @@
                 switch (HOW_TO_EQUAL.get(fieldTypeCanonicalName)) {
                     case EQUALS_DIRECT: // if (getField() != aFoo.getField()) return false
                         String getterPrefix = fieldTypeCanonicalName.equals("boolean") ? "is" : "get";
-                        writer.emitStatement("if (get%s() != a%s.%s%s()) return false", capFieldName, className, getterPrefix, capFieldName);
+                        writer.emitStatement("if (%s%s() != a%s.%s%s()) return false", getterPrefix, capFieldName, className, getterPrefix, capFieldName);
                         break;
                     case EQUALS_NULL: // if (getField() != null = !getField().equals(aFoo.getField()) : aFoo.getField() != null) return false
                         writer.emitStatement("if (get%s() != null ? !get%s().equals(a%s.get%s()) : a%s.get%s() != null) return false",
@@ -269,14 +269,14 @@
                                 capFieldName, className, capFieldName,
                                 className, capFieldName);
                         break;
-                    case EQUALS_ARRAY: // if (!Array.equals(getField(), aFoo.getField()) return false
-                        writer.emitStatement("if (!Array.equals(get%s(), a%s.get%s()) return false",
+                    case EQUALS_ARRAY: // if (!Arrays.equals(getField(), aFoo.getField())) return false
+                        writer.emitStatement("if (!Arrays.equals(get%s(), a%s.get%s())) return false",
                                 capFieldName,
                                 className, capFieldName);
                         break;
                     case EQUALS_COMPARE: // if (
-                        writer.emitStatement("if (%s.compare(get%s, a%s.get%s) != 0) return false",
-                                fieldTypeCanonicalName, capitaliseFirstChar(fieldName), className,
+                        writer.emitStatement("if (%s.compare(get%s(), a%s.get%s()) != 0) return false",
+                                capitaliseFirstChar(fieldTypeCanonicalName), capitaliseFirstChar(fieldName), className,
                                 capitaliseFirstChar(fieldName));
                         break;
                 }
