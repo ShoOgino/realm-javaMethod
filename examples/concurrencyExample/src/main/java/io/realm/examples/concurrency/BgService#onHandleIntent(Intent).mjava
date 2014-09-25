@@ -1,0 +1,30 @@
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        Log.d(TAG, "Starting intent...");
+
+        realm = Realm.getInstance(this);
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                Log.d(TAG, "RECEIVED_NOTIFICATION: " + Thread.currentThread().toString());
+            }
+        });
+
+        while(!serviceQuitting) {
+            int iterCount = 0;
+            realm.beginTransaction();
+            while (iterCount < 20 && serviceQuitting == false) {
+                if ((iterCount % 1000) == 0) {
+                    Log.d(TAG, "WR_OPERATION#: " + iterCount + "," + Thread.currentThread().getName());
+                }
+
+                Person person = realm.createObject(Person.class);
+                person.setName("New person");
+                iterCount++;
+            }
+            realm.commitTransaction();
+        }
+
+        Log.d(TAG, "Service has quit");
+    }
+
