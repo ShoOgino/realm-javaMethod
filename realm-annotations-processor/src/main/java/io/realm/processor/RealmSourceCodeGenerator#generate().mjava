@@ -24,6 +24,7 @@
                 "io.realm.RealmList",
                 "io.realm.RealmObject",
                 "java.util.Date",
+                "java.util.Arrays",
                 packageName + ".*")
                 .emitEmptyLine();
 
@@ -141,8 +142,8 @@
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
                 "ImplicitTransaction", "transaction"); // Argument type & argument name
 
-        writer.beginControlFlow("if(!transaction.hasTable(\"" + this.className + "\"))");
-        writer.emitStatement("Table table = transaction.getTable(\"%s\")", this.className);
+        writer.beginControlFlow("if(!transaction.hasTable(\"" + tablePrefix + this.className + "\"))");
+        writer.emitStatement("Table table = transaction.getTable(\"%s%s\")", tablePrefix, this.className);
 
         // For each field generate corresponding table index constant
         for (VariableElement field : fields) {
@@ -160,11 +161,11 @@
                         JAVA_TO_COLUMN_TYPES.get(fieldTypeCanonicalName),
                         fieldName.toLowerCase(Locale.getDefault()));
             } else if (typeUtils.isAssignable(field.asType(), realmObject)) {
-                writer.beginControlFlow("if (!transaction.hasTable(\"%s\"))", fieldTypeName);
+                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", tablePrefix, fieldTypeName);
                 writer.emitStatement("%sRealmProxy.initTable(transaction)", fieldTypeName);
                 writer.endControlFlow();
-                writer.emitStatement("table.addColumnLink(ColumnType.LINK, \"%s\", transaction.getTable(\"%s\"))",
-                        fieldName.toLowerCase(Locale.getDefault()), fieldTypeName);
+                writer.emitStatement("table.addColumnLink(ColumnType.LINK, \"%s\", transaction.getTable(\"%s%s\"))",
+                        fieldName.toLowerCase(Locale.getDefault()), tablePrefix, fieldTypeName);
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
                 String genericCanonicalType = ((DeclaredType) field.asType()).getTypeArguments().get(0).toString();
                 String genericType;
@@ -173,16 +174,16 @@
                 } else {
                     genericType = genericCanonicalType;
                 }
-                writer.beginControlFlow("if (!transaction.hasTable(\"%s\"))", genericType);
+                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", tablePrefix, genericType);
                 writer.emitStatement("%sRealmProxy.initTable(transaction)", genericType);
                 writer.endControlFlow();
-                writer.emitStatement("table.addColumnLink(ColumnType.LINK_LIST, \"%s\", transaction.getTable(\"%s\"))",
-                        fieldName.toLowerCase(Locale.getDefault()), genericType);
+                writer.emitStatement("table.addColumnLink(ColumnType.LINK_LIST, \"%s\", transaction.getTable(\"%s%s\"))",
+                        fieldName.toLowerCase(Locale.getDefault()), tablePrefix, genericType);
             }
         }
         writer.emitStatement("return table");
         writer.endControlFlow();
-        writer.emitStatement("return transaction.getTable(\"%s\")", this.className);
+        writer.emitStatement("return transaction.getTable(\"%s%s\")", tablePrefix, this.className);
         writer.endMethod();
         writer.emitEmptyLine();
 
@@ -239,6 +240,55 @@
             counter++;
         }
         writer.emitStatement("return result");
+        writer.endMethod();
+        writer.emitEmptyLine();
+
+        /**
+         * equals method
+         */
+        String proxyClassName = className + "RealmProxy";
+        writer.emitAnnotation("Override");
+        writer.beginMethod("boolean", "equals", EnumSet.of(Modifier.PUBLIC), "Object", "o");
+        writer.emitStatement("if (this == o) return true");
+        writer.emitStatement("if (o == null || getClass() != o.getClass()) return false");
+        writer.emitStatement("%s a%s = (%s)o", proxyClassName, className, proxyClassName);  // FooRealmProxy aFoo = (FooRealmProxy)o
+
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            String capFieldName = capitaliseFirstChar(fieldName);
+            String fieldTypeCanonicalName = field.asType().toString();
+            if (HOW_TO_EQUAL.containsKey(fieldTypeCanonicalName)) {
+                switch (HOW_TO_EQUAL.get(fieldTypeCanonicalName)) {
+                    case EQUALS_DIRECT: // if (getField() != aFoo.getField()) return false
+                        String getterPrefix = fieldTypeCanonicalName.equals("boolean") ? "is" : "get";
+                        writer.emitStatement("if (%s%s() != a%s.%s%s()) return false", getterPrefix, capFieldName, className, getterPrefix, capFieldName);
+                        break;
+                    case EQUALS_NULL: // if (getField() != null = !getField().equals(aFoo.getField()) : aFoo.getField() != null) return false
+                        writer.emitStatement("if (get%s() != null ? !get%s().equals(a%s.get%s()) : a%s.get%s() != null) return false",
+                                capFieldName,
+                                capFieldName, className, capFieldName,
+                                className, capFieldName);
+                        break;
+                    case EQUALS_ARRAY: // if (!Arrays.equals(getField(), aFoo.getField())) return false
+                        writer.emitStatement("if (!Arrays.equals(get%s(), a%s.get%s())) return false",
+                                capFieldName,
+                                className, capFieldName);
+                        break;
+                    case EQUALS_COMPARE: // if (
+                        writer.emitStatement("if (%s.compare(get%s(), a%s.get%s()) != 0) return false",
+                                capitaliseFirstChar(fieldTypeCanonicalName), capitaliseFirstChar(fieldName), className,
+                                capitaliseFirstChar(fieldName));
+                        break;
+                }
+            }
+            else if (typeUtils.isAssignable(field.asType(), realmObject) || typeUtils.isAssignable(field.asType(), realmList)) {
+                writer.emitStatement("if (get%s() != null ? !get%s().equals(a%s.get%s()) : a%s.get%s() != null) return false",
+                        capFieldName,
+                        capFieldName, className, capFieldName,
+                         className, capFieldName);
+            }
+        }
+        writer.emitStatement("return true");
         writer.endMethod();
         writer.emitEmptyLine();
 

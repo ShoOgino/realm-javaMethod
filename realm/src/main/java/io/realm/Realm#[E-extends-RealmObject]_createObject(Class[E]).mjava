@@ -7,11 +7,12 @@
         Table table;
         table = tables.get(clazz);
         if (table == null) {
-            String generatedClassName = generatedClassNames.get(clazz);
-            if (generatedClassName == null) {
-                generatedClassName = clazz.getName() + "RealmProxy";
-                generatedClassNames.put(clazz, generatedClassName);
+            String simpleClassName = simpleClassNames.get(clazz);
+            if (simpleClassName == null) {
+                simpleClassName = clazz.getSimpleName();
+                simpleClassNames.put(clazz, simpleClassName);
             }
+            String generatedClassName = "io.realm." + simpleClassName + "RealmProxy";
 
             Class<?> generatedClass = generatedClasses.get(generatedClassName);
             if (generatedClass == null) {
