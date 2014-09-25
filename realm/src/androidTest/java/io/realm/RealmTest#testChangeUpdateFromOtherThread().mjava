@@ -1,0 +1,51 @@
+    public void testChangeUpdateFromOtherThread() {
+
+        fail("testChangeUpdateFromOtherThread has been disabled because it currently causes a native crash in the next test");
+
+        testCount = 0;
+
+        RealmChangeListener realmChangeListener = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                testCount++;
+            }
+        };
+
+        testRealm.addChangeListener(realmChangeListener);
+
+        Thread addFromThread = new Thread( new Runnable() {
+            @Override
+            public void run() {
+                Realm localRealm = Realm.getInstance(getContext());
+                localRealm.beginTransaction();
+                for (int i = 0; i < BACKGROUND_COMMIT_TEST_DATA_SET_SIZE; i++) {
+
+                    Dog dog = localRealm.createObject(Dog.class);
+                    dog.setName("Fido" + Integer.toString(i));
+                }
+                localRealm.commitTransaction();
+
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception ex)
+                {
+
+                }
+            }
+        });
+
+        addFromThread.start();
+
+        try {
+            addFromThread.join();
+
+            getNotifications(BACKGROUND_COMMIT_TEST_DATA_SET_SIZE);
+
+            testRealm.removeAllChangeListeners();
+
+            assertTrue("Should receive change notifications when modifying table in another thread ", BACKGROUND_COMMIT_TEST_DATA_SET_SIZE <= testCount);
+        } catch (Exception ex) {
+            fail("Unexpected exception " + ex.getMessage());
+        }
+    }
+

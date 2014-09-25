@@ -1,0 +1,24 @@
+    public void testQueriesFailWithInvalidDataTypes() throws IOException {
+        RealmResults<AllTypes> resultList = null;
+
+        resultList = testRealm.where(AllTypes.class).equalTo("invalidcolumnname",33).findAll();
+        assertNotNull("ResultList.where.equalTo returns null when column name is non-existing", resultList);
+        assertEquals("ResultList.where.equalTo returns wrong result", 0, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).equalTo("invalidcolumnname","test").findAll();
+        assertNotNull("ResultList.where.equalTo returns null when column name is non-existing", resultList);
+        assertEquals("ResultList.where.equalTo returns wrong result", 0, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).equalTo("invalidcolumnname",true).findAll();
+        assertNotNull("ResultList.where.equalTo returns null when column name is non-existing", resultList);
+        assertEquals("ResultList.where.equalTo returns wrong result", 0, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).equalTo("invalidcolumnname",3.1415d).findAll();
+        assertNotNull("ResultList.where.equalTo returns null when column name is non-existing", resultList);
+        assertEquals("ResultList.where.equalTo returns wrong result", 0, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).equalTo("invalidcolumnname",3.1415f).findAll();
+        assertNotNull("ResultList.where.equalTo returns null when column name is non-existing", resultList);
+        assertEquals("ResultList.where.equalTo returns wrong result", 0, resultList.size());
+    }
+

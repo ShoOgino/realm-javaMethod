@@ -1,0 +1,38 @@
+    // void refresh()
+    public void testRefresh() {
+
+        fail("testRefresh has been disabled because it currently causes a native crash, terminating the rest of the tests");
+
+        testRealm.beginTransaction();
+        testRealm.clear(Dog.class);
+        testRealm.commitTransaction();
+
+        Thread addFromThread = new Thread() {
+            @Override
+            public void run() {
+                Realm localRealm = Realm.getInstance(getContext());
+                localRealm.beginTransaction();
+                for (int i = 0; i < BACKGROUND_COMMIT_TEST_DATA_SET_SIZE; i++) {
+
+                    Dog dog = localRealm.createObject(Dog.class);
+                    dog.setName("Fido" + Integer.toString(i));
+                }
+                localRealm.commitTransaction();
+            }
+        };
+
+        addFromThread.start();
+        try {
+            addFromThread.join();
+        } catch(InterruptedException ex) {
+            fail("Thread.join has unexpectedly failed");
+        }
+
+
+        // Here refresh will fail because of a "Native crash"
+        testRealm.refresh();
+
+        RealmResults<Dog> resultList = testRealm.where(Dog.class).findAll();
+        assertEquals("Change has not been committed", BACKGROUND_COMMIT_TEST_DATA_SET_SIZE, resultList.size());
+    }
+

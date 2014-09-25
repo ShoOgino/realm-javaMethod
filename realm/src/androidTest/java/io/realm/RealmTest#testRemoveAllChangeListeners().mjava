@@ -1,0 +1,32 @@
+    // void removeAllChangeListeners()
+    public void testRemoveAllChangeListeners() {
+
+        RealmChangeListener realmChangeListener = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                testCount++;
+            }
+        };
+
+        testRealm.addChangeListener(realmChangeListener);
+
+        testRealm.removeAllChangeListeners();
+
+
+        testCount = 0;
+
+        testRealm.beginTransaction();
+        for (int i = 0; i < BACKGROUND_COMMIT_TEST_DATA_SET_SIZE; i++) {
+
+            Dog dog = testRealm.createObject(Dog.class);
+            dog.setName("Fido"+Integer.toString(i) );
+        }
+
+        testRealm.commitTransaction();
+
+        getNotifications(1);
+
+        assertEquals("Should not receive change notifications after removeAllChangeListeners", 0, testCount);
+
+    }
+
