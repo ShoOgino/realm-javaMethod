@@ -19,8 +19,7 @@
                 try {
                     generatedClass = Class.forName(generatedClassName);
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                    return null; // TODO: throw RealmException
+                    throw new RealmException("Could not find the generated proxy class");
                 }
                 generatedClasses.put(generatedClassName, generatedClass);
             }
@@ -30,8 +29,7 @@
                 try {
                     method = generatedClass.getMethod("initTable", new Class[]{ImplicitTransaction.class});
                 } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                    return null; // TODO: throw RealmException
+                    throw new RealmException("Could not find the initTable() method in generated proxy class");
                 }
                 initTableMethods.put(generatedClass, method);
             }
@@ -40,11 +38,9 @@
                 table = (Table) method.invoke(null, transaction);
                 tables.put(clazz, table);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                return null; // TODO: throw RealmException
+                throw Throwables.propagate(e); // Wrap the exception in a runtime one
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
-                return null; // TODO: throw RealmException
+                throw Throwables.propagate(e); // Wrap the exception in a runtime one
             }
         }
 
