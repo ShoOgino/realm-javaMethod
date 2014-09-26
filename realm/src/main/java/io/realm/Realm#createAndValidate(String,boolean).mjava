@@ -15,7 +15,7 @@
         }
         if (validateSchema) {
             // FIXME - thread safety
-            if (!validated) {
+            if (!validatedPaths.contains(absolutePath)) {
                 try {
                     Class<?> validationClass = Class.forName("io.realm.ValidationList");
                     Method getProxyClassesMethod = validationClass.getMethod("getProxyClasses");
@@ -38,7 +38,7 @@
                     e.printStackTrace();
                     return null; // TODO: throw RealmException
                 }
-                validated = true;
+                validatedPaths.add(absolutePath);
             }
         }
         return realm;
