@@ -1,0 +1,46 @@
+    private static Realm createAndValidate(String absolutePath, boolean validateSchema) {
+        ThreadRealm threadRealm = realms.get(absolutePath);
+        if (threadRealm == null) {
+            threadRealm = new ThreadRealm(absolutePath);
+            realms.put(absolutePath, threadRealm);
+        }
+        SoftReference<Realm> realmSoftReference = threadRealm.get();
+        Realm realm = realmSoftReference.get();
+        if (realm == null) {
+            // The garbage collector decided to get rid of the realm instance
+            threadRealm = new ThreadRealm(absolutePath);
+            realms.put(absolutePath, threadRealm);
+            realmSoftReference = threadRealm.get();
+            realm = realmSoftReference.get();
+        }
+        if (validateSchema) {
+            // FIXME - thread safety
+            if (!validated) {
+                try {
+                    Class<?> validationClass = Class.forName("io.realm.ValidationList");
+                    Method getProxyClassesMethod = validationClass.getMethod("getProxyClasses");
+                    List<String> proxyClasses = (List<String>)getProxyClassesMethod.invoke(null);
+                    for (String className : proxyClasses) {
+                        Class<?> modelClass = Class.forName(className);
+                        Method validateMethod = modelClass.getMethod("validateTable");
+                        validateMethod.invoke(null, realm.transaction);
+                    }
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                    return null; // TODO: throw RealmException
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                    return null; // TODO: throw RealmException
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    return null; // TODO: throw RealmException
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                    return null; // TODO: throw RealmException
+                }
+                validated = true;
+            }
+        }
+        return realm;
+    }
+
