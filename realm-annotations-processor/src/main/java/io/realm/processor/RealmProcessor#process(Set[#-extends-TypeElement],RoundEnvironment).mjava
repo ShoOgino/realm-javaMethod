@@ -13,6 +13,7 @@
             }
             TypeElement typeElement = (TypeElement) classElement;
             className = typeElement.getSimpleName().toString();
+            classesToValidate.add(className);
 
             if (typeElement.toString().endsWith(".RealmObject") || typeElement.toString().endsWith("RealmProxy")) {
                 continue;
@@ -51,8 +52,8 @@
                 }
             }
 
-            RealmSourceCodeGenerator sourceCodeGenerator =
-                    new RealmSourceCodeGenerator(processingEnv, className, packageName, fields);
+            RealmProxyClassGenerator sourceCodeGenerator =
+                    new RealmProxyClassGenerator(processingEnv, className, packageName, fields);
             try {
                 sourceCodeGenerator.generate();
             } catch (IOException e) {
@@ -62,6 +63,15 @@
             }
         }
 
+        if (!done) {
+            RealmValidationListGenerator validationGenerator = new RealmValidationListGenerator(processingEnv, classesToValidate);
+            done = true;
+            try {
+                validationGenerator.generate();
+            } catch (IOException e) {
+                error(e.getMessage());
+            }
+        }
 
         return true;
     }
