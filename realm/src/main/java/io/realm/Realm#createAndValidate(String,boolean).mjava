@@ -14,12 +14,11 @@
             realm = realmSoftReference.get();
         }
         if (validateSchema) {
-            // FIXME - thread safety
             if (!validatedPaths.contains(absolutePath)) {
                 try {
                     Class<?> validationClass = Class.forName("io.realm.ValidationList");
                     Method getProxyClassesMethod = validationClass.getMethod("getProxyClasses");
-                    List<String> proxyClasses = (List<String>)getProxyClassesMethod.invoke(null);
+                    List<String> proxyClasses = (List<String>) getProxyClassesMethod.invoke(null);
                     for (String className : proxyClasses) {
                         Class<?> modelClass = Class.forName(className);
                         Method validateMethod = modelClass.getMethod("validateTable");
