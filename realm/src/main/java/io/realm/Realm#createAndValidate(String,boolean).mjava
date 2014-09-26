@@ -30,17 +30,13 @@
                         validateMethod.invoke(null, realm.transaction);
                     }
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                    return null; // TODO: throw RealmException
+                    throw new RealmException("Could not find the generated proxy class");
                 } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                    return null; // TODO: throw RealmException
+                    throw new RealmException("Could not find initTable() or validateTable() methods in generated proxy class");
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    return null; // TODO: throw RealmException
+                    throw Throwables.propagate(e); // Wrap the exception in a runtime one
                 } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                    return null; // TODO: throw RealmException
+                    throw Throwables.propagate(e); // Wrap the exception in a runtime one
                 }
                 validatedPaths.add(absolutePath);
             }
