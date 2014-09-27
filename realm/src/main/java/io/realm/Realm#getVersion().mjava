@@ -1,8 +1,8 @@
     private long getVersion() {
-        Table metadataTable = transaction.getTable("metadata");
-        if (metadataTable.getColumnCount() == 0) {
-            setVersion(-1);
+        if (!transaction.hasTable("metadata")) {
+            return UNVERSIONED;
         }
+        Table metadataTable = transaction.getTable("metadata");
         return metadataTable.getLong(0, 0);
     }
 
