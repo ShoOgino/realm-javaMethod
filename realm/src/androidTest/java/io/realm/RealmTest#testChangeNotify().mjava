@@ -1,0 +1,30 @@
+    public void testChangeNotify() {
+        fail("Change listeners are not presently working");
+
+        testRealm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                testCount++;
+            }
+        });
+
+        testRealm.beginTransaction();
+        for (int i = 0; i < BACKGROUND_COMMIT_TEST_DATA_SET_SIZE; i++) {
+
+            Dog dog = testRealm.createObject(Dog.class);
+            dog.setName("King" + Integer.toString(i));
+        }
+
+        testRealm.commitTransaction();
+
+        getNotifications(1); // This really should be BACKGROUND_COMMIT_TEST_DATA_SET_SIZE
+        // But there is a bug that prevents us from getting the right
+        // number of notifications back. So for now we are only checking
+        // that we do get at least one notification.
+
+        testRealm.removeAllChangeListeners();
+
+        assertTrue("Have not received the expected number of events in ChangeListener", 0 < testCount);
+
+    }
+
