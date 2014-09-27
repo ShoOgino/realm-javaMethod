@@ -1,7 +1,8 @@
-    private String complexReadWrite() throws IOException {
+    private String complexReadWrite() {
         String status = "\nPerforming complex Read/Write operation...";
 
-        // Open a default realm
+        // Open the default realm. All threads must use it's own reference to the realm.
+        // Those can not be transferred across threads.
         Realm realm = Realm.getInstance(this);
 
         // Add ten persons in one write transaction
@@ -45,7 +46,6 @@
             // Though we initially set its value to 42, it has
             // not been saved as part of the Person RealmObject:
             assert(pers.getTempReference() == 0);
-
         }
 
         return status;
