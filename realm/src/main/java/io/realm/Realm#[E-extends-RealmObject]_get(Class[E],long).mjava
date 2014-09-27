@@ -30,8 +30,7 @@
                 try {
                     generatedClass = Class.forName(generatedClassName);
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                    return null; // TODO: throw RealmException
+                    throw new RealmException("Could not find the generated proxy class");
                 }
                 generatedClasses.put(generatedClassName, generatedClass);
             }
@@ -41,8 +40,7 @@
                 try {
                     constructor = generatedClass.getConstructor();
                 } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                    return null; // TODO: throw RealmException
+                    throw new RealmException("Could not find the constructor in generated proxy class");
                 }
                 constructors.put(generatedClass, constructor);
                 generatedConstructors.put(clazz, constructor);
@@ -54,14 +52,11 @@
             //noinspection unchecked
             result = (E) constructor.newInstance();
         } catch (InstantiationException e) {
-            e.printStackTrace();
-            return null; // TODO: throw RealmException
+            throw Throwables.propagate(e); // Wrap the exception in a runtime one
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null; // TODO: throw RealmException
+            throw Throwables.propagate(e); // Wrap the exception in a runtime one
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            return null; // TODO: throw RealmException
+            throw Throwables.propagate(e); // Wrap the exception in a runtime one
         }
         result.realmSetRow(row);
         result.setRealm(this);
