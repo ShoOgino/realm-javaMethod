@@ -12,11 +12,9 @@
 
         try {
             // should throw as migration is required
-            Realm realm = Realm.getInstance(this, "default0");
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            // FIXME - catch the proper exception
+            Realm.getInstance(this, "default0");
+        } catch (RealmMigrationNeededException ex) {
+            Log.i(TAG, "Excellent! This is expected.");
         }
 
         Realm.migrateRealmAtPath(path0, new Migration());

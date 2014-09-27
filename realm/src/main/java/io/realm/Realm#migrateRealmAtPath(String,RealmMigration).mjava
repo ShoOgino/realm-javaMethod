@@ -3,5 +3,9 @@
         realm.beginTransaction();
         realm.setVersion(migration.execute(realm, realm.getVersion()));
         realm.commitTransaction();
+        // Update the cache
+        Map<String, Realm> realms = realmsCache.get();
+        realms.put(realmPath, new Realm(realmPath));
+        realmsCache.set(realms);
     }
 

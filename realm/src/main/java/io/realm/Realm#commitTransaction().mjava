@@ -7,6 +7,10 @@
         Message message = Message.obtain();
         message.arg1 = LooperThread.REALM_CHANGED;
         message.arg2 = id;
-        looperThread.handler.sendMessage(message);
+        if (looperThread.handler != null) {
+            looperThread.handler.sendMessage(message);
+        } else {
+            Log.i(TAG, "The LooperThread is not up and running yet. Commit message not sent");
+        }
     }
 
