@@ -1,0 +1,9 @@
+    public void testRealmQueryEqualTo() {
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).equalTo("columnfloat", 31.234567f).findAll();
+        assertEquals("Not the expected number records " + resultList.size(), 1, resultList.size());
+        resultList = testRealm.where(AllTypes.class).greaterThan("columnfloat", 11.0f).equalTo("columnlong", 10).findAll();
+        assertEquals("Not the expected number records " + resultList.size(), 1, resultList.size());
+        resultList = testRealm.where(AllTypes.class).greaterThan("columnfloat", 11.0f).equalTo("columnlong", 1).findAll();
+        assertEquals("Not the expected number records " + resultList.size(), 0, resultList.size());
+    }
+
