@@ -46,6 +46,7 @@
                         } catch (ClassNotFoundException e) {
                             throw new RealmException("Could not find the generated " + generatedClassName + " class");
                         }
+
                         if (version == UNVERSIONED) {
                             Method initTableMethod;
                             try {
@@ -61,6 +62,31 @@
                                 throw new RealmException("An exception was thrown in the initTable method in the " + generatedClassName + " class");
                             }
                         }
+
+                        // Populate the columnIndices table
+                        Method fieldNamesMethod;
+                        try {
+                            fieldNamesMethod = generatedClass.getMethod("getFieldNames");
+                        } catch (NoSuchMethodException e) {
+                            throw new RealmException("Could not find the getFieldNames method in the generated " + generatedClassName + " class");
+                        }
+                        List<String> fieldNames;
+                        try {
+                            fieldNames = (List<String>)fieldNamesMethod.invoke(null);
+                        } catch (IllegalAccessException e) {
+                            throw new RealmException("Could not execute the getFieldNames method in the generated " + generatedClassName + " class");
+                        } catch (InvocationTargetException e) {
+                            throw new RealmException("An exception was thrown in the getFieldNames method in the generated " + generatedClassName + " class");
+                        }
+                        Table table = realm.transaction.getTable(TABLE_PREFIX + modelClassName);
+                        for (String fieldName : fieldNames) {
+                            long columnIndex = table.getColumnIndex(fieldName);
+                            if (columnIndex == -1) {
+                                throw new RealmException("Column not found in the Realm");
+                            }
+                            columnIndices.put(modelClassName, fieldName, columnIndex);
+                        }
+
                         Method validateMethod;
                         try {
                             validateMethod = generatedClass.getMethod("validateTable", new Class[]{ImplicitTransaction.class});
