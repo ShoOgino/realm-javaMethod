@@ -1,0 +1,10 @@
+    public void testRealmQueryImplicitAnd() {
+        RealmQuery<AllTypes> query = testRealm.where(AllTypes.class).equalTo("columnfloat", 31.234567f);
+        RealmResults<AllTypes> resultList = query.between("columnlong", 1, 10).findAll();
+        assertEquals("Not the expected number records " + resultList.size(), 0, resultList.size());
+
+        query = testRealm.where(AllTypes.class).equalTo("columnfloat", 81.234567f);
+        resultList = query.between("columnlong", 1, 100).findAll();
+        assertEquals("Not the expected number records " + resultList.size(), 1, resultList.size());
+    }
+
