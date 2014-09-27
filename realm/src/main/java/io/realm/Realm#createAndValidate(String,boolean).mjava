@@ -9,26 +9,32 @@
             realm = newRealm;
         }
         if (validateSchema) {
+            // FIXME - get rid fo validatedPaths - only validate if we don't have a cached realm
             if (!validatedPaths.contains(absolutePath)) {
                 try {
                     Class<?> validationClass = Class.forName("io.realm.ValidationList");
                     Method getProxyClassesMethod = validationClass.getMethod("getProxyClasses");
                     List<String> proxyClasses = (List<String>) getProxyClassesMethod.invoke(null);
+
+                    realm.beginTransaction();
+                    long version = realm.getVersion();
                     for (String className : proxyClasses) {
                         Class<?> modelClass = Class.forName(className);
                         String modelClassName = Iterables.getLast(Splitter.on(".").split(className));
                         String generatedClassName = "io.realm." + modelClassName + "RealmProxy";
                         Class<?> generatedClass = Class.forName(generatedClassName);
-                        if (!initialized) {
-                            initialized = true;
+                        if (version == -1) {
                             Method initTableMethod = generatedClass.getMethod("initTable", new Class[]{ImplicitTransaction.class});
-                            realm.beginTransaction();
                             initTableMethod.invoke(null, realm.transaction);
-                            realm.commitTransaction();
                         }
                         Method validateMethod = generatedClass.getMethod("validateTable", new Class[]{ImplicitTransaction.class});
                         validateMethod.invoke(null, realm.transaction);
                     }
+                    if (version == -1) {
+                        realm.setVersion(0);
+                    }
+                    realm.commitTransaction();
+
                 } catch (ClassNotFoundException e) {
                     throw new RealmException("Could not find the generated proxy class");
                 } catch (NoSuchMethodException e) {
