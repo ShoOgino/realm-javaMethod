@@ -1,0 +1,11 @@
+    // void commitTransaction()
+    public void testCommitTransaction() {
+        testRealm.beginTransaction();
+        AllTypes allTypes = testRealm.createObject(AllTypes.class);
+        allTypes.setColumnBoolean(true);
+        testRealm.commitTransaction();
+
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
+        assertEquals("Change has not been committed", TEST_DATA_SIZE + 1, resultList.size());
+    }
+
