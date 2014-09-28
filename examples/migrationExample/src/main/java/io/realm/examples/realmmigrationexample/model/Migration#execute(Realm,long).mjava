@@ -1,5 +1,20 @@
     @Override
     public long execute(Realm realm, long version) {
+
+        /*
+            // Version 0
+            class Person
+                String fullName;
+                String lastName;
+                int    age;
+
+            // Version 1
+            class Person
+                String fullName;        // combine firstName and lastName into single field
+                int age;
+        */
+
+        // Migrate from version 0 to version 1
         if (version == 0) {
             Table personTable = realm.getTable(Person.class);
 
@@ -14,6 +29,20 @@
             personTable.removeColumn(getIndexForProperty(personTable, "lastName"));
             version++;
         }
+
+        /*
+            // Version 2
+                class Pet                   // add a new model class
+                    String name;
+                    String type;
+
+                class Person
+                    String fullName;
+                    int age;
+                    RealmList<Pet> pets;    // add an array property
+
+        */
+        // Migrate from version 1 to version 2
         if (version == 1) {
             Table personTable = realm.getTable(Person.class);
             Table petTable = realm.getTable(Pet.class);
@@ -29,6 +58,19 @@
             }
             version++;
         }
+
+        /*
+            // Version 3
+                class Pet
+                    String name;
+                    int type;               // type becomes int
+
+                class Person
+                    String fullName;
+                    RealmList<Pet> pets;    // age and pets re-ordered
+                    int age;
+        */
+        // Migrate from version 2 to version 3
         if (version == 2) {
             Table petTable = realm.getTable(Pet.class);
             long oldTypeIndex = getIndexForProperty(petTable, "type");
