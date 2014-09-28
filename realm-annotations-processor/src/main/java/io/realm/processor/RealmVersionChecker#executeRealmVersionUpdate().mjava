@@ -1,14 +1,15 @@
     public void executeRealmVersionUpdate() {
-        Thread bgT = new Thread(new Runnable() {
+        Thread backgroundThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 launchRealmCheck();
             }
         });
-        bgT.start();
+        backgroundThread.start();
         try {
-            bgT.join(CONNECT_TIMEOUT + READ_TIMEOUT);
+            backgroundThread.join(CONNECT_TIMEOUT + READ_TIMEOUT);
         } catch(InterruptedException e) {
+            // We ignore this exception on purpose not to break the build system if this class fails
         }
     }
 

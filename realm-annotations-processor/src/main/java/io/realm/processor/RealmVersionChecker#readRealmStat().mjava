@@ -1,23 +1,21 @@
     private Long readRealmStat() {
-        InputStream in = null;
-        BufferedReader reader = null;
-
-        String lastVersionStr = null;
+        InputStream inputStream;
+        BufferedReader bufferedReader;
+        String lastVersion;
         try {
-            in     = new FileInputStream(UPDATE_FILE_NAME);
-            reader = new BufferedReader(new InputStreamReader(in, Charset.forName("UTF-8")));
-            lastVersionStr = reader.readLine();
-            in.close();
-        } catch (FileNotFoundException f) {
+            inputStream     = new FileInputStream(UPDATE_FILE_NAME);
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")));
+            lastVersion = bufferedReader.readLine();
+            inputStream.close();
+        } catch (FileNotFoundException e) {
             return 0L;
         } catch (IOException e) {
             return 0L;
         }
 
         try {
-            long retL = Long.parseLong(lastVersionStr);
-            return retL;
-        } catch (NumberFormatException ne) {
+            return Long.parseLong(lastVersion);
+        } catch (NumberFormatException e) {
             return 0L;
         }
     }
