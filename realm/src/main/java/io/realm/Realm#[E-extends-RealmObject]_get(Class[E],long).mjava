@@ -52,11 +52,12 @@
             //noinspection unchecked
             result = (E) constructor.newInstance();
         } catch (InstantiationException e) {
-            throw Throwables.propagate(e); // Wrap the exception in a runtime one
+            throw new RealmException("Could not instantiate the proxy class");
         } catch (IllegalAccessException e) {
-            throw Throwables.propagate(e); // Wrap the exception in a runtime one
+            throw new RealmException("Could not run the constructor of the proxy class");
         } catch (InvocationTargetException e) {
-            throw Throwables.propagate(e); // Wrap the exception in a runtime one
+            e.printStackTrace();
+            throw new RealmException("An exception occurred while instantiating the proxy class");
         }
         result.realmSetRow(row);
         result.setRealm(this);
