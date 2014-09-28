@@ -1,0 +1,13 @@
+    public void testSumGivesCorrectValue() throws IOException {
+
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
+
+        Number sum = resultList.sum("columnlong");
+
+        int checkSum = 0;
+        for (int i = 0; i < TEST_DATA_SIZE; ++i) {
+            checkSum += i;
+        }
+        assertEquals("ResultList.sum returned wrong sum", checkSum, sum.intValue());
+    }
+

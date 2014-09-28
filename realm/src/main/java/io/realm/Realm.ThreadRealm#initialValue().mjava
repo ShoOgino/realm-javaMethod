@@ -1,5 +1,7 @@
         @Override
-        protected Map<String, Realm> initialValue() {
-            return new HashMap<String, Realm>();
+        protected SoftReference<Realm> initialValue() {
+            Realm realm = new Realm(absolutePath, key);
+            key = null;
+            return new SoftReference<Realm>(realm);
         }
 
