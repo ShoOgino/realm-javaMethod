@@ -1,0 +1,10 @@
+    // The transaction tests are one IntentService running multiple Writes
+    // to a Realm in either a multiple transaction or single transaction loop
+    private void startTransactionTests() {
+        Intent serviceIntent = new Intent(this, TransactionService.class);
+        serviceIntent.putExtra(TransactionService.REALM_TESTTYPE_EXTRA,
+                TransactionService.TestType.MANY_TRANSACTIONS);
+        serviceIntent.putExtra(TransactionService.ITERATION_COUNT, 10000000);
+        this.startService(serviceIntent);
+    }
+
