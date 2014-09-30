@@ -1,12 +1,12 @@
     public List<City> loadCities() {
         List<City> items = new ArrayList<City>();
 
-        //In this case we're loading from local assets.
-        //NOTE: could alternatively easily load from network
+        // In this case we're loading from local assets.
+        // NOTE: could alternatively easily load from network
         InputStream stream = null;
         try {
             stream = getAssets().open("cities.json");
-        } catch (Exception e) {
+        } catch (IOException e) {
             return null;
         }
 
@@ -19,11 +19,15 @@
         // Store the retrieved items to the Realm
         Realm realm = Realm.getInstance(this);
 
+        // Open a transaction to store items into the realm
         realm.beginTransaction();
         for (JsonElement e : array) {
+            // Create a realm capable object
             City realmCity = realm.createObject(City.class);
             realmCity.setName(e.getAsJsonObject().get("name").getAsString());
             realmCity.setVotes(e.getAsJsonObject().get("votes").getAsInt());
+            // Minor optimization to keep the new cities in a list
+            // so it doesn't have to be reloaded the first time
             items.add(realmCity);
         }
         realm.commitTransaction();
