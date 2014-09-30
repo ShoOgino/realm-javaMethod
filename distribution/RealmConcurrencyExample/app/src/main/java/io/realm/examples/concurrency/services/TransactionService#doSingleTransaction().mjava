@@ -1,0 +1,20 @@
+    // This method creates mInsertCount injections into the Realm
+    // inside >>ONE transaction<<
+    private void doSingleTransaction() {
+        int iterCount = 0;
+
+        // NOTE:  If you attempt to make writes from the UI while this loop is running
+        // it will block because of the write transaction being open.
+        realm.beginTransaction();
+        while (iterCount < mInsertCount && !mQuitting) {
+            if ((iterCount % 1000) == 0) {
+                Log.d(TAG, "WriteOperation#: " + iterCount + "," + Thread.currentThread().getName());
+            }
+
+            Person person = realm.createObject(Person.class);
+            person.setName("Foo" + iterCount);
+            iterCount++;
+        }
+        realm.commitTransaction();
+    }
+
