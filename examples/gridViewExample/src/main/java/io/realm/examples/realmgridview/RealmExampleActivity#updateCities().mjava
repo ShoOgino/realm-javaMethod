@@ -1,8 +1,12 @@
     public void updateCities() {
         Realm realm = Realm.getInstance(this);
-        RealmResults<City> cities = realm.where(City.class).findAll();
-        mAdapter.setData(cities);
 
+        // Pull all the cities from the realm
+        RealmResults<City> cities = realm.where(City.class).findAll();
+
+        // Put these items in the Adapter
+        mAdapter.setData(cities);
         mAdapter.notifyDataSetChanged();
+        mGridView.invalidate();
     }
 
