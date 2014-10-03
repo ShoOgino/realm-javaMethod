@@ -1,9 +1,9 @@
     public void run() {
-        realm = Realm.getInstance(context);
+        Realm realm = Realm.getInstance(context);
 
         int iterCount = 0;
 
-        while (iterCount < mInsertCount && mRunning == true) {
+        while (iterCount < mInsertCount && mRunning) {
             realm.beginTransaction();
 
             Person person = realm.createObject(Person.class);
@@ -11,7 +11,7 @@
             person.setAge(iterCount % 20 + (50 - 20));
 
             //Add a dog to every 50th person
-            if(iterCount % 50 == 0) {
+            if (iterCount % 50 == 0) {
                 Dog dog = realm.createObject(Dog.class);
                 dog.setName("Foo" + iterCount + "Fido");
                 person.setDog(dog);
