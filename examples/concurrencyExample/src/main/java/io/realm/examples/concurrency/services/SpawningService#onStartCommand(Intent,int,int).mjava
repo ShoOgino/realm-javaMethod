@@ -1,0 +1,25 @@
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        int insertCount = intent.getIntExtra(REALM_INSERTCOUNT_EXTRA, 0);
+        int readCount   = intent.getIntExtra(REALM_READCOUNT_EXTRA, 0);
+
+        try {
+            allThreads = new ArrayList<KillableThread>();
+            RealmWriter wT = new RealmWriter(this);
+            wT.setInsertCount(insertCount);
+            allThreads.add(wT);
+            wT.start();
+            RealmReader rT = new RealmReader(this);
+            rT.setReadCount(readCount);
+            allThreads.add(rT);
+            rT.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            quit();
+        }
+
+        //Service should stay active as long as Activity is active
+        return START_STICKY;
+    }
+
