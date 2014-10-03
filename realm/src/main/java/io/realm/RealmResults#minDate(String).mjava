@@ -4,7 +4,7 @@
      * @param fieldName  The field to look for the minimum date. If fieldName is not of Date type,
      *                   an exception is thrown.
      * @return           The minimum date.
-     * @throws           java.lang.RuntimeException if fieldName is not a Date field.
+     * @throws           java.lang.IllegalArgumentException if fieldName is not a Date field.
      */
     public Date minDate(String fieldName) {
         long columnIndex = table.getColumnIndex(fieldName);
@@ -12,7 +12,7 @@
             return table.minimumDate(columnIndex);
         }
         else {
-            throw new RuntimeException("Wrong type of field - Date type expected.");
+            throw new IllegalArgumentException("Wrong type of field - Date type expected.");
         }
     }
 
