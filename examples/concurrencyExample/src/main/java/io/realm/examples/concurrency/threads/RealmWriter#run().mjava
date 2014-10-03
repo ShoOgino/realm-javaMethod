@@ -1,0 +1,28 @@
+    public void run() {
+        Realm realm = Realm.getInstance(context);
+
+        int iterCount = 0;
+
+        while (iterCount < mInsertCount && mRunning) {
+            realm.beginTransaction();
+
+            Person person = realm.createObject(Person.class);
+            person.setName("Foo" + iterCount);
+            person.setAge(iterCount % 20 + (50 - 20));
+
+            //Add a dog to every 50th person
+            if (iterCount % 50 == 0) {
+                Dog dog = realm.createObject(Dog.class);
+                dog.setName("Foo" + iterCount + "Fido");
+                person.setDog(dog);
+            }
+
+            iterCount++;
+            realm.commitTransaction();
+
+            if ((iterCount % 1000) == 0) {
+                Log.d(TAG, "WriteOperation#: " + iterCount + "," + Thread.currentThread().getName());
+            }
+        }
+    }
+
