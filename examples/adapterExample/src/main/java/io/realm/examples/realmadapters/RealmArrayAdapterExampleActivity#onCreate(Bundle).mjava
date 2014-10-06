@@ -1,14 +1,14 @@
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_realm_updateexample);
+        setContentView(R.layout.activity_realm_example);
 
         findViewById(R.id.insert_record_button).setOnClickListener(this);
 
         mListView   = (ListView)findViewById(R.id.items_list);
 
         // Reset the realm data before starting the tests
-        Realm.deleteRealmFile(this);
+//        Realm.deleteRealmFile(this);
 
         // Acquire a realm object
         realm = Realm.getInstance(this);
@@ -17,5 +17,12 @@
 
         mAdapter = new RealmArrayAdapter<Person>(this, R.layout.simplelistitem, results);
         mListView.setAdapter(mAdapter);
+
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
