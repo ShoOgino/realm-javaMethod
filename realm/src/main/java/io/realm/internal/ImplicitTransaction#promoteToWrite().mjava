@@ -1,5 +1,9 @@
     public void promoteToWrite() {
-        immutable = false;
-        parent.promoteToWrite();
+        if (immutable) {
+            immutable = false;
+            parent.promoteToWrite();
+        } else {
+            throw new RealmException("Nested transactions are not allowed. Use commitTransaction() after each beginTransaction().");
+        }
     }
 
