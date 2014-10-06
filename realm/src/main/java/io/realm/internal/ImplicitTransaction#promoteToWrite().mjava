@@ -1,5 +1,10 @@
     public void promoteToWrite() {
-        immutable = false;
-        parent.promoteToWrite();
+        if (immutable) {
+            immutable = false;
+            parent.promoteToWrite();
+        }
+        else {
+            throw new RealmException("Trying to begin write transaction within a write transaction");
+        }
     }
 

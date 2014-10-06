@@ -1,0 +1,12 @@
+    public void testNestedTransaction() {
+        testRealm.beginTransaction();
+        try {
+            testRealm.beginTransaction();
+            fail();
+        }
+        catch (RealmException e) {
+            assertEquals("Trying to begin write transaction within a write transaction", e.getMessage());
+        }
+        testRealm.commitTransaction();
+    }
+
