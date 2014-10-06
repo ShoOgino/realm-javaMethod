@@ -1,0 +1,34 @@
+    @Override
+    public View getView(int i, View v, ViewGroup viewGroup) {
+        View view;
+        TextView text;
+
+        if (v == null) {
+            // Adapter fails if resId does not exist
+            view = mInflater.inflate(resId, null, false);
+        } else {
+            view = v;
+        }
+
+        try {
+            if (fieldId == 0) {
+                text = (TextView) view;
+            } else {
+                text = (TextView) view.findViewById(fieldId);
+            }
+        } catch (ClassCastException e) {
+            Log.e(TAG, "You must supply a resource ID for a TextView");
+            throw new IllegalStateException(
+                    "RealmArrayAdapter requires the resource ID to be a TextView", e);
+        }
+
+        RealmObject item = getItem(i);
+        if (item instanceof CharSequence) {
+            text.setText((CharSequence) item);
+        } else {
+            text.setText(item.toString());
+        }
+
+        return view;
+    }
+

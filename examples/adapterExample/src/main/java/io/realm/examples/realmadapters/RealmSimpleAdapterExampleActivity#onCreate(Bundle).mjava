@@ -1,0 +1,20 @@
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_realm_updateexample);
+
+        findViewById(R.id.insert_record_button).setOnClickListener(this);
+
+        mListView   = (ListView)findViewById(R.id.items_list);
+        // Reset the realm data before starting the tests
+        Realm.deleteRealmFile(this);
+
+        // Acquire a realm object
+        realm = Realm.getInstance(this);
+
+        RealmResults<Person> rList = realm.where(Person.class).findAll();
+
+        mAdapter = new RealmSimpleExampleAdapter<Person>(this, R.layout.simplelistitem, rList);
+        mListView.setAdapter(mAdapter);
+    }
+

@@ -1,0 +1,21 @@
+        @Override
+        protected FilterResults performFiltering(CharSequence prefix) {
+            FilterResults results = new FilterResults();
+
+            if (prefix == null || prefix.length() == 0) {
+                results.values = rList;
+                results.count  = rList.size();
+            } else {
+                RealmObject obj = rList.first();
+                Table t = obj.getRealm().getTable(obj.getClass());
+                // We assume column one for a table comparison
+                RealmResults<E> filteredResults
+                        = rList.where().beginsWith(t.getColumnName(0),
+                        prefix.toString().toLowerCase().toString(), false).findAll();
+                results.values = filteredResults;
+                results.count  = filteredResults.size();
+            }
+
+            return results;
+        }
+

@@ -1,0 +1,35 @@
+    // Using the screen form the user can inject into the Realm
+    // even if other threads are creating transactions.
+    @Override
+    public void onClick(View v) {
+        String personName = ((TextView) findViewById(R.id.name)).getText().toString();
+        String personAge = ((TextView) findViewById(R.id.age)).getText().toString();
+        String petName = ((TextView) findViewById(R.id.pets_name)).getText().toString();
+
+        Integer parseAge = 0;
+        try {
+            parseAge = Integer.parseInt(personAge);
+        } catch (NumberFormatException ignored) {
+	        Log.d(TAG, "Age for a person invalid");
+	        return;
+        }
+
+        realm.beginTransaction();
+        Person person = realm.createObject(Person.class);
+        person.setName(personName);
+        person.setAge(parseAge);
+
+        int checkedId = ((RadioGroup) findViewById(R.id.petType)).getCheckedRadioButtonId();
+        if (checkedId == R.id.hasCat) {
+            Cat cat = realm.createObject(Cat.class);
+            cat.setName(petName);
+            RealmList<Cat> cats = person.getCats();
+            cats.add(cat);
+        } else if (checkedId == R.id.hasDog) {
+            Dog dog = realm.createObject(Dog.class);
+            dog.setName(petName);
+            person.setDog(dog);
+        }
+        realm.commitTransaction();
+    }
+

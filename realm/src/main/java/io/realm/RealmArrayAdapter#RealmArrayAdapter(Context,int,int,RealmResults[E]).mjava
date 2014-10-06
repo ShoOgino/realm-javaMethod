@@ -1,0 +1,15 @@
+    public RealmArrayAdapter(Context context, int resId, int fieldId, RealmResults<E> rList) {
+        super(context, resId, fieldId, rList);
+        this.context = context;
+        this.resId = resId;
+        this.fieldId = fieldId;
+        this.rList = rList;
+
+        //Temporary solution for the fact that we can't create a RealmResults
+        if (rList == null) {
+            throw new NullPointerException("Can't use RealmResults with a null list");
+        }
+
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
