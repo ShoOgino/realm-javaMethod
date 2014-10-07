@@ -7,6 +7,7 @@
             String className;
             String packageName;
             List<VariableElement> fields = new ArrayList<VariableElement>();
+            List<VariableElement> fieldsToIndex = new ArrayList<VariableElement>();
 
             // Check the annotation was applied to a Class
             if (!classElement.getKind().equals(ElementKind.CLASS)) {
@@ -46,6 +47,18 @@
                         continue;
                     }
 
+                    if (variableElement.getAnnotation(Index.class) != null) {
+                        // The field has the @Index annotation. It's only valid for:
+                        // * String
+                        String elementTypeCanonicalName = variableElement.asType().toString();
+                        if (elementTypeCanonicalName.equals("java.lang.String")) {
+                            fieldsToIndex.add(variableElement);
+                        } else {
+                            error("@Index is only possible for String fields - got " + elementTypeCanonicalName);
+                            return true;
+                        }
+                    }
+
                     if (!variableElement.getModifiers().contains(Modifier.PRIVATE)) {
                         error("The fields of the model must be private");
                         return true;
@@ -56,7 +69,7 @@
             }
 
             RealmProxyClassGenerator sourceCodeGenerator =
-                    new RealmProxyClassGenerator(processingEnv, className, packageName, fields);
+                    new RealmProxyClassGenerator(processingEnv, className, packageName, fields, fieldsToIndex);
             try {
                 sourceCodeGenerator.generate();
             } catch (IOException e) {
