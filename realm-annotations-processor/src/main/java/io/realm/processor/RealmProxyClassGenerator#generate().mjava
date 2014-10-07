@@ -180,6 +180,12 @@
                         fieldName, TABLE_PREFIX, genericType);
             }
         }
+
+        for (VariableElement field : fieldsToIndex) {
+            String fieldName = field.getSimpleName().toString();
+            writer.emitStatement("table.setIndex(table.getColumnIndex(\"%s\"))", fieldName);
+        }
+
         writer.emitStatement("return table");
         writer.endControlFlow();
         writer.emitStatement("return transaction.getTable(\"%s%s\")", TABLE_PREFIX, this.className);
