@@ -1,0 +1,15 @@
+    public RealmBaseAdapter(@NotNull Context context, int resId, @NotNull RealmResults<T> realmResults, boolean automaticUpdate) {
+        this.resId   = resId;
+        this.context = context;
+        this.realmResults = realmResults;
+        this.inflater = LayoutInflater.from(context);
+        if (automaticUpdate) {
+            realmResults.getRealm().addChangeListener(new RealmChangeListener() {
+                @Override
+                public void onChange() {
+                    notifyDataSetChanged();
+                }
+            });
+        }
+    }
+
