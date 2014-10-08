@@ -7,10 +7,14 @@
         assertEquals("Last expected to be false", false, sortedList.last().isColumnBoolean());
         assertEquals("First expected to be true", true, sortedList.first().isColumnBoolean());
         assertEquals("Expected to be true", true, sortedList.get(147).isColumnBoolean());
-        assertEquals("Expected to be true", false, sortedList.get(368).isColumnBoolean());
+        assertEquals("Expected to be false", false, sortedList.get(368).isColumnBoolean());
 
         RealmResults<AllTypes> reverseList = sortedList.sort("columnBoolean", RealmResults.SORT_ORDER_ASCENDING);
         assertEquals(TEST_DATA_SIZE, reverseList.size());
+        assertEquals("Last expected to be true", true, reverseList.last().isColumnBoolean());
+        assertEquals("First expected to be false", false, reverseList.first().isColumnBoolean());
+        assertEquals("Expected to be false", false, reverseList.get(147).isColumnBoolean());
+        assertEquals("Expected to be true", true, reverseList.get(368).isColumnBoolean());
 
         RealmResults<AllTypes> reserveSortedList = reverseList.sort("columnBoolean", RealmResults.SORT_ORDER_DECENDING);
         assertEquals(TEST_DATA_SIZE, reserveSortedList.size());
