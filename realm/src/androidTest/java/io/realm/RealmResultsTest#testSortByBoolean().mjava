@@ -1,7 +1,7 @@
     public void testSortByBoolean(){
 
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
-        RealmResults<AllTypes> sortedList = resultList.sort("columnBoolean", RealmResults.SORT_ORDER_DECENDING);
+        RealmResults<AllTypes> sortedList = resultList.sort(FIELD_BOOLEAN, RealmResults.SORT_ORDER_DECENDING);
         assertEquals("Should have same size", resultList.size(), sortedList.size());
         assertEquals(TEST_DATA_SIZE, sortedList.size());
         assertEquals("Last expected to be false", false, sortedList.last().isColumnBoolean());
@@ -9,14 +9,14 @@
         assertEquals("Expected to be true", true, sortedList.get(147).isColumnBoolean());
         assertEquals("Expected to be false", false, sortedList.get(368).isColumnBoolean());
 
-        RealmResults<AllTypes> reverseList = sortedList.sort("columnBoolean", RealmResults.SORT_ORDER_ASCENDING);
+        RealmResults<AllTypes> reverseList = sortedList.sort(FIELD_BOOLEAN, RealmResults.SORT_ORDER_ASCENDING);
         assertEquals(TEST_DATA_SIZE, reverseList.size());
         assertEquals("Last expected to be true", true, reverseList.last().isColumnBoolean());
         assertEquals("First expected to be false", false, reverseList.first().isColumnBoolean());
         assertEquals("Expected to be false", false, reverseList.get(147).isColumnBoolean());
         assertEquals("Expected to be true", true, reverseList.get(368).isColumnBoolean());
 
-        RealmResults<AllTypes> reserveSortedList = reverseList.sort("columnBoolean", RealmResults.SORT_ORDER_DECENDING);
+        RealmResults<AllTypes> reserveSortedList = reverseList.sort(FIELD_BOOLEAN, RealmResults.SORT_ORDER_DECENDING);
         assertEquals(TEST_DATA_SIZE, reserveSortedList.size());
         assertEquals(reserveSortedList.first(), sortedList.first());
     }
