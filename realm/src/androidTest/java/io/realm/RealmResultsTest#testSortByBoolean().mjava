@@ -1,0 +1,17 @@
+    public void testSortByBoolean(){
+
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
+        RealmResults<AllTypes> sortedList = resultList.sort("columnBoolean", RealmResults.SORT_ORDER_DECENDING);
+        assertEquals("Should have same size", resultList.size(), sortedList.size());
+        assertEquals(TEST_DATA_SIZE, sortedList.size());
+        assertEquals("Last expected to be false", false, sortedList.last().isColumnBoolean());
+        assertEquals("First expected to be true", true, sortedList.first().isColumnBoolean());
+
+        RealmResults<AllTypes> reverseList = sortedList.sort("columnBoolean", RealmResults.SORT_ORDER_ASCENDING);
+        assertEquals(TEST_DATA_SIZE, reverseList.size());
+
+        RealmResults<AllTypes> reserveSortedList = reverseList.sort("columnBoolean", RealmResults.SORT_ORDER_DECENDING);
+        assertEquals(TEST_DATA_SIZE, reserveSortedList.size());
+        assertEquals(reserveSortedList.first(), sortedList.first());
+    }
+
