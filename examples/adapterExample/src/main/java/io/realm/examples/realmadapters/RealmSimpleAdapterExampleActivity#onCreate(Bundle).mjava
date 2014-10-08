@@ -5,16 +5,14 @@
 
         findViewById(R.id.insert_record_button).setOnClickListener(this);
 
-        mListView   = (ListView)findViewById(R.id.items_list);
-        // Reset the realm data before starting the tests
-        Realm.deleteRealmFile(this);
+        mListView = (ListView)findViewById(R.id.items_list);
 
         // Acquire a realm object
         realm = Realm.getInstance(this);
 
-        RealmResults<Person> rList = realm.where(Person.class).findAll();
+        RealmResults<SimpleRecord> rList = realm.where(SimpleRecord.class).findAll();
 
-        mAdapter = new RealmSimpleExampleAdapter<Person>(this, R.layout.simplelistitem, rList);
+        mAdapter = new RealmSimpleExampleAdapter<SimpleRecord>(this, R.layout.simplelistitem, rList);
         mListView.setAdapter(mAdapter);
 
         realm.addChangeListener(new RealmChangeListener() {
