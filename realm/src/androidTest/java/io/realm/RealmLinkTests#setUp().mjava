@@ -1,0 +1,26 @@
+    protected void setUp() {
+        Realm.deleteRealmFile(getContext());
+        testRealm = Realm.getInstance(getContext());
+
+        testRealm.beginTransaction();
+        testRealm.clear(Dog.class);
+        testRealm.clear(Owner.class);
+
+        Dog dog1 = testRealm.createObject(Dog.class);
+        dog1.setName("Pluto");
+
+        Dog dog2 = testRealm.createObject(Dog.class);
+        dog2.setName("Fido");
+
+        Cat cat = testRealm.createObject(Cat.class);
+        cat.setName("Blackie");
+
+        Owner owner = testRealm.createObject(Owner.class);
+        owner.setName("Tim");
+        owner.getDogs().add(dog1);
+        owner.getDogs().add(dog2);
+        owner.setCat(cat);
+
+        testRealm.commitTransaction();
+    }
+

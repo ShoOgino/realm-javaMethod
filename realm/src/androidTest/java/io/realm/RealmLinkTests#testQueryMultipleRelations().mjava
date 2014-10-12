@@ -1,0 +1,8 @@
+    public void testQueryMultipleRelations() {
+        RealmResults<Owner> owners = testRealm.where(Owner.class).equalTo("dogs.name", "Pluto").findAll();
+        assertEquals(1, owners.size());
+
+        RealmResults<Owner> none = testRealm.where(Owner.class).equalTo("dogs.name", "King").findAll();
+        assertEquals(0, none.size());
+    }
+
