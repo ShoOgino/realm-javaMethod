@@ -14,7 +14,6 @@
 
         writer.emitPackage(REALM_PACKAGE_NAME)
                 .emitEmptyLine();
-
         writer.emitImports(
                 "io.realm.internal.ColumnType",
                 "io.realm.internal.Table",
@@ -23,6 +22,8 @@
                 "io.realm.internal.LinkView",
                 "io.realm.RealmList",
                 "io.realm.RealmObject",
+                "org.json.JSONObject",
+                "org.json.JSONException",
                 "java.util.*",
                 packageName + ".*")
                 .emitEmptyLine();
@@ -406,6 +407,10 @@
         writer.emitStatement("return true");
         writer.endMethod();
         writer.emitEmptyLine();
+
+        // Add JSON methods
+        emitPopulateFromJsonObjectMethod(writer);
+//        emitPopulateFromJsonStreamMethod(writer);
 
         // End the class definition
         writer.endType();
