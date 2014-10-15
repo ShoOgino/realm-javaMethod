@@ -1,5 +1,5 @@
     @Override
-    protected void setUp() {
+    protected void setUp() throws InterruptedException {
         Realm.deleteRealmFile(getContext());
         testRealm = Realm.getInstance(getContext());
 
@@ -11,12 +11,13 @@
             AllTypes allTypes = testRealm.createObject(AllTypes.class);
             allTypes.setColumnBoolean((i % 3) == 0);
             allTypes.setColumnBinary(new byte[]{1, 2, 3});
-            allTypes.setColumnDate(new Date());
-            allTypes.setColumnDouble(3.1415);
+            allTypes.setColumnDate(new Date((long)i));
+            allTypes.setColumnDouble(3.1415 + i);
             allTypes.setColumnFloat(1.234567f + i);
             allTypes.setColumnString("test data " + i);
             allTypes.setColumnLong(i);
         }
         testRealm.commitTransaction();
+
     }
 
