@@ -1,18 +1,13 @@
     private static Realm createAndValidate(String absolutePath, byte[] key, boolean validateSchema) {
-        ThreadRealm threadRealm = realms.get(absolutePath);
-        boolean needsValidation = (threadRealm == null);
-        if (threadRealm == null) {
-            threadRealm = new ThreadRealm(absolutePath, key);
-        }
-        SoftReference<Realm> realmSoftReference = threadRealm.get();
-        Realm realm = realmSoftReference.get();
+        Map<String, Realm> realms = realmsCache.get();
+        Realm realm = realms.get(absolutePath);
+
         if (realm == null) {
-            // The garbage collector decided to get rid of the realm instance
-            threadRealm = new ThreadRealm(absolutePath, key);
-            realmSoftReference = threadRealm.get();
-            realm = realmSoftReference.get();
+            realm = new Realm(absolutePath, key);
+            realms.put(absolutePath, realm);
+            realmsCache.set(realms);
         }
-        if (validateSchema && needsValidation) {
+        if (validateSchema) {
             Class<?> validationClass;
             try {
                 validationClass = Class.forName("io.realm.ValidationList");
@@ -27,6 +22,7 @@
             }
             List<String> proxyClasses;
             try {
+                //noinspection unchecked
                 proxyClasses = (List<String>) getProxyClassesMethod.invoke(null);
             } catch (IllegalAccessException e) {
                 throw new RealmException("Could not execute the getProxyClasses method in the ValidationList class");
@@ -93,7 +89,8 @@
                     }
                     List<String> fieldNames;
                     try {
-                        fieldNames = (List<String>)fieldNamesMethod.invoke(null);
+                        //noinspection unchecked
+                        fieldNames = (List<String>) fieldNamesMethod.invoke(null);
                     } catch (IllegalAccessException e) {
                         throw new RealmException("Could not execute the getFieldNames method in the generated " + generatedClassName + " class");
                     } catch (InvocationTargetException e) {
@@ -113,11 +110,7 @@
                         columnIndices.put(modelClassName, innerMap);
                     }
                 }
-
-                // cache realm after validation
-                realms.put(absolutePath, threadRealm);
-            }
-            finally {
+            } finally {
                 realm.commitTransaction();
             }
         }
