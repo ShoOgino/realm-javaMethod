@@ -1,4 +1,14 @@
-    public void testImportJSonNestedObjects() {
-        fail("Not implemented.");
+    public void testImportJSonNestedObjects() throws JSONException {
+        JSONObject allTypesObject = new JSONObject();
+        JSONObject dogObject = new JSONObject();
+        dogObject.put("name", "Fido");
+        allTypesObject.put("columnRealmObject", dogObject);
+
+        testRealm.beginTransaction();
+        testRealm.createFromJson(AllTypes.class, allTypesObject);
+        testRealm.commitTransaction();
+
+        AllTypes obj = testRealm.allObjects(AllTypes.class).first();
+        assertEquals("Fido", obj.getColumnRealmObject().getName());
     }
 

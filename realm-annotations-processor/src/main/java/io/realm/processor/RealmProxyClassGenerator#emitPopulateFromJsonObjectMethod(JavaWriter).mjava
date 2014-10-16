@@ -10,7 +10,14 @@
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String fieldTypeCanonicalName = field.asType().toString();
-            RealmJsonTypeHelper.emitFillFieldWithJsonValue(fieldName, fieldTypeCanonicalName, writer);
+            if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                RealmJsonTypeHelper.emitFillRealmObjectWithJsonValue(fieldName, fieldTypeCanonicalName, writer);
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+
+            } else {
+                RealmJsonTypeHelper.emitFillJavaTypeFieldWithJsonValue(fieldName, fieldTypeCanonicalName, writer);
+            }
+
         }
 
         writer.endMethod();

@@ -1,0 +1,9 @@
+    public static void emitFillRealmObjectWithJsonValue(String fieldName, String fieldTypeCanonicalName, JavaWriter writer) throws IOException {
+        writer
+            .beginControlFlow("if (json.has(\"%s\"))", fieldName)
+                .emitStatement("%s obj = getRealm().createObject(%s.class)", fieldTypeCanonicalName, fieldTypeCanonicalName)
+                .emitStatement("obj.populateFromJsonObject(json.getJSONObject(\"%s\"))", fieldName)
+                .emitStatement("set%s(obj)", capitaliseFirstChar(fieldName))
+            .endControlFlow();
+    }
+
