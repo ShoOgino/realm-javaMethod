@@ -1,0 +1,13 @@
+    public <E extends RealmObject> void addFromJson(Class<E> clazz, JSONArray json) {
+        if (json == null) return;
+        for (int i = 0; i < json.length(); i++) {
+            E obj = createObject(clazz);
+            try {
+                obj.populateFromJsonObject(json.getJSONObject(i));
+            } catch (Exception e) {
+                // TODO Remove object from realm
+                throw new RealmException("Could not map Json", e);
+            }
+        }
+    }
+
