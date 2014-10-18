@@ -5,7 +5,7 @@
         json.put("columnFloat", 1.23f);
         json.put("columnDouble", 1.23d);
         json.put("columnBoolean", true);
-        json.put("columnBinary", Base64.encode(new byte[] {1, 2, 3}, Base64.DEFAULT));
+        json.put("columnBinary", new String(Base64.encode(new byte[] {1,2,3}, Base64.DEFAULT)));
 
         testRealm.beginTransaction();
         testRealm.createFromJson(AllTypes.class, json);
@@ -18,6 +18,6 @@
         assertEquals(1.23f, obj.getColumnFloat());
         assertEquals(1.23d, obj.getColumnDouble());
         assertEquals(true, obj.isColumnBoolean());
-        assertEquals(new byte[]{1, 2, 3}, obj.getColumnBinary());
+        assertArrayEquals(new byte[]{1, 2, 3}, obj.getColumnBinary());
     }
 

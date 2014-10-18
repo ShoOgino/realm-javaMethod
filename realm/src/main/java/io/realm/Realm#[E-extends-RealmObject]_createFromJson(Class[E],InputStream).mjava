@@ -6,17 +6,18 @@
      * @return Object with data or null if no json data was provided.
      *
      * @throws RealmException if the mapping fail.
+     * @throws IOException if something is wrong with the input stream.
      */
-    public <E extends RealmObject> E createFromJson(Class<E> clazz, InputStream inputStream) {
-        if (inputStream == null) return null;
-
-        E obj = createObject(clazz);
-        try {
-
-        } catch (Exception e) {
-
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public <E extends RealmObject> E createFromJson(Class<E> clazz, InputStream inputStream) throws IOException {
+        if (inputStream != null && clazz != null) {
+            JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
+            E obj = createObject(clazz);
+            obj.populateUsingJsonStream(reader);
+            reader.close();
+            return obj;
         }
 
-        return obj;
+        return null;
     }
 

@@ -1,7 +1,7 @@
     public void testImportStream_allSimpleTypes() throws IOException {
         InputStream in = loadJsonFromAssets("all_simple_types.json");
         testRealm.beginTransaction();
-        testRealm.createAllFromJson(AllTypes.class, in);
+        testRealm.createFromJson(AllTypes.class, in);
         testRealm.commitTransaction();
         in.close();
 
@@ -12,6 +12,6 @@
         assertEquals(1.23f, obj.getColumnFloat());
         assertEquals(1.23d, obj.getColumnDouble());
         assertEquals(true, obj.isColumnBoolean());
-        assertEquals(new byte[]{1, 2, 3}, obj.getColumnBinary());
+        assertArrayEquals(new byte[]{1, 2, 3}, obj.getColumnBinary());
     }
 
