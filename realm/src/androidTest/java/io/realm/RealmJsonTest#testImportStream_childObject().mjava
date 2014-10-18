@@ -1,4 +1,11 @@
-    public void testImportStream_childObject() {
-        fail("Not implemented.");
+    public void testImportStream_childObject() throws IOException {
+        InputStream in = loadJsonFromAssets("single_child_object.json");
+        testRealm.beginTransaction();
+        testRealm.createFromJson(AllTypes.class, in);
+        testRealm.commitTransaction();
+        in.close();
+
+        AllTypes obj = testRealm.allObjects(AllTypes.class).first();
+        assertEquals("Fido", obj.getColumnRealmObject().getName());
     }
 
