@@ -8,8 +8,16 @@
                 if (message.arg1 == REALM_CHANGED) {
                     for (Map.Entry<Handler, Integer> entry : handlers.entrySet()) {
                         if (entry.getValue() == message.arg2) {
-                            if (!entry.getKey().hasMessages(REALM_CHANGED)) {
-                                entry.getKey().sendEmptyMessage(REALM_CHANGED);
+                            Handler currentHandler = entry.getKey();
+                            if (currentHandler.getLooper().getThread().isAlive() &&
+                                !currentHandler.hasMessages(REALM_CHANGED))
+                            {
+                                try {
+                                    currentHandler.sendEmptyMessage(REALM_CHANGED);
+                                } catch (RuntimeException e) {
+                                    exceptions.add(e);
+                                    Log.w(TAG, e.getMessage());
+                                }
                             }
                         }
                     }
