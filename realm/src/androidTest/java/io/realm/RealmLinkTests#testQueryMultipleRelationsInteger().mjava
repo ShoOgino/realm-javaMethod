@@ -1,8 +1,29 @@
     public void testQueryMultipleRelationsInteger() {
-        RealmResults<Owner> owners = testRealm.where(Owner.class).equalTo("dogs.age", 10).findAll();
-        assertEquals(1, owners.size());
+        RealmResults<Owner> owners1 = testRealm.where(Owner.class).equalTo("dogs.age", 10).findAll();
+        assertEquals(1, owners1.size());
 
-        RealmResults<Owner> none = testRealm.where(Owner.class).equalTo("dogs.age", 7).findAll();
-        assertEquals(0, none.size());
+        RealmResults<Owner> none1 = testRealm.where(Owner.class).equalTo("dogs.age", 7).findAll();
+        assertEquals(0, none1.size());
+
+        RealmResults<Owner> owners2 = testRealm.where(Owner.class).notEqualTo("dogs.age", 10).findAll();
+        assertEquals(1, owners2.size());
+
+        RealmResults<Owner> all1 = testRealm.where(Owner.class).notEqualTo("dogs.age", 7).findAll();
+        assertEquals(1, all1.size());
+
+        RealmResults<Owner> owners3 = testRealm.where(Owner.class).greaterThan("dogs.age", 9).findAll();
+        assertEquals(1, owners3.size());
+
+        RealmResults<Owner> owners4 = testRealm.where(Owner.class).greaterThanOrEqualTo("dogs.age", 9).findAll();
+        assertEquals(1, owners4.size());
+
+        RealmResults<Owner> owners5 = testRealm.where(Owner.class).lessThan("dogs.age", 9).findAll();
+        assertEquals(1, owners5.size());
+
+        RealmResults<Owner> owners6 = testRealm.where(Owner.class).lessThanOrEqualTo("dogs.age", 9).findAll();
+        assertEquals(1, owners6.size());
+
+        RealmResults<Owner> owners7 = testRealm.where(Owner.class).between("dogs.age", 9, 11).findAll();
+        assertEquals(1, owners7.size());
     }
 

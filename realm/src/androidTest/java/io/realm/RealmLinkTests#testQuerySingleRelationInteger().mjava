@@ -1,9 +1,36 @@
     public void testQuerySingleRelationInteger() {
-        RealmResults<Owner> owners = testRealm.where(Owner.class).equalTo("cat.age", 12).findAll();
-        assertEquals(1, owners.size());
-        assertEquals(12, owners.first().getCat().getAge());
+        RealmResults<Owner> owners1 = testRealm.where(Owner.class).equalTo("cat.age", 12).findAll();
+        assertEquals(1, owners1.size());
+        assertEquals(12, owners1.first().getCat().getAge());
 
-        RealmResults<Owner> none = testRealm.where(Owner.class).equalTo("cat.age", 13).findAll();
-        assertEquals(0, none.size());
+        RealmResults<Owner> none1 = testRealm.where(Owner.class).equalTo("cat.age", 13).findAll();
+        assertEquals(0, none1.size());
+
+        RealmResults<Owner> owners2 = testRealm.where(Owner.class).notEqualTo("cat.age", 13).findAll();
+        assertEquals(1, owners2.size());
+        assertEquals(12, owners2.first().getCat().getAge());
+
+        RealmResults<Owner> none2 = testRealm.where(Owner.class).notEqualTo("cat.age", 12).findAll();
+        assertEquals(0, none2.size());
+
+        RealmResults<Owner> owners3 = testRealm.where(Owner.class).greaterThan("cat.age", 5).findAll();
+        assertEquals(1, owners3.size());
+        assertEquals(12, owners3.first().getCat().getAge());
+
+        RealmResults<Owner> owners4 = testRealm.where(Owner.class).greaterThanOrEqualTo("cat.age", 5).findAll();
+        assertEquals(1, owners4.size());
+        assertEquals(12, owners4.first().getCat().getAge());
+
+        RealmResults<Owner> owners5 = testRealm.where(Owner.class).lessThan("cat.age", 20).findAll();
+        assertEquals(1, owners5.size());
+        assertEquals(12, owners5.first().getCat().getAge());
+
+        RealmResults<Owner> owners6 = testRealm.where(Owner.class).lessThanOrEqualTo("cat.age", 20).findAll();
+        assertEquals(1, owners6.size());
+        assertEquals(12, owners6.first().getCat().getAge());
+
+        RealmResults<Owner> owners7 = testRealm.where(Owner.class).between("cat.age", 1, 20).findAll();
+        assertEquals(1, owners7.size());
+        assertEquals(12, owners7.first().getCat().getAge());
     }
 
