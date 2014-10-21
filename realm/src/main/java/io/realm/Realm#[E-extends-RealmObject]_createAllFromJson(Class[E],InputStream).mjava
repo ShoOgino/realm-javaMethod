@@ -1,0 +1,23 @@
+    /**
+     * Add a Json InputStream to the Realm as new objects. This must be done inside a transaction.
+     *
+     * @param clazz         Class of object the json will map to. All Objects in the array must be of the same type.
+     * @param inputStream   A JSON InputStream of objects of type clazz. All objects must be of the chosen clazz. Properties not in the class are ignored.
+     *
+     * @throws RealmException if the mapping fail.
+     * @throws IOException if something is wrong with the input stream.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public <E extends RealmObject> void createAllFromJson(Class<E> clazz, InputStream inputStream) throws IOException {
+        if (inputStream != null && clazz != null) {
+            JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
+            reader.beginArray();
+            while (reader.hasNext()) {
+                E obj = createObject(clazz);
+                obj.populateUsingJsonStream(reader);
+            }
+            reader.endArray();
+            reader.close();
+        }
+    }
+

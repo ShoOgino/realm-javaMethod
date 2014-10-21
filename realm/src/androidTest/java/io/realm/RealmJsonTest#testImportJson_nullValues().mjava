@@ -1,0 +1,29 @@
+    public void testImportJson_nullValues() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("columnString", null);
+        json.put("columnLong", null);
+        json.put("columnFloat", null);
+        json.put("columnDouble", null);
+        json.put("columnBoolean", null);
+        json.put("columnBinary", null);
+        json.put("columnDate", null);
+        json.put("columnRealmObject", null);
+        json.put("columnRealmList", null);
+
+        testRealm.beginTransaction();
+        testRealm.createFromJson(AllTypes.class, json);
+        testRealm.commitTransaction();
+        AllTypes obj = testRealm.allObjects(AllTypes.class).first();
+
+        // Check that all primitive types are imported correctly
+        assertEquals("", obj.getColumnString());
+        assertEquals(0L, obj.getColumnLong());
+        assertEquals(0f, obj.getColumnFloat());
+        assertEquals(0d, obj.getColumnDouble());
+        assertEquals(false, obj.isColumnBoolean());
+        assertEquals(new Date(0), obj.getColumnDate());
+        assertArrayEquals(new byte[0], obj.getColumnBinary());
+        assertNull(obj.getColumnRealmObject());
+        assertEquals(0, obj.getColumnRealmList().size());
+    }
+

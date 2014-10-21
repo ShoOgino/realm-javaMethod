@@ -1,0 +1,11 @@
+    public void testImportStream_emptyChildObjectList() throws IOException {
+        InputStream in = loadJsonFromAssets("realmlist_empty.json");
+        testRealm.beginTransaction();
+        testRealm.createFromJson(AllTypes.class, in);
+        testRealm.commitTransaction();
+        in.close();
+
+        AllTypes obj = testRealm.allObjects(AllTypes.class).first();
+        assertEquals(0, obj.getColumnRealmList().size());
+    }
+

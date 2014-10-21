@@ -7,13 +7,12 @@
      *
      * @throws RealmException if the mapping fail.
      */
-
     public <E extends RealmObject> E createFromJson(Class<E> clazz, JSONObject json) {
         if (json == null) return null;
 
         E obj = createObject(clazz);
         try {
-            obj.populateFromJsonObject(json);
+            obj.populateUsingJsonObject(json);
         } catch (Exception e) {
             // TODO Remove object from realm
             throw new RealmException("Could not map Json", e);

@@ -3,11 +3,11 @@
         JavaFileObject sourceFile = processingEnvironment.getFiler().createSourceFile(qualifiedGeneratedClassName);
         JavaWriter writer = new JavaWriter(new BufferedWriter(sourceFile.openWriter()));
 
-        Elements elementUtils = processingEnvironment.getElementUtils();
-        Types typeUtils = processingEnvironment.getTypeUtils();
+        elementUtils = processingEnvironment.getElementUtils();
+        typeUtils = processingEnvironment.getTypeUtils();
 
-        TypeMirror realmObject = elementUtils.getTypeElement("io.realm.RealmObject").asType();
-        DeclaredType realmList = typeUtils.getDeclaredType(elementUtils.getTypeElement("io.realm.RealmList"), typeUtils.getWildcardType(null, null));
+        realmObject = elementUtils.getTypeElement("io.realm.RealmObject").asType();
+        realmList = typeUtils.getDeclaredType(elementUtils.getTypeElement("io.realm.RealmList"), typeUtils.getWildcardType(null, null));
 
         // Set source code indent to 4 spaces
         writer.setIndent("    ");
@@ -20,10 +20,15 @@
                 "io.realm.internal.ImplicitTransaction",
                 "io.realm.internal.Row",
                 "io.realm.internal.LinkView",
+                "io.realm.internal.json.JsonUtils",
                 "io.realm.RealmList",
                 "io.realm.RealmObject",
                 "org.json.JSONObject",
                 "org.json.JSONException",
+                "org.json.JSONArray",
+                "android.util.JsonReader",
+                "android.util.JsonToken",
+                "java.io.IOException",
                 "java.util.*",
                 packageName + ".*")
                 .emitEmptyLine();
@@ -409,8 +414,8 @@
         writer.emitEmptyLine();
 
         // Add JSON methods
-        emitPopulateFromJsonObjectMethod(writer);
-//        emitPopulateFromJsonStreamMethod(writer);
+        emitPopulateUsingJsonObjectMethod(writer);
+        emitPopulateUsingJsonStreamMethod(writer);
 
         // End the class definition
         writer.endType();

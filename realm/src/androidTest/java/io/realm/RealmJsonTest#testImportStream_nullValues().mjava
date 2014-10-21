@@ -1,0 +1,20 @@
+    public void testImportStream_nullValues() throws IOException {
+        InputStream in = loadJsonFromAssets("all_types_null.json");
+        testRealm.beginTransaction();
+        testRealm.createFromJson(AllTypes.class, in);
+        testRealm.commitTransaction();
+        in.close();
+
+        // Check that all primitive types are imported correctly
+        AllTypes obj = testRealm.allObjects(AllTypes.class).first();
+        assertEquals("", obj.getColumnString());
+        assertEquals(0L, obj.getColumnLong());
+        assertEquals(0f, obj.getColumnFloat());
+        assertEquals(0d, obj.getColumnDouble());
+        assertEquals(false, obj.isColumnBoolean());
+        assertEquals(new Date(0), obj.getColumnDate());
+        assertArrayEquals(new byte[0], obj.getColumnBinary());
+        assertNull(obj.getColumnRealmObject());
+        assertEquals(0, obj.getColumnRealmList().size());
+    }
+

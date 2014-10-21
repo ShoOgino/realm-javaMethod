@@ -1,0 +1,20 @@
+    /**
+     * Add an array of of JsonObjects to the Realm as a new object. This must be done inside a transaction.
+     *
+     * @param clazz Class of object the json will map to. All Objects in the array must be of the same type.
+     * @param json  Array of JsonObject's that can map to the chosen clazz. Properties not in the class are ignored.
+     *
+     * @throws RealmException if the mapping fail.
+     */
+    public <E extends RealmObject> void createAllFromJson(Class<E> clazz, JSONArray json) {
+        if (json == null) return;
+        for (int i = 0; i < json.length(); i++) {
+            E obj = createObject(clazz);
+            try {
+                obj.populateUsingJsonObject(json.getJSONObject(i));
+            } catch (Exception e) {
+                throw new RealmException("Could not map Json", e);
+            }
+        }
+    }
+

@@ -1,0 +1,11 @@
+    public static void emitFillRealmListFromStream(String fieldName, String fieldTypeCanonicalName, JavaWriter writer) throws IOException {
+        writer
+            .emitStatement("reader.beginArray()")
+            .beginControlFlow("while (reader.hasNext())")
+                .emitStatement("%s obj = getRealm().createObject(%s.class)", fieldTypeCanonicalName, fieldTypeCanonicalName)
+                .emitStatement("obj.populateUsingJsonStream(reader)")
+                .emitStatement("get%s().add(obj)", capitaliseFirstChar(fieldName))
+            .endControlFlow()
+            .emitStatement("reader.endArray()");
+    }
+

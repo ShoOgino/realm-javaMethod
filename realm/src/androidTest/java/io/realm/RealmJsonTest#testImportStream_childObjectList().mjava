@@ -1,0 +1,11 @@
+    public void testImportStream_childObjectList() throws IOException {
+        InputStream in = loadJsonFromAssets("realmlist.json");
+        testRealm.beginTransaction();
+        testRealm.createFromJson(AllTypes.class, in);
+        testRealm.commitTransaction();
+        in.close();
+
+        assertEquals(3, testRealm.allObjects(Dog.class).size());
+        assertEquals(1, testRealm.where(Dog.class).equalTo("name", "Fido-3").findAll().size());
+    }
+
