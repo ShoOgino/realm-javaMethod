@@ -9,8 +9,8 @@
      * @throws java.lang.RuntimeException Any other error
      */
     public RealmQuery<E> between(String fieldName, Date from, Date to) {
-        int columnIndex = columns.get(fieldName);
-        this.query.between(columnIndex, from, to);
+        long columnIndexes[] = getColumnIndexes(fieldName, ColumnType.DATE);
+        this.query.between(columnIndexes, from, to);
         return this;
     }
 
