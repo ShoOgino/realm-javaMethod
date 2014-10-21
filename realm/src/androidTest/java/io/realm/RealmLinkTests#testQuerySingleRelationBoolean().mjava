@@ -1,0 +1,9 @@
+    public void testQuerySingleRelationBoolean() {
+        RealmResults<Owner> owners = testRealm.where(Owner.class).equalTo("cat.hasTail", true).findAll();
+        assertEquals(1, owners.size());
+        assertEquals(12, owners.first().getCat().getAge());
+
+        RealmResults<Owner> none = testRealm.where(Owner.class).equalTo("cat.hasTail", false).findAll();
+        assertEquals(0, none.size());
+    }
+
