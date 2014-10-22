@@ -2,8 +2,8 @@
     //       included in the cache.
     private long[] getColumnIndices(String fieldName, ColumnType fieldType) {
         Table table = (Table)getTable();
-        if (fieldName.contains(".")) {
-            String[] names = fieldName.split("\\.");
+        if (containsDot(fieldName)) {
+            String[] names = splitString(fieldName); //fieldName.split("\\.");
             long[] columnIndices = new long[names.length];
             for (int i = 0; i < names.length-1; i++) {
                 long index = table.getColumnIndex(names[i]);
