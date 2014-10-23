@@ -1,0 +1,9 @@
+    public void rollback() {
+        if (!immutable) {
+            parent.rollbackAndContinueAsRead();
+            immutable = true;
+        } else {
+            throw new RealmException("Cannot cancel a non-write transaction.");
+        }
+    }
+
