@@ -1,7 +1,9 @@
     /**
-     * Commits a write transaction
+     * Commits all writes operations in the current write transaction.
+     * After this is called the realm reverts back to being read-only, and all other threads
+     * will automatically be updated.
      *
-     * @throws java.lang.RuntimeException Any other error
+     * @throws java.lang.IllegalStateException If the write transaction is in an invalid state.
      */
     public void commitTransaction() {
         transaction.commitAndContinueAsRead();

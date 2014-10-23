@@ -1,11 +1,15 @@
     /**
-     * Revert all writes made in the current write transaction and end the transaction.
+     * Revert all writes (created, updated, or deleted objects) made in the current write
+     * transaction and end the transaction.
+     *
+     * The realm reverts back to read-only.
+     *
      * Calling this when not in a write transaction will throw an exception.
      *
-     * @throws io.realm.exceptions.RealmException If not in a write transaction.
-     * @throws IllegalStateException              If the write transaction is invalid.
-     */
+     * @throws java.lang.IllegalStateException    If the write transaction is an invalid state or
+    *                                             not in a write transaction.
+    */
      public void cancelTransaction() {
-         transaction.rollback();
+         transaction.rollbackAndContinueAsRead();
      }
 
