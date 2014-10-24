@@ -1,0 +1,20 @@
+    public void testObjects() {
+        RealmResults<Owner> owners = testRealm.allObjects(Owner.class);
+        assertEquals(1, owners.size());
+        assertEquals(2, owners.first().getDogs().size());
+        assertEquals("Pluto", owners.first().getDogs().first().getName());
+        assertEquals("Fido", owners.first().getDogs().last().getName());
+        assertEquals("Blackie", owners.first().getCat().getName());
+        assertEquals(12, owners.first().getCat().getAge());
+
+        RealmResults<Dog> dogs = testRealm.allObjects(Dog.class);
+        assertEquals(2, dogs.size());
+        for (Dog dog : dogs) {
+            assertEquals("Tim", dog.getOwner().getName());
+        }
+
+        RealmResults<Cat> cats = testRealm.allObjects(Cat.class);
+        assertEquals(1, cats.size());
+        assertEquals("Tim", cats.first().getOwner().getName());
+    }
+
