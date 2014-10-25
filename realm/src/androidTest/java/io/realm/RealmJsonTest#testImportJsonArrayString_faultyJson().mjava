@@ -1,0 +1,14 @@
+    public void testImportJsonArrayString_faultyJson() {
+        testRealm.beginTransaction();
+        try {
+            testRealm.createAllFromJson(Dog.class, "[{ name : \"Foo\" ]");
+        } catch (RealmException e) {
+            assertTrue(true);
+            return;
+        } finally {
+            testRealm.commitTransaction();
+        }
+
+        fail("Doesn't handle faulty JSON properly");
+    }
+

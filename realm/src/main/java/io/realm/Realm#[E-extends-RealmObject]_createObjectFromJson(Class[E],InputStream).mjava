@@ -1,0 +1,22 @@
+    /**
+     * Create a Realm object prefilled with data from a JSON object. Unknown JSON properties are
+     * ignored. This must be done inside a transaction.
+     *
+     * @param clazz         Type of Realm object to create.
+     * @param inputStream   JSON object data as a InputStream.
+     * @return Created object or null if json string was empty or null.
+     *
+     * @throws RealmException if the mapping from JSON failed.
+     * @throws IOException if something was wrong with the input stream.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public <E extends RealmObject> E createObjectFromJson(Class<E> clazz, InputStream inputStream) throws IOException {
+        if (inputStream == null || clazz == null) return null;
+
+        JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
+        E obj = createObject(clazz);
+        obj.populateUsingJsonStream(reader);
+        reader.close();
+        return obj;
+    }
+

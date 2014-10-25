@@ -1,0 +1,22 @@
+    /**
+     * Create a matching Realm object for each object in a JSON array. Unknown JSON properties are
+     * ignored. This must be done inside a transaction.
+     *
+     * @param clazz Type of Realm objects to create.
+     * @param json  JSON array as a String where each object can map to the chosen class.
+     *
+     * @throws RealmException if mapping from JSON failed.
+     */
+    public <E extends RealmObject> void createAllFromJson(Class<E> clazz, String json) {
+        if (clazz == null || json == null || json.length() == 0) return;
+
+        JSONArray arr;
+        try {
+            arr = new JSONArray(json);
+        } catch (Exception e) {
+            throw new RealmException("Could not create JSON array from string", e);
+        }
+
+        createAllFromJson(clazz, arr);
+    }
+
