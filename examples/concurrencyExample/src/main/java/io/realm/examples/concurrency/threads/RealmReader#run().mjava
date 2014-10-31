@@ -1,17 +1,18 @@
     public void run() {
-        Realm realm = Realm.getInstance(context);
+        Looper.prepare();
+        final Realm realm = Realm.getInstance(context, true);
 
-        int loopCount = 0;
+        realm.addChangeListener(new RealmChangeListener() {
 
-        while (loopCount < mReadCount && mRunning) {
-            Person person = realm.where(Person.class)
-                    .beginsWith("name", "Foo")
-                    .between("age", 20, 50).findFirst();
+            @Override
+            public void onChange() {
+                long peopleNumber = realm.where(Person.class).count();
+                if (peopleNumber % 10 == 0) {
+                    Log.d(TAG, "Found count " + peopleNumber);
+                }
 
-            if (loopCount % 1000 == 0) {
-                Log.d(TAG, "Found: " + person);
             }
-            loopCount++;
-        }
+        });
+        Looper.loop();
     }
 

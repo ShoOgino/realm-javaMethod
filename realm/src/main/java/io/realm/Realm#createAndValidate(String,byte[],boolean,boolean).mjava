@@ -1,9 +1,9 @@
-    private static Realm createAndValidate(String absolutePath, byte[] key, boolean validateSchema) {
+    private static Realm createAndValidate(String absolutePath, byte[] key, boolean validateSchema, boolean autoRefresh) {
         Map<String, Realm> realms = realmsCache.get();
         Realm realm = realms.get(absolutePath);
 
         if (realm == null) {
-            realm = new Realm(absolutePath, key);
+            realm = new Realm(absolutePath, key, autoRefresh);
             realms.put(absolutePath, realm);
             realmsCache.set(realms);
         }
