@@ -1,0 +1,20 @@
+    public void testSetAutoRefreshOnHandlerThread() {
+        HandlerThread thread = new HandlerThread("TestThread") {
+            @Override
+            protected void onLooperPrepared() {
+                Realm realm = Realm.getInstance(getContext());
+                assertTrue(realm.isAutoRefresh());
+                realm.setAutoRefresh(false);
+                assertFalse(realm.isAutoRefresh());
+                realm.setAutoRefresh(true);
+                assertTrue(realm.isAutoRefresh());
+            }
+        };
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            fail();
+        }
+    }
+

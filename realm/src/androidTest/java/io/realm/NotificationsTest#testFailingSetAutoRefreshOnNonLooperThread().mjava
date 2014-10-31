@@ -1,0 +1,21 @@
+    public void testFailingSetAutoRefreshOnNonLooperThread() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(getContext(), false);
+                boolean autoRefresh = realm.isAutoRefresh();
+                assertFalse(autoRefresh);
+                try {
+                    realm.setAutoRefresh(true);
+                    fail();
+                } catch (IllegalStateException ignored) {}
+            }
+        };
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            fail();
+        }
+    }
+
