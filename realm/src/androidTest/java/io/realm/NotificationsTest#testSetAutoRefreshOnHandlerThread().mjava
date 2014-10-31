@@ -1,4 +1,5 @@
     public void testSetAutoRefreshOnHandlerThread() {
+        final AtomicBoolean done = new AtomicBoolean(false);
         HandlerThread thread = new HandlerThread("TestThread") {
             @Override
             protected void onLooperPrepared() {
@@ -8,13 +9,15 @@
                 assertFalse(realm.isAutoRefresh());
                 realm.setAutoRefresh(true);
                 assertTrue(realm.isAutoRefresh());
+                done.set(true);
             }
         };
         thread.start();
         try {
-            thread.join();
+            thread.join(1000);
         } catch (InterruptedException e) {
             fail();
         }
+        assertTrue(done.get());
     }
 

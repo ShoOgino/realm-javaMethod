@@ -1,4 +1,5 @@
     public void testFailingSetAutoRefreshOnNonLooperThread() {
+        final AtomicBoolean done = new AtomicBoolean(false);
         Thread thread = new Thread() {
             @Override
             public void run() {
@@ -9,13 +10,15 @@
                     realm.setAutoRefresh(true);
                     fail();
                 } catch (IllegalStateException ignored) {}
+                done.set(true);
             }
         };
         thread.start();
         try {
-            thread.join();
+            thread.join(1000);
         } catch (InterruptedException e) {
             fail();
         }
+        assertTrue(done.get());
     }
 
