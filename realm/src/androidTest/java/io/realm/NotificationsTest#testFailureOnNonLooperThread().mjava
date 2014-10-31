@@ -1,0 +1,18 @@
+    public void testFailureOnNonLooperThread() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Realm realm = Realm.getInstance(getContext());
+                    fail("The Realm instantiations should have thrown an exception");
+                } catch (IllegalStateException ignored) {}
+            }
+        };
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            fail();
+        }
+    }
+
