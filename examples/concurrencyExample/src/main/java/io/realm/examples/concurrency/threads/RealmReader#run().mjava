@@ -10,9 +10,17 @@
                 if (peopleNumber % 10 == 0) {
                     Log.d(TAG, "Found count " + peopleNumber);
                 }
-
             }
         });
+        
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.what == KILL) {
+                    Looper.myLooper().quit();
+                }
+            }
+        };
         Looper.loop();
     }
 
