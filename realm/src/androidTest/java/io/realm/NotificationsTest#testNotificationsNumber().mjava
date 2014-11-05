@@ -1,8 +1,12 @@
-    public void testNotificationsNumber () throws InterruptedException {
+    public void testNotificationsNumber () throws InterruptedException, ExecutionException {
         final AtomicInteger counter = new AtomicInteger(0);
-        HandlerThread thread = new HandlerThread("Receiver") {
+        final AtomicBoolean isReady = new AtomicBoolean(false);
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
-            protected void onLooperPrepared() {
+            public Boolean call() throws Exception {
+                Looper.prepare();
                 Realm realm = Realm.getInstance(getContext());
                 realm.addChangeListener(new RealmChangeListener() {
                     @Override
@@ -10,9 +14,15 @@
                         counter.incrementAndGet();
                     }
                 });
+                isReady.set(true);
+                Looper.loop();
+                return true;
             }
-        };
-        thread.start();
+        });
+
+        while(!isReady.get()) {
+            Thread.sleep(5);
+        }
 
         Realm realm = Realm.getInstance(getContext(), false);
         realm.beginTransaction();
@@ -20,10 +30,10 @@
         dog.setName("Rex");
         realm.commitTransaction();
 
-        Thread.sleep(100);
+        try {
+            future.get(1, TimeUnit.SECONDS);
+        } catch (TimeoutException ignore) {}
 
-        assertEquals(1, counter.get());
-
-        thread.join(1);
+        assertEquals(2, counter.get());
     }
 

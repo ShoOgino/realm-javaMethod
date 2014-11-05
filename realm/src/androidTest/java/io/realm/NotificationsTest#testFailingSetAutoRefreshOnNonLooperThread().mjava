@@ -1,24 +1,19 @@
-    public void testFailingSetAutoRefreshOnNonLooperThread() {
-        final AtomicBoolean done = new AtomicBoolean(false);
-        Thread thread = new Thread() {
+    public void testFailingSetAutoRefreshOnNonLooperThread() throws ExecutionException, InterruptedException {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
-            public void run() {
+            public Boolean call() throws Exception {
                 Realm realm = Realm.getInstance(getContext(), false);
                 boolean autoRefresh = realm.isAutoRefresh();
                 assertFalse(autoRefresh);
                 try {
                     realm.setAutoRefresh(true);
-                    fail();
-                } catch (IllegalStateException ignored) {}
-                done.set(true);
+                    return false;
+                } catch (IllegalStateException ignored) {
+                    return true;
+                }
             }
-        };
-        thread.start();
-        try {
-            thread.join(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertTrue(done.get());
+        });
+        assertTrue(future.get());
     }
 

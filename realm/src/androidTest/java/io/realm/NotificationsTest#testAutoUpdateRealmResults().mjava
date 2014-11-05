@@ -1,49 +1,42 @@
-    public void testAutoUpdateRealmResults() {
+    public void testAutoUpdateRealmResults() throws InterruptedException, ExecutionException {
         final int TEST_SIZE = 10;
-        final AtomicBoolean cantRun = new AtomicBoolean(true);
         final AtomicInteger counter = new AtomicInteger(0);
+        final AtomicBoolean isReady = new AtomicBoolean(false);
+        final Map<Integer, Integer> results = new ConcurrentHashMap<Integer, Integer>();
 
-
-        Realm.deleteRealmFile(getContext());
-        Realm realm = Realm.getInstance(getContext());
-        //assertEquals(0, realm.allObjects(Dog.class).size());
-
-        Thread listenerThread = new Thread() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
-            public void run() {
+            public Boolean call() throws Exception {
                 Looper.prepare();
                 Realm.deleteRealmFile(getContext());
-                Realm realm = Realm.getInstance(getContext());
-                RealmResults<Dog> dogs = realm.allObjects(Dog.class);
+                final Realm realm = Realm.getInstance(getContext());
+                final RealmResults<Dog> dogs = realm.allObjects(Dog.class);
                 assertEquals(0, dogs.size());
                 realm.addChangeListener(new RealmChangeListener() {
                     @Override
                     public void onChange() {
-                        // Re-instatiation on each notification is intentional
-                        Realm r = Realm.getInstance(getContext());
-                        counter.incrementAndGet();
+                        int c = counter.incrementAndGet();
+                        if (c == 1) { // initTable
+                            results.put(c, dogs.size());
+                        } else if (c == 2) { // commit
+                            results.put(c, dogs.size());
+                        } else {
+                            results.put(c, dogs.size());
+                        }
                     }
                 });
-                cantRun.set(false);
+                isReady.set(true);
                 Looper.loop();
+                return true;
             }
-        };
-        listenerThread.start();
+        });
 
-        while (cantRun.get()) {
-            try {
-                Thread.sleep(100);
-            }
-            catch (InterruptedException ignored) {
-                fail();
-            }
-        }
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while (!isReady.get()) {
+            Thread.sleep(5);
         }
 
+        Realm realm = Realm.getInstance(getContext());
         realm.beginTransaction();
         for (int i = 0; i < TEST_SIZE; i++) {
             Dog dog = realm.createObject(Dog.class);
@@ -53,11 +46,16 @@
         assertEquals(TEST_SIZE, realm.allObjects(Dog.class).size());
 
         try {
-            listenerThread.join(2000);
-        } catch (InterruptedException ignored) {
-            fail();
-        }
-        // one for initTable and one for the commit
+            future.get(2, TimeUnit.SECONDS);
+        } catch (TimeoutException ignore) {}
+
+        assertEquals(2, results.size());
+
+        assertTrue(results.containsKey(1));
+        assertEquals(0, results.get(1).intValue());
+        assertTrue(results.containsKey(2));
+        assertEquals(10, results.get(2).intValue());
+
         assertEquals(2, counter.get());
     }
 
