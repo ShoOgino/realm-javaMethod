@@ -15,22 +15,22 @@
             try {
                 validationClass = Class.forName("io.realm.ValidationList");
             } catch (ClassNotFoundException e) {
-                throw new RealmException("Could not find the generated ValidationList class");
+                throw new RealmException("Could not find the generated ValidationList class: " + APT_NOT_EXECUTED_MESSAGE);
             }
             Method getProxyClassesMethod;
             try {
                 getProxyClassesMethod = validationClass.getMethod("getProxyClasses");
             } catch (NoSuchMethodException e) {
-                throw new RealmException("Could not find the getProxyClasses method in the ValidationList class");
+                throw new RealmException("Could not find the getProxyClasses method in the ValidationList class: " + APT_NOT_EXECUTED_MESSAGE);
             }
             List<String> proxyClasses;
             try {
                 //noinspection unchecked
                 proxyClasses = (List<String>) getProxyClassesMethod.invoke(null);
             } catch (IllegalAccessException e) {
-                throw new RealmException("Could not execute the getProxyClasses method in the ValidationList class");
+                throw new RealmException("Could not execute the getProxyClasses method in the ValidationList class: " + APT_NOT_EXECUTED_MESSAGE);
             } catch (InvocationTargetException e) {
-                throw new RealmException("An exception was thrown in the getProxyClasses method in the ValidationList class");
+                throw new RealmException("An exception was thrown in the getProxyClasses method in the ValidationList class: " + APT_NOT_EXECUTED_MESSAGE);
             }
 
             long version = realm.getVersion();
@@ -48,7 +48,7 @@
                     try {
                         generatedClass = Class.forName(generatedClassName);
                     } catch (ClassNotFoundException e) {
-                        throw new RealmException("Could not find the generated " + generatedClassName + " class");
+                        throw new RealmException("Could not find the generated " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
                     }
 
                     // if not versioned, create table
@@ -57,14 +57,14 @@
                         try {
                             initTableMethod = generatedClass.getMethod("initTable", new Class[]{ImplicitTransaction.class});
                         } catch (NoSuchMethodException e) {
-                            throw new RealmException("Could not find the initTable method in the generated " + generatedClassName + " class");
+                            throw new RealmException("Could not find the initTable method in the generated " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
                         }
                         try {
                             initTableMethod.invoke(null, realm.transaction);
                         } catch (IllegalAccessException e) {
-                            throw new RealmException("Could not execute the initTable method in the " + generatedClassName + " class");
+                            throw new RealmException("Could not execute the initTable method in the " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
                         } catch (InvocationTargetException e) {
-                            throw new RealmException("An exception was thrown in the initTable method in the " + generatedClassName + " class");
+                            throw new RealmException("An exception was thrown in the initTable method in the " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
                         }
                     }
 
@@ -73,12 +73,12 @@
                     try {
                         validateMethod = generatedClass.getMethod("validateTable", new Class[]{ImplicitTransaction.class});
                     } catch (NoSuchMethodException e) {
-                        throw new RealmException("Could not find the validateTable method in the generated " + generatedClassName + " class");
+                        throw new RealmException("Could not find the validateTable method in the generated " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
                     }
                     try {
                         validateMethod.invoke(null, realm.transaction);
                     } catch (IllegalAccessException e) {
-                        throw new RealmException("Could not execute the validateTable method in the " + generatedClassName + " class");
+                        throw new RealmException("Could not execute the validateTable method in the " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
                     } catch (InvocationTargetException e) {
                         throw new RealmMigrationNeededException(e.getMessage(), e);
                     }
@@ -88,22 +88,22 @@
                     try {
                         fieldNamesMethod = generatedClass.getMethod("getFieldNames");
                     } catch (NoSuchMethodException e) {
-                        throw new RealmException("Could not find the getFieldNames method in the generated " + generatedClassName + " class");
+                        throw new RealmException("Could not find the getFieldNames method in the generated " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
                     }
                     List<String> fieldNames;
                     try {
                         //noinspection unchecked
                         fieldNames = (List<String>) fieldNamesMethod.invoke(null);
                     } catch (IllegalAccessException e) {
-                        throw new RealmException("Could not execute the getFieldNames method in the generated " + generatedClassName + " class");
+                        throw new RealmException("Could not execute the getFieldNames method in the generated " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
                     } catch (InvocationTargetException e) {
-                        throw new RealmException("An exception was thrown in the getFieldNames method in the generated " + generatedClassName + " class");
+                        throw new RealmException("An exception was thrown in the getFieldNames method in the generated " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
                     }
                     Table table = realm.transaction.getTable(TABLE_PREFIX + modelClassName);
                     for (String fieldName : fieldNames) {
                         long columnIndex = table.getColumnIndex(fieldName);
                         if (columnIndex == -1) {
-                            throw new RealmMigrationNeededException("Column '" + fieldName + "' not found for type '" + modelClassName + "'");
+                            throw new RealmMigrationNeededException("Field '" + fieldName + "' not found for type '" + modelClassName + "'");
                         }
                         Map<String, Long> innerMap = columnIndices.get(modelClassName);
                         if (innerMap == null) {
