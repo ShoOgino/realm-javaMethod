@@ -2,11 +2,14 @@
         Map<String, Realm> realms = realmsCache.get();
         Realm realm = realms.get(absolutePath);
 
-        if (realm == null) {
-            realm = new Realm(absolutePath, key, autoRefresh);
-            realms.put(absolutePath, realm);
-            realmsCache.set(realms);
+        if (realm != null) {
+            return realm;
         }
+
+        realm = new Realm(absolutePath, key, autoRefresh);
+        realms.put(absolutePath, realm);
+        realmsCache.set(realms);
+
         if (validateSchema) {
             Class<?> validationClass;
             try {

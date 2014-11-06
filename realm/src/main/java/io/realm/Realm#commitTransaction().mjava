@@ -17,9 +17,11 @@
                     realmId == id                                // It's the right realm
                     && !handler.hasMessages(REALM_CHANGED)       // The right message
                     && handler.getLooper().getThread().isAlive() // The receiving thread is alive
+                    && !handler.equals(this.handler)             // Don't notify yourself
             ) {
                 handler.sendEmptyMessage(REALM_CHANGED);
             }
         }
+        sendNotifications();
     }
 

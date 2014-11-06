@@ -1,42 +1,38 @@
-    public void testNotifications() {
-        final AtomicBoolean changed = new AtomicBoolean(false);
+    public void testNotifications() throws InterruptedException, ExecutionException {
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
 
-        Thread listenerThread = new Thread() {
+        final AtomicInteger changed = new AtomicInteger(0);
+
+        List<Callable<Void>> callables = new ArrayList<Callable<Void>>();
+        callables.add(new Callable<Void>() {
             @Override
-            public void run() {
+            public Void call() throws Exception {
                 Looper.prepare();
-                Realm realm = Realm.getInstance(getContext());
+                Realm realm = Realm.getInstance(getContext()); // This does not sent a message to itself [0]
                 realm.addChangeListener(new RealmChangeListener() {
                     @Override
                     public void onChange() {
-                        changed.set(true);
-                        Looper.myLooper().quit();
+                        changed.incrementAndGet();
                     }
                 });
                 Looper.loop();
+                return null;
             }
-        };
-        listenerThread.start();
-
-        Thread writerThread = new Thread() {
+        });
+        callables.add(new Callable<Void>() {
             @Override
-            public void run() {
-                Realm realm = Realm.getInstance(getContext(), false);
+            public Void call() throws Exception {
+                Realm realm = Realm.getInstance(getContext(), false); // This will notify the other thread [1]
                 realm.beginTransaction();
                 Dog dog = realm.createObject(Dog.class);
                 dog.setName("Rex");
-                realm.commitTransaction();
+                realm.commitTransaction(); // This will notify the other thread[2]
+                return null;
             }
-        };
-        writerThread.start();
+        });
 
-        try {
-            writerThread.join();
-            listenerThread.join(2000);
-        } catch (InterruptedException e) {
-            fail();
-        }
+        executorService.invokeAll(callables, 2, TimeUnit.SECONDS);
 
-        assertEquals(true, changed.get());
+        assertEquals(2, changed.get());
     }
 

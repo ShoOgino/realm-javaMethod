@@ -1,23 +1,18 @@
-    public void testSetAutoRefreshOnHandlerThread() {
-        final AtomicBoolean done = new AtomicBoolean(false);
-        HandlerThread thread = new HandlerThread("TestThread") {
+    public void testSetAutoRefreshOnHandlerThread() throws ExecutionException, InterruptedException {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
-            protected void onLooperPrepared() {
+            public Boolean call() throws Exception {
+                Looper.prepare();
                 Realm realm = Realm.getInstance(getContext());
                 assertTrue(realm.isAutoRefresh());
                 realm.setAutoRefresh(false);
                 assertFalse(realm.isAutoRefresh());
                 realm.setAutoRefresh(true);
                 assertTrue(realm.isAutoRefresh());
-                done.set(true);
+                return true;
             }
-        };
-        thread.start();
-        try {
-            thread.join(1000);
-        } catch (InterruptedException e) {
-            fail();
-        }
-        assertTrue(done.get());
+        });
+        assertTrue(future.get());
     }
 
