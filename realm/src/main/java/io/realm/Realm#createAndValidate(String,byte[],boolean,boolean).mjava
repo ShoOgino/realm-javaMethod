@@ -1,5 +1,5 @@
     private static Realm createAndValidate(String absolutePath, byte[] key, boolean validateSchema, boolean autoRefresh) {
-        Map<String, Realm> realms = realmsCache.get();
+        Map<Integer, Realm> realms = realmsCache.get();
         Realm realm = realms.get(absolutePath);
 
         if (realm != null) {
@@ -7,7 +7,7 @@
         }
 
         realm = new Realm(absolutePath, key, autoRefresh);
-        realms.put(absolutePath, realm);
+        realms.put(new Integer(absolutePath.hashCode()), realm);
         realmsCache.set(realms);
 
         if (validateSchema) {
