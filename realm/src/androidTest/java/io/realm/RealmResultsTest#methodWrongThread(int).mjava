@@ -1,0 +1,36 @@
+    public boolean methodWrongThread(final int method) throws ExecutionException, InterruptedException {
+        final RealmResults<AllTypes> allTypeses = testRealm.where(AllTypes.class).findAll();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                try {
+                    switch (method) {
+                        case METHOD_MIN:
+                            allTypeses.min(FIELD_FLOAT);
+                            break;
+                        case METHOD_MAX:
+                            allTypeses.max(FIELD_FLOAT);
+                            break;
+                        case METHOD_SUM:
+                            allTypeses.sum(FIELD_FLOAT);
+                            break;
+                        case METHOD_AVG:
+                            allTypeses.average(FIELD_FLOAT);
+                            break;
+                        case METHOD_SORT:
+                            allTypeses.sort(FIELD_FLOAT);
+                            break;
+                        case METHOD_WHERE:
+                            allTypeses.where();
+                    }
+                    return false;
+                } catch (IllegalStateException ignored) {
+                    return true;
+                }
+            }
+        });
+
+        return future.get();
+    }
+
