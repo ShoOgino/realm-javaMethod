@@ -1,0 +1,19 @@
+    public void testAverageWrongThread() throws ExecutionException, InterruptedException {
+        final RealmResults<AllTypes> allTypeses = testRealm.where(AllTypes.class).findAll();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                try {
+                    allTypeses.average(FIELD_FLOAT);
+                    return false;
+                } catch (IllegalStateException ignored) {
+                    return true;
+                }
+            }
+        });
+
+        Boolean result = future.get();
+        assertTrue(result);
+    }
+
