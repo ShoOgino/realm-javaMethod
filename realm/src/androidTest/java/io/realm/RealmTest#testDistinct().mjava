@@ -1,0 +1,22 @@
+    public void testDistinct() {
+        testRealm.beginTransaction();
+        for (int i = 0; i < 10; ++i) {
+            Dog dog = testRealm.createObject(Dog.class);
+            if (i % 2 == 0) {
+                dog.setName("Rex");
+            } else {
+                dog.setName("King");
+            }
+        }
+        testRealm.commitTransaction();
+
+        RealmResults<Dog> dogs = testRealm.distinct(Dog.class, "name");
+        assertEquals(2, dogs.size());
+
+        try {
+            RealmResults<AllTypes> allTypeses = testRealm.distinct(AllTypes.class, "columnString");
+            fail();
+        } catch (UnsupportedOperationException ignore) {
+        }
+    }
+
