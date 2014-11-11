@@ -1,0 +1,14 @@
+    // Calback from EventBus on same thread as job who posted the event. This is not the UI thread.
+    public void onEvent(Person person) {
+        final String description = person.toString();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, description, Toast.LENGTH_SHORT).show();
+                TextView view = new TextView(MainActivity.this);
+                view.setText(description);
+                list.addView(view);
+            }
+        });
+    }
+
