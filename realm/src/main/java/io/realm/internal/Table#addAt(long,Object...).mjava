@@ -47,7 +47,11 @@
                 nativeInsertBoolean(nativePtr, columnIndex, rowIndex, (Boolean)value);
                 break;
             case INTEGER:
-                nativeInsertLong(nativePtr, columnIndex, rowIndex, ((Number)value).longValue());
+                long intValue = ((Number) value).longValue();
+                if (isPrimaryKeyColumn(columnIndex) && findFirstLong(columnIndex, intValue) != TableOrView.NO_MATCH) {
+                    throw new RealmException("Primary key constraint broken. Value already exists: " + intValue);
+                }
+                nativeInsertLong(nativePtr, columnIndex, rowIndex, intValue);
                 break;
             case FLOAT:
                 nativeInsertFloat(nativePtr, columnIndex, rowIndex, ((Float)value).floatValue());
@@ -56,6 +60,10 @@
                 nativeInsertDouble(nativePtr, columnIndex, rowIndex, ((Double)value).doubleValue());
                 break;
             case STRING:
+                String stringValue = (String) value;
+                if (isPrimaryKeyColumn(columnIndex) && findFirstString(columnIndex, stringValue) != TableOrView.NO_MATCH) {
+                    throw new RealmException("Primary key constraint broken. Value already exists: " + stringValue);
+                }
                 nativeInsertString(nativePtr, columnIndex, rowIndex, (String)value);
                 break;
             case DATE:

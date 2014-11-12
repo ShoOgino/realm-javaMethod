@@ -1,0 +1,36 @@
+    private void emitHashcodeMethod(JavaWriter writer) throws IOException {
+        writer.emitAnnotation("Override");
+        writer.beginMethod("int", "hashCode", EnumSet.of(Modifier.PUBLIC));
+        writer.emitStatement("int result = 17");
+        int counter = 0;
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            String fieldTypeCanonicalName = field.asType().toString();
+            if (HASHCODE.containsKey(fieldTypeCanonicalName)) {
+                for (String statement : HASHCODE.get(fieldTypeCanonicalName)) {
+                    if (statement.contains("%d") && statement.contains("%s")) {
+                        // This statement introduces a temporary variable
+                        writer.emitStatement(statement, counter, capitaliseFirstChar(fieldName));
+                    } else if(statement.contains("%d")) {
+                        // This statement uses the temporary variable
+                        writer.emitStatement(statement, counter, counter);
+                    } else if (statement.contains("%s")) {
+                        // This is a normal statement with only one assignment
+                        writer.emitStatement(statement, capitaliseFirstChar(fieldName));
+                    } else {
+                        // This should never happen
+                        throw new AssertionError();
+                    }
+                }
+            } else {
+                // Links and Link lists
+                writer.emitStatement("%s temp_%d = get%s()", fieldTypeCanonicalName, counter, capitaliseFirstChar(fieldName));
+                writer.emitStatement("result = 31 * result + (temp_%d != null ? temp_%d.hashCode() : 0)", counter, counter);
+            }
+            counter++;
+        }
+        writer.emitStatement("return result");
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+

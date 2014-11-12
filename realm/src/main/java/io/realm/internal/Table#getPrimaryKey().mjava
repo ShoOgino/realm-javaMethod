@@ -1,0 +1,14 @@
+    /**
+     * Returns the column index for the primary key.
+     *
+     * @return Column index or {@code #NO_MATCH} if no primary key is set.
+     */
+    public long getPrimaryKey() {
+        Table pkTable = getPrimaryKeyTable();
+        long rowIndex = pkTable.findFirstString(PRIMARY_KEY_CLASS_COLUMN_INDEX, getName());
+        if (rowIndex != NO_MATCH) {
+            return pkTable.getRow(rowIndex).getLong(PRIMARY_KEY_FIELD_COLUMN_INDEX);
+        }
+        return NO_MATCH;
+    }
+

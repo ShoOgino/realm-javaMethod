@@ -1,0 +1,99 @@
+    private void emitAccessors(JavaWriter writer) throws IOException {
+        // Accessors
+        ListIterator<VariableElement> iterator = fields.listIterator();
+        while (iterator.hasNext()) {
+            int columnNumber = iterator.nextIndex();
+            VariableElement field = iterator.next();
+
+            String fieldName = field.getSimpleName().toString();
+            String fieldTypeCanonicalName = field.asType().toString();
+
+            if (JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
+                /**
+                 * Primitives and boxed types
+                 */
+                String realmType = JAVA_TO_REALM_TYPES.get(fieldTypeCanonicalName);
+                String castingType = CASTING_TYPES.get(fieldTypeCanonicalName);
+
+                // Getter
+                writer.emitAnnotation("Override");
+                String getterPrefix = fieldTypeCanonicalName.equals("boolean")?"is":"get";
+                writer.beginMethod(fieldTypeCanonicalName, getterPrefix + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC));
+                writer.emitStatement(
+                        "return (%s) row.get%s(Realm.columnIndices.get(\"%s\").get(\"%s\"))",
+                        fieldTypeCanonicalName, realmType, className, fieldName);
+                writer.endMethod();
+                writer.emitEmptyLine();
+
+                // Setter
+                writer.emitAnnotation("Override");
+                writer.beginMethod("void", "set" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+                writer.emitStatement(
+                        "row.set%s(Realm.columnIndices.get(\"%s\").get(\"%s\"), (%s) value)",
+                        realmType, className, fieldName, castingType);
+                writer.endMethod();
+            } else if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                /**
+                 * Links
+                 */
+
+                // Getter
+                writer.emitAnnotation("Override");
+                writer.beginMethod(fieldTypeCanonicalName, "get" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC));
+                writer.beginControlFlow("if (row.isNullLink(Realm.columnIndices.get(\"%s\").get(\"%s\")))", className, fieldName);
+                writer.emitStatement("return null");
+                writer.endControlFlow();
+                writer.emitStatement(
+                        "return realm.get(%s.class, row.getLink(Realm.columnIndices.get(\"%s\").get(\"%s\")))",
+                        fieldTypeCanonicalName, className, fieldName);
+                writer.endMethod();
+                writer.emitEmptyLine();
+
+                // Setter
+                writer.emitAnnotation("Override");
+                writer.beginMethod("void", "set" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+                writer.beginControlFlow("if (value == null)");
+                writer.emitStatement("row.nullifyLink(Realm.columnIndices.get(\"%s\").get(\"%s\"))", className, fieldName);
+                writer.endControlFlow();
+                writer.emitStatement("row.setLink(Realm.columnIndices.get(\"%s\").get(\"%s\"), value.row.getIndex())", className, fieldName);
+                writer.endMethod();
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+                /**
+                 * LinkLists
+                 */
+                String genericCanonicalType = ((DeclaredType) field.asType()).getTypeArguments().get(0).toString();
+                String genericType;
+                if (genericCanonicalType.contains(".")) {
+                    genericType = genericCanonicalType.substring(genericCanonicalType.lastIndexOf('.') + 1);
+                } else {
+                    genericType = genericCanonicalType;
+                }
+
+                // Getter
+                writer.emitAnnotation("Override");
+                writer.beginMethod(fieldTypeCanonicalName, "get" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC));
+                writer.emitStatement(
+                        "return new RealmList(%s.class, row.getLinkList(Realm.columnIndices.get(\"%s\").get(\"%s\")), realm)",
+                        genericType, className, fieldName);
+                writer.endMethod();
+                writer.emitEmptyLine();
+
+                // Setter
+                writer.emitAnnotation("Override");
+                writer.beginMethod("void", "set" + capitaliseFirstChar(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+                writer.emitStatement("LinkView links = row.getLinkList(Realm.columnIndices.get(\"%s\").get(\"%s\"))", className, fieldName);
+                writer.beginControlFlow("if (value == null)");
+                writer.emitStatement("return"); // TODO: delete all the links instead
+                writer.endControlFlow();
+                writer.beginControlFlow("for (RealmObject linkedObject : (RealmList<? extends RealmObject>) value)");
+                writer.emitStatement("links.add(linkedObject.row.getIndex())");
+                writer.endControlFlow();
+                writer.endMethod();
+            } else {
+                throw new UnsupportedOperationException(
+                        String.format("Type %s of field %s is not supported", fieldTypeCanonicalName, fieldName));
+            }
+            writer.emitEmptyLine();
+        }
+    }
+

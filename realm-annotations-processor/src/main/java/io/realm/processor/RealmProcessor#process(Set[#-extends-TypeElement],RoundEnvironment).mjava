@@ -3,6 +3,15 @@
         RealmVersionChecker updateChecker = new RealmVersionChecker(processingEnv);
         updateChecker.executeRealmVersionUpdate();
 
+        Types typeUtils = processingEnv.getTypeUtils();
+        TypeMirror stringType = processingEnv.getElementUtils().getTypeElement("java.lang.String").asType();
+        List<TypeMirror> validPrimaryKeyTypes = Arrays.asList(
+                stringType,
+                typeUtils.getPrimitiveType(TypeKind.SHORT),
+                typeUtils.getPrimitiveType(TypeKind.INT),
+                typeUtils.getPrimitiveType(TypeKind.LONG)
+        );
+
         for (Element classElement : roundEnv.getElementsAnnotatedWith(RealmClass.class)) {
             String className;
             String packageName;
@@ -41,6 +50,7 @@
 
             PackageElement packageElement = (PackageElement) enclosingElement;
             packageName = packageElement.getQualifiedName().toString();
+            VariableElement primaryKey = null;
 
             for (Element element : typeElement.getEnclosedElements()) {
                 ElementKind elementKind = element.getKind();
@@ -63,6 +73,25 @@
                             error("@Index is only applicable to String fields - got " + element);
                             return true;
                         }
+                    }
+
+                    if (variableElement.getAnnotation(PrimaryKey.class) != null) {
+                        // The field has the @PrimaryKey annotation. It is only valid for
+                        // String, short, int, long and must only be present one time
+                        if (primaryKey != null) {
+                            error(String.format("@PrimaryKey cannot be defined twice. It was found here \"%s\" and here \"%s\"",
+                                    primaryKey.getSimpleName().toString(),
+                                    variableElement.getSimpleName().toString()));
+                            return true;
+                        }
+
+                        TypeMirror fieldType = variableElement.asType();
+                        if (!isValidType(typeUtils, fieldType, validPrimaryKeyTypes)) {
+                            error("\"" + variableElement.getSimpleName().toString() + "\" is not allowed as primary key. See @PrimaryKey for allowed types.");
+                            return true;
+                        }
+
+                        primaryKey = variableElement;
                     }
 
                     if (!variableElement.getModifiers().contains(Modifier.PRIVATE)) {
@@ -126,7 +155,7 @@
             }
 
             RealmProxyClassGenerator sourceCodeGenerator =
-                    new RealmProxyClassGenerator(processingEnv, className, packageName, fields, indexedFields);
+                    new RealmProxyClassGenerator(processingEnv, className, packageName, fields, indexedFields, primaryKey);
             try {
                 sourceCodeGenerator.generate();
             } catch (IOException e) {
