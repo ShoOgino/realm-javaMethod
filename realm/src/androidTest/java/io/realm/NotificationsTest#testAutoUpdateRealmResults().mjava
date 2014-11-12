@@ -1,0 +1,57 @@
+    public void testAutoUpdateRealmResults() throws InterruptedException, ExecutionException {
+        final int TEST_SIZE = 10;
+        final AtomicInteger counter = new AtomicInteger(0);
+        final AtomicBoolean isReady = new AtomicBoolean(false);
+        final Map<Integer, Integer> results = new ConcurrentHashMap<Integer, Integer>();
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                Looper.prepare();
+                Realm.deleteRealmFile(getContext());
+                final Realm realm = Realm.getInstance(getContext());
+                final RealmResults<Dog> dogs = realm.allObjects(Dog.class);
+                assertEquals(0, dogs.size());
+                realm.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        int c = counter.incrementAndGet();
+                        results.put(c, dogs.size());
+                    }
+                });
+                isReady.set(true);
+                Looper.loop();
+                return true;
+            }
+        });
+
+        // Wait until the looper is started
+        while (!isReady.get()) {
+            Thread.sleep(5);
+        }
+        Thread.sleep(100);
+
+        Realm realm = Realm.getInstance(getContext());
+        realm.beginTransaction();
+        for (int i = 0; i < TEST_SIZE; i++) {
+            Dog dog = realm.createObject(Dog.class);
+            dog.setName("Rex " + i);
+        }
+        realm.commitTransaction();
+        assertEquals(TEST_SIZE, realm.allObjects(Dog.class).size());
+
+        try {
+            future.get(2, TimeUnit.SECONDS);
+        } catch (TimeoutException ignore) {}
+
+        assertEquals(2, results.size());
+
+        assertTrue(results.containsKey(1));
+        assertEquals(0, results.get(1).intValue());
+        assertTrue(results.containsKey(2));
+        assertEquals(10, results.get(2).intValue());
+
+        assertEquals(2, counter.get());
+    }
+

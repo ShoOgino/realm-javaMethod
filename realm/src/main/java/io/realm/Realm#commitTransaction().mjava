@@ -1,18 +1,27 @@
     /**
-     * Commits a write transaction
-     *
-     * @throws java.lang.RuntimeException Any other error
+     * All changes since @{link io.realm.Realm#beginTransaction()} are persisted to disk and the
+     * realm reverts back to being read-only. An event is sent to notify all other realm instances
+     * that a change has occurred. When the event is received, the other realms will get their
+     * objects and @{link io.realm.RealmResults} updated to reflect
+     * the changes from this commit.
+     * 
+     * @throws java.lang.IllegalStateException If the write transaction is in an invalid state.
      */
     public void commitTransaction() {
         transaction.commitAndContinueAsRead();
 
-        Message message = Message.obtain();
-        message.arg1 = LooperThread.REALM_CHANGED;
-        message.arg2 = id;
-        if (looperThread.handler != null) {
-            looperThread.handler.sendMessage(message);
-        } else {
-            Log.i(TAG, "The LooperThread is not up and running yet. Commit message not sent");
+        for (Map.Entry<Handler, Integer> handlerIntegerEntry : handlers.entrySet()) {
+            Handler handler = handlerIntegerEntry.getKey();
+            int realmId = handlerIntegerEntry.getValue();
+            if (
+                    realmId == id                                // It's the right realm
+                    && !handler.hasMessages(REALM_CHANGED)       // The right message
+                    && handler.getLooper().getThread().isAlive() // The receiving thread is alive
+                    && !handler.equals(this.handler)             // Don't notify yourself
+            ) {
+                handler.sendEmptyMessage(REALM_CHANGED);
+            }
         }
+        sendNotifications();
     }
 

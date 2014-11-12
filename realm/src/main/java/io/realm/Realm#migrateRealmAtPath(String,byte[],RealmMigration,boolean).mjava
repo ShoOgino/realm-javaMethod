@@ -1,0 +1,9 @@
+    static public void migrateRealmAtPath(String realmPath, byte[] key, RealmMigration migration, boolean autoUpdate) {
+        Realm realm = Realm.createAndValidate(realmPath, key, false, autoUpdate);
+        realm.beginTransaction();
+        realm.setVersion(migration.execute(realm, realm.getVersion()));
+        realm.commitTransaction();
+
+        realmsCache.remove();
+    }
+

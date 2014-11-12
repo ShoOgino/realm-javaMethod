@@ -1,0 +1,21 @@
+    public RealmBaseAdapter(Context context, RealmResults<T> realmResults, boolean automaticUpdate) {
+        if (context == null) {
+            throw new IllegalArgumentException("Context cannot be null");
+        }
+        if (realmResults == null) {
+            throw new IllegalArgumentException("RealmResults cannot be null");
+        }
+
+        this.context = context;
+        this.realmResults = realmResults;
+        this.inflater = LayoutInflater.from(context);
+        if (automaticUpdate) {
+            realmResults.getRealm().addChangeListener(new RealmChangeListener() {
+                @Override
+                public void onChange() {
+                    notifyDataSetChanged();
+                }
+            });
+        }
+    }
+

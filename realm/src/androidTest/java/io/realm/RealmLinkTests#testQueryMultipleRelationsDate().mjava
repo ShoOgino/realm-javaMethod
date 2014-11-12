@@ -1,0 +1,29 @@
+    public void testQueryMultipleRelationsDate() {
+        RealmResults<Owner> owners1 = testRealm.where(Owner.class).equalTo("dogs.birthday", new Date(2000)).findAll();
+        assertEquals(1, owners1.size());
+
+        RealmResults<Owner> none1 = testRealm.where(Owner.class).equalTo("dogs.birthday", new Date(7)).findAll();
+        assertEquals(0, none1.size());
+
+        RealmResults<Owner> owners2 = testRealm.where(Owner.class).notEqualTo("dogs.birthday", new Date(10)).findAll();
+        assertEquals(1, owners2.size());
+
+        RealmResults<Owner> all1 = testRealm.where(Owner.class).notEqualTo("dogs.birthday", new Date(7)).findAll();
+        assertEquals(1, all1.size());
+
+        RealmResults<Owner> owners3 = testRealm.where(Owner.class).greaterThan("dogs.birthday", new Date(9)).findAll();
+        assertEquals(1, owners3.size());
+
+        RealmResults<Owner> owners4 = testRealm.where(Owner.class).greaterThanOrEqualTo("dogs.birthday", new Date(9)).findAll();
+        assertEquals(1, owners4.size());
+
+        RealmResults<Owner> owners5 = testRealm.where(Owner.class).lessThan("dogs.birthday", new Date(10000)).findAll();
+        assertEquals(1, owners5.size());
+
+        RealmResults<Owner> owners6 = testRealm.where(Owner.class).lessThanOrEqualTo("dogs.birthday", new Date(10000)).findAll();
+        assertEquals(1, owners6.size());
+
+        RealmResults<Owner> owners7 = testRealm.where(Owner.class).between("dogs.birthday", new Date(1000), new Date(3000)).findAll();
+        assertEquals(1, owners7.size());
+    }
+

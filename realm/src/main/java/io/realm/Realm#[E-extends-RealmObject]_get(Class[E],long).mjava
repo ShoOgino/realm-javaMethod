@@ -30,7 +30,7 @@
                 try {
                     generatedClass = Class.forName(generatedClassName);
                 } catch (ClassNotFoundException e) {
-                    throw new RealmException("Could not find the generated proxy class");
+                    throw new RealmException("Could not find the generated proxy class: " + APT_NOT_EXECUTED_MESSAGE);
                 }
                 generatedClasses.put(generatedClassName, generatedClass);
             }
@@ -40,7 +40,7 @@
                 try {
                     constructor = generatedClass.getConstructor();
                 } catch (NoSuchMethodException e) {
-                    throw new RealmException("Could not find the constructor in generated proxy class");
+                    throw new RealmException("Could not find the constructor in generated proxy class: " + APT_NOT_EXECUTED_MESSAGE);
                 }
                 constructors.put(generatedClass, constructor);
                 generatedConstructors.put(clazz, constructor);
@@ -59,8 +59,8 @@
             e.printStackTrace();
             throw new RealmException("An exception occurred while instantiating the proxy class");
         }
-        result.realmSetRow(row);
-        result.setRealm(this);
+        result.row = row;
+        result.realm = this;
         return result;
     }
 

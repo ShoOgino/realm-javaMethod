@@ -1,0 +1,12 @@
+    public void testCancelTransaction() {
+        testRealm.beginTransaction();
+        AllTypes allTypes = testRealm.createObject(AllTypes.class);
+        testRealm.cancelTransaction();
+        assertEquals(TEST_DATA_SIZE, testRealm.allObjects(AllTypes.class).size());
+
+        try {
+            testRealm.cancelTransaction();
+            fail();
+        } catch (IllegalStateException ignored) {}
+    }
+

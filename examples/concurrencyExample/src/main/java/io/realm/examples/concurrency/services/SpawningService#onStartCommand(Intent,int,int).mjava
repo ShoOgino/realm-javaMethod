@@ -1,25 +1,29 @@
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            Log.i(TAG, "The intent is null");
+            throw new AssertionError();
+        }
 
-        int insertCount = intent.getIntExtra(REALM_INSERTCOUNT_EXTRA, 0);
-        int readCount   = intent.getIntExtra(REALM_READCOUNT_EXTRA, 0);
+        int insertCount = intent.getIntExtra(REALM_INSERT_COUNT_EXTRA, 0);
+        int readCount   = intent.getIntExtra(REALM_READ_COUNT_EXTRA, 0);
 
         try {
-            allThreads = new ArrayList<KillableThread>();
-            RealmWriter wT = new RealmWriter(this);
-            wT.setInsertCount(insertCount);
-            allThreads.add(wT);
-            wT.start();
-            RealmReader rT = new RealmReader(this);
-            rT.setReadCount(readCount);
-            allThreads.add(rT);
-            rT.start();
+            RealmWriter writerThread = new RealmWriter(this);
+            writerThread.setInsertCount(insertCount);
+            allThreads.add(writerThread);
+            writerThread.start();
+
+            RealmReader readerThread = new RealmReader(this);
+            readerThread.setReadCount(readCount);
+            allThreads.add(readerThread);
+            readerThread.start();
         } catch (Exception e) {
             e.printStackTrace();
             quit();
         }
 
         //Service should stay active as long as Activity is active
-        return START_STICKY;
+        return START_STICKY_COMPATIBILITY;
     }
 

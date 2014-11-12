@@ -1,10 +1,16 @@
     /**
-     * Starts a write transaction, this must be closed with commitTransaction().
+     * Starts a write transaction, this must be closed with {@link io.realm.Realm#commitTransaction()}
+     * or aborted by @{link io.realm.Realm#cancelTransaction()}. Write transactions are used to
+     * atomically create, update and delete objects within a realm.
+     * <br>
+     * Before beginning the write transaction, @{link io.realm.Realm#beginTransaction()} updates the
+     * realm in the case of pending updates from other threads.
+     * <br>
      * Notice: it is not possible to nest write transactions. If you start a write
      * transaction within a write transaction an exception is thrown.
+     * <br>
+     * @throws java.lang.IllegalStateException If already in a write transaction.
      *
-     * @throws io.realm.exceptions.RealmException If already in a write transaction.
-     * @throws java.lang.RuntimeException         Any other error.
      */
     public void beginTransaction() {
         transaction.promoteToWrite();
