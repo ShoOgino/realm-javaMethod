@@ -4,7 +4,7 @@
     @Override
     public E get(int rowIndex) {
         E obj;
-
+        realm.assertThread();
         TableOrView table = getTable();
         if (table instanceof TableView) {
             obj = realm.get(classSpec, ((TableView)table).getSourceRowIndex(rowIndex));
