@@ -1,0 +1,12 @@
+    // TODO: This is not safe, size() can return the same result even though the data has changed
+    // Core has exposed a method so we can compare tableview version numbers, but are awaiting a core
+    // release.
+    private void assertRealmIsStable() {
+        int newSize = size();
+        if (oldSize > -1 && newSize != oldSize ) {
+            throw new ConcurrentModificationException("No changes to a Realm is allowed while iterating a RealmResults.");
+        }
+
+        oldSize = newSize;
+    }
+

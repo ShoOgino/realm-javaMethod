@@ -1,0 +1,18 @@
+    public void testRemovingObjectsInsideLoop() {
+        RealmResults<AllTypes> result = testRealm.allObjects(AllTypes.class);
+
+        try {
+            testRealm.beginTransaction();
+            for (AllTypes obj : result) {
+                obj.removeFromRealm();
+            }
+        } catch (ConcurrentModificationException e) {
+            assertTrue(true);
+            return;
+        } finally {
+            testRealm.cancelTransaction();
+        }
+
+        fail("Modifying Realm while iterating is not allowed");
+    }
+

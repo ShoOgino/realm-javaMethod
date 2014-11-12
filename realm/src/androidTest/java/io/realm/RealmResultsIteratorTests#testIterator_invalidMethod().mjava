@@ -1,0 +1,14 @@
+    public void testIterator_invalidMethod() {
+        RealmResults<AllTypes> result = testRealm.allObjects(AllTypes.class);
+        Iterator<AllTypes> it = result.iterator();
+        it.next();
+        try {
+            it.remove();
+         } catch (RealmException e) {
+            assertTrue(true);
+            return;
+        }
+
+        fail("remove() not allowed");
+    }
+

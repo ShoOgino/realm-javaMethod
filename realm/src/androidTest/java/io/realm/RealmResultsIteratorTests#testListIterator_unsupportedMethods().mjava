@@ -1,0 +1,18 @@
+    public void testListIterator_unsupportedMethods() {
+        for (ListIteratorMethods method : ListIteratorMethods.values()) {
+            ListIterator<AllTypes> it = testRealm.allObjects(AllTypes.class).listIterator();
+            try {
+                switch (method) {
+                    case ADD: it.add(new AllTypes()); break;
+                    case REMOVE: it.remove(); break;
+                    case SET: it.set(new AllTypes()); break;
+                }
+            } catch(RealmException e) {
+                assertTrue(true);
+                continue;
+            }
+
+            fail(method + " should not be supported");
+        }
+    }
+

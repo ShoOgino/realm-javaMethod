@@ -1,11 +1,11 @@
+        @Override
         public E next() {
             assertRealmIsStable();
+            pos++;
             try {
-                pos++;
-                E result = get(pos);
-                return result;
+                return get(pos);
             } catch (RuntimeException e) {
-                throw new NoSuchElementException();
+                return get(pos);
             }
         }
 
