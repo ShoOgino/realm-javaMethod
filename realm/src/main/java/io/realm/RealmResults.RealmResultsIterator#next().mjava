@@ -1,0 +1,13 @@
+        public E next() {
+            if (expectedModCount == modCount) {
+                try {
+                    E result = get(pos + 1);
+                    lastPosition = ++pos;
+                    return result;
+                } catch (IndexOutOfBoundsException e) {
+                    throw new NoSuchElementException();
+                }
+            }
+            throw new ConcurrentModificationException();
+        }
+
