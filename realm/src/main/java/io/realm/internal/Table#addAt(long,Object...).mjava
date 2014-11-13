@@ -49,7 +49,7 @@
             case INTEGER:
                 long intValue = ((Number) value).longValue();
                 if (isPrimaryKeyColumn(columnIndex) && findFirstLong(columnIndex, intValue) != TableOrView.NO_MATCH) {
-                    throw new RealmException("Primary key constraint broken. Value already exists: " + intValue);
+                    throwDuplicatePrimaryKeyMessage(intValue);
                 }
                 nativeInsertLong(nativePtr, columnIndex, rowIndex, intValue);
                 break;
@@ -62,7 +62,7 @@
             case STRING:
                 String stringValue = (String) value;
                 if (isPrimaryKeyColumn(columnIndex) && findFirstString(columnIndex, stringValue) != TableOrView.NO_MATCH) {
-                    throw new RealmException("Primary key constraint broken. Value already exists: " + stringValue);
+                    throwDuplicatePrimaryKeyMessage(stringValue);
                 }
                 nativeInsertString(nativePtr, columnIndex, rowIndex, (String)value);
                 break;

@@ -1,8 +1,16 @@
     @Override
     public void setString(long columnIndex, long rowIndex, String value) {
-        if (value == null)
-            throw new IllegalArgumentException("Null String is not allowed.");
+        if (value == null) throw new IllegalArgumentException("Null String is not allowed.");
         checkImmutable();
+        if (isPrimaryKeyColumn(columnIndex)) {
+            if (value.equals(STRING_DEFAULT_VALUE)) {
+                throwIllegalPrimaryKeyException(STRING_DEFAULT_VALUE);
+            }
+
+            if (findFirstString(columnIndex, value) != TableOrView.NO_MATCH) {
+                throwDuplicatePrimaryKeyMessage(value);
+            }
+        }
         nativeSetString(nativePtr, columnIndex, rowIndex, value);
     }
 

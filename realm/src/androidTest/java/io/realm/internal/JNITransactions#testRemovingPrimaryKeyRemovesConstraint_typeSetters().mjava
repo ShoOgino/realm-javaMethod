@@ -1,0 +1,28 @@
+    // Test that primary key constraints are actually removed
+    public void testRemovingPrimaryKeyRemovesConstraint_typeSetters() {
+        SharedGroup db = new SharedGroup(testFile, SharedGroup.Durability.FULL, null);
+
+        WriteTransaction trans = db.beginWrite();
+        Table tbl = trans.getTable("EmployeeTable");
+        tbl.addColumn(ColumnType.STRING, "name");
+        tbl.setPrimaryKey("name");
+
+        long rowIndex = tbl.addEmptyRow();
+        tbl.setString(0, rowIndex, "Foo");
+
+        try {
+            tbl.setString(0, rowIndex, "Foo");
+        } catch (RealmException e1) {
+            // Primary key check worked, now remove it and try again.
+            tbl.setPrimaryKey("");
+            try {
+                tbl.setString(0, rowIndex, "Foo");
+                return;
+            } catch (RealmException e2) {
+                fail("Primary key not removed");
+            }
+        }
+
+        fail("Primary key not enforced.");
+    }
+

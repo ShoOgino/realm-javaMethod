@@ -1,0 +1,27 @@
+    /**
+     * Define a primary key for this table. This will override any existing primary key.
+     * Note this is a temporary solution. Primary keys should be implemented in the core.
+     * Also, this needs to be called manually before working with the table.
+     *
+     * @param columnName    Name of the field that will function primary key.
+     */
+    public void setPrimaryKey(String columnName) {
+        Table pkTable = getPrimaryKeyTable();
+        if (pkTable == null) throw new RealmException("Primary keys are only supported if Table is part of a Group");
+
+        long rowIndex = pkTable.findFirstString(PRIMARY_KEY_CLASS_COLUMN_INDEX, getName());
+        if (columnName == null || columnName.equals("")) {
+            if (rowIndex > 0) pkTable.remove(rowIndex);
+            cachedPrimaryKeyColumnIndex = NO_PRIMARY_KEY;
+        } else {
+            long primaryKeyColumnIndex = getColumnIndex(columnName);
+            if (rowIndex == NO_MATCH) {
+                pkTable.add(getName(), primaryKeyColumnIndex);
+            } else {
+                pkTable.setLong(PRIMARY_KEY_FIELD_COLUMN_INDEX, rowIndex, primaryKeyColumnIndex);
+            }
+
+            cachedPrimaryKeyColumnIndex = primaryKeyColumnIndex;
+        }
+    }
+

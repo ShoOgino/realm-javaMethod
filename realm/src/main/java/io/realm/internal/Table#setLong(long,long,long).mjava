@@ -1,6 +1,9 @@
     @Override
     public void setLong(long columnIndex, long rowIndex, long value) {
         checkImmutable();
+        if (isPrimaryKeyColumn(columnIndex) && findFirstLong(columnIndex, value) != TableOrView.NO_MATCH) {
+            throwDuplicatePrimaryKeyMessage(value);
+        }
         nativeSetLong(nativePtr, columnIndex, rowIndex, value);
     }
 

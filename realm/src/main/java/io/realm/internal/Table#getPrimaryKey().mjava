@@ -4,11 +4,19 @@
      * @return Column index or {@code #NO_MATCH} if no primary key is set.
      */
     public long getPrimaryKey() {
-        Table pkTable = getPrimaryKeyTable();
-        long rowIndex = pkTable.findFirstString(PRIMARY_KEY_CLASS_COLUMN_INDEX, getName());
-        if (rowIndex != NO_MATCH) {
-            return pkTable.getRow(rowIndex).getLong(PRIMARY_KEY_FIELD_COLUMN_INDEX);
+        if (cachedPrimaryKeyColumnIndex > 0 || cachedPrimaryKeyColumnIndex == NO_PRIMARY_KEY) {
+            return cachedPrimaryKeyColumnIndex;
+        } else {
+            Table pkTable = getPrimaryKeyTable();
+            if (pkTable == null) return NO_PRIMARY_KEY; // Free table = No primary key
+            long rowIndex = pkTable.findFirstString(PRIMARY_KEY_CLASS_COLUMN_INDEX, getName());
+            if (rowIndex != NO_MATCH) {
+                cachedPrimaryKeyColumnIndex = pkTable.getRow(rowIndex).getLong(PRIMARY_KEY_FIELD_COLUMN_INDEX);
+            } else {
+                cachedPrimaryKeyColumnIndex = NO_PRIMARY_KEY;
+            }
+
+            return cachedPrimaryKeyColumnIndex;
         }
-        return NO_MATCH;
     }
 
