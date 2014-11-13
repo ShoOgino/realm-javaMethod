@@ -1,0 +1,38 @@
+    // Starting a transaction on the wrong thread will fail
+    public boolean transactionMethodWrongThread(final TransactionMethod method) throws InterruptedException, ExecutionException {
+        final Realm realm = Realm.getInstance(getContext());
+
+        if (method != TransactionMethod.METHOD_BEGIN) {
+            realm.beginTransaction();
+            Dog dog = realm.createObject(Dog.class); // FIXME: Empty transactions cannot be cancelled
+        }
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                try {
+                    switch (method) {
+                        case METHOD_BEGIN:
+                            realm.beginTransaction();
+                            break;
+                        case METHOD_COMMIT:
+                            realm.commitTransaction();
+                            break;
+                        case METHOD_CANCEL:
+                            realm.cancelTransaction();
+                            break;
+                    }
+                    return false;
+                } catch (IllegalStateException ignored) {
+                    return true;
+                }
+            }
+        });
+
+        boolean result = future.get();
+        if (result && method != TransactionMethod.METHOD_BEGIN) {
+            realm.cancelTransaction();
+        }
+        return result;
+    }
+

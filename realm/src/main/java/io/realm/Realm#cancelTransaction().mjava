@@ -6,10 +6,11 @@
      * <br>
      * Calling this when not in a write transaction will throw an exception.
      *
-     * @throws java.lang.IllegalStateException    If the write transaction is an invalid state or
-    *                                             not in a write transaction.
+     * @throws java.lang.IllegalStateException    If the write transaction is an invalid state,
+    *                                             not in a write transaction or incorrect thread.
     */
      public void cancelTransaction() {
+         assertThread();
          transaction.rollbackAndContinueAsRead();
      }
 
