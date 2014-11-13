@@ -1,0 +1,16 @@
+    private void emitToStringMethod(JavaWriter writer) throws IOException {
+        writer.emitAnnotation("Override");
+        writer.beginMethod("String", "toString", EnumSet.of(Modifier.PUBLIC));
+        writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = [\")", className);
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
+            writer.emitStatement("stringBuilder.append(%s())", getters.get(fieldName));
+            writer.emitStatement("stringBuilder.append(\"} \")", fieldName);
+        }
+        writer.emitStatement("stringBuilder.append(\"]\")");
+        writer.emitStatement("return stringBuilder.toString()");
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+
