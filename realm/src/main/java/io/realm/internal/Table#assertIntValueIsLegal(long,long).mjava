@@ -1,0 +1,7 @@
+    void assertIntValueIsLegal(long columnIndex, long value) {
+        if (isPrimaryKeyColumn(columnIndex)) {
+            if (value == INTEGER_DEFAULT_VALUE) throwIllegalPrimaryKeyException(INTEGER_DEFAULT_VALUE);
+            if (findFirstLong(columnIndex, value) != TableOrView.NO_MATCH) throwDuplicatePrimaryKeyException(value);
+        }
+    }
+

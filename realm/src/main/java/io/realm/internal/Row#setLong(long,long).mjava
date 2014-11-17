@@ -1,8 +1,5 @@
     public void setLong(long columnIndex, long value) {
-        Table table = getTable();
-        if (table.isPrimaryKey(columnIndex) && table.findFirstLong(columnIndex, value) != TableOrView.NO_MATCH) {
-            throw new RealmException("Primary key constraint broken. Value already exists: " + value);
-        }
+        getTable().assertIntValueIsLegal(columnIndex, value);
         nativeSetLong(nativePtr, columnIndex, value);
     }
 

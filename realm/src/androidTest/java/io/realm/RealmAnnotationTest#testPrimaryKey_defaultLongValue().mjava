@@ -1,0 +1,16 @@
+    public void testPrimaryKey_defaultLongValue() {
+        testRealm.beginTransaction();
+        testRealm.clear(PrimaryKeyAsLong.class);
+        try {
+            PrimaryKeyAsLong str = testRealm.createObject(PrimaryKeyAsLong.class);
+            str.setId(0);
+        } catch (RealmException e) {
+            assertTrue(e.getMessage().endsWith("not allowed as value in a field that is a primary key."));
+            return;
+        } finally {
+            testRealm.cancelTransaction();
+        }
+
+        fail("It should not be allowed to set a primary key to the default value for the field type");
+    }
+
