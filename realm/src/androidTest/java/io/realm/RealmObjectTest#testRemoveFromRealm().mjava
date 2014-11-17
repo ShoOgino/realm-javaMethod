@@ -22,5 +22,12 @@
             rex.getName();
             fail();
         } catch (IllegalStateException ignored) {}
+
+        try {
+            realm.beginTransaction();
+            rex.removeFromRealm();
+            realm.commitTransaction();
+            fail();
+        } catch (IllegalStateException ignored) {}
     }
 
