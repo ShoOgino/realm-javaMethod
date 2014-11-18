@@ -1,9 +1,14 @@
     /**
-     * Define a primary key for this table. This will override any existing primary key.
-     * Note this is a temporary solution. Primary keys should be implemented in the core.
-     * Also, this needs to be called manually before working with the table.
+     * Define a primary key for this table. This needs to be called manually before inserting data
+     * into the table.
      *
-     * @param columnName    Name of the field that will function primary key.
+     * @param columnName    Name of the field that will function primary key. "" or <code>null</code>
+     *                      will remove any previous set magic key.
+     *
+     * @throws              RealmException if it is not possible to set the primary key due to the
+     *                      column not having distinct values (ie. violating the primary key
+     *                      constaint).
+     *
      */
     public void setPrimaryKey(String columnName) {
         Table pkTable = getPrimaryKeyTable();
@@ -15,6 +20,7 @@
             cachedPrimaryKeyColumnIndex = NO_PRIMARY_KEY;
         } else {
             long primaryKeyColumnIndex = getColumnIndex(columnName);
+            assertIsValidPrimaryKeyColumn(primaryKeyColumnIndex);
             if (rowIndex == NO_MATCH) {
                 pkTable.add(getName(), primaryKeyColumnIndex);
             } else {
