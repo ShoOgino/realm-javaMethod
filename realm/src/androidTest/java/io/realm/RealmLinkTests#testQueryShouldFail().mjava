@@ -1,0 +1,19 @@
+    public void testQueryShouldFail() {
+        try {
+            RealmResults<Owner> owners = testRealm.where(Owner.class).equalTo("cat..hasTail", true).findAll();
+            fail("Invalid argument should fail");
+        } catch (IllegalArgumentException e) {
+
+        }
+        try {
+            RealmResults<Owner> owners = testRealm.where(Owner.class).equalTo("cat.hasTail.", true).findAll();
+        } catch (IllegalArgumentException e) {
+
+        }
+        try {
+            RealmResults<Owner> owners = testRealm.where(Owner.class).equalTo("not.there", true).findAll();
+        } catch (ArrayIndexOutOfBoundsException e) {
+
+        }
+    }
+
