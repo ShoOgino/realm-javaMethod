@@ -1,4 +1,4 @@
-    public void testSortNonLatin() {
+    public void testSortWithRussianCharacters() {
         testRealm.beginTransaction();
         testRealm.clear(AllTypes.class);
         AllTypes at1 = testRealm.createObject(AllTypes.class);
@@ -21,9 +21,8 @@
         RealmResults<AllTypes> reverseResult = result.sort(FIELD_STRING, RealmResults.SORT_ORDER_DECENDING);
         assertEquals(3, reverseResult.size());
         assertEquals("Москва", reverseResult.last().getColumnString());
-
-        RealmResults<AllTypes> reverseSortedResult = sortedResult.sort(FIELD_STRING, RealmResults.SORT_ORDER_DECENDING);
-        assertEquals(3, reverseSortedResult.size());
-        assertEquals("Москва", reverseSortedResult.last().getColumnString());
+        assertEquals("Санкт-Петербург", reverseResult.get(0).getColumnString());
+        assertEquals("Новороссийск", reverseResult.get(1).getColumnString());
+        assertEquals("Москва", reverseResult.get(2).getColumnString());
     }
 
