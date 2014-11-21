@@ -1,0 +1,43 @@
+    // remove all objects - one by one
+    public void removeFromRealmAt(boolean atTop) {
+        Set<Long> ages = new HashSet<Long>();
+        testRealm.beginTransaction();
+        for (int i = 0; i < TEST_SIZE; i++) {
+            Dog dog = testRealm.createObject(Dog.class);
+            dog.setAge(i);
+            ages.add(new Long(i));
+        }
+        testRealm.commitTransaction();
+
+        assertEquals(TEST_SIZE, testRealm.allObjects(Dog.class).size());
+
+        RealmResults<Dog> dogs = testRealm.allObjects(Dog.class);
+        for (int i = 0; i < TEST_SIZE; i++) {
+            testRealm.beginTransaction();
+            Dog dogToRemove;
+            if (atTop) {
+                dogToRemove = dogs.first();
+            } else {
+                dogToRemove = dogs.last();
+            }
+            ages.remove(new Long(dogToRemove.getAge()));
+            dogToRemove.removeFromRealm();
+
+            // object is no longer valid
+            try {
+                dogToRemove.getAge();
+                fail();
+            }
+            catch (IllegalStateException ignored) {}
+
+            testRealm.commitTransaction();
+
+            // and removed from realm and remaining objects are place correctly
+            RealmResults<Dog> remainingDogs = testRealm.allObjects(Dog.class);
+            assertEquals(TEST_SIZE - i - 1, remainingDogs.size());
+            for (Dog dog : remainingDogs) {
+                assertTrue(ages.contains(new Long(dog.getAge())));
+            }
+        }
+    }
+
