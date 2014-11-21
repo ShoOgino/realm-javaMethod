@@ -1,0 +1,17 @@
+    public void testCyclicHashCode() {
+        testRealm.beginTransaction();
+        testRealm.clear(CyclicType.class);
+        CyclicType foo = testRealm.createObject(CyclicType.class);
+        foo.setName("Foo");
+        CyclicType bar = testRealm.createObject(CyclicType.class);
+        bar.setName("Bar");
+
+        // Setup cycle on normal object references
+        foo.setObject(bar);
+        bar.setObject(foo);
+
+        testRealm.commitTransaction();
+
+        assertEquals(0, foo.hashCode());
+    }
+

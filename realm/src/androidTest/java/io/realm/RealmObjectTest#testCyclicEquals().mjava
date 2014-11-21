@@ -1,0 +1,18 @@
+    public void testCyclicEquals() {
+        Realm realm = Realm.getInstance(getContext());
+        realm.beginTransaction();
+        realm.clear(CyclicType.class);
+        CyclicType foo = realm.createObject(CyclicType.class);
+        foo.setName("Foo");
+        CyclicType bar = realm.createObject(CyclicType.class);
+        bar.setName("Bar");
+
+        // Setup cycle on normal object references
+        foo.setObject(bar);
+        bar.setObject(foo);
+
+        realm.commitTransaction();
+
+        assertEquals(foo, realm.where(CyclicType.class).equalTo("name", "Foo").findFirst());
+    }
+
