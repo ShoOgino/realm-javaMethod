@@ -1,14 +1,14 @@
     public void testRealmQueryBetween() {
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).between("columnLong", 0, 9).findAll();
-        assertEquals("Not the expected number records " + resultList.size(), 10, resultList.size());
+        assertEquals(10, resultList.size());
 
         resultList = testRealm.where(AllTypes.class).beginsWith("columnString", "test data ").findAll();
-        assertEquals("Not the expected number records " + resultList.size(), TEST_DATA_SIZE, resultList.size());
+        assertEquals(TEST_DATA_SIZE, resultList.size());
 
         resultList = testRealm.where(AllTypes.class).beginsWith("columnString", "test data 1").between("columnLong", 2, 20).findAll();
-        assertEquals("Not the expected number records " + resultList.size(), 10, resultList.size());
+        assertEquals(10, resultList.size());
 
         resultList = testRealm.where(AllTypes.class).between("columnLong", 2, 20).beginsWith("columnString", "test data 1").findAll();
-        assertEquals("Not the expected number records " + resultList.size(), 10, resultList.size());
+        assertEquals(10, resultList.size());
     }
 

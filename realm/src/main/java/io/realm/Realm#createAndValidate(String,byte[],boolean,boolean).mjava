@@ -1,13 +1,14 @@
+    @SuppressWarnings("unchecked")
     private static Realm createAndValidate(String absolutePath, byte[] key, boolean validateSchema, boolean autoRefresh) {
-        Map<String, Realm> realms = realmsCache.get();
-        Realm realm = realms.get(absolutePath);
+        Map<Integer, Realm> realms = realmsCache.get();
+        Realm realm = realms.get(absolutePath.hashCode());
 
         if (realm != null) {
             return realm;
         }
 
         realm = new Realm(absolutePath, key, autoRefresh);
-        realms.put(absolutePath, realm);
+        realms.put(absolutePath.hashCode(), realm);
         realmsCache.set(realms);
 
         if (validateSchema) {
