@@ -10,8 +10,10 @@
         assertEquals(resultList.first(), realmAdapter.getRealmResults().last());
         assertEquals(resultList.size(), realmAdapter.getRealmResults().size());
 
-        realmAdapter.updateRealmResults(realmAdapter.getRealmResults().sort(FIELD_STRING));
-        assertEquals(resultList.first(), realmAdapter.getRealmResults().first());
-        assertEquals(resultList.size(), realmAdapter.getRealmResults().size());
+        RealmResults<AllTypes> emptyResultList = testRealm.where(AllTypes.class)
+                .equalTo(FIELD_STRING, "Not there").findAll();
+
+        realmAdapter.updateRealmResults(emptyResultList);
+        assertEquals(emptyResultList.size(), realmAdapter.getRealmResults().size());
     }
 
