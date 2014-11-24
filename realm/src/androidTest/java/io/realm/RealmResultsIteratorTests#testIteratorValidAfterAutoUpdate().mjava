@@ -1,17 +1,18 @@
     // Query iterator should still be valid if we modify Realm after query but before iterator is
     // fetched.
-    public void testIterator_validAfterAutoUpdate() {
+    public void testIteratorValidAfterAutoUpdate() {
         RealmResults<AllTypes> result = testRealm.allObjects(AllTypes.class);
 
         testRealm.beginTransaction();
         result.removeLast();
         testRealm.commitTransaction();
 
-        long sum = 0;
+        // Use iterator instead of RealmResults.sum()
+        long realmSum = 0;
         for (AllTypes obj : result) {
-            sum += obj.getColumnLong();
+            realmSum += obj.getColumnLong();
         }
 
-        assertEquals(sum(0, TEST_DATA_SIZE - 2), sum);
+        assertEquals(sum(0, TEST_DATA_SIZE - 2), realmSum);
     }
 
