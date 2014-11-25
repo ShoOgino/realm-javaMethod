@@ -2,10 +2,10 @@
         public E previous() {
             assertRealmIsStable();
             pos--;
-            try {
-                return get(pos);
-            } catch (RuntimeException e) {
-                throw new NoSuchElementException();
+            if (pos < 0) {
+                throw new IndexOutOfBoundsException("Cannot access index less than zero. This was " + pos + ". Remember to check hasPrevious() before using previous().");
             }
+
+            return get(pos);
         }
 
