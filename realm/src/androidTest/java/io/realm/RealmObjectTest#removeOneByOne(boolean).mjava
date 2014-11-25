@@ -1,7 +1,7 @@
-    // remove all objects - one by one
-    public void removeFromRealmAt(boolean atTop) {
+    public void removeOneByOne(boolean atFirst) {
         Set<Long> ages = new HashSet<Long>();
         testRealm.beginTransaction();
+        testRealm.clear(Dog.class);
         for (int i = 0; i < TEST_SIZE; i++) {
             Dog dog = testRealm.createObject(Dog.class);
             dog.setAge(i);
@@ -15,7 +15,7 @@
         for (int i = 0; i < TEST_SIZE; i++) {
             testRealm.beginTransaction();
             Dog dogToRemove;
-            if (atTop) {
+            if (atFirst) {
                 dogToRemove = dogs.first();
             } else {
                 dogToRemove = dogs.last();
