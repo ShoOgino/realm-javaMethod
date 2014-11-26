@@ -1,13 +1,16 @@
     @SuppressWarnings("unchecked")
     private static Realm createAndValidate(String absolutePath, byte[] key, boolean validateSchema, boolean autoRefresh) {
+        int references = referenceCount.get();
         Map<Integer, Realm> realms = realmsCache.get();
         Realm realm = realms.get(absolutePath.hashCode());
 
         if (realm != null) {
+            referenceCount.set(references + 1);
             return realm;
         }
 
         realm = new Realm(absolutePath, key, autoRefresh);
+
         realms.put(absolutePath.hashCode(), realm);
         realmsCache.set(realms);
 
@@ -35,10 +38,12 @@
             }
 
             long version = realm.getVersion();
+            boolean commitNeeded = false;
             try {
                 realm.beginTransaction();
                 if (version == UNVERSIONED) {
                     realm.setVersion(0);
+                    commitNeeded = true;
                 }
 
                 for (String className : proxyClasses) {
@@ -62,6 +67,7 @@
                         }
                         try {
                             initTableMethod.invoke(null, realm.transaction);
+                            commitNeeded = true;
                         } catch (IllegalAccessException e) {
                             throw new RealmException("Could not execute the initTable method in the " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
                         } catch (InvocationTargetException e) {
@@ -115,10 +121,15 @@
                     }
                 }
             } finally {
-                realm.commitTransaction();
+                if (commitNeeded) {
+                    realm.commitTransaction();
+                } else {
+                    realm.cancelTransaction();
+                }
             }
         }
 
+        referenceCount.set(references + 1);
         return realm;
     }
 
