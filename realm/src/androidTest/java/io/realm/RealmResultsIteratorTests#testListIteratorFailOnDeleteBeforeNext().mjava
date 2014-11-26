@@ -1,0 +1,17 @@
+    public void testListIteratorFailOnDeleteBeforeNext() {
+        RealmResults<AllTypes> result = testRealm.allObjects(AllTypes.class);
+
+        // Use iterator instead of RealmResults.sum()
+        ListIterator<AllTypes> it = result.listIterator();
+        try {
+            testRealm.beginTransaction();
+            it.remove();
+        } catch (IllegalStateException e) {
+            return;
+        } finally {
+            testRealm.cancelTransaction();
+        }
+
+        fail("You must call next() before calling remove() pr. the JavaDoc");
+    }
+

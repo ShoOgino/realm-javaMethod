@@ -1,4 +1,11 @@
         public void remove() {
-            throw new RealmException("Removing RealmObjects while iterating is not supported.");
+            assertRealmIsStable();
+            if (pos == -1) throw new IllegalStateException("Must call next() before calling remove()");
+            if (removeUsed) throw new IllegalStateException("Cannot call remove() twice. Must call next() in between");
+
+            RealmResults.this.remove(pos);
+            pos--;
+            removeUsed = true;
+            currentTableViewVersion = getTable().sync();
         }
 

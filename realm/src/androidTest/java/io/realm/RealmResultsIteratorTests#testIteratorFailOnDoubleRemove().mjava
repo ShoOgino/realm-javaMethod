@@ -1,0 +1,20 @@
+    public void testIteratorFailOnDoubleRemove() {
+        RealmResults<AllTypes> result = testRealm.allObjects(AllTypes.class);
+
+        // Use iterator instead of RealmResults.sum()
+        Iterator<AllTypes> it = result.iterator();
+        try {
+            testRealm.beginTransaction();
+            it.next();
+            it.remove();
+            it.remove();
+
+        } catch (IllegalStateException e) {
+            return;
+        } finally {
+            testRealm.cancelTransaction();
+        }
+
+        fail("You can only make one call to remove() after calling next() pr. the JavaDoc");
+    }
+
