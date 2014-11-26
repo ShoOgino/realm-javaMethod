@@ -7,11 +7,18 @@
         }
 
         // Raise the reference
-        Realm realm = Realm.getInstance(getContext());
-        realm.close();
+        Realm realm = null;
         try {
-            // This should not fail because the reference is now 2
-            realm.where(AllTypes.class).count();
+            realm = Realm.getInstance(getContext());
+        } finally {
+            if (realm != null) realm.close();
+        }
+
+        try {
+            // This should not fail because the reference is now 1
+            if (realm != null) {
+                realm.where(AllTypes.class).count();
+            }
         } catch (IllegalStateException e) {
             fail();
         }
@@ -20,7 +27,7 @@
         try {
             testRealm.where(AllTypes.class).count();
             fail();
-        } catch (IllegalStateException ignored) {}
-
+        } catch (IllegalStateException ignored) {
+        }
     }
 
