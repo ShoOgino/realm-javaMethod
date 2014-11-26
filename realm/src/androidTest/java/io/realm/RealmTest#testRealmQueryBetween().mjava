@@ -1,0 +1,14 @@
+    public void testRealmQueryBetween() {
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).between(FIELD_LONG, 0, 9).findAll();
+        assertEquals(10, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).beginsWith(FIELD_STRING, "test data ").findAll();
+        assertEquals(TEST_DATA_SIZE, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).beginsWith(FIELD_STRING, "test data 1").between(FIELD_LONG, 2, 20).findAll();
+        assertEquals(10, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).between(FIELD_LONG, 2, 20).beginsWith(FIELD_STRING, "test data 1").findAll();
+        assertEquals(10, resultList.size());
+    }
+

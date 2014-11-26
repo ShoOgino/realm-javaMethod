@@ -1,0 +1,18 @@
+    // Note that this test is relying on the values set while initializing the test dataset
+    public void testQueriesResults() throws IOException {
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).equalTo(FIELD_LONG, 33).findAll();
+        assertEquals("ResultList.where not returning expected result", 1, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).equalTo(FIELD_LONG, 3333).findAll();
+        assertEquals("ResultList.where not returning expected result", 0, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).equalTo(FIELD_STRING, "test data 0").findAll();
+        assertEquals(1, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).equalTo(FIELD_STRING, "test data 0", RealmQuery.CASE_INSENSITIVE).findAll();
+        assertEquals(1, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).equalTo(FIELD_STRING, "Test data 0", RealmQuery.CASE_SENSITIVE).findAll();
+        assertEquals(0, resultList.size());
+    }
+
