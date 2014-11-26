@@ -1,15 +1,20 @@
     @SuppressWarnings("unchecked")
     private static Realm createAndValidate(String absolutePath, byte[] key, boolean validateSchema, boolean autoRefresh) {
+        int references = referenceCount.get();
         Map<Integer, Realm> realms = realmsCache.get();
         Realm realm = realms.get(absolutePath.hashCode());
 
         if (realm != null) {
+            referenceCount.set(references + 1);
             return realm;
         }
 
         realm = new Realm(absolutePath, key, autoRefresh);
-        realms.put(absolutePath.hashCode(), realm);
-        realmsCache.set(realms);
+
+        if (autoRefresh) {
+            realms.put(absolutePath.hashCode(), realm);
+            realmsCache.set(realms);
+        }
 
         if (validateSchema) {
             Class<?> validationClass;
@@ -119,6 +124,7 @@
             }
         }
 
+        referenceCount.set(references + 1);
         return realm;
     }
 
