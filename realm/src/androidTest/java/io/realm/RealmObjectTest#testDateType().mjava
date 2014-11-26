@@ -1,0 +1,49 @@
+    public void testDateType() {
+        long testDatesNotValid[] = {Long.MIN_VALUE, Long.MAX_VALUE};
+        long testDatesValid[] = {-1000, 0, 1000};
+        long testDatesLoosePrecision[] = {1, 1001};
+
+        // test valid dates
+        testRealm.beginTransaction();
+        testRealm.clear(AllTypes.class);
+        for (long value : testDatesValid) {
+            AllTypes allTypes = testRealm.createObject(AllTypes.class);
+            allTypes.setColumnDate(new Date(value));
+        }
+        testRealm.commitTransaction();
+
+        int i = 0;
+        for (AllTypes allTypes : testRealm.allObjects(AllTypes.class)) {
+            assertEquals("Item " + i, new Date(testDatesValid[i]), allTypes.getColumnDate());
+            i++;
+        }
+
+        // test valid dates but with precision lost
+        testRealm.beginTransaction();
+        testRealm.clear(AllTypes.class);
+        for (long value : testDatesLoosePrecision) {
+            AllTypes allTypes = testRealm.createObject(AllTypes.class);
+            allTypes.setColumnDate(new Date(value));
+        }
+        testRealm.commitTransaction();
+
+        i = 0;
+        for (AllTypes allTypes : testRealm.allObjects(AllTypes.class)) {
+            assertFalse("Item " + i, new Date(testDatesLoosePrecision[i]) == allTypes.getColumnDate());
+            assertEquals("Item " + i, new Date(1000*(testDatesLoosePrecision[i]/1000)), allTypes.getColumnDate());
+            i++;
+        }
+
+        // test invalid dates
+        for (long value : testDatesNotValid) {
+            try {
+                testRealm.beginTransaction();
+                testRealm.clear(AllTypes.class);
+                AllTypes allTypes = testRealm.createObject(AllTypes.class);
+                allTypes.setColumnDate(new Date(value));
+                testRealm.commitTransaction();
+                fail();
+            } catch (IllegalArgumentException ignored) { testRealm.cancelTransaction(); }
+        }
+    }
+
