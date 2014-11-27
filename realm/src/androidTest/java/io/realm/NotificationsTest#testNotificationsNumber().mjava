@@ -6,16 +6,23 @@
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                Looper.prepare();
-                Realm realm = Realm.getInstance(getContext());
-                realm.addChangeListener(new RealmChangeListener() {
-                    @Override
-                    public void onChange() {
-                        counter.incrementAndGet();
+                Realm realm = null;
+                try {
+                    Looper.prepare();
+                    realm = Realm.getInstance(getContext());
+                    realm.addChangeListener(new RealmChangeListener() {
+                        @Override
+                        public void onChange() {
+                            counter.incrementAndGet();
+                        }
+                    });
+                    isReady.set(true);
+                    Looper.loop();
+                } finally {
+                    if (realm != null) {
+                        realm.close();
                     }
-                });
-                isReady.set(true);
-                Looper.loop();
+                }
                 return true;
             }
         });
@@ -31,11 +38,13 @@
         Dog dog = realm.createObject(Dog.class);
         dog.setName("Rex");
         realm.commitTransaction();
+        realm.close();
 
         try {
             future.get(1, TimeUnit.SECONDS);
         } catch (TimeoutException ignore) {}
 
         assertEquals(1, counter.get());
+        assertTrue(Realm.realmsCache.get().isEmpty());
     }
 
