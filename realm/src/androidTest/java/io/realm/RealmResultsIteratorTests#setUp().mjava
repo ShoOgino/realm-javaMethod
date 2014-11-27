@@ -1,13 +1,8 @@
     @Override
     protected void setUp() throws InterruptedException {
-        boolean result = Realm.deleteRealmFile(getContext());
-        assertTrue(result);
-
+        Realm.deleteRealmFile(getContext());
         testRealm = Realm.getInstance(getContext());
-
         testRealm.beginTransaction();
-        testRealm.allObjects(AllTypes.class).clear();
-
         for (int i = 0; i < TEST_DATA_SIZE; ++i) {
             AllTypes allTypes = testRealm.createObject(AllTypes.class);
             allTypes.setColumnBoolean((i % 2) == 0);
