@@ -1,15 +1,14 @@
     public void testShouldFailOutsideTransaction() {
-
         // These API calls should fail outside a Transaction:
         try {
-            AllTypes aT = testRealm.createObject(AllTypes.class);
+            testRealm.createObject(AllTypes.class);
             fail("Realm.createObject should fail outside write transaction");
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException ignored) {
         }
         try {
             testRealm.remove(AllTypes.class, 0);
             fail("Realm.remove should fail outside write transaction");
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException ignored) {
         }
     }
 

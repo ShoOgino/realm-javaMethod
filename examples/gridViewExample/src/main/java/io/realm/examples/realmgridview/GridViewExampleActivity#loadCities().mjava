@@ -1,4 +1,4 @@
-    public List<City> loadCities() {
+    private List<City> loadCities() {
         List<City> items = new ArrayList<City>();
 
         // In this case we're loading from local assets.
@@ -12,12 +12,6 @@
 
         JsonParser parser = new JsonParser();
         JsonArray jsonArray = parser.parse(new InputStreamReader(stream)).getAsJsonArray();
-
-        // Clear the realm from last time
-        Realm.deleteRealmFile(this);
-
-        // Store the retrieved items to the Realm
-        Realm realm = Realm.getInstance(this);
 
         // Open a transaction to store items into the realm
         realm.beginTransaction();

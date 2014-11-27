@@ -11,9 +11,12 @@
                     return false;
                 } catch (IllegalStateException ignored) {
                     return true;
+                } finally {
+                    realm.close();
                 }
             }
         });
         assertTrue(future.get());
+        assertTrue(Realm.realmsCache.get().isEmpty());
     }
 

@@ -1,12 +1,11 @@
     // <E> void remove(Class<E> clazz, long objectIndex)
     public void testShouldRemoveRow() {
-
+        populateTestRealm();
         testRealm.beginTransaction();
         testRealm.remove(AllTypes.class, 0);
         testRealm.commitTransaction();
 
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
         assertEquals("Realm.delete has not deleted record correctly", TEST_DATA_SIZE - 1, resultList.size());
-
     }
 
