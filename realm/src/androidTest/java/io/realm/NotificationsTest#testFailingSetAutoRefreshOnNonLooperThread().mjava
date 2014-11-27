@@ -8,12 +8,15 @@
                 assertFalse(autoRefresh);
                 try {
                     realm.setAutoRefresh(true);
+                    realm.close();
                     return false;
                 } catch (IllegalStateException ignored) {
+                    realm.close();
                     return true;
                 }
             }
         });
         assertTrue(future.get());
+        assertTrue(Realm.realmsCache.get().isEmpty());
     }
 
