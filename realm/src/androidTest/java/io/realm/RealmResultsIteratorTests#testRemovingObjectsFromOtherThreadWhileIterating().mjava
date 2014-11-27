@@ -1,5 +1,7 @@
     // Using size() as heuristic for concurrent modifications is dangerous as we might skip
     // elements.
+    // TODO Possible bug: Why does this interfer with reference counting check. They are separate Realm files.
+    // TODO Possible bug: Why is realm.refresh() needed?
     public void testRemovingObjectsFromOtherThreadWhileIterating() throws InterruptedException, ExecutionException {
 
         // Prefill
@@ -25,13 +27,21 @@
                 Realm backgroundRealm = Realm.getInstance(getContext(), "test", false);
                 backgroundRealm.beginTransaction();
                 RealmResults<AllTypes> backgroundResult = backgroundRealm.allObjects(AllTypes.class);
-                if (backgroundResult.size() != 2) return false;
+                if (backgroundResult.size() != 2) {
+                    backgroundRealm.close();
+                    return false;
+                }
                 backgroundResult.sort("columnLong", RealmResults.SORT_ORDER_ASCENDING).remove(0);
                 AllTypes o3 = backgroundRealm.createObject(AllTypes.class);
                 o3.setColumnLong(3);
                 backgroundRealm.commitTransaction();
-                if (backgroundResult.size() != 2) return false;
-                return true;
+                int size = backgroundResult.size();
+                backgroundRealm.close();
+                if (size != 2) {
+                    return false;
+                } else {
+                    return true;
+                }
             }
         };
 
@@ -48,6 +58,8 @@
             fail("Failed to detect the list was modified, but retained it's size while iterating");
         } catch (ConcurrentModificationException ignored) {
             return;
+        } finally {
+            realm.close();
         }
     }
 
