@@ -1,19 +1,13 @@
     @Override
     public int hashCode() {
+        String realmName = realm.getPath();
+        String tableName = row.getTable().getName();
+        long rowIndex = row.getIndex();
+
         int result = 17;
-        String aString_0 = getColumnString();
-        result = 31 * result + (aString_0 != null ? aString_0.hashCode() : 0);
-        long aLong_1 = getColumnLong();
-        result = 31 * result + (int) (aLong_1 ^ (aLong_1 >>> 32));
-        float aFloat_2 = getColumnFloat();
-        result = 31 * result + (aFloat_2 != +0.0f ? Float.floatToIntBits(aFloat_2) : 0);
-        long temp_3 = Double.doubleToLongBits(getColumnDouble());
-        result = 31 * result + (int) (temp_3 ^ (temp_3 >>> 32));
-        result = 31 * result + (isColumnBoolean() ? 1 : 0);
-        java.util.Date temp_5 = getColumnDate();
-        result = 31 * result + (temp_5 != null ? temp_5.hashCode() : 0);
-        byte[] aByteArray_6 = getColumnBinary();
-        result = 31 * result + (aByteArray_6 != null ? Arrays.hashCode(aByteArray_6) : 0);
+        result = 31 * result + ((realmName != null) ? realmName.hashCode() : 0);
+        result = 31 * result + ((tableName != null) ? tableName.hashCode() : 0);
+        result = 31 * result + (int) (rowIndex ^ (rowIndex >>> 32));
         return result;
     }
 
