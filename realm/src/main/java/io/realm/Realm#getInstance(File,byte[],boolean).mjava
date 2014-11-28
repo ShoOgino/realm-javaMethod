@@ -1,0 +1,20 @@
+    /**
+     * Realm static constructor
+     *
+     * @param writableFolder absolute path to a writable directory
+     * @param key            a 32-byte encryption key
+     * @param autoRefresh whether the Realm object and its derived objects (RealmResults and RealmObjects)
+     *                    should be automatically refreshed with the event loop (requires to be in a thread with a Looper)
+     * @return an instance of the Realm class
+     * @throws RealmMigrationNeededException The model classes have been changed and the Realm
+     *                                       must be migrated
+     * @throws RealmIOException              Error when accessing underlying file
+     * @throws java.lang.IllegalStateException The Realm is being instantiated in a Thread without
+     *                                         a {@link android.os.Looper}
+     * @throws RealmException                Other errors
+     */
+    @SuppressWarnings("UnusedDeclaration")
+    public static Realm getInstance(File writableFolder, byte[] key, boolean autoRefresh) {
+        return Realm.create(writableFolder, DEFAULT_REALM_NAME, key, autoRefresh);
+    }
+
