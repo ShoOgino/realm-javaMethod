@@ -53,13 +53,7 @@
 //                        fieldName);
 //                writer.endControlFlow();
             } else if (typeUtils.isAssignable(field.asType(), realmList)) { // Link Lists
-                String genericCanonicalType = ((DeclaredType) field.asType()).getTypeArguments().get(0).toString();
-                String genericType;
-                if (genericCanonicalType.contains(".")) {
-                    genericType = genericCanonicalType.substring(genericCanonicalType.lastIndexOf('.') + 1);
-                } else {
-                    genericType = genericCanonicalType;
-                }
+                String genericType = getGenericType(field);
                 writer.beginControlFlow("if(!columnTypes.containsKey(\"%s\"))", fieldName);
                 writer.emitStatement("throw new IllegalStateException(\"Missing column '%s'\")", fieldName);
                 writer.endControlFlow();

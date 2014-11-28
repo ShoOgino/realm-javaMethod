@@ -4,24 +4,25 @@
         writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = [\")", className);
         for (int i = 0; i < fields.size(); i++) {
             VariableElement field = fields.get(i);
-            if (typeUtils.isAssignable(field.asType(), realmObject)) {
-                String fieldName = field.getSimpleName().toString();
-                String fieldTypeSimpleName = getFieldTypeSimpleName(field);
-                writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
-                writer.emitStatement(
-                        "stringBuilder.append(%s() != null ? \"%s\" + \"@\" + %s().row.getIndex() : \"null\")",
-                        getters.get(fieldName),
-                        fieldTypeSimpleName,
-                        getters.get(fieldName)
-                );
-                writer.emitStatement("stringBuilder.append(\"}\")");
+            String fieldName = field.getSimpleName().toString();
 
+            writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
+            if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                String fieldTypeSimpleName = getFieldTypeSimpleName(field);
+                writer.emitStatement(
+                        "stringBuilder.append(%s() != null ? \"%s\" : \"null\")",
+                        getters.get(fieldName),
+                        fieldTypeSimpleName
+                );
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+                String genericType = getGenericType(field);
+                writer.emitStatement("stringBuilder.append(\"RealmList<%s>[\").append(%s().size()).append(\"]\")",
+                        genericType,
+                        getters.get(fieldName));
             } else {
-                String fieldName = field.getSimpleName().toString();
-                writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
                 writer.emitStatement("stringBuilder.append(%s())", getters.get(fieldName));
-                writer.emitStatement("stringBuilder.append(\"}\")");
             }
+            writer.emitStatement("stringBuilder.append(\"}\")");
 
             if (i < fields.size() - 1) {
                 writer.emitStatement("stringBuilder.append(\",\")");

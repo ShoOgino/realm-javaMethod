@@ -25,13 +25,7 @@
                 writer.emitStatement("table.addColumnLink(ColumnType.LINK, \"%s\", transaction.getTable(\"%s%s\"))",
                         fieldName, TABLE_PREFIX, fieldTypeSimpleName);
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
-                String genericCanonicalType = ((DeclaredType) field.asType()).getTypeArguments().get(0).toString();
-                String genericType;
-                if (genericCanonicalType.contains(".")) {
-                    genericType = genericCanonicalType.substring(genericCanonicalType.lastIndexOf('.') + 1);
-                } else {
-                    genericType = genericCanonicalType;
-                }
+                String genericType = getGenericType(field);
                 writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", TABLE_PREFIX, genericType);
                 writer.emitStatement("%s%s.initTable(transaction)", genericType, PROXY_SUFFIX);
                 writer.endControlFlow();
