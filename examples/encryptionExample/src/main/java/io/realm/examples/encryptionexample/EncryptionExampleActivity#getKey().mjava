@@ -29,7 +29,7 @@
         // We have an existing secret key, so decrypt and return it
         if (keyData != null) {
             cipher.init(Cipher.UNWRAP_MODE, keyPair.getPrivate());
-            return ((SecretKey)cipher.unwrap(keyData, "AES", Cipher.SECRET_KEY)).getEncoded();
+            return cipher.unwrap(keyData, "AES", Cipher.SECRET_KEY).getEncoded();
         }
 
         // We need to generate a new secret key
@@ -43,8 +43,7 @@
         FileOutputStream stream = new FileOutputStream(file);
         try {
             stream.write(cipher.wrap(new SecretKeySpec(keyData, "AES")));
-        }
-        finally {
+        } finally {
             stream.close();
         }
 
