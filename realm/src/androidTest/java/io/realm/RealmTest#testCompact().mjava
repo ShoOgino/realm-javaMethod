@@ -1,0 +1,11 @@
+    public void testCompact() throws IOException {
+        final String copyRealm = "copy.realm";
+        fileCopy(
+                new File(getContext().getFilesDir(), Realm.DEFAULT_REALM_NAME),
+                new File(getContext().getFilesDir(), copyRealm));
+        long before = new File(getContext().getFilesDir(), copyRealm).length();
+        assertTrue(Realm.compactRealmFile(getContext()));
+        long after = new File(getContext().getFilesDir(), copyRealm).length();
+        assertTrue(before >= after);
+    }
+
