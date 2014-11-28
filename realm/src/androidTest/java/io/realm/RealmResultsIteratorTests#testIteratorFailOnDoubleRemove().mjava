@@ -1,12 +1,12 @@
     public void testIteratorFailOnDoubleRemove() {
         RealmResults<AllTypes> result = testRealm.allObjects(AllTypes.class);
 
-        // Use iterator instead of RealmResults.sum()
         Iterator<AllTypes> it = result.iterator();
+        testRealm.beginTransaction();
+        it.next();
+        it.remove();
+
         try {
-            testRealm.beginTransaction();
-            it.next();
-            it.remove();
             it.remove();
 
         } catch (IllegalStateException ignored) {
