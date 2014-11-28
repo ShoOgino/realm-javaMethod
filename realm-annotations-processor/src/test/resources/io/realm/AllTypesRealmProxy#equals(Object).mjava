@@ -3,13 +3,15 @@
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AllTypesRealmProxy aAllTypes = (AllTypesRealmProxy)o;
-        if (getColumnString() != null ? !getColumnString().equals(aAllTypes.getColumnString()) : aAllTypes.getColumnString() != null) return false;
-        if (getColumnLong() != aAllTypes.getColumnLong()) return false;
-        if (Float.compare(getColumnFloat(), aAllTypes.getColumnFloat()) != 0) return false;
-        if (Double.compare(getColumnDouble(), aAllTypes.getColumnDouble()) != 0) return false;
-        if (isColumnBoolean() != aAllTypes.isColumnBoolean()) return false;
-        if (getColumnDate() != null ? !getColumnDate().equals(aAllTypes.getColumnDate()) : aAllTypes.getColumnDate() != null) return false;
-        if (!Arrays.equals(getColumnBinary(), aAllTypes.getColumnBinary())) return false;
+
+        String path = realm.getPath();
+        String otherPath = aAllTypes.realm.getPath();
+        if (path != null ? !path.equals(otherPath) : otherPath != null) return false;;
+
+        String tableName = row.getTable().getName();
+        String otherTableName = aAllTypes.row.getTable().getName();
+        if (tableName != null ? !tableName.equals(otherTableName) : otherTableName != null) return false;
+
         return true;
     }
 

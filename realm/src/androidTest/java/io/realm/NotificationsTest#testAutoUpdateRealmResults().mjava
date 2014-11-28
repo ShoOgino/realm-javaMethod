@@ -9,19 +9,25 @@
             @Override
             public Boolean call() throws Exception {
                 Looper.prepare();
-                Realm.deleteRealmFile(getContext());
-                final Realm realm = Realm.getInstance(getContext());
-                final RealmResults<Dog> dogs = realm.allObjects(Dog.class);
-                assertEquals(0, dogs.size());
-                realm.addChangeListener(new RealmChangeListener() {
-                    @Override
-                    public void onChange() {
-                        int c = counter.incrementAndGet();
-                        results.put(c, dogs.size());
+                Realm realm = null;
+                try {
+                    realm = Realm.getInstance(getContext());
+                    final RealmResults<Dog> dogs = realm.allObjects(Dog.class);
+                    assertEquals(0, dogs.size());
+                    realm.addChangeListener(new RealmChangeListener() {
+                        @Override
+                        public void onChange() {
+                            int c = counter.incrementAndGet();
+                            results.put(c, dogs.size());
+                        }
+                    });
+                    isReady.set(true);
+                    Looper.loop();
+                } finally {
+                    if (realm != null) {
+                        realm.close();
                     }
-                });
-                isReady.set(true);
-                Looper.loop();
+                }
                 return true;
             }
         });
@@ -40,18 +46,18 @@
         }
         realm.commitTransaction();
         assertEquals(TEST_SIZE, realm.allObjects(Dog.class).size());
+        realm.close();
 
         try {
             future.get(2, TimeUnit.SECONDS);
         } catch (TimeoutException ignore) {}
 
-        assertEquals(2, results.size());
+        assertEquals(1, results.size());
 
         assertTrue(results.containsKey(1));
-        assertEquals(0, results.get(1).intValue());
-        assertTrue(results.containsKey(2));
-        assertEquals(10, results.get(2).intValue());
+        assertEquals(TEST_SIZE, results.get(1).intValue());
 
-        assertEquals(2, counter.get());
+        assertEquals(1, counter.get());
+        assertTrue(Realm.realmsCache.get().isEmpty());
     }
 
