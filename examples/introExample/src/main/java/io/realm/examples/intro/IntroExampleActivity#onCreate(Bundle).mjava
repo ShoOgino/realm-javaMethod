@@ -1,10 +1,15 @@
-    private void realmExamples() {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_realm_basic_example);
+        rootLayout = ((LinearLayout) findViewById(R.id.container));
+        rootLayout.removeAllViews();
 
         // These operations are small enough that
         // we can generally safely run them on the UI thread.
 
         // Open the default realm ones for the UI thread.
-        Realm realm = Realm.getInstance(this);
+        realm = Realm.getInstance(this);
 
         basicCRUD(realm);
         basicQuery(realm);
@@ -25,6 +30,5 @@
                 showStatus(result);
             }
         }.execute();
-
     }
 
