@@ -1,7 +1,8 @@
     /**
-     * Realm static constructor
+     * Realm static constructor.
+     * {link io.realm.close} must be called when you are done using the Realm instance.
      *
-     * It sets auto-refresh on
+     * It sets auto-refresh on if the current thread has a Looper, off otherwise.
      *
      * @param context an Android {@link android.content.Context}
      * @param key     a 32-byte encryption key
@@ -15,6 +16,10 @@
      */
     @SuppressWarnings("UnusedDeclaration")
     public static Realm getInstance(Context context, byte[] key) {
-        return Realm.getInstance(context, DEFAULT_REALM_NAME, key, true);
+        if (Looper.myLooper() != null) {
+            return Realm.getInstance(context, DEFAULT_REALM_NAME, key, true);
+        } else {
+            return Realm.getInstance(context, DEFAULT_REALM_NAME, key, false);
+        }
     }
 

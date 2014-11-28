@@ -1,0 +1,8 @@
+    public void testCyclicEquals() {
+        testRealm.beginTransaction();
+        CyclicType foo = createCyclicData();
+        testRealm.commitTransaction();
+
+        assertEquals(foo, testRealm.where(CyclicType.class).equalTo("name", "Foo").findFirst());
+    }
+
