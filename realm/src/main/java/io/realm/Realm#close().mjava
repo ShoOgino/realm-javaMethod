@@ -1,0 +1,22 @@
+    /**
+     * Closes the Realm instance and all its resources.
+     * 
+     * It's important to always remember to close Realm instances when you're done with it in order 
+     * not to leak memory, file descriptors or grow the size of Realm file out of measure.
+     */
+    @Override
+    public void close() {
+        Map<Integer, Integer> localRefCount = referenceCount.get();
+        Integer references = localRefCount.get(id);
+        if (references == null) {
+            references = 0;
+        }
+        if (sharedGroup != null && references == 1) {
+            realmsCache.get().remove(id);
+            sharedGroup.close();
+            sharedGroup = null;
+        }
+        localRefCount.put(id, references - 1);
+        referenceCount.set(localRefCount);
+    }
+

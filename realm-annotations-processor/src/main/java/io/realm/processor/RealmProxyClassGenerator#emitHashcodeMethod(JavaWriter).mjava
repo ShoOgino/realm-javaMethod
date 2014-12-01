@@ -1,0 +1,16 @@
+    private void emitHashcodeMethod(JavaWriter writer) throws IOException {
+        writer.emitAnnotation("Override");
+        writer.beginMethod("int", "hashCode", EnumSet.of(Modifier.PUBLIC));
+        writer.emitStatement("String realmName = realm.getPath()");
+        writer.emitStatement("String tableName = row.getTable().getName()");
+        writer.emitStatement("long rowIndex = row.getIndex()");
+        writer.emitEmptyLine();
+        writer.emitStatement("int result = 17");
+        writer.emitStatement("result = 31 * result + ((realmName != null) ? realmName.hashCode() : 0)");
+        writer.emitStatement("result = 31 * result + ((tableName != null) ? tableName.hashCode() : 0)");
+        writer.emitStatement("result = 31 * result + (int) (rowIndex ^ (rowIndex >>> 32))");
+        writer.emitStatement("return result");
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+
