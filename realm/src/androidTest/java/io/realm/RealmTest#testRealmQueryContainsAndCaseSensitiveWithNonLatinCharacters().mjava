@@ -1,4 +1,6 @@
     public void testRealmQueryContainsAndCaseSensitiveWithNonLatinCharacters() {
+        populateTestRealm();
+
         testRealm.beginTransaction();
         testRealm.clear(AllTypes.class);
         AllTypes at1 = testRealm.createObject(AllTypes.class);
@@ -10,8 +12,9 @@
         testRealm.commitTransaction();
 
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class)
-                .beginGroup().contains("columnString", "Α", RealmQuery.CASE_INSENSITIVE)
-                .or().contains("columnString", "δ").endGroup().findAll();
+                .contains("columnString", "Α", RealmQuery.CASE_INSENSITIVE)
+                .or().contains("columnString", "δ")
+                .findAll();
         // Without case sensitive there is 3, Α = α
         // assertEquals(3,resultList.size());
         assertEquals(2, resultList.size());
@@ -22,7 +25,8 @@
         resultList = testRealm.where(AllTypes.class).contains("columnString", "Δ").findAll();
         assertEquals(0, resultList.size());
 
-        resultList = testRealm.where(AllTypes.class).contains("columnString", "Δ", RealmQuery.CASE_INSENSITIVE).findAll();
+        resultList = testRealm.where(AllTypes.class).contains("columnString", "Δ",
+                RealmQuery.CASE_INSENSITIVE).findAll();
         // Without case sensitive there is 1, Δ = δ
         // assertEquals(1,resultList.size());
         assertEquals(0, resultList.size());

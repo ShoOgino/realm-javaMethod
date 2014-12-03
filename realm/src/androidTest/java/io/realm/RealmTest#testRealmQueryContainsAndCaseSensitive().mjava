@@ -1,13 +1,18 @@
     public void testRealmQueryContainsAndCaseSensitive() {
+        final int TEST_OBJECTS_COUNT = 200;
+        populateTestRealm(TEST_OBJECTS_COUNT);
+
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class)
-                .beginGroup().contains("columnString", "DaTa 0", RealmQuery.CASE_INSENSITIVE)
-                .or().contains("columnString", "20").endGroup().findAll();
+                .contains("columnString", "DaTa 0", RealmQuery.CASE_INSENSITIVE)
+                .or().contains("columnString", "20")
+                .findAll();
         assertEquals(3, resultList.size());
 
         resultList = testRealm.where(AllTypes.class).contains("columnString", "DATA").findAll();
         assertEquals(0, resultList.size());
 
-        resultList = testRealm.where(AllTypes.class).contains("columnString", "TEST", RealmQuery.CASE_INSENSITIVE).findAll();
-        assertEquals(TEST_DATA_SIZE, resultList.size());
+        resultList = testRealm.where(AllTypes.class)
+                .contains("columnString", "TEST", RealmQuery.CASE_INSENSITIVE).findAll();
+        assertEquals(TEST_OBJECTS_COUNT, resultList.size());
     }
 
