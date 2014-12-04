@@ -1,0 +1,24 @@
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()) {
+            case R.id.action_add_dot:
+                realm.beginTransaction();
+                Point point = realm.createObject(Point.class);
+                point.setX(random.nextInt(100));
+                point.setY(random.nextInt(100));
+                point.setColor(getResources().getColor(R.color.realm_blue));
+                realm.commitTransaction();
+                return true;
+
+            case R.id.action_clear:
+                realm.beginTransaction();
+                realm.clear(Point.class);
+                realm.commitTransaction();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+

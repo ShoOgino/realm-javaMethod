@@ -1,0 +1,36 @@
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Enable UI refresh while the fragment is active.
+        realm.addChangeListener(realmListener);
+
+        // Create background thread that add new dots every 0.5 second.
+        backgroundThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                // Realm instances cannot be shared between threads, so we need to create a new
+                // instance on the background thread.
+                Realm realm = Realm.getInstance(getActivity(), false);
+                while (!backgroundThread.isInterrupted()) {
+                    try {
+                        realm.beginTransaction();
+                        Point point = realm.createObject(Point.class);
+                        point.setX(random.nextInt(100));
+                        point.setY(random.nextInt(100));
+                        point.setColor(getResources().getColor(R.color.realm_red));
+                        realm.commitTransaction();
+
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                realm.close();
+            }
+        });
+        backgroundThread.start();
+    }
+
