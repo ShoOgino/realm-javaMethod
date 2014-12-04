@@ -10,7 +10,8 @@
         testRealm.commitTransaction();
 
         RealmResults<AllTypes> result = testRealm.allObjects(AllTypes.class);
-        RealmResults<AllTypes> sortedResult = result.sort(FIELD_STRING);
+        RealmResults<AllTypes> sortedResult = result.where().findAll();
+        sortedResult.sort(FIELD_STRING);
 
         assertEquals(3, sortedResult.size());
         assertEquals("Æble", sortedResult.first().getColumnString());
@@ -18,7 +19,8 @@
         assertEquals("Øl", sortedResult.get(1).getColumnString());
         assertEquals("Århus", sortedResult.get(2).getColumnString());
 
-        RealmResults<AllTypes> reverseResult = result.sort(FIELD_STRING, RealmResults.SORT_ORDER_DECENDING);
+        RealmResults<AllTypes> reverseResult = result.where().findAll();
+        reverseResult.sort(FIELD_STRING, RealmResults.SORT_ORDER_DESCENDING);
         assertEquals(3, reverseResult.size());
         assertEquals("Æble", reverseResult.last().getColumnString());
         assertEquals("Århus", reverseResult.get(0).getColumnString());
