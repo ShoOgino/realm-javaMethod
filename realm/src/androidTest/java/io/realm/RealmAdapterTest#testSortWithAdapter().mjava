@@ -1,13 +1,14 @@
     public void testSortWithAdapter() {
-        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll()
-                .sort(FIELD_STRING, RealmResults.SORT_ORDER_DECENDING);
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
+        resultList.sort(FIELD_STRING, RealmResults.SORT_ORDER_DESCENDING);
         RealmAdapter realmAdapter = new RealmAdapter(getContext(), resultList, automaticUpdate);
-        assertEquals(resultList.first(), realmAdapter.getRealmResults().first());
+        assertEquals(resultList.first().getColumnString(), realmAdapter.getRealmResults().first().getColumnString());
         assertEquals(resultList.size(), realmAdapter.getRealmResults().size());
 
-        realmAdapter.updateRealmResults(realmAdapter.getRealmResults()
-                .sort(FIELD_STRING));
-        assertEquals(resultList.last(), realmAdapter.getRealmResults().first());
+        resultList.sort(FIELD_STRING);
+
+        assertEquals(resultList.last().getColumnString(), realmAdapter.getRealmResults().last().getColumnString());
+        assertEquals(resultList.get(22).getColumnString(), realmAdapter.getRealmResults().get(22).getColumnString());
         assertEquals(resultList.size(), realmAdapter.getRealmResults().size());
     }
 
