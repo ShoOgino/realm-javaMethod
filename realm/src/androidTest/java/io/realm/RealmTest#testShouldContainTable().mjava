@@ -1,8 +1,9 @@
     // boolean contains(Class<?> clazz)
     public void testShouldContainTable() {
         testRealm.beginTransaction();
-        Dog dog = testRealm.createObject(Dog.class);
+        testRealm.createObject(Dog.class);
         testRealm.commitTransaction();
         assertTrue("contains returns false for newly created table", testRealm.contains(Dog.class));
+        assertFalse("contains returns true for non-existing table", testRealm.contains(RealmTest.class));
     }
 

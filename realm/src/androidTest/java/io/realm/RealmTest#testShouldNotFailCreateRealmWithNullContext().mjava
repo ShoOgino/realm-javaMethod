@@ -1,11 +1,14 @@
     public void testShouldNotFailCreateRealmWithNullContext() {
-        Context c = null;  // throws when c.getDirectory() is called; has nothing to do with Realm
-
+        Realm realm = null;
         try {
-            Realm realm = Realm.getInstance(c);
+            realm = Realm.getInstance(null); // throws when c.getDirectory() is called;
+                                             // has nothing to do with Realm
             fail("Should throw an exception");
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignore) {
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
         }
-
     }
 

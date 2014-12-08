@@ -1,0 +1,20 @@
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_realm_example);
+
+        findViewById(R.id.insert_record_button).setOnClickListener(this);
+        findViewById(R.id.quit_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stopTests();
+            }
+        });
+
+        // Reset the realm data before starting the tests
+        Realm.deleteRealmFile(this);
+
+        // Acquire a realm object
+        realm = Realm.getInstance(this);
+    }
+

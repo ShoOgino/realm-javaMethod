@@ -1,5 +1,8 @@
     public void testRealmQueryLessThan() {
-        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).lessThan(FIELD_FLOAT, 31.234567f).findAll();
+        populateTestRealm(200);
+
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).
+                lessThan(FIELD_FLOAT, 31.234567f).findAll();
         assertEquals(30, resultList.size());
         RealmQuery<AllTypes> query = testRealm.where(AllTypes.class).lessThan(FIELD_FLOAT, 31.234567f);
         resultList = query.between(FIELD_LONG, 1, 10).findAll();
