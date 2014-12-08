@@ -4,13 +4,13 @@
         dotsView = (DotsView) rootView.findViewById(R.id.dots);
 
         // Create a RealmQuery on the UI thread and send the results to the custom view. The
-        // RealmResults will automatically be updated whenever new data is either added or removed.
+        // RealmResults will automatically be updated whenever the Realm data is changed.
         // We still need to invalidate the UI to show the changes however. See the RealmChangeListener.
         //
-        // Note also that currently the query gets updated by rerunning it on the thread it was
-        // created. This can negatively effect framerates if it is a complicated query or a very
-        // large dataset.
-        dotsView.setRealmResults(realm.allObjects(Point.class));
+        // Note that the query gets updated by rerunning it on the thread it was
+        // created. This can negatively effect frame rates if it is a complicated query or a very
+        // large data set.
+        dotsView.setRealmResults(realm.allObjects(Dot.class));
 
         return rootView;
     }

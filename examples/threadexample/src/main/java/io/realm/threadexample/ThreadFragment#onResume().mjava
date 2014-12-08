@@ -5,7 +5,7 @@
         // Enable UI refresh while the fragment is active.
         realm.addChangeListener(realmListener);
 
-        // Create background thread that add new dots every 0.5 second.
+        // Create background thread that add a new dot every 0.5 second.
         backgroundThread = new Thread(new Runnable() {
 
             @Override
@@ -14,20 +14,22 @@
                 // instance on the background thread.
                 Realm realm = Realm.getInstance(getActivity(), false);
                 while (!backgroundThread.isInterrupted()) {
-                    try {
-                        realm.beginTransaction();
-                        Point point = realm.createObject(Point.class);
-                        point.setX(random.nextInt(100));
-                        point.setY(random.nextInt(100));
-                        point.setColor(getResources().getColor(R.color.realm_red));
-                        realm.commitTransaction();
+                    realm.beginTransaction();
+                    Dot dot = realm.createObject(Dot.class);
+                    dot.setX(random.nextInt(100));
+                    dot.setY(random.nextInt(100));
+                    dot.setColor(getResources().getColor(R.color.realm_red));
+                    realm.commitTransaction();
 
+                    // Wait 0.5 sec. before adding the next dot.
+                    try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
 
+                // Also close Realm instances used in background threads.
                 realm.close();
             }
         });

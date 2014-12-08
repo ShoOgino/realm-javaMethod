@@ -1,6 +1,21 @@
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_asynctask, container, false);
+        logsView = (LinearLayout) rootView.findViewById(R.id.logs);
+        seekBar = (SeekBar) rootView.findViewById(R.id.seekBar);
+        seekBar.setMax(TEST_OBJECTS);
+        rootView.findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (asyncTask != null) {
+                    asyncTask.cancel(true);
+                }
+
+                asyncTask = new ImportAsyncTask();
+                asyncTask.execute();
+            }
+        });
+
         return rootView;
     }
 

@@ -1,0 +1,27 @@
+        @Override
+        protected Integer doInBackground(Void... params) {
+            Realm realm = Realm.getInstance(getActivity(), false);
+
+            realm.beginTransaction();
+            realm.clear(Score.class);
+            for (int i = 0; i < TEST_OBJECTS; i++) {
+                if (isCancelled()) return 0;
+                Score score = realm.createObject(Score.class);
+                score.setName("Name" + i);
+                score.setScore(i);
+                publishProgress(i);
+
+                // Slow down import so seekBar doesn't move to fast
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            realm.commitTransaction();
+
+            Number sum = realm.allObjects(Score.class).sum("score");
+            realm.close();
+            return sum.intValue();
+        }
+
