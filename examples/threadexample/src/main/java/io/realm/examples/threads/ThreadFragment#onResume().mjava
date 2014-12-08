@@ -12,14 +12,16 @@
             public void run() {
                 // Realm instances cannot be shared between threads, so we need to create a new
                 // instance on the background thread.
-                Realm realm = Realm.getInstance(getActivity(), false);
+                Realm backgroundThreadRealm = Realm.getInstance(getActivity(), false);
                 while (!backgroundThread.isInterrupted()) {
-                    realm.beginTransaction();
-                    Dot dot = realm.createObject(Dot.class);
+                    backgroundThreadRealm.beginTransaction();
+
+                    // Add red dot from the background thread
+                    Dot dot = backgroundThreadRealm.createObject(Dot.class);
                     dot.setX(random.nextInt(100));
                     dot.setY(random.nextInt(100));
                     dot.setColor(getResources().getColor(R.color.realm_red));
-                    realm.commitTransaction();
+                    backgroundThreadRealm.commitTransaction();
 
                     // Wait 0.5 sec. before adding the next dot.
                     try {
@@ -30,7 +32,7 @@
                 }
 
                 // Also close Realm instances used in background threads.
-                realm.close();
+                backgroundThreadRealm.close();
             }
         });
         backgroundThread.start();
