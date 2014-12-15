@@ -5,10 +5,8 @@
 
         Realm.deleteRealmFile(this);
 
-        if (workerThread == null || !workerThread.isAlive()) {
-            workerThread = new WorkerThread(this);
-            workerThread.start();
-        }
+        workerThread = new WorkerThread(this);
+        workerThread.start();
 
         realm = Realm.getInstance(this);
         RealmResults<TimeStamp> timeStamps = realm.where(TimeStamp.class).findAll();
