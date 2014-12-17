@@ -1,0 +1,15 @@
+    private void addDate(int year, int month, int dayOfMonth) {
+        Date date = newDate(year, month, dayOfMonth);
+
+        testRealm.beginTransaction();
+        testRealm.clear(AllTypes.class);
+        AllTypes allTypes = testRealm.createObject(AllTypes.class);
+        allTypes.setColumnDate(date);
+        testRealm.commitTransaction();
+
+        AllTypes object = testRealm.allObjects(AllTypes.class).first();
+
+        // Realm does not support millisec precision
+        assertEquals(1000 * (date.getTime() / 1000), 1000 * (object.getColumnDate().getTime() / 1000));
+    }
+

@@ -2,11 +2,7 @@
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
 
         Number sum = resultList.sum(FIELD_LONG);
-
-        int checkSum = 0;
-        for (int i = 0; i < TEST_DATA_SIZE; ++i) {
-            checkSum += i;
-        }
-        assertEquals("ResultList.sum returned wrong sum", checkSum, sum.intValue());
+        // Sum of numbers 0 to M-1: (M-1)*M/2
+        assertEquals((TEST_DATA_SIZE - 1) * TEST_DATA_SIZE / 2, sum.intValue());
     }
 

@@ -5,9 +5,10 @@
      * objects and @{link io.realm.RealmResults} updated to reflect
      * the changes from this commit.
      * 
-     * @throws java.lang.IllegalStateException If the write transaction is in an invalid state.
+     * @throws java.lang.IllegalStateException If the write transaction is in an invalid state or incorrect thread.
      */
     public void commitTransaction() {
+        checkIfValid();
         transaction.commitAndContinueAsRead();
 
         for (Map.Entry<Handler, Integer> handlerIntegerEntry : handlers.entrySet()) {

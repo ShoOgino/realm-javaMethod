@@ -1,0 +1,16 @@
+    public void testWriteMustThrowOutOfTransaction() {
+        testRealm.beginTransaction();
+        Dog dog = testRealm.createObject(Dog.class);
+        testRealm.commitTransaction();
+
+        try {
+            dog.setName("Rex");
+            fail();
+        } catch (IllegalStateException ignored) {
+            // Don't fail
+        } catch (Exception ignored) {
+            fail();
+        }
+
+    }
+

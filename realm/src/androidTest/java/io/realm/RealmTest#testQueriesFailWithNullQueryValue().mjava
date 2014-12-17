@@ -1,37 +1,8 @@
     public void testQueriesFailWithNullQueryValue() throws IOException {
-        RealmResults<AllTypes> resultList = null;
-
-        String nullString = null;
-        Float nullFloat = null;
-        Long nullLong = null;
-        Boolean nullBoolean = null;
-
         try {
-            resultList = testRealm.where(AllTypes.class).equalTo("columnString", nullString).findAll();
+            testRealm.where(AllTypes.class).equalTo(FIELD_STRING, (String) null).findAll();
             fail("Realm.where should fail with illegal argument");
-        } catch (IllegalArgumentException e) {
-        }
-
-        try {
-            resultList = testRealm.where(AllTypes.class).equalTo("columnLong", nullLong).findAll();
-            fail("Realm.where should fail with illegal argument");
-
-        } catch (IllegalArgumentException e) {
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            resultList = testRealm.where(AllTypes.class).equalTo("columnBoolean", nullBoolean).findAll();
-            fail("Realm.where should fail with illegal argument");
-        } catch (IllegalArgumentException e) {
-        } catch (NullPointerException e) {
-        }
-
-        try {
-            resultList = testRealm.where(AllTypes.class).equalTo("columnFloat", nullFloat).findAll();
-            fail("Realm.where should fail with illegal argument");
-        } catch (IllegalArgumentException e) {
-        } catch (NullPointerException e) {
+        } catch (IllegalArgumentException ignored) {
         }
     }
 

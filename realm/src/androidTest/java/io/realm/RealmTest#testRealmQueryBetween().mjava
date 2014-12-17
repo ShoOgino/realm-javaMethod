@@ -1,14 +1,20 @@
     public void testRealmQueryBetween() {
-        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).between("columnLong", 0, 9).findAll();
-        assertEquals("Not the expected number records " + resultList.size(), 10, resultList.size());
+        final int TEST_OBJECTS_COUNT = 200;
+        populateTestRealm(TEST_OBJECTS_COUNT);
 
-        resultList = testRealm.where(AllTypes.class).beginsWith("columnString", "test data ").findAll();
-        assertEquals("Not the expected number records " + resultList.size(), TEST_DATA_SIZE, resultList.size());
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class)
+                .between(FIELD_LONG, 0, 9).findAll();
+        assertEquals(10, resultList.size());
 
-        resultList = testRealm.where(AllTypes.class).beginsWith("columnString", "test data 1").between("columnLong", 2, 20).findAll();
-        assertEquals("Not the expected number records " + resultList.size(), 10, resultList.size());
+        resultList = testRealm.where(AllTypes.class).beginsWith(FIELD_STRING, "test data ").findAll();
+        assertEquals(TEST_OBJECTS_COUNT, resultList.size());
 
-        resultList = testRealm.where(AllTypes.class).between("columnLong", 2, 20).beginsWith("columnString", "test data 1").findAll();
-        assertEquals("Not the expected number records " + resultList.size(), 10, resultList.size());
+        resultList = testRealm.where(AllTypes.class).beginsWith(FIELD_STRING, "test data 1")
+                .between(FIELD_LONG, 2, 20).findAll();
+        assertEquals(10, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).between(FIELD_LONG, 2, 20)
+                .beginsWith(FIELD_STRING, "test data 1").findAll();
+        assertEquals(10, resultList.size());
     }
 

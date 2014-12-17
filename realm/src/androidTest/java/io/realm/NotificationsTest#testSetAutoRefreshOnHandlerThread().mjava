@@ -10,9 +10,11 @@
                 assertFalse(realm.isAutoRefresh());
                 realm.setAutoRefresh(true);
                 assertTrue(realm.isAutoRefresh());
+                realm.close();
                 return true;
             }
         });
         assertTrue(future.get());
+        assertTrue(Realm.realmsCache.get().isEmpty());
     }
 

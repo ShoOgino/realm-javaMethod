@@ -1,7 +1,11 @@
     public void testRealmQueryLessThanOrEqual() {
-        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).lessThanOrEqualTo("columnFloat", 31.234567f).findAll();
-        assertEquals("Not the expected number records " + resultList.size(), 31, resultList.size());
-        resultList = testRealm.where(AllTypes.class).lessThanOrEqualTo("columnFloat", 31.234567f).between("columnLong", 11, 20).findAll();
-        assertEquals("Not the expected number records " + resultList.size(), 10, resultList.size());
+        populateTestRealm(200);
+
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class)
+                .lessThanOrEqualTo(FIELD_FLOAT, 31.234567f).findAll();
+        assertEquals(31, resultList.size());
+        resultList = testRealm.where(AllTypes.class).lessThanOrEqualTo(FIELD_FLOAT, 31.234567f)
+                .between(FIELD_LONG, 11, 20).findAll();
+        assertEquals(10, resultList.size());
     }
 
