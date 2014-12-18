@@ -3,9 +3,15 @@
             if (nativePtr != 0) {
                 context.asyncDisposeSharedGroup(nativePtr);
                 nativePtr = 0; // Set to 0 if finalize is called before close() for some reason
-                if (implicitTransactionsEnabled && nativeReplicationPtr != 0) {
-                    nativeCloseReplication(nativeReplicationPtr);
-                    nativeReplicationPtr = 0;
+                if (implicitTransactionsEnabled) {
+                    if (nativeTransactLogRegistryPtr != 0) {
+                        nativeCloseTransactRegistryLog(nativeTransactLogRegistryPtr);
+                        nativeTransactLogRegistryPtr = 0;
+                    }
+                    if (nativeReplicationPtr != 0) {
+                        nativeCloseReplication(nativeReplicationPtr);
+                        nativeReplicationPtr = 0;
+                    }
                 }
             }
         }
