@@ -1,0 +1,48 @@
+    private void emitInitTableMethod(JavaWriter writer) throws IOException {
+        writer.beginMethod(
+                "Table", // Return type
+                "initTable", // Method name
+                EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
+                "ImplicitTransaction", "transaction"); // Argument type & argument name
+
+        writer.beginControlFlow("if(!transaction.hasTable(\"" + TABLE_PREFIX + this.className + "\"))");
+        writer.emitStatement("Table table = transaction.getTable(\"%s%s\")", TABLE_PREFIX, this.className);
+
+        // For each field generate corresponding table index constant
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            String fieldTypeCanonicalName = field.asType().toString();
+            String fieldTypeSimpleName = getFieldTypeSimpleName(field);
+
+            if (JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
+                writer.emitStatement("table.addColumn(%s, \"%s\")",
+                        JAVA_TO_COLUMN_TYPES.get(fieldTypeCanonicalName),
+                        fieldName);
+            } else if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", TABLE_PREFIX, fieldTypeSimpleName);
+                writer.emitStatement("%s%s.initTable(transaction)", fieldTypeSimpleName, PROXY_SUFFIX);
+                writer.endControlFlow();
+                writer.emitStatement("table.addColumnLink(ColumnType.LINK, \"%s\", transaction.getTable(\"%s%s\"))",
+                        fieldName, TABLE_PREFIX, fieldTypeSimpleName);
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+                String genericType = getGenericType(field);
+                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", TABLE_PREFIX, genericType);
+                writer.emitStatement("%s%s.initTable(transaction)", genericType, PROXY_SUFFIX);
+                writer.endControlFlow();
+                writer.emitStatement("table.addColumnLink(ColumnType.LINK_LIST, \"%s\", transaction.getTable(\"%s%s\"))",
+                        fieldName, TABLE_PREFIX, genericType);
+            }
+        }
+
+        for (VariableElement field : fieldsToIndex) {
+            String fieldName = field.getSimpleName().toString();
+            writer.emitStatement("table.setIndex(table.getColumnIndex(\"%s\"))", fieldName);
+        }
+
+        writer.emitStatement("return table");
+        writer.endControlFlow();
+        writer.emitStatement("return transaction.getTable(\"%s%s\")", TABLE_PREFIX, this.className);
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+

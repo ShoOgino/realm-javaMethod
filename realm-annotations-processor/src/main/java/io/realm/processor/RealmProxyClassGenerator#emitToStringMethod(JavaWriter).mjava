@@ -1,0 +1,37 @@
+    private void emitToStringMethod(JavaWriter writer) throws IOException {
+        writer.emitAnnotation("Override");
+        writer.beginMethod("String", "toString", EnumSet.of(Modifier.PUBLIC));
+        writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = [\")", className);
+        for (int i = 0; i < fields.size(); i++) {
+            VariableElement field = fields.get(i);
+            String fieldName = field.getSimpleName().toString();
+
+            writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
+            if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                String fieldTypeSimpleName = getFieldTypeSimpleName(field);
+                writer.emitStatement(
+                        "stringBuilder.append(%s() != null ? \"%s\" : \"null\")",
+                        getters.get(fieldName),
+                        fieldTypeSimpleName
+                );
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+                String genericType = getGenericType(field);
+                writer.emitStatement("stringBuilder.append(\"RealmList<%s>[\").append(%s().size()).append(\"]\")",
+                        genericType,
+                        getters.get(fieldName));
+            } else {
+                writer.emitStatement("stringBuilder.append(%s())", getters.get(fieldName));
+            }
+            writer.emitStatement("stringBuilder.append(\"}\")");
+
+            if (i < fields.size() - 1) {
+                writer.emitStatement("stringBuilder.append(\",\")");
+            }
+        }
+
+        writer.emitStatement("stringBuilder.append(\"]\")");
+        writer.emitStatement("return stringBuilder.toString()");
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+
