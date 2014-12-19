@@ -8,19 +8,19 @@
             e.printStackTrace();
         }
 
-        // Store the retrieved items to the Realm
-        Realm realm = Realm.getInstance(this);
-
         // Open a transaction to store items into the realm
         realm.beginTransaction();
         try {
             realm.createAllFromJson(City.class, stream);
             realm.commitTransaction();
         } catch (IOException e) {
+            // Remember to cancel the transaction if anything goes wrong.
             realm.cancelTransaction();
         } finally {
             try {
-                stream.close();
+                if (stream != null) {
+                    stream.close();
+                }
             } catch (IOException ignore) {
                 // Ignore
             }
