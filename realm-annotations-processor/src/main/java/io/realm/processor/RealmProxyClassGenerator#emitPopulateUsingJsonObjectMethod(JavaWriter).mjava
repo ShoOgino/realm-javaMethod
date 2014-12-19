@@ -1,0 +1,39 @@
+    private void emitPopulateUsingJsonObjectMethod(JavaWriter writer) throws IOException {
+        writer.beginMethod(
+                "void",
+                "populateUsingJsonObject",
+                Collections.<Modifier>emptySet(),
+                Arrays.asList("JSONObject", "json"),
+                Arrays.asList("JSONException"));
+
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            String qualifiedFieldType = field.asType().toString();
+            if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                RealmJsonTypeHelper.emitFillRealmObjectWithJsonValue(
+                        setters.get(fieldName),
+                        fieldName,
+                        qualifiedFieldType,
+                        writer);
+
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+                RealmJsonTypeHelper.emitFillRealmListWithJsonValue(
+                        getters.get(fieldName),
+                        fieldName,
+                        ((DeclaredType) field.asType()).getTypeArguments().get(0).toString(),
+                        writer);
+
+            } else {
+                RealmJsonTypeHelper.emitFillJavaTypeWithJsonValue(
+                        setters.get(fieldName),
+                        fieldName,
+                        qualifiedFieldType,
+                        writer);
+            }
+
+        }
+
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+
