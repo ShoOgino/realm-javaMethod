@@ -1,20 +1,17 @@
-    public void testIteratorFailOnDoubleRemove() {
+    // TODO: Should we reenable this test?
+    public void DISABLEDtestListIteratorFailOnDeleteBeforeNext() {
         RealmResults<AllTypes> result = testRealm.allObjects(AllTypes.class);
 
-        Iterator<AllTypes> it = result.iterator();
+        ListIterator<AllTypes> it = result.listIterator();
         testRealm.beginTransaction();
-        it.next();
-        it.remove();
-
         try {
             it.remove();
-
         } catch (IllegalStateException ignored) {
             return;
         } finally {
             testRealm.cancelTransaction();
         }
 
-        fail("You can only make one call to remove() after calling next() pr. the JavaDoc");
+        fail("You must call next() before calling remove() pr. the JavaDoc");
     }
 
