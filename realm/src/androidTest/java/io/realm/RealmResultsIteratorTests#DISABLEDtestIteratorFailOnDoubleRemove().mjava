@@ -1,13 +1,15 @@
-    public void testListIteratorFailOnDoubleRemove() {
+    // TODO: Should we reenable this test?
+    public void DISABLEDtestIteratorFailOnDoubleRemove() {
         RealmResults<AllTypes> result = testRealm.allObjects(AllTypes.class);
 
-        ListIterator<AllTypes> it = result.listIterator();
+        Iterator<AllTypes> it = result.iterator();
         testRealm.beginTransaction();
         it.next();
         it.remove();
 
         try {
             it.remove();
+
         } catch (IllegalStateException ignored) {
             return;
         } finally {

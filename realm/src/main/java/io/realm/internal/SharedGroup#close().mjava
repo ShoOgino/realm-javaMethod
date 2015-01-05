@@ -3,15 +3,9 @@
             if (nativePtr != 0) {
                 nativeClose(nativePtr);
                 nativePtr = 0;
-                if (implicitTransactionsEnabled) {
-                    if (nativeTransactLogRegistryPtr != 0) {
-                        nativeCloseTransactRegistryLog(nativeTransactLogRegistryPtr);
-                        nativeTransactLogRegistryPtr = 0;
-                    }
-                    if (nativeReplicationPtr != 0) {
-                        nativeCloseReplication(nativeReplicationPtr);
-                        nativeReplicationPtr = 0;
-                    }
+                if (implicitTransactionsEnabled && nativeReplicationPtr != 0) {
+                    nativeCloseReplication(nativeReplicationPtr);
+                    nativeReplicationPtr = 0;
                 }
             }
         }
