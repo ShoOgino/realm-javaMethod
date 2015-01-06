@@ -1,0 +1,20 @@
+    /**
+     * Converts a Json string to a Java Date object. Currently supports 2 types:
+     * - "<long>"
+     * - "/Date(<long>)/"
+     *
+     * @param date   String input of date of the the supported types.
+     * @return Date object or null if invalid input.
+     *
+     * @throws NumberFormatException If date is not a proper long or has an illegal format.
+     */
+    public static Date stringToDate(String date) {
+        if (date == null || date.length() == 0) return null;
+        Matcher matcher = jsonDate.matcher(date);
+        if (matcher.matches()) {
+            return new Date(Long.parseLong(matcher.group(1)));
+        } else {
+            return new Date(Long.parseLong(date));
+        }
+    }
+
