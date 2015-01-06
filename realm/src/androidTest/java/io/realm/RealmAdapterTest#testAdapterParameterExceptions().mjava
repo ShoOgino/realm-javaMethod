@@ -1,16 +1,15 @@
-    public void testAdapterThrowsExceptions() {
+    public void testAdapterParameterExceptions() {
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
         try {
             RealmAdapter realmAdapter = new RealmAdapter(null, resultList, automaticUpdate);
             fail("Should throw exception if context is null");
-        } catch (IllegalArgumentException e) {
-
+        } catch (IllegalArgumentException ignore) {
         }
+
         try {
             RealmAdapter realmAdapter = new RealmAdapter(getContext(), null, automaticUpdate);
             fail("Should throw exception if RealmResult is null");
-        } catch (IllegalArgumentException e) {
-
+        } catch (IllegalArgumentException ignore) {
         }
     }
 
