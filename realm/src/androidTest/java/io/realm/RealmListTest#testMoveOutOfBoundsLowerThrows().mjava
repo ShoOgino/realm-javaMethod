@@ -1,11 +1,9 @@
     public void testMoveOutOfBoundsLowerThrows() {
         Owner owner = testRealm.where(Owner.class).findFirst();
         try {
-            owner.getDogs().move(1, -1);
-        } catch (IndexOutOfBoundsException e) {
-            return;
+            owner.getDogs().move(0, -1);
+            fail("Indexes < 0 should throw an exception");
+        } catch (IndexOutOfBoundsException ignored) {
         }
-
-        fail("Indexes < 0 should throw an exception");
     }
 

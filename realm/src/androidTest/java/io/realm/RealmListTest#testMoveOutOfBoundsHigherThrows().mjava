@@ -1,11 +1,11 @@
     public void testMoveOutOfBoundsHigherThrows() {
         Owner owner = testRealm.where(Owner.class).findFirst();
         try {
-            owner.getDogs().move(9, 10);
-        } catch (IndexOutOfBoundsException e) {
-            return;
+            int lastIndex = TEST_OBJECTS - 1;
+            int outOfBoundsIndex = TEST_OBJECTS;
+            owner.getDogs().move(lastIndex, outOfBoundsIndex);
+            fail("Indexes >= size() should throw an exception");
+        } catch (IndexOutOfBoundsException ignored) {
         }
-
-        fail("Indexes >= size() should throw an exception");
     }
 
