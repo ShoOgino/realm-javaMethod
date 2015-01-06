@@ -3,7 +3,7 @@
         JavaFileObject sourceFile = processingEnvironment.getFiler().createSourceFile(qualifiedGeneratedClassName);
         JavaWriter writer = new JavaWriter(new BufferedWriter(sourceFile.openWriter()));
 
-        Elements elementUtils = processingEnvironment.getElementUtils();
+        elementUtils = processingEnvironment.getElementUtils();
         typeUtils = processingEnvironment.getTypeUtils();
 
         realmObject = elementUtils.getTypeElement("io.realm.RealmObject").asType();
@@ -14,17 +14,20 @@
 
         writer.emitPackage(REALM_PACKAGE_NAME)
                 .emitEmptyLine();
-
         writer.emitImports(
+                "android.util.JsonReader",
+                "android.util.JsonToken",
+                "io.realm.RealmObject",
                 "io.realm.internal.ColumnType",
                 "io.realm.internal.Table",
                 "io.realm.internal.ImplicitTransaction",
-                "io.realm.internal.Row",
                 "io.realm.internal.LinkView",
-                "io.realm.RealmList",
-                "io.realm.RealmObject",
-                "io.realm.Realm",
+                "io.realm.internal.android.JsonUtils",
+                "java.io.IOException",
                 "java.util.*",
+                "org.json.JSONObject",
+                "org.json.JSONException",
+                "org.json.JSONArray",
                 packageName + ".*")
                 .emitEmptyLine();
 
@@ -40,6 +43,8 @@
         emitInitTableMethod(writer);
         emitValidateTableMethod(writer);
         emitGetFieldNamesMethod(writer);
+        emitPopulateUsingJsonObjectMethod(writer);
+        emitPopulateUsingJsonStreamMethod(writer);
         emitToStringMethod(writer);
         emitHashcodeMethod(writer);
         emitEqualsMethod(writer);
