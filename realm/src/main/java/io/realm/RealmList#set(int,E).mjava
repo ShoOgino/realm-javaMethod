@@ -3,7 +3,11 @@
      */
     @Override
     public E set(int location, E object) {
-        view.set(location, object.row.getIndex());
+        if (managedMode) {
+            view.set(location, object.row.getIndex());
+        } else {
+            nonManagedList.set(location, object);
+        }
         return object;
     }
 
