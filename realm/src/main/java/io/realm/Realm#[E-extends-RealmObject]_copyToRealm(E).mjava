@@ -10,8 +10,43 @@
      * @throws io.realm.exceptions.RealmException if object has already been added to the Realm.
      */
     public <E extends RealmObject> E copyToRealm(E object) {
+        if (object == null) {
+            throw new IllegalArgumentException("Null objects cannot be copied into Realm.");
+        }
 
+        // Object is already in this Realm
+        if (object.realm == this) {
+            return object;
+        }
 
-        return null;
+        Class<?> generatedClass;
+        Class<?> objectClass;
+        if (object.realm != null) {
+            // This is already a proxy object from another Realm, get superclass instead (invariant as we don't support subclasses)
+            generatedClass = object.getClass();
+            objectClass = object.getClass().getSuperclass();
+        } else {
+            generatedClass = getProxyClass(object.getClass());
+            objectClass = object.getClass();
+        }
+
+        Method method = copyObjectMethods.get(generatedClass);
+        if (method == null) {
+            try {
+                method = generatedClass.getMethod("copyToRealm", new Class[] {Realm.class, objectClass});
+            } catch (NoSuchMethodException e) {
+                throw new RealmException("Could not find the copyToRealm() method in generated proxy class: " + APT_NOT_EXECUTED_MESSAGE, e);
+            }
+            copyObjectMethods.put(generatedClass, method);
+        }
+
+        try {
+            Object result = method.invoke(null, this, object);
+            return (E) result;
+        } catch (IllegalAccessException e) {
+            throw new RealmException("Could not execute the copyToRealm method : " + APT_NOT_EXECUTED_MESSAGE, e);
+        } catch (InvocationTargetException e) {
+            throw new RealmException("An exception was thrown in the copyToRealm method in the proxy class class " + generatedClass.getName() + ": " + APT_NOT_EXECUTED_MESSAGE, e);
+        }
     }
 
