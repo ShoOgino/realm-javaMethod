@@ -1,9 +1,13 @@
     public void testSortWithNullThrows() {
         RealmResults<AllTypes> result = testRealm.allObjects(AllTypes.class);
         try {
-            result.sort(null);
+            result.sort((String)null);
             fail("Sorting with a null field name should throw an IllegalArgumentException");
-        } catch(IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException ignored) {
         }
+        try {
+            result.sort((String[])null);
+            fail();
+        } catch (IllegalArgumentException ignored) {}
     }
 

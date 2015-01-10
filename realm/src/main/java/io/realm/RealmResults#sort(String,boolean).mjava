@@ -1,5 +1,5 @@
     /**
-     * Sort existing @{link io.realm.RealmList}.
+     * Sort existing @{link io.realm.RealmResults}.
      *
      * @param fieldName      The field name to sort by. Only fields of type boolean, short, int,
      *                       long, float, double, Date, and String are supported.
@@ -16,13 +16,7 @@
         TableOrView table = getTable();
 
         if (table instanceof TableView) {
-            if (fieldName.contains(".")) {
-                throw new IllegalArgumentException("Sorting using child object properties is not supported: " + fieldName);
-            }
-            long columnIndex = table.getColumnIndex(fieldName);
-            if (columnIndex < 0) {
-                throw new IllegalArgumentException(String.format("Field '%s' does not exist.", fieldName));
-            }
+            long columnIndex = getColumnIndex(fieldName);
             TableView.Order TVOrder = sortAscending ? TableView.Order.ascending : TableView.Order.descending;
             ((TableView) table).sort(columnIndex, TVOrder);
         } else {
