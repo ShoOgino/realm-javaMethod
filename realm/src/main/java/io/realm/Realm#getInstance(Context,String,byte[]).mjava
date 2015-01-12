@@ -2,12 +2,10 @@
      * Realm static constructor.
      * {link io.realm.close} must be called when you are done using the Realm instance.
      *
-     * <strong>This constructor is now deprecated and will be removed in version 0.76.0.</strong>
+     * It sets auto-refresh on if the current thread has a Looper, off otherwise.
      *
-     * @param writableFolder absolute path to a writable directory
-     * @param key            a 64-byte encryption key
-     * @param autoRefresh whether the Realm object and its derived objects (RealmResults and RealmObjects)
-     *                    should be automatically refreshed with the event loop (requires to be in a thread with a Looper)
+     * @param context an Android {@link android.content.Context}
+     * @param key     a 64-byte encryption key
      * @return an instance of the Realm class
      * @throws RealmMigrationNeededException The model classes have been changed and the Realm
      *                                       must be migrated
@@ -17,8 +15,7 @@
      * @throws RealmException                Other errors
      */
     @SuppressWarnings("UnusedDeclaration")
-    @Deprecated
-    public static Realm getInstance(File writableFolder, byte[] key, boolean autoRefresh) {
-        return Realm.create(writableFolder, DEFAULT_REALM_NAME, key, autoRefresh);
+    public static Realm getInstance(Context context, String fileName, byte[] key) {
+        return Realm.create(context.getFilesDir(), fileName, key);
     }
 

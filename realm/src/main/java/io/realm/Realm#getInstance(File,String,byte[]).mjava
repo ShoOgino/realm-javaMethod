@@ -4,8 +4,9 @@
      *
      * It sets auto-refresh on if the current thread has a Looper, off otherwise.
      *
-     * @param context  an Android {@link android.content.Context}
-     * @param fileName the name of the file to save the Realm to
+     * @param writeableFolder a File object representing a writeable folder
+     * @param fileName the name of the Realm file
+     * @param key     a 64-byte encryption key
      * @return an instance of the Realm class
      * @throws RealmMigrationNeededException The model classes have been changed and the Realm
      *                                       must be migrated
@@ -15,7 +16,7 @@
      * @throws RealmException                Other errors
      */
     @SuppressWarnings("UnusedDeclaration")
-    public static Realm getInstance(Context context, String fileName) {
-        return Realm.getInstance(context, fileName, null);
+    public static Realm getInstance(File writeableFolder, String fileName, byte[] key) {
+        return Realm.create(writeableFolder, fileName, key);
     }
 
