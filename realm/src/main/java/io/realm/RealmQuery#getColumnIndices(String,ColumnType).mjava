@@ -27,8 +27,12 @@
             if (columns.get(fieldName) == null) {
                 throw new IllegalArgumentException(String.format("Field '%s' does not exist.", fieldName));
             }
-            if (fieldType != table.getColumnType(columns.get(fieldName))) {
-                throw new IllegalArgumentException(String.format("Field '%s': type mismatch.", fieldName));
+
+            ColumnType tableColumnType = table.getColumnType(columns.get(fieldName));
+            if (fieldType != tableColumnType) {
+                throw new IllegalArgumentException(String.format("Field '%s': type mismatch. Was %s, expected %s.",
+                        fieldName, fieldType, tableColumnType
+                ));
             }
             return new long[] {columns.get(fieldName)};
         }
