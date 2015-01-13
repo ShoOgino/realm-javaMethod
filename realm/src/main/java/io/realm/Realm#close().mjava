@@ -16,11 +16,11 @@
             sharedGroup.close();
             sharedGroup = null;
         }
-        localRefCount.put(id, references - 1);
-        referenceCount.set(localRefCount);
+        localRefCount.put(id, Math.max(0, references - 1));
 
         if (handler != null) {
             handlers.remove(handler);
+            handler = null;
         }
     }
 
