@@ -5,7 +5,11 @@
      * @see io.realm.RealmQuery
      */
     public RealmQuery<E> where() {
-        TableQuery query = this.view.where();
-        return new RealmQuery<E>(this.realm, query, clazz);
+        if (managedMode) {
+            TableQuery query = this.view.where();
+            return new RealmQuery<E>(this.realm, query, clazz);
+        } else {
+            throw new RealmException(ONLY_IN_MANAGED_MODE_MESSAGE);
+        }
     }
 
