@@ -8,9 +8,8 @@
     public RealmQuery(Realm realm, Class<E> clazz) {
         this.realm = realm;
         this.clazz = clazz;
-
-        TableOrView dataStore = getTable();
-        this.query = dataStore.where();
+        this.table = realm.getTable(clazz);
+        this.query = table.where();
         this.columns = Realm.columnIndices.get(clazz.getSimpleName());
     }
 
