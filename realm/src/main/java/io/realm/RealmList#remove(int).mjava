@@ -3,7 +3,11 @@
      */
     @Override
     public E remove(int location) {
-        view.remove(location);
-        return null;
+        if (managedMode) {
+            view.remove(location);
+            return null; // TODO Return the proper element not null
+        } else {
+            return nonManagedList.remove(location);
+        }
     }
 
