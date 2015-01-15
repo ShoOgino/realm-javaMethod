@@ -3,6 +3,11 @@
      */
     @Override
     public void add(int location, E object) {
-        view.insert(location, object.row.getIndex());
+        if (managedMode) {
+            view.insert(location, object.row.getIndex());
+        } else {
+            assertValidObjectInNonManagedMode(object);
+            nonManagedList.add(location, object);
+        }
     }
 
