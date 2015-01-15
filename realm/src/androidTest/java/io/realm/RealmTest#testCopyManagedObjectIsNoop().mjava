@@ -1,0 +1,13 @@
+    public void testCopyManagedObjectIsNoop() {
+        testRealm.beginTransaction();
+        AllTypes allTypes = testRealm.createObject(AllTypes.class);
+        allTypes.setColumnString("Test");
+        testRealm.commitTransaction();
+
+        testRealm.commitTransaction();
+        AllTypes copiedAllTypes = testRealm.copyToRealm(allTypes);
+        testRealm.commitTransaction();
+
+        assertTrue(allTypes == copiedAllTypes);
+    }
+

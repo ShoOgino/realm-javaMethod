@@ -4,8 +4,10 @@
      * @return The last object
      */
     public E last() {
-        if (!view.isEmpty()) {
-            return get(size()-1);
+        if (managedMode && !view.isEmpty()) {
+            return get((int) view.size() -1);
+        } else {
+            nonManagedList.get(nonManagedList.size() - 1);
         }
         return null;
     }

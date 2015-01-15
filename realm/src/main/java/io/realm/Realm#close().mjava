@@ -16,11 +16,15 @@
             sharedGroup.close();
             sharedGroup = null;
         }
-        localRefCount.put(id, references - 1);
-        referenceCount.set(localRefCount);
+
+        int refCount = references - 1;
+        if (refCount < 0) {
+            RealmLog.w("Calling close() on a Realm that is already closed: " + getPath());
+        }
+        localRefCount.put(id, Math.max(0, refCount));
 
         if (handler != null) {
-            handlers.remove(handler);
+            removeHandler(handler);
         }
     }
 
