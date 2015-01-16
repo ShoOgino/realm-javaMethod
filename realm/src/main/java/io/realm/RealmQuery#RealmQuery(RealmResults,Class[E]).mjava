@@ -1,20 +1,15 @@
     /**
      * Create a RealmQuery instance from a @{link io.realm.RealmResults}.
+     *
      * @param realmList   The @{link io.realm.RealmResults} to query
      * @param clazz       The class to query
      * @throws java.lang.RuntimeException Any other error
      */
     public RealmQuery(RealmResults realmList, Class<E> clazz) {
-        this.realmList = realmList;
-
         this.realm = realmList.getRealm();
         this.clazz = clazz;
-
-        TableOrView dataStore = getTable();
-        this.query = dataStore.where();
-
-        for(int i = 0; i < dataStore.getColumnCount(); i++) {
-            this.columns.put(dataStore.getColumnName(i), i);
-        }
+        this.table = realm.getTable(clazz);
+        this.query = realmList.getTable().where();
+        this.columns = Realm.columnIndices.get(clazz.getSimpleName());
     }
 

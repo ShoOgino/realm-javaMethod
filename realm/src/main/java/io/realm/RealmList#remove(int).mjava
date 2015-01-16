@@ -3,7 +3,13 @@
      */
     @Override
     public E remove(int location) {
-        view.remove(location);
-        return null;
+        if (managedMode) {
+            assertIndex(location);
+            E removedItem = get(location);
+            view.remove(location);
+            return removedItem;
+        } else {
+            return nonManagedList.remove(location);
+        }
     }
 

@@ -3,7 +3,12 @@
      */
     @Override
     public boolean add(E object) {
-        view.add(object.row.getIndex());
+        assertValidObject(object);
+        if (managedMode) {
+            view.add(object.row.getIndex());
+        } else {
+            nonManagedList.add(object);
+        }
         return true;
     }
 

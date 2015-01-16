@@ -3,7 +3,13 @@
      */
     @Override
     public E set(int location, E object) {
-        view.set(location, object.row.getIndex());
+        assertValidObject(object);
+        if (managedMode) {
+            assertIndex(location);
+            view.set(location, object.row.getIndex());
+        } else {
+            nonManagedList.set(location, object);
+        }
         return object;
     }
 

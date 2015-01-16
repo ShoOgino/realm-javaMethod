@@ -1,11 +1,13 @@
     /**
      * Find the last object.
      *
-     * @return The last object
+     * @return The last object or {@code null} if the list is empty.
      */
     public E last() {
-        if (!view.isEmpty()) {
-            return get(size()-1);
+        if (managedMode && !view.isEmpty()) {
+            return get((int) view.size() - 1);
+        } else if (nonManagedList != null && nonManagedList.size() > 0) {
+            return nonManagedList.get(nonManagedList.size() - 1);
         }
         return null;
     }

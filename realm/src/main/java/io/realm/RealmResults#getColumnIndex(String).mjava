@@ -1,0 +1,12 @@
+    // aux. method used by sort methods
+    private long getColumnIndex(String fieldName) {
+        if (fieldName.contains(".")) {
+            throw new IllegalArgumentException("Sorting using child object properties is not supported: " + fieldName);
+        }
+        long columnIndex = table.getColumnIndex(fieldName);
+        if (columnIndex < 0) {
+            throw new IllegalArgumentException(String.format("Field '%s' does not exist.", fieldName));
+        }
+        return columnIndex;
+    }
+

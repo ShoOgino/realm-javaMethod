@@ -1,0 +1,13 @@
+    protected void setUp() throws Exception {
+        super.setUp();
+        Realm.deleteRealmFile(getContext());
+        testRealm = Realm.getInstance(getContext());
+
+        testRealm.beginTransaction();
+        for (int i = 0; i < TEST_DATA_SIZE; ++i) {
+            AllTypes allTypes = testRealm.createObject(AllTypes.class);
+            allTypes.setColumnString("test data " + i);
+        }
+        testRealm.commitTransaction();
+    }
+

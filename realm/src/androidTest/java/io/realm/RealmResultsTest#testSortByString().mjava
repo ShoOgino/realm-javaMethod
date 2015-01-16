@@ -1,22 +1,25 @@
     public void testSortByString() {
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
-        RealmResults<AllTypes> sortedList = resultList.sort(FIELD_STRING, RealmResults.SORT_ORDER_DECENDING);
+        RealmResults<AllTypes> sortedList = resultList.where().findAll();
+        sortedList.sort(FIELD_STRING, RealmResults.SORT_ORDER_DESCENDING);
 
-        assertEquals("Should have same size", resultList.size(), sortedList.size());
+        assertEquals(resultList.size(), sortedList.size());
         assertEquals(TEST_DATA_SIZE, sortedList.size());
-        assertEquals("First excepted to be last", resultList.first().getColumnString(), sortedList.last().getColumnString());
+        assertEquals(resultList.first().getColumnString(), sortedList.last().getColumnString());
 
-        RealmResults<AllTypes> reverseList = sortedList.sort(FIELD_STRING, RealmResults.SORT_ORDER_ASCENDING);
+        RealmResults<AllTypes> reverseList = sortedList.where().findAll();
+        reverseList.sort(FIELD_STRING, RealmResults.SORT_ORDER_ASCENDING);
         assertEquals(TEST_DATA_SIZE, reverseList.size());
-        assertEquals("First excepted to be first", resultList.first().getColumnString(), reverseList.first().getColumnString());
+        assertEquals(resultList.first().getColumnString(), reverseList.first().getColumnString());
 
-        int numberOfDigits = 1+((int)Math.log10(TEST_DATA_SIZE));
+        int numberOfDigits = 1 + ((int) Math.log10(TEST_DATA_SIZE));
         int largestNumber = 1;
-        for(int i=1; i<numberOfDigits; i++)
+        for (int i = 1; i < numberOfDigits; i++)
             largestNumber *= 10;  // 10*10* ... *10
-        largestNumber = largestNumber-1;
-        assertEquals("Last excepted to be last", resultList.get(largestNumber).getColumnString(), reverseList.last().getColumnString());
-        RealmResults<AllTypes> reserveSortedList = reverseList.sort(FIELD_STRING, RealmResults.SORT_ORDER_DECENDING);
-        assertEquals(TEST_DATA_SIZE, reserveSortedList.size());
+        largestNumber = largestNumber - 1;
+        assertEquals(resultList.get(largestNumber).getColumnString(), reverseList.last().getColumnString());
+        RealmResults<AllTypes> reverseSortedList = reverseList.where().findAll();
+        reverseList.sort(FIELD_STRING, RealmResults.SORT_ORDER_DESCENDING);
+        assertEquals(TEST_DATA_SIZE, reverseSortedList.size());
     }
 

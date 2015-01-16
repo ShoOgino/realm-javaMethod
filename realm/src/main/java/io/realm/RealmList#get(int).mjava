@@ -2,7 +2,12 @@
      * {@inheritDoc}
      */
     @Override
-    public E get(int i) {
-        return realm.get(clazz, view.getTargetRowIndex(i));
+    public E get(int location) {
+        if (managedMode) {
+            assertIndex(location);
+            return realm.get(clazz, view.getTargetRowIndex(location));
+        } else {
+            return nonManagedList.get(location);
+        }
     }
 

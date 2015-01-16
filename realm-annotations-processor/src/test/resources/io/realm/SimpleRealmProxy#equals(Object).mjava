@@ -3,8 +3,17 @@
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SimpleRealmProxy aSimple = (SimpleRealmProxy)o;
-        if (getName() != null ? !getName().equals(aSimple.getName()) : aSimple.getName() != null) return false;
-        if (getAge() != aSimple.getAge()) return false;
+
+        String path = realm.getPath();
+        String otherPath = aSimple.realm.getPath();
+        if (path != null ? !path.equals(otherPath) : otherPath != null) return false;;
+
+        String tableName = row.getTable().getName();
+        String otherTableName = aSimple.row.getTable().getName();
+        if (tableName != null ? !tableName.equals(otherTableName) : otherTableName != null) return false;
+
+        if (row.getIndex() != aSimple.row.getIndex()) return false;
+
         return true;
     }
 

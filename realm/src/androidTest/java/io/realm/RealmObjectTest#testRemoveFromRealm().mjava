@@ -1,3 +1,4 @@
+    // removing original object and see if has been removed
     public void testRemoveFromRealm() {
         Realm realm = Realm.getInstance(getContext());
         realm.beginTransaction();
@@ -20,15 +21,18 @@
         fido.getName();
         try {
             rex.getName();
+            realm.close();
             fail();
         } catch (IllegalStateException ignored) {}
 
         // deleting rex twice should fail
         realm.beginTransaction();
         try {
-            rex.removeFromRealm();      
+            rex.removeFromRealm();
+            realm.close();
             fail();
         } catch (IllegalStateException ignored) {}
         realm.commitTransaction();
+        realm.close();
     }
 

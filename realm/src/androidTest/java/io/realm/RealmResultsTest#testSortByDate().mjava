@@ -1,16 +1,19 @@
     public void testSortByDate() {
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
-        RealmResults<AllTypes> sortedList = resultList.sort(FIELD_DATE, RealmResults.SORT_ORDER_DECENDING);
-        assertEquals("Should have same size", resultList.size(), sortedList.size());
+        RealmResults<AllTypes> sortedList = resultList.where().findAll();
+        sortedList.sort(FIELD_DATE, RealmResults.SORT_ORDER_DESCENDING);
+        assertEquals(resultList.size(), sortedList.size());
         assertEquals(TEST_DATA_SIZE, sortedList.size());
-        assertEquals("First excepted to be last", resultList.first().getColumnDate(), sortedList.last().getColumnDate());
+        assertEquals(resultList.first().getColumnDate(), sortedList.last().getColumnDate());
 
-        RealmResults<AllTypes> reverseList = sortedList.sort(FIELD_DATE, RealmResults.SORT_ORDER_ASCENDING);
+        RealmResults<AllTypes> reverseList = sortedList.where().findAll();
+        reverseList.sort(FIELD_DATE, RealmResults.SORT_ORDER_ASCENDING);
         assertEquals(TEST_DATA_SIZE, reverseList.size());
-        assertEquals("First excepted to be first", resultList.first().getColumnDate(), reverseList.first().getColumnDate());
-        assertEquals("Last excepted to be last", resultList.last().getColumnDate(), reverseList.last().getColumnDate());
+        assertEquals(resultList.first().getColumnDate(), reverseList.first().getColumnDate());
+        assertEquals(resultList.last().getColumnDate(), reverseList.last().getColumnDate());
 
-        RealmResults<AllTypes> reserveSortedList = reverseList.sort(FIELD_DATE, RealmResults.SORT_ORDER_DECENDING);
+        RealmResults<AllTypes> reserveSortedList = reverseList.where().findAll();
+        reserveSortedList.sort(FIELD_DATE, RealmResults.SORT_ORDER_DESCENDING);
         assertEquals(TEST_DATA_SIZE, reserveSortedList.size());
     }
 

@@ -3,9 +3,17 @@
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BooleansRealmProxy aBooleans = (BooleansRealmProxy)o;
-        if (isDone() != aBooleans.isDone()) return false;
-        if (isReady() != aBooleans.isReady()) return false;
-        if (ismCompleted() != aBooleans.ismCompleted()) return false;
+
+        String path = realm.getPath();
+        String otherPath = aBooleans.realm.getPath();
+        if (path != null ? !path.equals(otherPath) : otherPath != null) return false;;
+
+        String tableName = row.getTable().getName();
+        String otherTableName = aBooleans.row.getTable().getName();
+        if (tableName != null ? !tableName.equals(otherTableName) : otherTableName != null) return false;
+
+        if (row.getIndex() != aBooleans.row.getIndex()) return false;
+
         return true;
     }
 

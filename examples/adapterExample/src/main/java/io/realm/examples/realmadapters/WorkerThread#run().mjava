@@ -1,0 +1,15 @@
+    @Override
+    public void run() {
+        Realm realm = null;
+        try {
+            Looper.prepare();
+            realm = Realm.getInstance(context);
+            workerHandler = new WorkerHandler(realm);
+            Looper.loop();
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+        }
+    }
+

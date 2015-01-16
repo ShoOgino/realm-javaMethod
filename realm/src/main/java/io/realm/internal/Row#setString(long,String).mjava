@@ -1,5 +1,7 @@
     public void setString(long columnIndex, String value) {
-        getTable().assertStringValueIsLegal(columnIndex, value);
+        parent.checkImmutable();
+        if (value == null)
+            throw new IllegalArgumentException("Null String is not allowed.");
         nativeSetString(nativePtr, columnIndex, value);
     }
 
