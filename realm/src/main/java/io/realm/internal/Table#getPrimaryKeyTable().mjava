@@ -1,0 +1,13 @@
+    private Table getPrimaryKeyTable() {
+        Group group = getTableGroup();
+        if (group == null) return null;
+
+        Table pkTable = group.getTable(PRIMARY_KEY_TABLE_NAME);
+        if (pkTable.getColumnCount() == 0) {
+            pkTable.addColumn(ColumnType.STRING, PRIMARY_KEY_CLASS_COLUMN_NAME);
+            pkTable.addColumn(ColumnType.INTEGER, PRIMARY_KEY_FIELD_COLUMN_NAME);
+        }
+
+        return pkTable;
+    }
+

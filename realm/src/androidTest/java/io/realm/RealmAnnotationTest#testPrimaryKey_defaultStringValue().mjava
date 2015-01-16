@@ -1,16 +1,12 @@
     public void testPrimaryKey_defaultStringValue() {
         testRealm.beginTransaction();
-        testRealm.clear(PrimaryKeyAsString.class);
         try {
             PrimaryKeyAsString str = testRealm.createObject(PrimaryKeyAsString.class);
             str.setName("");
-        } catch (RealmException e) {
-            assertTrue(e.getMessage().endsWith("not allowed as value in a field that is a primary key."));
-            return;
+            fail("It should not be allowed to set a primary key to the default value for the field type");
+        } catch (RealmException expected) {
         } finally {
             testRealm.cancelTransaction();
         }
-
-        fail("It should not be allowed to set a primary key to the default value for the field type");
     }
 

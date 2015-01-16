@@ -1,0 +1,26 @@
+    // Row Handling methods.
+    public long addEmptyRow() {
+        checkImmutable();
+        if (hasPrimaryKey()) {
+            long primaryKeyColumnIndex = getPrimaryKey();
+            ColumnType type = getColumnType(primaryKeyColumnIndex);
+            switch(type) {
+                case STRING:
+                    if (findFirstString(primaryKeyColumnIndex, STRING_DEFAULT_VALUE) != NO_MATCH) {
+                        throwDuplicatePrimaryKeyException(STRING_DEFAULT_VALUE);
+                    }
+                    break;
+                case INTEGER:
+                    if (findFirstLong(primaryKeyColumnIndex, INTEGER_DEFAULT_VALUE) != NO_MATCH) {
+                        throwDuplicatePrimaryKeyException(INTEGER_DEFAULT_VALUE);
+                    };
+                    break;
+
+                default:
+                    throw new RealmException("Cannot check for duplicate rows for unsupported primary key type: " + type);
+            }
+        }
+
+        return nativeAddEmptyRow(nativePtr, 1);
+    }
+
