@@ -10,10 +10,6 @@
      */
     @Deprecated
     public <E extends RealmObject> RealmResults<E> allObjects(Class<E> clazz, String fieldNames[], boolean sortAscending[]) {
-        // FIXME: This is not an optimal implementation. When core's Table::get_sorted_view() supports
-        // FIXME: multi-column sorting, we can rewrite this method to a far better implementation.
-        RealmResults<E> results = this.allObjects(clazz);
-        results.sort(fieldNames, sortAscending);
-        return results;
+        return allObjectsSorted(clazz, fieldNames, sortAscending);
     }
 
