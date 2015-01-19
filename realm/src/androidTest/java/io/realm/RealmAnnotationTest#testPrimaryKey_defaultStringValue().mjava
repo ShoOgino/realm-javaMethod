@@ -1,12 +1,8 @@
+    // It should be allowed to override the primary key value with the same value
     public void testPrimaryKey_defaultStringValue() {
         testRealm.beginTransaction();
-        try {
-            PrimaryKeyAsString str = testRealm.createObject(PrimaryKeyAsString.class);
-            str.setName("");
-            fail("It should not be allowed to set a primary key to the default value for the field type");
-        } catch (RealmException expected) {
-        } finally {
-            testRealm.cancelTransaction();
-        }
+        PrimaryKeyAsString str = testRealm.createObject(PrimaryKeyAsString.class);
+        str.setName("");
+        testRealm.commitTransaction();
     }
 
