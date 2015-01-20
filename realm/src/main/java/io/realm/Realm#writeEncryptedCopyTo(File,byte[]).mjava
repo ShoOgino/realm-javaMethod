@@ -1,5 +1,5 @@
     /**
-     * Write a compacted copy of the Realm to the given destination File.
+     * Write a compacted and encrypted copy of the Realm to the given destination File.
      *
      * The destination file cannot already exist.
      *
@@ -9,7 +9,8 @@
      * @param destination File to save the Realm to
      * @throws java.io.IOException if any write operation fails
      */
-    public void writeCopyTo(File destination) throws IOException {
-        writeEncryptedCopyTo(destination, null);
+    public void writeEncryptedCopyTo(File destination, byte[] key) throws IOException {
+        checkIfValid();
+        transaction.writeToFile(destination, key);
     }
 
