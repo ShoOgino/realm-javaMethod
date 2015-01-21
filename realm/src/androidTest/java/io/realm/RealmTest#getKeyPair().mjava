@@ -1,0 +1,10 @@
+    private KeyPair getKeyPair() throws GeneralSecurityException, IOException, java.io.IOException {
+        final KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+        if (!keyStore.containsAlias(KEY_ALIAS)) {
+            generateKeyPair(KEY_ALIAS);
+        }
+        final KeyStore.PrivateKeyEntry entry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(KEY_ALIAS, null);
+        return new KeyPair(entry.getCertificate().getPublicKey(), entry.getPrivateKey());
+    }
+
