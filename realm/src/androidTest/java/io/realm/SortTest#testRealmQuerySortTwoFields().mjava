@@ -1,0 +1,12 @@
+    public void testRealmQuerySortTwoFields() {
+        RealmResults<AllTypes> results1 = testRealm.where(AllTypes.class)
+                .findAllSorted(new String[]{FIELD_STRING, FIELD_LONG},
+                        new boolean[] {RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_ASCENDING});
+        checkSortTwoFieldsStringInt(results1);
+
+        RealmResults<AllTypes> results2 = testRealm.where(AllTypes.class)
+                .findAllSorted(new String[]{FIELD_LONG, FIELD_STRING},
+                        new boolean[]{RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_ASCENDING});
+        checkSortTwoFieldsIntString(results2);
+    }
+

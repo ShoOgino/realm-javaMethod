@@ -1,4 +1,8 @@
-    static void populateForMultiSort(Realm testRealm) {
+    @Override
+    public void setUp() {
+        Realm.deleteRealmFile(getContext());
+        testRealm = Realm.getInstance(getContext());
+
         testRealm.beginTransaction();
         testRealm.clear(AllTypes.class);
         AllTypes object1 = testRealm.createObject(AllTypes.class);
