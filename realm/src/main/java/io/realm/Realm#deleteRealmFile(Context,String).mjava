@@ -9,9 +9,17 @@
     public static boolean deleteRealmFile(Context context, String fileName) {
         boolean result = true;
         File writableFolder = context.getFilesDir();
-        List<File> filesToDelete = Arrays.asList(
-                new File(writableFolder, fileName),
-                new File(writableFolder, fileName + ".lock"));
+
+        File realmFile = new File(writableFolder, fileName);
+        int realmId = realmFile.getAbsolutePath().hashCode();
+
+        AtomicInteger counter = openRealms.get(realmId);
+        if (counter != null && counter.get() > 0) {
+            throw new IllegalStateException("It's not allowed to delete the file associated to an open Realm. " +
+                    "Remember to close() all the instances of the Realm before deleting its file.");
+        }
+
+        List<File> filesToDelete = Arrays.asList(realmFile, new File(writableFolder, fileName + ".lock"));
         for (File fileToDelete : filesToDelete) {
             if (fileToDelete.exists()) {
                 boolean deleteResult = fileToDelete.delete();
