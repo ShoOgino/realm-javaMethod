@@ -1,0 +1,12 @@
+    private static void assertValidRealmPath(File writableFolder, String filename) {
+        if (filename == null || filename.isEmpty()) {
+            throw new IllegalArgumentException("Non-empty filename must be provided");
+        }
+        if (writableFolder == null || !writableFolder.isDirectory()) {
+            throw new IllegalArgumentException(("A existing folder must be provided. Yours was " + (writableFolder != null ? writableFolder.getAbsolutePath() : "null")));
+        }
+        if (!writableFolder.canWrite()) {
+            throw new IllegalArgumentException("You do not have write permissions to create a Realm in " + writableFolder.getAbsolutePath());
+        }
+    }
+
