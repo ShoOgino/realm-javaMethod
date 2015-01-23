@@ -1,0 +1,18 @@
+    public void testGetInstanceFileNoWritePermission() throws IOException {
+        String REALM_FILE = "readonly.realm";
+        File folder = getContext().getFilesDir();
+        File realmFile = new File(folder, REALM_FILE);
+        if (realmFile.exists()) {
+            realmFile.delete(); // Reset old test data
+        }
+
+        assertTrue(realmFile.createNewFile());
+        assertTrue(realmFile.setWritable(false));
+
+        try {
+            Realm.getInstance(folder, REALM_FILE);
+            fail("Trying to open a read-only file should fail");
+        } catch (IllegalArgumentException expected) {
+        }
+    }
+
