@@ -1,0 +1,15 @@
+    // Copies a Realm file from assets to app files dir
+    private void copyRealmFromAssets(String fileName) throws IOException {
+        AssetManager assetManager = getContext().getAssets();
+        InputStream is = assetManager.open(fileName);
+        File file = new File(getContext().getFilesDir(), fileName);
+        FileOutputStream outputStream = new FileOutputStream(file);
+        byte[] buf = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = is.read(buf)) > -1) {
+            outputStream.write(buf, 0, bytesRead);
+        }
+        outputStream.close();
+        is.close();
+    }
+
