@@ -1,0 +1,12 @@
+    void assertStringValueIsLegal(long columnIndex, long rowToUpdate, String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Null String is not allowed.");
+        }
+        if (isPrimaryKey(columnIndex)) {
+            long rowIndex = findFirstString(columnIndex, value);
+            if (rowIndex != rowToUpdate && rowIndex != TableOrView.NO_MATCH) {
+                throwDuplicatePrimaryKeyException(value);
+            }
+        }
+    }
+
