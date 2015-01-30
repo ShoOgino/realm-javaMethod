@@ -1,0 +1,54 @@
+    private void emitUpdateMethod(JavaWriter writer) throws IOException {
+
+        writer.beginMethod(
+                className, // Return type
+                "update", // Method name
+                EnumSet.of(Modifier.STATIC), // Modifiers
+                "Realm", "realm", className, "realmObject", className, "newObject"); // Argument type & argument name
+
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                writer
+                    .emitStatement("%s %s = newObject.%s()", getFieldTypeSimpleName(field), fieldName, getters.get(fieldName))
+                    .beginControlFlow("if (%s != null)", fieldName)
+                        .emitStatement("realmObject.%s(%s.copyOrUpdate(realm, %s, realm.getTable(%s.class).hasPrimaryKey()))",
+                                setters.get(fieldName),
+                                getProxyClassSimpleName(field),
+                                fieldName,
+                                getFieldTypeSimpleName(field)
+                        )
+                    .nextControlFlow("else")
+                        .emitStatement("realmObject.%s(null)", setters.get(fieldName))
+                    .endControlFlow();
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+                writer
+                    .emitStatement("RealmList<%s> %sList = newObject.%s()", getGenericType(field), fieldName, getters.get(fieldName))
+                    .beginControlFlow("if (%sList != null)", fieldName)
+                        .emitStatement("RealmList<%s> %sRealmList = realmObject.%s()", getGenericType(field), fieldName, getters.get(fieldName))
+                        .emitStatement("%sRealmList.clear()", fieldName)
+                        .beginControlFlow("for (int i = 0; i < %sList.size(); i++)", fieldName)
+                            .emitStatement("%sRealmList.add(%s.copy(realm, %sList.get(i)))", fieldName, getProxyClassSimpleName(field), fieldName)
+                        .endControlFlow()
+                    .endControlFlow();
+
+            } else {
+                if (field == primaryKey) {
+                    continue;
+                }
+
+                // Date is special
+                if (field.asType().toString().equals("java.util.Date")) {
+                    writer.emitStatement("Date %s = newObject.%s()", fieldName, getters.get(fieldName));
+                    writer.emitStatement("realmObject.%s(%s != null ? %s : new Date(0))", setters.get(fieldName), fieldName, fieldName);
+                } else {
+                    writer.emitStatement("realmObject.%s(newObject.%s())", setters.get(fieldName), getters.get(fieldName));
+                }
+            }
+        }
+
+        writer.emitStatement("return realmObject");
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+

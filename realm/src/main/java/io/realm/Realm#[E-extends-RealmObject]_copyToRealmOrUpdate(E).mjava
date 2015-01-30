@@ -1,0 +1,21 @@
+    /**
+     * Copies a RealmObject to Realm or update all the fields of an existing object if it has a
+     * matching primary key value. Any further changes to the original RealmObject will not be
+     * reflected in the Realm copy.
+     *
+     * @param object    {@link io.realm.RealmObject} to copy or update.
+     * @return The new or updated RealmObject with all its properties backed by the Realm.
+     *
+     * @throws java.lang.IllegalArgumentException if RealmObject is {@code null}.
+     * @see {@link #copyToRealm(RealmObject)}
+     */
+    public <E extends RealmObject> E copyToRealmOrUpdate(E object) {
+        checkNotNullObject(object);
+        checkHasPrimaryKey(object);
+        if (isObjectInRealm(object)) {
+            return object;
+        }
+
+        return copyOrUpdate(object, true);
+    }
+

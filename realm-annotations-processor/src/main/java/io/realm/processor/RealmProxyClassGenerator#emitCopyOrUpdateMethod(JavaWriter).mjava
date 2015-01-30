@@ -1,0 +1,50 @@
+    private void emitCopyOrUpdateMethod(JavaWriter writer) throws IOException {
+        writer.beginMethod(
+                className, // Return type
+                "copyOrUpdate", // Method name
+                EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
+                "Realm", "realm", className, "object", "boolean", "update" // Argument type & argument name
+        );
+
+        if (primaryKey == null) {
+            writer.emitStatement("return copy(realm, object)");
+
+        } else {
+            writer
+                .emitStatement("%s realmObject = null", className)
+                .beginControlFlow("if (update)")
+                    .emitStatement("Table table = realm.getTable(%s.class)", className)
+                    .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
+
+            if (primaryKey == null) {
+                writer.emitStatement("long rowIndex = TableOrView.NO_MATCH");
+            } else if (isString(primaryKey)) {
+                writer.emitStatement("long rowIndex = table.findFirstString(pkColumnIndex, object.%s())", getters.get(primaryKey.getSimpleName().toString()));
+            } else {
+                writer.emitStatement("long rowIndex = table.findFirstLong(pkColumnIndex, object.%s())", getters.get(primaryKey.getSimpleName().toString()));
+            }
+
+            writer
+                .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
+                    .emitStatement("realmObject = new %s()", getProxyClassSimpleName(className))
+                    .emitStatement("realmObject.realm = realm")
+                    .emitStatement("realmObject.row = table.getRow(rowIndex)")
+                .nextControlFlow("else")
+                    .emitStatement("update = false")
+                .endControlFlow();
+
+            writer.endControlFlow();
+
+            writer
+                .emitEmptyLine()
+                .beginControlFlow("if (update)")
+                    .emitStatement("return update(realm, realmObject, object)")
+                .nextControlFlow("else")
+                    .emitStatement("return copy(realm, object)")
+                .endControlFlow();
+        }
+
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+

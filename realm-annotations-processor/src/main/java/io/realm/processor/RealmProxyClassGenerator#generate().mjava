@@ -1,5 +1,5 @@
     public void generate() throws IOException, UnsupportedOperationException {
-        String qualifiedGeneratedClassName = String.format("%s.%s%s", REALM_PACKAGE_NAME, className, PROXY_SUFFIX);
+        String qualifiedGeneratedClassName = String.format("%s.%s", REALM_PACKAGE_NAME, getProxyClassSimpleName(className));
         JavaFileObject sourceFile = processingEnvironment.getFiler().createSourceFile(qualifiedGeneratedClassName);
         JavaWriter writer = new JavaWriter(new BufferedWriter(sourceFile.openWriter()));
 
@@ -19,8 +19,10 @@
         imports.add("android.util.JsonReader");
         imports.add("android.util.JsonToken");
         imports.add("io.realm.RealmObject");
+        imports.add("io.realm.exceptions.RealmException");
         imports.add("io.realm.internal.ColumnType");
         imports.add("io.realm.internal.Table");
+        imports.add("io.realm.internal.TableOrView");
         imports.add("io.realm.internal.ImplicitTransaction");
         imports.add("io.realm.internal.LinkView");
         imports.add("io.realm.internal.android.JsonUtils");
@@ -64,7 +66,9 @@
         emitGetFieldNamesMethod(writer);
         emitPopulateUsingJsonObjectMethod(writer);
         emitPopulateUsingJsonStreamMethod(writer);
-        emitCopyToRealmMethod(writer);
+        emitCopyOrUpdateMethod(writer);
+        emitCopyMethod(writer);
+        emitUpdateMethod(writer);
         emitToStringMethod(writer);
         emitHashcodeMethod(writer);
         emitEqualsMethod(writer);
