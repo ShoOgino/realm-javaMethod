@@ -1,0 +1,41 @@
+    public void testSortMultiFailures() {
+        RealmResults<AllTypes> allTypes = testRealm.allObjects(AllTypes.class);
+
+        // zero fields specified
+        try {
+            testRealm.allObjectsSorted(AllTypes.class, new String[]{}, new boolean[]{});
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // number of fields and sorting orders don't match
+        try {
+            testRealm.allObjectsSorted(AllTypes.class,
+                    new String[]{FIELD_STRING},
+                    new boolean[]{RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_ASCENDING});
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // null is not allowed
+        try {
+            testRealm.allObjectsSorted(AllTypes.class, null, null);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+        try {
+            testRealm.allObjectsSorted(AllTypes.class, new String[]{FIELD_STRING}, null);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // non-existing field name
+        try {
+            testRealm.allObjectsSorted(AllTypes.class,
+                    new String[]{FIELD_STRING, "dont-exist"},
+                    new boolean[]{RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_ASCENDING});
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
