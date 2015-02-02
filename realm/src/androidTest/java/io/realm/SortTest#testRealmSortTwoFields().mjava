@@ -1,12 +1,18 @@
     public void testRealmSortTwoFields() {
         RealmResults<AllTypes> results1 = testRealm.allObjectsSorted(AllTypes.class,
-                new String[]{FIELD_STRING, FIELD_LONG},
-                new boolean[] {RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_ASCENDING});
-        checkSortTwoFieldsStringInt(results1);
+                ORDER_STRING_INT, ORDER_ASC_ASC);
+        checkSortTwoFieldsStringAscendingIntAscending(results1);
 
         RealmResults<AllTypes> results2 = testRealm.allObjectsSorted(AllTypes.class,
-                new String[]{FIELD_LONG, FIELD_STRING},
-                new boolean[]{RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_ASCENDING});
+                ORDER_INT_STRING, ORDER_ASC_ASC);
         checkSortTwoFieldsIntString(results2);
+
+        RealmResults<AllTypes> results3 = testRealm.allObjectsSorted(AllTypes.class,
+                ORDER_STRING_INT, ORDER_ASC_DES);
+        checkSortTwoFieldsStringAscendingIntDescending(results3);
+
+        RealmResults<AllTypes> results4 = testRealm.allObjectsSorted(AllTypes.class,
+                ORDER_INT_STRING, ORDER_ASC_DES);
+        checkSortTwoFieldsIntAscendingStringDescending(results4);
     }
 

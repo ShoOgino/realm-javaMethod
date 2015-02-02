@@ -5,15 +5,16 @@
         try {
             testRealm.allObjectsSorted(AllTypes.class, new String[]{}, new boolean[]{});
             fail();
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
 
         // number of fields and sorting orders don't match
         try {
             testRealm.allObjectsSorted(AllTypes.class,
-                    new String[]{FIELD_STRING},
-                    new boolean[]{RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_ASCENDING});
+                    new String[]{FIELD_STRING}, ORDER_ASC_ASC);
             fail();
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
 
         // null is not allowed
         try {
@@ -23,14 +24,16 @@
         try {
             testRealm.allObjectsSorted(AllTypes.class, new String[]{FIELD_STRING}, null);
             fail();
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
 
         // non-existing field name
         try {
             testRealm.allObjectsSorted(AllTypes.class,
                     new String[]{FIELD_STRING, "dont-exist"},
-                    new boolean[]{RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_ASCENDING});
+                    ORDER_ASC_ASC);
             fail();
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
     }
 
