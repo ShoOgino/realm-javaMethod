@@ -21,6 +21,14 @@
             throw new RealmException("An exception was thrown in the getProxyClasses method in the ValidationList class: " + APT_NOT_EXECUTED_MESSAGE);
         }
 
+        // Custom schema overrides any schema already defined
+        if (customSchema.size() > 0) {
+            proxyClasses = new ArrayList<String>();
+            for (Class<? extends RealmObject> clazz : customSchema) {
+                proxyClasses.add(clazz.getName());
+            }
+        }
+
         long version = realm.getVersion();
         boolean commitNeeded = false;
         try {
