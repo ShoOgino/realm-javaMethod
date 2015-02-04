@@ -15,6 +15,8 @@
             realmsCache.get().remove(id);
             sharedGroup.close();
             sharedGroup = null;
+            AtomicInteger counter = openRealms.get(id);
+            counter.decrementAndGet();
         }
 
         int refCount = references - 1;
@@ -23,7 +25,7 @@
         }
         localRefCount.put(id, Math.max(0, refCount));
 
-        if (handler != null) {
+        if (handler != null && refCount <= 0) {
             removeHandler(handler);
         }
     }

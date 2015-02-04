@@ -21,13 +21,7 @@
 
                 // Find the current Handler for the thread now. All message and references will be
                 // cleared once we call close().
-                Handler threadHandler = null;
-                for (final Handler handler : Realm.handlers.keySet()) {
-                    if (Realm.handlers.get(handler).equals(realm.getPath().hashCode())) {
-                        threadHandler = handler;
-                        break;
-                    }
-                }
+                Handler threadHandler = realm.getHandler();
                 realm.close(); // Close native resources + associated handlers.
 
                 // Looper now reads the update message from the main thread if the Handler was not
