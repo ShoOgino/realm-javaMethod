@@ -10,7 +10,11 @@
      */
     public <E extends RealmObject> RealmResults<E> allObjectsSorted(Class<E> clazz, String fieldNames[],
                                                                boolean sortAscending[]) {
-        validateMultiSortParameters(fieldNames, sortAscending);
+        if (fieldNames == null) {
+            throw new IllegalArgumentException("fieldNames must be provided.");
+        } else if (sortAscending == null) {
+            throw new IllegalArgumentException("sortAscending must be provided.");
+        }
 
         Table table = this.getTable(clazz);
         long columnIndices[] = new long[fieldNames.length];

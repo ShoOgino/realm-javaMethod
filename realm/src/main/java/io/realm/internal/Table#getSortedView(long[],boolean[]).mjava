@@ -1,13 +1,6 @@
     public TableView getSortedView(long columnIndices[], boolean orders[]) {
         context.executeDelayedDisposal();
-        long indices[] = new long[columnIndices.length];
-        boolean sortOrders[] = new boolean[orders.length];
         long nativeViewPtr = nativeGetSortedViewMulti(nativePtr, columnIndices, orders);
-        try {
-            return new TableView(this.context, this, nativeViewPtr);
-        } catch (RuntimeException e) {
-            TableView.nativeClose(nativeViewPtr);
-            throw e;
-        }
+        return new TableView(this.context, this, nativeViewPtr);
     }
 
