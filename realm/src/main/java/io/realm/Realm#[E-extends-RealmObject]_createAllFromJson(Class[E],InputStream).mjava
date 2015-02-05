@@ -12,14 +12,16 @@
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public <E extends RealmObject> void createAllFromJson(Class<E> clazz, InputStream inputStream) throws IOException {
-        if (clazz == null || inputStream == null) return;
+        if (clazz == null || inputStream == null) {
+            return;
+        }
 
         JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
         try {
             reader.beginArray();
             while (reader.hasNext()) {
                 E obj = createObject(clazz);
-                obj.populateUsingJsonStream(reader);
+                realmJson.populateUsingJsonStream(obj, reader);
             }
             reader.endArray();
         } finally {

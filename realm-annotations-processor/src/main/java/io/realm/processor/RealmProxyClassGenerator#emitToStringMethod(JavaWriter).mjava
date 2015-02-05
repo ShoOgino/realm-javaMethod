@@ -11,14 +11,14 @@
 
             writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
             if (typeUtils.isAssignable(field.asType(), realmObject)) {
-                String fieldTypeSimpleName = getFieldTypeSimpleName(field);
+                String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
                 writer.emitStatement(
                         "stringBuilder.append(%s() != null ? \"%s\" : \"null\")",
                         getters.get(fieldName),
                         fieldTypeSimpleName
                 );
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
-                String genericType = getGenericType(field);
+                String genericType = Utils.getGenericType(field);
                 writer.emitStatement("stringBuilder.append(\"RealmList<%s>[\").append(%s().size()).append(\"]\")",
                         genericType,
                         getters.get(fieldName));

@@ -9,12 +9,14 @@
      * @throws RealmException if mapping from JSON fails.
      */
     public <E extends RealmObject> void createAllFromJson(Class<E> clazz, JSONArray json) {
-        if (clazz == null || json == null) return;
+        if (clazz == null || json == null) {
+            return;
+        }
 
         for (int i = 0; i < json.length(); i++) {
             E obj = createObject(clazz);
             try {
-                obj.populateUsingJsonObject(json.getJSONObject(i));
+                realmJson.populateUsingJsonObject(obj, json.getJSONObject(i));
             } catch (Exception e) {
                 throw new RealmException("Could not map Json", e);
             }

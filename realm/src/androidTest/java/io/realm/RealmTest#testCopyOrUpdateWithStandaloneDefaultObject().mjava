@@ -1,0 +1,37 @@
+    // Checks that a standalone object with only default values can override data
+    public void testCopyOrUpdateWithStandaloneDefaultObject() {
+        testRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
+                obj.setColumnString("Foo");
+                obj.setColumnLong(1);
+                obj.setColumnFloat(1.23F);
+                obj.setColumnDouble(1.234D);
+                obj.setColumnBoolean(false);
+                obj.setColumnBinary(new byte[]{1, 2, 3});
+                obj.setColumnDate(new Date(1000));
+                obj.setColumnRealmObject(new Dog("Dog1"));
+                obj.setColumnRealmList(new RealmList(new Dog("Dog2")));
+                realm.copyToRealm(obj);
+
+                AllTypesPrimaryKey obj2 = new AllTypesPrimaryKey();
+                obj2.setColumnLong(1);
+                realm.copyToRealmOrUpdate(obj2);
+            }
+        });
+
+        assertEquals(1, testRealm.allObjects(AllTypesPrimaryKey.class).size());
+
+        AllTypesPrimaryKey obj = testRealm.allObjects(AllTypesPrimaryKey.class).first();
+        assertEquals("", obj.getColumnString());
+        assertEquals(1, obj.getColumnLong());
+        assertEquals(0.0F, obj.getColumnFloat());
+        assertEquals(0.0D, obj.getColumnDouble());
+        assertEquals(false, obj.isColumnBoolean());
+        assertArrayEquals(new byte[0], obj.getColumnBinary());
+        assertEquals(new Date(0), obj.getColumnDate());
+        assertNull(obj.getColumnRealmObject());
+        assertEquals(0, obj.getColumnRealmList().size());
+    }
+

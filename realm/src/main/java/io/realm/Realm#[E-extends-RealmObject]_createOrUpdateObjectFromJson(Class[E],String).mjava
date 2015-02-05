@@ -1,0 +1,24 @@
+    /**
+     * TODO
+     *
+     * @param clazz
+     * @param json
+     * @param <E>
+     * @return
+     */
+    public <E extends RealmObject> E createOrUpdateObjectFromJson(Class<E> clazz, String json) {
+        if (clazz == null || json == null || json.length() == 0) {
+            return null;
+        }
+        checkHasPrimaryKey(clazz);
+
+        JSONObject obj;
+        try {
+            obj = new JSONObject(json);
+        } catch (Exception e) {
+            throw new RealmException("Could not create Json object from string", e);
+        }
+
+        return createOrUpdateObjectFromJson(clazz, obj);
+    }
+

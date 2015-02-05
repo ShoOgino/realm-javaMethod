@@ -2,10 +2,11 @@
         writer.beginMethod(
                 "void",
                 "populateUsingJsonStream",
-                Collections.<Modifier>emptySet(),
-                Arrays.asList("JsonReader", "reader"),
+                EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
+                Arrays.asList(className, "obj", "JsonReader", "reader"),
                 Arrays.asList("IOException"));
 
+        writer.emitStatement("boolean standalone = obj.realm == null");
         writer.emitStatement("reader.beginObject()");
         writer.beginControlFlow("while (reader.hasNext())");
         writer.emitStatement("String name = reader.nextName()");
@@ -25,12 +26,14 @@
                         setters.get(fieldName),
                         fieldName,
                         qualifiedFieldType,
+                        Utils.getProxyClassSimpleName(field),
                         writer);
 
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
                 RealmJsonTypeHelper.emitFillRealmListFromStream(
                         getters.get(fieldName),
                         ((DeclaredType) field.asType()).getTypeArguments().get(0).toString(),
+                        Utils.getProxyClassSimpleName(field),
                         writer);
 
             } else {

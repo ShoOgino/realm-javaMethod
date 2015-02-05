@@ -1,0 +1,37 @@
+    public void generate() throws IOException {
+        String qualifiedGeneratedClassName = String.format("%s.%s", REALM_PACKAGE_NAME, CLASS_NAME);
+        JavaFileObject sourceFile = processingEnvironment.getFiler().createSourceFile(qualifiedGeneratedClassName);
+        JavaWriter writer = new JavaWriter(new BufferedWriter(sourceFile.openWriter()));
+        writer.setIndent("    ");
+
+        writer.emitPackage(REALM_PACKAGE_NAME);
+        writer.emitEmptyLine();
+
+        writer.emitImports(
+                "android.util.JsonReader",
+                "java.io.IOException",
+                "java.util.ArrayList",
+                "java.util.Collections",
+                "java.util.List",
+                "org.json.JSONException",
+                "org.json.JSONObject",
+                "io.realm.exceptions.RealmException",
+                "io.realm.internal.RealmJson"
+        );
+        writer.emitImports(qualifiedModelClasses);
+        writer.emitEmptyLine();
+        writer.beginType(
+                qualifiedGeneratedClassName,        // full qualified name of the item to generate
+                "class",                            // the type of the item
+                Collections.<Modifier>emptySet(),   // modifiers to apply
+                null,                               // class to extend
+                "RealmJson");              // Interfaces to implement
+        writer.emitEmptyLine();
+
+        emitPopulateUsingJsonObject(writer);
+        emitPopulateUsingJsonStream(writer);
+
+        writer.endType();
+        writer.close();
+    }
+

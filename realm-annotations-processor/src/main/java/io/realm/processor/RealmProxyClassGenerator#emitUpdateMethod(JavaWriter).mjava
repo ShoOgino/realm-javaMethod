@@ -10,25 +10,25 @@
             String fieldName = field.getSimpleName().toString();
             if (typeUtils.isAssignable(field.asType(), realmObject)) {
                 writer
-                    .emitStatement("%s %s = newObject.%s()", getFieldTypeSimpleName(field), fieldName, getters.get(fieldName))
+                    .emitStatement("%s %s = newObject.%s()", Utils.getFieldTypeSimpleName(field), fieldName, getters.get(fieldName))
                     .beginControlFlow("if (%s != null)", fieldName)
                         .emitStatement("realmObject.%s(%s.copyOrUpdate(realm, %s, realm.getTable(%s.class).hasPrimaryKey()))",
                                 setters.get(fieldName),
-                                getProxyClassSimpleName(field),
+                                Utils.getProxyClassSimpleName(field),
                                 fieldName,
-                                getFieldTypeSimpleName(field)
+                                Utils.getFieldTypeSimpleName(field)
                         )
                     .nextControlFlow("else")
                         .emitStatement("realmObject.%s(null)", setters.get(fieldName))
                     .endControlFlow();
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
                 writer
-                    .emitStatement("RealmList<%s> %sList = newObject.%s()", getGenericType(field), fieldName, getters.get(fieldName))
+                    .emitStatement("RealmList<%s> %sList = newObject.%s()", Utils.getGenericType(field), fieldName, getters.get(fieldName))
+                    .emitStatement("RealmList<%s> %sRealmList = realmObject.%s()", Utils.getGenericType(field), fieldName, getters.get(fieldName))
+                    .emitStatement("%sRealmList.clear()", fieldName)
                     .beginControlFlow("if (%sList != null)", fieldName)
-                        .emitStatement("RealmList<%s> %sRealmList = realmObject.%s()", getGenericType(field), fieldName, getters.get(fieldName))
-                        .emitStatement("%sRealmList.clear()", fieldName)
                         .beginControlFlow("for (int i = 0; i < %sList.size(); i++)", fieldName)
-                            .emitStatement("%sRealmList.add(%s.copy(realm, %sList.get(i)))", fieldName, getProxyClassSimpleName(field), fieldName)
+                            .emitStatement("%sRealmList.add(%s.copy(realm, %sList.get(i)))", fieldName, Utils.getProxyClassSimpleName(field), fieldName)
                         .endControlFlow()
                     .endControlFlow();
 
@@ -37,10 +37,13 @@
                     continue;
                 }
 
-                // Date is special
-                if (field.asType().toString().equals("java.util.Date")) {
-                    writer.emitStatement("Date %s = newObject.%s()", fieldName, getters.get(fieldName));
-                    writer.emitStatement("realmObject.%s(%s != null ? %s : new Date(0))", setters.get(fieldName), fieldName, fieldName);
+                String fieldType = field.asType().toString();
+                if (NULLABLE_JAVA_TYPES.containsKey(fieldType)) {
+                    writer.emitStatement("realmObject.%s(newObject.%s() != null ? newObject.%s() : %s)",
+                            setters.get(fieldName),
+                            getters.get(fieldName),
+                            getters.get(fieldName),
+                            NULLABLE_JAVA_TYPES.get(fieldType));
                 } else {
                     writer.emitStatement("realmObject.%s(newObject.%s())", setters.get(fieldName), getters.get(fieldName));
                 }

@@ -18,7 +18,7 @@
 
             if (primaryKey == null) {
                 writer.emitStatement("long rowIndex = TableOrView.NO_MATCH");
-            } else if (isString(primaryKey)) {
+            } else if (Utils.isString(primaryKey)) {
                 writer.emitStatement("long rowIndex = table.findFirstString(pkColumnIndex, object.%s())", getters.get(primaryKey.getSimpleName().toString()));
             } else {
                 writer.emitStatement("long rowIndex = table.findFirstLong(pkColumnIndex, object.%s())", getters.get(primaryKey.getSimpleName().toString()));
@@ -26,7 +26,7 @@
 
             writer
                 .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
-                    .emitStatement("realmObject = new %s()", getProxyClassSimpleName(className))
+                    .emitStatement("realmObject = new %s()", Utils.getProxyClassName(className))
                     .emitStatement("realmObject.realm = realm")
                     .emitStatement("realmObject.row = table.getRow(rowIndex)")
                 .nextControlFlow("else")
