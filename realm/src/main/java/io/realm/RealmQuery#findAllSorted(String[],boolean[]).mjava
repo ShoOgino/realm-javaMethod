@@ -19,8 +19,8 @@
             throw new IllegalArgumentException(String.format("Number of field names (%d) and sort orders (%d) does not match.", fieldNames.length, sortAscending.length));
         }
 
-        if (fieldNames.length == 1) {
-            return findAll(fieldNames[0], sortAscending[0]);
+        if (fieldNames.length == 1 && sortAscending.length == 1) {
+            return findAllSorted(fieldNames[0], sortAscending[0]);
         } else {
             TableView tableView = query.findAll();
             List<Long> columnIndices = new ArrayList<Long>();
@@ -32,6 +32,8 @@
                     throw new IllegalArgumentException(String.format("Field name '%s' does not exist.", fieldName));
                 }
                 columnIndices.add(columnIndex);
+            }
+            for (int i = 0; i < sortAscending.length; i++) {
                 orders.add(sortAscending[i] ? TableView.Order.ascending : TableView.Order.descending);
             }
             tableView.sort(columnIndices, orders);
