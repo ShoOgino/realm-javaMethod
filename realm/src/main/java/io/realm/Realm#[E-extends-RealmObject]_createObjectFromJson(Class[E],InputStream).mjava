@@ -12,7 +12,9 @@
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public <E extends RealmObject> E createObjectFromJson(Class<E> clazz, InputStream inputStream) throws IOException {
-        if (inputStream == null || clazz == null) return null;
+        if (clazz == null || inputStream == null) {
+            return null;
+        }
 
         JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
         try {

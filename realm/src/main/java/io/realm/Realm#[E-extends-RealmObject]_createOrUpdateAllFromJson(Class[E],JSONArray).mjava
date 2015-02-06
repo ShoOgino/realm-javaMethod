@@ -1,4 +1,22 @@
+    /**
+     * TODO
+     * @param clazz
+     * @param json
+     */
     public <E extends RealmObject> void createOrUpdateAllFromJson(Class<E> clazz, JSONArray json) {
-        // TODO
+        if (clazz == null || json == null) {
+            return;
+        }
+        checkHasPrimaryKey(clazz);
+
+        for (int i = 0; i < json.length(); i++) {
+            E obj = createStandaloneRealmObjectInstance(clazz);
+            try {
+                realmJson.populateUsingJsonObject(obj, json.getJSONObject(i));
+                copyToRealmOrUpdate(obj);
+            } catch (Exception e) {
+                throw new RealmException("Could not map Json", e);
+            }
+        }
     }
 
