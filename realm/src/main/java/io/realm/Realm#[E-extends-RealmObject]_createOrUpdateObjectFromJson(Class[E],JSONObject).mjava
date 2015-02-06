@@ -1,10 +1,10 @@
     /**
      * Tries to update an existing object defined by its primary key with new JSON data. If no existing object could be
-     * found a new one will be saved in the Realm. This must happen inside a transaction.
+     * found a new object will be saved in the Realm. This must happen inside a transaction.
      *
      * @param clazz Type of {@link io.realm.RealmObject} to create or update. It must have a primary key defined.
      * @param json  {@link org.json.JSONObject} with object data.
-     * @return Created or updated {@link io.realm.RealmObject}
+     * @return Created or updated {@link io.realm.RealmObject}.
      * @throws {@link java.lang.IllegalArgumentException} if trying to update a class without a
      * {@link io.realm.annotations.PrimaryKey}.
      * @see {@link #createObjectFromJson(Class, org.json.JSONObject)}
@@ -15,19 +15,12 @@
         }
         checkHasPrimaryKey(clazz);
 
-        E obj;
-        try {
-            obj = clazz.newInstance();
-        } catch (InstantiationException e) {
-            throw new RealmException("Could not create an object of class: " + clazz, e);
-        } catch (IllegalAccessException e) {
-            throw new RealmException("Could not create an object of class: " + clazz, e);
-        }
+        E obj = createStandaloneRealmObjectInstance(clazz);
 
         try {
             realmJson.populateUsingJsonObject(obj, json);
             copyToRealmOrUpdate(obj);
-        } catch (Exception e) {
+        } catch (JSONException e) {
             throw new RealmException("Could not map Json", e);
         }
 
