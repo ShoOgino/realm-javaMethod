@@ -1,6 +1,6 @@
     // TODO: consider another caching strategy so linked classes are included in the cache.
     private long[] getColumnIndices(String fieldName, ColumnType fieldType) {
-        TableOrView table = this.table;
+        Table table = this.table;
         if (containsDot(fieldName)) {
             String[] names = splitString(fieldName); //fieldName.split("\\.");
             long[] columnIndices = new long[names.length];
@@ -11,7 +11,7 @@
                 }
                 ColumnType type = table.getColumnType(index);
                 if (type == ColumnType.LINK || type == ColumnType.LINK_LIST) {
-                    table = table.getTable().getLinkTarget(index);
+                    table = table.getLinkTarget(index);
                     columnIndices[i] = index;
                 } else {
                     throw new IllegalArgumentException("Invalid query: " + names[i] + " does not refer to a class.");
