@@ -8,7 +8,11 @@
     public E findFirst() {
         long rowIndex = this.query.find();
         if (rowIndex >= 0) {
-            return realm.get(clazz, rowIndex);
+            if (table instanceof TableView) {
+                return realm.get(clazz, ((TableView)table).getSourceRowIndex(rowIndex));
+            } else {
+                return realm.get(clazz, rowIndex);
+            }
         } else {
             return null;
         }

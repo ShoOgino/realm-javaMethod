@@ -6,8 +6,8 @@
      */
     public RealmQuery<E> where() {
         if (managedMode) {
-            TableQuery query = this.view.where();
-            return new RealmQuery<E>(this.realm, query, clazz);
+            TableOrView table = this.view.where().findAll();
+            return new RealmQuery<E>(this.realm, table, clazz);
         } else {
             throw new RealmException(ONLY_IN_MANAGED_MODE_MESSAGE);
         }
