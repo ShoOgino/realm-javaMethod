@@ -2,8 +2,10 @@
      * Find all objects that fulfill the query conditions and sorted by specific field names.
      *
      * @param fieldNames an array of field names to sort by.
-     * @param sortAscending sort ascending if SORT_ORDER_ASCENDING, sort descending if SORT_ORDER_DESCENDING.
-     * @return A sorted RealmResults containing the objects.
+     * @param sortAscending sort ascending if <code>SORT_ORDER_ASCENDING</code>, sort descending
+     *                      if <code>SORT_ORDER_DESCENDING</code>.
+     * @return A {@link io.realm.RealmResults} containing objects. If no objects match the condition,
+     * a list with zero objects is returned.
      * @throws java.lang.IllegalArgumentException if a field name does not exist.
      */
     public RealmResults<E> findAllSorted(String fieldNames[], boolean sortAscending[]) {
@@ -17,8 +19,8 @@
             throw new IllegalArgumentException(String.format("Number of field names (%d) and sort orders (%d) does not match.", fieldNames.length, sortAscending.length));
         }
 
-        if (fieldNames.length == 1) {
-            return findAll(fieldNames[0], sortAscending[0]);
+        if (fieldNames.length == 1 && sortAscending.length == 1) {
+            return findAllSorted(fieldNames[0], sortAscending[0]);
         } else {
             TableView tableView = query.findAll();
             List<Long> columnIndices = new ArrayList<Long>();
@@ -30,6 +32,8 @@
                     throw new IllegalArgumentException(String.format("Field name '%s' does not exist.", fieldName));
                 }
                 columnIndices.add(columnIndex);
+            }
+            for (int i = 0; i < sortAscending.length; i++) {
                 orders.add(sortAscending[i] ? TableView.Order.ascending : TableView.Order.descending);
             }
             tableView.sort(columnIndices, orders);

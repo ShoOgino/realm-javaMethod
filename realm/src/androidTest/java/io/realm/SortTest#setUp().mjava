@@ -1,4 +1,13 @@
-    static void populateForMultiSort(Realm testRealm) {
+    @Override
+    public void setUp() {
+        // Creates a Realm with the following objects:
+        // 0: (5, "Adam")
+        // 1: (4, "Brian")
+        // 2: (4, "Adam")
+        // 3: (5, "Adam")
+        Realm.deleteRealmFile(getContext());
+        testRealm = Realm.getInstance(getContext());
+
         testRealm.beginTransaction();
         testRealm.clear(AllTypes.class);
         AllTypes object1 = testRealm.createObject(AllTypes.class);
@@ -12,6 +21,10 @@
         AllTypes object3 = testRealm.createObject(AllTypes.class);
         object3.setColumnLong(4);
         object3.setColumnString("Adam");
+
+        AllTypes object4 = testRealm.createObject(AllTypes.class);
+        object4.setColumnLong(5);
+        object4.setColumnString("Adam");
         testRealm.commitTransaction();
     }
 
