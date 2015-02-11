@@ -2,7 +2,7 @@
         writer
             .emitStatement("reader.beginArray()")
             .beginControlFlow("if (standalone)")
-                .emitStatement("obj.%s(new RealmList())", setter)
+                .emitStatement("obj.%s(new RealmList<%s>())", setter, fieldTypeCanonicalName)
             .endControlFlow()
             .beginControlFlow("while (reader.hasNext())")
                 .emitStatement("%s item = standalone ? new %s() : obj.realm.createObject(%s.class)", fieldTypeCanonicalName, fieldTypeCanonicalName, fieldTypeCanonicalName)
