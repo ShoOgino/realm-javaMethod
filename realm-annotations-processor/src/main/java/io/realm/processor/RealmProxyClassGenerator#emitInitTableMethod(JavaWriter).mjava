@@ -39,6 +39,13 @@
             writer.emitStatement("table.setIndex(table.getColumnIndex(\"%s\"))", fieldName);
         }
 
+        if (primaryKey != null) {
+            String fieldName = primaryKey.getSimpleName().toString();
+            writer.emitStatement("table.setPrimaryKey(\"%s\")", fieldName);
+        } else {
+            writer.emitStatement("table.setPrimaryKey(\"\")");
+        }
+
         writer.emitStatement("return table");
         writer.endControlFlow();
         writer.emitStatement("return transaction.getTable(\"%s%s\")", TABLE_PREFIX, this.className);
