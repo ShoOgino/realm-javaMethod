@@ -13,10 +13,10 @@
                     .emitEmptyLine()
                     .emitStatement("%s %s = newObject.%s()", Utils.getFieldTypeSimpleName(field), fieldName, getters.get(fieldName))
                     .beginControlFlow("if (%s != null)", fieldName)
-                    .emitStatement("realmObject.%s(%s.copy(realm, %s))",
-                            setters.get(fieldName),
-                            Utils.getProxyClassSimpleName(field),
-                            fieldName)
+                        .emitStatement("realmObject.%s(%s.copy(realm, %s))",
+                                setters.get(fieldName),
+                                Utils.getProxyClassSimpleName(field),
+                                fieldName)
                     .endControlFlow();
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
                 writer
