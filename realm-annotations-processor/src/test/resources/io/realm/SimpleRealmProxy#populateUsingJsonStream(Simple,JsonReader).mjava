@@ -1,12 +1,13 @@
-    void populateUsingJsonStream(JsonReader reader)
+    public static void populateUsingJsonStream(Simple obj, JsonReader reader)
             throws IOException {
+        boolean standalone = obj.realm == null;
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
             if (name.equals("name") && reader.peek() != JsonToken.NULL) {
-                setName((String) reader.nextString());
+                obj.setName((String) reader.nextString());
             } else if (name.equals("age")  && reader.peek() != JsonToken.NULL) {
-                setAge((int) reader.nextInt());
+                obj.setAge((int) reader.nextInt());
             } else {
                 reader.skipValue();
             }
