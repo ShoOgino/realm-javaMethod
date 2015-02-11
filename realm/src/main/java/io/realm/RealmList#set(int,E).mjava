@@ -3,9 +3,11 @@
      */
     @Override
     public E set(int location, E object) {
-        assertValidObject(object);
+        checkValidObject(object);
         if (managedMode) {
-            assertIndex(location);
+            if (object.row == null) {
+                throw new RealmException(ONLY_IN_MANAGED_MODE_MESSAGE);
+            }
             view.set(location, object.row.getIndex());
         } else {
             nonManagedList.set(location, object);
