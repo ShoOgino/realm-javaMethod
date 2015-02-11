@@ -10,11 +10,11 @@
      * @throws java.lang.IndexOutOfBoundsException if any position is outside [0, size()[.
      */
     public void move(int oldPos, int newPos) {
-        assertIndex(oldPos);
-        assertIndex(newPos);
         if (managedMode) {
             view.move(oldPos, newPos);
         } else {
+            checkIndex(oldPos);
+            checkIndex(newPos);
             E object = nonManagedList.remove(oldPos);
             if (newPos > oldPos) {
                 nonManagedList.add(newPos - 1, object);

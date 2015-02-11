@@ -1,7 +1,8 @@
-    RealmQuery(Realm realm, TableQuery query, Class<E> clazz) {
+    RealmQuery(Realm realm, LinkView view, Class<E> clazz) {
         this.realm = realm;
         this.clazz = clazz;
-        this.query = query;
+        this.query = view.where();
+        this.view = view;
         this.table = realm.getTable(clazz);
         this.columns = Realm.columnIndices.get(clazz.getSimpleName());
     }
