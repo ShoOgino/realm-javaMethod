@@ -1,0 +1,17 @@
+    public static void emitFillRealmListWithJsonValue(String getter, String setter, String fieldName,
+                                                      String fieldTypeCanonicalName, String proxyClass,
+                                                      JavaWriter writer) throws IOException {
+        writer
+            .beginControlFlow("if (json.has(\"%s\"))", fieldName)
+                .beginControlFlow("if (standalone)")
+                    .emitStatement("obj.%s(new RealmList<%s>())", setter, fieldTypeCanonicalName)
+                .endControlFlow()
+                .emitStatement("JSONArray array = json.getJSONArray(\"%s\")", fieldName)
+                .beginControlFlow("for (int i = 0; i < array.length(); i++)")
+                    .emitStatement("%s item = standalone ? new %s() : obj.realm.createObject(%s.class)", fieldTypeCanonicalName, fieldTypeCanonicalName, fieldTypeCanonicalName)
+                    .emitStatement("%s.populateUsingJsonObject(item, array.getJSONObject(i))", proxyClass)
+                    .emitStatement("obj.%s().add(item)", getter)
+                .endControlFlow()
+            .endControlFlow();
+    }
+

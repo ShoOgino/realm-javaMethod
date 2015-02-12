@@ -1,0 +1,23 @@
+    @SuppressWarnings("unchecked")
+    private <E extends RealmObject> E copyOrUpdate(E object, boolean update) {
+        Class<? extends RealmObject> realmClass = getRealmClassFromObject(object);
+        Class<?> proxyClass = getProxyClass(realmClass);
+        Method method = insertOrUpdateMethods.get(realmClass);
+        if (method == null) {
+            try {
+                method = proxyClass.getMethod("copyOrUpdate", new Class[]{Realm.class, realmClass, boolean.class});
+            } catch (NoSuchMethodException e) {
+                throw new RealmException("Could not find the copyOrUpdate() method in generated proxy class for " + proxyClass.getName() + ": " + APT_NOT_EXECUTED_MESSAGE, e);
+            }
+            insertOrUpdateMethods.put(proxyClass, method);
+        }
+        try {
+            Object result = method.invoke(null, this, object, update);
+            return (E) result;
+        } catch (IllegalAccessException e) {
+            throw new RealmException("Could not execute the copyToRealm method : " + APT_NOT_EXECUTED_MESSAGE, e);
+        } catch (InvocationTargetException e) {
+            throw new RealmException("An exception was thrown in the copyToRealm method in the proxy class  " + proxyClass.getName() + ": " + APT_NOT_EXECUTED_MESSAGE, e);
+        }
+    }
+

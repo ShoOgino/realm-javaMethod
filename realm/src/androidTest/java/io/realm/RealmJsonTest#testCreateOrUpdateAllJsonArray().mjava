@@ -1,0 +1,10 @@
+    public void testCreateOrUpdateAllJsonArray() throws JSONException, IOException {
+        String json = TestHelper.streamToString(loadJsonFromAssets("list_alltypes_primarykey.json"));
+        JSONArray array = new JSONArray(json);
+        testRealm.beginTransaction();
+        testRealm.createOrUpdateAllFromJson(AllTypesPrimaryKey.class, array);
+        testRealm.commitTransaction();
+
+        assertAllTypesPrimaryKeyUpdated();
+    }
+

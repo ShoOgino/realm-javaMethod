@@ -1,0 +1,9 @@
+    public void testCreateOrUpdateAllString() throws IOException {
+        String json = TestHelper.streamToString(loadJsonFromAssets("list_alltypes_primarykey.json"));
+        testRealm.beginTransaction();
+        testRealm.createOrUpdateAllFromJson(AllTypesPrimaryKey.class, json);
+        testRealm.commitTransaction();
+
+        assertAllTypesPrimaryKeyUpdated();
+    }
+

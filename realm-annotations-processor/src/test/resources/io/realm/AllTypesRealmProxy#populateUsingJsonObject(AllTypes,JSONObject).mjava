@@ -1,0 +1,32 @@
+    public static void populateUsingJsonObject(AllTypes obj, JSONObject json)
+            throws JSONException {
+        boolean standalone = obj.realm == null;
+        if (json.has("columnString")) {
+            obj.setColumnString((String) json.getString("columnString"));
+        }
+        if (json.has("columnLong")) {
+            obj.setColumnLong((long) json.getLong("columnLong"));
+        }
+        if (json.has("columnFloat")) {
+            obj.setColumnFloat((float) json.getDouble("columnFloat"));
+        }
+        if (json.has("columnDouble")) {
+            obj.setColumnDouble((double) json.getDouble("columnDouble"));
+        }
+        if (json.has("columnBoolean")) {
+            obj.setColumnBoolean((boolean) json.getBoolean("columnBoolean"));
+        }
+        if (json.has("columnDate")) {
+            long timestamp = json.optLong("columnDate", -1);
+            if (timestamp > -1) {
+                obj.setColumnDate(new Date(timestamp));
+            } else {
+                String jsonDate = json.getString("columnDate");
+                obj.setColumnDate(JsonUtils.stringToDate(jsonDate));
+            }
+        }
+        if (json.has("columnBinary")) {
+            obj.setColumnBinary(JsonUtils.stringToBytes(json.getString("columnBinary")));
+        }
+    }
+

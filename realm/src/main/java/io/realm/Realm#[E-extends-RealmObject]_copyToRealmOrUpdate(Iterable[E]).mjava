@@ -1,0 +1,23 @@
+    /**
+     * Updates a list of existing RealmObjects that is identified by their {@link io.realm.annotations.PrimaryKey} or create a
+     * new copy if no existing object could be found.
+     *
+     * @param objects   List of objects to update or copy into Realm.
+     * @return A list of all the new or updated RealmObjects.
+     *
+     * @throws java.lang.IllegalArgumentException if RealmObject is {@code null} or doesn't have a Primary key defined.
+     * @see {@link #copyToRealm(Iterable)}
+     */
+    public <E extends RealmObject> List<E> copyToRealmOrUpdate(Iterable<E> objects) {
+        if (objects == null) {
+            return new ArrayList<E>();
+        }
+
+        ArrayList<E> realmObjects = new ArrayList<E>();
+        for (E object : objects) {
+            realmObjects.add(copyToRealmOrUpdate(object));
+        }
+
+        return realmObjects;
+    }
+

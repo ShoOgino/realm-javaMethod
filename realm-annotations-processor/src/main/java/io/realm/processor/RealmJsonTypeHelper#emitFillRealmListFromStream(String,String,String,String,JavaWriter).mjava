@@ -1,0 +1,14 @@
+    public static void emitFillRealmListFromStream(String getter, String setter, String fieldTypeCanonicalName, String proxyClass, JavaWriter writer) throws IOException {
+        writer
+            .emitStatement("reader.beginArray()")
+            .beginControlFlow("if (standalone)")
+                .emitStatement("obj.%s(new RealmList<%s>())", setter, fieldTypeCanonicalName)
+            .endControlFlow()
+            .beginControlFlow("while (reader.hasNext())")
+                .emitStatement("%s item = standalone ? new %s() : obj.realm.createObject(%s.class)", fieldTypeCanonicalName, fieldTypeCanonicalName, fieldTypeCanonicalName)
+                .emitStatement("%s.populateUsingJsonStream(item, reader)", proxyClass)
+                .emitStatement("obj.%s().add(item)", getter)
+            .endControlFlow()
+            .emitStatement("reader.endArray()");
+    }
+
