@@ -5,19 +5,19 @@
             public void execute(Realm realm) {
                 AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
                 obj.setColumnLong(1);
-                obj.setColumnRealmObject(new Dog("Dog1"));
-                obj.setColumnRealmList(new RealmList<Dog>(new Dog("Dog2")));
+                obj.setColumnRealmObject(new DogPrimaryKey(1, "Dog1"));
+                obj.setColumnRealmList(new RealmList<DogPrimaryKey>(new DogPrimaryKey(2, "Dog2")));
                 realm.copyToRealm(obj);
 
                 AllTypesPrimaryKey obj2 = new AllTypesPrimaryKey();
-                obj.setColumnLong(1);
-                obj2.setColumnRealmObject(new Dog("Dog3"));
-                obj2.setColumnRealmList(new RealmList<Dog>(new Dog("Dog4")));
-                realm.copyToRealmOrUpdate(obj);
+                obj2.setColumnLong(1);
+                obj2.setColumnRealmObject(new DogPrimaryKey(3, "Dog3"));
+                obj2.setColumnRealmList(new RealmList<DogPrimaryKey>(new DogPrimaryKey(4, "Dog4")));
+                realm.copyToRealmOrUpdate(obj2);
             }
         });
 
         assertEquals(1, testRealm.allObjects(AllTypesPrimaryKey.class).size());
-        assertEquals(4, testRealm.allObjects(Dog.class).size());
+        assertEquals(4, testRealm.allObjects(DogPrimaryKey.class).size());
     }
 
