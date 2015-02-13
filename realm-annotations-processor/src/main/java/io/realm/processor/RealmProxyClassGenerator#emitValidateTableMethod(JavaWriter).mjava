@@ -23,7 +23,7 @@
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String fieldTypeCanonicalName = field.asType().toString();
-            String fieldTypeSimpleName = getFieldTypeSimpleName(field);
+            String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
 
             if (JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
                 // make sure types align
@@ -53,7 +53,7 @@
 //                        fieldName);
 //                writer.endControlFlow();
             } else if (typeUtils.isAssignable(field.asType(), realmList)) { // Link Lists
-                String genericType = getGenericType(field);
+                String genericType = Utils.getGenericType(field);
                 writer.beginControlFlow("if(!columnTypes.containsKey(\"%s\"))", fieldName);
                 writer.emitStatement("throw new IllegalStateException(\"Missing column '%s'\")", fieldName);
                 writer.endControlFlow();

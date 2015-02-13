@@ -2,10 +2,11 @@
         writer.beginMethod(
                 "void",
                 "populateUsingJsonObject",
-                Collections.<Modifier>emptySet(),
-                Arrays.asList("JSONObject", "json"),
+                EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
+                Arrays.asList(className, "obj", "JSONObject", "json"),
                 Arrays.asList("JSONException"));
 
+        writer.emitStatement("boolean standalone = obj.realm == null");
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String qualifiedFieldType = field.asType().toString();
@@ -14,13 +15,16 @@
                         setters.get(fieldName),
                         fieldName,
                         qualifiedFieldType,
+                        Utils.getProxyClassSimpleName(field),
                         writer);
 
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
                 RealmJsonTypeHelper.emitFillRealmListWithJsonValue(
                         getters.get(fieldName),
+                        setters.get(fieldName),
                         fieldName,
                         ((DeclaredType) field.asType()).getTypeArguments().get(0).toString(),
+                        Utils.getProxyClassSimpleName(field),
                         writer);
 
             } else {

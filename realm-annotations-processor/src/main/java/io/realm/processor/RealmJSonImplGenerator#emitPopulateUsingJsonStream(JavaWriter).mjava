@@ -1,0 +1,14 @@
+    private void emitPopulateUsingJsonStream(JavaWriter writer) throws IOException {
+        writer.emitAnnotation("Override");
+        writer.beginMethod(
+                "<E extends RealmObject> void",
+                "populateUsingJsonStream",
+                EnumSet.of(Modifier.PUBLIC),
+                Arrays.asList("E", "obj", "JsonReader", "reader"),
+                Arrays.asList("IOException")
+        );
+        emitProxySwitch("%s.populateUsingJsonStream((%s) obj, reader)", writer);
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+
