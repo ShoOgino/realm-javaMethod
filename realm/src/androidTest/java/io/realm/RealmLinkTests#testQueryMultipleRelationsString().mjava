@@ -11,22 +11,13 @@
         RealmResults<Owner> none2 = testRealm.where(Owner.class).notEqualTo("dogs.name", "Pluto").findAll();
         assertEquals(0, none1.size());
 
-        try {
-            RealmResults<Owner> owners3 = testRealm.where(Owner.class).beginsWith("dogs.name", "Blackie").findAll();
-            fail();
-        } catch (IllegalArgumentException e) {
-        }
+        RealmResults<Owner> owners3 = testRealm.where(Owner.class).beginsWith("dogs.name", "Blackie").findAll();
+        assertEquals(0, owners3.size());
 
-        try {
-            RealmResults<Owner> owners4 = testRealm.where(Owner.class).endsWith("dogs.name", "Blackie").findAll();
-            fail();
-        } catch (IllegalArgumentException e) {
-        }
+        RealmResults<Owner> owners4 = testRealm.where(Owner.class).endsWith("dogs.name", "Blackie").findAll();
+        assertEquals(0, owners4.size());
 
-        try {
-            RealmResults<Owner> owners5 = testRealm.where(Owner.class).contains("dogs.name", "Blackie").findAll();
-            fail();
-        } catch (IllegalArgumentException e) {
-        }
+        RealmResults<Owner> owners5 = testRealm.where(Owner.class).contains("dogs.name", "Blackie").findAll();
+        assertEquals(0, owners5.size());
     }
 

@@ -10,10 +10,7 @@
      */
     public RealmQuery<E> beginsWith(String fieldName, String value, boolean caseSensitive) {
         long columnIndices[] = getColumnIndices(fieldName, ColumnType.STRING);
-        if (columnIndices.length == 1) {
-            this.query.beginsWith(columnIndices[0], value, caseSensitive);
-            return this;
-        }
-        throw new IllegalArgumentException(String.format(LINK_NOT_SUPPORTED_METHOD, "beginsWith"));
+        this.query.beginsWith(columnIndices, value, caseSensitive);
+        return this;
     }
 
