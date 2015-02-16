@@ -7,11 +7,12 @@
         );
 
         if (primaryKey == null) {
-            writer.emitStatement("return copy(realm, object)");
+            writer.emitStatement("return copy(realm, object, false)");
         } else {
             writer
                 .emitStatement("%s realmObject = null", className)
-                .beginControlFlow("if (update)")
+                .emitStatement("boolean canUpdate = update")
+                .beginControlFlow("if (canUpdate)")
                     .emitStatement("Table table = realm.getTable(%s.class)", className)
                     .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
 
@@ -29,17 +30,17 @@
                     .emitStatement("realmObject.realm = realm")
                     .emitStatement("realmObject.row = table.getRow(rowIndex)")
                 .nextControlFlow("else")
-                    .emitStatement("update = false")
+                    .emitStatement("canUpdate = false")
                 .endControlFlow();
 
             writer.endControlFlow();
 
             writer
                 .emitEmptyLine()
-                .beginControlFlow("if (update)")
+                .beginControlFlow("if (canUpdate)")
                     .emitStatement("return update(realm, realmObject, object)")
                 .nextControlFlow("else")
-                    .emitStatement("return copy(realm, object)")
+                    .emitStatement("return copy(realm, object, update)")
                 .endControlFlow();
         }
 
