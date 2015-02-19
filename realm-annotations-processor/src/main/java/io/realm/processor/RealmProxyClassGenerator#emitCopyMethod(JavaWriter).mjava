@@ -1,0 +1,51 @@
+    private void emitCopyMethod(JavaWriter writer) throws IOException {
+        writer.beginMethod(
+                className, // Return type
+                "copy", // Method name
+                EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
+                "Realm", "realm", className, "newObject", "boolean", "update"); // Argument type & argument name
+
+        writer.emitStatement("%s realmObject = realm.createObject(%s.class)", className, className);
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
+            if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                writer
+                    .emitEmptyLine()
+                    .emitStatement("%s %s = newObject.%s()", Utils.getFieldTypeSimpleName(field), fieldName, getters.get(fieldName))
+                    .beginControlFlow("if (%s != null)", fieldName)
+                        .emitStatement("realmObject.%s(%s.copyOrUpdate(realm, %s, update))",
+                                setters.get(fieldName),
+                                Utils.getProxyClassSimpleName(field),
+                                fieldName)
+                    .endControlFlow();
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+                writer
+                    .emitEmptyLine()
+                    .emitStatement("RealmList<%s> %sList = newObject.%s()", Utils.getGenericType(field), fieldName, getters.get(fieldName))
+                    .beginControlFlow("if (%sList != null)", fieldName)
+                        .emitStatement("RealmList<%s> %sRealmList = realmObject.%s()", Utils.getGenericType(field), fieldName, getters.get(fieldName))
+                        .beginControlFlow("for (int i = 0; i < %sList.size(); i++)", fieldName)
+                            .emitStatement("%sRealmList.add(%s.copyOrUpdate(realm, %sList.get(i), update))", fieldName, Utils.getProxyClassSimpleName(field), fieldName)
+                        .endControlFlow()
+                    .endControlFlow()
+                    .emitEmptyLine();
+
+            } else {
+                String fieldType = field.asType().toString();
+                if (NULLABLE_JAVA_TYPES.containsKey(fieldType)) {
+                    writer.emitStatement("realmObject.%s(newObject.%s() != null ? newObject.%s() : %s)",
+                            setters.get(fieldName),
+                            getters.get(fieldName),
+                            getters.get(fieldName),
+                            NULLABLE_JAVA_TYPES.get(fieldType));
+                } else {
+                    writer.emitStatement("realmObject.%s(newObject.%s())", setters.get(fieldName), getters.get(fieldName));
+                }
+            }
+        }
+
+        writer.emitStatement("return realmObject");
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+

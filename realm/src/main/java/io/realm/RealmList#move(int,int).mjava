@@ -3,18 +3,18 @@
      * RealmObjects will be shifted so no null values are introduced.
      *
      * @param oldPos Index of RealmObject to move.
-     * @param newPos Target position. If newPos < oldPos the object at the location will be shifted
-     *               to the right. If oldPos < newPos, indexes > oldPos will be shifted once to the
+     * @param newPos Target position. If newPos &lt; oldPos the object at the location will be shifted
+     *               to the right. If oldPos &lt; newPos, indexes &gt; oldPos will be shifted once to the
      *               left.
      *
      * @throws java.lang.IndexOutOfBoundsException if any position is outside [0, size()[.
      */
     public void move(int oldPos, int newPos) {
-        assertIndex(oldPos);
-        assertIndex(newPos);
         if (managedMode) {
             view.move(oldPos, newPos);
         } else {
+            checkIndex(oldPos);
+            checkIndex(newPos);
             E object = nonManagedList.remove(oldPos);
             if (newPos > oldPos) {
                 nonManagedList.add(newPos - 1, object);

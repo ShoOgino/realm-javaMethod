@@ -8,13 +8,16 @@
      * @return Created object or null if no json data was provided.
      *
      * @throws RealmException if the mapping from JSON fails.
+     * @see #createOrUpdateObjectFromJson(Class, org.json.JSONObject)
      */
     public <E extends RealmObject> E createObjectFromJson(Class<E> clazz, JSONObject json) {
-        if (clazz == null || json == null) return null;
+        if (clazz == null || json == null) {
+            return null;
+        }
 
         E obj = createObject(clazz);
         try {
-            obj.populateUsingJsonObject(json);
+            realmJson.populateUsingJsonObject(obj, json);
         } catch (Exception e) {
             throw new RealmException("Could not map Json", e);
         }

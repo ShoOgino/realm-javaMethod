@@ -47,7 +47,9 @@
                 nativeInsertBoolean(nativePtr, columnIndex, rowIndex, (Boolean)value);
                 break;
             case INTEGER:
-                nativeInsertLong(nativePtr, columnIndex, rowIndex, ((Number)value).longValue());
+                long intValue = ((Number) value).longValue();
+                checkIntValueIsLegal(columnIndex, rowIndex, intValue);
+                nativeInsertLong(nativePtr, columnIndex, rowIndex, intValue);
                 break;
             case FLOAT:
                 nativeInsertFloat(nativePtr, columnIndex, rowIndex, ((Float)value).floatValue());
@@ -56,6 +58,8 @@
                 nativeInsertDouble(nativePtr, columnIndex, rowIndex, ((Double)value).doubleValue());
                 break;
             case STRING:
+                String stringValue = (String) value;
+                checkStringValueIsLegal(columnIndex, rowIndex, stringValue);
                 nativeInsertString(nativePtr, columnIndex, rowIndex, (String)value);
                 break;
             case DATE:

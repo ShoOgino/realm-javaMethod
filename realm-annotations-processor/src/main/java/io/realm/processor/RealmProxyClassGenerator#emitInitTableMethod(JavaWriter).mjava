@@ -12,7 +12,7 @@
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String fieldTypeCanonicalName = field.asType().toString();
-            String fieldTypeSimpleName = getFieldTypeSimpleName(field);
+            String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
 
             if (JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
                 writer.emitStatement("table.addColumn(%s, \"%s\")",
@@ -25,7 +25,7 @@
                 writer.emitStatement("table.addColumnLink(ColumnType.LINK, \"%s\", transaction.getTable(\"%s%s\"))",
                         fieldName, TABLE_PREFIX, fieldTypeSimpleName);
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
-                String genericType = getGenericType(field);
+                String genericType = Utils.getGenericType(field);
                 writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", TABLE_PREFIX, genericType);
                 writer.emitStatement("%s%s.initTable(transaction)", genericType, PROXY_SUFFIX);
                 writer.endControlFlow();
@@ -37,6 +37,13 @@
         for (VariableElement field : fieldsToIndex) {
             String fieldName = field.getSimpleName().toString();
             writer.emitStatement("table.setIndex(table.getColumnIndex(\"%s\"))", fieldName);
+        }
+
+        if (primaryKey != null) {
+            String fieldName = primaryKey.getSimpleName().toString();
+            writer.emitStatement("table.setPrimaryKey(\"%s\")", fieldName);
+        } else {
+            writer.emitStatement("table.setPrimaryKey(\"\")");
         }
 
         writer.emitStatement("return table");
