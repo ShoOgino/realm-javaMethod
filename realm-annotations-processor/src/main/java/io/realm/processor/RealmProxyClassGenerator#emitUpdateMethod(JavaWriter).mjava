@@ -12,7 +12,7 @@
                 writer
                     .emitStatement("%s %s = newObject.%s()", Utils.getFieldTypeSimpleName(field), fieldName, getters.get(fieldName))
                     .beginControlFlow("if (%s != null)", fieldName)
-                        .emitStatement("realmObject.%s(%s.copyOrUpdate(realm, %s, realm.getTable(%s.class).hasPrimaryKey()))",
+                        .emitStatement("realmObject.%s(%s.copyOrUpdate(realm, %s, true))",
                                 setters.get(fieldName),
                                 Utils.getProxyClassSimpleName(field),
                                 fieldName,
