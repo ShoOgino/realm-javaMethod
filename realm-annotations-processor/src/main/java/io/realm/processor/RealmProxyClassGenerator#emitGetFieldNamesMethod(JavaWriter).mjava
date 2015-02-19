@@ -1,11 +1,17 @@
     private void emitGetFieldNamesMethod(JavaWriter writer) throws IOException {
         writer.beginMethod("List<String>", "getFieldNames", EnumSet.of(Modifier.PUBLIC, Modifier.STATIC));
-        List<String> entries = new ArrayList<String>();
-        for (VariableElement field : fields) {
-            String fieldName = field.getSimpleName().toString();
-            entries.add(String.format("\"%s\"", fieldName));
+        StringBuilder stringBuilder = new StringBuilder();
+        Iterator<VariableElement> iterator = fields.iterator();
+        while (iterator.hasNext()) {
+            String fieldName = iterator.next().getSimpleName().toString();
+            stringBuilder.append("\"");
+            stringBuilder.append(fieldName);
+            stringBuilder.append("\"");
+            if (iterator.hasNext()) {
+                stringBuilder.append(", ");
+            }
         }
-        String statementSection = String.join(", ", entries);
+        String statementSection = stringBuilder.toString();
         writer.emitStatement("return Arrays.asList(%s)", statementSection);
         writer.endMethod();
         writer.emitEmptyLine();
