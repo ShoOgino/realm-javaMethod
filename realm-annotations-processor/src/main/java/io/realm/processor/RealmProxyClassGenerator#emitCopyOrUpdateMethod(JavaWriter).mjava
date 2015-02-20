@@ -3,11 +3,11 @@
                 className, // Return type
                 "copyOrUpdate", // Method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
-                "Realm", "realm", className, "object", "boolean", "update" // Argument type & argument name
+                "Realm", "realm", className, "object", "boolean", "update", "Map<RealmObject,RealmObject>", "cache" // Argument type & argument name
         );
 
         if (primaryKey == null) {
-            writer.emitStatement("return copy(realm, object, false)");
+            writer.emitStatement("return copy(realm, object, update, cache)");
         } else {
             writer
                 .emitStatement("%s realmObject = null", className)
@@ -29,6 +29,7 @@
                     .emitStatement("realmObject = new %s()", Utils.getProxyClassName(className))
                     .emitStatement("realmObject.realm = realm")
                     .emitStatement("realmObject.row = table.getRow(rowIndex)")
+                    .emitStatement("cache.put(object, realmObject)")
                 .nextControlFlow("else")
                     .emitStatement("canUpdate = false")
                 .endControlFlow();
@@ -38,9 +39,9 @@
             writer
                 .emitEmptyLine()
                 .beginControlFlow("if (canUpdate)")
-                    .emitStatement("return update(realm, realmObject, object)")
+                    .emitStatement("return update(realm, realmObject, object, cache)")
                 .nextControlFlow("else")
-                    .emitStatement("return copy(realm, object, update)")
+                    .emitStatement("return copy(realm, object, update, cache)")
                 .endControlFlow();
         }
 
