@@ -28,5 +28,21 @@
         if (json.has("columnBinary")) {
             obj.setColumnBinary(JsonUtils.stringToBytes(json.getString("columnBinary")));
         }
+        if (json.has("columnObject")) {
+            some.test.AllTypes columnObject = standalone ? new some.test.AllTypes() : obj.realm.createObject(some.test.AllTypes.class);
+            AllTypesRealmProxy.populateUsingJsonObject(columnObject, json.getJSONObject("columnObject"));
+            obj.setColumnObject(columnObject);
+        }
+        if (json.has("columnRealmList")) {
+            if (standalone) {
+                obj.setColumnRealmList(new RealmList<some.test.AllTypes>());
+            }
+            JSONArray array = json.getJSONArray("columnRealmList");
+            for (int i = 0; i < array.length(); i++) {
+                some.test.AllTypes item = standalone ? new some.test.AllTypes() : obj.realm.createObject(some.test.AllTypes.class);
+                AllTypesRealmProxy.populateUsingJsonObject(item, array.getJSONObject(i));
+                obj.getColumnRealmList().add(item);
+            }
+        }
     }
 

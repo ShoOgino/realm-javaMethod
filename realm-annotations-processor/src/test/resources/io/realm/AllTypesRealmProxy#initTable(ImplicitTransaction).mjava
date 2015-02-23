@@ -8,7 +8,16 @@
             table.addColumn(ColumnType.BOOLEAN, "columnBoolean");
             table.addColumn(ColumnType.DATE, "columnDate");
             table.addColumn(ColumnType.BINARY, "columnBinary");
-            table.setPrimaryKey("");
+            if (!transaction.hasTable("class_AllTypes")) {
+                AllTypesRealmProxy.initTable(transaction);
+            }
+            table.addColumnLink(ColumnType.LINK, "columnObject", transaction.getTable("class_AllTypes"));
+            if (!transaction.hasTable("class_AllTypes")) {
+                AllTypesRealmProxy.initTable(transaction);
+            }
+            table.addColumnLink(ColumnType.LINK_LIST, "columnRealmList", transaction.getTable("class_AllTypes"));
+            table.setIndex(table.getColumnIndex("columnString"));
+            table.setPrimaryKey("columnString");
             return table;
         }
         return transaction.getTable("class_AllTypes");
