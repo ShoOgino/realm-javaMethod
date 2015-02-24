@@ -2,7 +2,7 @@
                                                       String fieldTypeCanonicalName, String proxyClass,
                                                       JavaWriter writer) throws IOException {
         writer
-            .beginControlFlow("if (json.has(\"%s\"))", fieldName)
+            .beginControlFlow("if (!json.isNull(\"%s\"))", fieldName)
                 .beginControlFlow("if (standalone)")
                     .emitStatement("obj.%s(new RealmList<%s>())", setter, fieldTypeCanonicalName)
                 .endControlFlow()

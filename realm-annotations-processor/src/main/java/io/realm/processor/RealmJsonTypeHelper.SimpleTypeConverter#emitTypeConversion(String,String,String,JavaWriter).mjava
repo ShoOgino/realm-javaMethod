@@ -1,9 +1,12 @@
         @Override
         public void emitTypeConversion(String setter, String fieldName, String fieldType, JavaWriter writer) throws IOException {
-            writer.emitStatement("obj.%s((%s) json.get%s(\"%s\"))",
-                    setter,
-                    castType,
-                    jsonType,
-                    fieldName);
+            writer
+                .beginControlFlow("if (!json.isNull(\"%s\"))", fieldName)
+                    .emitStatement("obj.%s((%s) json.get%s(\"%s\"))",
+                        setter,
+                        castType,
+                        jsonType,
+                        fieldName)
+                .endControlFlow();
         }
 
