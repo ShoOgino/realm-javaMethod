@@ -25,6 +25,21 @@
                 }
             } else if (name.equals("columnBinary")  && reader.peek() != JsonToken.NULL) {
                 obj.setColumnBinary(JsonUtils.stringToBytes(reader.nextString()));
+            } else if (name.equals("columnObject")  && reader.peek() != JsonToken.NULL) {
+                some.test.AllTypes columnObjectObj = standalone ? new some.test.AllTypes() : obj.realm.createObject(some.test.AllTypes.class);
+                AllTypesRealmProxy.populateUsingJsonStream(columnObjectObj, reader);
+                obj.setColumnObject(columnObjectObj);
+            } else if (name.equals("columnRealmList")  && reader.peek() != JsonToken.NULL) {
+                reader.beginArray();
+                if (standalone) {
+                    obj.setColumnRealmList(new RealmList<some.test.AllTypes>());
+                }
+                while (reader.hasNext()) {
+                    some.test.AllTypes item = standalone ? new some.test.AllTypes() : obj.realm.createObject(some.test.AllTypes.class);
+                    AllTypesRealmProxy.populateUsingJsonStream(item, reader);
+                    obj.getColumnRealmList().add(item);
+                }
+                reader.endArray();
             } else {
                 reader.skipValue();
             }

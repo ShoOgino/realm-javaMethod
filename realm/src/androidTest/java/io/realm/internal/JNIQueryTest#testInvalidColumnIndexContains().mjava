@@ -1,0 +1,20 @@
+    public void testInvalidColumnIndexContains() {
+        Table table = TestHelper.getTableWithAllColumnTypes();
+        TableQuery query = table.where();
+
+        // String
+        try { query.contains(new long[]{-1}, "hey").findAll(); fail("-1 column index"); } catch (ArrayIndexOutOfBoundsException e) {}
+        try { query.contains(new long[]{9}, "hey").findAll();  fail("9 column index"); }  catch (ArrayIndexOutOfBoundsException e) {}
+        try { query.contains(new long[]{10}, "hey").findAll(); fail("10 column index"); } catch (ArrayIndexOutOfBoundsException e) {}
+
+        // String case true
+        try { query.contains(new long[]{-1}, "hey", true).findAll(); fail("-1 column index"); } catch (ArrayIndexOutOfBoundsException e) {}
+        try { query.contains(new long[]{9}, "hey", true).findAll();  fail("9 column index"); }  catch (ArrayIndexOutOfBoundsException e) {}
+        try { query.contains(new long[]{10}, "hey", true).findAll(); fail("-0 column index"); } catch (ArrayIndexOutOfBoundsException e) {}
+
+        // String case false
+        try { query.contains(new long[]{-1}, "hey", false).findAll(); fail("-1 column index"); } catch (ArrayIndexOutOfBoundsException e) {}
+        try { query.contains(new long[]{9}, "hey", false).findAll();  fail("9 column index"); }  catch (ArrayIndexOutOfBoundsException e) {}
+        try { query.contains(new long[]{10}, "hey", false).findAll(); fail("10 column index"); } catch (ArrayIndexOutOfBoundsException e) {}
+    }
+
