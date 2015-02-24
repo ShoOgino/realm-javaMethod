@@ -1,4 +1,24 @@
-    public static AllTypes copyOrUpdate(Realm realm, AllTypes object, boolean update, Map<RealmObject, RealmObject> cache) {
-        return copy(realm, object, update, cache);
+    public static AllTypes copyOrUpdate(Realm realm, AllTypes object, boolean update, Map<RealmObject,RealmObject> cache) {
+        AllTypes realmObject = null;
+        boolean canUpdate = update;
+        if (canUpdate) {
+            Table table = realm.getTable(AllTypes.class);
+            long pkColumnIndex = table.getPrimaryKey();
+            long rowIndex = table.findFirstString(pkColumnIndex, object.getColumnString());
+            if (rowIndex != TableOrView.NO_MATCH) {
+                realmObject = new AllTypesRealmProxy();
+                realmObject.realm = realm;
+                realmObject.row = table.getRow(rowIndex);
+                cache.put(object, realmObject);
+            } else {
+                canUpdate = false;
+            }
+        }
+
+        if (canUpdate) {
+            return update(realm, realmObject, object, cache);
+        } else {
+            return copy(realm, object, update, cache);
+        }
     }
 
