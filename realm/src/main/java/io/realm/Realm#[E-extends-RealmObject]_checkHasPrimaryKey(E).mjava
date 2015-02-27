@@ -1,6 +1,8 @@
     private <E extends RealmObject> void checkHasPrimaryKey(E object) {
-        if (!getTable(object.getClass()).hasPrimaryKey()) {
-            throw new IllegalArgumentException("RealmObject has no @PrimaryKey defined: " + simpleClassNames.get(object));
+
+        Class<? extends RealmObject> objectClass = object.getClass();
+        if (!getTable(objectClass).hasPrimaryKey()) {
+            throw new IllegalArgumentException("RealmObject has no @PrimaryKey defined: " + simpleClassNames.get(objectClass));
         }
     }
 
