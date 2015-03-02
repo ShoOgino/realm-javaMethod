@@ -1,6 +1,14 @@
     private static synchronized Realm createAndValidate(RealmConfiguration config, boolean validateSchema, boolean autoRefresh) {
+        // Start the finalizer thread if needed
+        if (!isFinalizerStarted) {
+            executorService.submit(new FinalizerRunnable());
+            isFinalizerStarted = true;
+        }
+
         byte[] key = config.getEncryptionKey();
         String canonicalPath = config.getPath();
+
+        // Check thread local cache for existing Realm
         Map<String, Integer> localRefCount = referenceCount.get();
         Integer references = localRefCount.get(canonicalPath);
         if (references == null) {
