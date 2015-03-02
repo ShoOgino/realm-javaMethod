@@ -104,12 +104,8 @@
                     if (columnIndex == -1) {
                         throw new RealmMigrationNeededException("Field '" + fieldName + "' not found for type '" + modelClassName + "'");
                     }
-                    Map<String, Long> innerMap = columnIndices.get(modelClassName);
-                    if (innerMap == null) {
-                        innerMap = new HashMap<String, Long>();
-                    }
-                    innerMap.put(fieldName, columnIndex);
-                    columnIndices.put(modelClassName, innerMap);
+                    // Generated class is proxy class so this is safe
+                    columnIndices.add((Class<? extends RealmObject>) generatedClass.getSuperclass(), fieldName, columnIndex);
                 }
             }
         } finally {

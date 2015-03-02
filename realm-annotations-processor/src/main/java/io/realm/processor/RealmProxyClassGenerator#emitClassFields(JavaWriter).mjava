@@ -1,0 +1,12 @@
+    private void emitClassFields(JavaWriter writer) throws IOException {
+        writer.emitField("List<String>", "FIELD_NAMES", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL));
+        writer.beginInitializer(true);
+        writer.emitStatement("List<String> fieldNames = new ArrayList<String>()");
+        for (VariableElement field : metadata.getFields()) {
+            writer.emitStatement("fieldNames.add(\"%s\")", field.getSimpleName().toString());
+        }
+        writer.emitStatement("FIELD_NAMES = Collections.unmodifiableList(fieldNames)");
+        writer.endInitializer();
+        writer.emitEmptyLine();
+    }
+
