@@ -1,5 +1,5 @@
     private void emitAccessors(JavaWriter writer) throws IOException {
-        for (VariableElement field : fields) {
+        for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
             String fieldTypeCanonicalName = field.asType().toString();
 
@@ -12,7 +12,7 @@
 
                 // Getter
                 writer.emitAnnotation("Override");
-                writer.beginMethod(fieldTypeCanonicalName, getters.get(fieldName), EnumSet.of(Modifier.PUBLIC));
+                writer.beginMethod(fieldTypeCanonicalName, metadata.getGetter(fieldName), EnumSet.of(Modifier.PUBLIC));
                 writer.emitStatement(
                         "realm.checkIfValid()"
                 );
@@ -24,7 +24,7 @@
 
                 // Setter
                 writer.emitAnnotation("Override");
-                writer.beginMethod("void", setters.get(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+                writer.beginMethod("void", metadata.getSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
                 writer.emitStatement(
                         "realm.checkIfValid()"
                 );
@@ -39,7 +39,7 @@
 
                 // Getter
                 writer.emitAnnotation("Override");
-                writer.beginMethod(fieldTypeCanonicalName, getters.get(fieldName), EnumSet.of(Modifier.PUBLIC));
+                writer.beginMethod(fieldTypeCanonicalName, metadata.getGetter(fieldName), EnumSet.of(Modifier.PUBLIC));
                 writer.beginControlFlow("if (row.isNullLink(Realm.columnIndices.get(\"%s\").get(\"%s\")))", className, fieldName);
                 writer.emitStatement("return null");
                 writer.endControlFlow();
@@ -51,7 +51,7 @@
 
                 // Setter
                 writer.emitAnnotation("Override");
-                writer.beginMethod("void", setters.get(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+                writer.beginMethod("void", metadata.getSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
                 writer.beginControlFlow("if (value == null)");
                 writer.emitStatement("row.nullifyLink(Realm.columnIndices.get(\"%s\").get(\"%s\"))", className, fieldName);
                 writer.emitStatement("return");
@@ -66,7 +66,7 @@
 
                 // Getter
                 writer.emitAnnotation("Override");
-                writer.beginMethod(fieldTypeCanonicalName, getters.get(fieldName), EnumSet.of(Modifier.PUBLIC));
+                writer.beginMethod(fieldTypeCanonicalName, metadata.getGetter(fieldName), EnumSet.of(Modifier.PUBLIC));
                 writer.emitStatement(
                         "return new RealmList<%s>(%s.class, row.getLinkList(Realm.columnIndices.get(\"%s\").get(\"%s\")), realm)",
                         genericType, genericType, className, fieldName);
@@ -75,7 +75,7 @@
 
                 // Setter
                 writer.emitAnnotation("Override");
-                writer.beginMethod("void", setters.get(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+                writer.beginMethod("void", metadata.getSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
                 writer.emitStatement("LinkView links = row.getLinkList(Realm.columnIndices.get(\"%s\").get(\"%s\"))", className, fieldName);
                 writer.beginControlFlow("if (value == null)");
                 writer.emitStatement("return"); // TODO: delete all the links instead
