@@ -1,0 +1,75 @@
+    // Loop through all class elements and add them to the appropriate internal data structures.
+    private boolean categorizeClassElements() {
+        for (Element element : classType.getEnclosedElements()) {
+            ElementKind elementKind = element.getKind();
+
+            if (elementKind.equals(ElementKind.FIELD)) {
+                VariableElement variableElement = (VariableElement) element;
+                String fieldName = variableElement.getSimpleName().toString();
+                if (variableElement.getAnnotation(Ignore.class) != null) {
+                    // The field has the @Ignore annotation. No need to go any further.
+                    String ignoredFieldName = variableElement.getSimpleName().toString();
+                    fieldNames.add(ignoredFieldName);
+                    ignoreFieldNames.add(ignoredFieldName);
+                    continue;
+                }
+
+                if (variableElement.getAnnotation(Index.class) != null) {
+                    // The field has the @Index annotation. It's only valid for:
+                    // * String
+                    String elementTypeCanonicalName = variableElement.asType().toString();
+                    if (elementTypeCanonicalName.equals("java.lang.String")) {
+                        indexedFields.add(variableElement);
+                    } else {
+                        Utils.error("@Index is only applicable to String fields - got " + element);
+                        return true;
+                    }
+                }
+
+                if (variableElement.getAnnotation(PrimaryKey.class) != null) {
+                    // The field has the @PrimaryKey annotation. It is only valid for
+                    // String, short, int, long and must only be present one time
+                    if (primaryKey != null) {
+                        Utils.error(String.format("@PrimaryKey cannot be defined more than once. It was found here \"%s\" and here \"%s\"",
+                                primaryKey.getSimpleName().toString(),
+                                variableElement.getSimpleName().toString()));
+                        return true;
+                    }
+
+                    TypeMirror fieldType = variableElement.asType();
+                    if (!isValidPrimaryKeyType(fieldType)) {
+                        Utils.error("\"" + variableElement.getSimpleName().toString() + "\" is not allowed as primary key. See @PrimaryKey for allowed types.");
+                        return true;
+                    }
+
+                    primaryKey = variableElement;
+
+                    // Also add as index if the primary key is a string
+                    if (Utils.isString(variableElement) && !indexedFields.contains(variableElement)) {
+                        indexedFields.add(variableElement);
+                    }
+                }
+
+                if (!variableElement.getModifiers().contains(Modifier.PRIVATE)) {
+                    Utils.error("The fields of the model must be private", variableElement);
+                }
+
+                fields.add(variableElement);
+                expectedGetters.add(fieldName);
+                expectedSetters.add(fieldName);
+            } else if (elementKind.equals(ElementKind.CONSTRUCTOR)) {
+                hasDefaultConstructor =  hasDefaultConstructor || Utils.isDefaultConstructor(element);
+
+            } else if (elementKind.equals(ElementKind.METHOD)) {
+                ExecutableElement executableElement = (ExecutableElement) element;
+                methods.add(executableElement);
+            }
+        }
+
+        for (VariableElement field : fields) {
+            fieldNames.add(field.getSimpleName().toString());
+        }
+
+        return false;
+    }
+
