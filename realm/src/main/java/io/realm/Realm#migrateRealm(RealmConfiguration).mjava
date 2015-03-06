@@ -1,0 +1,17 @@
+    /**
+     * TODO: Hmm, perhaps a bit redundant as this is also blocking (same as Realm.getInstance()) Perhaps it would be better to just have the async variant?
+     *
+     * Manually migrate a Realm defined using the migration defined by its {@link io.realm.RealmConfiguration}.
+     *
+     * @see #migrateRealmAsync(RealmConfiguration, io.realm.Realm.MigrationListener)
+     */
+    public static synchronized void migrateRealm(RealmConfiguration configuration) {
+        Realm realm = Realm.createAndValidate(configuration, false, Looper.myLooper() != null);
+        realm.beginTransaction();
+        realm.setVersion(configuration.getMigration().execute(realm, realm.getVersion()));
+        realm.commitTransaction();
+        realm.close();
+
+        realmsCache.remove();
+    }
+

@@ -29,7 +29,11 @@
 
         Realm encryptedRealm = null;
         try {
-            encryptedRealm = Realm.getInstance(getContext(), ENCRYPTED_REALM_FILE_NAME, key);
+            encryptedRealm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                    .name(ENCRYPTED_REALM_FILE_NAME)
+                    .encryptionKey(key)
+                    .create()
+            );
             assertEquals(TEST_DATA_SIZE, encryptedRealm.where(AllTypes.class).count());
 
             destination = new File(getContext().getFilesDir(), RE_ENCRYPTED_REALM_FILE_NAME);
@@ -43,7 +47,11 @@
             }
             Realm reEncryptedRealm = null;
             try {
-                reEncryptedRealm = Realm.getInstance(getContext(), RE_ENCRYPTED_REALM_FILE_NAME, key);
+                reEncryptedRealm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                                .name(RE_ENCRYPTED_REALM_FILE_NAME)
+                                .encryptionKey(key)
+                                .create()
+                );
                 assertEquals(TEST_DATA_SIZE, reEncryptedRealm.where(AllTypes.class).count());
             } finally {
                 if (reEncryptedRealm != null) {

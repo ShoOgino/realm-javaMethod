@@ -1,19 +1,14 @@
     /**
-     * Realm static constructor.
-     * {@link #close()} must be called when you are done using the Realm instance.
-     * <p>
-     * It sets auto-refresh on if the current thread has a Looper, off otherwise.
+     * Use {@link #getInstance(RealmConfiguration)} or {@link #getDefaultInstance()} instead.
      *
-     * @param context  an Android {@link android.content.Context}
-     * @param fileName the name of the file to save the Realm to
-     * @return an instance of the Realm class
-     * @throws RealmMigrationNeededException The model classes have been changed and the Realm
-     *                                       must be migrated
-     * @throws RealmIOException              Error when accessing underlying file
-     * @throws RealmException                Other errors
+     * This creates a Realm using the default RealmConfiguration settings but with the given name instead of the
+     * default one.
      */
-    @SuppressWarnings("UnusedDeclaration")
-    public static Realm getInstance(Context context, String fileName) {
-        return Realm.getInstance(context, fileName, null);
+    @Deprecated
+    public static Realm getInstance(Context context, String realmName) {
+        return getInstance(new RealmConfiguration.Builder(context)
+                .name(realmName)
+                .create()
+        );
     }
 

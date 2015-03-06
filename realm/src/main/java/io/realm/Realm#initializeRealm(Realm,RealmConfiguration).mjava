@@ -1,5 +1,5 @@
     @SuppressWarnings("unchecked")
-    private static void initializeRealm(Realm realm) {
+    private static void initializeRealm(Realm realm, RealmConfiguration config) {
         Class<?> validationClass;
         try {
             validationClass = Class.forName("io.realm.ValidationList");
@@ -22,9 +22,10 @@
         }
 
         // Custom schema overrides any schema already defined
-        if (customSchema.size() > 0) {
+        Set<Class<? extends RealmObject>> customSpec = config.getSpecification();
+        if (customSpec.size() > 0) {
             proxyClasses = new ArrayList<String>();
-            for (Class<? extends RealmObject> clazz : customSchema) {
+            for (Class<? extends RealmObject> clazz : customSpec) {
                 proxyClasses.add(clazz.getName());
             }
         }
@@ -114,6 +115,7 @@
             }
         } finally {
             if (commitNeeded) {
+                realm.setVersion(config.getVersion());
                 realm.commitTransaction();
             } else {
                 realm.cancelTransaction();

@@ -1,5 +1,6 @@
-    private static synchronized Realm createAndValidate(String absolutePath, byte[] key, boolean validateSchema,
-                                            boolean autoRefresh) {
+    private static synchronized Realm createAndValidate(RealmConfiguration config, boolean validateSchema, boolean autoRefresh) {
+        String absolutePath = config.getAbsolutePathToRealm();
+        byte[] key = config.getKey();
         int id = absolutePath.hashCode();
         Map<Integer, Integer> localRefCount = referenceCount.get();
         Integer references = localRefCount.get(id);
@@ -9,6 +10,9 @@
         if (references == 0) {
             AtomicInteger counter = openRealms.get(id);
             if (counter == null) {
+                if (config.isDeleteRealmBeforeOpening()) {
+                    deleteRealmFile(config.getRealmDir(), config.getRealmName());
+                }
                 openRealms.put(id, new AtomicInteger(1));
             } else {
                 counter.incrementAndGet();
@@ -16,7 +20,7 @@
 
         }
         Map<Integer, Realm> realms = realmsCache.get();
-        Realm realm = realms.get(absolutePath.hashCode());
+        Realm realm = realms.get(id);
 
         if (realm != null) {
             if (!Arrays.equals(realm.key, key)) {
@@ -26,16 +30,16 @@
             return realm;
         }
 
-        // Create new Realm and cache it. All exception code paths must close the Realm otherwise
-        // we risk serving faulty cache data.
+        // Create new Realm and cache it. All exception code paths must close the Realm otherwise we risk serving
+        // faulty cache data.
         realm = new Realm(absolutePath, key, autoRefresh);
-        realms.put(absolutePath.hashCode(), realm);
+        realms.put(id, realm);
         realmsCache.set(realms);
         localRefCount.put(id, references + 1);
 
         if (validateSchema) {
             try {
-                initializeRealm(realm);
+                initializeRealm(realm, config);
             } catch (RuntimeException e) {
                 realm.close();
                 throw e;

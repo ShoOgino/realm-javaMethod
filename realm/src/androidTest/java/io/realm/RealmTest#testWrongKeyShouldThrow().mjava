@@ -4,7 +4,11 @@
 
         // Wrong key size
         try {
-            Realm.getInstance(getContext(), WRONG_KEY_REALM, new byte[63]);
+            Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                    .name(WRONG_KEY_REALM)
+                    .encryptionKey(new byte[63])
+                    .create()
+            );
             fail();
         } catch (IllegalArgumentException ignored) {
         }
@@ -12,10 +16,13 @@
         Realm.getInstance(getContext(), WRONG_KEY_REALM);
 
         try {
-            Realm.getInstance(getContext(), WRONG_KEY_REALM, new byte[64]);
+            Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                    .name(WRONG_KEY_REALM)
+                    .encryptionKey(new byte[64])
+                    .create()
+            );
             fail();
         } catch (IllegalStateException ignored) {
         }
-
     }
 
