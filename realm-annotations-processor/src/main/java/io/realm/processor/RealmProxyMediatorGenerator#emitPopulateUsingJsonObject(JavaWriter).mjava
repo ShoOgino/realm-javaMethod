@@ -7,7 +7,13 @@
                 Arrays.asList("E", "obj", "JSONObject", "json"),
                 Arrays.asList("JSONException")
         );
-        emitProxySwitch("%s.populateUsingJsonObject((%s) obj, json)", writer);
+        writer.emitStatement("Class<E> clazz = (Class<E>) ((obj instanceof RealmObjectProxy) ? obj.getClass().getSuperclass() : obj.getClass())");
+        emitMediatorSwitch(new ProxySwitchStatement() {
+            @Override
+            public void emitStatement(int i, JavaWriter writer) throws IOException {
+                writer.emitStatement("%s.populateUsingJsonObject((%s) obj, json)", proxyClasses.get(i), simpleModelClasses.get(i));
+            }
+        }, writer);
         writer.endMethod();
         writer.emitEmptyLine();
     }

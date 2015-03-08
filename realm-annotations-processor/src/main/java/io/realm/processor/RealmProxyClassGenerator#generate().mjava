@@ -20,6 +20,7 @@
         imports.add("io.realm.RealmObject");
         imports.add("io.realm.exceptions.RealmException");
         imports.add("io.realm.internal.ColumnType");
+        imports.add("io.realm.internal.RealmObjectProxy");
         imports.add("io.realm.internal.Table");
         imports.add("io.realm.internal.TableOrView");
         imports.add("io.realm.internal.ImplicitTransaction");
@@ -56,12 +57,14 @@
                 qualifiedGeneratedClassName, // full qualified name of the item to generate
                 "class",                     // the type of the item
                 EnumSet.of(Modifier.PUBLIC), // modifiers to apply
-                className)                   // class to extend
+                className,                   // class to extend
+                "RealmObjectProxy")          // interfaces to implement
                 .emitEmptyLine();
 
         emitAccessors(writer);
         emitInitTableMethod(writer);
         emitValidateTableMethod(writer);
+        emitGetTableNameMethod(writer);
         emitGetFieldNamesMethod(writer);
         emitPopulateUsingJsonObjectMethod(writer);
         emitPopulateUsingJsonStreamMethod(writer);

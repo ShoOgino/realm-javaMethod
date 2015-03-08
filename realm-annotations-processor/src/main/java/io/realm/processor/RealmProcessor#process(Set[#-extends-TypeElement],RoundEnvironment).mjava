@@ -13,6 +13,7 @@
                 typeUtils.getPrimitiveType(TypeKind.LONG)
         );
 
+        // Create all proxy classes
         for (Element classElement : roundEnv.getElementsAnnotatedWith(RealmClass.class)) {
             String className;
             String packageName;
@@ -251,21 +252,13 @@
                 sourceCodeGenerator.generate();
             } catch (IOException e) {
                 error(e.getMessage(), classElement);
-            } catch (UnsupportedOperationException e) {
-                error(e.getMessage(), classElement);
+                return true;
             }
         }
 
-        if (!done) {
-            RealmValidationListGenerator validationGenerator = new RealmValidationListGenerator(processingEnv, classesToValidate);
-            RealmJSonImplGenerator jsonGenerator = new RealmJSonImplGenerator(processingEnv, classesToValidate);
-            try {
-                validationGenerator.generate();
-                jsonGenerator.generate();
-                done = true;
-            } catch (IOException e) {
-                error(e.getMessage());
-            }
+        if (!hasProcessedModules) {
+            hasProcessedModules = true;
+            return processModules(roundEnv);
         }
 
         return true;

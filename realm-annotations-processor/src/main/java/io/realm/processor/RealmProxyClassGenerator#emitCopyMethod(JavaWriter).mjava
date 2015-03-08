@@ -3,10 +3,10 @@
                 className, // Return type
                 "copy", // Method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
-                "Realm", "realm", className, "newObject", "boolean", "update", "Map<RealmObject,RealmObject>", "cache"); // Argument type & argument name
+                "Realm", "realm", className, "newObject", "boolean", "update", "Map<RealmObject,RealmObjectProxy>", "cache"); // Argument type & argument name
 
         writer.emitStatement("%s realmObject = realm.createObject(%s.class)", className, className);
-        writer.emitStatement("cache.put(newObject, realmObject)");
+        writer.emitStatement("cache.put(newObject, (RealmObjectProxy) realmObject)");
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String fieldType = field.asType().toString();

@@ -1,64 +1,7 @@
-    @SuppressWarnings("unchecked")
     <E extends RealmObject> E get(Class<E> clazz, long rowIndex) {
-        E result;
-
-        Table table = tables.get(clazz);
-        if (table == null) {
-            String simpleClassName = simpleClassNames.get(clazz);
-            if (simpleClassName == null) {
-                simpleClassName = clazz.getSimpleName();
-                simpleClassNames.put(clazz, simpleClassName);
-            }
-
-            table = transaction.getTable(TABLE_PREFIX + simpleClassName);
-            tables.put(clazz, table);
-        }
-
+        Table table = getTable(clazz);
         Row row = table.getRow(rowIndex);
-
-        Constructor constructor = generatedConstructors.get(clazz);
-        if (constructor == null) {
-            String simpleClassName = simpleClassNames.get(clazz);
-            if (simpleClassName == null) {
-                simpleClassName = clazz.getSimpleName();
-                simpleClassNames.put(clazz, simpleClassName);
-            }
-            String generatedClassName = getProxyClassName(simpleClassName);
-
-
-            Class<?> generatedClass = generatedClasses.get(generatedClassName);
-            if (generatedClass == null) {
-                try {
-                    generatedClass = Class.forName(generatedClassName);
-                } catch (ClassNotFoundException e) {
-                    throw new RealmException("Could not find the generated proxy class: " + APT_NOT_EXECUTED_MESSAGE);
-                }
-                generatedClasses.put(generatedClassName, generatedClass);
-            }
-
-            constructor = constructors.get(generatedClass);
-            if (constructor == null) {
-                try {
-                    constructor = generatedClass.getConstructor();
-                } catch (NoSuchMethodException e) {
-                    throw new RealmException("Could not find the constructor in generated proxy class: " + APT_NOT_EXECUTED_MESSAGE);
-                }
-                constructors.put(generatedClass, constructor);
-                generatedConstructors.put(clazz, constructor);
-            }
-        }
-
-        try {
-            // We are know the casted type since we generated the class
-            result = (E) constructor.newInstance();
-        } catch (InstantiationException e) {
-            throw new RealmException("Could not instantiate the proxy class");
-        } catch (IllegalAccessException e) {
-            throw new RealmException("Could not run the constructor of the proxy class");
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            throw new RealmException("An exception occurred while instantiating the proxy class");
-        }
+        E result = proxyMediator.newInstance(clazz);
         result.row = row;
         result.realm = this;
         return result;

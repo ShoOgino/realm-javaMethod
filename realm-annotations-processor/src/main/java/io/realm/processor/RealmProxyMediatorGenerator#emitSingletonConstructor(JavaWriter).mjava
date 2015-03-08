@@ -1,0 +1,14 @@
+    private void emitSingletonConstructor(JavaWriter writer) throws IOException {
+        writer.beginConstructor(EnumSet.of(Modifier.PRIVATE));
+        writer.endConstructor();
+        writer.emitEmptyLine();
+        writer
+            .beginMethod("RealmProxyMediator", "getInstance", EnumSet.of(Modifier.PUBLIC, Modifier.STATIC, Modifier.SYNCHRONIZED))
+                .beginControlFlow("if (instance == null)")
+                    .emitStatement("instance = new %s()", className)
+                .endControlFlow()
+                .emitStatement("return instance")
+            .endMethod();
+        writer.emitEmptyLine();
+    }
+
