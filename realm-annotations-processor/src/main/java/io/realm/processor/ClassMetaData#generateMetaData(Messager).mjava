@@ -1,0 +1,33 @@
+    /**
+     * Build the meta data structures for this class. Any errors or messages will be
+     * posted on the provided Messager.
+     *
+     * @return True if meta data was correctly created and processing can continue, false otherwise.
+     */
+    public boolean generateMetaData(Messager messager) {
+
+        // Get the package of the class
+        Element enclosingElement = classType.getEnclosingElement();
+        if (!enclosingElement.getKind().equals(ElementKind.PACKAGE)) {
+            Utils.error("The RealmClass annotation does not support nested classes", classType);
+            return false;
+        }
+
+        TypeElement parentElement = (TypeElement) Utils.getSuperClass(classType);
+        if (!parentElement.toString().endsWith(".RealmObject")) {
+            Utils.error("A RealmClass annotated object must be derived from RealmObject", classType);
+            return false;
+        }
+
+        PackageElement packageElement = (PackageElement) enclosingElement;
+        packageName = packageElement.getQualifiedName().toString();
+
+        if (!categorizeClassElements()) return false;
+        if (!checkMethods()) return false;
+        if (!checkDefaultConstructor()) return false;
+        if (!checkRequiredGetters()) return false;
+        if (!checkRequireSetters()) return false;
+
+        return true; // Meta data was successfully generated
+    }
+

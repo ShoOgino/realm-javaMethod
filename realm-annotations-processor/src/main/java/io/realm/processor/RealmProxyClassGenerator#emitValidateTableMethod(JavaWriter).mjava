@@ -5,22 +5,22 @@
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
                 "ImplicitTransaction", "transaction"); // Argument type & argument name
 
-        writer.beginControlFlow("if(transaction.hasTable(\"" + TABLE_PREFIX + this.className + "\"))");
-        writer.emitStatement("Table table = transaction.getTable(\"%s%s\")", TABLE_PREFIX, this.className);
+        writer.beginControlFlow("if(transaction.hasTable(\"" + Constants.TABLE_PREFIX + this.className + "\"))");
+        writer.emitStatement("Table table = transaction.getTable(\"%s%s\")", Constants.TABLE_PREFIX, this.className);
 
         // verify number of columns
-        writer.beginControlFlow("if(table.getColumnCount() != " + fields.size() + ")");
+        writer.beginControlFlow("if(table.getColumnCount() != " + metadata.getFields().size() + ")");
         writer.emitStatement("throw new IllegalStateException(\"Column count does not match\")");
         writer.endControlFlow();
 
         // create type dictionary for lookup
         writer.emitStatement("Map<String, ColumnType> columnTypes = new HashMap<String, ColumnType>()");
-        writer.beginControlFlow("for(long i = 0; i < " + fields.size() + "; i++)");
+        writer.beginControlFlow("for(long i = 0; i < " + metadata.getFields().size() + "; i++)");
         writer.emitStatement("columnTypes.put(table.getColumnName(i), table.getColumnType(i))");
         writer.endControlFlow();
 
         // For each field verify there is a corresponding column
-        for (VariableElement field : fields) {
+        for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
             String fieldTypeCanonicalName = field.asType().toString();
             String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
@@ -42,9 +42,9 @@
                 writer.emitStatement("throw new IllegalStateException(\"Invalid type '%s' for column '%s'\")",
                         fieldTypeSimpleName, fieldName);
                 writer.endControlFlow();
-                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", TABLE_PREFIX, fieldTypeSimpleName);
+                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, fieldTypeSimpleName);
                 writer.emitStatement("throw new IllegalStateException(\"Missing table '%s%s' for column '%s'\")",
-                        TABLE_PREFIX, fieldTypeSimpleName, fieldName);
+                        Constants.TABLE_PREFIX, fieldTypeSimpleName, fieldName);
                 writer.endControlFlow();
                 // TODO: Replace with a proper comparison
 //                writer.emitStatement("Table table_%d = transaction.getTable(\"%s%s\")", columnNumber, TABLE_PREFIX, fieldTypeName);
@@ -61,9 +61,9 @@
                 writer.emitStatement("throw new IllegalStateException(\"Invalid type '%s' for column '%s'\")",
                         genericType, fieldName);
                 writer.endControlFlow();
-                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", TABLE_PREFIX, genericType);
+                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericType);
                 writer.emitStatement("throw new IllegalStateException(\"Missing table '%s%s' for column '%s'\")",
-                        TABLE_PREFIX, genericType, fieldName);
+                        Constants.TABLE_PREFIX, genericType, fieldName);
                 writer.endControlFlow();
                 // TODO: Replace with a proper comparison
 //                writer.emitStatement("Table table_%d = transaction.getTable(\"%s%s\")", columnNumber, TABLE_PREFIX, genericType);
