@@ -7,6 +7,13 @@
                 error("The RealmModule annotation can only be applied to classes", classElement);
             }
 
+            // Check that the class extends RealmClassCollection
+            TypeElement typeElement = (TypeElement) classElement;
+            TypeElement parentElement = (TypeElement) processingEnv.getTypeUtils().asElement(typeElement.getSuperclass());
+            if (!parentElement.toString().endsWith(".RealmCollectionClass")) {
+                error("A RealmModule annotated object must be derived from RealmCollectionClass", classElement);
+            }
+
             RealmModule module = classElement.getAnnotation(RealmModule.class);
             if (module.library()) {
                 libraryModules.add(((TypeElement) classElement).getQualifiedName().toString());
