@@ -1,5 +1,5 @@
     // Check that only allowed methods are present in the model class
-    private void checkMethods() {
+    private boolean checkMethods() {
         for (ExecutableElement executableElement : methods) {
             String methodName = executableElement.getSimpleName().toString();
 
@@ -9,15 +9,24 @@
                 continue; // We're cool with static methods. Move along!
             } else if (!modifiers.contains(Modifier.PUBLIC)) {
                 Utils.error("The methods of the model must be public", executableElement);
+                return false;
             }
 
+            // Check that getters and setters are valid
             if (methodName.startsWith("get") || methodName.startsWith("is")) {
-                checkGetterMethod(methodName);
+                if (!checkGetterMethod(methodName)) {
+                    return false;
+                }
             } else if (methodName.startsWith("set")) {
-                checkSetterMethod(methodName);
+                if (!checkSetterMethod(methodName)) {
+                    return false;
+                };
             } else {
                 Utils.error("Only getters and setters should be defined in model classes", executableElement);
+                return false;
             }
         }
+
+        return true;
     }
 

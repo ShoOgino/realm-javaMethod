@@ -1,7 +1,7 @@
     // Verify that a setter is used to set a field in the model class.
     // Note: This is done heuristically by comparing the name of setter with the name of the field.
     // Annotation processors does not allow us to inspect individual statements.
-    private void checkSetterMethod(String methodName) {
+    private boolean checkSetterMethod(String methodName) {
         boolean found = false;
 
         String methodMinusSet = methodName.substring(3);
@@ -31,5 +31,7 @@
         if (!found) {
             Utils.note(String.format("Setter %s is not associated to any field", methodName));
         }
+
+        return found;
     }
 

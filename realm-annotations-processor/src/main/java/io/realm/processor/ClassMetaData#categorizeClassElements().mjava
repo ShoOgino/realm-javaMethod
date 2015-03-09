@@ -1,4 +1,5 @@
-    // Loop through all class elements and add them to the appropriate internal data structures.
+    // Iterate through all class elements and add them to the appropriate internal data structures.
+    // Returns true if all elements could be false if elements could not be categorized,
     private boolean categorizeClassElements() {
         for (Element element : classType.getEnclosedElements()) {
             ElementKind elementKind = element.getKind();
@@ -22,7 +23,7 @@
                         indexedFields.add(variableElement);
                     } else {
                         Utils.error("@Index is only applicable to String fields - got " + element);
-                        return true;
+                        return false;
                     }
                 }
 
@@ -33,13 +34,13 @@
                         Utils.error(String.format("@PrimaryKey cannot be defined more than once. It was found here \"%s\" and here \"%s\"",
                                 primaryKey.getSimpleName().toString(),
                                 variableElement.getSimpleName().toString()));
-                        return true;
+                        return false;
                     }
 
                     TypeMirror fieldType = variableElement.asType();
                     if (!isValidPrimaryKeyType(fieldType)) {
                         Utils.error("\"" + variableElement.getSimpleName().toString() + "\" is not allowed as primary key. See @PrimaryKey for allowed types.");
-                        return true;
+                        return false;
                     }
 
                     primaryKey = variableElement;
@@ -52,6 +53,7 @@
 
                 if (!variableElement.getModifiers().contains(Modifier.PRIVATE)) {
                     Utils.error("The fields of the model must be private", variableElement);
+                    return false;
                 }
 
                 fields.add(variableElement);
@@ -70,6 +72,6 @@
             fieldNames.add(field.getSimpleName().toString());
         }
 
-        return false;
+        return true;
     }
 
