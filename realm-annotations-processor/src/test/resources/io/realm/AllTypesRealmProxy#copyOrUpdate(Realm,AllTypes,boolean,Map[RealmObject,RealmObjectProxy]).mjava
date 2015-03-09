@@ -1,4 +1,4 @@
-    public static AllTypes copyOrUpdate(Realm realm, AllTypes object, boolean update, Map<RealmObject,RealmObject> cache) {
+    public static AllTypes copyOrUpdate(Realm realm, AllTypes object, boolean update, Map<RealmObject,RealmObjectProxy> cache) {
         AllTypes realmObject = null;
         boolean canUpdate = update;
         if (canUpdate) {
@@ -9,7 +9,7 @@
                 realmObject = new AllTypesRealmProxy();
                 realmObject.realm = realm;
                 realmObject.row = table.getRow(rowIndex);
-                cache.put(object, realmObject);
+                cache.put(object, (RealmObjectProxy) realmObject);
             } else {
                 canUpdate = false;
             }
