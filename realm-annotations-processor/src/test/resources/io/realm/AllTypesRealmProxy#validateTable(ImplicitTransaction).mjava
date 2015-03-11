@@ -68,6 +68,17 @@
             if (!transaction.hasTable("class_AllTypes")) {
                 throw new IllegalStateException("Missing table 'class_AllTypes' for column 'columnRealmList'");
             }
+
+            columnIndices = new HashMap<String, Long>();
+            for (String fieldName : getFieldNames()) {
+                long index = table.getColumnIndex(fieldName);
+                if (index == -1) {
+                    throw new RealmMigrationNeededException("Field '" + fieldName + "' not found for type AllTypes");
+                }
+                columnIndices.put(fieldName, index);
+            }
+        } else {
+            throw new RealmMigrationNeededException("The AllTypes class is missing from the schema for this Realm.");
         }
     }
 

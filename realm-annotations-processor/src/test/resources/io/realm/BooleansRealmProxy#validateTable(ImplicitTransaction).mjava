@@ -26,6 +26,17 @@
             if (columnTypes.get("mCompleted") != ColumnType.BOOLEAN) {
                 throw new IllegalStateException("Invalid type 'boolean' for column 'mCompleted'");
             }
+
+            columnIndices = new HashMap<String, Long>();
+            for (String fieldName : getFieldNames()) {
+                long index = table.getColumnIndex(fieldName);
+                if (index == -1) {
+                    throw new RealmMigrationNeededException("Field '" + fieldName + "' not found for type Booleans");
+                }
+                columnIndices.put(fieldName, index);
+            }
+        } else {
+            throw new RealmMigrationNeededException("The Booleans class is missing from the schema for this Realm.");
         }
     }
 

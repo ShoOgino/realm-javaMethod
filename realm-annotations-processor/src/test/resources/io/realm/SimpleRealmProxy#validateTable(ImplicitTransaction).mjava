@@ -20,6 +20,17 @@
             if (columnTypes.get("age") != ColumnType.INTEGER) {
                 throw new IllegalStateException("Invalid type 'int' for column 'age'");
             }
+
+            columnIndices = new HashMap<String, Long>();
+            for (String fieldName : getFieldNames()) {
+                long index = table.getColumnIndex(fieldName);
+                if (index == -1) {
+                    throw new RealmMigrationNeededException("Field '" + fieldName + "' not found for type Simple");
+                }
+                columnIndices.put(fieldName, index);
+            }
+        } else {
+            throw new RealmMigrationNeededException("The Simple class is missing from the schema for this Realm.");
         }
     }
 
