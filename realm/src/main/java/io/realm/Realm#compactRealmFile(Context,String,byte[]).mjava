@@ -9,11 +9,27 @@
      *
      * @param context an Android {@link android.content.Context}
      * @param fileName the name of the file to compact
+     * @param key Key for opening a encrypted Realm.
      * @return true if successful, false if any file operation failed
      *
      * @throws IllegalStateException if trying to compact a Realm that is already open
      */
-    public static synchronized boolean compactRealmFile(Context context, String fileName) {
-        return compactRealmFile(context, fileName, null);
+    public static synchronized boolean compactRealmFile(Context context, String fileName, byte[] key) {
+        File realmFile = new File(context.getFilesDir(), fileName);
+        String path = realmFile.getAbsolutePath();
+        if (openRealms.get(path.hashCode()).get() > 0) {
+            throw new IllegalStateException("Cannot compact a open Realm");
+        }
+        SharedGroup sharedGroup = null;
+        boolean result = false;
+        try {
+            sharedGroup = new SharedGroup(path, false, key);
+            result = sharedGroup.compact();
+        } finally {
+            if (sharedGroup != null) {
+                sharedGroup.close();
+            }
+        }
+        return result;
     }
 
