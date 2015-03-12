@@ -13,9 +13,8 @@
      */
     public static synchronized boolean compactRealmFile(Context context, String fileName) {
         File realmFile = new File(context.getFilesDir(), fileName);
-        File tmpFile = new File(
-                context.getFilesDir(),
-                String.valueOf(System.currentTimeMillis()) + UUID.randomUUID() + ".realm");
+        String tmpFileName = String.valueOf(System.currentTimeMillis()) + UUID.randomUUID() + ".realm";
+        File tmpFile = new File(context.getFilesDir(), tmpFileName);
 
         Realm realm = null;
         try {
@@ -32,6 +31,12 @@
         } finally {
             if (realm != null) {
                 realm.close();
+            }
+            tmpFile = new File(context.getFilesDir(), tmpFileName);
+            if (tmpFile.exists()) {
+                if (!tmpFile.delete()) {
+                    RealmLog.w("Could not delete temporary file while compacting Realm:" + tmpFile.getAbsolutePath());
+                };
             }
         }
         return true;
