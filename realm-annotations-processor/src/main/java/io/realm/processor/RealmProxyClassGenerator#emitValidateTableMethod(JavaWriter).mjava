@@ -85,7 +85,9 @@
                 .endControlFlow()
                 .emitStatement("columnIndices.put(fieldName, index)")
             .endControlFlow();
-
+        for (VariableElement field : metadata.getFields()) {
+            writer.emitStatement("%s = table.getColumnIndex(\"%s\")", staticFieldIndexVarName(field), field.getSimpleName().toString());
+        }
         writer.nextControlFlow("else");
         writer.emitStatement("throw new RealmMigrationNeededException(\"The %s class is missing from the schema for this Realm.\")", metadata.getSimpleClassName());
         writer.endControlFlow();
