@@ -1,10 +1,11 @@
     /**
-     * Realm static constructor for the default realm "default.realm".
+     * Realm static constructor.
      * {@link #close()} must be called when you are done using the Realm instance.
      * <p>
      * It sets auto-refresh on if the current thread has a Looper, off otherwise.
      *
-     * @param context an Android {@link android.content.Context}
+     * @param writeableFolder a File object representing a writeable folder
+     * @param key     a 64-byte encryption key
      * @return an instance of the Realm class
      * @throws RealmMigrationNeededException The model classes have been changed and the Realm
      *                                       must be migrated
@@ -12,7 +13,12 @@
      * @throws RealmException                Other errors
      */
     @Deprecated
-    public static Realm getInstance(Context context) {
-        return Realm.getInstance(context, DEFAULT_REALM_NAME);
+    @SuppressWarnings("UnusedDeclaration")
+    public static Realm getInstance(File writeableFolder, byte[] key) {
+        return create(new RealmConfiguration.Builder(writeableFolder)
+                        .name(DEFAULT_REALM_NAME)
+                        .encryptionKey(key)
+                        .create()
+        );
     }
 

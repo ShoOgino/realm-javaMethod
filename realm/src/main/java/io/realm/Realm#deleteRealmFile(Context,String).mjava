@@ -1,9 +1,16 @@
     /**
-     * Deprecated, use {@link io.realm.RealmConfiguration.Builder#deleteRealmBeforeOpening} or
-     * {@link #deleteRealmFile(java.io.File, String)} instead.
+     * Delete the Realm file from the filesystem for a custom named Realm.
+     * The realm must be unused and closed before calling this method.
+     *
+     * @param context  an Android {@link android.content.Context}.
+     * @param fileName the name of the custom Realm (i.e. "myCustomRealm.realm").
+     * @return false if a file could not be deleted. The failing file will be logged.
      */
     @Deprecated
     public static boolean deleteRealmFile(Context context, String fileName) {
-        return deleteRealmFile(context.getFilesDir(), fileName);
+        return deleteRealmFile(new RealmConfiguration.Builder(context)
+                .name(fileName)
+                .create()
+        );
     }
 

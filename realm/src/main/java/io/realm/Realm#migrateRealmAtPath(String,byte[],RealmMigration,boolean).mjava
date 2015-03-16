@@ -1,17 +1,11 @@
-    /**
-     * See {@link io.realm.RealmConfiguration.Builder#migration(RealmMigration)} or
-     * {@link #migrateRealm(RealmConfiguration)}
-     */
     @Deprecated
     public static synchronized void migrateRealmAtPath(String realmPath, byte[] key, RealmMigration migration,
-                                            boolean autoUpdate) {
-        // TODO Rewrite to use a configuration
-//        Realm realm = Realm.createAndValidate(realmPath, key, false, autoUpdate);
-//        realm.beginTransaction();
-//        realm.setVersion(migration.execute(realm, realm.getVersion()));
-//        realm.commitTransaction();
-//        realm.close();
-//
-//        realmsCache.remove();
+                                                       boolean autoUpdate) {
+        File file = new File(realmPath);
+        migrateRealm(new RealmConfiguration.Builder(file.getParentFile())
+                .name(file.getName())
+                .encryptionKey(key)
+                .migration(migration)
+                .create());
     }
 

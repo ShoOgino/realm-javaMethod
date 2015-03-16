@@ -1,0 +1,38 @@
+    /**
+     * Compact a realm file. A realm file usually contain free/unused space.
+     * This method removes this free space and the file size is thereby reduced.
+     * Objects within the realm files are untouched.
+     * <p>
+     * The file must be closed before this method is called.<br>
+     * The file system should have free space for at least a copy of the realm file.<br>
+     * The realm file is left untouched if any file operation fails.<br>
+     *
+     * @param configuration a {@link RealmConfiguration} pointing to a Realm file.
+     * @return true if successful, false if any file operation failed
+     */
+    public static  boolean compactRealmFile(RealmConfiguration configuration) {
+        File realmFile = new File(configuration.getFileDir(), configuration.getFileName());
+        File tmpFile = new File(
+                configuration.getFileDir(),
+                String.valueOf(System.currentTimeMillis()) + UUID.randomUUID() + ".realm");
+
+        Realm realm = null;
+        try {
+            realm = Realm.getInstance(configuration);
+            realm.writeCopyTo(tmpFile);
+            if (!realmFile.delete()) {
+                return false;
+            }
+            if (!tmpFile.renameTo(realmFile)) {
+                return false;
+            }
+        } catch (IOException e) {
+            return false;
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+        }
+        return true;
+    }
+

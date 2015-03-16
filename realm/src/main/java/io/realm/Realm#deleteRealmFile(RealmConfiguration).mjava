@@ -1,19 +1,15 @@
     /**
-     * TODO Should we just remove this altogether and only make it part of the Configutation. Addng a
-     * deleteRealmWhenClosing() would cover all use cases I think?
-     *
-     * Delete the given Realm file defined by its from the filesystem for a custom named Realm.
+     * Delete the Realm file specified by the given {@link RealmConfiguration} from the filesystem.
      * The realm must be unused and closed before calling this method.
      *
-     * @param folder The folder where the Realm is stored, usually Context.getFilesDir().
-     * @param fileName the name of the custom Realm (i.e. "myCustomRealm.realm").
+     * @param configuration A {@link RealmConfiguration}
      * @return false if a file could not be deleted. The failing file will be logged.
      */
-    public static synchronized boolean deleteRealmFile(File folder, String fileName) {
+    public static synchronized boolean deleteRealmFile(RealmConfiguration configuration) {
         boolean result = true;
-        File writableFolder = folder;
+        File writableFolder = configuration.getFileDir();
 
-        File realmFile = new File(writableFolder, fileName);
+        File realmFile = new File(writableFolder, configuration.getFileName());
         int realmId = realmFile.getAbsolutePath().hashCode();
 
         AtomicInteger counter = openRealms.get(realmId);
@@ -22,7 +18,7 @@
                     "Remember to close() all the instances of the Realm before deleting its file.");
         }
 
-        List<File> filesToDelete = Arrays.asList(realmFile, new File(writableFolder, fileName + ".lock"));
+        List<File> filesToDelete = Arrays.asList(realmFile, new File(writableFolder, configuration.getFileName() + ".lock"));
         for (File fileToDelete : filesToDelete) {
             if (fileToDelete.exists()) {
                 boolean deleteResult = fileToDelete.delete();
