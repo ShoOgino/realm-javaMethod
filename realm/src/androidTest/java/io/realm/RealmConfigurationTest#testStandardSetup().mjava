@@ -1,0 +1,21 @@
+    public void testStandardSetup() {
+        byte[] key = new byte[64];
+        new Random().nextBytes(key);
+        Realm realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                .name("foo.realm")
+                .encryptionKey(key)
+                .version(42)
+                .migration(new RealmMigration() {
+                    @Override
+                    public long execute(Realm realm, long version) {
+                        return 0; // no-op
+                    }
+                })
+                .deleteRealmBeforeOpening()
+                .deleteRealmIfMigrationNeeded()
+                .create());
+        assertTrue(realm.getPath().endsWith("foo.realm"));
+        assertEquals(42, realm.getVersion());
+        realm.close();
+    }
+

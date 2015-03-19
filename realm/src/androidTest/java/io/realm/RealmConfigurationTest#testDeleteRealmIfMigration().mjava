@@ -1,0 +1,23 @@
+    public void testDeleteRealmIfMigration() {
+        RealmConfiguration config = new RealmConfiguration.Builder(getContext())
+                .deleteRealmBeforeOpening()
+                .schema(Dog.class)
+                .version(0)
+                .create();
+        Realm.deleteRealmFile(config);
+        Realm realm = Realm.getInstance(config);
+        realm.beginTransaction();
+        realm.copyToRealm(new Dog("Foo"));
+        realm.commitTransaction();
+        assertEquals(1, realm.where(Dog.class).count());
+        realm.close();
+
+        realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                .schema(Owner.class, Dog.class)
+                .version(1)
+                .deleteRealmIfMigrationNeeded()
+                .create());
+        assertEquals(0, realm.where(Dog.class).count());
+        realm.close();
+    }
+

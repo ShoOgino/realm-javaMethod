@@ -1,0 +1,19 @@
+    public void testVersionEqualWhenSchemaChangesThrows() {
+        Realm realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                .deleteRealmBeforeOpening()
+                .version(42)
+                .schema(Dog.class)
+                .create());
+        realm.close();
+
+        try {
+            Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                    .version(42)
+                    .schema(AllTypesPrimaryKey.class)
+                    .create());
+        } catch (RealmMigrationNeededException expected) {
+            return;
+        }
+        fail();
+    }
+

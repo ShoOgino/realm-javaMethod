@@ -16,7 +16,9 @@
             sharedGroup.close();
             sharedGroup = null;
             AtomicInteger counter = openRealms.get(id);
-            counter.decrementAndGet();
+            if (counter.decrementAndGet() == 0) {
+                openRealms.remove(id);
+            };
         }
 
         int refCount = references - 1;

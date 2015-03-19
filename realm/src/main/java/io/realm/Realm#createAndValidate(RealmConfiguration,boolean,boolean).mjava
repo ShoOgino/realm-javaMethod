@@ -10,7 +10,7 @@
         if (references == 0) {
             AtomicInteger counter = openRealms.get(id);
             if (counter == null) {
-                if (config.isDeleteRealmBeforeOpening()) {
+                if (config.shouldDeleteRealmBeforeOpening()) {
                     deleteRealmFile(config);
                 }
                 openRealms.put(id, new AtomicInteger(1));
@@ -36,6 +36,18 @@
         realms.put(id, realm);
         realmsCache.set(realms);
         localRefCount.put(id, references + 1);
+
+        // Check versions of Realm
+        long currentVersion = realm.getVersion();
+        long requiredVersion = config.getVersion();
+        if (currentVersion != UNVERSIONED && currentVersion < requiredVersion) {
+            realm.close();
+            throw new RealmMigrationNeededException(String.format("Realm on disc need to migrate from v%s to v%s", currentVersion, requiredVersion));
+        }
+        if (currentVersion != UNVERSIONED && requiredVersion < currentVersion) {
+            realm.close();
+            throw new IllegalArgumentException(String.format("Realm on disc is newer than the one specified: v%s vs. v%s", currentVersion, requiredVersion));
+        }
 
         if (validateSchema) {
             try {

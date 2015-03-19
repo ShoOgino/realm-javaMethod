@@ -1,0 +1,10 @@
+    public void testCustomSchemaAlsoIncludeLinkedClasses() {
+        Realm realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                .deleteRealmBeforeOpening()
+                .schema(Dog.class)
+                .create());
+        assertEquals(3, realm.getTable(Owner.class).getColumnCount());
+        assertEquals(7, realm.getTable(Dog.class).getColumnCount());
+        realm.close();
+    }
+

@@ -35,14 +35,15 @@
         try {
             realm.beginTransaction();
             if (version == UNVERSIONED) {
-                realm.setVersion(0);
                 commitNeeded = true;
+                realm.setVersion(config.getVersion());
             }
-
             for (String className : proxyClasses) {
                 String[] splitted = className.split("\\.");
                 String modelClassName = splitted[splitted.length - 1];
                 String generatedClassName = getProxyClassName(modelClassName);
+
+                // Verify that there is a proxy class for each supported model class
                 Class<?> generatedClass;
                 try {
                     generatedClass = Class.forName(generatedClassName);
@@ -115,7 +116,6 @@
             }
         } finally {
             if (commitNeeded) {
-                realm.setVersion(config.getVersion());
                 realm.commitTransaction();
             } else {
                 realm.cancelTransaction();

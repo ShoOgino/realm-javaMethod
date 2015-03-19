@@ -1,0 +1,13 @@
+    public void testVersionLessThanDiscVersionThrows() {
+        Realm.deleteRealmFile(new RealmConfiguration.Builder(getContext()).create());
+        Realm realm = Realm.getInstance(new RealmConfiguration.Builder(getContext()).version(42).create());
+        realm.close();
+
+        try {
+            Realm.getInstance(new RealmConfiguration.Builder(getContext()).version(1).create());
+        } catch (IllegalArgumentException expected) {
+            return;
+        }
+        fail();
+    }
+
