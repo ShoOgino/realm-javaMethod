@@ -1,0 +1,13 @@
+    protected void checkIfValid() {
+        // Check if the Realm instance has been closed
+        if (sharedGroup == null) {
+            throw new IllegalStateException(CLOSED_REALM_MESSAGE);
+        }
+
+        // Check if we are in the right thread
+        Realm currentRealm = realmsCache.get().get(this.id);
+        if (currentRealm != this) {
+            throw new IllegalStateException(INCORRECT_THREAD_MESSAGE);
+        }
+    }
+

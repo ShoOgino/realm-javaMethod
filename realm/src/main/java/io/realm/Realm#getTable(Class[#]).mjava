@@ -1,0 +1,12 @@
+    // Public because of migrations
+    public Table getTable(Class<?> clazz) {
+        final String proxySuffix = "RealmProxy";
+        String proxiedClassName = proxiedClassNames.get(clazz);
+        if (proxiedClassName == null) {
+            String classSimpleName = clazz.getSimpleName();
+            proxiedClassName = classSimpleName.replace(proxySuffix, "");
+            proxiedClassNames.put(clazz, proxiedClassName);
+        }
+        return transaction.getTable(TABLE_PREFIX + proxiedClassName);
+    }
+

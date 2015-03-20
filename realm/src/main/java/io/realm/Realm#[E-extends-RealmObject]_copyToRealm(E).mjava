@@ -1,0 +1,18 @@
+    /**
+     * Copies a RealmObject to the Realm instance and returns the copy. Any further changes to the original RealmObject
+     * will not be reflected in the Realm copy.
+     *
+     * @param object {@link io.realm.RealmObject} to copy to the Realm.
+     * @return A managed RealmObject with its properties backed by the Realm.
+     *
+     * @throws java.lang.IllegalArgumentException if RealmObject is {@code null}.
+     */
+    public <E extends RealmObject> E copyToRealm(E object) {
+        checkNotNullObject(object);
+        if (isObjectInRealm(object)) {
+            return object;
+        }
+
+        return copyOrUpdate(object, false);
+    }
+

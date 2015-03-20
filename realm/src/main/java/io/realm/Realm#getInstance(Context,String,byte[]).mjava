@@ -1,0 +1,19 @@
+    /**
+     * Realm static constructor.
+     * {@link #close()} must be called when you are done using the Realm instance.
+     * <p>
+     * It sets auto-refresh on if the current thread has a Looper, off otherwise.
+     *
+     * @param context an Android {@link android.content.Context}
+     * @param key     a 64-byte encryption key
+     * @return an instance of the Realm class
+     * @throws RealmMigrationNeededException The model classes have been changed and the Realm
+     *                                       must be migrated
+     * @throws RealmIOException              Error when accessing underlying file
+     * @throws RealmException                Other errors
+     */
+    @SuppressWarnings("UnusedDeclaration")
+    public static Realm getInstance(Context context, String fileName, byte[] key) {
+        return Realm.create(context.getFilesDir(), fileName, key);
+    }
+

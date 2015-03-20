@@ -1,0 +1,17 @@
+    /**
+     * Override the standard behavior of all classes extended RealmObject being part of the schema.
+     * Use this method to define the schema as only the classes given here.
+     *
+     * This class must be called before calling {@link #getInstance(android.content.Context)}
+     *
+     * If {@code null} is given as parameter, the Schema is reset to use all known classes.
+     *
+     */
+    @SafeVarargs
+    static void setSchema(Class<? extends RealmObject>... schemaClass) {
+        customSchema.clear();
+        if (schemaClass != null) {
+            Collections.addAll(customSchema, schemaClass);
+        }
+    }
+

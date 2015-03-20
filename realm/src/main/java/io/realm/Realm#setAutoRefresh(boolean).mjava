@@ -1,0 +1,24 @@
+    /**
+     * Set the auto-refresh status of the Realm instance.
+     * <p>
+     * Auto-refresh is a feature that enables automatic update of the current realm instance and all its derived objects
+     * (RealmResults and RealmObjects instances) when a commit is performed on a Realm acting on the same file in another thread.
+     * This feature is only available if the realm instance lives is a {@link android.os.Looper} enabled thread.
+     *
+     * @param autoRefresh true will turn auto-refresh on, false will turn it off.
+     * @throws java.lang.IllegalStateException if trying to enable auto-refresh in a thread without Looper.
+     */
+    public void setAutoRefresh(boolean autoRefresh) {
+        if (autoRefresh && Looper.myLooper() == null) {
+            throw new IllegalStateException("Cannot set auto-refresh in a Thread without a Looper");
+        }
+
+        if (autoRefresh && !this.autoRefresh) { // Switch it on
+            handler = new Handler(new RealmCallback());
+            handlers.put(handler, id);
+        } else if (!autoRefresh && this.autoRefresh && handler != null) { // Switch it off
+            removeHandler(handler);
+        }
+        this.autoRefresh = autoRefresh;
+    }
+
