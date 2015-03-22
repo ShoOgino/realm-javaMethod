@@ -39,7 +39,7 @@
 
         // Check versions of Realm
         long currentVersion = realm.getVersion();
-        long requiredVersion = config.getVersion();
+        long requiredVersion = config.getSchemaVersion();
         if (currentVersion != UNVERSIONED && currentVersion < requiredVersion) {
             realm.close();
             throw new RealmMigrationNeededException(String.format("Realm on disc need to migrate from v%s to v%s", currentVersion, requiredVersion));

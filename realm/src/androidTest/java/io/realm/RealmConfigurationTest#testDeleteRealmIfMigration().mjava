@@ -2,7 +2,7 @@
         RealmConfiguration config = new RealmConfiguration.Builder(getContext())
                 .deleteRealmBeforeOpening()
                 .schema(Dog.class)
-                .version(0)
+                .schemaVersion(0)
                 .create();
         Realm.deleteRealmFile(config);
         Realm realm = Realm.getInstance(config);
@@ -14,7 +14,7 @@
 
         realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
                 .schema(Owner.class, Dog.class)
-                .version(1)
+                .schemaVersion(1)
                 .deleteRealmIfMigrationNeeded()
                 .create());
         assertEquals(0, realm.where(Dog.class).count());
