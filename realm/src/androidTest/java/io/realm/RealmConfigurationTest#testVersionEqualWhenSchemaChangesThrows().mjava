@@ -1,5 +1,6 @@
+    // TODO Should throw IllegalState instead
     public void testVersionEqualWhenSchemaChangesThrows() {
-        Realm realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+        realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
                 .deleteRealmBeforeOpening()
                 .schemaVersion(42)
                 .schema(Dog.class)
@@ -11,9 +12,8 @@
                     .schemaVersion(42)
                     .schema(AllTypesPrimaryKey.class)
                     .create());
+            fail("A migration should be required");
         } catch (RealmMigrationNeededException expected) {
-            return;
         }
-        fail();
     }
 

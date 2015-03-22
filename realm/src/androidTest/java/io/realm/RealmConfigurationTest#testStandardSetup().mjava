@@ -1,7 +1,7 @@
     public void testStandardSetup() {
         byte[] key = new byte[64];
         new Random().nextBytes(key);
-        Realm realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+        realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
                 .name("foo.realm")
                 .encryptionKey(key)
                 .schemaVersion(42)
@@ -16,6 +16,5 @@
                 .create());
         assertTrue(realm.getPath().endsWith("foo.realm"));
         assertEquals(42, realm.getVersion());
-        realm.close();
     }
 
