@@ -4,14 +4,14 @@
         Set<String> libraryModules = new HashSet<String>();
         for (Element classElement : roundEnv.getElementsAnnotatedWith(RealmModule.class)) {
             if (!classElement.getKind().equals(ElementKind.CLASS)) {
-                error("The RealmModule annotation can only be applied to classes", classElement);
+                Utils.error("The RealmModule annotation can only be applied to classes", classElement);
             }
 
             // Check that the class extends RealmClassCollection
             TypeElement typeElement = (TypeElement) classElement;
             TypeElement parentElement = (TypeElement) processingEnv.getTypeUtils().asElement(typeElement.getSuperclass());
             if (!parentElement.toString().endsWith(".RealmCollectionClass")) {
-                error("A RealmModule annotated object must be derived from RealmCollectionClass", classElement);
+                Utils.error("A RealmModule annotated object must be derived from RealmCollectionClass", classElement);
             }
 
             RealmModule module = classElement.getAnnotation(RealmModule.class);
@@ -23,20 +23,19 @@
         }
 
         if (modules.size() > 0 && libraryModules.size() > 0) {
-            error("Normal modules and library modules cannot be mixed in the same project");
+            Utils.error("Normal modules and library modules cannot be mixed in the same project");
             return true;
         }
 
         // Create DefaultModule if needed
         if (libraryModules.size() == 0 ) {
-            note("Creating DefaultRealmModule");
+            Utils.note("Creating DefaultRealmModule");
             DefaultModuleGenerator defaultModuleGenerator = new DefaultModuleGenerator(processingEnv, classesToValidate);
             try {
                 defaultModuleGenerator.generate();
                 modules.add(DefaultModuleGenerator.CLASS_NAME);
             } catch (IOException e) {
-                error(e.getMessage());
-                return true;
+                Utils.error(e.getMessage());
             }
         }
 
@@ -53,10 +52,10 @@
 
         RealmProxyMediatorGenerator mediatorImplGenerator = new RealmProxyMediatorGenerator(processingEnv, proxyMediatorName, classesToValidate);
         try {
-            note("Creating RealmProxyMediator");
+            Utils.note("Creating RealmProxyMediator");
             mediatorImplGenerator.generate();
         } catch (IOException e) {
-            error(e.getMessage());
+            Utils.error(e.getMessage());
             return true;
         }
 
@@ -67,7 +66,7 @@
             try {
                 binderGenerator.generate();
             } catch (IOException e) {
-                error(e.getMessage());
+                Utils.error(e.getMessage());
                 return true;
             }
         }

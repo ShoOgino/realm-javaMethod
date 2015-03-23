@@ -11,6 +11,7 @@
         writer.beginControlFlow("while (reader.hasNext())");
         writer.emitStatement("String name = reader.nextName()");
 
+        List<VariableElement> fields = metadata.getFields();
         for (int i = 0; i < fields.size(); i++) {
             VariableElement field = fields.get(i);
             String fieldName = field.getSimpleName().toString();
@@ -23,7 +24,7 @@
             }
             if (typeUtils.isAssignable(field.asType(), realmObject)) {
                 RealmJsonTypeHelper.emitFillRealmObjectFromStream(
-                        setters.get(fieldName),
+                        metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
                         Utils.getProxyClassSimpleName(field),
@@ -31,15 +32,15 @@
 
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
                 RealmJsonTypeHelper.emitFillRealmListFromStream(
-                        getters.get(fieldName),
-                        setters.get(fieldName),
+                        metadata.getGetter(fieldName),
+                        metadata.getSetter(fieldName),
                         ((DeclaredType) field.asType()).getTypeArguments().get(0).toString(),
                         Utils.getProxyClassSimpleName(field),
                         writer);
 
             } else {
                 RealmJsonTypeHelper.emitFillJavaTypeFromStream(
-                        setters.get(fieldName),
+                        metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
                         writer);

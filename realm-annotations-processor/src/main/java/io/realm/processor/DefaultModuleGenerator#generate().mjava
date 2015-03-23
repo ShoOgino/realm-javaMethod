@@ -7,11 +7,14 @@
         writer.emitPackage(REALM_PACKAGE_NAME);
         writer.emitEmptyLine();
         writer.emitImports(
-            "java.util.Collections",
-            "java.util.HashSet",
-            "java.util.Set",
-            "io.realm.internal.modules.RealmClassCollection"
+                "java.util.Collections",
+                "java.util.HashSet",
+                "java.util.Set",
+                "io.realm.internal.modules.RealmClassCollection"
         );
+        for (ClassMetaData metadata : qualifiedRealmClasses) {
+            writer.emitImports(metadata.getFullyQualifiedClassName());
+        }
         writer.emitEmptyLine();
 
         writer.beginType(

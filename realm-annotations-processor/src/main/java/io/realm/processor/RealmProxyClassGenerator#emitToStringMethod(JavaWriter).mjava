@@ -5,6 +5,7 @@
         writer.emitStatement("return \"Invalid object\"");
         writer.endControlFlow();
         writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = [\")", className);
+        List<VariableElement> fields = metadata.getFields();
         for (int i = 0; i < fields.size(); i++) {
             VariableElement field = fields.get(i);
             String fieldName = field.getSimpleName().toString();
@@ -14,16 +15,16 @@
                 String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
                 writer.emitStatement(
                         "stringBuilder.append(%s() != null ? \"%s\" : \"null\")",
-                        getters.get(fieldName),
+                        metadata.getGetter(fieldName),
                         fieldTypeSimpleName
                 );
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
                 String genericType = Utils.getGenericType(field);
                 writer.emitStatement("stringBuilder.append(\"RealmList<%s>[\").append(%s().size()).append(\"]\")",
                         genericType,
-                        getters.get(fieldName));
+                        metadata.getGetter(fieldName));
             } else {
-                writer.emitStatement("stringBuilder.append(%s())", getters.get(fieldName));
+                writer.emitStatement("stringBuilder.append(%s())", metadata.getGetter(fieldName));
             }
             writer.emitStatement("stringBuilder.append(\"}\")");
 

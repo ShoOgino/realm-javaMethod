@@ -6,7 +6,7 @@
                 "Realm", "realm", className, "object", "boolean", "update", "Map<RealmObject,RealmObjectProxy>", "cache" // Argument type & argument name
         );
 
-        if (primaryKey == null) {
+        if (!metadata.hasPrimaryKey()) {
             writer.emitStatement("return copy(realm, object, update, cache)");
         } else {
             writer
@@ -16,12 +16,10 @@
                     .emitStatement("Table table = realm.getTable(%s.class)", className)
                     .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
 
-            if (primaryKey == null) {
-                writer.emitStatement("long rowIndex = TableOrView.NO_MATCH");
-            } else if (Utils.isString(primaryKey)) {
-                writer.emitStatement("long rowIndex = table.findFirstString(pkColumnIndex, object.%s())", getters.get(primaryKey.getSimpleName().toString()));
+            if (Utils.isString(metadata.getPrimaryKey())) {
+                writer.emitStatement("long rowIndex = table.findFirstString(pkColumnIndex, object.%s())", metadata.getPrimaryKeyGetter());
             } else {
-                writer.emitStatement("long rowIndex = table.findFirstLong(pkColumnIndex, object.%s())", getters.get(primaryKey.getSimpleName().toString()));
+                writer.emitStatement("long rowIndex = table.findFirstLong(pkColumnIndex, object.%s())", metadata.getPrimaryKeyGetter());
             }
 
             writer

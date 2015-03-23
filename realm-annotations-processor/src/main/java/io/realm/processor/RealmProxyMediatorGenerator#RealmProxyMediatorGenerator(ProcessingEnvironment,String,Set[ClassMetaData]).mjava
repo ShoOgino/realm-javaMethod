@@ -1,0 +1,12 @@
+    public RealmProxyMediatorGenerator(ProcessingEnvironment processingEnvironment, String className, Set<ClassMetaData> classesToValidate) {
+        this.processingEnvironment = processingEnvironment;
+        this.className = className;
+
+        for (ClassMetaData metadata : classesToValidate) {
+            String simpleName = metadata.getSimpleClassName();
+            qualifiedModelClasses.add(metadata.getFullyQualifiedClassName());
+            simpleModelClasses.add(simpleName);
+            proxyClasses.add(getProxyClassName(simpleName));
+        }
+    }
+

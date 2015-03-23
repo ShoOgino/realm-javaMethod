@@ -7,12 +7,12 @@
                 Arrays.asList("JSONException"));
 
         writer.emitStatement("boolean standalone = obj.realm == null");
-        for (VariableElement field : fields) {
+        for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
             String qualifiedFieldType = field.asType().toString();
             if (typeUtils.isAssignable(field.asType(), realmObject)) {
                 RealmJsonTypeHelper.emitFillRealmObjectWithJsonValue(
-                        setters.get(fieldName),
+                        metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
                         Utils.getProxyClassSimpleName(field),
@@ -20,8 +20,8 @@
 
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
                 RealmJsonTypeHelper.emitFillRealmListWithJsonValue(
-                        getters.get(fieldName),
-                        setters.get(fieldName),
+                        metadata.getGetter(fieldName),
+                        metadata.getSetter(fieldName),
                         fieldName,
                         ((DeclaredType) field.asType()).getTypeArguments().get(0).toString(),
                         Utils.getProxyClassSimpleName(field),
@@ -29,7 +29,7 @@
 
             } else {
                 RealmJsonTypeHelper.emitFillJavaTypeWithJsonValue(
-                        setters.get(fieldName),
+                        metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
                         writer);

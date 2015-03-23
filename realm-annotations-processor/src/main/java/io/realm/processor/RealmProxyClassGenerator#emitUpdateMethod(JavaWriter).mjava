@@ -6,30 +6,30 @@
                 EnumSet.of(Modifier.STATIC), // Modifiers
                 "Realm", "realm", className, "realmObject", className, "newObject", "Map<RealmObject, RealmObjectProxy>", "cache"); // Argument type & argument name
 
-        for (VariableElement field : fields) {
+        for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
             if (typeUtils.isAssignable(field.asType(), realmObject)) {
                 writer
-                    .emitStatement("%s %sObj = newObject.%s()", Utils.getFieldTypeSimpleName(field), fieldName, getters.get(fieldName))
+                    .emitStatement("%s %sObj = newObject.%s()", Utils.getFieldTypeSimpleName(field), fieldName, metadata.getGetter(fieldName))
                     .beginControlFlow("if (%sObj != null)", fieldName)
                         .emitStatement("%s cache%s = (%s) cache.get(%sObj)", Utils.getFieldTypeSimpleName(field), fieldName, Utils.getFieldTypeSimpleName(field), fieldName)
                         .beginControlFlow("if (cache%s != null)", fieldName)
-                            .emitStatement("realmObject.%s(cache%s)", setters.get(fieldName), fieldName)
+                            .emitStatement("realmObject.%s(cache%s)", metadata.getSetter(fieldName), fieldName)
                         .nextControlFlow("else")
                             .emitStatement("realmObject.%s(%s.copyOrUpdate(realm, %sObj, true, cache))",
-                                    setters.get(fieldName),
+                                    metadata.getSetter(fieldName),
                                     Utils.getProxyClassSimpleName(field),
                                     fieldName,
                                     Utils.getFieldTypeSimpleName(field)
                             )
                         .endControlFlow()
                     .nextControlFlow("else")
-                        .emitStatement("realmObject.%s(null)", setters.get(fieldName))
+                        .emitStatement("realmObject.%s(null)", metadata.getSetter(fieldName))
                     .endControlFlow();
             } else if (typeUtils.isAssignable(field.asType(), realmList)) {
                 writer
-                    .emitStatement("RealmList<%s> %sList = newObject.%s()", Utils.getGenericType(field), fieldName, getters.get(fieldName))
-                    .emitStatement("RealmList<%s> %sRealmList = realmObject.%s()", Utils.getGenericType(field), fieldName, getters.get(fieldName))
+                    .emitStatement("RealmList<%s> %sList = newObject.%s()", Utils.getGenericType(field), fieldName, metadata.getGetter(fieldName))
+                    .emitStatement("RealmList<%s> %sRealmList = realmObject.%s()", Utils.getGenericType(field), fieldName, metadata.getGetter(fieldName))
                     .emitStatement("%sRealmList.clear()", fieldName)
                     .beginControlFlow("if (%sList != null)", fieldName)
                         .beginControlFlow("for (int i = 0; i < %sList.size(); i++)", fieldName)
@@ -44,19 +44,19 @@
                     .endControlFlow();
 
             } else {
-                if (field == primaryKey) {
+                if (field == metadata.getPrimaryKey()) {
                     continue;
                 }
 
                 String fieldType = field.asType().toString();
                 if (NULLABLE_JAVA_TYPES.containsKey(fieldType)) {
                     writer.emitStatement("realmObject.%s(newObject.%s() != null ? newObject.%s() : %s)",
-                            setters.get(fieldName),
-                            getters.get(fieldName),
-                            getters.get(fieldName),
+                            metadata.getSetter(fieldName),
+                            metadata.getGetter(fieldName),
+                            metadata.getGetter(fieldName),
                             NULLABLE_JAVA_TYPES.get(fieldType));
                 } else {
-                    writer.emitStatement("realmObject.%s(newObject.%s())", setters.get(fieldName), getters.get(fieldName));
+                    writer.emitStatement("realmObject.%s(newObject.%s())", metadata.getSetter(fieldName), metadata.getGetter(fieldName));
                 }
             }
         }
