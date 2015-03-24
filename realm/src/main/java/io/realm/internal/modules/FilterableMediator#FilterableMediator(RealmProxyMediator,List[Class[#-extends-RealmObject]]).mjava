@@ -1,0 +1,16 @@
+    /**
+     * Creates a filterable Mediator.
+     *
+     * @param originalMediator      Original auto generated mediator.
+     * @param filter                Subset of classes from original mediator to allow.
+     */
+    public FilterableMediator(RealmProxyMediator originalMediator, List<Class<? extends RealmObject>> filter) {
+        this.originalMediator = originalMediator;
+        List<Class<? extends RealmObject>> originalClasses = originalMediator.getModelClasses();
+        for (Class<? extends RealmObject> clazz : filter) {
+            if (originalClasses.contains(clazz)) {
+                allowedClasses.add(clazz);
+            }
+        }
+    }
+

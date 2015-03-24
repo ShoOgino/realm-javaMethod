@@ -1,0 +1,60 @@
+    public boolean generate(ProcessingEnvironment processingEnv) {
+
+        // Check that modules are setup correctly
+        for (Element classElement : env.getElementsAnnotatedWith(RealmModule.class)) {
+            if (!classElement.getKind().equals(ElementKind.CLASS)) {
+                Utils.error("The RealmModule annotation can only be applied to classes", classElement);
+                return false;
+            }
+
+            RealmModule module = classElement.getAnnotation(RealmModule.class);
+            Utils.note("Processing " + classElement.getSimpleName());
+            if (module.allClasses() && module.classes().length > 0) {
+                Utils.error("Setting allClasses to true will override specific classes set in " + classElement.getSimpleName().toString());
+                return false;
+            }
+
+            String qualifiedName = ((TypeElement) classElement).getQualifiedName().toString();
+            Set<ClassMetaData> classes;
+            if (module.allClasses()) {
+                classes = availableClasses;
+            } else {
+                classes = new HashSet<ClassMetaData>();
+                for (Class<?> clazz : module.classes()) {
+                    if (!clazz.getSuperclass().toString().endsWith("RealmObject")) {
+                        Utils.error(clazz.getSimpleName() + " is not extending RealmObject. Only RealmObjects can be " +
+                                "part of a module.");
+                        return false;
+                    }
+                    ClassMetaData metadata = classMetaData.get(clazz.getName());
+                    if (metadata == null) {
+                        Utils.error(Utils.stripPackage(qualifiedName) + " could not be added to the module. It is not " +
+                                "possible to add classes are part of another library.");
+                        return false;
+                    }
+                    classes.add(metadata);
+                }
+            }
+
+            if (module.library()) {
+                libraryModules.put(qualifiedName, classes);
+            } else {
+                modules.put(qualifiedName, classes);
+            }
+        }
+
+        if (modules.size() > 0 && libraryModules.size() > 0) {
+            Utils.error("Normal modules and library modules cannot be mixed in the same project");
+            return false;
+        }
+
+        // Add default realm module if needed
+        if (libraryModules.size() == 0) {
+            shouldCreateDefaultModule = true;
+            String defautModuleName = Constants.REALM_PACKAGE_NAME + "." + Constants.DEFAULT_MODULE_CLASS_NAME;
+            modules.put(defautModuleName, availableClasses);
+        }
+
+        return true;
+    }
+

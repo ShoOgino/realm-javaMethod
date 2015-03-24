@@ -1,75 +1,25 @@
+    // Returns true if modules was processed successfully, false otherwise
     private boolean processModules(RoundEnvironment roundEnv) {
-        // Check that modules are setup correctly
-        Set<String> modules = new HashSet<String>();
-        Set<String> libraryModules = new HashSet<String>();
-        for (Element classElement : roundEnv.getElementsAnnotatedWith(RealmModule.class)) {
-            if (!classElement.getKind().equals(ElementKind.CLASS)) {
-                Utils.error("The RealmModule annotation can only be applied to classes", classElement);
-            }
 
-            // Check that the class extends RealmClassCollection
-            TypeElement typeElement = (TypeElement) classElement;
-            TypeElement parentElement = (TypeElement) processingEnv.getTypeUtils().asElement(typeElement.getSuperclass());
-            if (!parentElement.toString().endsWith(".RealmCollectionClass")) {
-                Utils.error("A RealmModule annotated object must be derived from RealmCollectionClass", classElement);
-            }
+        ModuleMetaData moduleMetaData = new ModuleMetaData(roundEnv, classesToValidate);
+        if (!moduleMetaData.generate(processingEnv)) {
+            return false;
+        }
 
-            RealmModule module = classElement.getAnnotation(RealmModule.class);
-            if (module.library()) {
-                libraryModules.add(((TypeElement) classElement).getQualifiedName().toString());
-            } else {
-                modules.add(((TypeElement) classElement).getQualifiedName().toString());
+        // Create default module if needed
+        if (moduleMetaData.shouldCreateDefaultModule()) {
+            if (!createDefaultModule()) {
+                return false;
+            };
+        }
+
+        // Create RealmProxyMediators for all Realm modules
+        for (Map.Entry<String, Set<ClassMetaData>> entry : moduleMetaData.getAllModules().entrySet()) {
+            if (createMediator(Utils.stripPackage(entry.getKey()), entry.getValue())) {
+                return false;
             }
         }
 
-        if (modules.size() > 0 && libraryModules.size() > 0) {
-            Utils.error("Normal modules and library modules cannot be mixed in the same project");
-            return true;
-        }
-
-        // Create DefaultModule if needed
-        if (libraryModules.size() == 0 ) {
-            Utils.note("Creating DefaultRealmModule");
-            DefaultModuleGenerator defaultModuleGenerator = new DefaultModuleGenerator(processingEnv, classesToValidate);
-            try {
-                defaultModuleGenerator.generate();
-                modules.add(DefaultModuleGenerator.CLASS_NAME);
-            } catch (IOException e) {
-                Utils.error(e.getMessage());
-            }
-        }
-
-        // Create ProxyMediator for all RealmClasses in this project.
-        String proxyMediatorName;
-        if (libraryModules.size() > 0) {
-            // Autogenerate random name for library module RealmProxyMediator classes
-            // This should prevent conflicts with other libraries
-            proxyMediatorName = UUID.randomUUID().toString().replace("-", "");
-        } else {
-            // Default RealmProxyMediator only used by "app" code
-            proxyMediatorName = "DefaultRealmProxyMediator";
-        }
-
-        RealmProxyMediatorGenerator mediatorImplGenerator = new RealmProxyMediatorGenerator(processingEnv, proxyMediatorName, classesToValidate);
-        try {
-            Utils.note("Creating RealmProxyMediator");
-            mediatorImplGenerator.generate();
-        } catch (IOException e) {
-            Utils.error(e.getMessage());
-            return true;
-        }
-
-        // Create Binder classes for all modules
-        Set<String> binders = (modules.size() > 0) ? modules : libraryModules;
-        for (String binder : binders) {
-            ModuleBinderGenerator binderGenerator = new ModuleBinderGenerator(processingEnv, Utils.stripPackage(binder), proxyMediatorName);
-            try {
-                binderGenerator.generate();
-            } catch (IOException e) {
-                Utils.error(e.getMessage());
-                return true;
-            }
-        }
-        return false;
+        return true;
     }
 

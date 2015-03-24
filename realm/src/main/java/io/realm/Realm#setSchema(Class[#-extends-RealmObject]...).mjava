@@ -11,10 +11,10 @@
     static void setSchema(Class<? extends RealmObject>... schemaClass) {
         if (schemaClass != null) {
             // Filter default schema
-            defaultModule = new FilterableClassCollection(defaultModule, Arrays.asList(schemaClass));
-        } else if (defaultModule instanceof FilterableClassCollection) {
+            proxyMediator = new FilterableMediator(proxyMediator, Arrays.asList(schemaClass));
+        } else if (proxyMediator instanceof FilterableMediator) {
             // else reset filter if needed
-            defaultModule = ((FilterableClassCollection) defaultModule).getOriginalCollection();
+            proxyMediator = ((FilterableMediator) proxyMediator).getOriginalMediator();
         }
     }
 

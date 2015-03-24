@@ -1,7 +1,5 @@
     @SuppressWarnings("unchecked")
     private static void initializeRealm(Realm realm) {
-        proxyMediator = defaultModule.getProxyMediator();
-
         long version = realm.getVersion();
         boolean commitNeeded = false;
         try {
@@ -11,7 +9,7 @@
                 commitNeeded = true;
             }
 
-            for (Class<? extends RealmObject> modelClass : defaultModule.getModuleClasses()) {
+            for (Class<? extends RealmObject> modelClass : proxyMediator.getModelClasses()) {
                 String modelClassName = modelClass.getSimpleName();
 
                 // Create and validate table
