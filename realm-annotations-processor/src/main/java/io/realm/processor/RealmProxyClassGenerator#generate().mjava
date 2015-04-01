@@ -19,6 +19,7 @@
         imports.add("android.util.JsonToken");
         imports.add("io.realm.RealmObject");
         imports.add("io.realm.exceptions.RealmException");
+        imports.add("io.realm.exceptions.RealmMigrationNeededException");
         imports.add("io.realm.internal.ColumnType");
         imports.add("io.realm.internal.RealmObjectProxy");
         imports.add("io.realm.internal.Table");
@@ -27,6 +28,8 @@
         imports.add("io.realm.internal.LinkView");
         imports.add("io.realm.internal.android.JsonUtils");
         imports.add("java.io.IOException");
+        imports.add("java.util.ArrayList");
+        imports.add("java.util.Collections");
         imports.add("java.util.List");
         imports.add("java.util.Arrays");
         imports.add("java.util.Date");
@@ -61,11 +64,13 @@
                 "RealmObjectProxy")          // interfaces to implement
                 .emitEmptyLine();
 
+        emitClassFields(writer);
         emitAccessors(writer);
         emitInitTableMethod(writer);
         emitValidateTableMethod(writer);
         emitGetTableNameMethod(writer);
         emitGetFieldNamesMethod(writer);
+        emitGetColumnIndicesMethod(writer);
         emitPopulateUsingJsonObjectMethod(writer);
         emitPopulateUsingJsonStreamMethod(writer);
         emitCopyOrUpdateMethod(writer);

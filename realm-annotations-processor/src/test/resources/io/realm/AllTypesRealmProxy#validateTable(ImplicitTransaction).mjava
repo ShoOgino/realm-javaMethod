@@ -68,6 +68,26 @@
             if (!transaction.hasTable("class_AllTypes")) {
                 throw new IllegalStateException("Missing table 'class_AllTypes' for column 'columnRealmList'");
             }
+
+            columnIndices = new HashMap<String, Long>();
+            for (String fieldName : getFieldNames()) {
+                long index = table.getColumnIndex(fieldName);
+                if (index == -1) {
+                    throw new RealmMigrationNeededException("Field '" + fieldName + "' not found for type AllTypes");
+                }
+                columnIndices.put(fieldName, index);
+            }
+            INDEX_COLUMNSTRING = table.getColumnIndex("columnString");
+            INDEX_COLUMNLONG = table.getColumnIndex("columnLong");
+            INDEX_COLUMNFLOAT = table.getColumnIndex("columnFloat");
+            INDEX_COLUMNDOUBLE = table.getColumnIndex("columnDouble");
+            INDEX_COLUMNBOOLEAN = table.getColumnIndex("columnBoolean");
+            INDEX_COLUMNDATE = table.getColumnIndex("columnDate");
+            INDEX_COLUMNBINARY = table.getColumnIndex("columnBinary");
+            INDEX_COLUMNOBJECT = table.getColumnIndex("columnObject");
+            INDEX_COLUMNREALMLIST = table.getColumnIndex("columnRealmList");
+        } else {
+            throw new RealmMigrationNeededException("The AllTypes class is missing from the schema for this Realm.");
         }
     }
 

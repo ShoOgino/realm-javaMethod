@@ -17,22 +17,7 @@
                     proxyMediator.createTable(modelClass, realm.transaction);
                 }
                 proxyMediator.validateTable(modelClass, realm.transaction);
-
-                // Create columnIndices
-                List<String> fieldNames = proxyMediator.getFieldNames(modelClass);
-                Table table = realm.transaction.getTable(proxyMediator.getTableName(modelClass));
-                for (String fieldName : fieldNames) {
-                    long columnIndex = table.getColumnIndex(fieldName);
-                    if (columnIndex == -1) {
-                        throw new RealmMigrationNeededException("Field '" + fieldName + "' not found for type '" + modelClassName + "'");
-                    }
-                    Map<String, Long> innerMap = columnIndices.get(modelClassName);
-                    if (innerMap == null) {
-                        innerMap = new HashMap<String, Long>();
-                    }
-                    innerMap.put(fieldName, columnIndex);
-                    columnIndices.put(modelClassName, innerMap);
-                }
+                columnIndices.addClass(modelClass, proxyMediator.getColumnIndices(modelClass));
             }
         } finally {
             if (commitNeeded) {
