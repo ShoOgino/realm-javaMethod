@@ -1,6 +1,6 @@
-    public static void populateUsingJsonObject(Booleans obj, JSONObject json)
+    public static Booleans createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
             throws JSONException {
-        boolean standalone = obj.realm == null;
+        Booleans obj = realm.createObject(Booleans.class);
         if (!json.isNull("done")) {
             obj.setDone((boolean) json.getBoolean("done"));
         }
@@ -10,5 +10,6 @@
         if (!json.isNull("mCompleted")) {
             obj.setmCompleted((boolean) json.getBoolean("mCompleted"));
         }
+        return obj;
     }
 

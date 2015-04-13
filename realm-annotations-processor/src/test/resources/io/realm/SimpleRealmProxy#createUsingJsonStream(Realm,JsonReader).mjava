@@ -1,6 +1,6 @@
-    public static void populateUsingJsonStream(Simple obj, JsonReader reader)
+    public static Simple createUsingJsonStream(Realm realm, JsonReader reader)
             throws IOException {
-        boolean standalone = obj.realm == null;
+        Simple obj = realm.createObject(Simple.class);
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
@@ -13,5 +13,6 @@
             }
         }
         reader.endObject();
+        return obj;
     }
 

@@ -1,6 +1,6 @@
-    public static void populateUsingJsonStream(Booleans obj, JsonReader reader)
+    public static Booleans createUsingJsonStream(Realm realm, JsonReader reader)
             throws IOException {
-        boolean standalone = obj.realm == null;
+        Booleans obj = realm.createObject(Booleans.class);
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
@@ -15,5 +15,6 @@
             }
         }
         reader.endObject();
+        return obj;
     }
 
