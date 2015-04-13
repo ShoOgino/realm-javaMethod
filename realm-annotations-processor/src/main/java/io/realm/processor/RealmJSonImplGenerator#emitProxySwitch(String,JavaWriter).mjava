@@ -2,18 +2,17 @@
     // Currently it is just if..else, which is inefficient for large amounts amounts of model classes.
     // Consider switching to HashMap or similar.
     private void emitProxySwitch(String proxyStatement, JavaWriter writer) throws IOException {
-        writer.emitStatement("String classQualifiedName = (obj.realm != null) ? obj.getClass().getSuperclass().getName() : obj.getClass().getName()");
         if (simpleModelClasses.size() == 0) {
             writer.emitStatement("throw new RealmException(%s)", EXCEPTION_MSG);
         } else {
-            writer.beginControlFlow("if (classQualifiedName.equals(%s.class.getName()))", simpleModelClasses.get(0));
-            writer.emitStatement(proxyStatement, proxyClasses.get(0), simpleModelClasses.get(0));
+            writer.beginControlFlow("if (clazz.equals(%s.class))", simpleModelClasses.get(0));
+            writer.emitStatement(proxyStatement, proxyClasses.get(0));
             for (int i = 1; i < simpleModelClasses.size(); i++) {
-                writer.nextControlFlow("else if (classQualifiedName.equals(%s.class.getName()))", simpleModelClasses.get(i));
-                writer.emitStatement(proxyStatement, proxyClasses.get(i), simpleModelClasses.get(i));
+                writer.nextControlFlow("else if (clazz.equals(%s.class))", simpleModelClasses.get(i));
+                writer.emitStatement(proxyStatement, proxyClasses.get(i));
             }
             writer.nextControlFlow("else");
-            writer.emitStatement("throw new RealmException(%s)", EXCEPTION_MSG);
+            writer.emitStatement("throw new RealmException(\"Boom\")", EXCEPTION_MSG);
             writer.endControlFlow();
         }
     }

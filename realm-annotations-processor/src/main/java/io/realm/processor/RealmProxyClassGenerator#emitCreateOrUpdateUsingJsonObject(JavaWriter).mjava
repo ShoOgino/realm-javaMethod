@@ -1,0 +1,66 @@
+    private void emitCreateOrUpdateUsingJsonObject(JavaWriter writer) throws IOException {
+        writer.beginMethod(
+                className,
+                "createOrUpdateUsingJsonObject",
+                EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
+                Arrays.asList("Realm", "realm", "JSONObject", "json", "boolean", "update"),
+                Arrays.asList("JSONException"));
+
+        if (!metadata.hasPrimaryKey()) {
+            writer.emitStatement("%s obj = realm.createObject(%s.class)", className, className);
+        } else {
+            String pkType = Utils.isString(metadata.getPrimaryKey()) ? "String" : "Long";
+            writer
+                .emitStatement("%s obj = null", className)
+                .beginControlFlow("if (update)")
+                    .emitStatement("Table table = realm.getTable(%s.class)", className)
+                    .emitStatement("long pkColumnIndex = table.getPrimaryKey()")
+                   .beginControlFlow("if (!json.isNull(\"%s\"))", metadata.getPrimaryKey().getSimpleName())
+                        .emitStatement("long rowIndex = table.findFirst%s(pkColumnIndex, json.get%s(\"%s\"))",
+                                pkType, pkType, metadata.getPrimaryKey().getSimpleName())
+                        .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
+                            .emitStatement("obj = new %s()", Utils.getProxyClassName(className))
+                            .emitStatement("obj.realm = realm")
+                            .emitStatement("obj.row = table.getRow(rowIndex)")
+                        .endControlFlow()
+                    .endControlFlow()
+                .endControlFlow()
+                .beginControlFlow("if (obj == null)")
+                    .emitStatement("obj = realm.createObject(%s.class)", className)
+                .endControlFlow();
+        }
+
+        for (VariableElement field : metadata.getFields()) {
+            String fieldName = field.getSimpleName().toString();
+            String qualifiedFieldType = field.asType().toString();
+            if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                RealmJsonTypeHelper.emitFillRealmObjectWithJsonValue(
+                        metadata.getSetter(fieldName),
+                        fieldName,
+                        qualifiedFieldType,
+                        Utils.getProxyClassSimpleName(field),
+                        writer);
+
+            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+                RealmJsonTypeHelper.emitFillRealmListWithJsonValue(
+                        metadata.getGetter(fieldName),
+                        metadata.getSetter(fieldName),
+                        fieldName,
+                        ((DeclaredType) field.asType()).getTypeArguments().get(0).toString(),
+                        Utils.getProxyClassSimpleName(field),
+                        writer);
+
+            } else {
+                RealmJsonTypeHelper.emitFillJavaTypeWithJsonValue(
+                        metadata.getSetter(fieldName),
+                        fieldName,
+                        qualifiedFieldType,
+                        writer);
+            }
+        }
+
+        writer.emitStatement("return obj");
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+
