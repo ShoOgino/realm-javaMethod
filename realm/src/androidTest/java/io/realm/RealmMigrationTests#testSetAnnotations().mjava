@@ -1,0 +1,22 @@
+    public void testSetAnnotations() {
+        Realm.setSchema(AnnotationTypes.class);
+        Realm.migrateRealmAtPath(new File(getContext().getFilesDir(), "default.realm").getAbsolutePath(), new RealmMigration() {
+            @Override
+            public long execute(Realm realm, long version) {
+                Table table = realm.getTable(AnnotationTypes.class);
+                table.addColumn(ColumnType.INTEGER, "id");
+                table.setPrimaryKey("id");
+                long columnIndex = table.addColumn(ColumnType.STRING, "indexString");
+                table.setIndex(columnIndex);
+                table.addColumn(ColumnType.STRING, "notIndexString");
+                return 1;
+            }
+        });
+
+        realm = Realm.getInstance(getContext());
+        Table table = realm.getTable(AnnotationTypes.class);
+        assertEquals(3, table.getColumnCount());
+        assertTrue(table.hasPrimaryKey());
+        assertTrue(table.hasIndex(table.getColumnIndex("indexString")));
+    }
+
