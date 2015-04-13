@@ -1,0 +1,22 @@
+    public void testNotSettingIndexThrows() {
+        Realm.setSchema(AnnotationTypes.class);
+        Realm.migrateRealmAtPath(new File(getContext().getFilesDir(), "default.realm").getAbsolutePath(), new RealmMigration() {
+            @Override
+            public long execute(Realm realm, long version) {
+                Table table = realm.getTable(AnnotationTypes.class);
+                table.addColumn(ColumnType.INTEGER, "id");
+                table.setPrimaryKey("id");
+                table.addColumn(ColumnType.STRING, "indexString");
+                table.addColumn(ColumnType.STRING, "notIndexString");
+                // Forget to set @Index
+                return 1;
+            }
+        });
+
+        try {
+            realm = Realm.getInstance(getContext());
+            fail();
+        } catch (RealmMigrationNeededException expected) {
+        }
+    }
+
