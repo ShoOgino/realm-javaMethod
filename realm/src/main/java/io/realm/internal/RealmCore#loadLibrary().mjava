@@ -3,19 +3,19 @@
             // only load library once
             return;
 
-        initTightDB();
+        init();
 
         String jnilib;
         if (osIsWindows()) {
             jnilib = loadLibraryWindows();
         }
         else {
-            String debug = System.getenv("TIGHTDB_JAVA_DEBUG");
+            String debug = System.getenv("REALM_JAVA_DEBUG");
             if (debug == null || debug.isEmpty()) {
-                jnilib = "tightdb-jni";
+                jnilib = "realm-jni";
             }
             else {
-                jnilib = "tightdb-jni-dbg";
+                jnilib = "realm-jni-dbg";
             }
             System.loadLibrary(jnilib);
         }

@@ -1,18 +1,6 @@
     private void emitGetFieldNamesMethod(JavaWriter writer) throws IOException {
         writer.beginMethod("List<String>", "getFieldNames", EnumSet.of(Modifier.PUBLIC, Modifier.STATIC));
-        StringBuilder stringBuilder = new StringBuilder();
-        Iterator<VariableElement> iterator = metadata.getFields().iterator();
-        while (iterator.hasNext()) {
-            String fieldName = iterator.next().getSimpleName().toString();
-            stringBuilder.append("\"");
-            stringBuilder.append(fieldName);
-            stringBuilder.append("\"");
-            if (iterator.hasNext()) {
-                stringBuilder.append(", ");
-            }
-        }
-        String statementSection = stringBuilder.toString();
-        writer.emitStatement("return Arrays.asList(%s)", statementSection);
+        writer.emitStatement("return FIELD_NAMES");
         writer.endMethod();
         writer.emitEmptyLine();
     }

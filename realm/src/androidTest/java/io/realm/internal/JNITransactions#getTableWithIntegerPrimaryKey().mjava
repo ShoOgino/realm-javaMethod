@@ -1,0 +1,9 @@
+    private Table getTableWithIntegerPrimaryKey() {
+        SharedGroup db = new SharedGroup(testFile, SharedGroup.Durability.FULL, null);
+        WriteTransaction trans = db.beginWrite();
+        Table t = trans.getTable("TestTable");
+        t.addColumn(ColumnType.INTEGER, "colName");
+        t.setPrimaryKey("colName");
+        return t;
+    }
+
