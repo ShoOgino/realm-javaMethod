@@ -14,9 +14,8 @@
         }
 
         for (int i = 0; i < json.length(); i++) {
-            E obj = createObject(clazz);
             try {
-                proxyMediator.populateUsingJsonObject(obj, json.getJSONObject(i));
+                proxyMediator.createOrUpdateUsingJsonObject(clazz, this, json.getJSONObject(i), false);
             } catch (Exception e) {
                 throw new RealmException("Could not map Json", e);
             }

@@ -14,16 +14,10 @@
             return null;
         }
         checkHasPrimaryKey(clazz);
-
-        E obj = createStandaloneRealmObjectInstance(clazz);
-
         try {
-            proxyMediator.populateUsingJsonObject(obj, json);
-            copyToRealmOrUpdate(obj);
+            return proxyMediator.createOrUpdateUsingJsonObject(clazz, this, json, true);
         } catch (JSONException e) {
             throw new RealmException("Could not map Json", e);
         }
-
-        return obj;
     }
 
