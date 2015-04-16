@@ -16,17 +16,21 @@
         }
         checkHasPrimaryKey(clazz);
 
-        JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+        // As we need the primary key value we have to first parse the entire input stream as in the general
+        // case that value might be the last property :(
+        Scanner scanner = null;
         try {
-            reader.beginArray();
-            while (reader.hasNext()) {
-                E obj = createStandaloneRealmObjectInstance(clazz);
-                realmJson.populateUsingJsonStream(obj, reader);
-                copyToRealmOrUpdate(obj);
+            scanner = getFullStringScanner(in);
+            JSONArray json = new JSONArray(scanner.next());
+            for (int i = 0; i < json.length(); i++) {
+                realmJson.createOrUpdateUsingJsonObject(clazz, this, json.getJSONObject(i), true);
             }
-            reader.endArray();
+        } catch (JSONException e) {
+            throw new RealmException("Failed to read JSON", e);
         } finally {
-            reader.close();
+            if (scanner != null) {
+                scanner.close();
+            }
         }
     }
 

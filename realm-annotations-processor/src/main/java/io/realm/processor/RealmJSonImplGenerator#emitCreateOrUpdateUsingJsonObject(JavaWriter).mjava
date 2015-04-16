@@ -1,0 +1,14 @@
+    private void emitCreateOrUpdateUsingJsonObject(JavaWriter writer) throws IOException {
+        writer.emitAnnotation("Override");
+        writer.beginMethod(
+                "<E extends RealmObject> E",
+                "createOrUpdateUsingJsonObject",
+                EnumSet.of(Modifier.PUBLIC),
+                Arrays.asList("Class<E>", "clazz", "Realm", "realm", "JSONObject", "json", "boolean", "update"),
+                Arrays.asList("JSONException")
+        );
+        emitProxySwitch("return (E) %s.createOrUpdateUsingJsonObject(realm, json, update)", writer);
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+

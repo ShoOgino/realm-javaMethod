@@ -14,12 +14,9 @@
             return;
         }
         checkHasPrimaryKey(clazz);
-
         for (int i = 0; i < json.length(); i++) {
-            E obj = createStandaloneRealmObjectInstance(clazz);
             try {
-                realmJson.populateUsingJsonObject(obj, json.getJSONObject(i));
-                copyToRealmOrUpdate(obj);
+                realmJson.createOrUpdateUsingJsonObject(clazz, this, json.getJSONObject(i), true);
             } catch (Exception e) {
                 throw new RealmException("Could not map Json", e);
             }
