@@ -1,12 +1,12 @@
-    private void emitPopulateUsingJsonStreamMethod(JavaWriter writer) throws IOException {
+    private void emitCreateUsingJsonStream(JavaWriter writer) throws IOException {
         writer.beginMethod(
-                "void",
-                "populateUsingJsonStream",
+                className,
+                "createUsingJsonStream",
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
-                Arrays.asList(className, "obj", "JsonReader", "reader"),
+                Arrays.asList("Realm", "realm", "JsonReader", "reader"),
                 Arrays.asList("IOException"));
 
-        writer.emitStatement("boolean standalone = obj.realm == null");
+        writer.emitStatement("%s obj = realm.createObject(%s.class)",className, className);
         writer.emitStatement("reader.beginObject()");
         writer.beginControlFlow("while (reader.hasNext())");
         writer.emitStatement("String name = reader.nextName()");
@@ -54,6 +54,7 @@
         }
         writer.endControlFlow();
         writer.emitStatement("reader.endObject()");
+        writer.emitStatement("return obj");
         writer.endMethod();
         writer.emitEmptyLine();
     }

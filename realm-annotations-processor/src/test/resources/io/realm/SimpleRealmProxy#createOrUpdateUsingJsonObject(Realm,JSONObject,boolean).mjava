@@ -1,11 +1,12 @@
-    public static void populateUsingJsonObject(Simple obj, JSONObject json)
+    public static Simple createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
             throws JSONException {
-        boolean standalone = obj.realm == null;
+        Simple obj = realm.createObject(Simple.class);
         if (!json.isNull("name")) {
             obj.setName((String) json.getString("name"));
         }
         if (!json.isNull("age")) {
             obj.setAge((int) json.getInt("age"));
         }
+        return obj;
     }
 
