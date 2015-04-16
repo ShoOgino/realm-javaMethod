@@ -1,0 +1,12 @@
+    public void testLinkIsNull() {
+        RealmResults<Owner> owners1 = testRealm.where(Owner.class).isNull("cat").findAll();
+        assertEquals(0, owners1.size());
+
+        testRealm.beginTransaction();
+        testRealm.clear(Cat.class);
+        testRealm.commitTransaction();
+
+        RealmResults<Owner> owners2 = testRealm.where(Owner.class).isNull("cat").findAll();
+        assertEquals(1, owners2.size());
+    }
+
