@@ -13,9 +13,9 @@
 
         for (Map.Entry<Handler, String> handlerIntegerEntry : handlers.entrySet()) {
             Handler handler = handlerIntegerEntry.getKey();
-            String realmId = handlerIntegerEntry.getValue();
+            String realmPath = handlerIntegerEntry.getValue();
             if (
-                    realmId.equals(id)                           // It's the right realm
+                    realmPath.equals(absolutePath)                       // It's the right realm
                     && !handler.hasMessages(REALM_CHANGED)       // The right message
                     && handler.getLooper().getThread().isAlive() // The receiving thread is alive
                     && !handler.equals(this.handler)             // Don't notify yourself
