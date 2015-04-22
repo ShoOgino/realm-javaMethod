@@ -10,8 +10,8 @@
         File realmFolder = realmFile.getParentFile();
         String fileName = realmFile.getName();
 
-        String realmAbsolutePath = realmFile.getAbsolutePath();
-        AtomicInteger counter = openRealms.get(realmAbsolutePath);
+        String id = getCanonicalPath(realmFile);
+        AtomicInteger counter = openRealms.get(id);
         if (counter != null && counter.get() > 0) {
             throw new IllegalStateException("It's not allowed to delete the file associated with an open Realm. " +
                     "Remember to close() all the instances of the Realm before deleting its file.");

@@ -7,23 +7,23 @@
     @Override
     public void close() {
         Map<String, Integer> localRefCount = referenceCount.get();
-        Integer references = localRefCount.get(absolutePath);
+        Integer references = localRefCount.get(canonicalPath);
         if (references == null) {
             references = 0;
         }
         if (sharedGroup != null && references == 1) {
-            realmsCache.get().remove(absolutePath);
+            realmsCache.get().remove(canonicalPath);
             sharedGroup.close();
             sharedGroup = null;
-            AtomicInteger counter = openRealms.get(absolutePath);
+            AtomicInteger counter = openRealms.get(canonicalPath);
             counter.decrementAndGet();
         }
 
         int refCount = references - 1;
         if (refCount < 0) {
-            RealmLog.w("Calling close() on a Realm that is already closed: " + getAbsolutePath());
+            RealmLog.w("Calling close() on a Realm that is already closed: " + canonicalPath);
         }
-        localRefCount.put(absolutePath, Math.max(0, refCount));
+        localRefCount.put(canonicalPath, Math.max(0, refCount));
 
         if (handler != null && refCount <= 0) {
             removeHandler(handler);

@@ -1,7 +1,7 @@
-    private static synchronized Realm createAndValidate(String absolutePath, byte[] key, boolean validateSchema,
+    private static synchronized Realm createAndValidate(String canonicalPath, byte[] key, boolean validateSchema,
                                                         boolean autoRefresh) {
         // Check thread local cache for existing Realm
-        String id = absolutePath;
+        String id = canonicalPath;
         Map<String, Integer> localRefCount = referenceCount.get();
         Integer references = localRefCount.get(id);
         if (references == null) {
@@ -19,7 +19,7 @@
 
         // Create new Realm and cache it. All exception code paths must close the Realm otherwise
         // we risk serving faulty cache data.
-        realm = new Realm(absolutePath, key, autoRefresh);
+        realm = new Realm(canonicalPath, key, autoRefresh);
         realms.put(id, realm);
         realmsCache.set(realms);
         localRefCount.put(id, references + 1);

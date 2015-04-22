@@ -21,14 +21,14 @@
         }
 
         File realmFile = new File(context.getFilesDir(), fileName);
-        String path = realmFile.getAbsolutePath();
-        if (openRealms.get(path).get() > 0) {
+        String canonicalPath = getCanonicalPath(realmFile);
+        if (openRealms.get(canonicalPath).get() > 0) {
             throw new IllegalStateException("Cannot compact an open Realm");
         }
         SharedGroup sharedGroup = null;
         boolean result = false;
         try {
-            sharedGroup = new SharedGroup(path, false, key);
+            sharedGroup = new SharedGroup(canonicalPath, false, key);
             result = sharedGroup.compact();
         } finally {
             if (sharedGroup != null) {
