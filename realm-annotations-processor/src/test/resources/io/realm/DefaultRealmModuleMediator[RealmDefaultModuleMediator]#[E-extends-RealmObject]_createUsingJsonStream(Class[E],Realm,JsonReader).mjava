@@ -1,7 +1,9 @@
     @Override
     public <E extends RealmObject> E createUsingJsonStream(Class<E> clazz, Realm realm, JsonReader reader)
             throws IOException {
-        if (clazz == null) throw new NullPointerException("A class extending RealmObject must be provided");
+        if (clazz == null) {
+            throw new NullPointerException("A class extending RealmObject must be provided");
+        }
 
         if (clazz.equals(AllTypes.class)) {
             return (E) AllTypesRealmProxy.createUsingJsonStream(realm, reader);
