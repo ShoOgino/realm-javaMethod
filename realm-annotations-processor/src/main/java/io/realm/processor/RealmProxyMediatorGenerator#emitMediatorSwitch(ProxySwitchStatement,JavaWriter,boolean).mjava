@@ -1,13 +1,11 @@
     private void emitMediatorSwitch(ProxySwitchStatement statement, JavaWriter writer, boolean nullPointerCheck)
             throws IOException {
         if (nullPointerCheck) {
-            writer.beginControlFlow("if (clazz == null)");
-            writer.emitStatement("throw new NullPointerException(\"A class extending RealmObject must be provided\")");
-            writer.endControlFlow();
+            writer.emitStatement("checkClass(clazz)");
             writer.emitEmptyLine();
         }
         if (simpleModelClasses.size() == 0) {
-            writer.emitStatement("throw new RealmException(%s)", EXCEPTION_MSG);
+            writer.emitStatement("throw getMissingProxyClassException(clazz)");
         } else {
             writer.beginControlFlow("if (clazz.equals(%s.class))", simpleModelClasses.get(0));
             statement.emitStatement(0, writer);
@@ -16,7 +14,7 @@
                 statement.emitStatement(i, writer);
             }
             writer.nextControlFlow("else");
-            writer.emitStatement("throw new RealmException(%s)", EXCEPTION_MSG);
+            writer.emitStatement("throw getMissingProxyClassException(clazz)");
             writer.endControlFlow();
         }
     }

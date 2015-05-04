@@ -1,14 +1,12 @@
     @Override
     public <E extends RealmObject> E createOrUpdateUsingJsonObject(Class<E> clazz, Realm realm, JSONObject json, boolean update)
             throws JSONException {
-        if (clazz == null) {
-            throw new NullPointerException("A class extending RealmObject must be provided");
-        }
+        checkClass(clazz);
 
         if (clazz.equals(AllTypes.class)) {
             return (E) AllTypesRealmProxy.createOrUpdateUsingJsonObject(realm, json, update);
         } else {
-            throw new RealmException("Could not find the generated proxy class for " + clazz + ". " + RealmProxyMediator.APT_NOT_EXECUTED_MESSAGE);
+            throw getMissingProxyClassException(clazz);
         }
     }
 

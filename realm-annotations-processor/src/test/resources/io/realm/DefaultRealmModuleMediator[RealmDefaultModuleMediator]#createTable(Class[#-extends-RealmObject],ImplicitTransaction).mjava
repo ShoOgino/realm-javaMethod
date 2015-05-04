@@ -1,13 +1,11 @@
     @Override
     public Table createTable(Class<? extends RealmObject> clazz, ImplicitTransaction transaction) {
-        if (clazz == null) {
-            throw new NullPointerException("A class extending RealmObject must be provided");
-        }
+        checkClass(clazz);
 
         if (clazz.equals(AllTypes.class)) {
             return AllTypesRealmProxy.initTable(transaction);
         } else {
-            throw new RealmException("Could not find the generated proxy class for " + clazz + ". " + RealmProxyMediator.APT_NOT_EXECUTED_MESSAGE);
+            throw getMissingProxyClassException(clazz);
         }
     }
 
