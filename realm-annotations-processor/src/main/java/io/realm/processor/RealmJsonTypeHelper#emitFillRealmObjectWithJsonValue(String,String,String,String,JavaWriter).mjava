@@ -2,11 +2,9 @@
                                                         String proxyClass, JavaWriter writer) throws IOException {
         writer
             .beginControlFlow("if (!json.isNull(\"%s\"))", fieldName)
-                .emitStatement("%s %s = standalone ? new %s() : obj.realm.createObject(%s.class)",
-                        qualifiedFieldType, fieldName, qualifiedFieldType, qualifiedFieldType)
-                .emitStatement("%s.populateUsingJsonObject(%s, json.getJSONObject(\"%s\"))",
-                        proxyClass, fieldName, fieldName)
-                .emitStatement("obj.%s(%s)", setter, fieldName)
+                .emitStatement("%s %sObj = %s.createOrUpdateUsingJsonObject(realm, json.getJSONObject(\"%s\"), update)",
+                        qualifiedFieldType, fieldName, proxyClass, fieldName)
+                .emitStatement("obj.%s(%sObj)", setter, fieldName)
             .endControlFlow();
     }
 

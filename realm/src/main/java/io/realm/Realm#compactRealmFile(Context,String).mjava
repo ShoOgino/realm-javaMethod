@@ -1,20 +1,21 @@
     /**
-     * Compact a realm file. A realm file usually contain free/unused space.
+     * Compact a Realm file. A Realm file usually contain free/unused space.
      * This method removes this free space and the file size is thereby reduced.
-     * Objects within the realm files are untouched.
+     * Objects within the Realm files are untouched.
      * <p>
      * The file must be closed before this method is called.<br>
-     * The file system should have free space for at least a copy of the realm file.<br>
+     * The file system should have free space for at least a copy of the Realm file.<br>
      * The realm file is left untouched if any file operation fails.<br>
+     * Currently it is not possible to compact an encrypted Realm.<br>
      *
      * @param context an Android {@link android.content.Context}
      * @param fileName the name of the file to compact
      * @return true if successful, false if any file operation failed
+     *
+     * @throws IllegalStateException if trying to compact a Realm that is already open.
      */
     @Deprecated
     public static synchronized boolean compactRealmFile(Context context, String fileName) {
-        return compactRealmFile(new RealmConfiguration.Builder(context)
-                .name(fileName)
-                .create());
+        return compactRealmFile(new RealmConfiguration.Builder(context).name(fileName).create());
     }
 

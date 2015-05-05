@@ -1,0 +1,26 @@
+    public static void loadLibrary() {
+        if (libraryIsLoaded.get())
+            // only load library once
+            return;
+
+        init();
+
+        String jnilib;
+        if (osIsWindows()) {
+            jnilib = loadLibraryWindows();
+        }
+        else {
+            String debug = System.getenv("REALM_JAVA_DEBUG");
+            if (debug == null || debug.isEmpty()) {
+                jnilib = "realm-jni";
+            }
+            else {
+                jnilib = "realm-jni-dbg";
+            }
+            System.loadLibrary(jnilib);
+        }
+        libraryIsLoaded.set(true);
+
+        Version.coreLibVersionCompatible(true);
+    }
+

@@ -7,24 +7,25 @@
      */
     public static synchronized boolean deleteRealmFile(RealmConfiguration configuration) {
         boolean result = true;
-        File writableFolder = configuration.getFileDir();
 
-        File realmFile = new File(writableFolder, configuration.getFileName());
-        int realmId = realmFile.getAbsolutePath().hashCode();
-
-        AtomicInteger counter = openRealms.get(realmId);
+        String id = configuration.getAbsolutePathToRealm();
+        AtomicInteger counter = openRealms.get(id);
         if (counter != null && counter.get() > 0) {
             throw new IllegalStateException("It's not allowed to delete the file associated with an open Realm. " +
                     "Remember to close() all the instances of the Realm before deleting its file.");
         }
 
-        List<File> filesToDelete = Arrays.asList(realmFile, new File(writableFolder, configuration.getFileName() + ".lock"));
+        List<File> filesToDelete = Arrays.asList(new File(configuration.getAbsolutePathToRealm()),
+                new File(configuration.getFileDir(), configuration.getFileName() + ".lock"),
+                new File(configuration.getFileDir(), configuration.getFileName() + ".lock_a"),
+                new File(configuration.getFileDir(), configuration.getFileName() + ".lock_b"),
+                new File(configuration.getFileDir(), configuration.getFileName() + ".log"));
         for (File fileToDelete : filesToDelete) {
             if (fileToDelete.exists()) {
                 boolean deleteResult = fileToDelete.delete();
                 if (!deleteResult) {
                     result = false;
-                    Log.w(TAG, "Could not delete the file " + fileToDelete);
+                    RealmLog.w("Could not delete the file " + fileToDelete);
                 }
             }
         }

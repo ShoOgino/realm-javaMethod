@@ -18,9 +18,7 @@
 
         JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
         try {
-            E obj = createObject(clazz);
-            realmJson.populateUsingJsonStream(obj, reader);
-            return obj;
+            return realmJson.createUsingJsonStream(clazz, this, reader);
         } finally {
             reader.close();
         }

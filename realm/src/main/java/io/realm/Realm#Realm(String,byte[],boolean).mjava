@@ -1,10 +1,9 @@
     // The constructor in private to enforce the use of the static one
-    private Realm(String absolutePath, byte[] key, boolean autoRefresh) {
-        this.sharedGroup = new SharedGroup(absolutePath, true, key);
+    private Realm(String canonicalPath, byte[] key, boolean autoRefresh) {
+        this.sharedGroup = new SharedGroup(canonicalPath, true, key);
         this.transaction = sharedGroup.beginImplicitTransaction();
-        this.path = absolutePath;
+        this.canonicalPath = canonicalPath;
         this.key = key;
-        this.id = absolutePath.hashCode();
         setAutoRefresh(autoRefresh);
     }
 
