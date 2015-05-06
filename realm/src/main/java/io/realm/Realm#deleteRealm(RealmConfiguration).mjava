@@ -5,21 +5,21 @@
      * @param configuration A {@link RealmConfiguration}
      * @return false if a file could not be deleted. The failing file will be logged.
      */
-    public static synchronized boolean deleteRealmFile(RealmConfiguration configuration) {
+    public static synchronized boolean deleteRealm(RealmConfiguration configuration) {
         boolean result = true;
 
-        String id = configuration.getAbsolutePathToRealm();
+        String id = configuration.getPath();
         AtomicInteger counter = openRealms.get(id);
         if (counter != null && counter.get() > 0) {
             throw new IllegalStateException("It's not allowed to delete the file associated with an open Realm. " +
                     "Remember to close() all the instances of the Realm before deleting its file.");
         }
 
-        List<File> filesToDelete = Arrays.asList(new File(configuration.getAbsolutePathToRealm()),
-                new File(configuration.getFileDir(), configuration.getFileName() + ".lock"),
-                new File(configuration.getFileDir(), configuration.getFileName() + ".lock_a"),
-                new File(configuration.getFileDir(), configuration.getFileName() + ".lock_b"),
-                new File(configuration.getFileDir(), configuration.getFileName() + ".log"));
+        List<File> filesToDelete = Arrays.asList(new File(configuration.getPath()),
+                new File(configuration.getRealmDir(), configuration.getRealmFileName() + ".lock"),
+                new File(configuration.getRealmDir(), configuration.getRealmFileName() + ".lock_a"),
+                new File(configuration.getRealmDir(), configuration.getRealmFileName() + ".lock_b"),
+                new File(configuration.getRealmDir(), configuration.getRealmFileName() + ".log"));
         for (File fileToDelete : filesToDelete) {
             if (fileToDelete.exists()) {
                 boolean deleteResult = fileToDelete.delete();

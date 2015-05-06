@@ -1,6 +1,6 @@
     private static synchronized Realm createAndValidate(RealmConfiguration config, boolean validateSchema, boolean autoRefresh) {
-        byte[] key = config.getKey();
-        String canonicalPath = config.getAbsolutePathToRealm();
+        byte[] key = config.getEncryptionKey();
+        String canonicalPath = config.getPath();
         Map<String, Integer> localRefCount = referenceCount.get();
         Integer references = localRefCount.get(canonicalPath);
         if (references == null) {
@@ -10,7 +10,7 @@
             AtomicInteger counter = openRealms.get(canonicalPath);
             if (counter == null) {
                 if (config.shouldDeleteRealmBeforeOpening()) {
-                    deleteRealmFile(config);
+                    deleteRealm(config);
                 }
 			}
 		}

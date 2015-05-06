@@ -10,12 +10,12 @@
      * @param configuration a {@link RealmConfiguration} pointing to a Realm file.
      * @return true if successful, false if any file operation failed
      */
-    public static boolean compactRealmFile(RealmConfiguration configuration) {
-        if (configuration.getKey() != null) {
+    public static boolean compactRealm(RealmConfiguration configuration) {
+        if (configuration.getEncryptionKey() != null) {
             throw new IllegalArgumentException("Cannot currently compact an encrypted Realm.");
         }
 
-        File realmFile = new File(configuration.getFileDir(), configuration.getFileName());
+        File realmFile = new File(configuration.getRealmDir(), configuration.getRealmFileName());
         String canonicalPath = getCanonicalPath(realmFile);
         if (openRealms.get(canonicalPath).get() > 0) {
             throw new IllegalStateException("Cannot compact an open Realm");
@@ -23,7 +23,7 @@
         SharedGroup sharedGroup = null;
         boolean result = false;
         try {
-            sharedGroup = new SharedGroup(canonicalPath, false, configuration.getKey());
+            sharedGroup = new SharedGroup(canonicalPath, false, configuration.getEncryptionKey());
             result = sharedGroup.compact();
         } finally {
             if (sharedGroup != null) {

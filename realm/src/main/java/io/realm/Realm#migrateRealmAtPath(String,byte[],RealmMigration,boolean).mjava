@@ -2,10 +2,12 @@
     public static synchronized void migrateRealmAtPath(String realmPath, byte[] key, RealmMigration migration,
                                                        boolean autoUpdate) {
         File file = new File(realmPath);
-        migrateRealm(new RealmConfiguration.Builder(file.getParentFile())
+        RealmConfiguration.Builder configuration = new RealmConfiguration.Builder(file.getParentFile())
                 .name(file.getName())
-                .encryptionKey(key)
-                .migration(migration)
-                .create());
+                .migration(migration);
+        if (key != null) {
+            configuration.encryptionKey(key);
+        }
+        migrateRealm(configuration.build());
     }
 
