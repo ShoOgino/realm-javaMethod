@@ -1,7 +1,12 @@
     void sendNotifications() {
-        List<RealmChangeListener> defensiveCopy = new ArrayList<RealmChangeListener>(changeListeners);
-        for (RealmChangeListener listener : defensiveCopy) {
-            listener.onChange();
+        Iterator<WeakReference<RealmChangeListener>> iterator = changeListeners.iterator();
+        while (iterator.hasNext()) {
+            RealmChangeListener listener = iterator.next().get();
+            if (listener == null) {
+                iterator.remove();
+            } else {
+                listener.onChange();
+            }
         }
     }
 
