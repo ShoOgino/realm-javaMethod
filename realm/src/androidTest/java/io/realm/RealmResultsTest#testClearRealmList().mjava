@@ -1,0 +1,29 @@
+    public void testClearRealmList() {
+
+        // Clearing the RealmList outside a transaction? Should not be possible?
+        testRealm.where(AllTypes.class).findFirst().getColumnRealmList().clear();
+
+        // Without the background commit, no crash is occurring
+        final CountDownLatch bgDone = new CountDownLatch(1);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(getContext());
+                realm.beginTransaction();
+                realm.commitTransaction();
+                realm.close();
+                bgDone.countDown();
+            }
+        }).start();
+
+        try {
+            bgDone.await(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        testRealm.beginTransaction();
+        testRealm.where(AllTypes.class).findAll().clear();
+        testRealm.commitTransaction();
+    }
+
