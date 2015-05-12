@@ -1,34 +1,5 @@
     @SuppressWarnings("unchecked")
     private static void initializeRealm(Realm realm) {
-        Class<?> validationClass;
-        try {
-            validationClass = Class.forName("io.realm.ValidationList");
-        } catch (ClassNotFoundException e) {
-            throw new RealmException("Could not find the generated ValidationList class: " + APT_NOT_EXECUTED_MESSAGE);
-        }
-        Method getProxyClassesMethod;
-        try {
-            getProxyClassesMethod = validationClass.getMethod("getProxyClasses");
-        } catch (NoSuchMethodException e) {
-            throw new RealmException("Could not find the getProxyClasses method in the ValidationList class: " + APT_NOT_EXECUTED_MESSAGE);
-        }
-        List<String> proxyClasses;
-        try {
-            proxyClasses = (List<String>) getProxyClassesMethod.invoke(null);
-        } catch (IllegalAccessException e) {
-            throw new RealmException("Could not execute the getProxyClasses method in the ValidationList class: " + APT_NOT_EXECUTED_MESSAGE);
-        } catch (InvocationTargetException e) {
-            throw new RealmException("An exception was thrown in the getProxyClasses method in the ValidationList class: " + APT_NOT_EXECUTED_MESSAGE);
-        }
-
-        // Custom schema overrides any schema already defined
-        if (customSchema.size() > 0) {
-            proxyClasses = new ArrayList<String>();
-            for (Class<? extends RealmObject> clazz : customSchema) {
-                proxyClasses.add(clazz.getName());
-            }
-        }
-
         long version = realm.getVersion();
         boolean commitNeeded = false;
         try {
@@ -38,67 +9,15 @@
                 commitNeeded = true;
             }
 
-            for (String className : proxyClasses) {
-                String[] splitted = className.split("\\.");
-                String modelClassName = splitted[splitted.length - 1];
-                String generatedClassName = getProxyClassName(modelClassName);
-                Class<?> generatedClass;
-                try {
-                    generatedClass = Class.forName(generatedClassName);
-                } catch (ClassNotFoundException e) {
-                    throw new RealmException("Could not find the generated " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
-                }
+            for (Class<? extends RealmObject> modelClass : proxyMediator.getModelClasses()) {
+                String modelClassName = modelClass.getSimpleName();
 
-                // if not versioned, create table
+                // Create and validate table
                 if (version == UNVERSIONED) {
-                    Method initTableMethod;
-                    try {
-                        initTableMethod = generatedClass.getMethod("initTable", new Class[]{ImplicitTransaction.class});
-                    } catch (NoSuchMethodException e) {
-                        throw new RealmException("Could not find the initTable method in the generated " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
-                    }
-                    try {
-                        initTableMethod.invoke(null, realm.transaction);
-                        commitNeeded = true;
-                    } catch (IllegalAccessException e) {
-                        throw new RealmException("Could not execute the initTable method in the " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
-                    } catch (InvocationTargetException e) {
-                        throw new RealmException("An exception was thrown in the initTable method in the " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
-                    }
+                    proxyMediator.createTable(modelClass, realm.transaction);
                 }
-
-                // validate created table
-                Method validateMethod;
-                try {
-                    validateMethod = generatedClass.getMethod("validateTable", new Class[]{ImplicitTransaction.class});
-                } catch (NoSuchMethodException e) {
-                    throw new RealmException("Could not find the validateTable method in the generated " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
-                }
-                try {
-                    validateMethod.invoke(null, realm.transaction);
-                } catch (IllegalAccessException e) {
-                    throw new RealmException("Could not execute the validateTable method in the " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
-                } catch (InvocationTargetException e) {
-                    throw new RealmMigrationNeededException(realm.getPath(), e.getMessage(), e);
-                }
-
-                // Populate the columnIndices table
-                Method columnIndiciesMethod;
-                try {
-                    columnIndiciesMethod = generatedClass.getMethod("getColumnIndices");
-                } catch (NoSuchMethodException e) {
-                    throw new RealmException("Could not find the getColumnIndices method in the generated " + generatedClassName + " class: " + APT_NOT_EXECUTED_MESSAGE);
-                }
-                Map<String,Long> indices;
-                try {
-                    //noinspection unchecked
-                    indices = (Map<String,Long>) columnIndiciesMethod.invoke(null);
-                } catch (IllegalAccessException e) {
-                    throw new RealmException("Could not execute the getColumnIndices method in the generated " + generatedClassName + " class", e);
-                } catch (InvocationTargetException e) {
-                    throw new RealmException("An exception was thrown in the getColumnIndices method in the generated " + generatedClassName + " class", e);
-                }
-                realm.columnIndices.addClass((Class<? extends RealmObject>) generatedClass.getSuperclass(), indices);
+                proxyMediator.validateTable(modelClass, realm.transaction);
+                realm.columnIndices.addClass(modelClass, proxyMediator.getColumnIndices(modelClass));
             }
         } finally {
             if (commitNeeded) {
