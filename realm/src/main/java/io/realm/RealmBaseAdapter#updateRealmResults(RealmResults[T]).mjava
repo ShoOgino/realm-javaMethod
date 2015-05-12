@@ -2,10 +2,20 @@
      * Update the RealmResults associated to the Adapter. Useful when the query has been changed.
      * If the query does not change you might consider using the automaticUpdate feature
      *
-     * @param realmResults the new RealmResults coming from the new query.
+     * @param queryResults the new RealmResults coming from the new query.
      */
-    public void updateRealmResults(RealmResults<T> realmResults) {
-        this.realmResults = realmResults;
+    public void updateRealmResults(RealmResults<T> queryResults) {
+        if (listener != null) {
+            // Making sure that Adapter is refreshed correctly if new RealmResults come from another Realm
+            if (this.realmResults != null) {
+                this.realmResults.getRealm().removeChangeListener(listener);
+            }
+            if (queryResults != null) {
+                queryResults.getRealm().addChangeListener(listener);
+            }
+        }
+
+        this.realmResults = queryResults;
         notifyDataSetChanged();
     }
 
