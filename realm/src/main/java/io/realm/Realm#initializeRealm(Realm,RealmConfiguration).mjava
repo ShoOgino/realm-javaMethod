@@ -8,13 +8,13 @@
                 commitNeeded = true;
                 realm.setVersion(config.getSchemaVersion());
             }
-            for (Class<? extends RealmObject> modelClass : proxyMediator.getModelClasses()) {
+            for (Class<? extends RealmObject> modelClass : realm.proxyMediator.getModelClasses()) {
                 // Create and validate table
                 if (version == UNVERSIONED) {
-                    proxyMediator.createTable(modelClass, realm.transaction);
+                    realm.proxyMediator.createTable(modelClass, realm.transaction);
                 }
-                proxyMediator.validateTable(modelClass, realm.transaction);
-                realm.columnIndices.addClass(modelClass, proxyMediator.getColumnIndices(modelClass));
+                realm.proxyMediator.validateTable(modelClass, realm.transaction);
+                realm.columnIndices.addClass(modelClass, realm.proxyMediator.getColumnIndices(modelClass));
             }
         } finally {
             if (commitNeeded) {

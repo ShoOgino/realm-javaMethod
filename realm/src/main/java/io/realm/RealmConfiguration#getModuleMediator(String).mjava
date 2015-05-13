@@ -1,0 +1,20 @@
+    // Finds the mediator associated with a given module
+    private static RealmProxyMediator getModuleMediator(String canonicalModuleClassName) {
+        String mediatorName = canonicalModuleClassName + "Mediator";
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(mediatorName);
+            Constructor<?> constructor = clazz.getDeclaredConstructors()[0];
+            constructor.setAccessible(true);
+            return (RealmProxyMediator) constructor.newInstance();
+        } catch (ClassNotFoundException e) {
+            throw new RealmException("Could not find " + mediatorName, e);
+        } catch (InvocationTargetException e) {
+            throw new RealmException("Could not create an instance of " + mediatorName, e);
+        } catch (InstantiationException e) {
+            throw new RealmException("Could not create an instance of " + mediatorName, e);
+        } catch (IllegalAccessException e) {
+            throw new RealmException("Could not create an instance of " + mediatorName, e);
+        }
+    }
+

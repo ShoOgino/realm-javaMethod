@@ -1,0 +1,22 @@
+        /**
+         * Replace the existing modules with one or more {@link RealmModule}s. Using this method will replace the
+         * current schema for this Realm with the schema defined by the provided modules.
+         *
+         * @param baseModule
+         * @param additionalModules
+         *
+         * @throws {@link IllegalArgumentException} if any of the modules are {@code null} or doesn't have the
+         * {@link RealmModule} annotation.
+         */
+        public void setModule(Object baseModule, Object... additionalModules) {
+            modules.clear();
+            addModule(baseModule);
+            if (additionalModules != null) {
+                for (int i = 0; i < additionalModules.length; i++) {
+                    Object module = additionalModules[i];
+                    checkModule(module);
+                    addModule(module);
+                }
+            }
+        }
+

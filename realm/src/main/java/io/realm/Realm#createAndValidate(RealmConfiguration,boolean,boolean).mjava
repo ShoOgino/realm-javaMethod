@@ -1,5 +1,4 @@
     private static synchronized Realm createAndValidate(RealmConfiguration config, boolean validateSchema, boolean autoRefresh) {
-        setSchema(config.getSchema());
         byte[] key = config.getEncryptionKey();
         String canonicalPath = config.getPath();
         Map<String, Integer> localRefCount = referenceCount.get();
@@ -28,6 +27,7 @@
         // Create new Realm and cache it. All exception code paths must close the Realm otherwise we risk serving
         // faulty cache data.
         realm = new Realm(canonicalPath, key, autoRefresh);
+        realm.proxyMediator = config.getSchemaMediator();
         realms.put(canonicalPath, realm);
         realmsCache.set(realms);
         localRefCount.put(canonicalPath, references + 1);

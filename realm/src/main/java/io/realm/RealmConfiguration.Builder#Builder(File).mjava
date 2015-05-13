@@ -1,16 +1,12 @@
         /**
          * Create an instance of the Builder for the RealmConfiguration.
-         * The Realm file in the provided folder.
+         * The Realm file will be saved in the provided folder.
+         *
+         * @param folder Folder to save Realm file in. Folder must be writable.
+         *
+         * @throws {@link IllegalArgumentException} if folder doesn't exists or isn't writable.
          */
-        public Builder(File writeableFolder) {
-            if (writeableFolder == null || !writeableFolder.isDirectory()) {
-                throw new IllegalArgumentException(("An existing folder must be provided. " +
-                        "Yours was " + (writeableFolder != null ? writeableFolder.getAbsolutePath() : "null")));
-            }
-            if (!writeableFolder.canWrite()) {
-                throw new IllegalArgumentException("Folder is not writeable: " + writeableFolder.getAbsolutePath());
-            }
-
-            this.folder = writeableFolder;
+        public Builder(File folder) {
+            initializeBuilder(folder);
         }
 
