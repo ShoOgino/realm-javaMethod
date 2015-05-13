@@ -12,13 +12,14 @@
             }
         };
 
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext()).schema(AnnotationTypes.class)
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
                 .schemaVersion(1)
+                .schema(AnnotationTypes.class)
                 .migration(migration)
                 .build();
-
         Realm.deleteRealm(realmConfig);
         Realm.migrateRealm(realmConfig);
+
         realm = Realm.getInstance(realmConfig);
         Table table = realm.getTable(AnnotationTypes.class);
         assertEquals(3, table.getColumnCount());

@@ -11,9 +11,10 @@
                 return 1;
             }
         };
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext()).schema(AnnotationTypes.class)
-                .migration(migration)
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
                 .schemaVersion(1)
+                .schema(AnnotationTypes.class)
+                .migration(migration)
                 .build();
         Realm.deleteRealm(realmConfig);
         Realm.migrateRealm(realmConfig);

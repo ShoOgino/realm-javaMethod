@@ -1,9 +1,7 @@
     public void testStandardSetup() {
-        byte[] key = new byte[64];
-        new Random().nextBytes(key);
-        realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+        RealmConfiguration config = new RealmConfiguration.Builder(getContext())
                 .name("foo.realm")
-                .encryptionKey(key)
+                .encryptionKey(TestHelper.getRandomKey())
                 .schemaVersion(42)
                 .migration(new RealmMigration() {
                     @Override
@@ -11,9 +9,11 @@
                         return 0; // no-op
                     }
                 })
-                .resetRealmBeforeOpening()
                 .deleteRealmIfMigrationNeeded()
-                .build());
+                .build();
+
+        Realm.deleteRealm(config);
+        realm = Realm.getInstance(config);
         assertTrue(realm.getPath().endsWith("foo.realm"));
         assertEquals(42, realm.getVersion());
     }

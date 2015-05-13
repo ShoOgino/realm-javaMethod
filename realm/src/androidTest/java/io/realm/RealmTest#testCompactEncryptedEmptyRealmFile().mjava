@@ -1,12 +1,14 @@
     public void testCompactEncryptedEmptyRealmFile() {
-        RealmConfiguration config = new RealmConfiguration.Builder(getContext())
-                .name("enc.realm").encryptionKey(getRandomKey()).resetRealmBeforeOpening()
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
+                .name("enc.realm")
+                .encryptionKey(TestHelper.getRandomKey())
                 .build();
-        Realm realm = Realm.getInstance(config);
+        Realm.deleteRealm(realmConfig);
+        Realm realm = Realm.getInstance(realmConfig);
         realm.close();
         // TODO: remove try/catch block when compacting encrypted Realms is supported
         try {
-            assertTrue(Realm.compactRealm(config));
+            assertTrue(Realm.compactRealm(realmConfig));
             fail();
         } catch (IllegalArgumentException expected) {
         }

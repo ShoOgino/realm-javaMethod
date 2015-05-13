@@ -1,11 +1,11 @@
     public void testIOSEncryptedRealm() throws IOException {
         TestHelper.prepareDatabaseFromAssets(getContext(),  "ios/0.90.5-alltypes-default-encrypted.realm", REALM_NAME);
-        realm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
-                        .name(REALM_NAME)
-                        .encryptionKey(getIOSKey())
-                        .schema(IOSAllTypes.class, IOSChild.class)
-                        .build()
-        );
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
+                .name(REALM_NAME)
+                .encryptionKey(getIOSKey())
+                .schema(IOSAllTypes.class, IOSChild.class)
+                .build();
+        realm = Realm.getInstance(realmConfig);
 
         IOSAllTypes obj = realm.allObjects(IOSAllTypes.class).first();
         assertFalse(obj.isBoolCol());

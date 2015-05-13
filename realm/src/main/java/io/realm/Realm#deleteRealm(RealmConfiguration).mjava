@@ -1,6 +1,6 @@
     /**
      * Delete the Realm file specified by the given {@link RealmConfiguration} from the filesystem.
-     * The realm must be unused and closed before calling this method.
+     * The Realm must be unused and closed before calling this method.
      *
      * @param configuration A {@link RealmConfiguration}
      * @return false if a file could not be deleted. The failing file will be logged.
@@ -15,11 +15,13 @@
                     "Remember to close() all the instances of the Realm before deleting its file.");
         }
 
+        File realmFolder = configuration.getRealmFolder();
+        String realmFileName = configuration.getRealmFileName();
         List<File> filesToDelete = Arrays.asList(new File(configuration.getPath()),
-                new File(configuration.getRealmFolder(), configuration.getRealmFileName() + ".lock"),
-                new File(configuration.getRealmFolder(), configuration.getRealmFileName() + ".lock_a"),
-                new File(configuration.getRealmFolder(), configuration.getRealmFileName() + ".lock_b"),
-                new File(configuration.getRealmFolder(), configuration.getRealmFileName() + ".log"));
+                new File(realmFolder, realmFileName + ".lock"),
+                new File(realmFolder, realmFileName + ".lock_a"),
+                new File(realmFolder, realmFileName + ".lock_b"),
+                new File(realmFolder, realmFileName + ".log"));
         for (File fileToDelete : filesToDelete) {
             if (fileToDelete.exists()) {
                 boolean deleteResult = fileToDelete.delete();
