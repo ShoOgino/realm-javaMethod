@@ -1,5 +1,5 @@
         /**
-         * Replace the existing modules with one or more {@link RealmModule}s. Using this method will replace the
+         * Replace the existing module(s) with one or more {@link RealmModule}s. Using this method will replace the
          * current schema for this Realm with the schema defined by the provided modules.
          *
          * @param baseModule
@@ -8,7 +8,7 @@
          * @throws {@link IllegalArgumentException} if any of the modules are {@code null} or doesn't have the
          * {@link RealmModule} annotation.
          */
-        public void setModule(Object baseModule, Object... additionalModules) {
+        public Builder setModules(Object baseModule, Object... additionalModules) {
             modules.clear();
             addModule(baseModule);
             if (additionalModules != null) {
@@ -18,5 +18,6 @@
                     addModule(module);
                 }
             }
+            return this;
         }
 
