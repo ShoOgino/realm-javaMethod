@@ -1,9 +1,13 @@
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        if (hasProcessedModules) {
+            return true;
+        }
         RealmVersionChecker updateChecker = RealmVersionChecker.getInstance(processingEnv);
         updateChecker.executeRealmVersionUpdate();
         Utils.initialize(processingEnv);
 
+        // Create all proxy classes
         for (Element classElement : roundEnv.getElementsAnnotatedWith(RealmClass.class)) {
 
             // Check the annotation was applied to a Class
@@ -15,9 +19,8 @@
                 continue;
             }
             Utils.note("Processing class " + metadata.getSimpleClassName());
-            boolean success = metadata.generateMetaData(processingEnv.getMessager());
+            boolean success = metadata.generate();
             if (!success) {
-                done = true;
                 return true; // Abort processing by claiming all annotations
             }
             classesToValidate.add(metadata);
@@ -30,20 +33,9 @@
             } catch (UnsupportedOperationException e) {
                 Utils.error(e.getMessage(), classElement);
             }
-        }
+	    }
 
-        if (!done) {
-            RealmValidationListGenerator validationGenerator = new RealmValidationListGenerator(processingEnv, classesToValidate);
-            RealmJSonImplGenerator jsonGenerator = new RealmJSonImplGenerator(processingEnv, classesToValidate);
-            try {
-                validationGenerator.generate();
-                jsonGenerator.generate();
-                done = true;
-            } catch (IOException e) {
-                Utils.error(e.getMessage());
-            }
-        }
-
-        return true;
+        hasProcessedModules = true;
+        return processModules(roundEnv);
     }
 

@@ -3,15 +3,18 @@
      * Use this method to define the schema as only the classes given here.
      *
      * This class must be called before calling {@link #getInstance(android.content.Context)}
-     *
+     *ø
      * If {@code null} is given as parameter, the Schema is reset to use all known classes.
      *
      */
     @SafeVarargs
     static void setSchema(Class<? extends RealmObject>... schemaClass) {
-        customSchema.clear();
         if (schemaClass != null) {
-            Collections.addAll(customSchema, schemaClass);
+            // Filter default schema
+            proxyMediator = new FilterableMediator(getDefaultMediator(), Arrays.asList(schemaClass));
+        } else if (proxyMediator instanceof FilterableMediator) {
+            // else reset filter if needed
+            proxyMediator = ((FilterableMediator) proxyMediator).getOriginalMediator();
         }
     }
 
