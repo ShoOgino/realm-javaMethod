@@ -4,12 +4,10 @@
      * @param configuration
      */
     public static synchronized void migrateRealm(RealmConfiguration configuration) {
-        Realm realm = Realm.createAndValidate(configuration, false, Looper.myLooper() != null);
-        realm.beginTransaction();
-        realm.setVersion(configuration.getMigration().execute(realm, realm.getVersion()));
-        realm.commitTransaction();
-        realm.close();
-
-        realmsCache.remove();
+        if (configuration.getMigration() == null) {
+            migrateRealm(configuration, new SetVersionNumberMigration(configuration.getSchemaVersion()));
+        } else {
+            migrateRealm(configuration, configuration.getMigration());
+        }
     }
 

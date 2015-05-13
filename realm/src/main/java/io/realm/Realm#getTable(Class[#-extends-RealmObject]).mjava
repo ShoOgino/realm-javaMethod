@@ -1,0 +1,9 @@
+    // Public because of migrations
+    public Table getTable(Class<? extends RealmObject> clazz) {
+        Class<?> superclass = clazz.getSuperclass();
+        if (!superclass.equals(RealmObject.class)) {
+            clazz = (Class<? extends RealmObject>) superclass;
+        }
+        return transaction.getTable(proxyMediator.getTableName(clazz));
+    }
+

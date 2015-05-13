@@ -1,6 +1,5 @@
     public void testSetAnnotations() {
-        Realm.setSchema(AnnotationTypes.class);
-        Realm.migrateRealmAtPath(new File(getContext().getFilesDir(), "default.realm").getAbsolutePath(), new RealmMigration() {
+        RealmMigration migration = new RealmMigration() {
             @Override
             public long execute(Realm realm, long version) {
                 Table table = realm.getTable(AnnotationTypes.class);
@@ -11,9 +10,16 @@
                 table.addColumn(ColumnType.STRING, "notIndexString");
                 return 1;
             }
-        });
+        };
 
-        realm = Realm.getInstance(getContext());
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext()).schema(AnnotationTypes.class)
+                .schemaVersion(1)
+                .migration(migration)
+                .build();
+
+        Realm.deleteRealm(realmConfig);
+        Realm.migrateRealm(realmConfig);
+        realm = Realm.getInstance(realmConfig);
         Table table = realm.getTable(AnnotationTypes.class);
         assertEquals(3, table.getColumnCount());
         assertTrue(table.hasPrimaryKey());

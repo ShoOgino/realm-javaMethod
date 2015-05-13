@@ -5,11 +5,18 @@
         String NEW_REALM = "new.realm";
 
         // Migrate old Realm to proper schema
-        Realm.deleteRealmFile(getContext(), MIGRATED_REALM);
-        Realm.setSchema(AllTypes.class);
-        Realm migratedRealm = Realm.getInstance(getContext(), MIGRATED_REALM);
-        migratedRealm.close();
-        Realm.migrateRealmAtPath(new File(getContext().getFilesDir(), MIGRATED_REALM).getAbsolutePath(), new RealmMigration() {
+
+        // V1 config
+        Realm oldRealm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                .name(MIGRATED_REALM)
+                .schema(AllTypes.class)
+                .schemaVersion(1)
+                .deleteRealmBeforeOpening()
+                .build());
+        oldRealm.close();
+
+        // V2 config
+        RealmMigration migration = new RealmMigration() {
             @Override
             public long execute(Realm realm, long version) {
                 Table languageTable = realm.getTable(FieldOrder.class);
@@ -20,19 +27,22 @@
 
                 return version + 1;
             }
-        });
+        };
 
-        // Open migrated Realm and populate column indices based on migration ordering.
-        Realm.setSchema(AllTypes.class, FieldOrder.class);
-        migratedRealm = Realm.getInstance(getContext(), MIGRATED_REALM);
+        oldRealm = Realm.getInstance(new RealmConfiguration.Builder(getContext())
+                .name(MIGRATED_REALM)
+                .schema(AllTypes.class, FieldOrder.class)
+                .schemaVersion(2)
+                .migration(migration)
+                .build());
 
         // Create new Realm which will cause column indices to be recalculated based on the order in the java file
         // instead of the migration
-        Realm.deleteRealmFile(getContext(), NEW_REALM);
-        Realm newRealm = Realm.getInstance(getContext(), NEW_REALM);
+        Realm newRealm = Realm.getInstance(new RealmConfiguration.Builder(getContext()).name(NEW_REALM).schemaVersion(2).build());
         newRealm.close();
 
         // Try to query migrated realm. With local column indices this will work. With global it will fail.
-        assertEquals(0, migratedRealm.where(FieldOrder.class).equalTo("field1", true).findAll().size());
+        assertEquals(0, oldRealm.where(FieldOrder.class).equalTo("field1", true).findAll().size());
+        oldRealm.close();
     }
 

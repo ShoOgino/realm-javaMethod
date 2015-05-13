@@ -9,15 +9,17 @@
      *
      * @param configuration a {@link RealmConfiguration} pointing to a Realm file.
      * @return true if successful, false if any file operation failed
+     *
+     * @throws java.lang.IllegalStateException if trying to compact a Realm that is already open.
      */
     public static boolean compactRealm(RealmConfiguration configuration) {
         if (configuration.getEncryptionKey() != null) {
             throw new IllegalArgumentException("Cannot currently compact an encrypted Realm.");
         }
 
-        File realmFile = new File(configuration.getRealmDir(), configuration.getRealmFileName());
-        String canonicalPath = getCanonicalPath(realmFile);
-        if (openRealms.get(canonicalPath).get() > 0) {
+        String canonicalPath = configuration.getPath();
+        AtomicInteger openInstances = openRealms.get(canonicalPath);
+        if (openInstances != null && openInstances.get() > 0) {
             throw new IllegalStateException("Cannot compact an open Realm");
         }
         SharedGroup sharedGroup = null;

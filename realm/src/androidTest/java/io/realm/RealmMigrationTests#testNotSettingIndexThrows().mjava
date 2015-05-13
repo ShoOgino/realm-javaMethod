@@ -1,6 +1,5 @@
     public void testNotSettingIndexThrows() {
-        Realm.setSchema(AnnotationTypes.class);
-        Realm.migrateRealmAtPath(new File(getContext().getFilesDir(), "default.realm").getAbsolutePath(), new RealmMigration() {
+        RealmMigration migration = new RealmMigration() {
             @Override
             public long execute(Realm realm, long version) {
                 Table table = realm.getTable(AnnotationTypes.class);
@@ -11,10 +10,15 @@
                 // Forget to set @Index
                 return 1;
             }
-        });
+        };
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
+                .schema(AnnotationTypes.class).migration(migration).schemaVersion(1)
+                .build();
+        Realm.deleteRealm(realmConfig);
+        Realm.migrateRealm(realmConfig);
 
         try {
-            realm = Realm.getInstance(getContext());
+            realm = Realm.getInstance(realmConfig);
             fail();
         } catch (RealmMigrationNeededException expected) {
         }
