@@ -1,4 +1,4 @@
-    // Finds the module (if there is one
+    // Finds the default module (if there is one)
     private static Object getDefaultModule() {
         String moduleName = "io.realm.DefaultRealmModule";
         Class<?> clazz;
@@ -8,7 +8,7 @@
             constructor.setAccessible(true);
             return constructor.newInstance();
         } catch (ClassNotFoundException e) {
-            throw new RealmException("Could not find " + moduleName, e);
+            return null;
         } catch (InvocationTargetException e) {
             throw new RealmException("Could not create an instance of " + moduleName, e);
         } catch (InstantiationException e) {
