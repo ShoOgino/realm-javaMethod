@@ -9,9 +9,12 @@
      */
     @SafeVarargs
     static void setSchema(Class<? extends RealmObject>... schemaClass) {
-        customSchema.clear();
         if (schemaClass != null) {
-            Collections.addAll(customSchema, schemaClass);
+            // Filter default schema
+            proxyMediator = new FilterableMediator(getDefaultMediator(), Arrays.asList(schemaClass));
+        } else if (proxyMediator instanceof FilterableMediator) {
+            // else reset filter if needed
+            proxyMediator = ((FilterableMediator) proxyMediator).getOriginalMediator();
         }
     }
 

@@ -1,18 +1,13 @@
     public void testCreateOrUpdateJsonStream_ignoreUnsetProperties() throws IOException {
         testRealm.beginTransaction();
-        AllTypesPrimaryKey obj = testRealm.createOrUpdateObjectFromJson(
-                AllTypesPrimaryKey.class, strToStream("{ \"columnLong\":1, \"columnString\": \"foo\" }")
-        );
-        obj.setColumnBoolean(true);
+        testRealm.createOrUpdateAllFromJson(AllTypesPrimaryKey.class, loadJsonFromAssets("list_alltypes_primarykey.json"));
         testRealm.commitTransaction();
 
+        // No-op as no properties should be updated
         testRealm.beginTransaction();
-        obj = testRealm.createOrUpdateObjectFromJson(
-                AllTypesPrimaryKey.class, strToStream("{ \"columnLong\":1, \"columnString\": \"bar\" }")
-        );
+        testRealm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, TestHelper.stringToStream("{ \"columnLong\":1 }"));
         testRealm.commitTransaction();
 
-        assertTrue(obj.isColumnBoolean());
-        assertEquals("bar", obj.getColumnString());
+        assertAllTypesPrimaryKeyUpdated();
     }
 
