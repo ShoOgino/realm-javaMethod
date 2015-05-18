@@ -31,12 +31,13 @@
             }
         });
 
-        // Wait until the looper is started
+        // Wait until the looper in the background thread is started
         while (!isReady.get()) {
             Thread.sleep(5);
         }
         Thread.sleep(100); 
 
+        // Trigger OnRealmChanged on background thread
         Realm realm = Realm.getInstance(getContext());
         realm.beginTransaction();
         Dog dog = realm.createObject(Dog.class);
