@@ -1,5 +1,6 @@
     // Check that all methods work correctly on a empty RealmList
-    private void testMethodsOnEmptyList(RealmList<Dog> list) {
+    private void checkMethodsOnEmptyList(Realm realm, RealmList<Dog> list) {
+        realm.beginTransaction();
         for (int i = 0; i < 4; i++) {
             try {
                 switch(i) {
@@ -13,6 +14,7 @@
             } catch (RealmException expected) {
             }
         }
+        realm.cancelTransaction();
 
         assertEquals(0, list.size());
         assertNull(list.first());
