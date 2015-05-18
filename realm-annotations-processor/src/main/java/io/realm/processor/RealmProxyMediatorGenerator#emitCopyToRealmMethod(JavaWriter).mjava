@@ -1,0 +1,21 @@
+    private void emitCopyToRealmMethod(JavaWriter writer) throws IOException {
+        writer.emitAnnotation("Override");
+        writer.beginMethod(
+                "<E extends RealmObject> E",
+                "copyOrUpdate",
+                EnumSet.of(Modifier.PUBLIC),
+                "Realm", "realm", "E", "obj", "boolean", "update", "Map<RealmObject, RealmObjectProxy>",  "cache"
+        );
+
+        writer.emitStatement("Class<E> clazz = (Class<E>) ((obj instanceof RealmObjectProxy) ? obj.getClass().getSuperclass() : obj.getClass())");
+        writer.emitEmptyLine();
+        emitMediatorSwitch(new ProxySwitchStatement() {
+            @Override
+            public void emitStatement(int i, JavaWriter writer) throws IOException {
+                writer.emitStatement("return (E) %s.copyOrUpdate(realm, (%s) obj, update, cache)", proxyClasses.get(i), simpleModelClasses.get(i));
+            }
+        }, writer, false);
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+

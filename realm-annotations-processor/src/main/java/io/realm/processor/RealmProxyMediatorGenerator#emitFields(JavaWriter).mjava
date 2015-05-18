@@ -1,0 +1,12 @@
+    private void emitFields(JavaWriter writer) throws IOException {
+        writer.emitField("List<Class<? extends RealmObject>>", "MODEL_CLASSES", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL));
+        writer.beginInitializer(true);
+        writer.emitStatement("List<Class<? extends RealmObject>> modelClasses = new ArrayList<Class<? extends RealmObject>>()");
+        for (String clazz : simpleModelClasses) {
+            writer.emitStatement("modelClasses.add(%s.class)", clazz);
+        }
+        writer.emitStatement("MODEL_CLASSES = Collections.unmodifiableList(modelClasses)");
+        writer.endInitializer();
+        writer.emitEmptyLine();
+    }
+

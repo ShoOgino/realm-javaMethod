@@ -1,0 +1,11 @@
+    @Override
+    public <E extends RealmObject> E newInstance(Class<E> clazz) {
+        checkClass(clazz);
+
+        if (clazz.equals(AllTypes.class)) {
+            return (E) new AllTypesRealmProxy();
+        } else {
+            throw getMissingProxyClassException(clazz);
+        }
+    }
+
