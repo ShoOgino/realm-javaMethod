@@ -1,0 +1,15 @@
+    public void testImmediateNotificationsOnSameThread() {
+        final AtomicBoolean success = new AtomicBoolean(false);
+        realm = Realm.getInstance(getContext());
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                success.set(true);
+            }
+        });
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+        assertTrue(success.get());
+    }
+

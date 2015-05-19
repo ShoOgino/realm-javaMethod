@@ -1,5 +1,6 @@
     public void testMoveOutOfBoundsHigherThrows() {
         Owner owner = testRealm.where(Owner.class).findFirst();
+        testRealm.beginTransaction();
         try {
             int lastIndex = TEST_OBJECTS - 1;
             int outOfBoundsIndex = TEST_OBJECTS;
@@ -7,6 +8,8 @@
             fail("Indexes >= size() should throw an exception");
         } catch (IndexOutOfBoundsException ignored) {
             ignored.printStackTrace();
+        } finally {
+            testRealm.cancelTransaction();
         }
     }
 

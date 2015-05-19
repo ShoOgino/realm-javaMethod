@@ -7,11 +7,15 @@
             AllTypes allTypes = testRealm.createObject(AllTypes.class);
             allTypes.setColumnBoolean((i % 2) == 0);
             allTypes.setColumnBinary(new byte[]{1, 2, 3});
-            allTypes.setColumnDate(new Date((long) 1000*i));
+            allTypes.setColumnDate(new Date((long) 1000 * i));
             allTypes.setColumnDouble(3.1415 + i);
             allTypes.setColumnFloat(1.234567f + i);
             allTypes.setColumnString("test data " + i);
             allTypes.setColumnLong(i);
+            Dog d = testRealm.createObject(Dog.class);
+            d.setName("Foo " + i);
+            allTypes.setColumnRealmObject(d);
+            allTypes.getColumnRealmList().add(d);
             NonLatinFieldNames nonLatinFieldNames = testRealm.createObject(NonLatinFieldNames.class);
             nonLatinFieldNames.set델타(i);
             nonLatinFieldNames.setΔέλτα(i);
