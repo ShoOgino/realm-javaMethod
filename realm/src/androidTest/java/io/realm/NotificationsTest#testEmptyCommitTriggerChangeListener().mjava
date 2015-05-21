@@ -1,12 +1,13 @@
     public void testEmptyCommitTriggerChangeListener() {
         final AtomicBoolean success = new AtomicBoolean(false);
-        realm = Realm.getInstance(getContext());
-        realm.addChangeListener(new RealmChangeListener() {
+        final RealmChangeListener listener = new RealmChangeListener() {
             @Override
             public void onChange() {
                 success.set(true);
             }
-        });
+        };
+        realm = Realm.getInstance(getContext());
+        realm.addChangeListener(listener);
         realm.beginTransaction();
         realm.commitTransaction();
         assertTrue(success.get());
