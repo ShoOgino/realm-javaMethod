@@ -3,6 +3,12 @@
         final AtomicBoolean isReady = new AtomicBoolean(false);
         final Looper[] looper = new Looper[1];
         final AtomicBoolean isRealmOpen = new AtomicBoolean(true);
+        final RealmChangeListener listener = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                counter.incrementAndGet();
+            }
+        };
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
@@ -13,12 +19,7 @@
                     Looper.prepare();
                     looper[0] = Looper.myLooper();
                     realm = Realm.getInstance(getContext());
-                    realm.addChangeListener(new RealmChangeListener() {
-                        @Override
-                        public void onChange() {
-                            counter.incrementAndGet();
-                        }
-                    });
+                    realm.addChangeListener(listener);
                     isReady.set(true);
                     Looper.loop();
                 } finally {
@@ -31,12 +32,13 @@
             }
         });
 
-        // Wait until the looper is started
+        // Wait until the looper in the background thread is started
         while (!isReady.get()) {
             Thread.sleep(5);
         }
         Thread.sleep(100); 
 
+        // Trigger OnRealmChanged on background thread
         Realm realm = Realm.getInstance(getContext());
         realm.beginTransaction();
         Dog dog = realm.createObject(Dog.class);

@@ -6,6 +6,13 @@
      */
     public void addChangeListener(RealmChangeListener listener) {
         checkIfValid();
+        for (WeakReference<RealmChangeListener> ref : changeListeners) {
+            if (ref.get() == listener) {
+                // It has already been added before
+                return;
+            }
+        }
+
         changeListeners.add(new WeakReference<RealmChangeListener>(listener));
     }
 

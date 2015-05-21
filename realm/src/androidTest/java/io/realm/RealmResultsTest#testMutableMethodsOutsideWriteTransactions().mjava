@@ -1,0 +1,9 @@
+    // Test that all methods that require a write transaction (ie. any function that mutates Realm data)
+    public void testMutableMethodsOutsideWriteTransactions() {
+        RealmResults<AllTypes> result = testRealm.where(AllTypes.class).findAll();
+
+        try { result.clear();       fail(); } catch (IllegalStateException expected) {}
+        try { result.remove(0);     fail(); } catch (IllegalStateException expected) {}
+        try { result.removeLast();  fail(); } catch (IllegalStateException expected) {}
+    }
+
