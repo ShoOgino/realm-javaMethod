@@ -1,12 +1,16 @@
     void sendNotifications() {
         Iterator<WeakReference<RealmChangeListener>> iterator = changeListeners.iterator();
+        List<WeakReference<RealmChangeListener>> toRemoveList =
+                new ArrayList<WeakReference<RealmChangeListener>>(changeListeners.size());
         while (iterator.hasNext()) {
-            RealmChangeListener listener = iterator.next().get();
+            WeakReference<RealmChangeListener> weakRef = iterator.next();
+            RealmChangeListener listener = weakRef.get();
             if (listener == null) {
-                iterator.remove();
+                toRemoveList.add(weakRef);
             } else {
                 listener.onChange();
             }
         }
+        changeListeners.removeAll(toRemoveList);
     }
 

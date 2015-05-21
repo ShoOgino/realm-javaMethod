@@ -1,0 +1,25 @@
+    public void testWeakReferenceListener() throws InterruptedException {
+        final AtomicInteger counter = new AtomicInteger(0);
+        realm = Realm.getInstance(getContext());
+        RealmChangeListener listener = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                counter.incrementAndGet();
+            }
+        };
+        realm.addChangeListener(listener);
+
+        // There is no guaranteed way to release the WeakReference,
+        // just clear it.
+        for (WeakReference<RealmChangeListener> weakRef: realm.getChangeListeners()) {
+            weakRef.clear();
+        }
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        assertEquals(0, counter.get());
+        assertEquals(0, realm.getChangeListeners().size());
+    }
+
