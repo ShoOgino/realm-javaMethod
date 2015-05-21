@@ -1,0 +1,47 @@
+    public void testAddRemoveListenerConcurrency() {
+        final AtomicInteger counter1 = new AtomicInteger(0);
+        final AtomicInteger counter2 = new AtomicInteger(0);
+        final AtomicInteger counter3 = new AtomicInteger(0);
+
+        // At least we need 2 listeners existing in the list to make sure
+        // the iterator.next get called
+        final RealmChangeListener listener1 = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                counter1.incrementAndGet();
+            }
+        };
+
+        final RealmChangeListener listener2 = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                counter2.incrementAndGet();
+                realm.addChangeListener(listener1);
+            }
+        };
+
+        RealmChangeListener listener3 = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                counter3.incrementAndGet();
+                realm.removeChangeListener(this);
+            }
+        };
+
+        realm = Realm.getInstance(getContext());
+        realm.addChangeListener(listener2);
+        realm.addChangeListener(listener3);
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        assertEquals(1, counter1.get());
+        assertEquals(2, counter2.get());
+        assertEquals(1, counter3.get());
+    }
+

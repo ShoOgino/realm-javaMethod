@@ -6,13 +6,16 @@
      */
     public void removeChangeListener(RealmChangeListener listener) {
         checkIfValid();
-        Iterator<WeakReference<RealmChangeListener>> iterator = changeListeners.iterator();
-        while (iterator.hasNext()) {
-            if (listener == iterator.next().get()) {
-                iterator.remove();
+        WeakReference<RealmChangeListener> weakRefToRemove = null;
+        for (WeakReference<RealmChangeListener> weakRef : changeListeners) {
+            if (listener == weakRef.get()) {
+                weakRefToRemove = weakRef;
                 // There won't be duplicated entries, checking is done when adding
                 break;
             }
+        }
+        if (weakRefToRemove != null) {
+            changeListeners.remove(weakRefToRemove);
         }
     }
 
