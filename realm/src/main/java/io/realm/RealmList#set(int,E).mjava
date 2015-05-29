@@ -1,13 +1,25 @@
     /**
-     * {@inheritDoc}
+     * Replaces the element at the specified location in this list with the
+     * specified object.
+     * <p>
+     * <b>Un-managed RealmLists:</b> It is possible to add both managed and un-managed objects. If adding managed
+     * objects to a un-managed RealmList they will not be copied to the Realm again if using
+     * {@link Realm#copyToRealm(RealmObject)} afterwards.
+     * <p>
+     * <b>Managed RealmLists:</b> It is possible to add un-managed objects to a RealmList that is already managed. In
+     * that case the object will transparently be copied to Realm using {@link Realm#copyToRealm(RealmObject)}
+     * or {@link Realm#copyToRealmOrUpdate(RealmObject)} if it has a primary key.
+     *
+     * @param location the index at which to put the specified object.
+     * @param object the object to add.
+     * @return the previous element at the index.
+     * @throws IndexOutOfBoundsException if {@code location < 0 || location >= size()}
      */
     @Override
     public E set(int location, E object) {
         checkValidObject(object);
         if (managedMode) {
-            if (object.row == null) {
-                throw new RealmException(ONLY_IN_MANAGED_MODE_MESSAGE);
-            }
+            object = copyToRealmIfNeeded(object);
             view.set(location, object.row.getIndex());
         } else {
             nonManagedList.set(location, object);

@@ -1,10 +1,22 @@
     /**
-     * {@inheritDoc}
+     * Adds the specified object at the end of this List.
+     * <p>
+     * <b>Un-managed RealmLists:</b> It is possible to add both managed and un-managed objects. If adding managed
+     * objects to a un-managed RealmList they will not be copied to the Realm again if using
+     * {@link Realm#copyToRealm(RealmObject)} afterwards.
+     * <p>
+     * <b>Managed RealmLists:</b> It is possible to add un-managed objects to a RealmList that is already managed. In
+     * that case the object will transparently be copied to Realm using {@link Realm#copyToRealm(RealmObject)}
+     * or {@link Realm#copyToRealmOrUpdate(RealmObject)} if it has a primary key.
+     *
+     * @param object the object to add.
+     * @return true
      */
     @Override
     public boolean add(E object) {
         checkValidObject(object);
         if (managedMode) {
+            object = copyToRealmIfNeeded(object);
             view.add(object.row.getIndex());
         } else {
             nonManagedList.add(object);
