@@ -21,12 +21,11 @@
                     ") does not match the number of columns in the table (" +
                     String.valueOf(columns) + ").");
         }
+
         // Verify type of 'values'
-        ColumnType colTypes[] = new ColumnType[columns];
         for (int columnIndex = 0; columnIndex < columns; columnIndex++) {
             Object value = values[columnIndex];
             ColumnType colType = getColumnType(columnIndex);
-            colTypes[columnIndex] = colType;
             if (!colType.matchObject(value)) {
                 throw new IllegalArgumentException("Invalid argument no " + String.valueOf(1 + columnIndex) +
                         ". Expected a value compatible with column type " + colType + ", but got " + value.getClass() + ".");
