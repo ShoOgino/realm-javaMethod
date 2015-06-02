@@ -2,10 +2,13 @@
         realm = Realm.getInstance(new RealmConfiguration.Builder(getContext()).schemaVersion(42).build());
         realm.close();
 
-        try {
-            Realm.getInstance(new RealmConfiguration.Builder(getContext()).schemaVersion(1).build());
-            fail();
-        } catch (IllegalArgumentException expected) {
+        int[] wrongVersions = new int[] { 0, 1, 41 };
+        for (int version : wrongVersions) {
+            try {
+                Realm.getInstance(new RealmConfiguration.Builder(getContext()).schemaVersion(version).build());
+                fail("Version " + version + " should throw an exception");
+            } catch (IllegalArgumentException expected) {
+            }
         }
     }
 
