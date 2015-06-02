@@ -1,47 +1,24 @@
-    public boolean equals(Object second) {
-        if (second == null)
-            return false;
-        if (!(second instanceof Mixed))
-            return false;
-        Mixed secondMixed = (Mixed) second;
-        if (value == null) {
-            if (secondMixed.value == null) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        if (!getType().equals(secondMixed.getType())) {
-            return false;
-        }
-        if (value instanceof byte[]) {
-            if (!(secondMixed.value instanceof byte[])) {
-                return false;
-            }
-            byte[] firstBytes = (byte[]) value;
-            byte[] secondBytes = (byte[]) secondMixed.value;
-            if (firstBytes.length != secondBytes.length) {
-                return false;
-            }
-            for (int i = 0; i < firstBytes.length; i++) {
-                if (firstBytes[i] != secondBytes[i]) {
-                    return false;
-                }
-            }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Mixed mixed = (Mixed) obj;
+
+        if (value.getClass() != mixed.value.getClass()) {
+            return false;
+        }
+
+        if (value instanceof byte[]) {
+            return Arrays.equals((byte[]) value, (byte[]) mixed.value);
         }
         if (value instanceof ByteBuffer) {
-            ByteBuffer firstByteBuffer = (ByteBuffer) value;
-            ByteBuffer secondByteBuffer = (ByteBuffer) secondMixed.value;
-            if (firstByteBuffer.capacity() != secondByteBuffer.capacity()) {
-                return false;
-            }
-            for (int i = 0; i < firstByteBuffer.capacity(); i++) {
-                if (firstByteBuffer.get(i) != secondByteBuffer.get(i))
-                    return false;
-            }
-            return true;
+            return ((ByteBuffer) value).compareTo((ByteBuffer) mixed.value) == 0;
         }
-        return this.value.equals(secondMixed.value);
+        return value.equals(mixed.value);
     }
 
