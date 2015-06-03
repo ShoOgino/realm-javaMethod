@@ -3,7 +3,7 @@
         Class<E> clazz = (Class<E>) ((obj instanceof RealmObjectProxy) ? obj.getClass().getSuperclass() : obj.getClass());
 
         if (clazz.equals(AllTypes.class)) {
-            return (E) AllTypesRealmProxy.copyOrUpdate(realm, (AllTypes) obj, update, cache);
+            return clazz.cast(AllTypesRealmProxy.copyOrUpdate(realm, (AllTypes) obj, update, cache));
         } else {
             throw getMissingProxyClassException(clazz);
         }
