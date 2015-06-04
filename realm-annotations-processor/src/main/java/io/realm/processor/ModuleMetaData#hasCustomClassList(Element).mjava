@@ -1,0 +1,13 @@
+    // Work around for asking for a Class primitive array which would otherwise throw a TypeMirrorException
+    // https://community.oracle.com/thread/1184190
+    private boolean hasCustomClassList(Element classElement) {
+        AnnotationMirror annotationMirror = getAnnotationMirror(classElement);
+        AnnotationValue annotationValue = getAnnotationValue(annotationMirror);
+        if (annotationValue == null) {
+            return false;
+        } else {
+            List<? extends AnnotationValue> moduleClasses = (List<? extends AnnotationValue>) annotationValue.getValue();
+            return moduleClasses.size() > 0;
+        }
+    }
+

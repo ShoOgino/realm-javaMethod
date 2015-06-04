@@ -1,4 +1,6 @@
     /**
+     * Deprecated: Use {@link #deleteRealm(RealmConfiguration)} instead.
+     *
      * Delete the Realm file from the filesystem for a custom named Realm.
      * The Realm must be unused and closed before calling this method.
      *
@@ -8,7 +10,11 @@
      *
      * @throws java.lang.IllegalStateException if trying to delete a Realm that is already open.
      */
+    @Deprecated
     public static boolean deleteRealmFile(Context context, String fileName) {
-        return deleteRealmFile(new File(context.getFilesDir(), fileName));
+        return deleteRealm(new RealmConfiguration.Builder(context)
+                        .name(fileName)
+                        .build()
+        );
     }
 

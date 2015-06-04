@@ -1,6 +1,5 @@
     public void testNotSettingPrimaryKeyThrows() {
-        Realm.setSchema(AnnotationTypes.class);
-        Realm.migrateRealmAtPath(new File(getContext().getFilesDir(), "default.realm").getAbsolutePath(), new RealmMigration() {
+        RealmMigration migration = new RealmMigration() {
             @Override
             public long execute(Realm realm, long version) {
                 Table table = realm.getTable(AnnotationTypes.class);
@@ -11,10 +10,17 @@
                 table.addColumn(ColumnType.STRING, "notIndexString");
                 return 1;
             }
-        });
+        };
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
+                .schemaVersion(1)
+                .schema(AnnotationTypes.class)
+                .migration(migration)
+                .build();
+        Realm.deleteRealm(realmConfig);
+        Realm.migrateRealm(realmConfig);
 
         try {
-            realm = Realm.getInstance(getContext());
+            realm = Realm.getInstance(realmConfig);
             fail();
         } catch (RealmMigrationNeededException expected) {
         }
