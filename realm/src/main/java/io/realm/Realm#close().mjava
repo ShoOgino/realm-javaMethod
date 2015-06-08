@@ -1,7 +1,7 @@
     /**
      * Closes the Realm instance and all its resources.
      * <p>
-     * It's important to always remember to close Realm instances when you're done with it in order 
+     * It's important to always remember to close Realm instances when you're done with it in order
      * not to leak memory, file descriptors or grow the size of Realm file out of measure.
      */
     @Override
@@ -16,7 +16,9 @@
             sharedGroup.close();
             sharedGroup = null;
             AtomicInteger counter = openRealms.get(canonicalPath);
-            counter.decrementAndGet();
+            if (counter.decrementAndGet() == 0) {
+                openRealms.remove(canonicalPath);
+            }
         }
 
         int refCount = references - 1;

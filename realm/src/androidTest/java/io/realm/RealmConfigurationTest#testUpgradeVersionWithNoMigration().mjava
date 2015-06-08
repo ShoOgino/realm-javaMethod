@@ -1,0 +1,9 @@
+    public void testUpgradeVersionWithNoMigration() {
+        realm = Realm.getInstance(defaultConfig);
+        assertEquals(0, realm.getVersion());
+        realm.close();
+
+        // Version upgrades should happen automatically if possible
+        realm = Realm.getInstance(new RealmConfiguration.Builder(getContext()).schemaVersion(42).build());
+    }
+

@@ -1,11 +1,13 @@
+    @Deprecated
     public static synchronized void migrateRealmAtPath(String realmPath, byte[] key, RealmMigration migration,
-                                            boolean autoUpdate) {
-        Realm realm = Realm.createAndValidate(realmPath, key, false, autoUpdate);
-        realm.beginTransaction();
-        realm.setVersion(migration.execute(realm, realm.getVersion()));
-        realm.commitTransaction();
-        realm.close();
-
-        realmsCache.remove();
+                                                       boolean autoUpdate) {
+        File file = new File(realmPath);
+        RealmConfiguration.Builder configuration = new RealmConfiguration.Builder(file.getParentFile())
+                .name(file.getName())
+                .migration(migration);
+        if (key != null) {
+            configuration.encryptionKey(key);
+        }
+        migrateRealm(configuration.build());
     }
 

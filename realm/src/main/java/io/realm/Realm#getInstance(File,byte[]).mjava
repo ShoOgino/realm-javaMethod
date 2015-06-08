@@ -12,8 +12,13 @@
      * @throws RealmIOException              Error when accessing underlying file
      * @throws RealmException                Other errors
      */
+    @Deprecated
     @SuppressWarnings("UnusedDeclaration")
     public static Realm getInstance(File writeableFolder, byte[] key) {
-        return Realm.create(writeableFolder, DEFAULT_REALM_NAME, key);
+        return create(new RealmConfiguration.Builder(writeableFolder)
+                        .name(DEFAULT_REALM_NAME)
+                        .encryptionKey(key)
+                        .build()
+        );
     }
 
