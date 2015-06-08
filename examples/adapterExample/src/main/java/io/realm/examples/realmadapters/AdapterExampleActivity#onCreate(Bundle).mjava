@@ -3,9 +3,10 @@
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
 
-        Realm.deleteRealmFile(this);
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this).build();
+        Realm.deleteRealm(realmConfig);
+        realm = Realm.getInstance(realmConfig);
 
-        realm = Realm.getInstance(this);
         RealmResults<TimeStamp> timeStamps = realm.where(TimeStamp.class).findAll();
         final MyAdapter adapter = new MyAdapter(this, R.id.listView, timeStamps, true);
         ListView listView = (ListView) findViewById(R.id.listView);
