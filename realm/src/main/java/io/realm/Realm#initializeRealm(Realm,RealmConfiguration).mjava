@@ -1,0 +1,27 @@
+    @SuppressWarnings("unchecked")
+    private static void initializeRealm(Realm realm, RealmConfiguration config) {
+        long version = realm.getVersion();
+        boolean commitNeeded = false;
+        try {
+            realm.beginTransaction();
+            if (version == UNVERSIONED) {
+                commitNeeded = true;
+                realm.setVersion(config.getSchemaVersion());
+            }
+            for (Class<? extends RealmObject> modelClass : realm.proxyMediator.getModelClasses()) {
+                // Create and validate table
+                if (version == UNVERSIONED) {
+                    realm.proxyMediator.createTable(modelClass, realm.transaction);
+                }
+                realm.proxyMediator.validateTable(modelClass, realm.transaction);
+                realm.columnIndices.addClass(modelClass, realm.proxyMediator.getColumnIndices(modelClass));
+            }
+        } finally {
+            if (commitNeeded) {
+                realm.commitTransaction();
+            } else {
+                realm.cancelTransaction();
+            }
+        }
+    }
+

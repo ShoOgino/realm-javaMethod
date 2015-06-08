@@ -1,8 +1,5 @@
     // The constructor in private to enforce the use of the static one
     private Realm(String canonicalPath, byte[] key, boolean autoRefresh) {
-        if (key != null && key.length != 64) {
-            throw new IllegalArgumentException(INVALID_KEY_MESSAGE);
-        }
         this.sharedGroup = new SharedGroup(canonicalPath, true, key);
         this.transaction = sharedGroup.beginImplicitTransaction();
         this.canonicalPath = canonicalPath;

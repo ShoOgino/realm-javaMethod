@@ -1,0 +1,61 @@
+    private static synchronized Realm createAndValidate(RealmConfiguration config, boolean validateSchema, boolean autoRefresh) {
+        byte[] key = config.getEncryptionKey();
+        String canonicalPath = config.getPath();
+        Map<String, Integer> localRefCount = referenceCount.get();
+        Integer references = localRefCount.get(canonicalPath);
+        if (references == null) {
+            references = 0;
+        }
+        Map<String, Realm> realms = realmsCache.get();
+        Realm realm = realms.get(canonicalPath);
+        if (realm != null) {
+            if (!Arrays.equals(realm.key, key)) {
+                throw new IllegalStateException(DIFFERENT_KEY_MESSAGE);
+            }
+            localRefCount.put(canonicalPath, references + 1);
+            return realm;
+        }
+
+        // Create new Realm and cache it. All exception code paths must close the Realm otherwise we risk serving
+        // faulty cache data.
+        realm = new Realm(canonicalPath, key, autoRefresh);
+        realm.proxyMediator = config.getSchemaMediator();
+        realms.put(canonicalPath, realm);
+        realmsCache.set(realms);
+        localRefCount.put(canonicalPath, references + 1);
+
+        // Increment global reference counter
+        if (references == 0) {
+            AtomicInteger counter = openRealms.get(canonicalPath);
+            if (counter == null) {
+                openRealms.put(canonicalPath, new AtomicInteger(1));
+            } else {
+                counter.incrementAndGet();
+            }
+        }
+
+        // Check versions of Realm
+        long currentVersion = realm.getVersion();
+        long requiredVersion = config.getSchemaVersion();
+        if (currentVersion != UNVERSIONED && currentVersion < requiredVersion && validateSchema) {
+            realm.close();
+            throw new RealmMigrationNeededException(canonicalPath, String.format("Realm on disc need to migrate from v%s to v%s", currentVersion, requiredVersion));
+        }
+        if (currentVersion != UNVERSIONED && requiredVersion < currentVersion && validateSchema) {
+            realm.close();
+            throw new IllegalArgumentException(String.format("Realm on disc is newer than the one specified: v%s vs. v%s", currentVersion, requiredVersion));
+		}
+
+        // Initialize Realm schema if needed
+        if (validateSchema) {
+            try {
+                initializeRealm(realm, config);
+            } catch (RuntimeException e) {
+                realm.close();
+                throw e;
+            }
+        }
+
+        return realm;
+    }
+
