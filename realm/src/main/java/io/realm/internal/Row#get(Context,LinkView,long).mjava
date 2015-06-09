@@ -1,0 +1,14 @@
+    /**
+     * Get the row object associated to an index in a LinkView
+     * @param context the Realm context
+     * @param linkView the LinkView holding the row
+     * @param index the index of the row
+     * @return an instance of Row for the LinkView and index specified
+     */
+    public static Row get(Context context, LinkView linkView, long index) {
+        long nativeRowPointer = linkView.nativeGetRow(linkView.nativeLinkViewPtr, index);
+        Row row = new Row(context, linkView.parent.getLinkTarget(linkView.columnIndexInParent), nativeRowPointer);
+        FinalizerRunnable.references.put(new NativeObjectReference(row, FinalizerRunnable.referenceQueue), Boolean.TRUE);
+        return row;
+    }
+
