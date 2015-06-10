@@ -1,15 +1,15 @@
-    private static Realm create(RealmConfiguration config) {
+    private static Realm create(RealmConfiguration configuration) {
         boolean autoRefresh = Looper.myLooper() != null;
         try {
-            return createAndValidate(config, true, autoRefresh);
+            return createAndValidate(configuration, true, autoRefresh);
         } catch (RealmMigrationNeededException e) {
-            if (config.shouldDeleteRealmIfMigrationNeeded()) {
-                deleteRealm(config);
+            if (configuration.shouldDeleteRealmIfMigrationNeeded()) {
+                deleteRealm(configuration);
             } else {
-                migrateRealm(config);
+                migrateRealm(configuration);
             }
 
-            return createAndValidate(config, true, autoRefresh);
+            return createAndValidate(configuration, true, autoRefresh);
         }
     }
 

@@ -18,7 +18,7 @@
         }
 
         String canonicalPath = configuration.getPath();
-        AtomicInteger openInstances = openRealms.get(canonicalPath);
+        AtomicInteger openInstances = globalOpenInstanceCounter.get(canonicalPath);
         if (openInstances != null && openInstances.get() > 0) {
             throw new IllegalStateException("Cannot compact an open Realm");
         }

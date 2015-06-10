@@ -3,7 +3,7 @@
      * found a new object will be saved in the Realm. This must happen within a transaction.
      *
      * @param clazz Type of {@link io.realm.RealmObject} to create or update. It must have a primary key defined.
-     * @param in    Inputstream with object data in JSON format.
+     * @param in    {@link InputStream} with object data in JSON format.
      * @return Created or updated {@link io.realm.RealmObject}.
      * @throws java.lang.IllegalArgumentException if trying to update a class without a
      * {@link io.realm.annotations.PrimaryKey}.
@@ -22,7 +22,7 @@
         try {
             scanner = getFullStringScanner(in);
             JSONObject json = new JSONObject(scanner.next());
-            return proxyMediator.createOrUpdateUsingJsonObject(clazz, this, json, true);
+            return configuration.getSchemaMediator().createOrUpdateUsingJsonObject(clazz, this, json, true);
         } catch (JSONException e) {
             throw new RealmException("Failed to read JSON", e);
         } finally {
