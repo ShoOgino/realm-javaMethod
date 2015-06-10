@@ -1,0 +1,12 @@
+    private boolean checkListTypes() {
+        for (VariableElement field : fields) {
+            if (typeUtils.isAssignable(field.asType(), realmList)) {
+                if (Utils.getGenericType(field) == null) {
+                    Utils.error("No generic type supplied for field", field);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
