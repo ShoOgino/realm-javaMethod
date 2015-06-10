@@ -6,18 +6,20 @@
      */
     @Override
     public void close() {
-        Map<String, Integer> localRefCount = referenceCount.get();
-        Integer references = localRefCount.get(canonicalPath);
+        Map<RealmConfiguration, Integer> localRefCount = referenceCount.get();
+        String canonicalPath = configuration.getPath();
+        Integer references = localRefCount.get(configuration);
         if (references == null) {
             references = 0;
         }
         if (sharedGroup != null && references == 1) {
-            realmsCache.get().remove(canonicalPath);
+            realmsCache.get().remove(configuration);
+            globalPathConfigurationCache.get(canonicalPath).remove(configuration);
             sharedGroup.close();
             sharedGroup = null;
-            AtomicInteger counter = openRealms.get(canonicalPath);
+            AtomicInteger counter = globalOpenInstanceCounter.get(canonicalPath);
             if (counter.decrementAndGet() == 0) {
-                openRealms.remove(canonicalPath);
+                globalOpenInstanceCounter.remove(canonicalPath);
             }
         }
 
@@ -25,7 +27,7 @@
         if (refCount < 0) {
             RealmLog.w("Calling close() on a Realm that is already closed: " + canonicalPath);
         }
-        localRefCount.put(canonicalPath, Math.max(0, refCount));
+        localRefCount.put(configuration, Math.max(0, refCount));
 
         if (handler != null && refCount <= 0) {
             removeHandler(handler);

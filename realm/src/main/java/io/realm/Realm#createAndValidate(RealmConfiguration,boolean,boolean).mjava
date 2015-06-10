@@ -1,42 +1,37 @@
-    private static synchronized Realm createAndValidate(RealmConfiguration config, boolean validateSchema, boolean autoRefresh) {
+    private static synchronized Realm createAndValidate(RealmConfiguration configuration, boolean validateSchema, boolean autoRefresh) {
         // Start the finalizer thread if needed
         if (!isFinalizerStarted) {
             executorService.submit(new FinalizerRunnable());
             isFinalizerStarted = true;
         }
 
-        byte[] key = config.getEncryptionKey();
-        String canonicalPath = config.getPath();
-
-        // Check thread local cache for existing Realm
-        Map<String, Integer> localRefCount = referenceCount.get();
-        Integer references = localRefCount.get(canonicalPath);
+        // Check if a cached instance already exists for this thread
+        String canonicalPath = configuration.getPath();
+        Map<RealmConfiguration, Integer> localRefCount = referenceCount.get();
+        Integer references = localRefCount.get(configuration);
         if (references == null) {
             references = 0;
         }
-        Map<String, Realm> realms = realmsCache.get();
-        Realm realm = realms.get(canonicalPath);
+        Map<RealmConfiguration, Realm> realms = realmsCache.get();
+        Realm realm = realms.get(configuration);
         if (realm != null) {
-            if (!Arrays.equals(realm.key, key)) {
-                throw new IllegalStateException(DIFFERENT_KEY_MESSAGE);
-            }
-            localRefCount.put(canonicalPath, references + 1);
+            localRefCount.put(configuration, references + 1);
             return realm;
         }
 
+
         // Create new Realm and cache it. All exception code paths must close the Realm otherwise we risk serving
         // faulty cache data.
-        realm = new Realm(canonicalPath, key, autoRefresh);
-        realm.proxyMediator = config.getSchemaMediator();
-        realms.put(canonicalPath, realm);
-        realmsCache.set(realms);
-        localRefCount.put(canonicalPath, references + 1);
+        validateAgainstExistingConfigurations(configuration);
+        realm = new Realm(configuration, autoRefresh);
+        realms.put(configuration, realm);
+        localRefCount.put(configuration, references + 1);
 
         // Increment global reference counter
         if (references == 0) {
-            AtomicInteger counter = openRealms.get(canonicalPath);
+            AtomicInteger counter = globalOpenInstanceCounter.get(canonicalPath);
             if (counter == null) {
-                openRealms.put(canonicalPath, new AtomicInteger(1));
+                globalOpenInstanceCounter.put(canonicalPath, new AtomicInteger(1));
             } else {
                 counter.incrementAndGet();
             }
@@ -44,7 +39,7 @@
 
         // Check versions of Realm
         long currentVersion = realm.getVersion();
-        long requiredVersion = config.getSchemaVersion();
+        long requiredVersion = configuration.getSchemaVersion();
         if (currentVersion != UNVERSIONED && currentVersion < requiredVersion && validateSchema) {
             realm.close();
             throw new RealmMigrationNeededException(canonicalPath, String.format("Realm on disc need to migrate from v%s to v%s", currentVersion, requiredVersion));
@@ -57,7 +52,7 @@
         // Initialize Realm schema if needed
         if (validateSchema) {
             try {
-                initializeRealm(realm, config);
+                initializeRealm(realm);
             } catch (RuntimeException e) {
                 realm.close();
                 throw e;
