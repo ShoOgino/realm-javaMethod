@@ -36,7 +36,7 @@
                 .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
                     .emitStatement("realmObject = new %s()", Utils.getProxyClassName(className))
                     .emitStatement("realmObject.realm = realm")
-                    .emitStatement("realmObject.row = table.getRow(rowIndex)")
+                    .emitStatement("realmObject.row = table.getUncheckedRow(rowIndex)")
                     .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
                 .nextControlFlow("else")
                     .emitStatement("canUpdate = false")

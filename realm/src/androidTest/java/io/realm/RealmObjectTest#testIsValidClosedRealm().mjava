@@ -1,6 +1,7 @@
     public void testIsValidClosedRealm() {
-        Realm.deleteRealmFile(getContext(), "other-realm");
-        Realm testRealm = Realm.getInstance(getContext(), "other-realm");
+        RealmConfiguration otherConfig = new RealmConfiguration.Builder(getContext()).name("other-realm").build();
+        Realm.deleteRealm(otherConfig);
+        Realm testRealm = Realm.getInstance(otherConfig);
         testRealm.beginTransaction();
         AllTypes allTypes = testRealm.createObject(AllTypes.class);
         assertTrue(allTypes.isValid());

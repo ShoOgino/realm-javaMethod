@@ -1,9 +1,9 @@
     public boolean methodWrongThread(final boolean callGetter) throws ExecutionException, InterruptedException {
-        Realm realm = Realm.getInstance(getContext());
-        realm.beginTransaction();
-        realm.createObject(AllTypes.class);
-        realm.commitTransaction();
-        final AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        testRealm = Realm.getInstance(getContext());
+        testRealm.beginTransaction();
+        testRealm.createObject(AllTypes.class);
+        testRealm.commitTransaction();
+        final AllTypes allTypes = testRealm.where(AllTypes.class).findFirst();
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
@@ -22,7 +22,7 @@
         });
 
         Boolean result = future.get();
-        realm.close();
+        testRealm.close();
         return result;
     }
 
