@@ -65,8 +65,7 @@
         signalCallbackFinishedLatch.await();
         looper[0].quit();
         executorService.shutdownNow();
-        if (null == threadAssertionError[0]) {
-           //TODO use explicit exception from Core, so we can check for type safety
+        if (null == threadAssertionError[0] || !(threadAssertionError[0] instanceof UnreachableVersionException)) {
             fail("Expecting RuntimeException: Unspecified exception." +
                     " Handover failed due to version mismatch in io_realm_internal_TableQuery.cpp");
         }
