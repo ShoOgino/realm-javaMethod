@@ -21,7 +21,7 @@
                 looper[0] = Looper.myLooper();
                 Realm realm = null;
                 try {
-                    realm = openRealmInstance();
+                    realm = openRealmInstance("test_find_all");
                     populateTestRealm(realm, 10);
 
                     // async query (will run on different thread)
@@ -60,7 +60,10 @@
 
                     Looper.loop();//ready to receive callback
 
-                } finally {
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                finally {
                     if (realm != null) {
                         realm.close();
                     }

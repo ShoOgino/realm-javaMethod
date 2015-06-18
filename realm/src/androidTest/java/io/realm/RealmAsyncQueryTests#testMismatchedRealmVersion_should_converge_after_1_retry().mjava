@@ -12,7 +12,7 @@
                 looper[0] = Looper.myLooper();
                 Realm realm = null;
                 try {
-                    realm = openRealmInstance();
+                    realm = openRealmInstance("should_converge_after_1_retry");
                     populateTestRealm(realm, 10);
                     // async query (will run on different thread)
                     realm.findAsync(AllTypes.class,
@@ -46,7 +46,7 @@
                                 }
 
                                 @Override
-                                public void onAdvancedRead(Realm realm) {
+                                public void onBackgroundQueryCompleted(Realm realm) {
                                     //Triggered on the background thread to alter the caller's Realm state
                                     populateTestRealm(realm, 3);//this is already inside a transaction
                                 }
