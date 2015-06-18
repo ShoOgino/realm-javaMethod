@@ -1,0 +1,21 @@
+    // If the cached Realm share the same configuration as the caller then use it
+    // instead of creating a new one (Opening a SharedGroup is expensive)
+    private Realm createOrRetrieveCachedWorkerRealm (final RealmConfiguration callerConfiguration) {
+        Realm worker = bgRealmWorker.get();
+        if (null == worker || !worker.getConfiguration().equals(callerConfiguration)) {
+            if (null != worker) {
+                //This cached Realm instance can't be used with the provided configuration
+                worker.close();
+            }
+
+            worker = Realm.getInstance(callerConfiguration);
+            bgRealmWorker.set(worker);
+        }
+
+        // Clear cached pointers to Table (since we may position the Realm to transaction
+        // where those pointers are no longer valid)
+        worker.resetTableCache();
+
+        return worker;
+    }
+

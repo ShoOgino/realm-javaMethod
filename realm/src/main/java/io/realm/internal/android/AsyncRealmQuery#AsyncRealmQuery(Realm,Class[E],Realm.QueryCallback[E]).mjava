@@ -5,9 +5,11 @@
      * @param clazz    The class to query.
      * @param callback invoked on the thread {@link Realm#findAsync(Class, Realm.QueryCallback)} was called from, to post results.
      */
-    public AsyncRealmQuery(Realm realm, Class<E> clazz, Realm.QueryCallback<RealmResults<E>> callback) {
+    public AsyncRealmQuery(Realm realm, Class<E> clazz, Realm.QueryCallback<E> callback) {
         this.callerRealm = realm;
         this.callback = callback;
         this.clazz = clazz;
+        this.retryPolicy = RetryPolicyFactory.get(RETRY_POLICY_MODE, MAX_NUMBER_RETRIES_POLICY);
+
     }
 

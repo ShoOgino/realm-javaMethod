@@ -1,0 +1,74 @@
+    public void testMismatchedRealmVersion_should_crash_no_retry() throws Throwable {
+        final CountDownLatch signalCallbackFinishedLatch = new CountDownLatch(1);
+        final Looper[] looper = new Looper[1];
+        final Throwable[] threadAssertionError = new Throwable[1];
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        // simulate one advanced read just after the worker thread has finished querying the Realm
+        // without any retry we should crash, because the background Realm used to perform the query
+        // return a TableView using a different version of the caller Realm (now more advanced)
+        setDebugModeForAsyncRealmQuery(1, RetryPolicy.MODE_NO_RETRY, 0);
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                looper[0] = Looper.myLooper();
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance();
+                    populateTestRealm(realm, 10);
+                    // async query (will run on different thread)
+                    realm.findAsync(AllTypes.class,
+                            new Realm.DebugQueryCallback<AllTypes>() {
+                                @Override
+                                public void onSuccess(RealmResults<AllTypes> results) {
+                                    signalCallbackFinishedLatch.countDown();
+                                }
+
+                                @Override
+                                public void onError(Throwable t) {
+                                    try {
+                                        threadAssertionError[0] = t;
+                                    } finally {
+                                        signalCallbackFinishedLatch.countDown();
+                                    }
+                                }
+
+                                @Override
+                                public void onAdvancedRead(Realm realm) {
+                                    //Triggered on the background thread to alter the caller's Realm state
+                                    realm.executeTransaction(new Realm.Transaction() {
+                                        @Override
+                                        public void execute(Realm realm) {
+                                            realm.clear(AllTypes.class);
+                                        }
+                                    });
+
+                                }
+                            })
+                            .between("columnLong", 0, 9).findAll();
+
+                    Looper.loop();//ready to receive callback
+
+                } finally {
+                    if (signalCallbackFinishedLatch.getCount() > 0) {
+                        // opening Realm crashed, not even callbacks get the chance to be called
+                        signalCallbackFinishedLatch.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        // wait until the callback of our async query proceed
+        signalCallbackFinishedLatch.await();
+        looper[0].quit();
+        executorService.shutdownNow();
+        if (null == threadAssertionError[0]) {
+           //TODO use explicit exception from Core, so we can check for type safety
+            fail("Expecting RuntimeException: Unspecified exception." +
+                    " Handover failed due to version mismatch in io_realm_internal_TableQuery.cpp");
+        }
+    }
+

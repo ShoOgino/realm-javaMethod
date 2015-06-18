@@ -1,19 +1,12 @@
-    // Async query without any conflicts strategy
-    public void testFindAll() throws Throwable {
-        setDebugModeForAsyncRealmQuery(0, RetryPolicy.MODE_NO_RETRY, 0);
-        // We need to control precisely which Looper/Thread our Realm
-        // will operate on. This is unfortunately not possible when using the
-        // current Instrumentation#InstrumentationThread, because InstrumentationTestRunner#onStart
-        // Call Looper.prepare() for us and surprisingly doesn't call Looper#loop(), this is problematic
-        // as the async query callback will not run (because the Handler is sending Runnables to a Looper
-        // that didn't loop.
-        //
-        // In the other hand, using a dedicated 'ExecutorService' will allow us to fine grain control the
-        // desired behaviour
-        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+    // This should crash because the number of retries is less the the number of modifications
+    public void testMismatchedRealmVersion_should_crash_after_2_retries () throws Throwable {
+        final CountDownLatch signalCallbackFinishedLatch = new CountDownLatch(1);
         final Looper[] looper = new Looper[1];
         final Throwable[] threadAssertionError = new Throwable[1];
         ExecutorService executorService = Executors.newSingleThreadExecutor();
+        //simulate 3 modification to the caller's Realm each time a result from the background thread
+        // try to handover the result to the caller's Realm
+        setDebugModeForAsyncRealmQuery(3, RetryPolicy.MODE_MAX_RETRY, 2);
         executorService.submit(new Runnable() {
             @Override
             public void run() {
@@ -23,26 +16,20 @@
                 try {
                     realm = openRealmInstance();
                     populateTestRealm(realm, 10);
-
                     // async query (will run on different thread)
                     realm.findAsync(AllTypes.class,
-                            new Realm.QueryCallback<AllTypes>() {
+                            new Realm.DebugQueryCallback<AllTypes>() {
                                 @Override
                                 public void onSuccess(RealmResults<AllTypes> results) {
                                     try {
-                                        assertEquals(10, results.size());
-
-                                        //Make sure access to RealmObject will not throw an Exception
-                                        for (int i = 0, size = results.size(); i < size; i++) {
-                                            assertEquals(i, results.get(i).getColumnLong());
-                                        }
+                                        signalCallbackFinishedLatch.countDown();
 
                                     } catch (AssertionFailedError e) {
                                         threadAssertionError[0] = e;
 
                                     } finally {
                                         // whatever happened, make sure to notify the waiting TestCase Thread
-                                        signalCallbackFinished.countDown();
+                                        signalCallbackFinishedLatch.countDown();
                                     }
                                 }
 
@@ -50,17 +37,29 @@
                                 public void onError(Throwable t) {
                                     try {
                                         threadAssertionError[0] = t;
-                                        t.printStackTrace();
                                     } finally {
-                                        signalCallbackFinished.countDown();
+                                        signalCallbackFinishedLatch.countDown();
                                     }
                                 }
+
+                                @Override
+                                public void onAdvancedRead(Realm realm) {
+                                    //Triggered on the background thread to alter the caller's Realm state
+                                    populateTestRealm(realm, 3);//this is already inside a transaction
+                                }
+
                             })
                             .between("columnLong", 0, 9).findAll();
 
                     Looper.loop();//ready to receive callback
 
+                } catch (Exception e) {
+                    threadAssertionError[0] = e;
                 } finally {
+                    if (signalCallbackFinishedLatch.getCount() > 0) {
+                        // opening Realm crashed, not even callbacks get the chance to be called
+                        signalCallbackFinishedLatch.countDown();
+                    }
                     if (realm != null) {
                         realm.close();
                     }
@@ -69,12 +68,13 @@
         });
 
         // wait until the callback of our async query proceed
-        signalCallbackFinished.await();
+        signalCallbackFinishedLatch.await();
         looper[0].quit();
         executorService.shutdownNow();
-        if (null != threadAssertionError[0]) {
-            // Throw any assertion errors happened in the background thread
-            throw threadAssertionError[0];
+        if (null == threadAssertionError[0]) {
+            //TODO use explicit exception from Core, so we can check for type safety
+            fail("Expecting RuntimeException: Unspecified exception." +
+                    " Handover failed due to version mismatch in io_realm_internal_TableQuery.cpp");
         }
     }
 

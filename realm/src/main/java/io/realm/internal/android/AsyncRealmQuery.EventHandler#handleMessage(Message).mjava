@@ -2,11 +2,31 @@
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_SUCCESS:
-                    RealmResults<E> resultList = new RealmResults<E>(callerRealm, (TableOrView) msg.obj, clazz);
-                    callback.onSuccess(resultList);
+                    Bundle bundle = msg.getData();
+                    try {
+                        // This will block the caller Thread from performing any advance_read, commit or rollback
+                        // operations on its SharedGroup, until the handover is complete, this will also eliminate the risk
+                        // of performing those operations while creating a TableView
+                        RealmResults<E> resultList = new RealmResults<>(callerRealm,
+                                realmQueryAdapter.importTableViewToRealm(bundle.getLong(TABLE_VIEW_POINTER_ARG), bundle.getLong(CALLER_SHARED_GROUP_POINTER_ARG)),
+                                clazz);
+                        callback.onSuccess(resultList);
+
+                    } catch (Exception e) {//TODO use the type safe exception from Core
+                        if (retryPolicy.shouldRetry()) {
+                            findAll();
+                        } else {
+                            callback.onError(e);
+                        }
+                    }
                     break;
+
                 case MSG_ERROR:
                     callback.onError((Throwable) msg.obj);
+                    break;
+
+                case MSG_ADVANCE_READ:
+                    ((Realm.DebugQueryCallback<E>)callback).onBackgroundQueryCompleted(callerRealm);
                     break;
             }
         }

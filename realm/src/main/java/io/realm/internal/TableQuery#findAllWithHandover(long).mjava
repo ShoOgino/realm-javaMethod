@@ -1,0 +1,11 @@
+    // Suppose to be called from the a background SharedGroup thread
+    public long findAllWithHandover(long bgSharedGroupPtr) {
+        validateQuery();
+
+        // Execute the disposal of abandoned realm objects each time a new realm object is created
+        context.executeDelayedDisposal();
+        return nativeFindAllWithHandover(bgSharedGroupPtr, nativePtr, 0, Table.INFINITE, Table.INFINITE);
+        // handover nativeViewPtr to UI Thread
+
+    }
+

@@ -22,29 +22,44 @@
         // We need to use the same configuration to open a background SharedGroup (i.e Realm)
         // to perform the query
         final RealmConfiguration realmConfiguration = callerRealm.getConfiguration();
+        //This call needs to be done on the caller's thread, since SG()->get_version_of_current_transaction is not thread safe
+        final long[] callerSharedGroupVersion = callerRealm.getSharedGroupVersion();
 
         pendingQuery = asyncQueryExecutor.submit(new Runnable() {
             @Override
             public void run() {
                 if (!Thread.currentThread().isInterrupted()) {
                     try {
-                        Realm bgRealm = Realm.getInstance(realmConfiguration);
-
+                        Realm bgRealm = createOrRetrieveCachedWorkerRealm(realmConfiguration);
+                        // Position the SharedGroup to the same version as the caller thread
+                        // the call to SharedGroup->get_version_of_current_transaction is not thread safe
+                        // it needs to happen on the caller's thread.
+                        bgRealm.setSharedGroupAtVersion(callerSharedGroupVersion);
                         //TODO This will probably be replace by a kind of 'QueryBuilder'
                         //     that holds all the operations (predicates/filters) then
                         //     replay them here in this background thread. The current implementation
                         //     call Core for each step, we want to limit the overhead by sending one
                         //     single call to Core with all the parameters.
 
-                        TableView tv = new RealmQueryAdapter<E>(bgRealm, clazz)
+                        long tableViewPtr = new RealmQueryAdapter<>(bgRealm, clazz)
                                 .between(fieldName, from, to)
-                                .findAll(callerSharedGroupNativePtr, bgRealm.getSharedGroupPointer());
+                                .findAll(bgRealm.getSharedGroupPointer());
 
-                        bgRealm.close();
+                        if (IS_DEBUG && NB_ADVANCE_READ_SIMULATION-- > 0) {
+                            // notify caller thread that we're about to post result to Handler
+                            // (this is interesting in Unit Testing, as we can advance read to simulate
+                            // a mismatch between the query result, and the current version of the Realm
+                            eventHandler.sendEmptyMessage(EventHandler.MSG_ADVANCE_READ);
+                        }
 
                         // send results to the caller thread's callback
                         if (!pendingQuery.isCancelled()) {
-                            Message msg = eventHandler.obtainMessage(EventHandler.MSG_SUCCESS, tv);
+                            Bundle bundle = new Bundle(2);
+                            bundle.putLong(EventHandler.TABLE_VIEW_POINTER_ARG, tableViewPtr);
+                            bundle.putLong(EventHandler.CALLER_SHARED_GROUP_POINTER_ARG, callerSharedGroupNativePtr);
+
+                            Message msg = eventHandler.obtainMessage(EventHandler.MSG_SUCCESS);
+                            msg.setData(bundle);
                             eventHandler.sendMessage(msg);
                         }
 

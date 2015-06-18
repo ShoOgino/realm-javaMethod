@@ -1,0 +1,33 @@
+    // We could have avoid using reflection to inject this behaviour if we were using a DI :)
+    private void setDebugModeForAsyncRealmQuery(int nbAdvancedReadSimulation, int retryPolicyMode, int maxNumberOfRetries) {
+        try {
+            Field debugFlagField = AsyncRealmQuery.class.getDeclaredField("IS_DEBUG");
+            Field nbAdvancedReadSimulationField = AsyncRealmQuery.class.getDeclaredField("NB_ADVANCE_READ_SIMULATION");
+            Field nbNumberRetriesPolicyField = AsyncRealmQuery.class.getDeclaredField("MAX_NUMBER_RETRIES_POLICY");
+            Field retryPolicyModeField = AsyncRealmQuery.class.getDeclaredField("RETRY_POLICY_MODE");
+
+            debugFlagField.setAccessible(true);
+            nbAdvancedReadSimulationField.setAccessible(true);
+            nbNumberRetriesPolicyField.setAccessible(true);
+            retryPolicyModeField.setAccessible(true);
+
+            if (nbAdvancedReadSimulation > 0) {
+                debugFlagField.set(null, true);
+                nbAdvancedReadSimulationField.set(null, nbAdvancedReadSimulation);
+                nbNumberRetriesPolicyField.set(null, maxNumberOfRetries);
+                retryPolicyModeField.set(null, retryPolicyMode);
+
+            } else {//reset to defaults
+                debugFlagField.set(null, false);
+                nbAdvancedReadSimulationField.set(null, 0);
+                nbNumberRetriesPolicyField.set(null, 0);
+                retryPolicyModeField.set(null, RetryPolicy.MODE_INDEFINITELY);
+            }
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
