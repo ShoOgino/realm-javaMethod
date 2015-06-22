@@ -1,0 +1,28 @@
+    // Check that FinalizerRunnable can free native resources (phantom refs)
+    public void testFinalizerThread() throws NoSuchFieldException, IllegalAccessException {
+        Field fieldReferences = FinalizerRunnable.class.getDeclaredField("references");
+        fieldReferences.setAccessible(true);
+        Map<Reference<?>, Boolean> references = (Map<Reference<?>, Boolean>) fieldReferences.get(null);
+        assertNotNull(references);
+
+        Field fieldIsFinalizerStarted = Realm.class.getDeclaredField("isFinalizerStarted");
+        fieldIsFinalizerStarted.setAccessible(true);
+        boolean isFinalizerStarted = fieldIsFinalizerStarted.getBoolean(null);
+        assertTrue(isFinalizerStarted);
+
+        //insert some rows, then give the FinalizerRunnable some time to cleanup
+        populateTestRealm(testRealm, 20);
+
+        final int MAX_WAITING_RETRY = 5;
+        int nbRetry = 0;
+        while (references.size() > 0 && nbRetry < MAX_WAITING_RETRY) {
+            SystemClock.sleep(5);//5ms
+            nbRetry++;
+            System.gc();
+        }
+
+        if (nbRetry >= MAX_WAITING_RETRY) {
+            fail("FinalizerRunnable didn't close all native resources :(");
+        }
+    }
+
