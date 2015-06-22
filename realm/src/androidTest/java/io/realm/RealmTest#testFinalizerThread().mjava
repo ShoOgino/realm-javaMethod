@@ -1,0 +1,40 @@
+    // Check that FinalizerRunnable can free native resources (phantom refs)
+    public void testFinalizerThread() throws NoSuchFieldException, IllegalAccessException {
+        Field fieldReferences = FinalizerRunnable.class.getDeclaredField("references");
+        fieldReferences.setAccessible(true);
+        Map<Reference<?>, Boolean> references = (Map<Reference<?>, Boolean>) fieldReferences.get(null);
+        assertNotNull(references);
+
+        Field fieldIsFinalizerStarted = Realm.class.getDeclaredField("isFinalizerStarted");
+        fieldIsFinalizerStarted.setAccessible(true);
+        boolean isFinalizerStarted = fieldIsFinalizerStarted.getBoolean(null);
+        assertTrue(isFinalizerStarted);
+
+        //insert some rows, then give the FinalizerRunnable some time to cleanup
+        // we have 8 reference so far let's add more
+        final int numberOfPopulateTest = 10000;
+        final int totalNumberOfReferences = 8 + 20 * 2 * numberOfPopulateTest;
+
+        for (int i = 0; i < numberOfPopulateTest; i++) {
+            populateTestRealm(testRealm, 20);
+        }
+
+        final int MAX_GC_RETRIES = 5;
+        int numberOfRetries = 0;
+        while (references.size() > 0 && numberOfRetries < MAX_GC_RETRIES) {
+            SystemClock.sleep(TimeUnit.SECONDS.toMillis(1)); //1s
+            numberOfRetries++;
+            System.gc();
+        }
+
+        // we can't guarantee that all references have been GC'd but we should detect a decrease
+        boolean isDecreasing = references.size() < totalNumberOfReferences;
+        if (!isDecreasing) {
+            fail("FinalizerRunnable is not closing all native resources");
+
+        } else {
+            android.util.Log.d(RealmTest.class.getName(), "FinalizerRunnable freed : "
+                    + (totalNumberOfReferences - references.size()) + " out of " + totalNumberOfReferences);
+        }
+    }
+
