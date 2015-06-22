@@ -5,7 +5,7 @@
         long primaryKeyColumnIndex = getPrimaryKey();
         ColumnType type = getColumnType(primaryKeyColumnIndex);
         long rowIndex;
-        Row row;
+        UncheckedRow row;
 
         // Add with primary key initially set
         switch (type) {
@@ -17,7 +17,7 @@
                     throwDuplicatePrimaryKeyException(primaryKeyValue);
                 }
                 rowIndex = nativeAddEmptyRow(nativePtr, 1);
-                row = getRow(rowIndex);
+                row = getUncheckedRow(rowIndex);
                 row.setString(primaryKeyColumnIndex, (String) primaryKeyValue);
                 break;
 
@@ -32,7 +32,7 @@
                     throwDuplicatePrimaryKeyException(pkValue);
                 }
                 rowIndex = nativeAddEmptyRow(nativePtr, 1);
-                row = getRow(rowIndex);
+                row = getUncheckedRow(rowIndex);
                 row.setLong(primaryKeyColumnIndex, pkValue);
                 break;
 

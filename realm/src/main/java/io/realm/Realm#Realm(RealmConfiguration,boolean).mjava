@@ -1,5 +1,6 @@
     // The constructor in private to enforce the use of the static one
     private Realm(RealmConfiguration configuration, boolean autoRefresh) {
+        this.threadId = Thread.currentThread().getId();
         this.configuration = configuration;
         this.sharedGroup = new SharedGroup(configuration.getPath(), true, configuration.getEncryptionKey());
         this.transaction = sharedGroup.beginImplicitTransaction();
