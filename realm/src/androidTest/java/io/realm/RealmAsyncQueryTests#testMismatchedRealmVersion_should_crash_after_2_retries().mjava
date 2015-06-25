@@ -1,12 +1,12 @@
-    // This should crash because the number of retries is less the the number of modifications
-    public void testMismatchedRealmVersion_should_crash_after_2_retries () throws Throwable {
+    // This should crash because the number of retries is less than the number of modifications
+    public void testMismatchedRealmVersion_should_crash_after_2_retries() throws Throwable {
+        // simulate 3 modification to the caller's Realm for each result coming from the background thread
+        setDebugModeForAsyncRealmQuery(ADVANCE_THREE_READ, RetryPolicy.MODE_MAX_RETRY, RETRY_TWICE);
+
         final CountDownLatch signalCallbackFinishedLatch = new CountDownLatch(1);
         final Looper[] looper = new Looper[1];
         final Throwable[] threadAssertionError = new Throwable[1];
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        //simulate 3 modification to the caller's Realm each time a result from the background thread
-        // try to handover the result to the caller's Realm
-        setDebugModeForAsyncRealmQuery(3, RetryPolicy.MODE_MAX_RETRY, 2);
         executorService.submit(new Runnable() {
             @Override
             public void run() {
@@ -16,9 +16,9 @@
                 try {
                     realm = openRealmInstance("test_should_crash_after_2_retries");
                     populateTestRealm(realm, 10);
-                    // async query (will run on different thread)
-                    realm.findAsync(AllTypes.class,
-                            new Realm.DebugQueryCallback<AllTypes>() {
+                    realm.where(AllTypes.class)
+                            .between("columnLong", 0, 9)
+                            .findAll(new Realm.DebugQueryCallback<AllTypes>() {
                                 @Override
                                 public void onSuccess(RealmResults<AllTypes> results) {
                                     try {
@@ -44,16 +44,14 @@
 
                                 @Override
                                 public void onBackgroundQueryCompleted(Realm realm) {
-                                    //Triggered on the background thread to alter the caller's Realm state
-                                    populateTestRealm(realm, 3);//this is already inside a transaction
+                                    populateTestRealm(realm, 3);
                                 }
+                            });
 
-                            })
-                            .between("columnLong", 0, 9).findAll();
-
-                    Looper.loop();//ready to receive callback
+                    Looper.loop();
 
                 } catch (Exception e) {
+                    e.printStackTrace();
                     threadAssertionError[0] = e;
                 } finally {
                     if (signalCallbackFinishedLatch.getCount() > 0) {
@@ -67,7 +65,6 @@
             }
         });
 
-        // wait until the callback of our async query proceed
         signalCallbackFinishedLatch.await();
         looper[0].quit();
         executorService.shutdownNow();

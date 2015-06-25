@@ -1,0 +1,15 @@
+    /**
+     * This will use the background shared group to import the query pointer from the handover one
+     * then run the query and export the table view result with handover
+     * @param bgSharedGroupPtr Background shared group native pointer
+     * @param ptrQuery handover pointer to the query (coming from the caller SharedGroup)
+     * @return handover pointer to the table view results
+     */
+    public long findAllWithHandover(long bgSharedGroupPtr, long ptrQuery) {
+        validateQuery();
+
+        // Execute the disposal of abandoned realm objects each time a new realm object is created
+        context.executeDelayedDisposal();// TODO bottleneck. when freeing tables become thread safe in core use FinalizerRunnable
+        return nativeFindAllWithHandover(bgSharedGroupPtr, ptrQuery, 0, Table.INFINITE, Table.INFINITE);
+    }
+

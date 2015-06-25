@@ -1,10 +1,12 @@
-    public void testMismatchedRealmVersion_should_converge_after_1_retry () throws Throwable {
+    // async query that converge after 1 retry
+    public void testMismatchedRealmVersion_should_converge_after_1_retry() throws Throwable {
+        // simulate one advanced read just after the worker thread has finished querying the Realm
+        setDebugModeForAsyncRealmQuery(ADVANCE_ONE_READ, RetryPolicy.MODE_MAX_RETRY, RETRY_ONCE);
+
         final CountDownLatch signalCallbackFinishedLatch = new CountDownLatch(1);
         final Looper[] looper = new Looper[1];
         final Throwable[] threadAssertionError = new Throwable[1];
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        //simulate one advanced read just after the worker thread has finished querying the Realm
-        setDebugModeForAsyncRealmQuery(1, RetryPolicy.MODE_MAX_RETRY, 1);
         executorService.submit(new Runnable() {
             @Override
             public void run() {
@@ -14,15 +16,14 @@
                 try {
                     realm = openRealmInstance("should_converge_after_1_retry");
                     populateTestRealm(realm, 10);
-                    // async query (will run on different thread)
-                    realm.findAsync(AllTypes.class,
-                            new Realm.DebugQueryCallback<AllTypes>() {
+                    realm.where(AllTypes.class)
+                            .between("columnLong", 0, 9)
+                            .findAll(new Realm.DebugQueryCallback<AllTypes>() {
                                 @Override
                                 public void onSuccess(RealmResults<AllTypes> results) {
                                     try {
                                         assertEquals(3, results.size());
 
-                                        //Make sure access to RealmObject will not throw an Exception
                                         for (int i = 0, size = results.size(); i < size; i++) {
                                             assertEquals(i, results.get(i).getColumnLong());
                                         }
@@ -31,7 +32,6 @@
                                         threadAssertionError[0] = e;
 
                                     } finally {
-                                        // whatever happened, make sure to notify the waiting TestCase Thread
                                         signalCallbackFinishedLatch.countDown();
                                     }
                                 }
@@ -47,16 +47,14 @@
 
                                 @Override
                                 public void onBackgroundQueryCompleted(Realm realm) {
-                                    //Triggered on the background thread to alter the caller's Realm state
-                                    populateTestRealm(realm, 3);//this is already inside a transaction
+                                    populateTestRealm(realm, 3);// this is already inside a transaction
                                 }
-
-                            })
-                            .between("columnLong", 0, 9).findAll();
+                            });
 
                     Looper.loop();//ready to receive callback
 
                 } catch (Exception e) {
+                    e.printStackTrace();
                     threadAssertionError[0] = e;
                 } finally {
                     if (signalCallbackFinishedLatch.getCount() > 0) {
@@ -70,12 +68,10 @@
             }
         });
 
-        // wait until the callback of our async query proceed
         signalCallbackFinishedLatch.await();
         looper[0].quit();
         executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
-            // Throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
         }
     }
