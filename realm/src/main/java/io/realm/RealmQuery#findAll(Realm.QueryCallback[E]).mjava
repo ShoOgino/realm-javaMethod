@@ -2,11 +2,11 @@
      * Find all objects that fulfill the query conditions.
      * Results will be posted to the callback instance {@link Realm.QueryCallback} asynchronously
      *
-     * @return An {@link io.realm.RealmQuery.AsyncRequest} representing a cancellable, pending asynchronous query
+     * @return An {@link Request} representing a cancellable, pending asynchronous query
      * @see io.realm.RealmResults
      * @throws java.lang.RuntimeException Any other error
      */
-    public AsyncRequest findAll(Realm.QueryCallback<E> callback) {
+    public Request findAll(Realm.QueryCallback<E> callback) {
         // will use the Looper of the caller thread to post the result
         final Handler handler = new EventHandler(callback);
 
@@ -23,10 +23,10 @@
         // This call needs to be done on the caller's thread, since SG()->get_version_of_current_transaction is not thread safe
         final long[] callerSharedGroupVersion = realm.getSharedGroupVersion();
 
-        pendingQuery = asyncQueryExecutor.submit(new Runnable() {
+        Future<?> pendingQuery = asyncQueryExecutor.submit(new Runnable() {
             @Override
             public void run() {
-                if (!Thread.currentThread().isInterrupted() && (null == asyncRequest || !asyncRequest.isCancelled())) {
+                if (!Thread.currentThread().isInterrupted() && (asyncRequest == null || !asyncRequest.isCancelled())) {
                     Realm bgRealm = null;
 
                     try {
@@ -80,7 +80,7 @@
             asyncRequest.setPendingQuery(pendingQuery);
 
         } else { //First run
-            asyncRequest = new RealmQuery.AsyncRequest(pendingQuery);
+            asyncRequest = new Request(pendingQuery);
         }
         return asyncRequest;
     }
