@@ -17,8 +17,8 @@
 
             // Check that allClasses and classes are not set at the same time
             RealmModule module = classElement.getAnnotation(RealmModule.class);
-            Utils.note("Processing " + classSimpleName);
-            if (module.allClasses() && module.classes().length > 0) {
+            Utils.note("Processing module " + classSimpleName);
+            if (module.allClasses() && hasCustomClassList(classElement)) {
                 Utils.error("Setting @RealmModule(allClasses=true) will override @RealmModule(classes={...}) in " + classSimpleName);
                 return false;
             }
@@ -30,16 +30,12 @@
                 classes = availableClasses;
             } else {
                 classes = new HashSet<ClassMetaData>();
-                for (Class<?> clazz : module.classes()) {
-                    if (!clazz.getSuperclass().toString().endsWith("RealmObject")) {
-                        Utils.error(clazz.getSimpleName() + " is not extending RealmObject. Only RealmObjects can be " +
-                                "part of a module.");
-                        return false;
-                    }
-                    ClassMetaData metadata = classMetaData.get(clazz.getName());
+                Set<String> classNames = getClassMetaDataFromModule(classElement);
+                for (String fullyQualifiedClassName : classNames) {
+                    ClassMetaData metadata = classMetaData.get(fullyQualifiedClassName);
                     if (metadata == null) {
-                        Utils.error(Utils.stripPackage(qualifiedName) + " could not be added to the module. It is not " +
-                                "possible to add classes which are part of another library.");
+                        Utils.error(Utils.stripPackage(fullyQualifiedClassName) + " could not be added to the module. " +
+                                "Only classes extending RealmObject, which are part of this project, can be added.");
                         return false;
                     }
                     classes.add(metadata);

@@ -4,7 +4,7 @@
      * <p>
      * It sets auto-refresh on if the current thread has a Looper, off otherwise.
      *
-     * @param writeableFolder a File object representing a writeable folder
+     * @param writableFolder a File object representing a writable folder
      * @param fileName the name of the Realm file
      * @param key     a 64-byte encryption key
      * @return an instance of the Realm class
@@ -13,8 +13,13 @@
      * @throws RealmIOException              Error when accessing underlying file
      * @throws RealmException                Other errors
      */
+    @Deprecated
     @SuppressWarnings("UnusedDeclaration")
-    public static Realm getInstance(File writeableFolder, String fileName, byte[] key) {
-        return Realm.create(writeableFolder, fileName, key);
+    public static Realm getInstance(File writableFolder, String fileName, byte[] key) {
+        return create(new RealmConfiguration.Builder(writableFolder)
+                        .name(fileName)
+                        .encryptionKey(key)
+                        .build()
+        );
     }
 

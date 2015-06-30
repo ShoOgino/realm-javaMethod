@@ -1,0 +1,24 @@
+    // Creates the mediator that defines the current schema
+    private RealmProxyMediator createSchemaMediator(Builder builder) {
+
+        Set<Object> modules = builder.modules;
+        Set<Class<? extends RealmObject>> debugSchema = builder.debugSchema;
+
+        // If using debug schema, use special mediator
+        if (debugSchema.size() > 0) {
+            return new FilterableMediator(DEFAULT_MODULE_MEDIATOR, debugSchema);
+        }
+
+        // If only one module, use that mediator directly
+        if (modules.size() == 1) {
+            return getModuleMediator(modules.iterator().next().getClass().getCanonicalName());
+        }
+
+        // Otherwise combine all mediators
+        CompositeMediator mediator = new CompositeMediator();
+        for (Object module : modules) {
+            mediator.addMediator(getModuleMediator(module.getClass().getCanonicalName()));
+        }
+        return mediator;
+    }
+

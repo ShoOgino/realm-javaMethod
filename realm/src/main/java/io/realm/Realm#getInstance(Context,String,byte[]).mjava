@@ -12,8 +12,13 @@
      * @throws RealmIOException              Error when accessing underlying file
      * @throws RealmException                Other errors
      */
-    @SuppressWarnings("UnusedDeclaration")
+    @Deprecated
     public static Realm getInstance(Context context, String fileName, byte[] key) {
-        return Realm.create(context.getFilesDir(), fileName, key);
+        RealmConfiguration.Builder builder = new RealmConfiguration.Builder(context).name(fileName);
+        if (key != null) {
+            builder.encryptionKey(key);
+        }
+
+        return create(builder.build());
     }
 

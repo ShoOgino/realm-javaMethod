@@ -1,9 +1,11 @@
     // Public because of migrations
     public Table getTable(Class<? extends RealmObject> clazz) {
-        Class<?> superclass = clazz.getSuperclass();
-        if (!superclass.equals(RealmObject.class)) {
-            clazz = (Class<? extends RealmObject>) superclass;
+        Table table = classToTable.get(clazz);
+        if (table == null) {
+            clazz = Util.getOriginalModelClass(clazz);
+            table = transaction.getTable(configuration.getSchemaMediator().getTableName(clazz));
+            classToTable.put(clazz, table);
         }
-        return transaction.getTable(proxyMediator.getTableName(clazz));
+        return table;
     }
 

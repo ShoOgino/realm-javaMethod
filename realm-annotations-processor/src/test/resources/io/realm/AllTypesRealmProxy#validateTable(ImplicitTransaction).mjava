@@ -1,0 +1,108 @@
+    public static void validateTable(ImplicitTransaction transaction) {
+        if (transaction.hasTable("class_AllTypes")) {
+            Table table = transaction.getTable("class_AllTypes");
+            if (table.getColumnCount() != 9) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Field count does not match - expected 9 but was " + table.getColumnCount());
+            }
+            Map<String, ColumnType> columnTypes = new HashMap<String, ColumnType>();
+            for (long i = 0; i < 9; i++) {
+                columnTypes.put(table.getColumnName(i), table.getColumnType(i));
+            }
+
+            columnIndices = new HashMap<String, Long>();
+            for (String fieldName : getFieldNames()) {
+                long index = table.getColumnIndex(fieldName);
+                if (index == -1) {
+                    throw new RealmMigrationNeededException(transaction.getPath(), "Field '" + fieldName + "' not found for type AllTypes");
+                }
+                columnIndices.put(fieldName, index);
+            }
+            INDEX_COLUMNSTRING = table.getColumnIndex("columnString");
+            INDEX_COLUMNLONG = table.getColumnIndex("columnLong");
+            INDEX_COLUMNFLOAT = table.getColumnIndex("columnFloat");
+            INDEX_COLUMNDOUBLE = table.getColumnIndex("columnDouble");
+            INDEX_COLUMNBOOLEAN = table.getColumnIndex("columnBoolean");
+            INDEX_COLUMNDATE = table.getColumnIndex("columnDate");
+            INDEX_COLUMNBINARY = table.getColumnIndex("columnBinary");
+            INDEX_COLUMNOBJECT = table.getColumnIndex("columnObject");
+            INDEX_COLUMNREALMLIST = table.getColumnIndex("columnRealmList");
+
+            if (!columnTypes.containsKey("columnString")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'columnString'");
+            }
+            if (columnTypes.get("columnString") != ColumnType.STRING) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'String' for field 'columnString'");
+            }
+            if (table.getPrimaryKey() != table.getColumnIndex("columnString")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Primary key not defined for field 'columnString'");
+            }
+            if (!table.hasSearchIndex(table.getColumnIndex("columnString"))) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Index not defined for field 'columnString'");
+            }
+            if (!columnTypes.containsKey("columnLong")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'columnLong'");
+            }
+            if (columnTypes.get("columnLong") != ColumnType.INTEGER) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'long' for field 'columnLong'");
+            }
+            if (!columnTypes.containsKey("columnFloat")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'columnFloat'");
+            }
+            if (columnTypes.get("columnFloat") != ColumnType.FLOAT) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'float' for field 'columnFloat'");
+            }
+            if (!columnTypes.containsKey("columnDouble")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'columnDouble'");
+            }
+            if (columnTypes.get("columnDouble") != ColumnType.DOUBLE) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'double' for field 'columnDouble'");
+            }
+            if (!columnTypes.containsKey("columnBoolean")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'columnBoolean'");
+            }
+            if (columnTypes.get("columnBoolean") != ColumnType.BOOLEAN) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'boolean' for field 'columnBoolean'");
+            }
+            if (!columnTypes.containsKey("columnDate")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'columnDate'");
+            }
+            if (columnTypes.get("columnDate") != ColumnType.DATE) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'Date' for field 'columnDate'");
+            }
+            if (!columnTypes.containsKey("columnBinary")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'columnBinary'");
+            }
+            if (columnTypes.get("columnBinary") != ColumnType.BINARY) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'byte[]' for field 'columnBinary'");
+            }
+            if (!columnTypes.containsKey("columnObject")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'columnObject'");
+            }
+            if (columnTypes.get("columnObject") != ColumnType.LINK) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'AllTypes' for field 'columnObject'");
+            }
+            if (!transaction.hasTable("class_AllTypes")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing class 'class_AllTypes' for field 'columnObject'");
+            }
+            Table table_7 = transaction.getTable("class_AllTypes");
+            if (!table.getLinkTarget(INDEX_COLUMNOBJECT).hasSameSchema(table_7)) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid RealmObject for field 'columnObject': '" + table.getLinkTarget(INDEX_COLUMNOBJECT).getName() + "' expected - was '" + table_7.getName() + "'");
+            }
+            if (!columnTypes.containsKey("columnRealmList")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'columnRealmList'");
+            }
+            if (columnTypes.get("columnRealmList") != ColumnType.LINK_LIST) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'AllTypes' for field 'columnRealmList'");
+            }
+            if (!transaction.hasTable("class_AllTypes")) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Missing class 'class_AllTypes' for field 'columnRealmList'");
+            }
+            Table table_8 = transaction.getTable("class_AllTypes");
+            if (!table.getLinkTarget(INDEX_COLUMNREALMLIST).hasSameSchema(table_8)) {
+                throw new RealmMigrationNeededException(transaction.getPath(), "Invalid RealmList type for field 'columnRealmList': '" + table.getLinkTarget(INDEX_COLUMNREALMLIST).getName() + "' expected - was '" + table_8.getName() + "'");
+            }
+        } else {
+            throw new RealmMigrationNeededException(transaction.getPath(), "The AllTypes class is missing from the schema for this Realm.");
+        }
+    }
+

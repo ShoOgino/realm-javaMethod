@@ -1,0 +1,26 @@
+    /**
+     * Returns the default Realm module. This module contains all Realm classes in the current project, but not
+     * those from library or project dependencies. Realm classes in these should be exposed using their own module.
+     *
+     * @return The default Realm module or null if no default module exists.
+     * @see io.realm.RealmConfiguration.Builder#setModules(Object, Object...)
+     */
+    public static Object getDefaultModule() {
+        String moduleName = "io.realm.DefaultRealmModule";
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(moduleName);
+            Constructor<?> constructor = clazz.getDeclaredConstructors()[0];
+            constructor.setAccessible(true);
+            return constructor.newInstance();
+        } catch (ClassNotFoundException e) {
+            return null;
+        } catch (InvocationTargetException e) {
+            throw new RealmException("Could not create an instance of " + moduleName, e);
+        } catch (InstantiationException e) {
+            throw new RealmException("Could not create an instance of " + moduleName, e);
+        } catch (IllegalAccessException e) {
+            throw new RealmException("Could not create an instance of " + moduleName, e);
+        }
+    }
+

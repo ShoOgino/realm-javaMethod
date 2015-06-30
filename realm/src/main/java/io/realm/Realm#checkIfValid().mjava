@@ -5,8 +5,7 @@
         }
 
         // Check if we are in the right thread
-        Realm currentRealm = realmsCache.get().get(canonicalPath);
-        if (currentRealm != this) {
+        if (threadId != Thread.currentThread().getId()) {
             throw new IllegalStateException(INCORRECT_THREAD_MESSAGE);
         }
     }
