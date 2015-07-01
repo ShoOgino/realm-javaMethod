@@ -1,7 +1,7 @@
-    // Async query without any conflicts strategy
+    // async query without any conflicts strategy
     public void testFindAll() throws Throwable {
         setDebugModeForAsyncRealmQuery(NO_ADVANCED_READ, RetryPolicy.MODE_NO_RETRY, NO_RETRY);
-        // We need to control precisely which Looper/Thread our Realm
+        // we need to control precisely which Looper/Thread our Realm
         // will operate on. This is unfortunately not possible when using the
         // current Instrumentation#InstrumentationThread, because InstrumentationTestRunner#onStart
         // Call Looper.prepare() for us and surprisingly doesn't call Looper#loop(), this is problematic
@@ -27,7 +27,7 @@
                     // async query (will run on different thread)
                     realm.where(AllTypes.class)
                             .between("columnLong", 0, 9)
-                            .findAll(new Realm.QueryCallback<AllTypes>() {
+                            .findAll(new RealmResults.QueryCallback<AllTypes>() {
                                 @Override
                                 public void onSuccess(RealmResults<AllTypes> results) {
                                     try {
@@ -63,7 +63,11 @@
                 } catch (Exception e) {
                     e.printStackTrace();
                     threadAssertionError[0] = e;
+
                 } finally {
+                    if (signalCallbackFinished.getCount() > 0) {
+                        signalCallbackFinished.countDown();
+                    }
                     if (realm != null) {
                         realm.close();
                     }

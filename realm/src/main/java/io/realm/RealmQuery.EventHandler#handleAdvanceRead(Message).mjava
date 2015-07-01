@@ -1,0 +1,13 @@
+        private void handleAdvanceRead (Message message) {
+            switch (message.arg1) {
+                case FIND_FIRST_QUERY:
+                    ((Realm.DebugRealmObjectQueryCallback<E>)callbackRealmObject).onBackgroundQueryCompleted(realm);
+                    break;
+                case FIND_ALL_QUERY:
+                case FIND_ALL_SORTED_QUERY:
+                case FIND_ALL_SORTED_MULTI_QUERY:
+                    ((Realm.DebugRealmResultsQueryCallback<E>)callbackRealmResults).onBackgroundQueryCompleted(realm);
+                    break;
+            }
+        }
+

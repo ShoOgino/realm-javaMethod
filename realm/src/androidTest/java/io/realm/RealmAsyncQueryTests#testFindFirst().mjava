@@ -1,0 +1,93 @@
+    // Async query to find one RealmObject without any conflicts strategy
+    public void testFindFirst() throws Throwable {
+        setDebugModeForAsyncRealmQuery(NO_ADVANCED_READ, RetryPolicy.MODE_NO_RETRY, NO_RETRY);
+
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final Looper[] looper = new Looper[1];
+        final Throwable[] threadAssertionError = new Throwable[1];
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                looper[0] = Looper.myLooper();
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance("test_find_first");
+                    realm.beginTransaction();
+                    final Owner owner1 = realm.createObject(Owner.class);
+                    owner1.setName("Owner 1");
+                    final Dog dog1 = realm.createObject(Dog.class);
+                    dog1.setName("Dog 1");
+                    dog1.setWeight(1);
+                    final Dog dog2 = realm.createObject(Dog.class);
+                    dog2.setName("Dog 2");
+                    dog2.setWeight(2);
+                    owner1.getDogs().add(dog1);
+                    owner1.getDogs().add(dog2);
+
+                    final Owner owner2 = realm.createObject(Owner.class);
+                    owner2.setName("Owner 2");
+                    final Dog dog3 = realm.createObject(Dog.class);
+                    dog3.setName("Dog 3");
+                    dog3.setWeight(1);
+                    final Dog dog4 = realm.createObject(Dog.class);
+                    dog4.setName("Dog 4");
+                    dog4.setWeight(2);
+                    owner2.getDogs().add(dog3);
+                    owner2.getDogs().add(dog4);
+                    realm.commitTransaction();
+
+                    realm.where(Owner.class)
+                            .equalTo("name", "Owner 2")
+                            .findFirst(new RealmObject.QueryCallback<Owner>() {
+                                @Override
+                                public void onSuccess(Owner result) {
+                                    try {
+                                        RealmList<Dog> dogs = result.getDogs();
+                                        Dog dog = dogs.where().equalTo("name", "Dog 4").findFirst();
+                                        assertEquals(dog4, dog);
+
+                                    } catch (AssertionFailedError e) {
+                                        threadAssertionError[0] = e;
+
+                                    } finally {
+                                        // whatever happened, make sure to notify the waiting TestCase Thread
+                                        signalCallbackFinished.countDown();
+                                    }
+                                }
+
+                                @Override
+                                public void onError(Exception t) {
+                                    try {
+                                        threadAssertionError[0] = t;
+                                        t.printStackTrace();
+                                    } finally {
+                                        signalCallbackFinished.countDown();
+                                    }
+                                }
+                            });
+
+                    Looper.loop();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+                } finally {
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        // wait until the callback of our async query proceed
+        signalCallbackFinished.await();
+        looper[0].quit();
+        executorService.shutdownNow();
+        if (null != threadAssertionError[0]) {
+            // throw any assertion errors happened in the background thread
+            throw threadAssertionError[0];
+        }
+    }
+

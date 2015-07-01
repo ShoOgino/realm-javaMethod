@@ -1,0 +1,94 @@
+    /**
+     * Find all objects that fulfill the query conditions.
+     * Results will be posted to the callback instance {@link RealmResults.QueryCallback} asynchronously
+     *
+     * @param callback to receive the result of this query
+     * @return A {@link Request} representing a cancellable, pending asynchronous query
+     * @see io.realm.RealmResults
+     * @throws java.lang.RuntimeException Any other error
+     */
+    public Request findAll(RealmResults.QueryCallback<E> callback) {
+        // will use the Looper of the caller thread to post the result
+        final Handler handler = new EventHandler(callback);
+
+        // We need a pointer to the caller Realm, to be able to handover the result to it
+        final long callerSharedGroupNativePtr = realm.getSharedGroupPointer();
+
+        // Handover the query (to be used by a worker thread)
+        final long ptrQuery = query.handoverQuery(callerSharedGroupNativePtr);
+
+        // We need to use the same configuration to open a background SharedGroup (i.e Realm)
+        // to perform the query
+        final RealmConfiguration realmConfiguration = realm.getConfiguration();
+
+        // This call needs to be done on the caller's thread, since SG()->get_version_of_current_transaction is not thread safe
+        final long[] callerSharedGroupVersion = realm.getSharedGroupVersion();
+
+        Future<?> pendingQuery = asyncQueryExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                if (!Thread.currentThread().isInterrupted() && (asyncRequest == null || !asyncRequest.isCancelled())) {
+                    Realm bgRealm = null;
+
+                    try {
+                        //TODO Once SharedGroup is thread safe, start reusing a cached instance
+                        //     of a worker Realm to avoid the cost of opening/closing a SharedGroup
+                        //     for each query
+                        bgRealm = Realm.getInstance(realmConfiguration);
+
+                        // begin_read may throw an UnreachableVersionException if the provided version
+                        // is no longer available, we fail fast
+                        bgRealm.setSharedGroupAtVersion(callerSharedGroupVersion);
+
+                        // Run the query & handover the table view for the caller thread
+                        long tableViewPtr = query.findAllWithHandover(bgRealm.getSharedGroupPointer(), ptrQuery);
+
+                        if (IS_DEBUG && NB_ADVANCE_READ_SIMULATION-- > 0) {
+                            // notify caller thread that we're about to post result to Handler
+                            // (this is relevant in Unit Testing, as we can advance read to simulate
+                            // a mismatch between the query result, and the current version of the Realm
+                            handler.sendMessage(handler.obtainMessage(
+                                    EventHandler.MSG_ADVANCE_READ,
+                                    EventHandler.FIND_ALL_QUERY, 0));
+                        }
+
+                        // send results to the caller thread's callback
+                        Bundle bundle = new Bundle(2);
+                        bundle.putLong(EventHandler.QUERY_RESULT_POINTER_ARG, tableViewPtr);
+                        bundle.putLong(EventHandler.CALLER_SHARED_GROUP_POINTER_ARG, callerSharedGroupNativePtr);
+
+                        Message message = handler.obtainMessage(EventHandler.MSG_SUCCESS);
+                        message.arg1 = EventHandler.FIND_ALL_QUERY;
+                        message.setData(bundle);
+                        handler.sendMessage(message);
+
+                    } catch (UnreachableVersionException e) {
+                        handler.sendMessage(handler.obtainMessage(
+                                EventHandler.MSG_UNREACHABLE_VERSION,
+                                EventHandler.FIND_ALL_QUERY));
+
+                    } catch (Exception e) {
+                        handler.sendMessage(handler.obtainMessage(
+                                EventHandler.MSG_ERROR,
+                                EventHandler.FIND_ALL_QUERY, 0, e));
+
+                    } finally {
+                        if (null != bgRealm) {
+                            bgRealm.close();
+                        }
+                    }
+                }
+            }
+        });
+        if (null != asyncRequest) {
+            // update current reference, since retrying the query will
+            // submit a new Runnable, hence the need to update the user
+            // with the new Future<?> reference.
+            asyncRequest.setPendingQuery(pendingQuery);
+
+        } else { //First run
+            asyncRequest = new Request(pendingQuery);
+        }
+        return asyncRequest;
+    }
+

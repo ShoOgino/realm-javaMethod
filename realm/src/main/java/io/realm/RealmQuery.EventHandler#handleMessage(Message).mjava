@@ -1,40 +1,30 @@
         @Override
         public void handleMessage(Message msg) {
             if (!asyncRequest.isCancelled()) {
-                switch (msg.what) {
-                    case MSG_SUCCESS:
-                        Bundle bundle = msg.getData();
-                        try {
-                            // import & create a RealmResults
-                            // importHandoverTableView may throw UnreachableVersionException
-                            RealmResults<E> resultList = new RealmResults<E>(realm,
-                                    query.importHandoverTableView(bundle.getLong(TABLE_VIEW_POINTER_ARG), bundle.getLong(CALLER_SHARED_GROUP_POINTER_ARG)),
-                                    clazz);
-                            callback.onSuccess(resultList);
-
-                        } catch (UnreachableVersionException e) {
-                            if (retryPolicy.shouldRetry()) {
-                                findAll(callback);
-                            } else {
-                                callback.onError(e);
-                            }
-                        } catch (Exception e) {
-                            callback.onError(e);
+                try {
+                    switch (msg.what) {
+                        case MSG_SUCCESS:
+                            handleSuccess (msg);
+                            break;
+                        case MSG_ERROR:
+                            handleError(msg);
+                            break;
+                        case MSG_UNREACHABLE_VERSION: {
+                            handleUnreachableVersion(msg);
+                            break;
                         }
-                        break;
-
-                    case MSG_UNREACHABLE_VERSION:
-                        if (retryPolicy.shouldRetry()) {
-                            findAll(callback);
+                        case MSG_ADVANCE_READ: {
+                            handleAdvanceRead(msg);
+                            break;
                         }
-                        break;
-                    case MSG_ERROR:
-                        callback.onError((Exception) msg.obj);
-                        break;
+                    }
+                } catch (Exception e) {
+                    if (callbackRealmResults != null) {
+                        callbackRealmResults.onError(e);
 
-                    case MSG_ADVANCE_READ:
-                        ((Realm.DebugQueryCallback<E>)callback).onBackgroundQueryCompleted(realm);
-                        break;
+                    } else if (callbackRealmObject != null) {
+                        callbackRealmObject.onError(e);
+                    }
                 }
             }
         }

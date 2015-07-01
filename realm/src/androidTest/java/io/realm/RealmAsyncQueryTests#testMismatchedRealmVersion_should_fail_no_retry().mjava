@@ -1,9 +1,13 @@
-    // This should crash because the number of retries is less than the number of modifications
-    public void testMismatchedRealmVersion_should_crash_after_2_retries() throws Throwable {
-        // simulate 3 modification to the caller's Realm for each result coming from the background thread
-        setDebugModeForAsyncRealmQuery(ADVANCE_THREE_READ, RetryPolicy.MODE_MAX_RETRY, RETRY_TWICE);
+    // async query that should fail, because the caller thread has advanced
+    // the version of the Realm, which is different from the one used by
+    // the background thread. Since no retry policy was defined, we should fail.
+    public void testMismatchedRealmVersion_should_fail_no_retry() throws Throwable {
+        // simulate one advanced read just after the worker thread has finished querying the Realm
+        // without any retry we should crash, because the background Realm used to perform the query
+        // return a TableView using a different version of the caller Realm (now more advanced)
+        setDebugModeForAsyncRealmQuery(ADVANCE_ONE_READ, RetryPolicy.MODE_NO_RETRY, NO_RETRY);
 
-        final CountDownLatch signalCallbackFinishedLatch = new CountDownLatch(1);
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Looper[] looper = new Looper[1];
         final Throwable[] threadAssertionError = new Throwable[1];
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -14,23 +18,15 @@
                 looper[0] = Looper.myLooper();
                 Realm realm = null;
                 try {
-                    realm = openRealmInstance("test_should_crash_after_2_retries");
+                    realm = openRealmInstance("test_should_fail_no_retry");
                     populateTestRealm(realm, 10);
+
                     realm.where(AllTypes.class)
                             .between("columnLong", 0, 9)
-                            .findAll(new Realm.DebugQueryCallback<AllTypes>() {
+                            .findAll(new Realm.DebugRealmResultsQueryCallback<AllTypes>() {
                                 @Override
                                 public void onSuccess(RealmResults<AllTypes> results) {
-                                    try {
-                                        signalCallbackFinishedLatch.countDown();
-
-                                    } catch (AssertionFailedError e) {
-                                        threadAssertionError[0] = e;
-
-                                    } finally {
-                                        // whatever happened, make sure to notify the waiting TestCase Thread
-                                        signalCallbackFinishedLatch.countDown();
-                                    }
+                                    signalCallbackFinished.countDown();
                                 }
 
                                 @Override
@@ -38,13 +34,19 @@
                                     try {
                                         threadAssertionError[0] = t;
                                     } finally {
-                                        signalCallbackFinishedLatch.countDown();
+                                        signalCallbackFinished.countDown();
                                     }
                                 }
 
                                 @Override
                                 public void onBackgroundQueryCompleted(Realm realm) {
-                                    populateTestRealm(realm, 3);
+                                    // triggered on the background thread to alter the caller's Realm state
+                                    realm.executeTransaction(new Realm.Transaction() {
+                                        @Override
+                                        public void execute(Realm realm) {
+                                            realm.clear(AllTypes.class);
+                                        }
+                                    });
                                 }
                             });
 
@@ -54,9 +56,9 @@
                     e.printStackTrace();
                     threadAssertionError[0] = e;
                 } finally {
-                    if (signalCallbackFinishedLatch.getCount() > 0) {
+                    if (signalCallbackFinished.getCount() > 0) {
                         // opening Realm crashed, not even callbacks get the chance to be called
-                        signalCallbackFinishedLatch.countDown();
+                        signalCallbackFinished.countDown();
                     }
                     if (realm != null) {
                         realm.close();
@@ -65,7 +67,7 @@
             }
         });
 
-        signalCallbackFinishedLatch.await();
+        signalCallbackFinished.await();
         looper[0].quit();
         executorService.shutdownNow();
         if (null == threadAssertionError[0] || !(threadAssertionError[0] instanceof UnreachableVersionException)) {

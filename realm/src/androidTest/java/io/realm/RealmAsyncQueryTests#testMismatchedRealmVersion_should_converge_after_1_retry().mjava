@@ -18,7 +18,7 @@
                     populateTestRealm(realm, 10);
                     realm.where(AllTypes.class)
                             .between("columnLong", 0, 9)
-                            .findAll(new Realm.DebugQueryCallback<AllTypes>() {
+                            .findAll(new Realm.DebugRealmResultsQueryCallback<AllTypes>() {
                                 @Override
                                 public void onSuccess(RealmResults<AllTypes> results) {
                                     try {
@@ -58,7 +58,6 @@
                     threadAssertionError[0] = e;
                 } finally {
                     if (signalCallbackFinishedLatch.getCount() > 0) {
-                        // opening Realm crashed, not even callbacks get the chance to be called
                         signalCallbackFinishedLatch.countDown();
                     }
                     if (realm != null) {

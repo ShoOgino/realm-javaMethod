@@ -1,0 +1,80 @@
+    public void testFindAllSorted_fail_no_retry() throws Throwable {
+        setDebugModeForAsyncRealmQuery(ADVANCE_ONE_READ, RetryPolicy.MODE_NO_RETRY, NO_RETRY);
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final Looper[] looper = new Looper[1];
+        final Throwable[] threadAssertionError = new Throwable[1];
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                looper[0] = Looper.myLooper();
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance("test_find_all_sorted_no_retry");
+                    realm.beginTransaction();
+                    for (int i = 0; i < 10; i++) {
+                        AllTypes allTypes = realm.createObject(AllTypes.class);
+                        allTypes.setColumnLong(i);
+                        allTypes.setColumnString("data " + i % 3);
+                    }
+                    realm.commitTransaction();
+
+                    realm.where(AllTypes.class)
+                            .findAllSorted("columnLong",
+                                    RealmResults.SORT_ORDER_DESCENDING,
+                                    new Realm.DebugRealmResultsQueryCallback<AllTypes>() {
+                                        @Override
+                                        public void onSuccess(RealmResults<AllTypes> result) {
+                                            signalCallbackFinished.countDown();
+                                        }
+
+                                        @Override
+                                        public void onError(Exception t) {
+                                            try {
+                                                threadAssertionError[0] = t;
+                                                t.printStackTrace();
+                                            } finally {
+                                                signalCallbackFinished.countDown();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onBackgroundQueryCompleted(Realm realm) {
+                                            // triggered on the background thread to alter the caller's Realm state
+                                            realm.executeTransaction(new Realm.Transaction() {
+                                                @Override
+                                                public void execute(Realm realm) {
+                                                    realm.createObject(Owner.class);
+                                                    realm.createObject(Dog.class);
+                                                }
+                                            });
+                                        }
+                                    });
+
+                    Looper.loop();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+                } finally {
+                    if (signalCallbackFinished.getCount() > 0) {
+                        signalCallbackFinished.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        // wait until the callback of our async query proceed
+        signalCallbackFinished.await();
+        looper[0].quit();
+        executorService.shutdownNow();
+        if (null == threadAssertionError[0] || !(threadAssertionError[0] instanceof UnreachableVersionException)) {
+            fail("Expecting RuntimeException: Unspecified exception." +
+                    " Handover failed due to version mismatch in io_realm_internal_TableQuery.cpp");
+        }
+    }
+
