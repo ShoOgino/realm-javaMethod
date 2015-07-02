@@ -1,0 +1,12 @@
+    public void testSetWrongTableClassThrows() {
+        realm.beginTransaction();
+        Dog dog = realm.createObject(Dog.class);
+        try {
+            dynamicList.set(0, new DynamicRealmObject(dog));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+
