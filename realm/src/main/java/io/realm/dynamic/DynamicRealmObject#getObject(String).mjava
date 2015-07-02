@@ -1,0 +1,18 @@
+    /**
+     * Returns the object being linked to from this field.
+     *
+     * @param fieldName Name of field.
+     * @return The {@link DynamicRealmObject} representation of the linked object or {@code null} if no object is linked.
+     * @throws IllegalArgumentException if field name doesn't exists or it doesn't contain links to other objects.
+     */
+    public DynamicRealmObject getObject(String fieldName) {
+        long columnIndex = row.getColumnIndex(fieldName);
+        if (row.isNullLink(columnIndex)) {
+            return null;
+        } else {
+            long linkRowIndex = row.getLink(columnIndex);
+            CheckedRow linkRow = row.getTable().getCheckedRow(linkRowIndex);
+            return new DynamicRealmObject(realm, linkRow);
+        }
+    }
+

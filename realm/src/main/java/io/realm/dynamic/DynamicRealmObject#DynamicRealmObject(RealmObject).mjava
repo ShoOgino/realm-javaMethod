@@ -1,0 +1,18 @@
+    /**
+     * Creates a dynamic Realm object based on a existing object.
+     *
+     * @param obj Realm object to convert to a dynamic object. Only objects managed by Realm can be used.
+     * @throws IllegalArgumentException if object isn't managed by a Realm.
+     */
+    public DynamicRealmObject(RealmObject obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException("Non-null object must be provided.");
+        }
+        Row row = RealmObject.getRow(obj);
+        if (row == null) {
+            throw new IllegalArgumentException("A object managed by Realm must be provided. This is a standalone object.");
+        }
+        this.realm = RealmObject.getRealm(obj);
+        this.row = (row instanceof CheckedRow) ? (CheckedRow) row : ((UncheckedRow) row).convertToChecked();
+    }
+

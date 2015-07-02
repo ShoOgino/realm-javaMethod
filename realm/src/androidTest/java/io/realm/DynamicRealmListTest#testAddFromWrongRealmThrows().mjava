@@ -1,0 +1,19 @@
+    public void testAddFromWrongRealmThrows() {
+        RealmConfiguration otherConfig = new RealmConfiguration.Builder(getContext()).name("realm2").build();
+        Realm.deleteRealm(otherConfig);
+        Realm realm2 = Realm.getInstance(otherConfig);
+        realm2.beginTransaction();
+        AllJavaTypes realm2Object = realm2.createObject(AllJavaTypes.class);
+        realm2.commitTransaction();
+
+        realm.beginTransaction();
+        try {
+            dynamicList.add(new DynamicRealmObject(realm2Object));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+            realm2.close();
+        }
+    }
+
