@@ -1,0 +1,16 @@
+    // Supported "Index" annotation types
+    @Test
+    public void compileIndexTypes() throws IOException {
+        // TODO: Test "Byte", "Short", "Integer", "Long", "Boolean" when they are supported
+        final String validIndexFieldTypes[] = {"byte", "short", "int", "long", "boolean", "String", "java.util.Date"};
+
+        for (String fieldType : validIndexFieldTypes) {
+            TestRealmObjectFileObject javaFileObject =
+                    TestRealmObjectFileObject.getSingleFieldInstance("ValidIndexType", "Index", fieldType, "testField");
+            ASSERT.about(javaSource())
+                    .that(javaFileObject)
+                    .processedWith(new RealmProcessor())
+                    .compilesWithoutError();
+        }
+    }
+
