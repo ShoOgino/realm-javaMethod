@@ -27,9 +27,6 @@
         // to perform the query
         final RealmConfiguration realmConfiguration = realm.getConfiguration();
 
-        // This call needs to be done on the caller's thread, since SG()->get_version_of_current_transaction is not thread safe
-        final long[] callerSharedGroupVersion = realm.getSharedGroupVersion();
-
         final TableView.Order order = sortAscending ? TableView.Order.ascending : TableView.Order.descending;
         final Long columnIndex = columns.get(fieldName);
         if (columnIndex == null || columnIndex < 0) {
@@ -47,10 +44,6 @@
                         //     of a worker Realm to avoid the cost of opening/closing a SharedGroup
                         //     for each query
                         bgRealm = Realm.getInstance(realmConfiguration);
-
-                        // begin_read may throw an UnreachableVersionException if the provided version
-                        // is no longer available, we fail fast
-                        bgRealm.setSharedGroupAtVersion(callerSharedGroupVersion);
 
                         // Run the query & handover the table view for the caller thread
                         long tableViewPtr = query.findAllSortedWithHandover(bgRealm.getSharedGroupPointer(), ptrQuery, columnIndex, (order == TableView.Order.ascending));
@@ -75,7 +68,7 @@
                         message.setData(bundle);
                         handler.sendMessage(message);
 
-                    } catch (UnreachableVersionException e) {
+                    } catch (BadVersionException e) {
                         handler.sendMessage(handler.obtainMessage(
                                 EventHandler.MSG_UNREACHABLE_VERSION,
                                 EventHandler.FIND_ALL_SORTED_QUERY, 0));
