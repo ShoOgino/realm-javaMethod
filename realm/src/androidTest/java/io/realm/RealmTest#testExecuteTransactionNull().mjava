@@ -1,5 +1,8 @@
     public void testExecuteTransactionNull() {
-        testRealm.executeTransaction(null); // Nothing happens
+        try {
+            testRealm.executeTransaction(null);
+            fail("null transaction should throw");
+        } catch (IllegalArgumentException ignore) {}
         assertFalse(testRealm.hasChanged());
     }
 
