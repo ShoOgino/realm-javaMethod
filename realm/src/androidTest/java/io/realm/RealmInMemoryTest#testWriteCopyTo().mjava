@@ -1,0 +1,44 @@
+    // Test if an in-memory Realm can be written to disk with/without encryption
+    public void testWriteCopyTo() throws IOException {
+        byte[] key = TestHelper.getRandomKey();
+        String fileName = IDENTIFIER + ".realm";
+        String encFileName = IDENTIFIER + ".enc.realm";
+        RealmConfiguration conf = new RealmConfiguration.Builder(getContext())
+                .name(fileName)
+                .build();
+        RealmConfiguration encConf = new RealmConfiguration.Builder(getContext())
+                .name(encFileName)
+                .encryptionKey(key)
+                .build();
+
+        Realm.deleteRealm(conf);
+        Realm.deleteRealm(encConf);
+
+        testRealm.beginTransaction();
+        Dog dog = testRealm.createObject(Dog.class);
+        dog.setName("DinoDog");
+        testRealm.commitTransaction();
+
+        // Test a normal Realm file
+        testRealm.writeCopyTo(new File(getContext().getFilesDir(), fileName));
+        Realm onDiskRealm = Realm.getInstance(conf);
+        assertEquals(onDiskRealm.allObjects(Dog.class).size(), 1);
+        onDiskRealm.close();
+
+        // Test a encrypted Realm file
+        testRealm.writeEncryptedCopyTo(new File(getContext().getFilesDir(), encFileName), key);
+        onDiskRealm = Realm.getInstance(encConf);
+        assertEquals(onDiskRealm.allObjects(Dog.class).size(), 1);
+        onDiskRealm.close();
+        // Test with a wrong key to see if it fails as expected.
+        try {
+            RealmConfiguration wrongKeyConf = new RealmConfiguration.Builder(getContext())
+                    .name(encFileName)
+                    .encryptionKey(TestHelper.getRandomKey(42))
+                    .build();
+            Realm.getInstance(wrongKeyConf);
+            fail("Realm.getInstance should fail with illegal argument");
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

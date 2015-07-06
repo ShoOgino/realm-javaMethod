@@ -1,0 +1,15 @@
+    @Override
+    protected void setUp() throws Exception {
+        RealmConfiguration onDiskConf = new RealmConfiguration.Builder(getContext())
+                .name(IDENTIFIER)
+                .build();
+        inMemConf = new RealmConfiguration.Builder(getContext())
+                .name(IDENTIFIER)
+                .inMemory()
+                .build();
+
+        // Delete the same name Realm file just in case
+        Realm.deleteRealm(onDiskConf);
+        testRealm = Realm.getInstance(inMemConf);
+    }
+

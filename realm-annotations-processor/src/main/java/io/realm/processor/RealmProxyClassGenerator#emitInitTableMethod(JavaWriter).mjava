@@ -14,9 +14,9 @@
             String fieldTypeCanonicalName = field.asType().toString();
             String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
 
-            if (JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
+            if (Constants.JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
                 writer.emitStatement("table.addColumn(%s, \"%s\")",
-                        JAVA_TO_COLUMN_TYPES.get(fieldTypeCanonicalName),
+                        Constants.JAVA_TO_COLUMN_TYPES.get(fieldTypeCanonicalName),
                         fieldName);
             } else if (typeUtils.isAssignable(field.asType(), realmObject)) {
                 writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, fieldTypeSimpleName);

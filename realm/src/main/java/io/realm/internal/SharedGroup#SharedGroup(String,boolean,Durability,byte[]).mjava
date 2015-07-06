@@ -1,0 +1,13 @@
+    public SharedGroup(String databaseFile, boolean enableImplicitTransactions, Durability durability, byte[] key) {
+        if (enableImplicitTransactions) {
+            nativeReplicationPtr = nativeCreateReplication(databaseFile, key);
+            nativePtr = createNativeWithImplicitTransactions(nativeReplicationPtr, durability.value, key);
+            implicitTransactionsEnabled = true;
+        } else {
+            nativePtr = nativeCreate(databaseFile, Durability.FULL.value, false, false, key);
+        }
+        context = new Context();
+        path = databaseFile;
+        checkNativePtrNotZero();
+    }
+
