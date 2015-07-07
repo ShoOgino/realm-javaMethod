@@ -1,4 +1,4 @@
-        private void handleUnreachableVersion (Message message) {
+        private void handleUnreachableVersion(Message message) {
             if (retryPolicy.shouldRetry()) {
                 switch (message.arg1) {
                     case FIND_FIRST_QUERY:
@@ -8,14 +8,20 @@
                         findAll(callbackRealmResults);
                         break;
                     case FIND_ALL_SORTED_QUERY:
-                        findAllSorted(fieldName, sortAscending);
+                        findAllSorted(fieldName, sortAscending, callbackRealmResults);
                         break;
                     case FIND_ALL_SORTED_MULTI_QUERY:
-                        findAllSorted(fieldNames, sortAscendings);
+                        findAllSorted(fieldNames, sortAscendings, callbackRealmResults);
                         break;
                 }
             } else {
-                handleError (message);
+                // pointers were already freed/consumed by 'import_from_handover'
+                // calling delete again will crash core
+                handoverQueryPtr = -1;
+                handoverTableViewPtr = -1;
+                handoverRowPtr = -1;
+                message.obj = new RealmException("Query failed due to concurrent modification of the Realm");
+                handleError(message);
             }
         }
 

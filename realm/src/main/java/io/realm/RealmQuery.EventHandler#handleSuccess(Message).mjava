@@ -1,73 +1,59 @@
-        private void handleSuccess (Message message) {
+        private void handleSuccess(final Message message) {
             Bundle bundle = message.getData();
-            switch (message.arg1) {
-                case FIND_FIRST_QUERY:
-                    try {
+            try {
+                switch (message.arg1) {
+                    case FIND_FIRST_QUERY: {
                         E realmObject = realm.getByPointer(clazz,
                                 query.importHandoverRow(bundle.getLong(QUERY_RESULT_POINTER_ARG),
                                         bundle.getLong(CALLER_SHARED_GROUP_POINTER_ARG)));
 
                         callbackRealmObject.onSuccess(realmObject);
-
-                    } catch (BadVersionException e) {
-                        if (retryPolicy.shouldRetry()) {
-                            findFirst(callbackRealmObject);
-                        } else {
-                            callbackRealmObject.onError(e);
-                        }
+                        callbackRealmObject = null;
+                        break;
                     }
-                    break;
-                case FIND_ALL_QUERY:
-                    try {
+                    case FIND_ALL_QUERY: {
                         RealmResults<E> resultList = new RealmResults<E>(realm,
                                 query.importHandoverTableView(bundle.getLong(QUERY_RESULT_POINTER_ARG),
                                         bundle.getLong(CALLER_SHARED_GROUP_POINTER_ARG)),
                                 clazz);
 
                         callbackRealmResults.onSuccess(resultList);
-
-                    } catch (BadVersionException e) {
-                        if (retryPolicy.shouldRetry()) {
-                            findAll(callbackRealmResults);
-                        } else {
-                            callbackRealmResults.onError(e);
-                        }
+                        callbackRealmResults = null;
+                        break;
                     }
-                    break;
-                case FIND_ALL_SORTED_QUERY:
-                    try {
+                    case FIND_ALL_SORTED_QUERY: {
                         RealmResults<E> resultList = new RealmResults<E>(realm,
                                 query.importHandoverTableView(bundle.getLong(QUERY_RESULT_POINTER_ARG),
                                         bundle.getLong(CALLER_SHARED_GROUP_POINTER_ARG)),
                                 clazz);
 
                         callbackRealmResults.onSuccess(resultList);
-
-                    } catch (BadVersionException e) {
-                        if (retryPolicy.shouldRetry()) {
-                            findAllSorted(fieldName, sortAscending, callbackRealmResults);
-                        } else {
-                            callbackRealmResults.onError(e);
-                        }
+                        callbackRealmResults = null;
+                        break;
                     }
-                    break;
-                case FIND_ALL_SORTED_MULTI_QUERY:
-                    try {
+                    case FIND_ALL_SORTED_MULTI_QUERY: {
                         RealmResults<E> resultList = new RealmResults<E>(realm,
                                 query.importHandoverTableView(bundle.getLong(QUERY_RESULT_POINTER_ARG),
                                         bundle.getLong(CALLER_SHARED_GROUP_POINTER_ARG)),
                                 clazz);
 
                         callbackRealmResults.onSuccess(resultList);
-
-                    } catch (BadVersionException e) {
-                        if (retryPolicy.shouldRetry()) {
-                            findAllSorted(fieldNames, sortAscendings, callbackRealmResults);
-                        } else {
-                            callbackRealmResults.onError(e);
-                        }
+                        callbackRealmResults = null;
+                        break;
                     }
-                    break;
+                }
+
+            } catch (BadVersionException e) {
+                handleUnreachableVersion(message);
+
+            } catch (Exception e) {
+                // if we make it this fare it means that the query handover + TableView or Row
+                // were already freed/consumed
+                handoverQueryPtr = -1;
+                handoverTableViewPtr = -1;
+                handoverRowPtr = -1;
+                message.obj = e;
+                handleError(message);
             }
         }
 

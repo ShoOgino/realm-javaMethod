@@ -1,12 +1,16 @@
-        private void handleError (Message message) {
+        private void handleError(Message message) {
+            releaseHandoverResources();
+
             switch (message.arg1) {
                 case FIND_FIRST_QUERY:
-                    callbackRealmResults.onError((Exception) message.obj);
+                    callbackRealmObject.onError((Exception) message.obj);
+                    callbackRealmObject = null;
                     break;
                 case FIND_ALL_QUERY:
                 case FIND_ALL_SORTED_QUERY:
                 case FIND_ALL_SORTED_MULTI_QUERY:
                     callbackRealmResults.onError((Exception) message.obj);
+                    callbackRealmResults = null;
                     break;
             }
         }

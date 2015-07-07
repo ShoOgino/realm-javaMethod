@@ -1,10 +1,10 @@
     /**
      * Similar to {@link #findAllSorted(String, boolean)} but runs asynchronously from a worker thread
      *
-     * @param fieldName the field name to sort by.
+     * @param fieldName     the field name to sort by.
      * @param sortAscending sort ascending if <code>SORT_ORDER_ASCENDING</code>, sort descending
      *                      if <code>SORT_ORDER_DESCENDING</code>
-     * @param callback to receive the result of this query
+     * @param callback      to receive the result of this query
      * @return A {@link io.realm.RealmResults} containing objects. If no objects match the condition,
      * a list with zero objects is returned.
      * @throws java.lang.IllegalArgumentException if field name does not exist.
@@ -21,7 +21,7 @@
         final long callerSharedGroupNativePtr = realm.getSharedGroupPointer();
 
         // Handover the query (to be used by a worker thread)
-        final long ptrQuery = query.handoverQuery(callerSharedGroupNativePtr);
+        handoverQueryPtr = query.handoverQuery(callerSharedGroupNativePtr);
 
         // We need to use the same configuration to open a background SharedGroup (i.e Realm)
         // to perform the query
@@ -46,8 +46,8 @@
                         bgRealm = Realm.getInstance(realmConfiguration);
 
                         // Run the query & handover the table view for the caller thread
-                        long tableViewPtr = query.findAllSortedWithHandover(bgRealm.getSharedGroupPointer(), ptrQuery, columnIndex, (order == TableView.Order.ascending));
-
+                        handoverTableViewPtr = query.findAllSortedWithHandover(bgRealm.getSharedGroupPointer(), handoverQueryPtr, columnIndex, (order == TableView.Order.ascending));
+                        handoverQueryPtr = -1;
                         if (IS_DEBUG && NB_ADVANCE_READ_SIMULATION-- > 0) {
                             // notify caller thread that we're about to post result to Handler
                             // (this is relevant in Unit Testing, as we can advance read to simulate
@@ -60,7 +60,7 @@
 
                         // send results to the caller thread's callback
                         Bundle bundle = new Bundle(2);
-                        bundle.putLong(EventHandler.QUERY_RESULT_POINTER_ARG, tableViewPtr);
+                        bundle.putLong(EventHandler.QUERY_RESULT_POINTER_ARG, handoverTableViewPtr);
                         bundle.putLong(EventHandler.CALLER_SHARED_GROUP_POINTER_ARG, callerSharedGroupNativePtr);
 
                         Message message = handler.obtainMessage(EventHandler.MSG_SUCCESS);
@@ -83,6 +83,8 @@
                             bgRealm.close();
                         }
                     }
+                } else {
+                    releaseHandoverResources();
                 }
             }
         });

@@ -39,12 +39,13 @@
 
                     Looper.loop();// ready to receive callback
 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+
                 } finally {
                     if (signalCallbackFinished.getCount() > 0) {
                         signalCallbackFinished.countDown();
-                    }
-                    if (realm != null) {
-                        realm.close();
                     }
                 }
             }

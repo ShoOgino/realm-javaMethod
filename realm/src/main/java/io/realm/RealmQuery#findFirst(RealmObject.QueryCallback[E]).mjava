@@ -1,5 +1,6 @@
     /**
      * Similar to {@link #findFirst()} but runs asynchronously from a worker thread
+     *
      * @param callback to receive the result of this query
      * @return A {@link Request} representing a cancellable, pending asynchronous query
      */
@@ -11,7 +12,7 @@
         final long callerSharedGroupNativePtr = realm.getSharedGroupPointer();
 
         // Handover the query (to be used by a worker thread)
-        final long ptrQuery = query.handoverQuery(callerSharedGroupNativePtr);
+        handoverQueryPtr = query.handoverQuery(callerSharedGroupNativePtr);
 
         // We need to use the same configuration to open a background SharedGroup (i.e Realm)
         // to perform the query
@@ -30,8 +31,8 @@
                         bgRealm = Realm.getInstance(realmConfiguration);
 
                         // Run the query & handover the table view for the caller thread
-                        long rowPtr = query.findWithHandover(bgRealm.getSharedGroupPointer(), ptrQuery);
-
+                        handoverRowPtr = query.findWithHandover(bgRealm.getSharedGroupPointer(), handoverQueryPtr);
+                        handoverQueryPtr = -1;
                         if (IS_DEBUG && NB_ADVANCE_READ_SIMULATION-- > 0) {
                             // notify caller thread that we're about to post result to Handler
                             // (this is relevant in Unit Testing, as we can advance read to simulate
@@ -43,7 +44,7 @@
 
                         // send results to the caller thread's callback
                         Bundle bundle = new Bundle(2);
-                        bundle.putLong(EventHandler.QUERY_RESULT_POINTER_ARG, rowPtr);
+                        bundle.putLong(EventHandler.QUERY_RESULT_POINTER_ARG, handoverRowPtr);
                         bundle.putLong(EventHandler.CALLER_SHARED_GROUP_POINTER_ARG, callerSharedGroupNativePtr);
 
                         Message message = handler.obtainMessage(EventHandler.MSG_SUCCESS);
@@ -66,6 +67,8 @@
                             bgRealm.close();
                         }
                     }
+                } else {
+                    releaseHandoverResources();
                 }
             }
         });

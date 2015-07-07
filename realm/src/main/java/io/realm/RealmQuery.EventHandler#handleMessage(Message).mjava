@@ -1,31 +1,27 @@
         @Override
         public void handleMessage(Message msg) {
-            if (!asyncRequest.isCancelled()) { // FIXME check if realm is still open/valid
-                try {
-                    switch (msg.what) {
-                        case MSG_SUCCESS:
-                            handleSuccess (msg);
-                            break;
-                        case MSG_ERROR:
-                            handleError(msg);
-                            break;
-                        case MSG_UNREACHABLE_VERSION: {
-                            handleUnreachableVersion(msg);
-                            break;
-                        }
-                        case MSG_ADVANCE_READ: {
-                            handleAdvanceRead(msg);
-                            break;
-                        }
+            if (!asyncRequest.isCancelled()) {
+                switch (msg.what) {
+                    case MSG_SUCCESS:
+                        handleSuccess(msg);
+                        break;
+                    case MSG_ERROR:
+                        handleError(msg);
+                        break;
+                    case MSG_UNREACHABLE_VERSION: {
+                        handleUnreachableVersion(msg);
+                        break;
                     }
-                } catch (Exception e) {
-                    if (callbackRealmResults != null) {
-                        callbackRealmResults.onError(e);
-
-                    } else if (callbackRealmObject != null) {
-                        callbackRealmObject.onError(e);
+                    case MSG_ADVANCE_READ: {
+                        handleAdvanceRead(msg);
+                        break;
                     }
                 }
+
+            } else {
+                // in case we didn't have the chance to import the different handovers(because the query was cancelled/crash)
+                // we need to manually free those resources to avoid memory leak
+                releaseHandoverResources();
             }
         }
 

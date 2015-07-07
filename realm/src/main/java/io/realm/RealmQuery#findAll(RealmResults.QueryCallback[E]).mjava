@@ -4,8 +4,8 @@
      *
      * @param callback to receive the result of this query
      * @return A {@link Request} representing a cancellable, pending asynchronous query
-     * @see io.realm.RealmResults
      * @throws java.lang.RuntimeException Any other error
+     * @see io.realm.RealmResults
      */
     public Request findAll(RealmResults.QueryCallback<E> callback) {
         // will use the Looper of the caller thread to post the result
@@ -15,7 +15,7 @@
         final long callerSharedGroupNativePtr = realm.getSharedGroupPointer();
 
         // Handover the query (to be used by a worker thread)
-        final long ptrQuery = query.handoverQuery(callerSharedGroupNativePtr);
+        handoverQueryPtr = query.handoverQuery(callerSharedGroupNativePtr);
 
         // We need to use the same configuration to open a background SharedGroup (i.e Realm)
         // to perform the query
@@ -34,7 +34,8 @@
                         bgRealm = Realm.getInstance(realmConfiguration);
 
                         // Run the query & handover the table view for the caller thread
-                        long tableViewPtr = query.findAllWithHandover(bgRealm.getSharedGroupPointer(), ptrQuery);
+                        handoverTableViewPtr = query.findAllWithHandover(bgRealm.getSharedGroupPointer(), handoverQueryPtr);
+                        handoverQueryPtr = -1;
 
                         if (IS_DEBUG && NB_ADVANCE_READ_SIMULATION-- > 0) {
                             // notify caller thread that we're about to post result to Handler
@@ -47,7 +48,7 @@
 
                         // send results to the caller thread's callback
                         Bundle bundle = new Bundle(2);
-                        bundle.putLong(EventHandler.QUERY_RESULT_POINTER_ARG, tableViewPtr);
+                        bundle.putLong(EventHandler.QUERY_RESULT_POINTER_ARG, handoverTableViewPtr);
                         bundle.putLong(EventHandler.CALLER_SHARED_GROUP_POINTER_ARG, callerSharedGroupNativePtr);
 
                         Message message = handler.obtainMessage(EventHandler.MSG_SUCCESS);
@@ -70,6 +71,8 @@
                             bgRealm.close();
                         }
                     }
+                } else {
+                    releaseHandoverResources();
                 }
             }
         });
