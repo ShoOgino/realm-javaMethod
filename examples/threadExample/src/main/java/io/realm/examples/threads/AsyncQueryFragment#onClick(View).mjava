@@ -32,6 +32,8 @@
                                             public void execute(Realm realm) {
                                                 // query for all points
                                                 RealmResults<Dot> dots = realm.where(Dot.class).findAll();
+
+                                                // Iterating backwards to avoid https://github.com/realm/realm-java/issues/640
                                                 for (int i = dots.size()-1; i>=0; i--) {
                                                     Dot dot = dots.get(i);
                                                     if (dot.isValid()) {
@@ -40,7 +42,6 @@
                                                         dot.setX(y);
                                                         dot.setY(x);
                                                     }
-                                                    SystemClock.sleep(60);
                                                 }
                                             }
                                         }, new Realm.Transaction.Callback() {
