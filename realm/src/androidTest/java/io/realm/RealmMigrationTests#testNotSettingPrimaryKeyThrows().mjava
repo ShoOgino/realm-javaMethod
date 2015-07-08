@@ -3,9 +3,10 @@
             @Override
             public long execute(Realm realm, long version) {
                 Table table = realm.getTable(AnnotationTypes.class);
-                table.addColumn(ColumnType.INTEGER, "id");
+                long columnIndex = table.addColumn(ColumnType.INTEGER, "id");
+                table.addSearchIndex(columnIndex);
                 // Forget to set @PrimaryKey
-                long columnIndex = table.addColumn(ColumnType.STRING, "indexString");
+                columnIndex = table.addColumn(ColumnType.STRING, "indexString");
                 table.addSearchIndex(columnIndex);
                 table.addColumn(ColumnType.STRING, "notIndexString");
                 return 1;
