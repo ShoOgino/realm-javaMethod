@@ -1,15 +1,14 @@
-    public void testNotSettingIndexThrows() {
+    public void testNotSettingIndexForPrimaryKeyThrows() {
         RealmMigration migration = new RealmMigration() {
             @Override
             public long execute(Realm realm, long version) {
                 Table table = realm.getTable(AnnotationTypes.class);
-                long columnIndex = table.addColumn(ColumnType.INTEGER, "id");
+                table.addColumn(ColumnType.INTEGER, "id");
                 table.setPrimaryKey("id");
-                // Primary key will be indexed automatically
+                // Forget to add search index primary key
+                long columnIndex = table.addColumn(ColumnType.STRING, "indexString");
                 table.addSearchIndex(columnIndex);
-                table.addColumn(ColumnType.STRING, "indexString");
                 table.addColumn(ColumnType.STRING, "notIndexString");
-                // Forget to set @Index
                 return 1;
             }
         };
@@ -26,5 +25,6 @@
             fail();
         } catch (RealmMigrationNeededException expected) {
         }
+
     }
 
