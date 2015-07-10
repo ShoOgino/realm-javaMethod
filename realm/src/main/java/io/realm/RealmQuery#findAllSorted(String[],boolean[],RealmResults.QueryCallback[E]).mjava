@@ -44,6 +44,7 @@
             Future<?> pendingQuery = asyncQueryExecutor.submit(new Runnable() {
                 @Override
                 public void run() {
+                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
                     if (!Thread.currentThread().isInterrupted() && (asyncRequest == null || !asyncRequest.isCancelled())) {
                         Realm bgRealm = null;
 
