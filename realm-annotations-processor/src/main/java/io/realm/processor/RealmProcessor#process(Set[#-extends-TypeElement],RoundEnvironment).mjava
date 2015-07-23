@@ -3,9 +3,13 @@
         if (hasProcessedModules) {
             return true;
         }
+
         RealmVersionChecker updateChecker = RealmVersionChecker.getInstance(processingEnv);
         updateChecker.executeRealmVersionUpdate();
+
         Utils.initialize(processingEnv);
+
+        List<String> packages = new ArrayList<String>();
 
         // Create all proxy classes
         for (Element classElement : roundEnv.getElementsAnnotatedWith(RealmClass.class)) {
@@ -19,6 +23,7 @@
                 continue;
             }
             Utils.note("Processing class " + metadata.getSimpleClassName());
+            packages.add(metadata.getPackageName());
             boolean success = metadata.generate();
             if (!success) {
                 return true; // Abort processing by claiming all annotations
@@ -34,6 +39,9 @@
                 Utils.error(e.getMessage(), classElement);
             }
 	    }
+
+        RealmAnalytics analytics = RealmAnalytics.getInstance(packages);
+        analytics.send();
 
         hasProcessedModules = true;
         return processModules(roundEnv);

@@ -1,0 +1,15 @@
+    /**
+     * Compute an anonymous app/library id from the packages containing Realm model classes
+     * @return the anonymous app/library id
+     * @throws NoSuchAlgorithmException
+     */
+    public String getAnonymousAppId() throws NoSuchAlgorithmException {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String modelPackage : packages) {
+            stringBuilder.append(modelPackage).append(":");
+        }
+        byte[] packagesBytes = stringBuilder.toString().getBytes();
+
+        return Utils.hexStringify(Utils.sha256Hash(packagesBytes));
+    }
+
