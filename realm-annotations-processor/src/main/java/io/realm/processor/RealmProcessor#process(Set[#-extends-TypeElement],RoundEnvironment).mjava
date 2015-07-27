@@ -9,7 +9,7 @@
 
         Utils.initialize(processingEnv);
 
-        List<String> packages = new ArrayList<String>();
+        Set<String> packages = new TreeSet<String>();
 
         // Create all proxy classes
         for (Element classElement : roundEnv.getElementsAnnotatedWith(RealmClass.class)) {
@@ -41,7 +41,7 @@
 	    }
 
         RealmAnalytics analytics = RealmAnalytics.getInstance(packages);
-        analytics.send();
+        analytics.execute();
 
         hasProcessedModules = true;
         return processModules(roundEnv);
