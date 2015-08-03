@@ -7,7 +7,7 @@
      */
     public static UncheckedRow getByRowPointer(Context context, Table table, long nativeRowPointer) {
         UncheckedRow row = new UncheckedRow(context, table, nativeRowPointer);
-        FinalizerRunnable.references.put(new NativeObjectReference(row, FinalizerRunnable.referenceQueue), Boolean.TRUE);
+        context.rowReferences.add(new NativeObjectReference(row, context.referenceQueue));
         return row;
     }
 
