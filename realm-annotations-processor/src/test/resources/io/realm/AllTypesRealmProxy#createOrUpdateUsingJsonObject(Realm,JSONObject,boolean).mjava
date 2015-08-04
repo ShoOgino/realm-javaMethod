@@ -16,8 +16,12 @@
         if (obj == null) {
             obj = realm.createObject(AllTypes.class);
         }
-        if (!json.isNull("columnString")) {
-            obj.setColumnString((String) json.getString("columnString"));
+        if (json.has("columnString")) {
+            if (json.isNull("columnString")) {
+                obj.setColumnString("");
+            } else {
+                obj.setColumnString((String) json.getString("columnString"));
+            }
         }
         if (!json.isNull("columnLong")) {
             obj.setColumnLong((long) json.getLong("columnLong"));
