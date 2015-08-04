@@ -1,0 +1,25 @@
+    @Override
+    protected void tearDown() throws Exception {
+        int counter = 10;
+        if (testRealm != null) {
+            testRealm.close();
+        }
+
+        getContext().unbindService(serviceConnection);
+        remoteMessenger = null;
+
+        // Kill the remote process.
+        ActivityManager.RunningAppProcessInfo info = getRemoteProcessInfo();
+        if (info != null) {
+            android.os.Process.killProcess(info.pid);
+        }
+        while (getRemoteProcessInfo() != null) {
+            if (counter == 0) {
+                assertTrue("The remote service process is still alive.", false);
+            }
+            Thread.sleep(300);
+            counter--;
+        }
+        super.tearDown();
+    }
+

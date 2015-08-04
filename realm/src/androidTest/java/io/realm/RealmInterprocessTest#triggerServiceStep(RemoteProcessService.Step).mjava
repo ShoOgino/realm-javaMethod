@@ -1,0 +1,11 @@
+    // Call this to trigger the next step of service process
+    private void triggerServiceStep(RemoteProcessService.Step step) {
+        Message msg = Message.obtain(null, step.message);
+        msg.replyTo = localMessenger;
+        try {
+            remoteMessenger.send(msg);
+        } catch (RemoteException e) {
+            assertTrue(false);
+        }
+    }
+
