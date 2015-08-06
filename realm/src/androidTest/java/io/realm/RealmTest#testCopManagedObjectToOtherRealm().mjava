@@ -4,8 +4,9 @@
         allTypes.setColumnString("Test");
         testRealm.commitTransaction();
 
-        Realm.deleteRealmFile(getContext(), "other-realm");
-        Realm otherRealm = Realm.getInstance(getContext(), "other-realm");
+        RealmConfiguration realmConfig = TestHelper.createConfiguration(getContext(), "other-realm");
+        Realm.deleteRealm(realmConfig);
+        Realm otherRealm = Realm.getInstance(realmConfig);
         otherRealm.beginTransaction();
         AllTypes copiedAllTypes = otherRealm.copyToRealm(allTypes);
         otherRealm.commitTransaction();
