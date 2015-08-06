@@ -1,19 +1,22 @@
     public void testOpenRealmFileDeletionShouldThrow() {
         final String OTHER_REALM_NAME = "yetAnotherRealm.realm";
 
+        RealmConfiguration configA = TestHelper.createConfiguration(getContext());
+        RealmConfiguration configB = TestHelper.createConfiguration(getContext(), OTHER_REALM_NAME);
+
         // This instance is already cached because of the setUp() method so this deletion should throw
         try {
-            Realm.deleteRealmFile(getContext());
+            Realm.deleteRealm(configA);
             fail();
         } catch (IllegalStateException ignored) {
         }
 
         // Create a new Realm file
-        Realm yetAnotherRealm = Realm.getInstance(getContext(), OTHER_REALM_NAME);
+        Realm yetAnotherRealm = Realm.getInstance(configB);
 
         // Deleting it should fail
         try {
-            Realm.deleteRealmFile(getContext(), OTHER_REALM_NAME);
+            Realm.deleteRealm(configB);
             fail();
         } catch (IllegalStateException ignored) {
         }
@@ -21,7 +24,7 @@
         // But now that we close it deletion should work
         yetAnotherRealm.close();
         try {
-            Realm.deleteRealmFile(getContext(), OTHER_REALM_NAME);
+            Realm.deleteRealm(configB);
         } catch (Exception e) {
             fail();
         }
