@@ -1,4 +1,5 @@
     public void testDeletingRealmAlsoClearsConfigurationCache() throws IOException {
+        testRealm.close();
         String REALM_NAME = "encrypted.realm";
         byte[] oldPassword = TestHelper.SHA512("realm");
         byte[] newPassword = TestHelper.SHA512("realm-copy");
@@ -13,6 +14,7 @@
         // 1. Write a copy of the encrypted Realm to a new file
         testRealm = Realm.getInstance(config);
         File copiedRealm = new File(config.getRealmFolder(), "encrypted-copy.realm");
+        copiedRealm.delete();
         testRealm.writeEncryptedCopyTo(copiedRealm, newPassword);
         testRealm.close();
         testRealm = null;

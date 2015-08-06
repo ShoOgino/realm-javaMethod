@@ -17,7 +17,12 @@
         // faulty cache data.
         validateAgainstExistingConfigurations(configuration);
         realm = new Realm(configuration, autoRefresh);
-        globalPathConfigurationCache.get(canonicalPath).add(configuration);
+        List<RealmConfiguration> pathConfigurationCache = globalPathConfigurationCache.get(canonicalPath);
+        if (pathConfigurationCache == null) {
+            pathConfigurationCache = new CopyOnWriteArrayList<RealmConfiguration>();
+            globalPathConfigurationCache.put(canonicalPath, pathConfigurationCache);
+        }
+        pathConfigurationCache.add(configuration);
         realms.put(configuration, realm);
         localRefCount.put(configuration, references + 1);
 
