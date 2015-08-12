@@ -1,10 +1,7 @@
-    public void testLargeRealmMultipleThreads() {
-        final AtomicInteger finished;
+    public void testLargeRealmMultipleThreads() throws InterruptedException {
         final int nObjects = 500000;
         final int nThreads = 3;
-
-        finished = new AtomicInteger();
-        finished.set(0);
+        final CountDownLatch latch = new CountDownLatch(nThreads);
 
         testRealm.beginTransaction();
         testRealm.clear(StringOnly.class);
@@ -29,22 +26,13 @@
                             }
                             assertEquals(nObjects, n);
                             realm.close();
-                            finished.incrementAndGet();
+                            latch.countDown();
                         }
                     }
                 );
             thread.start();
         }
 
-        while (true) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (finished.get() == nThreads) {
-                break;
-            }
-        }
+        latch.await();
     }
 
