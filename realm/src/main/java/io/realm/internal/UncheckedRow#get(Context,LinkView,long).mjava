@@ -8,7 +8,7 @@
     public static UncheckedRow get(Context context, LinkView linkView, long index) {
         long nativeRowPointer = linkView.nativeGetRow(linkView.nativeLinkViewPtr, index);
         UncheckedRow row = new UncheckedRow(context, linkView.parent.getLinkTarget(linkView.columnIndexInParent), nativeRowPointer);
-        context.rowReferences.add(new NativeObjectReference(row, context.referenceQueue));
+        context.rowReferences.put(new NativeObjectReference(row, context.referenceQueue), Integer.MIN_VALUE);
         return row;
     }
 
