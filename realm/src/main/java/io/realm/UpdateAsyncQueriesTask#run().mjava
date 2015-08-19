@@ -1,0 +1,54 @@
+    @Override
+    public void run() {
+        Realm realm = null;
+        try {
+            realm = Realm.getInstance(realmConfiguration);
+            // TODO position the realm at the caller Thread version
+            //realm.sharedGroup. [End_read|begin_readAT(version_ID)] if it crash
+            HashMap<Integer, Long> updatedQueries = new HashMap<Integer, Long>(queries.size());
+
+            for (Entry entry : queries) {
+                if (!isTaskCancelled()) {
+                    // TODO: call findAll with the right mode
+                    switch (entry.query.arguments.type) {
+                        case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL:
+                            // need to import the query into the latest
+                            //findAll
+                            break;
+                        case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL_SORTED:
+                            //findAllSorted
+                            break;
+                        case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL_MULTI_SORTED:
+                            //findAllMultiSorted
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Query mode " + entry.query.arguments + " not supported");
+                    }
+
+                    // update the pointer with the new exported tableview
+                    // realm accessed from another thread (maybe try the weak reference)
+
+                    updatedQueries.put(entry.realmResults, 0xCAFEBABEL);
+                }
+            }
+
+            // TODO: should group result & send one call to Handler
+            if(!isTaskCancelled()) {
+                Handler handler = callerThread.get();
+                if (handler != null) {
+                    Result result = new Result(updatedQueries, realm.sharedGroup.getVersion());
+                    Message message = handler.obtainMessage(Realm.REALM_UPDATE_ASYNC_QUERIES, result);
+                    handler.sendMessage(message);
+                }
+            }
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+        }
+    }
+

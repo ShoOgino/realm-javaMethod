@@ -1,0 +1,49 @@
+    // Make sure that the new configuration doesn't clash with any existing configurations for the Realm
+    private static void validateAgainstExistingConfigurations(RealmConfiguration newConfiguration) {
+
+        // Ensure cache state
+        String realmPath = newConfiguration.getPath();
+        List<RealmConfiguration> pathConfigurationCache = globalPathConfigurationCache.get(realmPath);
+        if (pathConfigurationCache == null) {
+            pathConfigurationCache = new CopyOnWriteArrayList<RealmConfiguration>();
+            globalPathConfigurationCache.put(realmPath, pathConfigurationCache);
+        }
+
+        if (pathConfigurationCache.size() > 0) {
+
+            // For the current restrictions, it is enough to just check one of the existing configurations.
+            RealmConfiguration cachedConfiguration = pathConfigurationCache.get(0);
+
+            // Check that encryption keys aren't different
+            if (!Arrays.equals(cachedConfiguration.getEncryptionKey(), newConfiguration.getEncryptionKey())) {
+                throw new IllegalArgumentException(DIFFERENT_KEY_MESSAGE);
+            }
+
+            // Check schema versions are the same
+            if (cachedConfiguration.getSchemaVersion() != newConfiguration.getSchemaVersion()) {
+                throw new IllegalArgumentException(String.format("Configurations cannot have different schema versions " +
+                                "if used to open the same file. %d vs. %d", cachedConfiguration.getSchemaVersion(),
+                        newConfiguration.getSchemaVersion()));
+            }
+
+            // Check that schema is the same
+            RealmProxyMediator cachedSchema = cachedConfiguration.getSchemaMediator();
+            RealmProxyMediator schema = newConfiguration.getSchemaMediator();
+            if (!cachedSchema.equals(schema)) {
+                throw new IllegalArgumentException("Two configurations with different schemas are trying to open " +
+                        "the same Realm file. Their schema must be the same: " + newConfiguration.getPath());
+            }
+
+            // Check if the durability is the same
+            SharedGroup.Durability cachedDurability = cachedConfiguration.getDurability();
+            SharedGroup.Durability newDurability = newConfiguration.getDurability();
+            if (!cachedDurability.equals(newDurability)) {
+                throw new IllegalArgumentException("A Realm cannot be both in-memory and persisted. Two conflicting " +
+                        "configurations pointing to " + newConfiguration.getPath() + " are being used.");
+            }
+        }
+
+        // The new configuration doesn't violate existing configurations. Cache it.
+        pathConfigurationCache.add(newConfiguration);
+    }
+

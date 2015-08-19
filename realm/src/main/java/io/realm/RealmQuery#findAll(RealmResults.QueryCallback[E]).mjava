@@ -1,13 +1,7 @@
-    /**
-     * Find all objects that fulfill the query conditions.
-     * Results will be posted to the callback instance {@link RealmResults.QueryCallback} asynchronously
-     *
-     * @param callback to receive the result of this query
-     * @return A {@link Request} representing a cancellable, pending asynchronous query
-     * @throws java.lang.RuntimeException Any other error
-     * @see io.realm.RealmResults
-     */
     public Request findAll(final RealmResults.QueryCallback<E> callback) {
+        // capture the sorting properties in case we want to retry the query
+        this.callbackRealmResults = callback;
+
         // will use the Looper of the caller thread to post the result
         final Handler handler = new EventHandler(callback);
 
@@ -16,6 +10,8 @@
 
         // Handover the query (to be used by a worker thread)
         handoverQueryPtr = query.handoverQuery(callerSharedGroupNativePtr);
+        // save query arguments (for future update)
+        argumentsHolder =  new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_ALL_SORTED);
 
         // We need to use the same configuration to open a background SharedGroup (i.e Realm)
         // to perform the query

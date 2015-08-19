@@ -1,0 +1,14 @@
+    /**
+     * Indicates if there are currently any RealmResults being used in this tread (obtained
+     * previously asynchronously). This will prevent advanceRead accidentally the current transaction
+     * resulting in re-running the queries in this thread.
+     * @return {@code true} if there is at least one (non GC'd) instance of {@link RealmResults} {@code false} otherwise
+     */
+    private boolean threadContainsAsyncQueries () {
+        if (asyncQueries.get().keySet().size() > 0)
+        for (RealmResults<?> realmResultsWeakReference : asyncQueries.get().keySet()) {
+            if (realmResultsWeakReference != null) return true;
+        }
+        return false;
+    }
+

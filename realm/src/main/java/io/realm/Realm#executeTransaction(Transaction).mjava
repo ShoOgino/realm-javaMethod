@@ -1,0 +1,25 @@
+    /**
+     * Executes a given transaction on the Realm. {@link #beginTransaction()} and
+     * {@link #commitTransaction()} will be called automatically. If any exception is thrown
+     * during the transaction {@link #cancelTransaction()} will be called instead of {@link #commitTransaction()}.
+     *
+     * @param transaction {@link io.realm.Realm.Transaction} to execute.
+     * @throws RealmException if any error happened during the transaction.
+     */
+    public void executeTransaction(Transaction transaction) {
+        if (transaction == null)
+            throw new IllegalArgumentException("transaction should not be null");
+
+        beginTransaction();
+        try {
+            transaction.execute(this);
+            commitTransaction();
+        } catch (RuntimeException e) {
+            cancelTransaction();
+            throw new RealmException("Error during transaction.", e);
+        } catch (Error e) {
+            cancelTransaction();
+            throw e;
+        }
+    }
+

@@ -1,0 +1,34 @@
+    /**
+     * All changes since {@link io.realm.Realm#beginTransaction()} are persisted to disk and the
+     * Realm reverts back to being read-only. An event is sent to notify all other realm instances
+     * that a change has occurred. When the event is received, the other Realms will get their
+     * objects and {@link io.realm.RealmResults} updated to reflect
+     * the changes from this commit.
+     *
+     * @throws java.lang.IllegalStateException If the write transaction is in an invalid state or incorrect thread.
+     */
+    public void commitTransaction() {
+        checkIfValid();
+        transaction.commitAndContinueAsRead();
+
+        for (Map.Entry<Handler, String> handlerIntegerEntry : handlers.entrySet()) {
+            Handler handler = handlerIntegerEntry.getKey();
+            String realmPath = handlerIntegerEntry.getValue();
+
+            // Notify at once on thread doing the commit
+            if (handler.equals(this.handler)) {
+                sendNotifications();
+                continue;
+            }
+
+            // For all other threads, use the Handler
+            if (
+                    realmPath.equals(configuration.getPath())    // It's the right realm
+                    && !handler.hasMessages(REALM_CHANGED)       // The right message
+                    && handler.getLooper().getThread().isAlive() // The receiving thread is alive
+            ) {
+                handler.sendEmptyMessage(REALM_CHANGED);
+            }
+        }
+    }
+

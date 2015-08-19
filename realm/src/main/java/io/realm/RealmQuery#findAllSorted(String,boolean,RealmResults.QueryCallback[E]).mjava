@@ -11,6 +11,7 @@
      */
     public Request findAllSorted(String fieldName, boolean sortAscending, RealmResults.QueryCallback<E> callback) {
         // capture the sorting properties in case we want to retry the query
+        this.callbackRealmResults = callback;
         this.fieldName = fieldName;
         this.sortAscending = sortAscending;
 
@@ -48,6 +49,12 @@
 
                         // Run the query & handover the table view for the caller thread
                         handoverTableViewPtr = query.findAllSortedWithHandover(bgRealm.getSharedGroupPointer(), handoverQueryPtr, columnIndex, (order == TableView.Order.ascending));
+                        // save query arguments (for future update)
+                        argumentsHolder =  new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_ALL_SORTED);
+                        argumentsHolder.columnIndex = columnIndex;
+                        argumentsHolder.ascending = (order == TableView.Order.ascending);
+
+
                         handoverQueryPtr = -1;
                         if (IS_DEBUG && NB_ADVANCE_READ_SIMULATION-- > 0) {
                             // notify caller thread that we're about to post result to Handler

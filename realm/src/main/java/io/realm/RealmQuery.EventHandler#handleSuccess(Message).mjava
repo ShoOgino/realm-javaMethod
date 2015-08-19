@@ -16,9 +16,21 @@
                                 query.importHandoverTableView(bundle.getLong(QUERY_RESULT_POINTER_ARG),
                                         bundle.getLong(CALLER_SHARED_GROUP_POINTER_ARG)),
                                 clazz);
-
+                        // instead of returning a new instance of RealmResults we swap pointers
+                        // we the empty one returned before
+                        resultList.swapTableViewPointer();
                         callbackRealmResults.onSuccess(resultList);
-                        Realm.asyncRealmResults.get().add(new WeakReference<RealmResults<?>>(resultList));
+                        Realm.asyncQueries.get().put(resultList, RealmQuery.this);
+                        // need also to add the handoverQuery or the original one (depends on the GC)
+                        // use the associated Handler passed thru the constructor in order to add
+                        // this couple to the correct thread
+//                        if (!Realm.asyncQueries.containsKey(/*handler*/ null)) {
+//                            Realm.asyncQueries.put(/*handler*/ null, new HashMap<WeakReference<RealmResults<?>>, Long>());
+//                        }
+//                        Realm.asyncQueries.get(/*handler*/null).put(new WeakReference<RealmResults<?>>(resultList), /*query ptr or query object as WeakRef*/ 0L);
+//                        Realm.asyncQueriesCallback.put(new WeakReference<RealmResults<?>>(resultList), new WeakReference<RealmResults.QueryCallback<?>>(callbackRealmResults));
+//
+//                        Realm.asyncRealmResults.get().add(new WeakReference<RealmResults<?>>(resultList));
                         callbackRealmResults = null;
                         break;
                     }
@@ -29,7 +41,7 @@
                                 clazz);
 
                         callbackRealmResults.onSuccess(resultList);
-                        Realm.asyncRealmResults.get().add(new WeakReference<RealmResults<?>>(resultList));
+//                        Realm.asyncRealmResults.get().add(new WeakReference<RealmResults<?>>(resultList));
                         callbackRealmResults = null;
                         break;
                     }
@@ -40,7 +52,7 @@
                                 clazz);
 
                         callbackRealmResults.onSuccess(resultList);
-                        Realm.asyncRealmResults.get().add(new WeakReference<RealmResults<?>>(resultList));
+//                        Realm.asyncRealmResults.get().add(new WeakReference<RealmResults<?>>(resultList));
                         callbackRealmResults = null;
                         break;
                     }
