@@ -1,0 +1,36 @@
+    public void testProcessLocalListenersAfterRefresh() {
+        // Used to validate the result
+        final AtomicBoolean listenerWasCalled = new AtomicBoolean(false);
+
+        // Used by the background thread to wait for the main thread to do the write operation
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        Thread backgroundThread = new Thread() {
+            @Override
+            public void run() {
+                Realm bgRealm = Realm.getInstance(testConfig);
+                bgRealm.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        listenerWasCalled.set(true);
+                    }
+                });
+                try {
+                    latch.await(); // Wait for the main thread to do a write operation
+                    bgRealm.refresh(); // This should call the listener
+                    assertTrue(listenerWasCalled.get());
+                } catch (InterruptedException e) {
+                    fail();
+                } finally {
+                    bgRealm.close();
+                }
+            }
+        };
+        backgroundThread.start();
+
+        testRealm.beginTransaction();
+        testRealm.createObject(Dog.class);
+        testRealm.commitTransaction();
+        latch.countDown();
+    }
+
