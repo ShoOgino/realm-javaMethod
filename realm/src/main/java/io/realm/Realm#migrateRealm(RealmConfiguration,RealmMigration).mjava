@@ -20,6 +20,7 @@
             realm.beginTransaction();
             realm.setVersion(realmMigration.execute(realm, realm.getVersion()));
             realm.commitTransaction();
+            validatedRealmFiles.remove(configuration.getPath());
         } finally {
             if (realm != null) {
                 realm.close();
