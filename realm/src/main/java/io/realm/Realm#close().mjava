@@ -21,13 +21,13 @@
         }
         if (sharedGroup != null && references == 1) {
             realmsCache.get().remove(configuration);
-            validatedRealmFiles.remove(configuration.getPath());
             sharedGroup.close();
             sharedGroup = null;
 
             // It is necessary to be synchronized here since there is a chance that before the counter removed,
             // the other thread could get the counter and increase it in createAndValidate.
             synchronized (Realm.class) {
+                validatedRealmFiles.remove(configuration.getPath());
                 List<RealmConfiguration>  pathConfigurationCache = globalPathConfigurationCache.get(canonicalPath);
                 pathConfigurationCache.remove(configuration);
                 if (pathConfigurationCache.isEmpty()) {
