@@ -1,0 +1,77 @@
+    // async query that converge after 1 retry
+    public void _testMismatchedRealmVersion_should_converge_after_1_retry() throws Throwable {
+        // simulate one advanced read just after the worker thread has finished querying the Realm
+        setDebugModeForAsyncRealmQuery(ADVANCE_ONE_READ, RetryPolicy.MODE_MAX_RETRY, RETRY_ONCE);
+
+        final CountDownLatch signalCallbackFinishedLatch = new CountDownLatch(1);
+        final Looper[] looper = new Looper[1];
+        final Throwable[] threadAssertionError = new Throwable[1];
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                looper[0] = Looper.myLooper();
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance("should_converge_after_1_retry");
+                    populateTestRealm(realm, 10);
+                    realm.where(AllTypes.class)
+                            .between("columnLong", 0, 9)
+                            .findAll(new RealmResults.DebugRealmResultsQueryCallback<AllTypes>() {
+                                @Override
+                                public void onSuccess(RealmResults<AllTypes> results) {
+                                    try {
+                                        assertEquals(3, results.size());
+
+                                        for (int i = 0, size = results.size(); i < size; i++) {
+                                            assertEquals(i, results.get(i).getColumnLong());
+                                        }
+
+                                    } catch (AssertionFailedError e) {
+                                        threadAssertionError[0] = e;
+
+                                    } finally {
+                                        signalCallbackFinishedLatch.countDown();
+                                    }
+                                }
+
+                                @Override
+                                public void onError(Exception t) {
+                                    try {
+                                        threadAssertionError[0] = t;
+                                    } finally {
+                                        signalCallbackFinishedLatch.countDown();
+                                    }
+                                }
+
+                                @Override
+                                public void onBackgroundQueryCompleted(Realm realm) {
+                                    populateTestRealm(realm, 3);// this is already inside a transaction
+                                }
+                            });
+
+                    Looper.loop();//ready to receive callback
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+                } finally {
+                    if (signalCallbackFinishedLatch.getCount() > 0) {
+                        signalCallbackFinishedLatch.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        signalCallbackFinishedLatch.await();
+        looper[0].quit();
+        executorService.shutdownNow();
+        if (null != threadAssertionError[0]) {
+            throw threadAssertionError[0];
+        }
+    }
+

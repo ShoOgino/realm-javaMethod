@@ -1,0 +1,119 @@
+    public void _testFindAllSortedMulti_converge_after_100_retries() throws Throwable {
+        setDebugModeForAsyncRealmQuery(ADVANCE_HUNDRED_READ, RetryPolicy.MODE_INDEFINITELY, RETRY_NUMBER_NOT_APPLICABLE);
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final Looper[] looper = new Looper[1];
+        final Throwable[] threadAssertionError = new Throwable[1];
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                looper[0] = Looper.myLooper();
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance("test_find_all_sorted_multi_100_retries");
+                    realm.beginTransaction();
+                    for (int i = 0; i < 5; ) {
+                        AllTypes allTypes = realm.createObject(AllTypes.class);
+                        allTypes.setColumnLong(i);
+                        allTypes.setColumnString("data " + i % 3);
+
+                        allTypes = realm.createObject(AllTypes.class);
+                        allTypes.setColumnLong(i);
+                        allTypes.setColumnString("data " + (++i % 3));
+                    }
+                    realm.commitTransaction();
+
+                    realm.where(AllTypes.class)
+                            .findAllSorted(new String[]{"columnLong", "columnString"},
+                                    new boolean[]{RealmResults.SORT_ORDER_DESCENDING, RealmResults.SORT_ORDER_ASCENDING},
+                                    new RealmResults.DebugRealmResultsQueryCallback<AllTypes>() {
+                                        @Override
+                                        public void onSuccess(RealmResults<AllTypes> sortedList) {
+                                            try {
+                                                assertEquals(10, sortedList.size());
+                                                assertEquals(4, sortedList.first().getColumnLong());
+                                                assertEquals(0, sortedList.last().getColumnLong());
+
+                                                assertEquals(4, sortedList.get(0).getColumnLong());
+                                                assertEquals("data 1", sortedList.get(0).getColumnString());
+                                                assertEquals(4, sortedList.get(1).getColumnLong());
+                                                assertEquals("data 2", sortedList.get(1).getColumnString());
+
+                                                assertEquals(3, sortedList.get(2).getColumnLong());
+                                                assertEquals("data 0", sortedList.get(2).getColumnString());
+                                                assertEquals(3, sortedList.get(3).getColumnLong());
+                                                assertEquals("data 1", sortedList.get(3).getColumnString());
+
+                                                assertEquals(2, sortedList.get(4).getColumnLong());
+                                                assertEquals("data 0", sortedList.get(4).getColumnString());
+                                                assertEquals(2, sortedList.get(5).getColumnLong());
+                                                assertEquals("data 2", sortedList.get(5).getColumnString());
+
+                                                assertEquals(1, sortedList.get(6).getColumnLong());
+                                                assertEquals("data 1", sortedList.get(6).getColumnString());
+                                                assertEquals(1, sortedList.get(7).getColumnLong());
+                                                assertEquals("data 2", sortedList.get(7).getColumnString());
+
+                                                assertEquals(0, sortedList.get(8).getColumnLong());
+                                                assertEquals("data 0", sortedList.get(8).getColumnString());
+                                                assertEquals(0, sortedList.get(9).getColumnLong());
+                                                assertEquals("data 1", sortedList.get(9).getColumnString());
+
+                                            } catch (AssertionFailedError e) {
+                                                threadAssertionError[0] = e;
+
+                                            } finally {
+                                                // whatever happened, make sure to notify the waiting TestCase Thread
+                                                signalCallbackFinished.countDown();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onError(Exception t) {
+                                            try {
+                                                threadAssertionError[0] = t;
+                                                t.printStackTrace();
+                                            } finally {
+                                                signalCallbackFinished.countDown();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onBackgroundQueryCompleted(Realm realm) {
+                                            // triggered on the background thread to alter the caller's Realm state
+                                            realm.executeTransaction(new Realm.Transaction() {
+                                                @Override
+                                                public void execute(Realm realm) {
+                                                    realm.createObject(Owner.class);
+                                                    realm.createObject(Dog.class);
+                                                }
+                                            });
+                                        }
+                                    });
+
+                    Looper.loop();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+                } finally {
+                    if (signalCallbackFinished.getCount() > 0) {
+                        signalCallbackFinished.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        // wait until the callback of our async query proceed
+        signalCallbackFinished.await();
+        looper[0].quit();
+        executorService.shutdownNow();
+        if (null != threadAssertionError[0]) {
+            throw threadAssertionError[0];
+        }
+    }
+

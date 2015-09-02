@@ -1,3 +1,13 @@
+    /**
+     * Find all objects that fulfill the query conditions.
+     * Results will be posted to the callback instance {@link RealmResults.QueryCallback} asynchronously
+     *
+     * @param callback to receive the result of this query
+     * @return A {@link Request} representing a cancellable, pending asynchronous query
+     * @throws java.lang.RuntimeException Any other error
+     * @see io.realm.RealmResults
+     */
+
     public Request findAll(final RealmResults.QueryCallback<E> callback) {
         // capture the sorting properties in case we want to retry the query
         this.callbackRealmResults = callback;
@@ -31,7 +41,7 @@
                         bgRealm = Realm.getInstance(realmConfiguration);
 
                         // Run the query & handover the table view for the caller thread
-                        handoverTableViewPtr = query.findAllWithHandover(bgRealm.getSharedGroupPointer(), handoverQueryPtr);
+//                        handoverTableViewPtr = query.findAllWithHandover(bgRealm.getSharedGroupPointer(), handoverQueryPtr);
                         handoverQueryPtr = -1;
 
                         if (IS_DEBUG && NB_ADVANCE_READ_SIMULATION-- > 0) {

@@ -1,0 +1,87 @@
+    // async query without any conflicts strategy
+    public void _testFindAll() throws Throwable {
+        setDebugModeForAsyncRealmQuery(NO_ADVANCED_READ, RetryPolicy.MODE_NO_RETRY, NO_RETRY);
+        // we need to control precisely which Looper/Thread our Realm
+        // will operate on. This is unfortunately not possible when using the
+        // current Instrumentation#InstrumentationThread, because InstrumentationTestRunner#onStart
+        // Call Looper.prepare() for us and surprisingly doesn't call Looper#loop(), this is problematic
+        // as the async query callback will not run (because the Handler is sending Runnables to a Looper
+        // that didn't loop.
+        //
+        // On the other hand, using a dedicated 'ExecutorService' will allow us to fine grain control the
+        // desired behaviour
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final Looper[] looper = new Looper[1];
+        final Throwable[] threadAssertionError = new Throwable[1];
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                looper[0] = Looper.myLooper();
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance("test_find_all");
+                    populateTestRealm(realm, 10);
+
+                    // async query (will run on different thread)
+                    realm.where(AllTypes.class)
+                            .between("columnLong", 0, 9)
+                            .findAll(new RealmResults.QueryCallback<AllTypes>() {
+                                @Override
+                                public void onSuccess(RealmResults<AllTypes> results) {
+                                    try {
+                                        assertEquals(10, results.size());
+
+                                        // make sure access to RealmObject will not throw an Exception
+                                        for (int i = 0, size = results.size(); i < size; i++) {
+                                            assertEquals(i, results.get(i).getColumnLong());
+                                        }
+
+                                    } catch (AssertionFailedError e) {
+                                        threadAssertionError[0] = e;
+
+                                    } finally {
+                                        // whatever happened, make sure to notify the waiting TestCase Thread
+                                        signalCallbackFinished.countDown();
+                                    }
+                                }
+
+                                @Override
+                                public void onError(Exception t) {
+                                    try {
+                                        threadAssertionError[0] = t;
+                                        t.printStackTrace();
+                                    } finally {
+                                        signalCallbackFinished.countDown();
+                                    }
+                                }
+                            });
+
+                    Looper.loop();// ready to receive callback
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+
+                } finally {
+                    if (signalCallbackFinished.getCount() > 0) {
+                        signalCallbackFinished.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        // wait until the callback of our async query proceed
+        signalCallbackFinished.await();
+        looper[0].quit();
+        executorService.shutdownNow();
+        if (null != threadAssertionError[0]) {
+            // throw any assertion errors happened in the background thread
+            throw threadAssertionError[0];
+        }
+    }
+

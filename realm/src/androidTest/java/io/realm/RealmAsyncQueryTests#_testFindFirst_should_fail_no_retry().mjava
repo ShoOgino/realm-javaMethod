@@ -1,0 +1,99 @@
+    // async query to find one RealmObject without any conflicts strategy.
+    // since no retry policy was defined it should crash
+    public void _testFindFirst_should_fail_no_retry() throws Throwable {
+        setDebugModeForAsyncRealmQuery(1, RetryPolicy.MODE_NO_RETRY, NO_RETRY);
+
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final Looper[] looper = new Looper[1];
+        final Throwable[] threadAssertionError = new Throwable[1];
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                looper[0] = Looper.myLooper();
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance("test_find_first_fail_no_retry");
+                    realm.beginTransaction();
+                    final Owner owner1 = realm.createObject(Owner.class);
+                    owner1.setName("Owner 1");
+                    final Dog dog1 = realm.createObject(Dog.class);
+                    dog1.setName("Dog 1");
+                    dog1.setWeight(1);
+                    final Dog dog2 = realm.createObject(Dog.class);
+                    dog2.setName("Dog 2");
+                    dog2.setWeight(2);
+                    owner1.getDogs().add(dog1);
+                    owner1.getDogs().add(dog2);
+
+                    final Owner owner2 = realm.createObject(Owner.class);
+                    owner2.setName("Owner 2");
+                    final Dog dog3 = realm.createObject(Dog.class);
+                    dog3.setName("Dog 3");
+                    dog3.setWeight(1);
+                    final Dog dog4 = realm.createObject(Dog.class);
+                    dog4.setName("Dog 4");
+                    dog4.setWeight(2);
+                    owner2.getDogs().add(dog3);
+                    owner2.getDogs().add(dog4);
+                    realm.commitTransaction();
+
+                    realm.where(Owner.class)
+                            .equalTo("name", "Owner 2")
+                            .findFirst(new RealmObject.DebugRealmObjectQueryCallback<Owner>() {
+                                @Override
+                                public void onSuccess(Owner result) {
+                                    signalCallbackFinished.countDown();
+                                }
+
+                                @Override
+                                public void onError(Exception t) {
+                                    try {
+                                        threadAssertionError[0] = t;
+                                        t.printStackTrace();
+                                    } finally {
+                                        signalCallbackFinished.countDown();
+                                    }
+                                }
+
+                                @Override
+                                public void onBackgroundQueryCompleted(Realm realm) {
+                                    // triggered on the background thread to alter the caller's Realm state
+                                    realm.executeTransaction(new Realm.Transaction() {
+                                        @Override
+                                        public void execute(Realm realm) {
+                                            realm.createObject(Owner.class);
+                                            realm.createObject(Dog.class);
+                                        }
+                                    });
+                                }
+                            });
+
+                    Looper.loop();// ready to receive callback
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+
+                } finally {
+                    if (signalCallbackFinished.getCount() > 0) {
+                        signalCallbackFinished.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        // wait until the callback of our async query proceed
+        signalCallbackFinished.await();
+        looper[0].quit();
+        executorService.shutdownNow();
+        if (null == threadAssertionError[0] || !(threadAssertionError[0] instanceof RealmException)) {
+            fail("Expecting RuntimeException: Unspecified exception." +
+                    " Handover failed due to version mismatch in io_realm_internal_TableQuery.cpp");
+        }
+    }
+

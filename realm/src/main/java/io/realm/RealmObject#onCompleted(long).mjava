@@ -1,0 +1,16 @@
+    void onCompleted (long nativeRowHandoverPointer) {
+        realm.checkIfValid();
+        long nativeRowPointer = TableQuery.nativeImportHandoverRowIntoSharedGroup(nativeRowHandoverPointer, realm.getSharedGroupPointer());
+        Table table = realm.getTable(clazz);
+        this.row = table.getUncheckedRowByPointer(nativeRowPointer);
+
+//           = query.importHandoverRow(rowHandoverPointer);
+//            //TODO call method to import handover
+//            // this may fail with BadVersionException in this case we keep the RealmResuls empty
+//            // then will wait for REALM_COMPLETED_ASYNC_QUERY fired anyway, which handle more complex
+//            // use cases like retry, ignore etc
+//            table = query.importHandoverTableView(tvHandover, realm.sharedGroup.getNativePointer());
+        isCompleted = true;
+        notifyChangeListeners();
+    }
+

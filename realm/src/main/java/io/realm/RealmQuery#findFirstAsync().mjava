@@ -1,0 +1,262 @@
+    public E findFirstAsync () {
+        // TODO: Need to clear all params of this query, as user may use the same instance to
+        // call multiple findAllAsync
+
+        //TODO check that caller has a looper
+        final Handler handler = realm.getHandler();//use caller Looper
+
+        // just need to build a query configuration that we need to add to the list
+        // of current async queries
+
+        // We need a pointer to the caller Realm, to be able to handover the result to it
+        final long callerSharedGroupNativePtr = realm.getSharedGroupPointer();
+
+        // Handover the query (to be used by a worker thread)
+        final long handoverQueryPointer = query.handoverQuery(callerSharedGroupNativePtr);
+        Log.e("REALM", "naruto java_caller thread >> " + Thread.currentThread().getName() + " handoverQueryPtr " + handoverQueryPtr);
+
+        // save query arguments (for future update)
+        argumentsHolder =  new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_FIRST);
+
+        // We need to use the same configuration to open a background SharedGroup (i.e Realm)
+        // to perform the query
+        final RealmConfiguration realmConfiguration = realm.getConfiguration();
+        final E result = realm.getConfiguration().getSchemaMediator().newInstance(clazz);
+        final WeakReference<RealmObject> realmObjectWeakReference = new WeakReference<RealmObject>(result);
+        Realm.asyncRealmObjects.get().put(realmObjectWeakReference, this);
+        result.realm = realm;
+//        final WeakReference<RealmResults<?>> weakRealmResults = new WeakReference<RealmResults<?>>(realmResults);
+//        final int hashRealmResults = System.identityHashCode(realmResults);
+//        Realm.asyncQueries.get().put(weakRealmResults, this);
+//        realm.hashToInstance.put(hashRealmResults, new WeakReference<RealmResults<?>>(realmResults));
+        final Future<Long> pendingQuery = asyncQueryExecutor.submit(new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+//                if (!Thread.currentThread().isInterrupted() && (asyncRequest == null || !asyncRequest.isCancelled())) {
+//                    Realm bgRealm = null;
+                SharedGroup sharedGroup = null;
+
+                try {
+                    sharedGroup = new SharedGroup(realmConfiguration.getPath(),
+                            true, realmConfiguration.getDurability(),
+                            realmConfiguration.getEncryptionKey());
+
+                    handoverRowPtr = query.findWithHandover(sharedGroup.getNativePointer(), handoverQueryPointer);
+
+                    IdentityHashMap<WeakReference<RealmObject>, Long> updatedRow = new IdentityHashMap<WeakReference<RealmObject>, Long>(1);
+                    updatedRow.put(realmObjectWeakReference, handoverRowPtr);
+                    UpdateAsyncQueriesTask.Result result =  UpdateAsyncQueriesTask.Result.newRealmObject(updatedRow, sharedGroup.getVersion());
+
+
+                    // notify caller thread
+                    if (handler.getLooper().getThread().isAlive()) {
+                        Message message = handler.obtainMessage(Realm.REALM_COMPLETED_ASYNC_FIND_FIRST, result);
+                        handler.sendMessage(message);
+                    }
+
+
+                    // need to use CompleteableFuture in order to notify when the RealmResults.notifyChangeListeners
+                    // once this finished
+                    return handoverRowPtr;
+
+                } catch (BadVersionException e) {// TODO this exception shouldn't be thrown
+                    e.printStackTrace();
+//                        throw e;
+                    // TODO consider calling releaseHandoverResources();
+                    return INVALID_TABLE_VIEW_POINTER;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // TODO consider calling releaseHandoverResources();
+                    return INVALID_TABLE_VIEW_POINTER;
+
+                } finally {
+//                        if (null != bgRealm) {
+//                            bgRealm.close();
+//                        }
+                    if (null != sharedGroup) {
+                        sharedGroup.close();
+                    }
+                }
+//                } else {
+//                    // TODO consider calling releaseHandoverResources();
+//                    releaseHandoverResources();
+//                    return INVALID_TABLE_VIEW_POINTER;
+//                }
+            }
+        });
+//        if (null != asyncRequest) {
+//            // update current reference, since retrying the query will
+//            // submit a new Runnable, hence the need to update the user
+//            // with the new Future<?> reference.
+//            asyncRequest.setPendingQuery(pendingQuery);
+//
+//        } else { // first run
+//            asyncRequest = new Request(pendingQuery);
+//        }
+        //TODO: need to add this instance to the global list of async queries
+        result.setPendingQuery(pendingQuery);
+        result.setType(clazz);
+        // TODO implemntation is to return an empty realm.createObject, then
+        //      swap the pointer (Row when the query finished)
+        // E result = configuration.getSchemaMediator().newInstance(clazz);
+        // result.row = null; or empty row (Empty implementaion of Row interface where getDouble
+        // return the default value for each primitive ) basicallly mock all method returning nativePointer
+        // result.realm = this;
+
+        result.row = new Row() {
+            @Override
+            public long getColumnCount() {
+                return 0;
+            }
+
+            @Override
+            public String getColumnName(long columnIndex) {
+                return null;
+            }
+
+            @Override
+            public long getColumnIndex(String columnName) {
+                return 0;
+            }
+
+            @Override
+            public ColumnType getColumnType(long columnIndex) {
+                return null;
+            }
+
+            @Override
+            public Table getTable() {
+                return null;
+            }
+
+            @Override
+            public long getIndex() {
+                return 0;
+            }
+
+            @Override
+            public long getLong(long columnIndex) {
+                return 0;
+            }
+
+            @Override
+            public boolean getBoolean(long columnIndex) {
+                return false;
+            }
+
+            @Override
+            public float getFloat(long columnIndex) {
+                return 0;
+            }
+
+            @Override
+            public double getDouble(long columnIndex) {
+                return 0;
+            }
+
+            @Override
+            public Date getDate(long columnIndex) {
+                return null;
+            }
+
+            @Override
+            public String getString(long columnIndex) {
+                return "";
+            }
+
+            @Override
+            public byte[] getBinaryByteArray(long columnIndex) {
+                return new byte[0];
+            }
+
+            @Override
+            public Mixed getMixed(long columnIndex) {
+                return null;
+            }
+
+            @Override
+            public ColumnType getMixedType(long columnIndex) {
+                return null;
+            }
+
+            @Override
+            public long getLink(long columnIndex) {
+                return 0;
+            }
+
+            @Override
+            public boolean isNullLink(long columnIndex) {
+                return true;
+            }
+
+            @Override
+            public LinkView getLinkList(long columnIndex) {
+                return null;
+            }
+
+            @Override
+            public void setLong(long columnIndex, long value) {
+
+            }
+
+            @Override
+            public void setBoolean(long columnIndex, boolean value) {
+
+            }
+
+            @Override
+            public void setFloat(long columnIndex, float value) {
+
+            }
+
+            @Override
+            public void setDouble(long columnIndex, double value) {
+
+            }
+
+            @Override
+            public void setDate(long columnIndex, Date date) {
+
+            }
+
+            @Override
+            public void setString(long columnIndex, String value) {
+
+            }
+
+            @Override
+            public void setBinaryByteArray(long columnIndex, byte[] data) {
+
+            }
+
+            @Override
+            public void setMixed(long columnIndex, Mixed data) {
+
+            }
+
+            @Override
+            public void setLink(long columnIndex, long value) {
+
+            }
+
+            @Override
+            public void nullifyLink(long columnIndex) {
+
+            }
+
+            @Override
+            public boolean isAttached() {
+                return false;
+            }
+
+            @Override
+            public boolean hasColumn(String fieldName) {
+                return false;
+            }
+        };
+        return result;
+
+    }
+

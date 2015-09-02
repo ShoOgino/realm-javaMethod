@@ -1,18 +1,29 @@
     @Override
     public void run() {
-        Realm realm = null;
+//        Realm realm = null;
+        SharedGroup sharedGroup = null;
         try {
-            realm = Realm.getInstance(realmConfiguration);
+//            realm = Realm.getInstance(realmConfiguration);
+            sharedGroup = new SharedGroup(realmConfiguration.getPath(),
+                    true, realmConfiguration.getDurability(),
+                    realmConfiguration.getEncryptionKey());
+
             // TODO position the realm at the caller Thread version
             //realm.sharedGroup. [End_read|begin_readAT(version_ID)] if it crash
-            HashMap<Integer, Long> updatedQueries = new HashMap<Integer, Long>(queries.size());
+            IdentityHashMap<WeakReference<RealmResults<?>>, Long> updatedQueries = new IdentityHashMap<WeakReference<RealmResults<?>>, Long>(queries.size());
+            //TODO remove duplicate
+            IdentityHashMap<WeakReference<RealmObject>, Long> updatedObject = new IdentityHashMap<WeakReference<RealmObject>, Long>(queries.size());
 
+            //TODO optimisation batch those update in JNI level (avoid ending_read & advance_read for each  query)
             for (Entry entry : queries) {
                 if (!isTaskCancelled()) {
                     // TODO: call findAll with the right mode
                     switch (entry.query.arguments.type) {
                         case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL:
-                            // need to import the query into the latest
+                            long tvPointer = TableQuery.nativeFindAllWithHandover(sharedGroup.getNativePointer(),
+                                    sharedGroup.getNativeReplicationPointer(),
+                                    entry.query.handoverQueryPtr, 0, Table.INFINITE, Table.INFINITE);
+                            updatedQueries.put(entry.realmResults, tvPointer);
                             //findAll
                             break;
                         case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL_SORTED:
@@ -21,6 +32,12 @@
                         case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL_MULTI_SORTED:
                             //findAllMultiSorted
                             break;
+                        case RealmQuery.ArgumentsHolder.TYPE_FIND_FIRST:
+                            //findfirst
+                            long rowPointer = TableQuery.nativeFindWithHandover(sharedGroup.getNativePointer(),
+                                    entry.query.handoverQueryPtr, 0);
+                            updatedObject.put(entry.realmObject, rowPointer);
+                            break;
                         default:
                             throw new IllegalArgumentException("Query mode " + entry.query.arguments + " not supported");
                     }
@@ -28,16 +45,22 @@
                     // update the pointer with the new exported tableview
                     // realm accessed from another thread (maybe try the weak reference)
 
-                    updatedQueries.put(entry.realmResults, 0xCAFEBABEL);
+
                 }
             }
 
             // TODO: should group result & send one call to Handler
             if(!isTaskCancelled()) {
                 Handler handler = callerThread.get();
-                if (handler != null) {
-                    Result result = new Result(updatedQueries, realm.sharedGroup.getVersion());
-                    Message message = handler.obtainMessage(Realm.REALM_UPDATE_ASYNC_QUERIES, result);
+                if (handler != null && handler.getLooper().getThread().isAlive()) {
+                    Result result = null;
+                    if (!updatedQueries.isEmpty()) {
+                        result = Result.newRealmResults(updatedQueries, sharedGroup.getVersion());
+                    } else {
+                        result = Result.newRealmObject(updatedObject, sharedGroup.getVersion());
+                    }
+
+                    Message message = handler.obtainMessage(notifySignal, result);
                     handler.sendMessage(message);
                 }
             }
@@ -46,8 +69,11 @@
             e.printStackTrace();
 
         } finally {
-            if (realm != null) {
-                realm.close();
+//            if (realm != null) {
+//                realm.close();
+//            }
+            if (sharedGroup != null) {
+                sharedGroup.close();
             }
         }
     }

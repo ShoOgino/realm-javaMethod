@@ -1,0 +1,13 @@
+    // should be invoked once the pendingQuery finish
+    void onCompleted () {
+        realm.checkIfValid();
+        try {
+            long nativeRowHandoverPointer = pendingQuery.get();// make the query blocking
+            onCompleted(nativeRowHandoverPointer);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+

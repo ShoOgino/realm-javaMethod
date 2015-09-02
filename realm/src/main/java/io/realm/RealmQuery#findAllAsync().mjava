@@ -1,0 +1,112 @@
+    public RealmResults<E> findAllAsync() {
+        // TODO: Need to clear all params of this query, as user may use the same instance to
+        // call multiple findAllAsync
+
+        //TODO check that caller has a looper
+        final Handler handler = realm.getHandler();//use caller Looper
+
+        // just need to build a query configuration that we need to add to the list
+        // of current async queries
+
+        // We need a pointer to the caller Realm, to be able to handover the result to it
+        final long callerSharedGroupNativePtr = realm.getSharedGroupPointer();
+
+        // Handover the query (to be used by a worker thread)
+        final long handoverQueryPointer = query.handoverQuery(callerSharedGroupNativePtr);
+        Log.e("REALM", "naruto java_caller thread >> " + Thread.currentThread().getName() + " handoverQueryPtr " + handoverQueryPtr);
+
+        // save query arguments (for future update)
+        argumentsHolder =  new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_ALL);
+
+        // We need to use the same configuration to open a background SharedGroup (i.e Realm)
+        // to perform the query
+        final RealmConfiguration realmConfiguration = realm.getConfiguration();
+//        RealmResults<E> realmResults = RealmResults.newEmpty(realm, query, clazz);
+        RealmResults<E> realmResults = new RealmResults<E>(realm, query, clazz);
+        final WeakReference<RealmResults<?>> weakRealmResults = new WeakReference<RealmResults<?>>(realmResults);
+//        final int hashRealmResults = System.identityHashCode(realmResults);
+        Realm.asyncQueries.get().put(weakRealmResults, this);
+//        realm.hashToInstance.put(hashRealmResults, new WeakReference<RealmResults<?>>(realmResults));
+        final Future<Long> pendingQuery = asyncQueryExecutor.submit(new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+               // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+//                if (!Thread.currentThread().isInterrupted() && (asyncRequest == null || !asyncRequest.isCancelled())) {
+//                    Realm bgRealm = null;
+                    SharedGroup sharedGroup = null;
+
+                    try {
+                        sharedGroup = new SharedGroup(realmConfiguration.getPath(),
+                                true, realmConfiguration.getDurability(),
+                                realmConfiguration.getEncryptionKey());
+
+//                        bgRealm = Realm.getInstance(realmConfiguration);
+
+                        // Run the query & handover the table view for the caller thread
+                        // Note: the handoverQueryPtr contain the versionID needed by the SG in order
+                        // to import it.
+                        // TODO: need to position back the SG to the latest version in JNI so the query
+                        // will run against the latest version
+                        Log.e("REALM", "naruto java_bg version >> " + Thread.currentThread().getName() + " version " + sharedGroup.getVersion());
+                        handoverTableViewPtr = query.findAllWithHandover(sharedGroup.getNativePointer(), sharedGroup.getNativeReplicationPointer() ,handoverQueryPointer);
+
+//                        UpdateAsyncQueriesTask.Result
+                        // we need to post 'like the update job' to the handler
+                        // using the signal REALM_COMPLETED_ASYNC_QUERY
+                        IdentityHashMap<WeakReference<RealmResults<?>>, Long> updatedTV = new IdentityHashMap<WeakReference<RealmResults<?>>, Long>(1);
+                        updatedTV.put(weakRealmResults, handoverTableViewPtr);
+                        UpdateAsyncQueriesTask.Result result =  UpdateAsyncQueriesTask.Result.newRealmResults(updatedTV, sharedGroup.getVersion());
+
+                        // notify caller thread
+                        if (handler.getLooper().getThread().isAlive()) {
+                            Message message = handler.obtainMessage(Realm.REALM_COMPLETED_ASYNC_QUERY, result);
+                            handler.sendMessage(message);
+                        }
+
+
+                        // need to use CompleteableFuture in order to notify when the RealmResults.notifyChangeListeners
+                        // once this finished
+                        return handoverTableViewPtr;
+
+                    } catch (BadVersionException e) {// TODO this exception shouldn't be thrown
+                        e.printStackTrace();
+//                        throw e;
+                        // TODO consider calling releaseHandoverResources();
+                        return INVALID_TABLE_VIEW_POINTER;
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        // TODO consider calling releaseHandoverResources();
+                        return INVALID_TABLE_VIEW_POINTER;
+
+                    } finally {
+//                        if (null != bgRealm) {
+//                            bgRealm.close();
+//                        }
+                        if (null != sharedGroup) {
+                            sharedGroup.close();
+                        }
+                    }
+//                } else {
+//                    // TODO consider calling releaseHandoverResources();
+//                    releaseHandoverResources();
+//                    return INVALID_TABLE_VIEW_POINTER;
+//                }
+            }
+        });
+//        if (null != asyncRequest) {
+//            // update current reference, since retrying the query will
+//            // submit a new Runnable, hence the need to update the user
+//            // with the new Future<?> reference.
+//            asyncRequest.setPendingQuery(pendingQuery);
+//
+//        } else { // first run
+//            asyncRequest = new Request(pendingQuery);
+//        }
+        //TODO: need to add this instance to the global list of async queries
+        realmResults.setPendingQuery(pendingQuery);
+
+
+        return realmResults;
+    }
+

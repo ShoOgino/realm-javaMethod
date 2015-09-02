@@ -1,0 +1,80 @@
+    //TODO: remove, experiment to check the implementation of our HandlerProxy
+    public void HandlerProxy() throws Throwable {
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final Throwable[] threadAssertionError = new Throwable[1];
+        final ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance("test_find_all");
+                    // partial mocking ofr our Handler
+                    final Handler handler = new HandlerProxy(realm.getHandler()) {
+                        @Override
+                        public boolean onInterceptMessage(int what) {
+                            switch (what) {
+                                case Realm.REALM_COMPLETED_ASYNC_QUERY: {
+                                    System.out.println("REALM_COMPLETED_ASYNC_QUERY");
+                                    // block intentionally the call
+                                    try {
+                                        Thread.sleep(7000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                                }
+                                case Realm.REALM_UPDATE_ASYNC_QUERIES: {
+                                    System.out.println("REALM_UPDATE_ASYNC_QUERIES");
+                                    break;
+                                }
+                            }
+                            return false;
+                        }
+                    };
+                    realm.setHandler(handler);
+
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.sendMessage(handler.obtainMessage(Realm.REALM_COMPLETED_ASYNC_QUERY));
+                        }
+                    }, 5000);
+
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.sendMessage(handler.obtainMessage(Realm.REALM_UPDATE_ASYNC_QUERIES));
+                        }
+                    }, 10000);
+
+                    Looper.loop();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+
+                } finally {
+                    if (signalCallbackFinished.getCount() > 0) {
+                        signalCallbackFinished.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        // wait until the callback of our async query proceed
+//        signalCallbackFinished.await(20, TimeUnit.MINUTES);
+        signalCallbackFinished.await();
+
+
+        executorService.shutdownNow();
+        if (null != threadAssertionError[0]) {
+            // throw any assertion errors happened in the background thread
+            throw threadAssertionError[0];
+        }
+    }
+

@@ -1,0 +1,94 @@
+    public void _testFindAllSorted_converge_3_retries() throws Throwable {
+        setDebugModeForAsyncRealmQuery(ADVANCE_THREE_READ, RetryPolicy.MODE_MAX_RETRY, ADVANCE_THREE_READ);
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final Looper[] looper = new Looper[1];
+        final Throwable[] threadAssertionError = new Throwable[1];
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                looper[0] = Looper.myLooper();
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance("test_find_all_sorted_converge_3_retries");
+                    realm.beginTransaction();
+                    for (int i = 0; i < 10; i++) {
+                        AllTypes allTypes = realm.createObject(AllTypes.class);
+                        allTypes.setColumnLong(i);
+                        allTypes.setColumnString("data " + i % 3);
+                    }
+                    realm.commitTransaction();
+
+                    realm.where(AllTypes.class)
+                            .findAllSorted("columnLong",
+                                    RealmResults.SORT_ORDER_ASCENDING,
+                                    new RealmResults.DebugRealmResultsQueryCallback<AllTypes>() {
+
+                                        @Override
+                                        public void onSuccess(RealmResults<AllTypes> sortedList) {
+                                            try {
+                                                assertEquals(10, sortedList.size());
+                                                assertEquals(0, sortedList.first().getColumnLong());
+                                                assertEquals(9, sortedList.last().getColumnLong());
+
+
+                                            } catch (AssertionFailedError e) {
+                                                threadAssertionError[0] = e;
+
+                                            } finally {
+                                                // whatever happened, make sure to notify the waiting TestCase Thread
+                                                signalCallbackFinished.countDown();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onError(Exception t) {
+                                            try {
+                                                threadAssertionError[0] = t;
+                                                t.printStackTrace();
+                                            } finally {
+                                                signalCallbackFinished.countDown();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onBackgroundQueryCompleted(Realm realm) {
+                                            // triggered on the background thread to alter the caller's Realm state
+                                            realm.executeTransaction(new Realm.Transaction() {
+                                                @Override
+                                                public void execute(Realm realm) {
+                                                    realm.createObject(Owner.class);
+                                                    realm.createObject(Dog.class);
+                                                }
+                                            });
+                                        }
+
+                                    });
+
+                    Looper.loop();// ready to receive callback
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+                } finally {
+                    if (signalCallbackFinished.getCount() > 0) {
+                        signalCallbackFinished.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        // wait until the callback of our async query proceed
+        signalCallbackFinished.await();
+        looper[0].quit();
+        executorService.shutdownNow();
+        if (null != threadAssertionError[0]) {
+            // throw any assertion errors happened in the background thread
+            throw threadAssertionError[0];
+        }
+    }
+

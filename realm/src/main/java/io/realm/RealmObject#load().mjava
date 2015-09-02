@@ -1,0 +1,10 @@
+    // Doesn't guarantee to import correctly the result (because the user may have advanced)
+    public void load() {
+        realm.checkIfValid();
+        //TODO the query could be complete but the handler didn't receive the results yet
+        //     same behaviour for RealmResults
+        if (pendingQuery != null && !pendingQuery.isDone()) {
+            onCompleted();
+        }
+    }
+

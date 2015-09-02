@@ -1,0 +1,19 @@
+    // should be invoked once the pendingQuery finish
+    private void onCompleted () {
+        realm.checkIfValid();
+        try {
+            long tvHandover = pendingQuery.get();// make the query blocking
+            //TODO call method to import handover
+            // this may fail with BadVersionException in this case we keep the RealmResuls empty
+            // then will wait for REALM_COMPLETED_ASYNC_QUERY fired anyway, which handle more complex
+            // use cases like retry, ignore etc
+            table = query.importHandoverTableView(tvHandover, realm.sharedGroup.getNativePointer());
+            isCompleted = true;
+            notifyChangeListeners();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
