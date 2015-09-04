@@ -1,0 +1,11 @@
+    public void resume() {
+//        ((PausableArrayBlockingQueue<Runnable>) getQueue()).resume();
+        pauseLock.lock();
+        try {
+            isPaused = false;
+            unpaused.signalAll();
+        } finally {
+            pauseLock.unlock();
+        }
+    }
+

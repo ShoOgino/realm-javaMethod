@@ -1,0 +1,15 @@
+    private void updateRealmObjectQuery(SharedGroup sharedGroup, Result result) {
+        if (!isTaskCancelled()) {
+            switch (realmObjectEntry.queryArguments.type) {
+                case RealmQuery.ArgumentsHolder.TYPE_FIND_FIRST:
+                    long handoverRowPointer = TableQuery.
+                            nativeFindWithHandover(sharedGroup.getNativePointer(),
+                                    realmObjectEntry.handoverQueryPointer, 0);
+                    result.updatedRow.put(realmObjectEntry.element, handoverRowPointer);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Query mode " + realmObjectEntry.queryArguments.type + " not supported");
+            }
+        }
+    }
+

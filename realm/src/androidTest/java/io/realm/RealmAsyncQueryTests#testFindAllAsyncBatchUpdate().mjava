@@ -61,7 +61,7 @@
                         }
                     };
                     realm.setHandler(handler);
-                    final Realm.PausableThreadPoolExecutor asyncQueryExecutor = (Realm.PausableThreadPoolExecutor) realm.asyncQueryExecutor;
+                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
                     asyncQueryExecutor.pause();
 
                     populateTestRealm(realm, 10);
@@ -153,7 +153,8 @@
             }
         });
 
-        signalCallbackFinished.await(7, TimeUnit.SECONDS);
+//        signalCallbackFinished.await(7, TimeUnit.SECONDS);
+        signalCallbackFinished.await();
         assertEquals(2, numberOfNotificationsQuery1.get());
         assertEquals(2, numberOfNotificationsQuery2.get());
 

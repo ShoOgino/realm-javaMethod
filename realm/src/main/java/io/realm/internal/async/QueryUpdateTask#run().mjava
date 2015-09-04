@@ -1,0 +1,36 @@
+    @Override
+    public void run() {
+        SharedGroup sharedGroup = null;
+        try {
+            sharedGroup = new SharedGroup(realmConfiguration.getPath(),
+                    true, realmConfiguration.getDurability(),
+                    realmConfiguration.getEncryptionKey());
+
+            Result result;
+            if (isUpdatingRealmResults) {
+                result = Result.newRealmResults();
+                updateRealmResultsQueries(sharedGroup, result);
+                result.versionID = sharedGroup.getVersion();
+
+            } else {
+                result = Result.newRealmObject();
+                updateRealmObjectQuery(sharedGroup, result);
+                result.versionID = sharedGroup.getVersion();
+            }
+
+            Handler handler = callerHandler.get();
+            if (!isTaskCancelled() && isAliveHandler(handler)) {
+                Message msg = handler.obtainMessage(message, result);
+                handler.sendMessage(msg);
+            }
+
+        } catch (Throwable e) {
+            e.fillInStackTrace();
+
+        } finally {
+            if (sharedGroup != null) {
+                sharedGroup.close();
+            }
+        }
+    }
+

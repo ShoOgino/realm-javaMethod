@@ -44,10 +44,12 @@
 
                     handoverRowPtr = query.findWithHandover(sharedGroup.getNativePointer(), handoverQueryPointer);
 
-                    IdentityHashMap<WeakReference<RealmObject>, Long> updatedRow = new IdentityHashMap<WeakReference<RealmObject>, Long>(1);
-                    updatedRow.put(realmObjectWeakReference, handoverRowPtr);
-                    UpdateAsyncQueriesTask.Result result =  UpdateAsyncQueriesTask.Result.newRealmObject(updatedRow, sharedGroup.getVersion());
-
+                    QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmObject();
+                    result.updatedRow.put(realmObjectWeakReference, handoverRowPtr);
+                    result.versionID = sharedGroup.getVersion();
+//                    IdentityHashMap<WeakReference<RealmObject>, Long> updatedRow = new IdentityHashMap<WeakReference<RealmObject>, Long>(1);
+//                    updatedRow.put(realmObjectWeakReference, handoverRowPtr);
+//                    UpdateAsyncQueriesTask.Result result =  UpdateAsyncQueriesTask.Result.newRealmObject(updatedRow, );
 
                     // notify caller thread
                     if (handler.getLooper().getThread().isAlive()) {

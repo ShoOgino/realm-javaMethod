@@ -1,0 +1,97 @@
+    public RealmResults<E> findAllSortedAsync(String fieldNames[], final boolean [] sortAscendings) {
+        if (fieldNames == null) {
+            throw new IllegalArgumentException("fieldNames cannot be 'null'.");
+        } else if (sortAscendings == null) {
+            throw new IllegalArgumentException("sortAscending cannot be 'null'.");
+        } else if (fieldNames.length == 0) {
+            throw new IllegalArgumentException("At least one field name must be specified.");
+        } else if (fieldNames.length != sortAscendings.length) {
+            throw new IllegalArgumentException(String.format("Number of field names (%d) and sort orders (%d) does not match.", fieldNames.length, sortAscendings.length));
+        }
+
+        if (fieldNames.length == 1 && sortAscendings.length == 1) {
+            return findAllSortedAsync(fieldNames[0], sortAscendings[0]);
+
+        } else {
+
+            // will use the Looper of the caller Realm to post the result
+            final Handler handler = realm.getHandler();
+
+            // Handover the query (to be used by a worker thread)
+            handoverQueryPtr = query.handoverQuery(realm.getSharedGroupPointer());
+
+            // We need to use the same configuration to open a background SharedGroup to perform the query
+            final RealmConfiguration realmConfiguration = realm.getConfiguration();
+
+            final long indices[] = new long[fieldNames.length];
+            for (int i = 0; i < fieldNames.length; i++) {
+                String fieldName = fieldNames[i];
+                Long columnIndex = columns.get(fieldName);
+                if (columnIndex == null || columnIndex < 0) {
+                    throw new IllegalArgumentException(String.format("Field name '%s' does not exist.", fieldName));
+                }
+                indices[i] = columnIndex;
+            }
+
+            // capture the query arguments for future retries & update
+            argumentsHolder =  new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_ALL_MULTI_SORTED);
+            argumentsHolder.ascendings = sortAscendings;
+            argumentsHolder.columnIndices = indices;
+
+            // prepare the promise result
+            RealmResults<E> realmResults = new RealmResults<E>(realm, query, clazz);
+            final WeakReference<RealmResults<?>> weakRealmResults = new WeakReference<RealmResults<?>>(realmResults);
+            Realm.asyncQueries.get().put(weakRealmResults, this);
+
+            final Future<Long> pendingQuery = asyncQueryExecutor.submit(new Callable<Long>() {
+                @Override
+                public Long call() throws Exception {
+                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+                    if (!Thread.currentThread().isInterrupted() && (asyncRequest == null || !asyncRequest.isCancelled())) {
+                        SharedGroup sharedGroup = null;
+
+                        try {
+                            sharedGroup = new SharedGroup(realmConfiguration.getPath(),
+                                    true, realmConfiguration.getDurability(),
+                                    realmConfiguration.getEncryptionKey());
+
+                            // Run the query & handover the table view for the caller thread
+                            handoverTableViewPtr = query.findAllMultiSortedWithHandover(sharedGroup.getNativePointer(), sharedGroup.getNativeReplicationPointer(), handoverQueryPtr, indices, sortAscendings);
+
+                            QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResults();
+                            result.updatedTableViews.put(weakRealmResults, handoverTableViewPtr);
+                            result.versionID = sharedGroup.getVersion();
+
+                            if (handler.getLooper().getThread().isAlive()) {
+                                Message message = handler.obtainMessage(Realm.REALM_COMPLETED_ASYNC_QUERY, result);
+                                handler.sendMessage(message);
+                            }
+
+                            return handoverTableViewPtr;
+
+                        } catch (BadVersionException e) {
+                            e.printStackTrace();
+                            return INVALID_TABLE_VIEW_POINTER;
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return INVALID_TABLE_VIEW_POINTER;
+
+                        } finally {
+                            if (sharedGroup != null) {
+                                sharedGroup.close();
+                            }
+                        }
+                    } else {
+                        //TODO is there any releaseHandoverResources() to release?
+
+                    }
+                    return INVALID_TABLE_VIEW_POINTER;
+                }
+            });
+
+            realmResults.setPendingQuery(pendingQuery);
+            return realmResults;
+        }
+    }
+

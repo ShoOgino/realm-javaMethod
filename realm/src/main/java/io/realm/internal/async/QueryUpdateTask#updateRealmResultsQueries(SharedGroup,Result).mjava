@@ -1,0 +1,44 @@
+    private void updateRealmResultsQueries(SharedGroup sharedGroup, Result result) {
+        for (Builder.QueryEntry<RealmResults<?>>  queryEntry : realmResultsEntries) {
+            if (!isTaskCancelled()) {
+                switch (queryEntry.queryArguments.type) {
+                    case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL: {
+                        long handoverTableViewPointer = TableQuery.nativeFindAllWithHandover
+                                (sharedGroup.getNativePointer(),
+                                        sharedGroup.getNativeReplicationPointer(),
+                                        queryEntry.handoverQueryPointer, 0, Table.INFINITE, Table.INFINITE);
+                        result.updatedTableViews.put(queryEntry.element, handoverTableViewPointer);
+                        break;
+                    }
+                    case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL_SORTED: {
+                        // TODO calling statically the native method willnot trigger executeDelayedDisposal
+                        //      make the java method static
+                        long handoverTableViewPointer = TableQuery.nativeFindAllSortedWithHandover(
+                                sharedGroup.getNativePointer(),
+                                sharedGroup.getNativeReplicationPointer(),
+                                queryEntry.handoverQueryPointer,
+                                0, Table.INFINITE, Table.INFINITE,
+                                queryEntry.queryArguments.columnIndex,
+                                queryEntry.queryArguments.ascending);
+
+                        result.updatedTableViews.put(queryEntry.element, handoverTableViewPointer);
+                        break;
+                    }
+                    case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL_MULTI_SORTED:
+                        long handoverTableViewPointer = TableQuery.nativeFindAllMultiSortedWithHandover(
+                                sharedGroup.getNativePointer(),
+                                sharedGroup.getNativeReplicationPointer(),
+                                queryEntry.handoverQueryPointer,
+                                0, Table.INFINITE, Table.INFINITE,
+                                queryEntry.queryArguments.columnIndices,
+                                queryEntry.queryArguments.ascendings);
+
+                        result.updatedTableViews.put(queryEntry.element, handoverTableViewPointer);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Query mode " + queryEntry.queryArguments.type + " not supported");
+                }
+            }
+        }
+    }
+

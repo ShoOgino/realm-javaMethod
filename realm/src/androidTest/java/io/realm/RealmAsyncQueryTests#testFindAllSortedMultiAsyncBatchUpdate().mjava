@@ -1,0 +1,253 @@
+    // UC:
+    //   1- insert 10 objects
+    //   2- start 2 async queries to find all objects [0-9] & objects[0-4]
+    //   3- assert both RealmResults are empty (Worker Thread didn't complete)
+    //   4- the queries will complete with the same version as the caller thread
+    //   5- using a background thread update the Realm
+    //   6- now REALM_CHANGED will trigger a REALM_UPDATE_ASYNC_QUERIES that should update
+    //   7- callbacks are notified with the latest results (called twice overall)
+    public void testFindAllSortedMultiAsyncBatchUpdate() throws Throwable {
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(2);
+        final Throwable[] threadAssertionError = new Throwable[1];
+        final ExecutorService executorService = Executors.newSingleThreadExecutor();
+        final AtomicInteger numberOfNotificationsQuery1 = new AtomicInteger(0);
+        final AtomicInteger numberOfNotificationsQuery2 = new AtomicInteger(0);
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                try {
+                    final Realm realm = openRealmInstance("testFindAllSortedMultiAsyncBatchUpdate");
+                    final AtomicInteger numberOfIntercept = new AtomicInteger(1);
+                    final Handler handler = new HandlerProxy(realm.getHandler()) {
+                        @Override
+                        public boolean onInterceptMessage(int what) {
+                            switch (what) {
+                                case Realm.REALM_COMPLETED_ASYNC_QUERY: {
+                                    if (numberOfIntercept.getAndDecrement() > 0) {
+                                        // We advance the Realm so we can simulate a retry
+                                        // This is intercepted on the worker thread, we need to use
+                                        // the Realm on the caller thread
+                                        postAtFront(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                final CountDownLatch bgThreadLatch = new CountDownLatch(1);
+                                                new Thread() {
+                                                    @Override
+                                                    public void run() {
+                                                        Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+                                                        bgRealm.beginTransaction();
+                                                        bgRealm.where(AllTypes.class)
+                                                                .equalTo("columnString", "data 1")
+                                                                .equalTo("columnLong", 0)
+                                                                .findFirst().setColumnDouble(Math.PI);
+                                                        AllTypes allTypes = bgRealm.createObject(AllTypes.class);
+                                                        allTypes.setColumnLong(2);
+                                                        allTypes.setColumnString("data " + 5);
+
+                                                        allTypes = bgRealm.createObject(AllTypes.class);
+                                                        allTypes.setColumnLong(0);
+                                                        allTypes.setColumnString("data " + 5);
+                                                        bgRealm.commitTransaction();
+                                                        bgRealm.close();
+                                                        bgThreadLatch.countDown();
+                                                    }
+                                                }.start();
+                                                try {
+                                                    bgThreadLatch.await();
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                    threadAssertionError[0] = e;
+                                                }
+                                            }
+                                        });
+                                    }
+                                    break;
+                                }
+                            }
+                            return false;
+                        }
+                    };
+                    realm.setHandler(handler);
+                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
+                    asyncQueryExecutor.pause();
+
+//                    populateTestRealm(realm, 10);
+                    realm.beginTransaction();
+                    for (int i = 0; i < 5; ) {
+                        AllTypes allTypes = realm.createObject(AllTypes.class);
+                        allTypes.setColumnLong(i);
+                        allTypes.setColumnString("data " + i % 3);
+
+                        allTypes = realm.createObject(AllTypes.class);
+                        allTypes.setColumnLong(i);
+                        allTypes.setColumnString("data " + (++i % 3));
+                    }
+                    realm.commitTransaction();
+
+                    // queries will not run i parallel (since our Executor is single threaded)
+                    // should save the pointer
+                    final RealmResults<AllTypes> realmResults1 = realm.where(AllTypes.class)
+                            .findAllSortedAsync(new String[]{"columnString", "columnLong"},
+                                     new boolean[]{RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_DESCENDING});
+                    final RealmResults<AllTypes> realmResults2 = realm.where(AllTypes.class)
+                            .between("columnLong", 0, 5)
+                            .findAllSortedAsync(new String[]{"columnString", "columnLong"},
+                                    new boolean[]{RealmResults.SORT_ORDER_DESCENDING, RealmResults.SORT_ORDER_ASCENDING});
+
+                    assertFalse(realmResults1.isLoaded());
+                    assertFalse(realmResults2.isLoaded());
+                    assertEquals(0, realmResults1.size());
+                    assertEquals(0, realmResults2.size());
+
+                    asyncQueryExecutor.resume();
+
+
+                    realmResults1.addChangeListener(new RealmChangeListener() {
+                        @Override
+                        public void onChange() {
+                            try {
+                                switch (numberOfNotificationsQuery1.incrementAndGet()) {
+                                    case 1: { // first callback invocation
+                                        assertTrue(realmResults1.isLoaded());
+                                        assertEquals(10, realmResults1.size());
+
+                                        assertEquals("data 0", realmResults1.get(0).getColumnString());
+                                        assertEquals(3, realmResults1.get(0).getColumnLong());
+                                        assertEquals("data 0", realmResults1.get(1).getColumnString());
+                                        assertEquals(2, realmResults1.get(1).getColumnLong());
+                                        assertEquals("data 0", realmResults1.get(2).getColumnString());
+                                        assertEquals(0, realmResults1.get(2).getColumnLong());
+
+                                        assertEquals("data 1", realmResults1.get(3).getColumnString());
+                                        assertEquals(4, realmResults1.get(3).getColumnLong());
+                                        assertEquals("data 1", realmResults1.get(4).getColumnString());
+                                        assertEquals(3, realmResults1.get(4).getColumnLong());
+                                        assertEquals("data 1", realmResults1.get(5).getColumnString());
+                                        assertEquals(1, realmResults1.get(5).getColumnLong());
+                                        assertEquals("data 1", realmResults1.get(6).getColumnString());
+                                        assertEquals(0, realmResults1.get(6).getColumnLong());
+
+                                        assertEquals("data 2", realmResults1.get(7).getColumnString());
+                                        assertEquals(4, realmResults1.get(7).getColumnLong());
+                                        assertEquals("data 2", realmResults1.get(8).getColumnString());
+                                        assertEquals(2, realmResults1.get(8).getColumnLong());
+                                        assertEquals("data 2", realmResults1.get(9).getColumnString());
+                                        assertEquals(1, realmResults1.get(9).getColumnLong());
+
+                                        break;
+                                    }
+                                    case 2: { // second callback
+                                        assertTrue(realmResults1.isLoaded());
+                                        assertEquals(12, realmResults1.size());
+                                        //first
+                                        assertEquals("data 0", realmResults1.get(0).getColumnString());
+                                        assertEquals(3, realmResults1.get(0).getColumnLong());
+
+                                        //last
+                                        assertEquals("data 5", realmResults1.get(11).getColumnString());
+                                        assertEquals(0, realmResults1.get(11).getColumnLong());
+
+                                        signalCallbackFinished.countDown();
+                                        break;
+                                    }
+                                    default: {
+                                        throw new AssertionFailedError("Callback called more than twice");
+                                    }
+                                }
+                            } catch (AssertionFailedError e) {
+                                threadAssertionError[0] = e;
+                                signalCallbackFinished.countDown();
+                            }
+                        }
+                    });
+
+                    realmResults2.addChangeListener(new RealmChangeListener() {
+                        @Override
+                        public void onChange() {
+                            try {
+                                switch (numberOfNotificationsQuery2.incrementAndGet()) {
+                                    case 1: { // first callback invocation
+                                        assertTrue(realmResults2.isLoaded());
+                                        assertEquals(10, realmResults2.size());
+
+                                        assertEquals("data 2", realmResults2.get(0).getColumnString());
+                                        assertEquals(1, realmResults2.get(0).getColumnLong());
+                                        assertEquals("data 2", realmResults2.get(1).getColumnString());
+                                        assertEquals(2, realmResults2.get(1).getColumnLong());
+                                        assertEquals("data 2", realmResults2.get(2).getColumnString());
+                                        assertEquals(4, realmResults2.get(2).getColumnLong());
+
+                                        assertEquals("data 1", realmResults2.get(3).getColumnString());
+                                        assertEquals(0, realmResults2.get(3).getColumnLong());
+                                        assertEquals("data 1", realmResults2.get(4).getColumnString());
+                                        assertEquals(1, realmResults2.get(4).getColumnLong());
+                                        assertEquals("data 1", realmResults2.get(5).getColumnString());
+                                        assertEquals(3, realmResults2.get(5).getColumnLong());
+                                        assertEquals("data 1", realmResults2.get(6).getColumnString());
+                                        assertEquals(4, realmResults2.get(6).getColumnLong());
+
+                                        assertEquals("data 0", realmResults2.get(7).getColumnString());
+                                        assertEquals(0, realmResults2.get(7).getColumnLong());
+                                        assertEquals("data 0", realmResults2.get(8).getColumnString());
+                                        assertEquals(2, realmResults2.get(8).getColumnLong());
+                                        assertEquals("data 0", realmResults2.get(9).getColumnString());
+                                        assertEquals(3, realmResults2.get(9).getColumnLong());
+
+                                        break;
+                                    }
+                                    case 2: { // second callback
+                                        assertTrue(realmResults2.isLoaded());
+                                        assertEquals(12, realmResults2.size());
+
+                                        assertEquals("data 5", realmResults2.get(0).getColumnString());
+                                        assertEquals(0, realmResults2.get(0).getColumnLong());
+
+                                        assertEquals("data 0", realmResults2.get(11).getColumnString());
+                                        assertEquals(3, realmResults2.get(11).getColumnLong());
+
+                                        assertEquals("data 1", realmResults2.get(5).getColumnString());
+                                        assertEquals(Math.PI, realmResults2.get(5).getColumnDouble(), 0.000000000001D);
+
+                                        signalCallbackFinished.countDown();
+                                        break;
+                                    }
+                                    default: {
+                                        throw new AssertionFailedError("Callback called more than twice");
+                                    }
+                                }
+                            } catch (AssertionFailedError e) {
+                                threadAssertionError[0] = e;
+                                signalCallbackFinished.countDown();
+                            }
+                        }
+                    });
+
+                    Looper.loop();// ready to receive callback
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+
+                } finally {
+                    if (signalCallbackFinished.getCount() > 0) {
+                        signalCallbackFinished.countDown();
+                    }
+
+                }
+            }
+        });
+
+//        signalCallbackFinished.await(7, TimeUnit.SECONDS);
+        signalCallbackFinished.await();
+        if (null != threadAssertionError[0]) {
+            // throw any assertion errors happened in the background thread
+            throw threadAssertionError[0];
+        }
+
+        assertEquals(2, numberOfNotificationsQuery1.get());
+        assertEquals(2, numberOfNotificationsQuery2.get());
+
+        executorService.shutdownNow();
+    }
+

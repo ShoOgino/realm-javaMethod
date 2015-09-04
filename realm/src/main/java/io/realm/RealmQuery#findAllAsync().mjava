@@ -2,8 +2,7 @@
         // TODO: Need to clear all params of this query, as user may use the same instance to
         // call multiple findAllAsync
 
-        //TODO check that caller has a looper
-        final Handler handler = realm.getHandler();//use caller Looper
+        final Handler handler = realm.getHandler();//use caller Realm Looper
 
         // just need to build a query configuration that we need to add to the list
         // of current async queries
@@ -30,6 +29,7 @@
         final Future<Long> pendingQuery = asyncQueryExecutor.submit(new Callable<Long>() {
             @Override
             public Long call() throws Exception {
+                //TODO emable thread priority & check for interruption
                // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 //                if (!Thread.currentThread().isInterrupted() && (asyncRequest == null || !asyncRequest.isCancelled())) {
 //                    Realm bgRealm = null;
@@ -53,9 +53,12 @@
 //                        UpdateAsyncQueriesTask.Result
                         // we need to post 'like the update job' to the handler
                         // using the signal REALM_COMPLETED_ASYNC_QUERY
-                        IdentityHashMap<WeakReference<RealmResults<?>>, Long> updatedTV = new IdentityHashMap<WeakReference<RealmResults<?>>, Long>(1);
-                        updatedTV.put(weakRealmResults, handoverTableViewPtr);
-                        UpdateAsyncQueriesTask.Result result =  UpdateAsyncQueriesTask.Result.newRealmResults(updatedTV, sharedGroup.getVersion());
+                        QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResults();
+                        result.updatedTableViews.put(weakRealmResults, handoverTableViewPtr);
+                        result.versionID = sharedGroup.getVersion();
+//                        IdentityHashMap<WeakReference<RealmResults<?>>, Long> updatedTV = new IdentityHashMap<WeakReference<RealmResults<?>>, Long>(1);
+//                        updatedTV.put(weakRealmResults, handoverTableViewPtr);
+//                        UpdateAsyncQueriesTask.Result result =  UpdateAsyncQueriesTask.Result.newRealmResults(updatedTV, );
 
                         // notify caller thread
                         if (handler.getLooper().getThread().isAlive()) {

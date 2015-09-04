@@ -2,7 +2,9 @@
     //TODO test removed callback
     //TODO test cancel pending query
     public void testFindAllCallerIsAdvanced() throws Throwable {
+        io.realm.internal.Util.setDebugLevel(5);
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final CountDownLatch callbackInvokedFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
         final AtomicInteger numberOfInvocation = new AtomicInteger(0);
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -78,7 +80,7 @@
                     };
                     realm.setHandler(handler);
 
-                    final Realm.PausableThreadPoolExecutor asyncQueryExecutor = (Realm.PausableThreadPoolExecutor) realm.asyncQueryExecutor;
+                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
                     asyncQueryExecutor.pause();
 
                     populateTestRealm(realm, 10);
@@ -100,6 +102,8 @@
                                 assertEquals(6, realmResults.size());
                             } catch (AssertionFailedError e) {
                                 threadAssertionError[0] = e;
+                            } finally {
+                                callbackInvokedFinished.countDown();
                             }
                         }
                     });
@@ -109,18 +113,14 @@
                 } catch (Exception e) {
                     e.printStackTrace();
                     threadAssertionError[0] = e;
-
-                } finally {
-                    if (signalCallbackFinished.getCount() > 0) {
-                        signalCallbackFinished.countDown();
-                    }
-
                 }
             }
         });
 
         // wait until the callback of our async query proceed
-        signalCallbackFinished.await(7, TimeUnit.SECONDS);
+        //signalCallbackFinished.await(7, TimeUnit.SECONDS);
+        signalCallbackFinished.await();
+        callbackInvokedFinished.await();
         assertEquals(1, numberOfInvocation.get());
 
         executorService.shutdownNow();

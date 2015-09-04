@@ -1,0 +1,10 @@
+    public void pause() {
+//        ((PausableArrayBlockingQueue<Runnable>) getQueue()).pause();
+        pauseLock.lock();
+        try {
+            isPaused = true;
+        } finally {
+            pauseLock.unlock();
+        }
+    }
+

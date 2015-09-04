@@ -55,7 +55,7 @@
                             bgRealm = Realm.getInstance(realmConfiguration);
 
                             // Run the query & handover the table view for the caller thread
-                            handoverTableViewPtr = query.findAllMultiSortedWithHandover(bgRealm.getSharedGroupPointer(), handoverQueryPtr, indices, sortAscendings);
+                            handoverTableViewPtr = query.findAllMultiSortedWithHandover(bgRealm.getSharedGroupPointer(), bgRealm.sharedGroup.getNativeReplicationPointer(), handoverQueryPtr, indices, sortAscendings);
                             handoverQueryPtr = -1;
                             if (IS_DEBUG && NB_ADVANCE_READ_SIMULATION-- > 0) {
                                 // notify caller thread that we're about to post result to Handler
