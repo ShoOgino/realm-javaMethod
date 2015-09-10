@@ -30,12 +30,12 @@
                                     // swallow this message, so the caller thread
                                     // remain behind the worker thread. This has as
                                     // a consequence to ignore the delivered result & wait for the
-                                    // upcoming REALM_CHANGED to batch update all asycn queries
+                                    // upcoming REALM_CHANGED to batch update all async queries
                                     return numberOfInterceptedChangeMessage.getAndIncrement() == 0;
                                 }
                                 case Realm.REALM_COMPLETED_ASYNC_QUERY: {
                                     if (numberOfCompletedAsyncQuery.incrementAndGet() == 2) {
-                                        // both queries has completed now (& their result should be ignored)
+                                        // both queries have completed now (& their results should be ignored)
                                         // now send the REALM_CHANGED event that should batch update all queries
                                         sendEmptyMessage(Realm.REALM_CHANGED);
                                     }
@@ -45,12 +45,9 @@
                         }
                     };
                     realm.setHandler(handler);
-                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
-                    asyncQueryExecutor.pause();
+                    Realm.asyncQueryExecutor.pause();
 
                     populateTestRealm(realm, 10);
-                    // queries will not run i parallel (since our Executor is single threaded)
-                    // should save the pointer
                     final RealmResults<AllTypes> realmResults1 = realm.where(AllTypes.class)
                             .findAllAsync();
                     final RealmResults<AllTypes> realmResults2 = realm.where(AllTypes.class)
@@ -77,7 +74,7 @@
                         }
                     }.start();
                     bgThreadLatch.await();
-                    asyncQueryExecutor.resume();
+                    Realm.asyncQueryExecutor.resume();
 
                     final AtomicInteger maxNumberOfNotificationsQuery1 = new AtomicInteger(1);
                     final AtomicInteger maxNumberOfNotificationsQuery2 = new AtomicInteger(1);
@@ -115,7 +112,7 @@
                         }
                     });
 
-                    Looper.loop();// ready to receive callback
+                    Looper.loop();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -130,13 +127,11 @@
             }
         });
 
-
         signalCallbackFinished.await(7, TimeUnit.SECONDS);
-
-        executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
         }
+        executorService.shutdownNow();
     }
 

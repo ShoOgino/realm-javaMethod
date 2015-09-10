@@ -1,3 +1,4 @@
+    // similar UC as #testForceLoadAsync using 'findFirst'
     public void testForceLoadFindFirstAsync() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
@@ -9,8 +10,7 @@
                 Realm realm = null;
                 try {
                     realm = openRealmInstance("testForceLoadFindFirstAsync");
-                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
-                    asyncQueryExecutor.pause();
+                    Realm.asyncQueryExecutor.pause();
 
                     populateTestRealm(realm, 10);
                     final AllTypes realmResults = realm.where(AllTypes.class)
@@ -20,7 +20,7 @@
                     assertFalse(realmResults.isLoaded());
                     assertEquals("", realmResults.getColumnString());
 
-                    asyncQueryExecutor.resume();
+                    Realm.asyncQueryExecutor.resume();
                     realmResults.load();
 
                     assertTrue(realmResults.isLoaded());
@@ -46,10 +46,10 @@
         // wait until the callback of our async query proceed
         signalCallbackFinished.await(7, TimeUnit.SECONDS);
 
-        executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
         }
+        executorService.shutdownNow();
     }
 

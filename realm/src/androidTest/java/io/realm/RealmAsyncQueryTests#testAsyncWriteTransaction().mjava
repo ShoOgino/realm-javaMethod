@@ -1,6 +1,6 @@
+    // start asynchronously a write transaction to insert one element
     public void testAsyncWriteTransaction() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
-        final Looper[] looper = new Looper[1];
         final Realm[] realm = new Realm[1];
         final Throwable[] threadAssertionError = new Throwable[1];
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -8,10 +8,13 @@
             @Override
             public void run() {
                 Looper.prepare();
-                looper[0] = Looper.myLooper();
+
                 try {
-                    realm[0] = openRealmInstance("test_async_write_transaction");
-                    realm[0].executeAsyncTransaction(new Realm.Transaction() {
+                    realm[0] = openRealmInstance("testAsyncWriteTransaction");
+
+                    assertEquals(0, realm[0].allObjects(Owner.class).size());
+
+                    realm[0].executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
                             Owner owner = realm.createObject(Owner.class);
@@ -32,7 +35,7 @@
                         }
 
                         @Override
-                        public void onError(Throwable e) {
+                        public void onError(Exception e) {
                             signalCallbackFinished.countDown();
                         }
                     });
@@ -55,8 +58,7 @@
         });
 
         // wait until the callback of our async query proceed
-        signalCallbackFinished.await();
-        looper[0].quit();
+        signalCallbackFinished.await(7, TimeUnit.SECONDS);
         executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread

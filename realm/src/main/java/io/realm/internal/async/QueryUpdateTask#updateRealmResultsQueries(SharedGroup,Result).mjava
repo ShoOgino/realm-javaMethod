@@ -1,4 +1,4 @@
-    private void updateRealmResultsQueries(SharedGroup sharedGroup, Result result) {
+    private boolean updateRealmResultsQueries(SharedGroup sharedGroup, Result result) {
         for (Builder.QueryEntry<RealmResults<?>>  queryEntry : realmResultsEntries) {
             if (!isTaskCancelled()) {
                 switch (queryEntry.queryArguments.type) {
@@ -8,6 +8,9 @@
                                         sharedGroup.getNativeReplicationPointer(),
                                         queryEntry.handoverQueryPointer, 0, Table.INFINITE, Table.INFINITE);
                         result.updatedTableViews.put(queryEntry.element, handoverTableViewPointer);
+                        // invalidate the handover query pointer, in case this task is cancelled
+                        // we will not try to close/delete a consumed pointer
+                        queryEntry.handoverQueryPointer = 0L;
                         break;
                     }
                     case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL_SORTED: {
@@ -22,6 +25,7 @@
                                 queryEntry.queryArguments.ascending);
 
                         result.updatedTableViews.put(queryEntry.element, handoverTableViewPointer);
+                        queryEntry.handoverQueryPointer = 0L;
                         break;
                     }
                     case RealmQuery.ArgumentsHolder.TYPE_FIND_ALL_MULTI_SORTED:
@@ -34,11 +38,20 @@
                                 queryEntry.queryArguments.ascendings);
 
                         result.updatedTableViews.put(queryEntry.element, handoverTableViewPointer);
+                        queryEntry.handoverQueryPointer = 0L;
                         break;
                     default:
                         throw new IllegalArgumentException("Query mode " + queryEntry.queryArguments.type + " not supported");
                 }
+            } else {
+                for (Long handoverQueryPointer : result.updatedTableViews.values()) {
+                    if (handoverQueryPointer != 0) {
+                        TableQuery.nativeCloseQueryHandover(handoverQueryPointer);
+                    }
+                }
+                return false;
             }
         }
+        return true;
     }
 

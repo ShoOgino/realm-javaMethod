@@ -1,0 +1,96 @@
+    // keep advancing the Realm by sending 1 commit for each frame (16ms)
+    // the async queries should keep up with the modification
+    public void testStressTestBackgroundCommits() throws Throwable {
+        final CountDownLatch signalInsertionFinished = new CountDownLatch(1);
+        final CountDownLatch signalTestFinished = new CountDownLatch(1);
+        final Throwable[] threadAssertionError = new Throwable[1];
+        final ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                Realm realm = null;
+                try {
+                    final int NUMBER_OF_COMMITS = 1000;
+                    realm = openRealmInstance("testStressTest");
+                    final RealmConfiguration configuration = realm.getConfiguration();
+                    final AtomicInteger numberOfBackgroundCommit = new AtomicInteger(0);
+                    final long[] latestLongValue = new long[1];
+                    final float[] latestFloatValue = new float[1];
+
+                    // start a background thread that pushes a commit every 500ms
+                    Thread backgroundThread = new Thread() {
+                        @Override
+                        public void run() {
+                            Random random = new Random(System.currentTimeMillis());
+                            Realm backgroundThreadRealm = Realm.getInstance(configuration);
+                            while (numberOfBackgroundCommit.getAndIncrement() < NUMBER_OF_COMMITS) {
+                                backgroundThreadRealm.beginTransaction();
+                                // Add red dot from the background thread
+                                AllTypes object = backgroundThreadRealm.createObject(AllTypes.class);
+                                latestLongValue[0] = random.nextInt(100);
+                                latestFloatValue[0] = random.nextFloat();
+                                object.setColumnFloat(latestFloatValue[0]);
+                                object.setColumnLong(latestLongValue[0]);
+                                backgroundThreadRealm.commitTransaction();
+
+                                numberOfBackgroundCommit.incrementAndGet();
+
+                                // Wait 16ms. before adding the next dot.
+                                SystemClock.sleep(16);
+                            }
+                            signalInsertionFinished.countDown();
+                        }
+                    };
+
+
+                    final AtomicInteger numberOfNotificationReceived = new AtomicInteger(0);
+                    RealmResults<AllTypes> allAsync = realm.where(AllTypes.class).findAllAsync();
+                    allAsync.addChangeListener(new RealmChangeListener() {
+                        @Override
+                        public void onChange() {
+                            numberOfNotificationReceived.incrementAndGet();
+                        }
+                    });
+
+                    backgroundThread.start();
+
+                    signalInsertionFinished.await();
+
+                    assertTrue(allAsync.isLoaded());
+                    assertEquals(NUMBER_OF_COMMITS, allAsync.size());
+                    assertEquals(NUMBER_OF_COMMITS, numberOfNotificationReceived.get());
+                    AllTypes lastInserted = realm.where(AllTypes.class)
+                            .equalTo("columnLong", latestLongValue[0])
+                            .equalTo("columnFloat", latestFloatValue[0])
+                            .findFirst();
+                    assertNotNull(lastInserted);
+                    signalTestFinished.countDown();
+
+                    Looper.loop();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+
+                } finally {
+                    if (signalTestFinished.getCount() > 0) {
+                        signalTestFinished.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        // wait until the callback of our async query proceed
+        signalTestFinished.await(7, TimeUnit.SECONDS);
+
+        executorService.shutdownNow();
+        if (null != threadAssertionError[0]) {
+            // throw any assertion errors happened in the background thread
+            throw threadAssertionError[0];
+        }
+    }
+

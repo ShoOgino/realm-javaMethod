@@ -1,13 +1,4 @@
-    // UC:
-    //   1- insert 10 objects
-    //   2- start an async query to find object [0-4]
-    //   3- assert current RealmResults is empty (Worker Thread didn't complete)
-    //   4- when the worker thread complete, advance the Realm
-    //   5- the caller thread is ahead of the result provided by the worker thread
-    //   6- retry automatically the async query
-    //   7- the returned RealmResults is now in the same version as the caller thread
-    //   8- the notification should be called once (when we retry automatically we shouldn't
-    //      notify the user).
+    // similar UC as #testFindAllAsyncWithNotification using 'findAllSorted'
     public void testFindAllSortedAsyncRetry() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
@@ -19,7 +10,6 @@
                 try {
                     final AtomicInteger numberOfIntercept = new AtomicInteger(1);
                     final Realm realm = openRealmInstance("testFindAllSortedAsyncRetry");
-                    // partial mocking ofr our Handler
                     final Handler handler = new HandlerProxy(realm.getHandler()) {
                         @Override
                         public boolean onInterceptMessage(int what) {
@@ -28,7 +18,7 @@
                                     if (numberOfIntercept.getAndDecrement() > 0) {
                                         // We advance the Realm so we can simulate a retry
                                         // This is intercepted on the worker thread, we need to use
-                                        // the Realm om the original thread
+                                        // the Realm on the original thread
                                         postAtFront(new Runnable() {
                                             @Override
                                             public void run() {
@@ -45,9 +35,7 @@
                         }
                     };
                     realm.setHandler(handler);
-
-                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
-                    asyncQueryExecutor.pause();
+                    Realm.asyncQueryExecutor.pause();
 
                     populateTestRealm(realm, 10);
                     final RealmResults<AllTypes> realmResults = realm.where(AllTypes.class)
@@ -57,7 +45,7 @@
                     assertFalse(realmResults.isLoaded());
                     assertEquals(0, realmResults.size());
 
-                    asyncQueryExecutor.resume();
+                    Realm.asyncQueryExecutor.resume();
 
                     final AtomicInteger numberOfInvocation = new AtomicInteger(0);
                     realmResults.addChangeListener(new RealmChangeListener() {
@@ -72,11 +60,10 @@
                             } finally {
                                 signalCallbackFinished.countDown();
                             }
-
                         }
                     });
 
-                    Looper.loop();// ready to receive callback
+                    Looper.loop();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -86,19 +73,17 @@
                     if (signalCallbackFinished.getCount() > 0) {
                         signalCallbackFinished.countDown();
                     }
-
                 }
             }
         });
 
         // wait until the callback of our async query proceed
-//        signalCallbackFinished.await(7, TimeUnit.SECONDS);
-        signalCallbackFinished.await();
+        signalCallbackFinished.await(7, TimeUnit.SECONDS);
 
-        executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
         }
+        executorService.shutdownNow();
     }
 

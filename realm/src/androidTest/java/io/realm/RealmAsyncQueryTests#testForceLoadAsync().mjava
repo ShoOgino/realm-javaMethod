@@ -1,4 +1,5 @@
-    // Transforming an async query into sync by calling load
+    // transforming an async query into sync by calling load to force
+    // the blocking behaviour
     public void testForceLoadAsync() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
@@ -10,8 +11,7 @@
                 Realm realm = null;
                 try {
                     realm = openRealmInstance("testForceLoadAsync");
-                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
-                    asyncQueryExecutor.pause();
+                    Realm.asyncQueryExecutor.pause();
 
                     populateTestRealm(realm, 10);
                     final RealmResults<AllTypes> realmResults = realm.where(AllTypes.class)
@@ -35,9 +35,10 @@
                     assertFalse(realmResults.isLoaded());
                     assertEquals(0, realmResults.size());
 
-                    asyncQueryExecutor.resume();
-                    realmResults.load();
+                    Realm.asyncQueryExecutor.resume();
+                    boolean successful = realmResults.load();
 
+                    assertTrue(successful);
                     assertTrue(realmResults.isLoaded());
                     assertEquals(5, realmResults.size());
 

@@ -7,24 +7,25 @@
                     realmConfiguration.getEncryptionKey());
 
             Result result;
+            boolean updateSuccessful = false;
             if (isUpdatingRealmResults) {
                 result = Result.newRealmResults();
-                updateRealmResultsQueries(sharedGroup, result);
+                updateSuccessful = updateRealmResultsQueries(sharedGroup, result);
                 result.versionID = sharedGroup.getVersion();
 
             } else {
                 result = Result.newRealmObject();
-                updateRealmObjectQuery(sharedGroup, result);
+                updateSuccessful = updateRealmObjectQuery(sharedGroup, result);
                 result.versionID = sharedGroup.getVersion();
             }
 
             Handler handler = callerHandler.get();
-            if (!isTaskCancelled() && isAliveHandler(handler)) {
-                Message msg = handler.obtainMessage(message, result);
-                handler.sendMessage(msg);
+            if (updateSuccessful && !isTaskCancelled() && isAliveHandler(handler)) {
+                handler.obtainMessage(message, result).sendToTarget();
             }
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            RealmLog.e(e.getMessage());
             e.fillInStackTrace();
 
         } finally {

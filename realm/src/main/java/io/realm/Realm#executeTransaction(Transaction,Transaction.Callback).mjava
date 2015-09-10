@@ -1,0 +1,67 @@
+    /**
+     * Similar to {@link #executeTransaction(Transaction)} but runs asynchronously from a worker thread
+     * @param transaction {@link io.realm.Realm.Transaction} to execute.
+     * @param callback optional, to receive the result of this query
+     * @return A {@link io.realm.Realm.Request} representing a cancellable task
+     */
+    public Request executeTransaction(final Transaction transaction, final Transaction.Callback callback) {
+        if (transaction == null)
+            throw new IllegalArgumentException("transaction should not be null");
+
+        if (callback == null)
+            throw new IllegalArgumentException("callback should not be null");
+
+        // will use the Looper of the caller thread to post the result
+        final Handler handler = new Handler();
+
+        // We need to use the same configuration to open a background SharedGroup (i.e Realm)
+        // to perform the transaction
+        final RealmConfiguration realmConfiguration = getConfiguration();
+
+        final Future<?> pendingQuery = asyncQueryExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                if (!Thread.currentThread().isInterrupted()) {
+                    Realm bgRealm = Realm.getInstance(realmConfiguration);
+                    bgRealm.beginTransaction();
+                    try {
+                        transaction.execute(bgRealm);
+
+                        if (!Thread.currentThread().isInterrupted()) {
+                            bgRealm.commitTransaction();
+                            if (callback != null
+                                    && !Thread.currentThread().isInterrupted()
+                                    && handler.getLooper().getThread().isAlive()) {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        callback.onSuccess();
+                                    }
+                                });
+                            }
+                        } else {
+                            bgRealm.cancelTransaction();
+                        }
+
+                    } catch (final Exception e) {
+                        bgRealm.cancelTransaction();
+                        if (callback != null
+                                && !Thread.currentThread().isInterrupted()
+                                && handler.getLooper().getThread().isAlive()) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    callback.onError(e);
+                                }
+                            });
+                        }
+                    } finally {
+                        bgRealm.close();
+                    }
+                }
+            }
+        });
+
+        return new Request(pendingQuery);
+    }
+

@@ -1,11 +1,4 @@
-    // UC:
-    //   1- insert 10 objects
-    //   2- start 2 async queries to find all objects [0-9] & objects[0-4]
-    //   3- assert both RealmResults are empty (Worker Thread didn't complete)
-    //   4- the queries will complete with the same version as the caller thread
-    //   5- using a background thread update the Realm
-    //   6- now REALM_CHANGED will trigger a REALM_UPDATE_ASYNC_QUERIES that should update
-    //   7- callbacks are notified with the latest results (called twice overall)
+    // similar UC as #testFindAllAsyncBatchUpdate using 'findAllSorted'
     public void testFindAllSortedAsyncBatchUpdate() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(2);
         final Throwable[] threadAssertionError = new Throwable[1];
@@ -61,24 +54,21 @@
                         }
                     };
                     realm.setHandler(handler);
-                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
-                    asyncQueryExecutor.pause();
+                    Realm.asyncQueryExecutor.pause();
 
                     populateTestRealm(realm, 10);
-                    // queries will not run i parallel (since our Executor is single threaded)
-                    // should save the pointer
                     final RealmResults<AllTypes> realmResults1 = realm.where(AllTypes.class)
                             .findAllSortedAsync("columnString", RealmResults.SORT_ORDER_ASCENDING);
                     final RealmResults<AllTypes> realmResults2 = realm.where(AllTypes.class)
                             .between("columnLong", 0, 4)
-                            .findAllSortedAsync("columnString", RealmResults.SORT_ORDER_DESCENDING);//TODO replace second query with Sort multiple
+                            .findAllSortedAsync("columnString", RealmResults.SORT_ORDER_DESCENDING);
 
                     assertFalse(realmResults1.isLoaded());
                     assertFalse(realmResults2.isLoaded());
                     assertEquals(0, realmResults1.size());
                     assertEquals(0, realmResults2.size());
 
-                    asyncQueryExecutor.resume();
+                    Realm.asyncQueryExecutor.resume();
 
 
                     realmResults1.addChangeListener(new RealmChangeListener() {
@@ -139,7 +129,7 @@
                         }
                     });
 
-                    Looper.loop();// ready to receive callback
+                    Looper.loop();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -154,15 +144,14 @@
             }
         });
 
-//        signalCallbackFinished.await(7, TimeUnit.SECONDS);
-        signalCallbackFinished.await();
+        signalCallbackFinished.await(7, TimeUnit.SECONDS);
         assertEquals(2, numberOfNotificationsQuery1.get());
         assertEquals(2, numberOfNotificationsQuery2.get());
 
-        executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
         }
+        executorService.shutdownNow();
     }
 

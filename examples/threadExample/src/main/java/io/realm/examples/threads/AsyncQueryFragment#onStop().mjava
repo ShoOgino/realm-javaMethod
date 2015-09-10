@@ -2,8 +2,10 @@
     public void onStop() {
         super.onStop();
         // Remember to close the Realm instance when done with it.
-        cancelRequest();
         cancelTransaction();
+        mAllSortedDots.deleteChangeListener(this);
+        mAllSortedDots = null;
         realm.close();
+        RealmLog.d("AsyncQueryFragment onStop closing realm");
     }
 

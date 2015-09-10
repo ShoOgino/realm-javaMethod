@@ -4,7 +4,7 @@
 
         // Enable UI refresh while the fragment is active.
         realm.addChangeListener(realmListener);
-
+        RealmLog.d("ThreadFragment onResume enable change listener");
         // Create background thread that add a new dot every 0.5 second.
         backgroundThread = new Thread() {
 
@@ -14,6 +14,7 @@
                 // instance on the background thread.
                 int redColor = getResources().getColor(R.color.realm_red);
                 Realm backgroundThreadRealm = Realm.getInstance(getActivity());
+                RealmLog.d("ThreadFragment onResume opening bg realm");
                 while (!backgroundThread.isInterrupted()) {
                     backgroundThreadRealm.beginTransaction();
 
@@ -30,6 +31,7 @@
 
                 // Also close Realm instances used in background threads.
                 backgroundThreadRealm.close();
+                RealmLog.d("ThreadFragment onResume closing bg realm");
             }
         };
         backgroundThread.start();

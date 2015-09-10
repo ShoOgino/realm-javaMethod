@@ -1,0 +1,14 @@
+    private void deleteWeakReferences() {//TODO could also use isEnqueued instead
+        // From the AOSP FinalizationTest:
+        // https://android.googlesource.com/platform/libcore/+/master/support/src/test/java/libcore/
+        // java/lang/ref/FinalizationTester.java
+        // System.gc() does not garbage collect every time. Runtime.gc() is
+        // more likely to perform a gc.
+        Runtime.getRuntime().gc();
+        Reference<? extends RealmResults<?>> weakReference;
+        while ((weakReference = referenceQueue.poll()) != null ) { // Does not wait for a reference to become available.
+            RealmLog.d("deleted 1 reference: " + weakReference);
+            asyncRealmResults.remove(weakReference);
+        }
+    }
+

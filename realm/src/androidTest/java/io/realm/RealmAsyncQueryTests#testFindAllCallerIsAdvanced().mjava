@@ -1,8 +1,7 @@
-    //TODO test GC'd in REALM_COMPLETED_ASYNC_QUERY
-    //TODO test removed callback
-    //TODO test cancel pending query
+    // simulate a use case, when the caller thread advance read, while the background thread
+    // is operating on a previous version, this will should retry the query on the worker thread
+    // to deliver the results once (suing the latest version of the Realm)
     public void testFindAllCallerIsAdvanced() throws Throwable {
-        io.realm.internal.Util.setDebugLevel(5);
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final CountDownLatch callbackInvokedFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
@@ -12,18 +11,30 @@
             @Override
             public void run() {
                 Looper.prepare();
+                final boolean[] isFirstIdle = {true};
+                Looper.myQueue().addIdleHandler(new MessageQueue.IdleHandler() {
+                    @Override
+                    public boolean queueIdle() {
+                        if (isFirstIdle[0]) {
+                            isFirstIdle[0] = false;
+                            return true;
+
+                        } else {
+                            signalCallbackFinished.countDown();
+                            return false; // unregister from the future IdleHandler events
+                        }
+                    }
+                });
+
                 try {
                     final AtomicInteger numberOfIntercept = new AtomicInteger(1);
                     final Realm realm = openRealmInstance("testFindAllCallerIsAdvanced");
                     final CountDownLatch updateCallerThread = new CountDownLatch(1);
-                    // partial mocking ofr our Handler
                     final Handler handler = new HandlerProxy(realm.getHandler()) {
                         @Override
                         public boolean onInterceptMessage(int what) {
                             switch (what) {
                                 case Realm.REALM_UPDATE_ASYNC_QUERIES: {
-                                    // re-prioritise batch update to complete before the waiting
-
                                     // posting this as a runnable guarantee that  REALM_UPDATE_ASYNC_QUERIES
                                     // logic complete before resuming the awaiting REALM_COMPLETED_ASYNC_QUERY
                                     post(new Runnable() {
@@ -32,25 +43,13 @@
                                             updateCallerThread.countDown();
                                         }
                                     });
-
-                                    // this will give a chance to the blocked REALM_COMPLETED_ASYNC_QUERY
-                                    // to proceed. note, that the result of this REALM_COMPLETED_ASYNC_QUERY
-                                    // will be ignored (should not trigger a callback)
-                                    post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            signalCallbackFinished.countDown();
-                                        }
-                                    });
                                     break;
                                 }
                                 case Realm.REALM_COMPLETED_ASYNC_QUERY: {
-
                                     if (numberOfIntercept.getAndDecrement() > 0) {
-
-                                        // We advance the Realm so we can simulate a retry
-                                        // This is intercepted on the worker thread, we need to use
-                                        // the Realm om the original thread
+                                        // we advance the Realm so we can simulate a retry
+                                        // this is intercepted on the worker thread, we need to use
+                                        // the Realm on the original thread
                                         postAtFront(new Runnable() {
                                             @Override
                                             public void run() {
@@ -79,9 +78,7 @@
                         }
                     };
                     realm.setHandler(handler);
-
-                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
-                    asyncQueryExecutor.pause();
+                    Realm.asyncQueryExecutor.pause();
 
                     populateTestRealm(realm, 10);
                     final RealmResults<AllTypes> realmResults = realm.where(AllTypes.class)
@@ -91,7 +88,7 @@
                     assertFalse(realmResults.isLoaded());
                     assertEquals(0, realmResults.size());
 
-                    asyncQueryExecutor.resume();
+                    Realm.asyncQueryExecutor.resume();
 
                     realmResults.addChangeListener(new RealmChangeListener() {
                         @Override
@@ -108,7 +105,7 @@
                         }
                     });
 
-                    Looper.loop();// ready to receive callback
+                    Looper.loop();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -118,15 +115,14 @@
         });
 
         // wait until the callback of our async query proceed
-        //signalCallbackFinished.await(7, TimeUnit.SECONDS);
-        signalCallbackFinished.await();
-        callbackInvokedFinished.await();
-        assertEquals(1, numberOfInvocation.get());
-
-        executorService.shutdownNow();
+        signalCallbackFinished.await(7, TimeUnit.SECONDS);
+        callbackInvokedFinished.await(7, TimeUnit.SECONDS);
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
         }
+
+        assertEquals(1, numberOfInvocation.get());
+        executorService.shutdownNow();
     }
 

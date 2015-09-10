@@ -1,15 +1,5 @@
-    // UC:
-    //   1- insert 10 objects
-    //   2- start an async query to find object [0-4]
-    //   3- assert current RealmResults is empty (Worker Thread didn't complete)
-    //   4- when the worker thread complete, advance the Realm
-    //   5- the caller thread is ahead of the result provided by the worker thread
-    //   6- retry automatically the async query
-    //   7- the returned RealmResults is now in the same version as the caller thread
-    //   8- the notification should be called once (when we retry automatically we shouldn't
-    //      notify the user).
+    // similar UC as #testFindAllAsyncRetry using 'findFirst'
     public void testFindFirstAsyncRetry() throws Throwable {
-        io.realm.internal.Util.setDebugLevel(5);
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -20,16 +10,15 @@
                 try {
                     final AtomicInteger numberOfIntercept = new AtomicInteger(1);
                     final Realm realm = openRealmInstance("testFindFirstAsyncRetry");
-                    // partial mocking ofr our Handler
                     final Handler handler = new HandlerProxy(realm.getHandler()) {
                         @Override
                         public boolean onInterceptMessage(int what) {
                             switch (what) {
                                 case Realm.REALM_COMPLETED_ASYNC_FIND_FIRST: {
                                     if (numberOfIntercept.getAndDecrement() > 0) {
-                                        // We advance the Realm so we can simulate a retry
-                                        // This is intercepted on the worker thread, we need to use
-                                        // the Realm om the original thread
+                                        // we advance the Realm so we can simulate a retry
+                                        // this is intercepted on the worker thread, we need to use
+                                        // the Realm on the original thread
                                         postAtFront(new Runnable() {
                                             @Override
                                             public void run() {
@@ -38,8 +27,7 @@
                                                 AllTypes object = realm.createObject(AllTypes.class);
 
                                                 object.setColumnString("The Endless River");
-                                                object.setColumnLong(5);//TODO the test crash if we choose unvailable indice (not betwe 4-6)
-                                                // TODO need to handle result -1 (object not found so we set an empty row again)
+                                                object.setColumnLong(5);
                                                 realm.commitTransaction();
                                             }
                                         });
@@ -51,9 +39,7 @@
                         }
                     };
                     realm.setHandler(handler);
-
-                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
-                    asyncQueryExecutor.pause();
+                    Realm.asyncQueryExecutor.pause();
 
                     populateTestRealm(realm, 10);
                     final AllTypes realmResults = realm.where(AllTypes.class)
@@ -63,7 +49,7 @@
                     assertFalse(realmResults.isLoaded());
                     assertEquals("", realmResults.getColumnString());
 
-                    asyncQueryExecutor.resume();
+                    Realm.asyncQueryExecutor.resume();
 
                     final AtomicInteger numberOfInvocation = new AtomicInteger(0);
                     realmResults.addChangeListener(new RealmChangeListener() {
@@ -83,7 +69,7 @@
                         }
                     });
 
-                    Looper.loop();// ready to receive callback
+                    Looper.loop();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -99,13 +85,12 @@
         });
 
         // wait until the callback of our async query proceed
-//        signalCallbackFinished.await(7, TimeUnit.SECONDS);
-        signalCallbackFinished.await();
+        signalCallbackFinished.await(7, TimeUnit.SECONDS);
 
-        executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
         }
+        executorService.shutdownNow();
     }
 

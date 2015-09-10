@@ -4,7 +4,7 @@
     //   3- assert both RealmResults are empty (Worker Thread didn't complete)
     //   4- the queries will complete with the same version as the caller thread
     //   5- using a background thread update the Realm
-    //   6- now REALM_CHANGED will trigger a REALM_UPDATE_ASYNC_QUERIES that should update
+    //   6- now REALM_CHANGED will trigger a REALM_UPDATE_ASYNC_QUERIES that should update all queries
     //   7- callbacks are notified with the latest results (called twice overall)
     public void testFindAllAsyncBatchUpdate() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(2);
@@ -19,6 +19,7 @@
                 try {
                     final Realm realm = openRealmInstance("testFindAllAsyncBatchUpdate");
                     final AtomicInteger numberOfIntercept = new AtomicInteger(1);
+                    assertNotNull(realm.getHandler());
                     final Handler handler = new HandlerProxy(realm.getHandler()) {
                         @Override
                         public boolean onInterceptMessage(int what) {
@@ -61,12 +62,9 @@
                         }
                     };
                     realm.setHandler(handler);
-                    final RealmThreadPoolExecutor asyncQueryExecutor =  Realm.asyncQueryExecutor;
-                    asyncQueryExecutor.pause();
+                    Realm.asyncQueryExecutor.pause();
 
                     populateTestRealm(realm, 10);
-                    // queries will not run i parallel (since our Executor is single threaded)
-                    // should save the pointer
                     final RealmResults<AllTypes> realmResults1 = realm.where(AllTypes.class)
                             .findAllAsync();
                     final RealmResults<AllTypes> realmResults2 = realm.where(AllTypes.class)
@@ -77,8 +75,7 @@
                     assertEquals(0, realmResults1.size());
                     assertEquals(0, realmResults2.size());
 
-                    asyncQueryExecutor.resume();
-
+                    Realm.asyncQueryExecutor.resume();
 
                     realmResults1.addChangeListener(new RealmChangeListener() {
                         @Override
@@ -138,7 +135,7 @@
                         }
                     });
 
-                    Looper.loop();// ready to receive callback
+                    Looper.loop();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -153,8 +150,7 @@
             }
         });
 
-//        signalCallbackFinished.await(7, TimeUnit.SECONDS);
-        signalCallbackFinished.await();
+        signalCallbackFinished.await(7, TimeUnit.SECONDS);
         assertEquals(2, numberOfNotificationsQuery1.get());
         assertEquals(2, numberOfNotificationsQuery2.get());
 

@@ -1,0 +1,12 @@
+    private void cleanRR () {
+        Iterator<Map.Entry<WeakReference<RealmResults<?>>, RealmQuery<?>>> iterator =
+                asyncRealmResults.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<WeakReference<RealmResults<?>>, RealmQuery<?>> entry = iterator.next();
+            RealmResults<?> weakReference = entry.getKey().get();
+            if (weakReference == null) {
+                iterator.remove();
+            }
+        }
+    }
+

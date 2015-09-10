@@ -1,15 +1,18 @@
     /**
-     * Indicates if there are currently any RealmResults being used in this tread (obtained
+     * Indicates if there are currently any RealmResults being used in this thread (obtained
      * previously asynchronously). This will prevent advanceRead accidentally the current transaction
      * resulting in re-running the queries in this thread.
      * @return {@code true} if there is at least one (non GC'd) instance of {@link RealmResults} {@code false} otherwise
      */
     private boolean threadContainsAsyncQueries () {
+        deleteWeakReferences();
         boolean isEmpty = true;
-        Iterator<Map.Entry<WeakReference<RealmResults<?>>, RealmQuery<?>>> iterator = asyncQueries.get().entrySet().iterator();
+        Iterator<Map.Entry<WeakReference<RealmResults<?>>, RealmQuery<?>>> iterator = asyncRealmResults.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<WeakReference<RealmResults<?>>, RealmQuery<?>> next = iterator.next();
             if (next.getKey().get() == null) {
+                // clean the GC'd instance
+                // we could've avoided this if we had a 'WeakIdentityHashmap' data structure. miss Guava :(
                 iterator.remove();
             } else {
                 isEmpty = false;

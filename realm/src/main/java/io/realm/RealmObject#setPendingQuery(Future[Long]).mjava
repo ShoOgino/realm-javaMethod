@@ -1,17 +1,18 @@
-    void setPendingQuery (Future<Long> pendingQuery) {
+    /**
+     * Set the Future instance returned by the worker thread, we need this instance
+     * to force {@link #load()} an async query, we use it to determine if the current
+     * RealmResults is a sync or async one
+     *
+     * @param pendingQuery pending query
+     */
+    void setPendingQuery(Future<Long> pendingQuery) {
         this.pendingQuery = pendingQuery;
-        if (isLoaded()) { // The query completed before RealmQuery
+        if (isLoaded()) {
+            // the query completed before RealmQuery
             // had a chance to call setPendingQuery to register the pendingQuery (used btw
             // to determine isLoaded behaviour)
             onCompleted();
 
-        } else {
-            // This will be handled by the Realm#handler
-            // we need a handler since the onCompleted should run on the caller
-            // thread
-            // register a listener to wait for the worker thread to finish
-            // so we can call onCompleted
-//            pendingQuery.addListener(new O)
-        }
+        } // else, it will be handled by the Realm#handler
     }
 
