@@ -1,8 +1,23 @@
         @Override
         public void emitStreamTypeConversion(String setter, String fieldName, String fieldType, JavaWriter writer) throws IOException {
-            writer.emitStatement("obj.%s((%s) reader.next%s())",
-                    setter,
-                    castType,
-                    jsonType);
+            // TODO: This checking should be removed after nullable support for all types.
+            //       And remove the else block as well.
+            if (Utils.isString(fieldType)) {
+                writer
+                    .beginControlFlow("if (reader.peek() == JsonToken.NULL)")
+                        .emitStatement("obj.%s(\"\")", setter)
+                        .emitStatement("reader.skipValue()")
+                    .nextControlFlow("else")
+                        .emitStatement("obj.%s((%s) reader.next%s())",
+                                setter,
+                                castType,
+                                jsonType)
+                    .endControlFlow();
+            } else {
+                writer.emitStatement("obj.%s((%s) reader.next%s())",
+                        setter,
+                        castType,
+                        jsonType);
+            }
         }
 

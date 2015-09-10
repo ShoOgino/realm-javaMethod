@@ -4,12 +4,8 @@
         // Ensure cache state
         String realmPath = newConfiguration.getPath();
         List<RealmConfiguration> pathConfigurationCache = globalPathConfigurationCache.get(realmPath);
-        if (pathConfigurationCache == null) {
-            pathConfigurationCache = new CopyOnWriteArrayList<RealmConfiguration>();
-            globalPathConfigurationCache.put(realmPath, pathConfigurationCache);
-        }
 
-        if (pathConfigurationCache.size() > 0) {
+        if (pathConfigurationCache != null && pathConfigurationCache.size() > 0) {
 
             // For the current restrictions, it is enough to just check one of the existing configurations.
             RealmConfiguration cachedConfiguration = pathConfigurationCache.get(0);
@@ -42,8 +38,5 @@
                         "configurations pointing to " + newConfiguration.getPath() + " are being used.");
             }
         }
-
-        // The new configuration doesn't violate existing configurations. Cache it.
-        pathConfigurationCache.add(newConfiguration);
     }
 

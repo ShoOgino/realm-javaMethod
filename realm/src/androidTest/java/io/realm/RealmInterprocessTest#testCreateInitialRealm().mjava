@@ -1,0 +1,31 @@
+    // 1. Main process create Realm, write one object.
+    // A. Service process open Realm, check if there is one and only one object.
+    public void testCreateInitialRealm() throws InterruptedException {
+        new InterprocessHandler(new Runnable() {
+            @Override
+            public void run() {
+                // Step 1
+                testRealm = Realm.getInstance(getContext());
+                assertEquals(testRealm.allObjects(AllTypes.class).size(), 0);
+                testRealm.beginTransaction();
+                testRealm.createObject(AllTypes.class);
+                testRealm.commitTransaction();
+
+                // Step A
+                triggerServiceStep(RemoteProcessService.stepCreateInitialRealm_A);
+            }}) {
+
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if (msg.what == RemoteProcessService.stepCreateInitialRealm_A.message) {
+                    clearTimeoutFlag();
+                    done();
+                } else {
+                    assertTrue(false);
+                }
+            }
+        };
+        Looper.loop();
+    }
+

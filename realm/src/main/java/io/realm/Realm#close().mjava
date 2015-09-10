@@ -27,7 +27,11 @@
             // It is necessary to be synchronized here since there is a chance that before the counter removed,
             // the other thread could get the counter and increase it in createAndValidate.
             synchronized (Realm.class) {
-                globalPathConfigurationCache.get(canonicalPath).remove(configuration);
+                List<RealmConfiguration>  pathConfigurationCache = globalPathConfigurationCache.get(canonicalPath);
+                pathConfigurationCache.remove(configuration);
+                if (pathConfigurationCache.isEmpty()) {
+                    globalPathConfigurationCache.remove(canonicalPath);
+                }
                 AtomicInteger counter = globalOpenInstanceCounter.get(canonicalPath);
                 if (counter.decrementAndGet() == 0) {
                     globalOpenInstanceCounter.remove(canonicalPath);
