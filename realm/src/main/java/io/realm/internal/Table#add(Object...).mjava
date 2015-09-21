@@ -1,11 +1,86 @@
     /**
-     * Appends the specified row to the end of the table
+     * Appends the specified row to the end of the table.
+     * For internal testing usage only.
+     *
      * @param values
      * @return The row index of the appended row
      */
-    public long add(Object... values) {
-        long rowIndex = size();
-        addAt(rowIndex, values);
+    protected long add(Object... values) {
+        long rowIndex = addEmptyRow();
+
+        checkImmutable();
+
+        // Check values types
+        int columns = (int)getColumnCount();
+        if (columns != values.length) {
+            throw new IllegalArgumentException("The number of value parameters (" +
+                    String.valueOf(values.length) +
+                    ") does not match the number of columns in the table (" +
+                    String.valueOf(columns) + ").");
+        }
+        ColumnType colTypes[] = new ColumnType[columns];
+        for (int columnIndex = 0; columnIndex < columns; columnIndex++) {
+            Object value = values[columnIndex];
+            ColumnType colType = getColumnType(columnIndex);
+            colTypes[columnIndex] = colType;
+            if (!colType.matchObject(value)) {
+                //String representation of the provided value type
+                String providedType;
+                if (value == null)
+                    providedType = "null";
+                else
+                    providedType = value.getClass().toString();
+
+                throw new IllegalArgumentException("Invalid argument no " + String.valueOf(1 + columnIndex) +
+                        ". Expected a value compatible with column type " + colType + ", but got " + providedType + ".");
+            }
+        }
+
+        // Insert values
+        for (long columnIndex = 0; columnIndex < columns; columnIndex++) {
+            Object value = values[(int)columnIndex];
+            switch (colTypes[(int)columnIndex]) {
+            case BOOLEAN:
+                nativeSetBoolean(nativePtr, columnIndex, rowIndex, (Boolean)value);
+                break;
+            case INTEGER:
+                long intValue = ((Number) value).longValue();
+                checkIntValueIsLegal(columnIndex, rowIndex, intValue);
+                nativeSetLong(nativePtr, columnIndex, rowIndex, intValue);
+                break;
+            case FLOAT:
+                nativeSetFloat(nativePtr, columnIndex, rowIndex, (Float) value);
+                break;
+            case DOUBLE:
+                nativeSetDouble(nativePtr, columnIndex, rowIndex, (Double) value);
+                break;
+            case STRING:
+                String stringValue = (String) value;
+                checkStringValueIsLegal(columnIndex, rowIndex, stringValue);
+                nativeSetString(nativePtr, columnIndex, rowIndex, (String)value);
+                break;
+            case DATE:
+                if (value == null)
+                    throw new IllegalArgumentException("Null Date is not allowed.");
+                nativeSetDate(nativePtr, columnIndex, rowIndex, ((Date)value).getTime()/1000);
+                break;
+            case MIXED:
+                if (value == null)
+                    throw new IllegalArgumentException("Null Mixed data is not allowed");
+                nativeSetMixed(nativePtr, columnIndex, rowIndex, Mixed.mixedValue(value));
+                break;
+            case BINARY:
+                if (value == null)
+                    throw new IllegalArgumentException("Null Array is not allowed");
+                nativeSetByteArray(nativePtr, columnIndex, rowIndex, (byte[])value);
+                break;
+            case TABLE:
+                insertSubTable(columnIndex, rowIndex, value);
+                break;
+            default:
+                throw new RuntimeException("Unexpected columnType: " + String.valueOf(colTypes[(int)columnIndex]));
+            }
+        }
         return rowIndex;
     }
 
