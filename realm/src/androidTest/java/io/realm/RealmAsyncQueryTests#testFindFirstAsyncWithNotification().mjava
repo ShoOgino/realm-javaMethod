@@ -22,6 +22,7 @@
                         public void onChange() {
                             try {
                                 assertTrue(realmResults.isLoaded());
+                                assertTrue(realmResults.isValid());
                                 assertEquals("test data 4", realmResults.getColumnString());
                             } catch (AssertionFailedError e) {
                                 threadAssertionError[0] = e;
@@ -32,7 +33,12 @@
                     });
 
                     assertFalse(realmResults.isLoaded());
+                    assertFalse(realmResults.isValid());
                     assertEquals("", realmResults.getColumnString());
+                    try {
+                        realmResults.setColumnString("should fail");
+                        fail("Accessing an unloaded object should throw");
+                    } catch (IllegalAccessError ignore) {}
 
                     Realm.asyncQueryExecutor.resume();
 
