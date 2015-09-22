@@ -1,0 +1,56 @@
+    // Tests that if the same configuration is used on 2 different Looper threads that each gets its own Handler. This
+    // prevents commitTransaction from accidentally posting messages to Handlers which might reference a closed Realm.
+    public void testDoNotUseClosedHandler() throws InterruptedException {
+        final RealmConfiguration realmConfiguration = TestHelper.createConfiguration(getContext());
+        Realm.deleteRealm(realmConfiguration);
+
+        final CountDownLatch handlerNotified = new CountDownLatch(1);
+
+        // Create Handler on Thread1 by opening a Realm instance
+        new Thread("thread1") {
+            @Override
+            public void run() {
+                Looper.prepare();
+                final Realm realm = Realm.getInstance(realmConfiguration);
+                RealmChangeListener listener = new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        handlerNotified.countDown();
+                        realm.close();
+                    }
+                };
+                realm.addChangeListener(listener);
+                Looper.loop();
+            }
+        }.start();
+
+        // Create Handler on Thread2 for the same Realm path and close the Realm instance again.
+        new Thread("thread2") {
+            @Override
+            public void run() {
+                Looper.prepare();
+                Realm realm = Realm.getInstance(realmConfiguration);
+                RealmChangeListener listener = new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        fail("This handler should not be notified");
+                    }
+                };
+                realm.addChangeListener(listener);
+                realm.close();
+                Looper.loop();
+            }
+
+        }.start();
+
+        // Any REALM_CHANGED message should now only reach the open Handler on Thread1
+        Realm realm = Realm.getInstance(realmConfiguration);
+        realm.beginTransaction();
+        realm.commitTransaction();
+        try {
+            handlerNotified.await(5, TimeUnit.SECONDS);
+        } finally {
+            realm.close();
+        }
+    }
+
