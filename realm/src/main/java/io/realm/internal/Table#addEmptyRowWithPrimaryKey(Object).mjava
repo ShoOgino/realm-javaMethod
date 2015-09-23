@@ -5,7 +5,7 @@
         long primaryKeyColumnIndex = getPrimaryKey();
         ColumnType type = getColumnType(primaryKeyColumnIndex);
         long rowIndex;
-        Row row;
+        UncheckedRow row;
 
         // Add with primary key initially set
         switch (type) {
@@ -17,14 +17,14 @@
                     throwDuplicatePrimaryKeyException(primaryKeyValue);
                 }
                 rowIndex = nativeAddEmptyRow(nativePtr, 1);
-                row = getRow(rowIndex);
+                row = getUncheckedRow(rowIndex);
                 row.setString(primaryKeyColumnIndex, (String) primaryKeyValue);
                 break;
 
             case INTEGER:
                 long pkValue;
                 try {
-                    pkValue = Long.valueOf(primaryKeyValue.toString());
+                    pkValue = Long.parseLong(primaryKeyValue.toString());
                 } catch (RuntimeException e) {
                     throw new IllegalArgumentException("Primary key value is not a long: " + primaryKeyValue);
                 }
@@ -32,7 +32,7 @@
                     throwDuplicatePrimaryKeyException(pkValue);
                 }
                 rowIndex = nativeAddEmptyRow(nativePtr, 1);
-                row = getRow(rowIndex);
+                row = getUncheckedRow(rowIndex);
                 row.setLong(primaryKeyColumnIndex, pkValue);
                 break;
 

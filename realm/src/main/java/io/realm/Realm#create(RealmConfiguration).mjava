@@ -1,0 +1,17 @@
+    private static synchronized Realm create(RealmConfiguration configuration) {
+        boolean autoRefresh = Looper.myLooper() != null;
+        try {
+            boolean validateSchema = !validatedRealmFiles.contains(configuration.getPath());
+            return createAndValidate(configuration, validateSchema, autoRefresh);
+
+        } catch (RealmMigrationNeededException e) {
+            if (configuration.shouldDeleteRealmIfMigrationNeeded()) {
+                deleteRealm(configuration);
+            } else {
+                migrateRealm(configuration);
+            }
+
+            return createAndValidate(configuration, true, autoRefresh);
+        }
+    }
+

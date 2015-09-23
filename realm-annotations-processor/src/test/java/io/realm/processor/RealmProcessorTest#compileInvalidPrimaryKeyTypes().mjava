@@ -1,0 +1,16 @@
+    // Unsupported "PrimaryKey" annotation types
+    @Test
+    public void compileInvalidPrimaryKeyTypes() throws IOException {
+        final String invalidPrimaryKeyFieldTypes[] = {"boolean", "java.util.Date", "Simple", "RealmList"};
+
+        for (String fieldType : invalidPrimaryKeyFieldTypes) {
+            TestRealmObjectFileObject javaFileObject =
+                    TestRealmObjectFileObject.getSingleFieldInstance(
+                            "InvalidPrimaryKeyType", "PrimaryKey", fieldType, "testField");
+            ASSERT.about(javaSource())
+                    .that(javaFileObject)
+                    .processedWith(new RealmProcessor())
+                    .failsToCompile();
+        }
+    }
+

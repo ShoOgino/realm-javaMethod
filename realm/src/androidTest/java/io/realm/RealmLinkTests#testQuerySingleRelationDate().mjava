@@ -29,8 +29,11 @@
         assertEquals(1, owners6.size());
         assertEquals(12, owners6.first().getCat().getAge());
 
-        RealmResults<Owner> owners7 = testRealm.where(Owner.class).between("cat.birthday", new Date(1), new Date(10000)).findAll();
-        assertEquals(1, owners7.size());
-        assertEquals(12, owners7.first().getCat().getAge());
+        try {
+            testRealm.where(Owner.class).between("cat.birthday", new Date(1), new Date(10000)).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+            // Between does not support link queries.
+        }
     }
 

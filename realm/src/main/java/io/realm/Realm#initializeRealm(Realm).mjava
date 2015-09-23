@@ -5,20 +5,20 @@
         try {
             realm.beginTransaction();
             if (version == UNVERSIONED) {
-                realm.setVersion(0);
                 commitNeeded = true;
+                realm.setVersion(realm.configuration.getSchemaVersion());
             }
 
-            for (Class<? extends RealmObject> modelClass : proxyMediator.getModelClasses()) {
-                String modelClassName = modelClass.getSimpleName();
-
+            RealmProxyMediator mediator = realm.configuration.getSchemaMediator();
+            for (Class<? extends RealmObject> modelClass : mediator.getModelClasses()) {
                 // Create and validate table
                 if (version == UNVERSIONED) {
-                    proxyMediator.createTable(modelClass, realm.transaction);
+                    mediator.createTable(modelClass, realm.transaction);
                 }
-                proxyMediator.validateTable(modelClass, realm.transaction);
-                realm.columnIndices.addClass(modelClass, proxyMediator.getColumnIndices(modelClass));
+                mediator.validateTable(modelClass, realm.transaction);
+                realm.columnIndices.addClass(modelClass, mediator.getColumnIndices(modelClass));
             }
+            validatedRealmFiles.add(realm.getPath());
         } finally {
             if (commitNeeded) {
                 realm.commitTransaction();

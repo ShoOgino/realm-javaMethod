@@ -1,10 +1,13 @@
     /**
-     * {@inheritDoc}
+     * Returns the number of elements in this {@code List}.
+     *
+     * @return the number of elements in this {@code List}.
      */
     @Override
     public int size() {
         if (managedMode) {
-            return ((Long)view.size()).intValue();
+            long size = view.size();
+            return size < Integer.MAX_VALUE ? (int) size : Integer.MAX_VALUE;
         } else {
             return nonManagedList.size();
         }

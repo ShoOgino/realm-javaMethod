@@ -1,15 +1,17 @@
-    public static void loadLibrary() {
-        if (libraryIsLoaded.get())
-            // only load library once
+    // Although loadLibrary is synchronized internally from AOSP 4.3, for the compatibility reason,
+    // KEEP synchronized here for the old devices!
+    public static synchronized void loadLibrary() {
+        if (libraryIsLoaded) {
+            // The java native should ensure only load the lib once, but we met some problems before.
+            // So keep the flag.
             return;
+        }
 
-        init();
-
-        String jnilib;
         if (osIsWindows()) {
-            jnilib = loadLibraryWindows();
+            loadLibraryWindows();
         }
         else {
+            String jnilib;
             String debug = System.getenv("REALM_JAVA_DEBUG");
             if (debug == null || debug.isEmpty()) {
                 jnilib = "realm-jni";
@@ -19,7 +21,7 @@
             }
             System.loadLibrary(jnilib);
         }
-        libraryIsLoaded.set(true);
+        libraryIsLoaded = true;
 
         Version.coreLibVersionCompatible(true);
     }
