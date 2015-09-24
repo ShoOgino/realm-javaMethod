@@ -1,0 +1,12 @@
+    /**
+     * Acquire a reference to the given Realm file.
+     */
+    protected synchronized void acquireFileReference(RealmConfiguration configuration) {
+        String path = configuration.getPath();
+        Integer refCount = globalRealmFileReferenceCounter.get(path);
+        if (refCount == null) {
+            refCount = 0;
+        }
+        globalRealmFileReferenceCounter.put(path, refCount + 1);
+    }
+

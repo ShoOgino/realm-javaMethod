@@ -1,6 +1,6 @@
     // package protected so unit tests can access it
-    void setVersion(long version) {
-        Table metadataTable = transaction.getTable("metadata");
+    protected void setVersion(long version) {
+        Table metadataTable = sharedGroupManager.getTable("metadata");
         if (metadataTable.getColumnCount() == 0) {
             metadataTable.addColumn(ColumnType.INTEGER, "version");
             metadataTable.addEmptyRow();
