@@ -10,11 +10,11 @@
      * @throws java.io.IOException if any write operation fails
      * @throws RealmEncryptionNotSupportedException if the device doesn't support Realm encryption.
      */
-    public void writeEncryptedCopyTo(File destination, byte[] key) throws IOException {
+    public void writeEncryptedCopyTo(File destination, byte[] key) throws java.io.IOException {
         if (destination == null) {
             throw new IllegalArgumentException("The destination argument cannot be null");
         }
         checkIfValid();
-        transaction.writeToFile(destination, key);
+        sharedGroupManager.copyToFile(destination, key);
     }
 

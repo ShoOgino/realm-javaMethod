@@ -13,31 +13,17 @@
             throw new IllegalStateException(INCORRECT_THREAD_CLOSE_MESSAGE);
         }
 
-        Map<RealmConfiguration, Integer> localRefCount = referenceCount.get();
+        Map<RealmConfiguration, Integer> localRefCount = getLocalReferenceCount();
         String canonicalPath = configuration.getPath();
         Integer references = localRefCount.get(configuration);
         if (references == null) {
             references = 0;
         }
-        if (sharedGroup != null && references == 1) {
-            realmsCache.get().remove(configuration);
-            sharedGroup.close();
-            sharedGroup = null;
-
-            // It is necessary to be synchronized here since there is a chance that before the counter removed,
-            // the other thread could get the counter and increase it in createAndValidate.
-            synchronized (Realm.class) {
-                validatedRealmFiles.remove(configuration.getPath());
-                List<RealmConfiguration>  pathConfigurationCache = globalPathConfigurationCache.get(canonicalPath);
-                pathConfigurationCache.remove(configuration);
-                if (pathConfigurationCache.isEmpty()) {
-                    globalPathConfigurationCache.remove(canonicalPath);
-                }
-                AtomicInteger counter = globalOpenInstanceCounter.get(canonicalPath);
-                if (counter.decrementAndGet() == 0) {
-                    globalOpenInstanceCounter.remove(canonicalPath);
-                }
-            }
+        if (sharedGroupManager != null && references == 1) {
+            lastLocalInstanceClosed();
+            sharedGroupManager.close();
+            sharedGroupManager = null;
+            releaseFileReference();
         }
 
         int refCount = references - 1;

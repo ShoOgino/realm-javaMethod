@@ -13,25 +13,6 @@
      * @throws java.lang.IllegalStateException if trying to compact a Realm that is already open.
      */
     public static boolean compactRealm(RealmConfiguration configuration) {
-        if (configuration.getEncryptionKey() != null) {
-            throw new IllegalArgumentException("Cannot currently compact an encrypted Realm.");
-        }
-
-        String canonicalPath = configuration.getPath();
-        AtomicInteger openInstances = globalOpenInstanceCounter.get(canonicalPath);
-        if (openInstances != null && openInstances.get() > 0) {
-            throw new IllegalStateException("Cannot compact an open Realm");
-        }
-        SharedGroup sharedGroup = null;
-        boolean result = false;
-        try {
-            sharedGroup = new SharedGroup(canonicalPath, false, SharedGroup.Durability.FULL, configuration.getEncryptionKey());
-            result = sharedGroup.compact();
-        } finally {
-            if (sharedGroup != null) {
-                sharedGroup.close();
-            }
-        }
-        return result;
+        return BaseRealm.compactRealm(configuration);
     }
 

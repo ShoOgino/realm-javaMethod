@@ -19,10 +19,10 @@
         argumentsHolder.columnIndex = columnIndex;
 
         // will use the Looper of the caller Realm to post the result
-        final WeakReference<Handler> weakHandler = new WeakReference<Handler>(realm.getHandler());
+        final WeakReference<Handler> weakHandler = new WeakReference<Handler>(realm.handler);
 
         // handover the query (to be used by a worker thread)
-        final long handoverQueryPointer = query.handoverQuery(realm.sharedGroup.getNativePointer());
+        final long handoverQueryPointer = query.handoverQuery(realm.sharedGroupManager.getNativePointer());
 
         // we need to use the same configuration to open a background SharedGroup to perform the query
         final RealmConfiguration realmConfiguration = realm.getConfiguration();
