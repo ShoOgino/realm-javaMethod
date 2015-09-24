@@ -1,0 +1,21 @@
+    /**
+     * Compacts a Realm file. It cannot be open when calling this method.
+     */
+    public static boolean compact(RealmConfiguration configuration) {
+        SharedGroup sharedGroup = null;
+        boolean result = false;
+        try {
+            sharedGroup = new SharedGroup(
+                    configuration.getPath(),
+                    SharedGroup.EXPLICIT_TRANSACTION,
+                    SharedGroup.Durability.FULL,
+                    configuration.getEncryptionKey());
+            result = sharedGroup.compact();
+        } finally {
+            if (sharedGroup != null) {
+                sharedGroup.close();
+            }
+        }
+        return result;
+    }
+

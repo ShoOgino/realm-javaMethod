@@ -5,27 +5,18 @@
      * @param migration {@link RealmMigration} to run on the Realm. This will override any migration set on the
      * configuration.
      */
-    public static synchronized void migrateRealm(RealmConfiguration configuration, RealmMigration migration) {
-        if (configuration == null) {
-            throw new IllegalArgumentException("RealmConfiguration must be provided");
-        }
-        if (migration == null && configuration.getMigration() == null) {
-            throw new RealmMigrationNeededException(configuration.getPath(), "RealmMigration must be provided");
-        }
+    public static void migrateRealm(RealmConfiguration configuration, RealmMigration migration) {
+        BaseRealm.migrateRealm(configuration, migration, new MigrationCallback() {
 
-        RealmMigration realmMigration = (migration == null) ? configuration.getMigration() : migration;
-        Realm realm = null;
-        try {
-            realm = Realm.createAndValidate(configuration, false, Looper.myLooper() != null);
-            realm.beginTransaction();
-            realm.setVersion(realmMigration.execute(realm, realm.getVersion()));
-            realm.commitTransaction();
-            validatedRealmFiles.remove(configuration.getPath());
-        } finally {
-            if (realm != null) {
-                realm.close();
+            @Override
+            public BaseRealm getRealm(RealmConfiguration configuration) {
+                return Realm.createAndValidate(configuration, false, Looper.myLooper() != null);
+           }
+
+            @Override
+            public void migrationComplete() {
                 realmsCache.remove();
             }
-        }
+        });
     }
 

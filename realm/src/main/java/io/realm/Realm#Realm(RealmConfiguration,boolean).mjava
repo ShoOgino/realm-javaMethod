@@ -7,11 +7,6 @@
      * @throws RealmEncryptionNotSupportedException if the device doesn't support Realm encryption.
      */
     private Realm(RealmConfiguration configuration, boolean autoRefresh) {
-        this.threadId = Thread.currentThread().getId();
-        this.configuration = configuration;
-        this.sharedGroup = new SharedGroup(configuration.getPath(), true, configuration.getDurability(),
-                configuration.getEncryptionKey());
-        this.transaction = sharedGroup.beginImplicitTransaction();
-        setAutoRefresh(autoRefresh);
+        super(configuration, autoRefresh);
     }
 
