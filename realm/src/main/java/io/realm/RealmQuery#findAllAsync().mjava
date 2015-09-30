@@ -9,10 +9,10 @@
      */
     public RealmResults<E> findAllAsync() {
         // use caller Realm Looper
-        final WeakReference<Handler> weakHandler = new WeakReference<Handler>(realm.getHandler());
+        final WeakReference<Handler> weakHandler = new WeakReference<Handler>(realm.handler);
 
         // handover the query (to be used by a worker thread)
-        final long handoverQueryPointer = query.handoverQuery(realm.sharedGroup.getNativePointer());
+        final long handoverQueryPointer = query.handoverQuery(realm.sharedGroupManager.getNativePointer());
 
         // save query arguments (for future update)
         argumentsHolder =  new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_ALL);

@@ -9,7 +9,7 @@
      */
     public void commitTransaction() {
         checkIfValid();
-        transaction.commitAndContinueAsRead();
+        sharedGroupManager.commitAndContinueAsRead();
 
         for (Map.Entry<Handler, String> handlerIntegerEntry : handlers.entrySet()) {
             Handler handler = handlerIntegerEntry.getKey();
@@ -24,9 +24,9 @@
             // For all other threads, use the Handler
             if (
                     realmPath.equals(configuration.getPath())    // It's the right realm
-                    && !handler.hasMessages(REALM_CHANGED)       // The right message
-                    && handler.getLooper().getThread().isAlive() // The receiving thread is alive
-            ) {
+                            && !handler.hasMessages(REALM_CHANGED)       // The right message
+                            && handler.getLooper().getThread().isAlive() // The receiving thread is alive
+                    ) {
                 handler.sendEmptyMessage(REALM_CHANGED);
             }
         }
