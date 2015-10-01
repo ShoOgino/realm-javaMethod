@@ -16,5 +16,9 @@
         resultList = testRealm.where(AllTypes.class).between(FIELD_LONG, 2, 20)
                 .beginsWith(FIELD_STRING, "test data 1").findAll();
         assertEquals(10, resultList.size());
+
+        assertEquals(51, testRealm.where(AllTypes.class).between(FIELD_DATE,
+                new Date(0),
+                new Date(DECADE_MILLIS * 50)).count());
     }
 
