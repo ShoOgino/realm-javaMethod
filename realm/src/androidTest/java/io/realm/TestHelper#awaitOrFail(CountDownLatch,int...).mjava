@@ -1,0 +1,11 @@
+    public static void awaitOrFail(CountDownLatch latch, int... numberOfSeconds) {
+        try {
+            int timeout = (numberOfSeconds.length > 0) ? numberOfSeconds[0] : 7;
+            if (!latch.await(timeout, TimeUnit.SECONDS)) {
+                fail();
+            }
+        } catch (InterruptedException e) {
+            fail();
+        }
+    }
+

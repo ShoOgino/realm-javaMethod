@@ -1,6 +1,11 @@
     private void emitClassFields(JavaWriter writer) throws IOException {
         for (VariableElement variableElement : metadata.getFields()) {
             writer.emitField("long", staticFieldIndexVarName(variableElement), EnumSet.of(Modifier.PRIVATE, Modifier.STATIC));
+            if (typeUtils.isAssignable(variableElement.asType(), realmList)) {
+                String genericType = Utils.getGenericType(variableElement);
+
+                writer.emitField("RealmList<" + genericType + ">", variableElement.getSimpleName().toString() + "RealmList", EnumSet.of(Modifier.PRIVATE));
+            }
         }
         writer.emitField("Map<String, Long>", "columnIndices", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC));
         writer.emitField("List<String>", "FIELD_NAMES", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL));

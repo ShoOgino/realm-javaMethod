@@ -9,8 +9,10 @@
             @Override
             public void run() {
                 Looper.prepare();
+                Realm realm = null;
                 try {
-                    final Realm realm = openRealmInstance("testFindAllSortedAsyncBatchUpdate");
+                    realm = openRealmInstance("testFindAllSortedAsyncBatchUpdate");
+                    final RealmConfiguration realmConfiguration = realm.getConfiguration();
                     final AtomicInteger numberOfIntercept = new AtomicInteger(1);
                     final Handler handler = new HandlerProxy(realm.handler) {
                         @Override
@@ -28,7 +30,7 @@
                                                 new Thread() {
                                                     @Override
                                                     public void run() {
-                                                        Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+                                                        Realm bgRealm = Realm.getInstance(realmConfiguration);
                                                         bgRealm.beginTransaction();
                                                         bgRealm.where(AllTypes.class).equalTo("columnLong", 4).findFirst().setColumnString("modified");
                                                         bgRealm.createObject(AllTypes.class);
@@ -139,7 +141,9 @@
                     if (signalCallbackFinished.getCount() > 0) {
                         signalCallbackFinished.countDown();
                     }
-
+                    if (realm != null) {
+                        realm.close();
+                    }
                 }
             }
         });

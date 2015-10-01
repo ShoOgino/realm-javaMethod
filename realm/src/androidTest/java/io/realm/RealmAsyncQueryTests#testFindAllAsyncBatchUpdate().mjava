@@ -16,8 +16,10 @@
             @Override
             public void run() {
                 Looper.prepare();
+                Realm realm = null;
                 try {
-                    final Realm realm = openRealmInstance("testFindAllAsyncBatchUpdate");
+                    realm = openRealmInstance("testFindAllAsyncBatchUpdate");
+                    final RealmConfiguration realmConfiguration = realm.getConfiguration();
                     final AtomicInteger numberOfIntercept = new AtomicInteger(1);
                     assertNotNull(realm.handler);
                     final Handler handler = new HandlerProxy(realm.handler) {
@@ -36,7 +38,7 @@
                                                 new Thread() {
                                                     @Override
                                                     public void run() {
-                                                        Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+                                                        Realm bgRealm = Realm.getInstance(realmConfiguration);
                                                         bgRealm.beginTransaction();
                                                         bgRealm.where(AllTypes.class).equalTo("columnLong", 4).findFirst().setColumnString("modified");
                                                         bgRealm.createObject(AllTypes.class);
@@ -145,13 +147,14 @@
                     if (signalCallbackFinished.getCount() > 0) {
                         signalCallbackFinished.countDown();
                     }
-
+                    if (realm != null) {
+                        realm.close();
+                    }
                 }
             }
         });
 
-//        signalCallbackFinished.await(7, TimeUnit.SECONDS);
-        signalCallbackFinished.await();
+        TestHelper.awaitOrFail(signalCallbackFinished);
         assertEquals(2, numberOfNotificationsQuery1.get());
         assertEquals(2, numberOfNotificationsQuery2.get());
 

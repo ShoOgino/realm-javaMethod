@@ -11,7 +11,7 @@
                 Looper.prepare();
                 // register IdleHandler to quit the Looper once all messages have proceeded
                 // Let the first queueIdle invocation pass, because it occurs before the first message is received.
-                // WARNING: when debugging the 'queueIdle' will be called more often (because of the breaking points)
+                // WARNING: when debugging the 'queueIdle' will be called more often (because of the break points)
                 //          making the countdown latch to be invoked earlier.
                 final boolean[] isFirstIdle = {true};
                 Looper.myQueue().addIdleHandler(new MessageQueue.IdleHandler() {
@@ -69,7 +69,7 @@
         });
 
         // wait until the callback of our async query proceed
-        signalCallbackFinished.await(7, TimeUnit.SECONDS);
+        TestHelper.awaitOrFail(signalCallbackFinished);
 
         executorService.shutdownNow();
         if (null != threadAssertionError[0]) {

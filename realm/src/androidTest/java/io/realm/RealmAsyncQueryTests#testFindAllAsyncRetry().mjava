@@ -16,10 +16,11 @@
             @Override
             public void run() {
                 Looper.prepare();
+                final Realm[] realm = new Realm[1];
                 try {
                     final AtomicInteger numberOfIntercept = new AtomicInteger(1);
-                    final Realm realm = openRealmInstance("testFindAllAsyncRetry");
-                    final Handler handler = new HandlerProxy(realm.handler) {
+                    realm[0] = openRealmInstance("testFindAllAsyncRetry");
+                    final Handler handler = new HandlerProxy(realm[0].handler) {
                         @Override
                         public boolean onInterceptMessage(int what) {
                             switch (what) {
@@ -31,9 +32,9 @@
                                         postAtFront(new Runnable() {
                                             @Override
                                             public void run() {
-                                                realm.beginTransaction();
-                                                realm.clear(AllTypes.class);
-                                                realm.commitTransaction();
+                                                realm[0].beginTransaction();
+                                                realm[0].clear(AllTypes.class);
+                                                realm[0].commitTransaction();
                                             }
                                         });
                                     }
@@ -43,12 +44,12 @@
                             return false;
                         }
                     };
-                    realm.setHandler(handler);
+                    realm[0].setHandler(handler);
 
                     Realm.asyncQueryExecutor.pause();
 
-                    populateTestRealm(realm, 10);
-                    final RealmResults<AllTypes> realmResults = realm.where(AllTypes.class)
+                    populateTestRealm(realm[0], 10);
+                    final RealmResults<AllTypes> realmResults = realm[0].where(AllTypes.class)
                             .between("columnLong", 0, 4)
                             .findAllAsync();
 
@@ -83,13 +84,15 @@
                     if (signalCallbackFinished.getCount() > 0) {
                         signalCallbackFinished.countDown();
                     }
-
+                    if (realm[0] != null) {
+                        realm[0].close();
+                    }
                 }
             }
         });
 
         // wait until the callback of our async query proceed
-        signalCallbackFinished.await(7, TimeUnit.SECONDS);
+        TestHelper.awaitOrFail(signalCallbackFinished);
 
         executorService.shutdownNow();
         if (null != threadAssertionError[0]) {

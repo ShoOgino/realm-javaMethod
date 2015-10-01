@@ -1,0 +1,7 @@
+    private static void loadMediatorClasses(Realm realm) {
+        RealmProxyMediator mediator = realm.configuration.getSchemaMediator();
+        for (Class<? extends RealmObject> modelClass : mediator.getModelClasses()) {
+            realm.columnIndices.addClass(modelClass, mediator.getColumnIndices(modelClass));
+        }
+    }
+

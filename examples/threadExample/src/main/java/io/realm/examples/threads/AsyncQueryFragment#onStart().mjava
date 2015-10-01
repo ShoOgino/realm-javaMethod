@@ -3,13 +3,14 @@
         super.onStart();
         // Create Realm instance for the UI thread
         realm = Realm.getDefaultInstance();
-        mAllSortedDots = realm.where(Dot.class)
+        allSortedDots = realm.where(Dot.class)
                 .between("x", 25, 75)
                 .between("y", 0, 50)
                 .findAllSortedAsync(
-                        "x", RealmResults.SORT_ORDER_ASCENDING,
-                        "y", RealmResults.SORT_ORDER_DESCENDING);
-        mDotAdapter.updateList(mAllSortedDots);
-        mAllSortedDots.addChangeListener(this);
+                         "x", RealmResults.SORT_ORDER_ASCENDING,
+                         "y", RealmResults.SORT_ORDER_DESCENDING
+                 );
+        dotAdapter.updateList(allSortedDots);
+        allSortedDots.addChangeListener(this);
     }
 

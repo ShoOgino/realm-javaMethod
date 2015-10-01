@@ -12,15 +12,7 @@
      * @throws java.lang.IllegalArgumentException if a field name does not exist.
      */
     public RealmResults<E> findAllSorted(String fieldNames[], boolean sortAscending[]) {
-        if (fieldNames == null) {
-            throw new IllegalArgumentException("fieldNames cannot be 'null'.");
-        } else if (sortAscending == null) {
-            throw new IllegalArgumentException("sortAscending cannot be 'null'.");
-        } else if (fieldNames.length == 0) {
-            throw new IllegalArgumentException("At least one field name must be specified.");
-        } else if (fieldNames.length != sortAscending.length) {
-            throw new IllegalArgumentException(String.format("Number of field names (%d) and sort orders (%d) does not match.", fieldNames.length, sortAscending.length));
-        }
+        checkSortParameters (fieldNames, sortAscending);
 
         if (fieldNames.length == 1 && sortAscending.length == 1) {
             return findAllSorted(fieldNames[0], sortAscending[0]);

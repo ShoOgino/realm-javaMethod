@@ -3,18 +3,19 @@
         SharedGroup sharedGroup = null;
         try {
             sharedGroup = new SharedGroup(realmConfiguration.getPath(),
-                    true, realmConfiguration.getDurability(),
+                    SharedGroup.IMPLICIT_TRANSACTION,
+                    realmConfiguration.getDurability(),
                     realmConfiguration.getEncryptionKey());
 
             Result result;
             boolean updateSuccessful = false;
             if (isUpdatingRealmResults) {
-                result = Result.newRealmResults();
+                result = Result.newRealmResultsResponse();
                 updateSuccessful = updateRealmResultsQueries(sharedGroup, result);
                 result.versionID = sharedGroup.getVersion();
 
             } else {
-                result = Result.newRealmObject();
+                result = Result.newRealmObjectResponse();
                 updateSuccessful = updateRealmObjectQuery(sharedGroup, result);
                 result.versionID = sharedGroup.getVersion();
             }

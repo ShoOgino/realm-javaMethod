@@ -1,9 +1,9 @@
     /**
-     * Similar to {@link #findAll()} but runs asynchronously from a worker thread
+     * Similar to {@link #findAll()} but runs asynchronously from a worker thread.
      *
      * @return immediately an empty {@link RealmResults}. Users need to register a listener
      * io.realm.RealmResults#addChangeListener(RealmChangeListener) to be notified
-     * of the query completion.
+     * when the query completes.
      * @throws java.lang.RuntimeException Any other error
      * @see io.realm.RealmResults
      */
@@ -35,7 +35,8 @@
 
                     try {
                         sharedGroup = new SharedGroup(realmConfiguration.getPath(),
-                                true, realmConfiguration.getDurability(),
+                                SharedGroup.IMPLICIT_TRANSACTION,
+                                realmConfiguration.getDurability(),
                                 realmConfiguration.getEncryptionKey());
 
                         // Run the query & handover the table view for the caller thread
@@ -43,7 +44,7 @@
                         // to import it.
                         long handoverTableViewPointer = query.findAllWithHandover(sharedGroup.getNativePointer(), sharedGroup.getNativeReplicationPointer() ,handoverQueryPointer);
 
-                        QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResults();
+                        QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResultsResponse();
                         result.updatedTableViews.put(weakRealmResults, handoverTableViewPointer);
                         result.versionID = sharedGroup.getVersion();
 
@@ -57,7 +58,6 @@
 
                     } catch (Exception e) {
                         RealmLog.e(e.getMessage());
-                        e.printStackTrace();
 
                     } finally {
                         if (null != sharedGroup) {
@@ -68,7 +68,7 @@
                     TableQuery.nativeCloseQueryHandover(handoverQueryPointer);
                 }
 
-                return INVALID_TABLE_VIEW_POINTER;
+                return INVALID_NATIVE_POINTER;
             }
         });
 

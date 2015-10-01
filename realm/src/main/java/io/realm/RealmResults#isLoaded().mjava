@@ -1,9 +1,10 @@
     /**
-     * Determine if the current RealmResults is obtained synchronously or asynchronously (from
-     * a worker thread). Synchronously RealmResults are by definition blocking hence this method
-     * will always return {@code true} for them.
+     * Returns {@code true} if the results are not yet loaded, {@code false} if they are
+     * still loading. Synchronous query methods like findAll() will always return {@code true},
+     * while asynchronous query methods like findAllAsync() will return {@code false} until
+     * the results are available.
      * @return {@code true} if the query has completed & the data is available {@code false} if the
-     *         query is in progress.
+     *         query is still running
      */
     public boolean isLoaded () {
         realm.checkIfValid();

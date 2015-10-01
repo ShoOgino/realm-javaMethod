@@ -3,7 +3,7 @@
      *
      * @return immediately an empty {@link RealmResults}. Users need to register a listener
      * io.realm.RealmResults#addChangeListener(RealmChangeListener) to be notified
-     * of the query completion.
+     * when the query completes.
      * @throws java.lang.IllegalArgumentException if field name does not exist.
      */
     public RealmResults<E> findAllSortedAsync(String fieldName, boolean sortAscending) {
@@ -39,13 +39,14 @@
 
                     try {
                         sharedGroup = new SharedGroup(realmConfiguration.getPath(),
-                                true, realmConfiguration.getDurability(),
+                                SharedGroup.IMPLICIT_TRANSACTION,
+                                realmConfiguration.getDurability(),
                                 realmConfiguration.getEncryptionKey());
 
                         // run the query & handover the table view for the caller thread
                         long handoverTableViewPointer = query.findAllSortedWithHandover(sharedGroup.getNativePointer(), sharedGroup.getNativeReplicationPointer(), handoverQueryPointer, columnIndex, (order == TableView.Order.ascending));
 
-                        QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResults();
+                        QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResultsResponse();
                         result.updatedTableViews.put(weakRealmResults, handoverTableViewPointer);
                         result.versionID = sharedGroup.getVersion();
 
@@ -58,7 +59,6 @@
 
                     } catch (Exception e) {
                         RealmLog.e(e.getMessage());
-                        e.printStackTrace();
 
                     } finally {
                         if (sharedGroup != null) {
@@ -69,7 +69,7 @@
                     TableQuery.nativeCloseQueryHandover(handoverQueryPointer);
                 }
 
-                return INVALID_TABLE_VIEW_POINTER;
+                return INVALID_NATIVE_POINTER;
             }
         });
         realmResults.setPendingQuery(pendingQuery);

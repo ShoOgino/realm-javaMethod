@@ -1,4 +1,5 @@
-    // similar UC as #testFindAllAsyncWithNotification using 'findFirst'
+    // finding elements [0-4] asynchronously then wait for the promise to be loaded
+    // using a callback to be notified when the data is loaded
     public void testFindFirstAsyncWithNotification() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
@@ -60,7 +61,7 @@
         });
 
         // wait until the callback of our async query proceed
-        signalCallbackFinished.await(7, TimeUnit.SECONDS);
+        TestHelper.awaitOrFail(signalCallbackFinished);
 
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread

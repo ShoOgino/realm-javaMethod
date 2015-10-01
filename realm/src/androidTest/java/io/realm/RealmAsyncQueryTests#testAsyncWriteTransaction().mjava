@@ -8,7 +8,6 @@
             @Override
             public void run() {
                 Looper.prepare();
-
                 try {
                     realm[0] = openRealmInstance("testAsyncWriteTransaction");
 
@@ -28,7 +27,6 @@
                                 assertEquals("Owner", realm[0].where(Owner.class).findFirst().getName());
                             } catch (AssertionFailedError e) {
                                 threadAssertionError[0] = e;
-
                             } finally {
                                 signalCallbackFinished.countDown();
                             }
@@ -36,6 +34,7 @@
 
                         @Override
                         public void onError(Exception e) {
+                            threadAssertionError[0] = e;
                             signalCallbackFinished.countDown();
                         }
                     });
@@ -58,7 +57,7 @@
         });
 
         // wait until the callback of our async query proceed
-        signalCallbackFinished.await(7, TimeUnit.SECONDS);
+        TestHelper.awaitOrFail(signalCallbackFinished);
         executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread

@@ -2,7 +2,7 @@
      * Similar to {@link #findFirst()} but runs asynchronously from a worker thread
      *
      * @return immediately an empty {@link RealmObject}. Users need to register a listener
-     * io.realm.RealmObject#addChangeListener to be notified of the query completion.
+     * io.realm.RealmObject#addChangeListener to be notified when the query completes.
      */
     public E findFirstAsync () {
         // use caller Realm Looper
@@ -22,7 +22,6 @@
         final WeakReference<RealmObject> realmObjectWeakReference = new WeakReference<RealmObject>(result);
         realm.asyncRealmObjects.put(realmObjectWeakReference, this);
         result.realm = realm;
-        result.setType(clazz);
         result.row = Row.EMPTY_ROW;
 
         final Future<Long> pendingQuery = Realm.asyncQueryExecutor.submit(new Callable<Long>() {
@@ -33,13 +32,14 @@
 
                     try {
                         sharedGroup = new SharedGroup(realmConfiguration.getPath(),
-                                true, realmConfiguration.getDurability(),
+                                SharedGroup.IMPLICIT_TRANSACTION,
+                                realmConfiguration.getDurability(),
                                 realmConfiguration.getEncryptionKey());
 
                         long handoverTableViewPointer =query.findWithHandover(sharedGroup.getNativePointer(),
                                 sharedGroup.getNativeReplicationPointer(), handoverQueryPointer);
 
-                        QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmObject();
+                        QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmObjectResponse();
                         result.updatedRow.put(realmObjectWeakReference, handoverTableViewPointer);
                         result.versionID = sharedGroup.getVersion();
 
@@ -51,7 +51,6 @@
 
                     }  catch (Exception e) {
                         RealmLog.e(e.getMessage());
-                        e.printStackTrace();
 
                     } finally {
                         if (null != sharedGroup) {
@@ -62,7 +61,7 @@
                     TableQuery.nativeCloseQueryHandover(handoverQueryPointer);
                 }
 
-                return INVALID_TABLE_VIEW_POINTER;
+                return INVALID_NATIVE_POINTER;
             }
         });
         result.setPendingQuery(pendingQuery);

@@ -22,12 +22,10 @@
                                 assertTrue(result[0].isLoaded());
                                 assertEquals(5, result[0].size());
                                 RealmResults<AllTypes> allTypes = (RealmResults<AllTypes>) result[0];
-                                assertEquals("test data 4", allTypes.get(0).getColumnString());
-                                assertEquals("test data 3", allTypes.get(1).getColumnString());
-                                assertEquals("test data 2", allTypes.get(2).getColumnString());
-                                assertEquals("test data 1", allTypes.get(3).getColumnString());
-                                assertEquals("test data 0", allTypes.get(4).getColumnString());
-
+                                for (int i = 0; i < 5; i++) {
+                                    int iteration = (4 - i);
+                                    assertEquals("test data " + iteration, allTypes.get(4 - iteration).getColumnString());
+                                }
                             } catch (AssertionFailedError e) {
                                 threadAssertionError[0] = e;
                             } finally {
@@ -73,7 +71,7 @@
         });
 
         // wait until the callback of our async query proceed
-        signalCallbackFinished.await(7, TimeUnit.SECONDS);
+        TestHelper.awaitOrFail(signalCallbackFinished);
 
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
