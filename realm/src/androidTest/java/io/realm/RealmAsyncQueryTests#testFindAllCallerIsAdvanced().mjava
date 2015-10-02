@@ -5,12 +5,14 @@
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final CountDownLatch callbackInvokedFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
+        final Looper[] backgroundLooper = new Looper[1];
         final AtomicInteger numberOfInvocation = new AtomicInteger(0);
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new Runnable() {
             @Override
             public void run() {
                 Looper.prepare();
+                backgroundLooper[0] = Looper.myLooper();
                 final boolean[] isFirstIdle = {true};
                 Looper.myQueue().addIdleHandler(new MessageQueue.IdleHandler() {
                     @Override
@@ -122,9 +124,15 @@
         // wait until the callback of our async query proceed
         TestHelper.awaitOrFail(signalCallbackFinished);
         TestHelper.awaitOrFail(callbackInvokedFinished);
+
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
+        }
+        if (backgroundLooper[0] != null) {
+            // failing to quit the looper will not execute the finally block responsible
+            // of closing the Realm
+            backgroundLooper[0].quit();
         }
 
         assertEquals(1, numberOfInvocation.get());

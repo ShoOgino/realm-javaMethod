@@ -3,11 +3,14 @@
     public void testFindAllSortedAsyncRetry() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
+        final Looper[] backgroundLooper = new Looper[1];
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new Runnable() {
             @Override
             public void run() {
                 Looper.prepare();
+                backgroundLooper[0] = Looper.myLooper();
+
                 final Realm[] realm = new Realm[1];
                 try {
                     final AtomicInteger numberOfIntercept = new AtomicInteger(1);
@@ -89,6 +92,12 @@
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
         }
+        if (backgroundLooper[0] != null) {
+            // failing to quit the looper will not execute the finally block responsible
+            // of closing the Realm
+            backgroundLooper[0].quit();
+        }
+
         executorService.shutdownNow();
     }
 

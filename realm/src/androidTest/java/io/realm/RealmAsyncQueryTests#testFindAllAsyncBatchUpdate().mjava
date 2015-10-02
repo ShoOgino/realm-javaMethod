@@ -9,6 +9,7 @@
     public void testFindAllAsyncBatchUpdate() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(2);
         final Throwable[] threadAssertionError = new Throwable[1];
+        final Looper[] backgroundLooper = new Looper[1];
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
         final AtomicInteger numberOfNotificationsQuery1 = new AtomicInteger(0);
         final AtomicInteger numberOfNotificationsQuery2 = new AtomicInteger(0);
@@ -16,6 +17,7 @@
             @Override
             public void run() {
                 Looper.prepare();
+                backgroundLooper[0] = Looper.myLooper();
                 Realm realm = null;
                 try {
                     realm = openRealmInstance("testFindAllAsyncBatchUpdate");
@@ -162,6 +164,11 @@
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
+        }
+        if (backgroundLooper[0] != null) {
+            // failing to quit the looper will not execute the finally block responsible
+            // of closing the Realm
+            backgroundLooper[0].quit();
         }
     }
 

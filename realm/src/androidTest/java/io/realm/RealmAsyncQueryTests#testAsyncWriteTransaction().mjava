@@ -3,11 +3,14 @@
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Realm[] realm = new Realm[1];
         final Throwable[] threadAssertionError = new Throwable[1];
+        final Looper[] backgroundLooper = new Looper[1];
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new Runnable() {
             @Override
             public void run() {
                 Looper.prepare();
+                backgroundLooper[0] = Looper.myLooper();
+
                 try {
                     realm[0] = openRealmInstance("testAsyncWriteTransaction");
 
@@ -62,6 +65,11 @@
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
+        }
+        if (backgroundLooper[0] != null) {
+            // failing to quit the looper will not execute the finally block responsible
+            // of closing the Realm
+            backgroundLooper[0].quit();
         }
     }
 

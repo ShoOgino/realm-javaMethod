@@ -4,11 +4,14 @@
         final CountDownLatch signalInsertionFinished = new CountDownLatch(1);
         final CountDownLatch signalTestFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
+        final Looper[] backgroundLooper = new Looper[1];
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new Runnable() {
             @Override
             public void run() {
                 Looper.prepare();
+                backgroundLooper[0] = Looper.myLooper();
+
                 Realm realm = null;
                 try {
                     final int NUMBER_OF_COMMITS = 1000;
@@ -85,12 +88,17 @@
         });
 
         // wait until the callback of our async query proceed
-        signalTestFinished.await(7, TimeUnit.SECONDS);
+        TestHelper.awaitOrFail(signalTestFinished, 60);
 
         executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
+        }
+        if (backgroundLooper[0] != null) {
+            // failing to quit the looper will not execute the finally block responsible
+            // of closing the Realm
+            backgroundLooper[0].quit();
         }
     }
 
