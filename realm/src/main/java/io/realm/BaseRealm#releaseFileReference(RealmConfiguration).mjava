@@ -2,7 +2,7 @@
      * Releases a reference to the Realm file. If reference count reaches 0 any cached configurations
      * will be removed.
      */
-    protected synchronized void releaseFileReference() {
+    static synchronized void releaseFileReference(RealmConfiguration configuration) {
         String canonicalPath = configuration.getPath();
         List<RealmConfiguration> pathConfigurationCache = globalPathConfigurationCache.get(canonicalPath);
         pathConfigurationCache.remove(configuration);
