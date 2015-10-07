@@ -12,6 +12,7 @@
                 obj.setColumnDate(new Date(1000));
                 obj.setColumnRealmObject(new DogPrimaryKey(1, "Dog1"));
                 obj.setColumnRealmList(new RealmList<DogPrimaryKey>(new DogPrimaryKey(2, "Dog2")));
+                obj.setColumnBoxedBoolean(true);
                 realm.copyToRealm(obj);
 
                 AllTypesPrimaryKey obj2 = new AllTypesPrimaryKey();
@@ -24,6 +25,7 @@
                 obj2.setColumnDate(new Date(2000));
                 obj2.setColumnRealmObject(new DogPrimaryKey(3, "Dog3"));
                 obj2.setColumnRealmList(new RealmList<DogPrimaryKey>(new DogPrimaryKey(4, "Dog4")));
+                obj2.setColumnBoxedBoolean(false);
                 realm.copyToRealmOrUpdate(obj2);
             }
         });
@@ -42,5 +44,6 @@
         assertEquals("Dog3", obj.getColumnRealmObject().getName());
         assertEquals(1, obj.getColumnRealmList().size());
         assertEquals("Dog4", obj.getColumnRealmList().get(0).getName());
+        assertFalse(obj.getColumnBoxedBoolean());
     }
 

@@ -11,20 +11,27 @@
             String fieldName = field.getSimpleName().toString();
 
             writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
-            if (typeUtils.isAssignable(field.asType(), realmObject)) {
+            if (Utils.isRealmObject(field)) {
                 String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
                 writer.emitStatement(
                         "stringBuilder.append(%s() != null ? \"%s\" : \"null\")",
                         metadata.getGetter(fieldName),
                         fieldTypeSimpleName
                 );
-            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+            } else if (Utils.isRealmList(field)) {
                 String genericType = Utils.getGenericType(field);
                 writer.emitStatement("stringBuilder.append(\"RealmList<%s>[\").append(%s().size()).append(\"]\")",
                         genericType,
                         metadata.getGetter(fieldName));
             } else {
-                writer.emitStatement("stringBuilder.append(%s())", metadata.getGetter(fieldName));
+                if (metadata.isNullable(field)) {
+                    writer.emitStatement("stringBuilder.append(%s() != null ? %s() : \"null\")",
+                            metadata.getGetter(fieldName),
+                            metadata.getGetter(fieldName)
+                    );
+                } else {
+                    writer.emitStatement("stringBuilder.append(%s())", metadata.getGetter(fieldName));
+                }
             }
             writer.emitStatement("stringBuilder.append(\"}\")");
 

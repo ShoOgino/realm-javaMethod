@@ -1,0 +1,11 @@
+    // migrating an mixed column to be nullable is not supported
+    public void testConvertMixedToNullable() {
+        Table table = new Table();
+        table.addColumn(ColumnType.MIXED, "mixed", Table.NOT_NULLABLE);
+        try {
+            table.convertColumnToNullable(0);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

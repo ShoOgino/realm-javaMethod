@@ -1,9 +1,4 @@
     public void generate() throws IOException, UnsupportedOperationException {
-        elementUtils = processingEnvironment.getElementUtils();
-        typeUtils = processingEnvironment.getTypeUtils();
-        realmObject = elementUtils.getTypeElement("io.realm.RealmObject").asType();
-        realmList = typeUtils.getDeclaredType(elementUtils.getTypeElement("io.realm.RealmList"), typeUtils.getWildcardType(null, null));
-
         String qualifiedGeneratedClassName = String.format("%s.%s", Constants.REALM_PACKAGE_NAME, Utils.getProxyClassName(className));
         JavaFileObject sourceFile = processingEnvironment.getFiler().createSourceFile(qualifiedGeneratedClassName);
         JavaWriter writer = new JavaWriter(new BufferedWriter(sourceFile.openWriter()));
@@ -42,9 +37,9 @@
 
         for (VariableElement field : metadata.getFields()) {
             String fieldTypeName = "";
-            if (typeUtils.isAssignable(field.asType(), realmObject)) { // Links
+            if (Utils.isRealmObject(field)) { // Links
                 fieldTypeName = field.asType().toString();
-            } else if (typeUtils.isAssignable(field.asType(), realmList)) { // LinkLists
+            } else if (Utils.isRealmList(field)) { // LinkLists
                 fieldTypeName = ((DeclaredType) field.asType()).getTypeArguments().get(0).toString();
             }
             if (!fieldTypeName.isEmpty() && !imports.contains(fieldTypeName)) {

@@ -8,9 +8,11 @@
 
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
-            if (typeUtils.isAssignable(field.asType(), realmObject)) {
+            String setter = metadata.getSetter(fieldName);
+            String getter = metadata.getGetter(fieldName);
+            if (Utils.isRealmObject(field)) {
                 writer
-                    .emitStatement("%s %sObj = newObject.%s()", Utils.getFieldTypeSimpleName(field), fieldName, metadata.getGetter(fieldName))
+                    .emitStatement("%s %sObj = newObject.%s()", Utils.getFieldTypeSimpleName(field), fieldName, getter)
                     .beginControlFlow("if (%sObj != null)", fieldName)
                         .emitStatement("%s cache%s = (%s) cache.get(%sObj)", Utils.getFieldTypeSimpleName(field), fieldName, Utils.getFieldTypeSimpleName(field), fieldName)
                         .beginControlFlow("if (cache%s != null)", fieldName)
@@ -24,12 +26,13 @@
                             )
                         .endControlFlow()
                     .nextControlFlow("else")
-                        .emitStatement("realmObject.%s(null)", metadata.getSetter(fieldName))
+                        // No need to throw exception here if the field is not nullable. A exception will be thrown in setter.
+                        .emitStatement("realmObject.%s(null)", setter)
                     .endControlFlow();
-            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+            } else if (Utils.isRealmList(field)) {
                 writer
-                    .emitStatement("RealmList<%s> %sList = newObject.%s()", Utils.getGenericType(field), fieldName, metadata.getGetter(fieldName))
-                    .emitStatement("RealmList<%s> %sRealmList = realmObject.%s()", Utils.getGenericType(field), fieldName, metadata.getGetter(fieldName))
+                    .emitStatement("RealmList<%s> %sList = newObject.%s()", Utils.getGenericType(field), fieldName, getter)
+                    .emitStatement("RealmList<%s> %sRealmList = realmObject.%s()", Utils.getGenericType(field), fieldName, getter)
                     .emitStatement("%sRealmList.clear()", fieldName)
                     .beginControlFlow("if (%sList != null)", fieldName)
                         .beginControlFlow("for (int i = 0; i < %sList.size(); i++)", fieldName)
@@ -47,17 +50,7 @@
                 if (field == metadata.getPrimaryKey()) {
                     continue;
                 }
-
-                String fieldType = field.asType().toString();
-                if (Constants.NULLABLE_JAVA_TYPES.containsKey(fieldType)) {
-                    writer.emitStatement("realmObject.%s(newObject.%s() != null ? newObject.%s() : %s)",
-                            metadata.getSetter(fieldName),
-                            metadata.getGetter(fieldName),
-                            metadata.getGetter(fieldName),
-                            Constants.NULLABLE_JAVA_TYPES.get(fieldType));
-                } else {
-                    writer.emitStatement("realmObject.%s(newObject.%s())", metadata.getSetter(fieldName), metadata.getGetter(fieldName));
-                }
+                writer.emitStatement("realmObject.%s(newObject.%s())", metadata.getSetter(fieldName), getter);
             }
         }
 
