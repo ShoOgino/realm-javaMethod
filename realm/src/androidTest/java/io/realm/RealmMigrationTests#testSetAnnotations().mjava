@@ -3,13 +3,15 @@
             @Override
             public long execute(Realm realm, long version) {
                 Table table = realm.getTable(AnnotationTypes.class);
-                long columnIndex = table.addColumn(ColumnType.INTEGER, "id");
-                table.setPrimaryKey("id");
-                // Primary key will be indexed automatically
-                table.addSearchIndex(columnIndex);
-                columnIndex = table.addColumn(ColumnType.STRING, "indexString");
-                table.addSearchIndex(columnIndex);
-                table.addColumn(ColumnType.STRING, "notIndexString");
+                if (table.getColumnCount() == 0) {
+                    long columnIndex = table.addColumn(ColumnType.INTEGER, "id");
+                    table.setPrimaryKey("id");
+                    // Primary key will be indexed automatically
+                    table.addSearchIndex(columnIndex);
+                    columnIndex = table.addColumn(ColumnType.STRING, "indexString", Table.NULLABLE);
+                    table.addSearchIndex(columnIndex);
+                    table.addColumn(ColumnType.STRING, "notIndexString", Table.NULLABLE);
+                }
                 return 1;
             }
         };

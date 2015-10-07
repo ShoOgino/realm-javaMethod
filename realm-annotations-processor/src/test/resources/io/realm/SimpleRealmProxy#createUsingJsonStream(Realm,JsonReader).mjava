@@ -6,13 +6,18 @@
             String name = reader.nextName();
             if (name.equals("name")) {
                 if (reader.peek() == JsonToken.NULL) {
-                    obj.setName("");
                     reader.skipValue();
+                    obj.setName(null);
                 } else {
                     obj.setName((String) reader.nextString());
                 }
-            } else if (name.equals("age")  && reader.peek() != JsonToken.NULL) {
-                obj.setAge((int) reader.nextInt());
+            } else if (name.equals("age")) {
+                if (reader.peek() == JsonToken.NULL) {
+                    reader.skipValue();
+                    throw new IllegalArgumentException("Trying to set non-nullable field age to null.");
+                } else {
+                    obj.setAge((int) reader.nextInt());
+                }
             } else {
                 reader.skipValue();
             }

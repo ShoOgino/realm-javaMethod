@@ -1,5 +1,9 @@
     public Date maximumDate(long columnIndex, long start, long end, long limit) {
         validateQuery();
-        return new Date(nativeMaximumDate(nativePtr, columnIndex, start, end, limit) * 1000);
+        Long result = nativeMaximumDate(nativePtr, columnIndex, start, end, limit);
+        if (result != null) {
+            return new Date(result * 1000);
+        }
+        return null;
     }
 
