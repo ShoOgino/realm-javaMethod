@@ -1,7 +1,9 @@
     public TableQuery equalTo(long columnIndex[], Date value){
-        if (value == null)
-            throw new IllegalArgumentException(DATE_NULL_ERROR_MESSAGE);
-        nativeEqualDateTime(nativePtr, columnIndex, value.getTime()/1000);
+        if (value == null) {
+            nativeIsNull(nativePtr, columnIndex);
+        } else {
+            nativeEqualDateTime(nativePtr, columnIndex, value.getTime()/1000);
+        }
         queryValidated = false;
         return this;
     }

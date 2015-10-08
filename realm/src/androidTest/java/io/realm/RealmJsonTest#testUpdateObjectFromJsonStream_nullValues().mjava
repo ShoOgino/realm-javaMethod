@@ -1,4 +1,5 @@
-    // Test update a existing object with JSON stream.
+    // Test update a existing object with JSON stream. Only primary key in JSON.
+    // No value should be changed.
     public void testUpdateObjectFromJsonStream_nullValues() throws IOException {
         AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
         Date date = new Date(0);
@@ -14,7 +15,7 @@
         testRealm.copyToRealm(obj);
         testRealm.commitTransaction();
 
-        InputStream in = loadJsonFromAssets("all_types_primary_key_null.json");
+        InputStream in = loadJsonFromAssets("all_types_primary_key_field_only.json");
         testRealm.beginTransaction();
         testRealm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, in);
         testRealm.commitTransaction();
@@ -22,9 +23,7 @@
 
         // Check that all primitive types are imported correctly
         obj = testRealm.allObjects(AllTypesPrimaryKey.class).first();
-        // TODO: We only handle updating null for String right now.
-        //       Clean this up after nullable support for all types.
-        assertEquals("", obj.getColumnString());
+        assertEquals("1", obj.getColumnString());
         assertEquals(1L, obj.getColumnLong());
         assertEquals(1f, obj.getColumnFloat());
         assertEquals(1d, obj.getColumnDouble());

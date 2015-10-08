@@ -4,7 +4,7 @@
         if (containsDot(fieldName)) {
             String[] names = splitString(fieldName); //fieldName.split("\\.");
             long[] columnIndices = new long[names.length];
-            for (int i = 0; i < names.length - 1; i++) {
+            for (int i = 0; i < names.length-1; i++) {
                 long index = table.getColumnIndex(names[i]);
                 if (index < 0) {
                     throw new IllegalArgumentException("Invalid query: " + names[i] + " does not refer to a class.");
@@ -18,7 +18,7 @@
                 }
             }
             columnIndices[names.length - 1] = table.getColumnIndex(names[names.length - 1]);
-            if (fieldType != table.getColumnType(columnIndices[names.length - 1])) {
+            if (fieldType != null && fieldType != table.getColumnType(columnIndices[names.length - 1])) {
                 throw new IllegalArgumentException(String.format("Field '%s': type mismatch.", names[names.length - 1]));
             }
             return columnIndices;
@@ -28,12 +28,12 @@
             }
 
             ColumnType tableColumnType = table.getColumnType(columns.get(fieldName));
-            if (fieldType != tableColumnType) {
+            if (fieldType != null && fieldType != tableColumnType) {
                 throw new IllegalArgumentException(String.format("Field '%s': type mismatch. Was %s, expected %s.",
                         fieldName, fieldType, tableColumnType
                 ));
             }
-            return new long[]{columns.get(fieldName)};
+            return new long[] {columns.get(fieldName)};
         }
     }
 

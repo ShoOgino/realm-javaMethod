@@ -3,15 +3,20 @@
         testRealm.close();
         String REALM_NAME = "encrypted.realm";
         TestHelper.copyRealmFromAssets(getContext(), REALM_NAME, REALM_NAME);
+        RealmMigration realmMigration = TestHelper.prepareMigrationToNullSupportStep();
 
         RealmConfiguration wrongConfig = new RealmConfiguration.Builder(getContext())
                 .name(REALM_NAME)
                 .encryptionKey(TestHelper.SHA512("foo"))
+                .migration(realmMigration)
+                .schema(StringOnly.class)
                 .build();
 
         RealmConfiguration rightConfig = new RealmConfiguration.Builder(getContext())
                 .name(REALM_NAME)
                 .encryptionKey(TestHelper.SHA512("realm"))
+                .migration(realmMigration)
+                .schema(StringOnly.class)
                 .build();
 
         // Open Realm with wrong key

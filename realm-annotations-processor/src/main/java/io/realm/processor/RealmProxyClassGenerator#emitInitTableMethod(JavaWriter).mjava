@@ -15,16 +15,22 @@
             String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
 
             if (Constants.JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
-                writer.emitStatement("table.addColumn(%s, \"%s\")",
+                String nullableFlag;
+                if (metadata.isNullable(field)) {
+                    nullableFlag = "Table.NULLABLE";
+                } else {
+                    nullableFlag = "Table.NOT_NULLABLE";
+                }
+                writer.emitStatement("table.addColumn(%s, \"%s\", %s)",
                         Constants.JAVA_TO_COLUMN_TYPES.get(fieldTypeCanonicalName),
-                        fieldName);
-            } else if (typeUtils.isAssignable(field.asType(), realmObject)) {
+                        fieldName, nullableFlag);
+            } else if (Utils.isRealmObject(field)) {
                 writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, fieldTypeSimpleName);
                 writer.emitStatement("%s%s.initTable(transaction)", fieldTypeSimpleName, Constants.PROXY_SUFFIX);
                 writer.endControlFlow();
                 writer.emitStatement("table.addColumnLink(ColumnType.LINK, \"%s\", transaction.getTable(\"%s%s\"))",
                         fieldName, Constants.TABLE_PREFIX, fieldTypeSimpleName);
-            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+            } else if (Utils.isRealmList(field)) {
                 String genericType = Utils.getGenericType(field);
                 writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericType);
                 writer.emitStatement("%s%s.initTable(transaction)", genericType, Constants.PROXY_SUFFIX);

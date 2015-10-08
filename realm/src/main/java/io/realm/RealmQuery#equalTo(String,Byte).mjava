@@ -1,0 +1,19 @@
+    /**
+     * Equal-to comparison.
+     * @param fieldName  the field to compare.
+     * @param value      the value to compare with.
+     * @return the query object.
+     * @throws java.lang.IllegalArgumentException if one or more arguments do not match class or
+     * field type.
+     * @throws java.lang.RuntimeException if any other error happens.
+     */
+    public RealmQuery<E> equalTo(String fieldName, Byte value) {
+        long[] columnIndices = getColumnIndices(fieldName, ColumnType.INTEGER);
+        if (value == null) {
+            this.query.isNull(columnIndices);
+        } else {
+            this.query.equalTo(columnIndices, value);
+        }
+        return this;
+    }
+
