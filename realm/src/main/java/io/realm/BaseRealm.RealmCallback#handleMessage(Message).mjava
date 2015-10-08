@@ -16,11 +16,11 @@
                         QueryUpdateTask.Builder.RealmResultsQueryStep realmResultsQueryStep = null;
 
                         // we iterate over non GC'd async RealmResults then add them to the list to be updated (in a batch)
-                        Iterator<Map.Entry<WeakReference<RealmResults<?>>, RealmQuery<?>>> iterator = asyncRealmResults.entrySet().iterator();
+                        Iterator<Map.Entry<WeakReference<RealmResults<? extends RealmObject>>, RealmQuery<?>>> iterator = asyncRealmResults.entrySet().iterator();
                         while (iterator.hasNext()) {
-                            Map.Entry<WeakReference<RealmResults<?>>, RealmQuery<?>> entry = iterator.next();
-                            WeakReference<RealmResults<?>> weakReference = entry.getKey();
-                            RealmResults<?> realmResults = weakReference.get();
+                            Map.Entry<WeakReference<RealmResults<? extends RealmObject>>, RealmQuery<?>> entry = iterator.next();
+                            WeakReference<RealmResults<? extends RealmObject>> weakReference = entry.getKey();
+                            RealmResults<? extends RealmObject> realmResults = weakReference.get();
                             if (realmResults == null) {
                                 // GC'd instance remove from the list
                                 iterator.remove();
@@ -55,14 +55,13 @@
                 }
                 case REALM_COMPLETED_ASYNC_QUERY: {
                     // one async query has completed
-                    QueryUpdateTask.Result result
-                            = (QueryUpdateTask.Result) message.obj;
+                    QueryUpdateTask.Result result = (QueryUpdateTask.Result) message.obj;
 
-                    Set<WeakReference<RealmResults<?>>> updatedTableViewsKeys = result.updatedTableViews.keySet();
+                    Set<WeakReference<RealmResults<? extends RealmObject>>> updatedTableViewsKeys = result.updatedTableViews.keySet();
                     if (updatedTableViewsKeys.size() > 0) {
-                        WeakReference<RealmResults<?>> weakRealmResults = updatedTableViewsKeys.iterator().next();
+                        WeakReference<RealmResults<? extends RealmObject>> weakRealmResults = updatedTableViewsKeys.iterator().next();
 
-                        RealmResults<?> realmResults = weakRealmResults.get();
+                        RealmResults<? extends RealmObject> realmResults = weakRealmResults.get();
                         if (realmResults == null) {
                             asyncRealmResults.remove(weakRealmResults);
                             RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] realm:"+ BaseRealm.this + " RealmResults GC'd ignore results");
@@ -153,11 +152,11 @@
                             sharedGroupManager.advanceRead(result.versionID);
                         }
 
-                        ArrayList<RealmResults<?>> callbacksToNotify = new ArrayList<RealmResults<?>>(result.updatedTableViews.size());
+                        ArrayList<RealmResults<? extends RealmObject>> callbacksToNotify = new ArrayList<RealmResults<? extends RealmObject>>(result.updatedTableViews.size());
                         // use updated TableViews pointers for the existing async RealmResults
-                        for (Map.Entry<WeakReference<RealmResults<?>>, Long> query : result.updatedTableViews.entrySet()) {
-                            WeakReference<RealmResults<?>> weakRealmResults = query.getKey();
-                            RealmResults<?> realmResults = weakRealmResults.get();
+                        for (Map.Entry<WeakReference<RealmResults<? extends RealmObject>>, Long> query : result.updatedTableViews.entrySet()) {
+                            WeakReference<RealmResults<? extends RealmObject>> weakRealmResults = query.getKey();
+                            RealmResults<? extends RealmObject> realmResults = weakRealmResults.get();
                             if (realmResults == null) {
                                 // don't update GC'd instance
                                 asyncRealmResults.remove(weakRealmResults);
@@ -177,7 +176,7 @@
                             }
                         }
 
-                        for (RealmResults<?> query : callbacksToNotify) {
+                        for (RealmResults<? extends RealmObject> query : callbacksToNotify) {
                             query.notifyChangeListeners();
                         }
 

@@ -1,13 +1,15 @@
     /**
      * Remove a previously registered listener.
+     *
      * @param listener the instance to be removed.
      */
     public void removeChangeListener(RealmChangeListener listener) {
         if (listener == null) {
             throw new IllegalArgumentException("Listener should not be null");
         }
-        realm.checkIfValid();
-
+        if (realm != null) {
+            realm.checkIfValid();
+        }
         listeners.remove(listener);
     }
 

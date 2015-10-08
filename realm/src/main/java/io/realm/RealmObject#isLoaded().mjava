@@ -2,11 +2,15 @@
      * Determine if the current RealmObject is obtained synchronously or asynchronously (from
      * a worker thread). Synchronous RealmObjects are by definition blocking hence this method
      * will always return {@code true} for them.
+     * Note: This will return {@code true} if called from a standalone object (created outside of Realm).
      *
      * @return {@code true} if the query has completed & the data is available {@code false} if the
      * query is in progress.
      */
     public boolean isLoaded() {
+        if (realm == null) {
+            return true;
+        }
         realm.checkIfValid();
         return pendingQuery == null || isCompleted;
     }

@@ -2,11 +2,11 @@
      * Similar to {@link #executeTransaction(Transaction)} but runs asynchronously from a worker thread
      * @param transaction {@link io.realm.Realm.Transaction} to execute.
      * @param callback optional, to receive the result of this query
-     * @return A {@link io.realm.Realm.Request} representing a cancellable task
+     * @return A {@link RealmAsyncTask} representing a cancellable task
      */
-    public Request executeTransaction(final Transaction transaction, final Transaction.Callback callback) {
+    public RealmAsyncTask executeTransaction(final Transaction transaction, final Transaction.Callback callback) {
         if (transaction == null)
-            throw new IllegalArgumentException("transaction should not be null");
+            throw new IllegalArgumentException("Transaction should not be null");
 
         // will use the Looper of the caller thread to post the result
         final Handler handler = new Handler();
@@ -59,6 +59,6 @@
             }
         });
 
-        return new Request(pendingQuery);
+        return new RealmAsyncTask(pendingQuery);
     }
 
