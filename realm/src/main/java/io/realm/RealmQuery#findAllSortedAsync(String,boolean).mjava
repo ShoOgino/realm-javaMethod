@@ -7,6 +7,7 @@
      * @throws java.lang.IllegalArgumentException if field name does not exist.
      */
     public RealmResults<E> findAllSortedAsync(String fieldName, boolean sortAscending) {
+        checkQueryIsNotReused();
         final TableView.Order order = sortAscending ? TableView.Order.ascending : TableView.Order.descending;
         final Long columnIndex = columns.get(fieldName);
         if (columnIndex == null || columnIndex < 0) {

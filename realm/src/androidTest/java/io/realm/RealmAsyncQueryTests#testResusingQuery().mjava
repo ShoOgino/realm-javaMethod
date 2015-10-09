@@ -1,5 +1,4 @@
-    // similar UC as #testForceLoadAsync using 'findFirst'
-    public void testForceLoadFindFirstAsync() throws Throwable {
+    public void testResusingQuery() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
         final Looper[] backgroundLooper = new Looper[1];
@@ -12,24 +11,25 @@
 
                 Realm realm = null;
                 try {
-                    realm = openRealmInstance("testForceLoadFindFirstAsync");
-                    Realm.asyncQueryExecutor.pause();
-
+                    realm = openRealmInstance("testResusingQuery");
                     populateTestRealm(realm, 10);
-                    final AllTypes realmResults = realm.where(AllTypes.class)
-                            .between("columnLong", 4, 9)
-                            .findFirstAsync();
 
-                    assertFalse(realmResults.isLoaded());
-                    assertEquals("", realmResults.getColumnString());
+                    RealmQuery<AllTypes> query = realm.where(AllTypes.class)
+                            .between("columnLong", 0, 4);
+                    RealmResults<AllTypes> queryAllSync = query.findAll();
+                    RealmResults<AllTypes> allAsync = query.findAllAsync();
 
-                    Realm.asyncQueryExecutor.resume();
+                    assertTrue(allAsync.load());
+                    assertEquals(allAsync, queryAllSync);
 
-                    assertTrue(realmResults.load());
-                    assertTrue(realmResults.isLoaded());
-                    assertEquals("test data 4", realmResults.getColumnString());
+                    // the RealmQuery already has an argumentHolder, can't reuse it
+                    try {
+                        RealmResults<AllTypes> allAsyncSorted = query.findAllSorted("columnLong");
+                        fail("Should throw an exception, can not reuse RealmQuery");
+                    } catch (IllegalStateException ignored) {
+                        signalCallbackFinished.countDown();
+                    }
 
-                    signalCallbackFinished.countDown();
                     Looper.loop();
 
                 } catch (Exception e) {
@@ -50,6 +50,7 @@
         // wait until the callback of our async query proceed
         TestHelper.awaitOrFail(signalCallbackFinished);
 
+        executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
             throw threadAssertionError[0];
@@ -59,7 +60,5 @@
             // of closing the Realm
             backgroundLooper[0].quit();
         }
-
-        executorService.shutdownNow();
     }
 
