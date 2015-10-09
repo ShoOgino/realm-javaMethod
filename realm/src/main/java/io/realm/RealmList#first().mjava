@@ -2,10 +2,12 @@
      * Find the first object.
      *
      * @return The first object or {@code null} if the list is empty.
+     * @throws IllegalStateException if Realm instance has been closed or parent object has been removed.
      */
     public E first() {
-        if (managedMode && !view.isEmpty()) {
-            return get(0);
+        if (managedMode) {
+            checkIfViewAttached();
+            return view.isEmpty() ? null : get(0);
         } else if (nonManagedList != null && nonManagedList.size() > 0) {
             return nonManagedList.get(0);
         }
