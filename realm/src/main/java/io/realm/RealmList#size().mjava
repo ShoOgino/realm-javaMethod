@@ -2,10 +2,12 @@
      * Returns the number of elements in this {@code List}.
      *
      * @return the number of elements in this {@code List}.
+     * @throws IllegalStateException if Realm instance has been closed or parent object has been removed.
      */
     @Override
     public int size() {
         if (managedMode) {
+            checkIfViewAttached();
             long size = view.size();
             return size < Integer.MAX_VALUE ? (int) size : Integer.MAX_VALUE;
         } else {

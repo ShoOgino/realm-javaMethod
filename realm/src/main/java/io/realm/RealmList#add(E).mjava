@@ -11,11 +11,13 @@
      * </ol>
      * @param object the object to add.
      * @return true
+     * @throws IllegalStateException if Realm instance has been closed or parent object has been removed.
      */
     @Override
     public boolean add(E object) {
         checkValidObject(object);
         if (managedMode) {
+            checkIfViewAttached();
             object = copyToRealmIfNeeded(object);
             view.add(object.row.getIndex());
         } else {
