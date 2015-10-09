@@ -18,8 +18,7 @@
         argumentsHolder.ascending = sortAscending;
         argumentsHolder.columnIndex = columnIndex;
 
-        // will use the Looper of the caller Realm to post the result
-        final WeakReference<Handler> weakHandler = new WeakReference<Handler>(realm.handler);
+        final WeakReference<Handler> weakHandler = getWeakReferenceHandler();
 
         // handover the query (to be used by a worker thread)
         final long handoverQueryPointer = query.handoverQuery(realm.sharedGroupManager.getNativePointer());
