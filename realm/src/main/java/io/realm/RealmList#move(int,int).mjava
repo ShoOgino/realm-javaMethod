@@ -7,10 +7,12 @@
      *               to the right. If oldPos &lt; newPos, indexes &gt; oldPos will be shifted once to the
      *               left.
      *
+     * @throws IllegalStateException if Realm instance has been closed or parent object has been removed.
      * @throws java.lang.IndexOutOfBoundsException if any position is outside [0, size()[.
      */
     public void move(int oldPos, int newPos) {
         if (managedMode) {
+            checkIfViewAttached();
             view.move(oldPos, newPos);
         } else {
             checkIndex(oldPos);
