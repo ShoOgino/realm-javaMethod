@@ -2,21 +2,8 @@
     public void testDistinct() {
         final long numberOfBlocks = 25;
         final long numberOfObjects = 10; // must be greater than 1
-        testRealm.beginTransaction();
-        for (int i = 0; i < numberOfObjects * numberOfBlocks; i++) {
-            for (int j = 0; j < numberOfBlocks; j++) {
-                AnnotationIndexTypes obj = testRealm.createObject(AnnotationIndexTypes.class);
-                obj.setIndexBoolean(j % 2 == 0);
-                obj.setIndexLong(j);
-                obj.setIndexDate(new Date(1000 * j));
-                obj.setIndexString("Test " + j);
-                obj.setNotIndexBoolean(j % 2 == 0);
-                obj.setNotIndexLong(j);
-                obj.setNotIndexDate(new Date(1000 * j));
-                obj.setNotIndexString("Test " + j);
-            }
-        }
-        testRealm.commitTransaction();
+
+        populateForDistinct(testRealm, numberOfBlocks, numberOfObjects);
 
         RealmResults<AnnotationIndexTypes> distinctBool = testRealm.distinct(AnnotationIndexTypes.class, "indexBoolean");
         assertEquals(2, distinctBool.size());
@@ -24,20 +11,6 @@
         for (String fieldName : new String[]{"Long", "Date", "String"}) {
             RealmResults<AnnotationIndexTypes> distinct = testRealm.distinct(AnnotationIndexTypes.class, "index" + fieldName);
             assertEquals("index" + fieldName, numberOfBlocks, distinct.size());
-        }
-
-        for (String fieldName : new String[]{"Boolean", "Long", "Date", "String"}) {
-            try {
-                testRealm.distinct(AnnotationIndexTypes.class, "notIndex" + fieldName);
-                fail("notIndex" + fieldName);
-            } catch (UnsupportedOperationException ignore) {
-            }
-        }
-
-        try {
-            testRealm.distinct(AnnotationIndexTypes.class, "doesNotExist");
-            fail();
-        } catch (IllegalArgumentException ignore) {
         }
     }
 
