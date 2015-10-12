@@ -8,12 +8,11 @@
 
         populateTestRealm(realm, 100);
         realm.close();
-        assertTrue(realm.isClosed());
-
-        assertTrue(Realm.compactRealm(realmConfig));
-
-        realm = Realm.getInstance(realmConfig);
-        assertEquals(100, realm.allObjects(AllTypes.class).size());
-        realm.close();
+        // TODO: remove try/catch block when compacting encrypted Realms is supported
+        try {
+            assertTrue(Realm.compactRealm(realmConfig));
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
     }
 
