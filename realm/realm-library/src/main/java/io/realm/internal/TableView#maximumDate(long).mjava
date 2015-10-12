@@ -1,5 +1,9 @@
     @Override
     public Date maximumDate(long columnIndex) {
-        return new Date(nativeMaximumDate(nativePtr, columnIndex) * 1000);
+        Long result = nativeMaximumDate(nativePtr, columnIndex);
+        if (result == null) {
+            return null;
+        }
+        return new Date(result * 1000);
     }
 

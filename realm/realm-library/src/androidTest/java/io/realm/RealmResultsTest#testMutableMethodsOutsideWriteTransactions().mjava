@@ -2,8 +2,20 @@
     public void testMutableMethodsOutsideWriteTransactions() {
         RealmResults<AllTypes> result = testRealm.where(AllTypes.class).findAll();
 
-        try { result.clear();       fail(); } catch (IllegalStateException expected) {}
-        try { result.remove(0);     fail(); } catch (IllegalStateException expected) {}
-        try { result.removeLast();  fail(); } catch (IllegalStateException expected) {}
+        try {
+            result.clear();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+        try {
+            result.remove(0);
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+        try {
+            result.removeLast();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
     }
 

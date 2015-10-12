@@ -23,7 +23,7 @@
             lastLocalInstanceClosed();
             sharedGroupManager.close();
             sharedGroupManager = null;
-            releaseFileReference();
+            releaseFileReference(configuration);
         }
 
         int refCount = references - 1;
@@ -34,7 +34,6 @@
 
         if (handler != null && refCount <= 0) {
             removeHandler(handler);
-            handler = null;
         }
     }
 

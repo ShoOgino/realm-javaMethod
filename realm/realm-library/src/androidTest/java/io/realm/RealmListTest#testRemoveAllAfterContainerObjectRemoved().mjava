@@ -1,0 +1,13 @@
+    public void testRemoveAllAfterContainerObjectRemoved() {
+        RealmList<Dog> dogs = createDeletedRealmList();
+
+        testRealm.beginTransaction();
+        try {
+            dogs.removeAll(Collections.<Dog>emptyList());
+            fail();
+        } catch (IllegalStateException ignore) {
+        } finally {
+            testRealm.cancelTransaction();
+        }
+    }
+

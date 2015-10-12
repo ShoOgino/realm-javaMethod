@@ -1,5 +1,9 @@
     @Override
     public Date minimumDate(long columnIndex) {
-        return new Date(nativeMinimumDate(nativePtr, columnIndex) * 1000);
+        Long result = nativeMinimumDate(nativePtr, columnIndex);
+        if (result == null) {
+            return null;
+        }
+        return new Date(result * 1000);
     }
 

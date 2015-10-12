@@ -3,13 +3,17 @@
         Simple obj = realm.createObject(Simple.class);
         if (json.has("name")) {
             if (json.isNull("name")) {
-                obj.setName("");
+                obj.setName(null);
             } else {
                 obj.setName((String) json.getString("name"));
             }
         }
-        if (!json.isNull("age")) {
-            obj.setAge((int) json.getInt("age"));
+        if (json.has("age")) {
+            if (json.isNull("age")) {
+                throw new IllegalArgumentException("Trying to set non-nullable field age to null.");
+            } else {
+                obj.setAge((int) json.getInt("age"));
+            }
         }
         return obj;
     }

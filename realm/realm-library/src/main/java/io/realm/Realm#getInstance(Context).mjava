@@ -1,17 +1,18 @@
     /**
-     * Realm static constructor for the default Realm "default.realm".
-     * {@link #close()} must be called when you are done using the Realm instance.
-     * <p>
-     * It sets auto-refresh on if the current thread has a Looper, off otherwise.
-     *
+     * Realm static constructor for the default Realm file {@value io.realm.RealmConfiguration#DEFAULT_REALM_NAME}.
      * This is equivalent to calling {@code Realm.getInstance(new RealmConfiguration(getContext()).build()) }.
+     *
+     * This constructor is only provided for convenience. It is recommended to use
+     * {@link #getInstance(RealmConfiguration)} or {@link #getDefaultInstance()}.
+     *
+     * @param context a non-null Android {@link android.content.Context}
+     * @return an instance of the Realm class.
 
-     * @param context an Android {@link android.content.Context}
-     * @return an instance of the Realm class
-     * @throws RealmMigrationNeededException The model classes have been changed and the Realm
-     *                                       must be migrated
-     * @throws RealmIOException              Error when accessing underlying file
-     * @throws RealmException                Other errors
+     * @throws java.lang.IllegalArgumentException if no {@link Context} is provided.
+     * @throws RealmMigrationNeededException if the model classes no longer match the underlying Realm
+     *                                       and it must be migrated.
+     * @throws RealmIOException              if an error happened when accessing the underlying Realm
+     *                                       file.
      */
     public static Realm getInstance(Context context) {
         return Realm.getInstance(new RealmConfiguration.Builder(context)

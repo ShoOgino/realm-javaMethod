@@ -1,7 +1,6 @@
     public void testDateType() {
-        long testDatesNotValid[] = {Long.MIN_VALUE, Long.MAX_VALUE};
         long testDatesValid[] = {-1000, 0, 1000};
-        long testDatesLoosePrecision[] = {1, 1001};
+        long testDatesLoosePrecision[] = {Long.MIN_VALUE, 1, 1001, Long.MAX_VALUE};
 
         // test valid dates
         testRealm.beginTransaction();
@@ -31,18 +30,6 @@
             assertFalse("Item " + i, new Date(testDatesLoosePrecision[i]) == allTypes.getColumnDate());
             assertEquals("Item " + i, new Date(1000*(testDatesLoosePrecision[i]/1000)), allTypes.getColumnDate());
             i++;
-        }
-
-        // test invalid dates
-        for (long value : testDatesNotValid) {
-            try {
-                testRealm.beginTransaction();
-                testRealm.clear(AllTypes.class);
-                AllTypes allTypes = testRealm.createObject(AllTypes.class);
-                allTypes.setColumnDate(new Date(value));
-                testRealm.commitTransaction();
-                fail();
-            } catch (IllegalArgumentException ignored) { testRealm.cancelTransaction(); }
         }
     }
 

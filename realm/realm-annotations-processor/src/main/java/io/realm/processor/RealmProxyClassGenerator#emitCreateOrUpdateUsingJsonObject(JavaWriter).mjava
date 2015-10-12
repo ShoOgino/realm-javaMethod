@@ -33,15 +33,16 @@
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
             String qualifiedFieldType = field.asType().toString();
-            if (typeUtils.isAssignable(field.asType(), realmObject)) {
+            if (Utils.isRealmObject(field)) {
                 RealmJsonTypeHelper.emitFillRealmObjectWithJsonValue(
                         metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
                         Utils.getProxyClassSimpleName(field),
-                        writer);
+                        writer
+                );
 
-            } else if (typeUtils.isAssignable(field.asType(), realmList)) {
+            } else if (Utils.isRealmList(field)) {
                 RealmJsonTypeHelper.emitFillRealmListWithJsonValue(
                         metadata.getGetter(fieldName),
                         metadata.getSetter(fieldName),
@@ -55,7 +56,8 @@
                         metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
-                        writer);
+                        writer
+                );
             }
         }
 
