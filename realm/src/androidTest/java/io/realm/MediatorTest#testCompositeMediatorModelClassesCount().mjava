@@ -1,0 +1,11 @@
+    public void testCompositeMediatorModelClassesCount() {
+        final CompositeMediator mediator = new CompositeMediator();
+        mediator.addMediator(new HumanModuleMediator());
+        mediator.addMediator(new AnimalModuleMediator());
+
+        final int modelsInHumanModule = HumanModule.class.getAnnotation(RealmModule.class).classes().length;
+        final int modelsInAnimalModule = AnimalModule.class.getAnnotation(RealmModule.class).classes().length;
+
+        assertEquals(modelsInHumanModule + modelsInAnimalModule, mediator.getModelClasses().size());
+    }
+
