@@ -1,0 +1,29 @@
+    @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
+    public void testMediatorsEquality() {
+        final DefaultRealmModuleMediator defaultMediator = new DefaultRealmModuleMediator();
+        final CompositeMediator compositeMediator = new CompositeMediator();
+        compositeMediator.addMediator(defaultMediator);
+        final FilterableMediator filterableMediator = new FilterableMediator(defaultMediator, defaultMediator.getModelClasses());
+
+        assertEquals(defaultMediator, defaultMediator);
+        assertEquals(defaultMediator.hashCode(), defaultMediator.hashCode());
+        assertEquals(defaultMediator, compositeMediator);
+        assertEquals(defaultMediator.hashCode(), compositeMediator.hashCode());
+        assertEquals(defaultMediator, filterableMediator);
+        assertEquals(defaultMediator.hashCode(), filterableMediator.hashCode());
+
+        assertEquals(compositeMediator, defaultMediator);
+        assertEquals(compositeMediator.hashCode(), defaultMediator.hashCode());
+        assertEquals(compositeMediator, compositeMediator);
+        assertEquals(compositeMediator.hashCode(), compositeMediator.hashCode());
+        assertEquals(compositeMediator, filterableMediator);
+        assertEquals(compositeMediator.hashCode(), filterableMediator.hashCode());
+
+        assertEquals(filterableMediator, defaultMediator);
+        assertEquals(filterableMediator.hashCode(), defaultMediator.hashCode());
+        assertEquals(filterableMediator, compositeMediator);
+        assertEquals(filterableMediator.hashCode(), compositeMediator.hashCode());
+        assertEquals(filterableMediator, filterableMediator);
+        assertEquals(filterableMediator.hashCode(), filterableMediator.hashCode());
+    }
+
