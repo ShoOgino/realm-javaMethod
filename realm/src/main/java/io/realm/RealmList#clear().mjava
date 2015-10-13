@@ -1,12 +1,14 @@
     /**
      * Removes all elements from this list, leaving it empty.
      *
+     * @throws IllegalStateException if Realm instance has been closed or parent object has been removed.
      * @see List#isEmpty
      * @see List#size
      */
     @Override
     public void clear() {
         if (managedMode) {
+            checkIfViewAttached();
             view.clear();
         } else {
             nonManagedList.clear();
