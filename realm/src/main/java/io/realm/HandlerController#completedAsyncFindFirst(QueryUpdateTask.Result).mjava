@@ -5,7 +5,7 @@
             RealmObject realmObject = realmObjectWeakReference.get();
 
             if (realmObject != null) {
-                SharedGroup.VersionID callerVersionID = sharedGroupManager.getVersion();
+                SharedGroup.VersionID callerVersionID = realm.sharedGroupManager.getVersion();
                 int compare = callerVersionID.compareTo(result.versionID);
                 // we always query on the same version
                 // only two use cases could happen 1. we're on the same version or 2. the caller has advanced in the meanwhile
@@ -19,14 +19,14 @@
                     RealmQuery<?> realmQuery = asyncRealmObjects.get(realmObjectWeakReference);
 
                     QueryUpdateTask queryUpdateTask = QueryUpdateTask.newBuilder()
-                            .realmConfiguration(getConfiguration())
+                            .realmConfiguration(realm.getConfiguration())
                             .addObject(realmObjectWeakReference,
                                     realmQuery.handoverQueryPointer(),
                                     realmQuery.getArgument())
-                            .sendToHandler(handler, REALM_COMPLETED_ASYNC_FIND_FIRST)
+                            .sendToHandler(realm.handler, Realm.REALM_COMPLETED_ASYNC_FIND_FIRST)
                             .build();
 
-                    asyncQueryExecutor.submit(queryUpdateTask);
+                    Realm.asyncQueryExecutor.submit(queryUpdateTask);
                 } else {
                     // should not happen, since the the background thread position itself against the provided version
                     // and the caller thread can only go forward (advance_read)

@@ -6,22 +6,22 @@
             RealmResults<? extends RealmObject> realmResults = weakRealmResults.get();
             if (realmResults == null) {
                 asyncRealmResults.remove(weakRealmResults);
-                RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] realm:"+ BaseRealm.this + " RealmResults GC'd ignore results");
+                RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] realm:"+ HandlerController.this + " RealmResults GC'd ignore results");
 
             } else {
-                SharedGroup.VersionID callerVersionID = sharedGroupManager.getVersion();
+                SharedGroup.VersionID callerVersionID = realm.sharedGroupManager.getVersion();
                 int compare = callerVersionID.compareTo(result.versionID);
                 if (compare == 0) {
                     // if the RealmResults is empty (has not completed yet) then use the value
                     // otherwise a task (grouped update) has already updated this RealmResults
                     if (!realmResults.isLoaded()) {
-                        RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] , realm:"+ BaseRealm.this + " same versions, using results (RealmResults is not loaded)");
+                        RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] , realm:"+ HandlerController.this + " same versions, using results (RealmResults is not loaded)");
                         // swap pointer
                         realmResults.swapTableViewPointer(result.updatedTableViews.get(weakRealmResults));
                         // notify callbacks
                         realmResults.notifyChangeListeners();
                     } else {
-                        RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] , realm:"+ BaseRealm.this + " ignoring result the RealmResults (is already loaded)");
+                        RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] , realm:"+ HandlerController.this + " ignoring result the RealmResults (is already loaded)");
                     }
 
                 } else if (compare > 0) {
@@ -36,22 +36,22 @@
 
                     if (!realmResults.isLoaded()) { // UC2
                         // UC covered by this test: RealmAsyncQueryTests#testFindAllAsyncRetry
-                        RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY " + weakRealmResults + "] , realm:"+ BaseRealm.this + " caller is more advanced & RealmResults is not loaded, rerunning the query against the latest version");
+                        RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY " + weakRealmResults + "] , realm:"+ HandlerController.this + " caller is more advanced & RealmResults is not loaded, rerunning the query against the latest version");
 
                         RealmQuery<?> query = asyncRealmResults.get(weakRealmResults);
                         QueryUpdateTask queryUpdateTask = QueryUpdateTask.newBuilder()
-                                .realmConfiguration(getConfiguration())
+                                .realmConfiguration(realm.getConfiguration())
                                 .add(weakRealmResults,
                                         query.handoverQueryPointer(),
                                         query.getArgument())
-                                .sendToHandler(handler, REALM_COMPLETED_ASYNC_QUERY)
+                                .sendToHandler(realm.handler, Realm.REALM_COMPLETED_ASYNC_QUERY)
                                 .build();
 
-                        asyncQueryExecutor.submit(queryUpdateTask);
+                        Realm.asyncQueryExecutor.submit(queryUpdateTask);
 
                     } else {
                         // UC covered by this test: RealmAsyncQueryTests#testFindAllCallerIsAdvanced
-                        RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] , realm:"+ BaseRealm.this + " caller is more advanced & RealmResults is loaded ignore the outdated result");
+                        RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] , realm:"+ HandlerController.this + " caller is more advanced & RealmResults is loaded ignore the outdated result");
                     }
 
                 } else {
@@ -59,7 +59,7 @@
                     // no need to rerun the query, since we're going to receive the update signal
                     // & batch update all async queries including this one
                     // UC covered by this test: RealmAsyncQueryTests#testFindAllCallerThreadBehind
-                    RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] , realm:"+ BaseRealm.this + " caller thread behind worker thread, ignore results (a batch update will update everything including this query)");
+                    RealmLog.d("[REALM_COMPLETED_ASYNC_QUERY "+ weakRealmResults + "] , realm:"+ HandlerController.this + " caller thread behind worker thread, ignore results (a batch update will update everything including this query)");
                 }
             }
         }

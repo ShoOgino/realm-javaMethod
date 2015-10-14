@@ -1,11 +1,11 @@
     private void completedAsyncQueriesUpdate(QueryUpdateTask.Result result) {
-        SharedGroup.VersionID callerVersionID = sharedGroupManager.getVersion();
+        SharedGroup.VersionID callerVersionID = realm.sharedGroupManager.getVersion();
         int compare = callerVersionID.compareTo(result.versionID);
         if (compare > 0) {
-            RealmLog.d("REALM_UPDATE_ASYNC_QUERIES realm:" + BaseRealm.this + " caller is more advanced, rerun updates");
+            RealmLog.d("REALM_UPDATE_ASYNC_QUERIES realm:" + HandlerController.this + " caller is more advanced, rerun updates");
             // The caller is more advance than the updated queries ==>
             // need to refresh them again (if there is still queries)
-            handler.sendEmptyMessage(REALM_CHANGED);
+            realm.handler.sendEmptyMessage(Realm.REALM_CHANGED);
 
         } else {
             // We're behind or on the same version as the worker thread
@@ -16,11 +16,11 @@
                 // imperative TV, they will not rerun if the SharedGroup advance
 
                 // UC covered by this test: RealmAsyncQueryTests#testFindAllCallerThreadBehind
-                RealmLog.d("REALM_UPDATE_ASYNC_QUERIES realm:"+ BaseRealm.this + " caller is behind  advance_read");
+                RealmLog.d("REALM_UPDATE_ASYNC_QUERIES realm:"+ HandlerController.this + " caller is behind  advance_read");
                 // refresh the Realm to the version provided by the worker thread
                 // (advanceRead to the latest version may cause a version mismatch error) preventing us
                 // from importing correctly the handover table view
-                sharedGroupManager.advanceRead(result.versionID);
+                realm.sharedGroupManager.advanceRead(result.versionID);
             }
 
             ArrayList<RealmResults<? extends RealmObject>> callbacksToNotify = new ArrayList<RealmResults<? extends RealmObject>>(result.updatedTableViews.size());
@@ -41,7 +41,7 @@
                     //      to the existing value(s) for this RealmResults (use a hashCode?)
                     callbacksToNotify.add(realmResults);
 
-                    RealmLog.d("REALM_UPDATE_ASYNC_QUERIES realm:"+ BaseRealm.this + " updating RealmResults " + weakRealmResults);
+                    RealmLog.d("REALM_UPDATE_ASYNC_QUERIES realm:"+ HandlerController.this + " updating RealmResults " + weakRealmResults);
                     // update the instance with the new pointer
                     realmResults.swapTableViewPointer(query.getValue());
                 }
@@ -53,7 +53,7 @@
 
             // notify listeners only when we advanced
             if (compare != 0) {
-                sendNotifications();
+                realm.sendNotifications();
             }
 
             updateAsyncQueriesTask = null;
