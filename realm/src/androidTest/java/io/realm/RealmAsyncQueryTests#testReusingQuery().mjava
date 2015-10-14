@@ -1,45 +1,34 @@
-    // finding elements [0-4] asynchronously then wait for the promise to be loaded
-    // using a callback to be notified when the data is loaded
-    public void testFindAllAsyncWithNotification() throws Throwable {
+    public void testReusingQuery() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
         final Looper[] backgroundLooper = new Looper[1];
+        final ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new Runnable() {
             @Override
             public void run() {
                 Looper.prepare();
                 backgroundLooper[0] = Looper.myLooper();
+
                 Realm realm = null;
                 try {
-                    realm = openRealmInstance("testFindAllAsyncWithNotification");
-                    Realm.asyncQueryExecutor.pause();
-
+                    realm = openRealmInstance("testResusingQuery");
                     populateTestRealm(realm, 10);
-                    final RealmResults<AllTypes> realmResults = realm.where(AllTypes.class)
-                            .between("columnLong", 0, 4)
-                            .findAllAsync();
 
-                    realmResults.addChangeListener(new RealmChangeListener() {
-                        @Override
-                        public void onChange() {
-                            try {
-                                assertTrue(realmResults.isLoaded());
-                                assertEquals(5, realmResults.size());
-                                assertTrue(realmResults.get(4).isValid());
-                            } catch (AssertionFailedError e) {
-                                threadAssertionError[0] = e;
-                            } finally {
-                                signalCallbackFinished.countDown();
-                            }
+                    RealmQuery<AllTypes> query = realm.where(AllTypes.class)
+                            .between("columnLong", 0, 4);
+                    RealmResults<AllTypes> queryAllSync = query.findAll();
+                    RealmResults<AllTypes> allAsync = query.findAllAsync();
 
-                        }
-                    });
+                    assertTrue(allAsync.load());
+                    assertEquals(allAsync, queryAllSync);
 
-                    assertFalse(realmResults.isLoaded());
-                    assertEquals(0, realmResults.size());
-
-                    Realm.asyncQueryExecutor.resume();
+                    // the RealmQuery already has an argumentHolder, can't reuse it
+                    try {
+                        RealmResults<AllTypes> allAsyncSorted = query.findAllSorted("columnLong");
+                        fail("Should throw an exception, can not reuse RealmQuery");
+                    } catch (IllegalStateException ignored) {
+                        signalCallbackFinished.countDown();
+                    }
 
                     Looper.loop();
 

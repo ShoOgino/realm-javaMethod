@@ -2,7 +2,7 @@
     public void testAsyncWriteTransaction() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final Realm[] realm = new Realm[1];
-        final Throwable[] threadAssertionError = new Throwable[1];
+        final Throwable[] threadAssertionError = new Throwable[1];// to catch both Exception & AssertionError
         final Looper[] backgroundLooper = new Looper[1];
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new Runnable() {
@@ -44,7 +44,7 @@
 
                     Looper.loop();
 
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                     threadAssertionError[0] = e;
 

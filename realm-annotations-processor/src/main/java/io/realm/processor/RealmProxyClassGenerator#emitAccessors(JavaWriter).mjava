@@ -105,7 +105,7 @@
                 writer.beginControlFlow("if (linkView == null)");
                 writer.emitSingleLineComment("return empty non managed RealmList if the LinkView is null");
                 writer.emitSingleLineComment("useful for non-initialized RealmObject (async query returns empty Row while the query is still running)");
-                    writer.emitStatement("return new RealmList<" + genericType + ">()");
+                    writer.emitStatement("return EMPTY_REALM_LIST_" + fieldName.toUpperCase());
                 writer.nextControlFlow("else");
                     writer.emitStatement(fieldName + "RealmList = new RealmList<%s>(%s.class, linkView, realm)",
                         genericType, genericType);

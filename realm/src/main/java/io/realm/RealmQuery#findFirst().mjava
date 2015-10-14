@@ -6,6 +6,7 @@
      * @see io.realm.RealmObject
      */
     public E findFirst() {
+        checkQueryIsNotReused();
         long rowIndex = this.query.find();
         if (rowIndex >= 0) {
             return realm.get(clazz, (view != null) ? view.getTargetRowIndex(rowIndex) : rowIndex);
