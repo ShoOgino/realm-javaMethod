@@ -1,0 +1,11 @@
+    public void testFilterableMediatorModelClassesCount() {
+        //noinspection unchecked
+        final FilterableMediator mediator = new FilterableMediator(new AnimalModuleMediator(), Arrays.asList(Cat.class, CatOwner.class));
+
+        assertTrue(mediator.getModelClasses().contains(Cat.class));
+        // CatOwner is not a member of AnimalModuleMediator
+        assertFalse(mediator.getModelClasses().contains(CatOwner.class));
+        assertFalse(mediator.getModelClasses().contains(Dog.class));
+        assertFalse(mediator.getModelClasses().contains(AllTypes.class));
+    }
+
