@@ -22,8 +22,11 @@
             }
 
             // For all other threads, use the Handler
+            // Note there is a race condition with handler.hasMessages() and handler.sendEmptyMessage()
+            // as the target thread consumes messages at the same time. In this case it is not a problem as worst
+            // case we end up with two REALM_CHANGED messages in the queue.
             if (
-                    realmPath.equals(configuration.getPath())    // It's the right realm
+                    realmPath.equals(configuration.getPath())            // It's the right realm
                             && !handler.hasMessages(REALM_CHANGED)       // The right message
                             && handler.getLooper().getThread().isAlive() // The receiving thread is alive
                     ) {
