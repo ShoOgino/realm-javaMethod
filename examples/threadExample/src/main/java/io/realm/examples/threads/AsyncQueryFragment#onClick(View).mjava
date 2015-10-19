@@ -1,0 +1,43 @@
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.translate_button: {
+                cancelAsyncTransaction();
+                // translate all points coordinates using an async transaction
+                asyncTransaction = realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        // query for all points
+                        RealmResults<Dot> dots = realm.where(Dot.class).findAll();
+
+                        for (int i = dots.size() - 1; i >= 0; i--) {
+                            Dot dot = dots.get(i);
+                            if (dot.isValid()) {
+                                int x = dot.getX();
+                                int y = dot.getY();
+                                dot.setX(y);
+                                dot.setY(x);
+                            }
+                        }
+                    }
+                }, new Realm.Transaction.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        if (isAdded()) {
+                            Toast.makeText(getActivity(), "Translation completed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        if (isAdded()) {
+                            Toast.makeText(getActivity(), "Error while translating dots", Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                break;
+            }
+        }
+    }
+

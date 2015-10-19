@@ -1,0 +1,38 @@
+    @Override
+    public void run() {
+        SharedGroup sharedGroup = null;
+        try {
+            sharedGroup = new SharedGroup(realmConfiguration.getPath(),
+                    SharedGroup.IMPLICIT_TRANSACTION,
+                    realmConfiguration.getDurability(),
+                    realmConfiguration.getEncryptionKey());
+
+            Result result;
+            boolean updateSuccessful = false;
+            if (updateMode == MODE_UPDATE_REALM_RESULTS) {
+                result = Result.newRealmResultsResponse();
+                updateSuccessful = updateRealmResultsQueries(sharedGroup, result);
+                result.versionID = sharedGroup.getVersion();
+
+            } else {
+                result = Result.newRealmObjectResponse();
+                updateSuccessful = updateRealmObjectQuery(sharedGroup, result);
+                result.versionID = sharedGroup.getVersion();
+            }
+
+            Handler handler = callerHandler.get();
+            if (updateSuccessful && !isTaskCancelled() && isAliveHandler(handler)) {
+                handler.obtainMessage(message, result).sendToTarget();
+            }
+
+        } catch (Exception e) {
+            RealmLog.e(e.getMessage());
+            e.fillInStackTrace();
+
+        } finally {
+            if (sharedGroup != null) {
+                sharedGroup.close();
+            }
+        }
+    }
+
