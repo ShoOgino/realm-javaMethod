@@ -15,7 +15,8 @@
         }
 
         if (autoRefresh && !this.autoRefresh) { // Switch it on
-            handler = new Handler(new RealmCallback());
+            handlerController = new HandlerController(this);
+            handler = new Handler(handlerController);
             handlers.put(handler, configuration.getPath());
         } else if (!autoRefresh && this.autoRefresh && handler != null) { // Switch it off
             removeHandler();

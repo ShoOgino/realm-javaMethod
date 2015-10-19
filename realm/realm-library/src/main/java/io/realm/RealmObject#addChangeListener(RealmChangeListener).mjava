@@ -1,0 +1,19 @@
+    /**
+     * Add a change listener to this RealmObject.
+     *
+     * @param listener the change listener to be notified.
+     */
+    public void addChangeListener(RealmChangeListener listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("Listener should not be null");
+        }
+        if (realm != null) {
+            realm.checkIfValid();
+        } else {
+            throw new IllegalArgumentException("Cannot add listener from this unmanaged RealmObject (created outside of Realm)");
+        }
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+

@@ -1,0 +1,81 @@
+    // make sure the notification listener does not leak the enclosing class
+    // if unregistered properly.
+    public void testListenerShouldNotLeak() throws Throwable {
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final Throwable[] threadAssertionError = new Throwable[1];
+        final Looper[] backgroundLooper = new Looper[1];
+        final ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                backgroundLooper[0] = Looper.myLooper();
+
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance("testListenerShouldNotLeak");
+                    populateTestRealm(realm, 10);
+
+                    // simulate the ActivityManager by creating 1 instance responsible
+                    // of attaching an onChange listener, then simulate a configuration
+                    // change (ex: screen rotation), this change will create a new instance.
+                    // we make sure that the GC enqueue the reference of the destroyed instance
+                    // which indicate no memory leak
+                    MockActivityManager mockActivityManager =
+                            MockActivityManager.newInstance(realm.getConfiguration());
+
+                    mockActivityManager.sendConfigurationChange();
+
+                    try {
+                        assertEquals(1, mockActivityManager.numberOfInstances());
+                        // remove GC'd reference & assert that one instance should remain
+                        Iterator<Map.Entry<WeakReference<RealmResults<?>>, RealmQuery<?>>> iterator =
+                                realm.handlerController.asyncRealmResults.entrySet().iterator();
+                        while (iterator.hasNext()) {
+                            Map.Entry<WeakReference<RealmResults<?>>, RealmQuery<?>> entry = iterator.next();
+                            RealmResults<?> weakReference = entry.getKey().get();
+                            if (weakReference == null) {
+                                iterator.remove();
+                            }
+                        }
+
+                        assertEquals(1, realm.handlerController.asyncRealmResults.size());
+
+                    } catch (AssertionFailedError e) {
+                        threadAssertionError[0] = e;
+                    } finally {
+                        signalCallbackFinished.countDown();
+                        mockActivityManager.onStop();
+                    }
+                    Looper.loop();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+
+                } finally {
+                    if (signalCallbackFinished.getCount() > 0) {
+                        signalCallbackFinished.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                }
+            }
+        });
+
+        // wait until the callback of our async query proceed
+        TestHelper.awaitOrFail(signalCallbackFinished);
+
+        if (backgroundLooper[0] != null) {
+            // failing to quit the looper will not execute the finally block responsible
+            // of closing the Realm
+            backgroundLooper[0].quit();
+        }
+        if (null != threadAssertionError[0]) {
+            // throw any assertion errors happened in the background thread
+            throw threadAssertionError[0];
+        }
+
+        executorService.shutdownNow();
+    }
+
