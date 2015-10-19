@@ -1,0 +1,12 @@
+    public void testIsInWriteTransaction() {
+        assertFalse(testRealm.isInWriteTransaction());
+        testRealm.beginTransaction();
+        assertTrue(testRealm.isInWriteTransaction());
+        testRealm.commitTransaction();
+        assertFalse(testRealm.isInWriteTransaction());
+        testRealm.beginTransaction();
+        assertTrue(testRealm.isInWriteTransaction());
+        testRealm.cancelTransaction();
+        assertFalse(testRealm.isInWriteTransaction());
+    }
+
