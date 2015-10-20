@@ -1,5 +1,5 @@
-    // Test that all methods that require a write transaction (ie. any function that mutates Realm data)
-    public void testMutableMethodsOutsideWriteTransactions() throws JSONException, IOException {
+    // Test that all methods that require a transaction (ie. any function that mutates Realm data)
+    public void testMutableMethodsOutsideTransactions() throws JSONException, IOException {
 
         // Prepare standalone object data
         AllTypesPrimaryKey t = new AllTypesPrimaryKey();
@@ -16,7 +16,7 @@
         InputStream jsonArrStream = TestHelper.stringToStream(jsonArrStr);
         InputStream jsonArrStream2 = TestHelper.stringToStream(jsonArrStr);
 
-        // Test all methods that should require a write transaction
+        // Test all methods that should require a transaction
         try { testRealm.createObject(AllTypes.class);   fail(); } catch (IllegalStateException expected) {}
         try { testRealm.copyToRealm(t);                 fail(); } catch (IllegalStateException expected) {}
         try { testRealm.copyToRealm(ts);                fail(); } catch (IllegalStateException expected) {}
