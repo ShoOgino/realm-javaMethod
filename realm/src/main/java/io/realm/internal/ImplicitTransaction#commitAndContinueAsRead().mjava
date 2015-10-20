@@ -1,10 +1,9 @@
     public void commitAndContinueAsRead() {
         assertNotClosed();
-        if (!immutable) {
-            parent.commitAndContinueAsRead();
-            immutable = true;
-        } else {
-            throw new IllegalStateException("Cannot commit a non-write transaction.");
+        if (immutable) {
+            throw new IllegalStateException("Cannot commit a non transaction.");
         }
+        parent.commitAndContinueAsRead();
+        immutable = true;
     }
 

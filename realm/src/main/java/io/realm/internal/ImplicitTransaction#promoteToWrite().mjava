@@ -1,10 +1,9 @@
     public void promoteToWrite() {
         assertNotClosed();
-        if (immutable) {
-            immutable = false;
-            parent.promoteToWrite();
-        } else {
+        if (!immutable) {
             throw new IllegalStateException("Nested transactions are not allowed. Use commitTransaction() after each beginTransaction().");
         }
+        immutable = false;
+        parent.promoteToWrite();
     }
 
