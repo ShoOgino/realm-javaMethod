@@ -1,6 +1,6 @@
     private void emitValidateTableMethod(JavaWriter writer) throws IOException {
         writer.beginMethod(
-                "void", // Return type
+                columnInfoClassName(), // Return type
                 "validateTable", // Method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
                 "ImplicitTransaction", "transaction"); // Argument type & argument name
@@ -19,21 +19,10 @@
         writer.beginControlFlow("for (long i = 0; i < " + metadata.getFields().size() + "; i++)");
         writer.emitStatement("columnTypes.put(table.getColumnName(i), table.getColumnType(i))");
         writer.endControlFlow();
-
-        // Populate column indices
         writer.emitEmptyLine();
-        writer.emitStatement("columnIndices = new HashMap<String, Long>()");
-        writer
-                .beginControlFlow("for (String fieldName : getFieldNames())")
-                    .emitStatement("long index = table.getColumnIndex(fieldName)")
-                    .beginControlFlow("if (index == -1)")
-                        .emitStatement("throw new RealmMigrationNeededException(transaction.getPath(), \"Field '\" + fieldName + \"' not found for type %s\")", metadata.getSimpleClassName())
-                    .endControlFlow()
-                    .emitStatement("columnIndices.put(fieldName, index)")
-                .endControlFlow();
-        for (VariableElement field : metadata.getFields()) {
-            writer.emitStatement("%s = table.getColumnIndex(\"%s\")", staticFieldIndexVarName(field), field.getSimpleName().toString());
-        }
+
+        // create an instance of ColumnInfo
+        writer.emitStatement("final %1$s columnInfo = new %1$s(table, transaction.getPath())", columnInfoClassName());
         writer.emitEmptyLine();
 
         // For each field verify there is a corresponding
@@ -58,7 +47,7 @@
 
                 // make sure that nullability matches
                 if (metadata.isNullable(field)) {
-                    writer.beginControlFlow("if (!table.isColumnNullable(%s))", staticFieldIndexVarName(field));
+                    writer.beginControlFlow("if (!table.isColumnNullable(%s))", fieldIndexVariableReference(field));
                     if (Utils.isBoxedType(fieldTypeCanonicalName)) {
                         writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath()," +
                                 "\"Field '%s' does not support null values in the existing Realm file. " +
@@ -75,7 +64,7 @@
                     }
                     writer.endControlFlow();
                 } else {
-                    writer.beginControlFlow("if (table.isColumnNullable(%s))", staticFieldIndexVarName(field));
+                    writer.beginControlFlow("if (table.isColumnNullable(%s))", fieldIndexVariableReference(field));
                     if (Utils.isPrimitiveType(fieldTypeCanonicalName)) {
                         writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath()," +
                                 " \"Field '%s' does support null values in the existing Realm file. " +
@@ -121,9 +110,9 @@
 
                 writer.emitStatement("Table table_%d = transaction.getTable(\"%s%s\")", fieldIndex, Constants.TABLE_PREFIX, fieldTypeSimpleName);
                 writer.beginControlFlow("if (!table.getLinkTarget(%s).hasSameSchema(table_%d))",
-                        staticFieldIndexVarName(field), fieldIndex);
+                        fieldIndexVariableReference(field), fieldIndex);
                 writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath(), \"Invalid RealmObject for field '%s': '\" + table.getLinkTarget(%s).getName() + \"' expected - was '\" + table_%d.getName() + \"'\")",
-                        fieldName, staticFieldIndexVarName(field), fieldIndex);
+                        fieldName, fieldIndexVariableReference(field), fieldIndex);
                 writer.endControlFlow();
             } else if (Utils.isRealmList(field)) { // Link Lists
                 String genericType = Utils.getGenericType(field);
@@ -141,13 +130,15 @@
 
                 writer.emitStatement("Table table_%d = transaction.getTable(\"%s%s\")", fieldIndex, Constants.TABLE_PREFIX, genericType);
                 writer.beginControlFlow("if (!table.getLinkTarget(%s).hasSameSchema(table_%d))",
-                        staticFieldIndexVarName(field), fieldIndex);
+                        fieldIndexVariableReference(field), fieldIndex);
                 writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath(), \"Invalid RealmList type for field '%s': '\" + table.getLinkTarget(%s).getName() + \"' expected - was '\" + table_%d.getName() + \"'\")",
-                        fieldName, staticFieldIndexVarName(field), fieldIndex);
+                        fieldName, fieldIndexVariableReference(field), fieldIndex);
                 writer.endControlFlow();
             }
             fieldIndex++;
         }
+
+        writer.emitStatement("return %s", "columnInfo");
 
         writer.nextControlFlow("else");
         writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath(), \"The %s class is missing from the schema for this Realm.\")", metadata.getSimpleClassName());

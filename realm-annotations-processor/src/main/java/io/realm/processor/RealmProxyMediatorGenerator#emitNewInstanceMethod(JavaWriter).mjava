@@ -4,12 +4,12 @@
                 "<E extends RealmObject> E",
                 "newInstance",
                 EnumSet.of(Modifier.PUBLIC),
-                "Class<E>", "clazz"
+                "Class<E>", "clazz", "ColumnInfo", "columnInfo"
         );
         emitMediatorSwitch(new ProxySwitchStatement() {
             @Override
             public void emitStatement(int i, JavaWriter writer) throws IOException {
-                writer.emitStatement("return clazz.cast(new %s())", proxyClasses.get(i));
+                writer.emitStatement("return clazz.cast(new %s(columnInfo))", proxyClasses.get(i));
             }
         }, writer);
         writer.endMethod();

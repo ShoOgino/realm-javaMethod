@@ -1,9 +1,9 @@
     @Override
-    public Map<String, Long> getColumnIndices(Class<? extends RealmObject> clazz) {
+    public <E extends RealmObject> E newInstance(Class<E> clazz, ColumnInfo columnInfo) {
         checkClass(clazz);
 
         if (clazz.equals(AllTypes.class)) {
-            return AllTypesRealmProxy.getColumnIndices();
+            return clazz.cast(new AllTypesRealmProxy(columnInfo));
         } else {
             throw getMissingProxyClassException(clazz);
         }
