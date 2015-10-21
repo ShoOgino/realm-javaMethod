@@ -1,8 +1,8 @@
-    public void testUnloadedRealmListsShouldBeTheSameInstance() throws Throwable {
+    public void testCombiningAsyncAndSync() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
-        final Throwable[] threadAssertionError = new Throwable[1];
+        final Throwable[] threadAssertionError = new Throwable[1];// to catch both Exception & AssertionError
         final Looper[] backgroundLooper = new Looper[1];
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new Runnable() {
             @Override
             public void run() {
@@ -11,33 +11,25 @@
 
                 Realm realm = null;
                 try {
-                    realm = openRealmInstance("testUnloadedRealmListsShouldBeTheSameInstance");
-                    Realm.asyncQueryExecutor.pause();
-
+                    realm = openRealmInstance("testCombiningAsyncAndSync");
                     populateTestRealm(realm, 10);
-                    final AllTypes alltypes1 = realm.where(AllTypes.class)
-                            .equalTo("columnLong", 0)
-                            .findFirstAsync();
 
-                    final AllTypes alltypes2 = realm.where(AllTypes.class)
-                            .equalTo("columnLong", 4)
-                            .findFirstAsync();
+                    Realm.asyncQueryExecutor.pause();
+                    final RealmResults<AllTypes> allTypesAsync = realm.where(AllTypes.class).greaterThan("columnLong", 5).findAllAsync();
+                    final RealmResults<AllTypes> allTypesSync = allTypesAsync.where().greaterThan("columnLong", 3).findAll();
 
-                    assertFalse(alltypes1.isLoaded());
-                    assertNotNull(alltypes1.getColumnRealmList());
-                    assertEquals(0, alltypes1.getColumnRealmList().size());
-
-                    assertFalse(alltypes2.isLoaded());
-                    assertNotNull(alltypes2.getColumnRealmList());
-                    assertEquals(0, alltypes2.getColumnRealmList().size());
-
-                    assertEquals(alltypes1.getColumnRealmList(), alltypes2.getColumnRealmList());
-                    assertTrue(alltypes1.getColumnRealmList() == alltypes2.getColumnRealmList());
-
+                    assertEquals(0, allTypesAsync.size());
+                    assertEquals(6, allTypesSync.size());
+                    allTypesAsync.addChangeListener(new RealmChangeListener() {
+                        @Override
+                        public void onChange() {
+                            assertEquals(4, allTypesAsync.size());
+                            assertEquals(6, allTypesSync.size());
+                            signalCallbackFinished.countDown();
+                        }
+                    });
                     Realm.asyncQueryExecutor.resume();
-                    signalCallbackFinished.countDown();
                     Looper.loop();
-
                 } catch (Throwable e) {
                     e.printStackTrace();
                     threadAssertionError[0] = e;
@@ -54,8 +46,7 @@
         });
 
         // wait until the callback of our async query proceed
-        TestHelper.awaitOrFail(signalCallbackFinished);
-
+        TestHelper.awaitOrFail(signalCallbackFinished, 6000);
         executorService.shutdownNow();
         if (null != threadAssertionError[0]) {
             // throw any assertion errors happened in the background thread
