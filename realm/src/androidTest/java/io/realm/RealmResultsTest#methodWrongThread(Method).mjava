@@ -1,5 +1,6 @@
     public boolean methodWrongThread(final Method method) throws ExecutionException, InterruptedException {
         final RealmResults<AllTypes> allTypeses = testRealm.where(AllTypes.class).findAll();
+        testRealm.beginTransaction();
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
@@ -23,6 +24,16 @@
                             break;
                         case METHOD_WHERE:
                             allTypeses.where();
+                            break;
+                        case METHOD_REMOVE:
+                            allTypeses.remove(0);
+                            break;
+                        case METHOD_REMOVE_LAST:
+                            allTypeses.removeLast();
+                            break;
+                        case METHOD_CLEAR:
+                            allTypeses.clear();
+                            break;
                     }
                     return false;
                 } catch (IllegalStateException ignored) {
@@ -30,6 +41,8 @@
                 }
             }
         });
-        return future.get();
+        Boolean result = future.get();
+        testRealm.cancelTransaction();
+        return result;
     }
 
