@@ -1,0 +1,36 @@
+    private void emitColumnIndicesClass(JavaWriter writer) throws IOException {
+        writer.beginType(
+                columnInfoClassName(),                       // full qualified name of the item to generate
+                "class",                                     // the type of the item
+                EnumSet.of(Modifier.STATIC, Modifier.FINAL), // modifiers to apply
+                "ColumnInfo")                                // base class
+                .emitEmptyLine();
+
+        // fields
+        for (VariableElement variableElement : metadata.getFields()) {
+            writer.emitField("long", columnIndexVarName(variableElement),
+                    EnumSet.of(Modifier.PUBLIC, Modifier.FINAL));
+        }
+        writer.emitEmptyLine();
+
+        // constructor
+        writer.beginConstructor(EnumSet.noneOf(Modifier.class),
+                "Table", "table",
+                "String", "path");
+        writer.emitStatement("final Map<String, Long> indicesMap = new HashMap<String, Long>(%s)",
+                metadata.getFields().size());
+        for (VariableElement variableElement : metadata.getFields()) {
+            final String columnName = variableElement.getSimpleName().toString();
+            final String columnIndexVarName = columnIndexVarName(variableElement);
+            writer.emitStatement("this.%s = getValidColumnIndex(table, \"%s\", path, \"%s\")",
+                    columnIndexVarName, columnName, className);
+            writer.emitStatement("indicesMap.put(\"%s\", this.%s)", columnName, columnIndexVarName);
+            writer.emitEmptyLine();
+        }
+        writer.emitStatement("setIndicesMap(indicesMap)");
+        writer.endConstructor();
+
+        writer.endType();
+        writer.emitEmptyLine();
+    }
+

@@ -1,0 +1,46 @@
+    private RealmConfiguration prepareColumnSwappedRealm() {
+        final RealmConfiguration columnSwappedRealmConfigForV0 = new RealmConfiguration.Builder(getContext())
+                .name("columnSwapped.realm")
+                .migration(new RealmMigration() {
+                    @Override
+                    public long execute(Realm realm, long version) {
+                        final Table table = realm.getTable(StringAndInt.class);
+                        final long strIndex = table.getColumnIndex("str");
+                        final long numberIndex = table.getColumnIndex("number");
+
+                        while (0 < table.getColumnCount()) {
+                            table.removeColumn(0);
+                        }
+
+                        final long newStrIndex;
+                        // swap column indices
+                        if (strIndex < numberIndex) {
+                            table.addColumn(ColumnType.INTEGER, "number");
+                            newStrIndex = table.addColumn(ColumnType.STRING, "str");
+                        } else {
+                            newStrIndex = table.addColumn(ColumnType.STRING, "str");
+                            table.addColumn(ColumnType.INTEGER, "number");
+                        }
+                        table.convertColumnToNullable(newStrIndex);
+
+                        return 1L;
+                    }
+                })
+                .build();
+        final RealmConfiguration columnSwappedRealmConfigForV1 = new RealmConfiguration.Builder(getContext())
+                .name("columnSwapped.realm")
+                .migration(new RealmMigration() {
+                    @Override
+                    public long execute(Realm realm, long version) {
+                        return 1L;
+                    }
+                })
+                .schemaVersion(1L)
+                .build();
+
+        Realm.deleteRealm(columnSwappedRealmConfigForV0);
+        Realm.getInstance(columnSwappedRealmConfigForV0).close();
+        Realm.migrateRealm(columnSwappedRealmConfigForV0);
+        return columnSwappedRealmConfigForV1;
+    }
+

@@ -1,7 +1,7 @@
     private static synchronized Realm create(RealmConfiguration configuration) {
         boolean autoRefresh = Looper.myLooper() != null;
         try {
-            boolean validateSchema = !validatedRealmFiles.contains(configuration.getPath());
+            boolean validateSchema = !validatedRealmFiles.containsKey(configuration.getPath());
             return createAndValidate(configuration, validateSchema, autoRefresh);
 
         } catch (RealmMigrationNeededException e) {
