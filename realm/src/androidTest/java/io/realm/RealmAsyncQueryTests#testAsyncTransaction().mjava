@@ -1,6 +1,7 @@
     // start asynchronously a transaction to insert one element
     public void testAsyncTransaction() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
         final Realm[] realm = new Realm[1];
         final Throwable[] threadAssertionError = new Throwable[1];// to catch both Exception & AssertionError
         final Looper[] backgroundLooper = new Looper[1];
@@ -55,6 +56,7 @@
                     if (realm.length > 0 && realm[0] != null) {
                         realm[0].close();
                     }
+                    signalClosedRealm.countDown();
                 }
             }
         });
@@ -62,14 +64,17 @@
         // wait until the callback of our async query proceed
         TestHelper.awaitOrFail(signalCallbackFinished);
         executorService.shutdownNow();
-        if (null != threadAssertionError[0]) {
-            // throw any assertion errors happened in the background thread
-            throw threadAssertionError[0];
-        }
         if (backgroundLooper[0] != null) {
             // failing to quit the looper will not execute the finally block responsible
             // of closing the Realm
             backgroundLooper[0].quit();
+        }
+
+        TestHelper.awaitOrFail(signalClosedRealm);
+
+        if (null != threadAssertionError[0]) {
+            // throw any assertion errors happened in the background thread
+            throw threadAssertionError[0];
         }
     }
 
