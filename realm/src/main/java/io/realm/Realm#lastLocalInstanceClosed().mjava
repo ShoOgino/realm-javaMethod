@@ -1,6 +1,9 @@
     @Override
     protected void lastLocalInstanceClosed() {
-        validatedRealmFiles.remove(configuration.getPath());
+        // validatedRealmFiles must not modified while other thread is executing createAndValidate()
+        synchronized (BaseRealm.class) {
+            validatedRealmFiles.remove(configuration.getPath());
+        }
         realmsCache.get().remove(configuration);
     }
 
