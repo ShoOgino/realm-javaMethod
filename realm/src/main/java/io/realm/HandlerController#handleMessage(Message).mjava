@@ -7,7 +7,7 @@
         // longer exists. `sharedGroupManager` will only be null if a Realm is really closed.
         if (realm.sharedGroupManager != null) {
             switch (message.what) {
-                case Realm.REALM_CHANGED: {
+                case REALM_CHANGED: {
                     if (threadContainsAsyncQueries()) {
                         updateAsyncQueries();
 
@@ -18,22 +18,26 @@
                     }
                     break;
                 }
-                case Realm.REALM_COMPLETED_ASYNC_QUERY: {
+                case REALM_COMPLETED_ASYNC_QUERY: {
                     // one async query has completed
                     QueryUpdateTask.Result result = (QueryUpdateTask.Result) message.obj;
                     completedAsyncQueryUpdate(result);
                     break;
                 }
-                case Realm.REALM_UPDATE_ASYNC_QUERIES: {
+                case REALM_UPDATE_ASYNC_QUERIES: {
                     // this is called once the background thread completed the update of the async queries
                     QueryUpdateTask.Result result = (QueryUpdateTask.Result) message.obj;
                     completedAsyncQueriesUpdate(result);
                     break;
                 }
-                case Realm.REALM_COMPLETED_ASYNC_FIND_FIRST: {
+                case REALM_COMPLETED_ASYNC_FIND_FIRST: {
                     QueryUpdateTask.Result result = (QueryUpdateTask.Result) message.obj;
                     completedAsyncFindFirst(result);
                     break;
+                }
+                case REALM_ASYNC_BACKGROUND_EXCEPTION: {
+                    // Don't fail silently in the background in case of Core exception
+                    throw (Error) message.obj;
                 }
             }
         }

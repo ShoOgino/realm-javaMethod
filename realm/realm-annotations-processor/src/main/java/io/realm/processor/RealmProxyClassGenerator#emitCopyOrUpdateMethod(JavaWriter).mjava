@@ -34,7 +34,9 @@
 
             writer
                 .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
-                    .emitStatement("realmObject = new %s()", Utils.getProxyClassName(className))
+                    .emitStatement("realmObject = new %s(realm.getColumnInfo(%s.class))",
+                            Utils.getProxyClassName(className),
+                            className)
                     .emitStatement("realmObject.realm = realm")
                     .emitStatement("realmObject.row = table.getUncheckedRow(rowIndex)")
                     .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")

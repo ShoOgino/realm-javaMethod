@@ -4,8 +4,11 @@
      *
      * Using this method while iterating the list can result in a undefined behavior. Use
      * {@link io.realm.RealmResults.RealmResultsListIterator#removeLast()} instead.
+     *
+     * @throws IllegalStateException if the corresponding Realm is closed or in an incorrect thread.
      */
     public void removeLast() {
+        realm.checkIfValid();
         TableOrView table = getTable();
         table.removeLast();
     }

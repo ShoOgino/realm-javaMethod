@@ -6,9 +6,11 @@
      *
      * @param index      The array index identifying the object to be removed.
      * @return           Always return {@code null}.
+     * @throws IllegalStateException if the corresponding Realm is closed or in an incorrect thread.
      */
     @Override
     public E remove(int index) {
+        realm.checkIfValid();
         TableOrView table = getTable();
         table.remove(index);
         return null; // Returning the object doesn't make sense, since it could no longer access any data.

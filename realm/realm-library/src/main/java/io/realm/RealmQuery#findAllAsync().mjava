@@ -1,6 +1,6 @@
     /**
      * Find all objects that fulfill the query conditions and sorted by specific field name.
-     * This method is only available from a Looper thread
+     * This method is only available from a Looper thread.
      *
      * @return immediately an empty {@link RealmResults}. Users need to register a listener
      * {@link io.realm.RealmResults#addChangeListener(RealmChangeListener)} to be notified
@@ -48,17 +48,13 @@
                         QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResultsResponse();
                         result.updatedTableViews.put(weakRealmResults, handoverTableViewPointer);
                         result.versionID = sharedGroup.getVersion();
-
-                        // notify the caller thread
-                        Handler handler = weakHandler.get();
-                        if (handler != null && handler.getLooper().getThread().isAlive()) {
-                            handler.obtainMessage(Realm.REALM_COMPLETED_ASYNC_QUERY, result).sendToTarget();
-                        }
+                        sendMessageToHandler(weakHandler, HandlerController.REALM_COMPLETED_ASYNC_QUERY, result);
 
                         return handoverTableViewPointer;
 
                     } catch (Exception e) {
                         RealmLog.e(e.getMessage());
+                        sendMessageToHandler(weakHandler, HandlerController.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
 
                     } finally {
                         if (null != sharedGroup) {

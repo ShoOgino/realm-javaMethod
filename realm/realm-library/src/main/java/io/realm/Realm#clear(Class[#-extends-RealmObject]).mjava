@@ -2,9 +2,11 @@
      * Remove all objects of the specified class.
      *
      * @param clazz The class which objects should be removed
+     * @throws IllegalStateException if the corresponding Realm is closed or in an incorrect thread.
      * @throws java.lang.RuntimeException Any other error
      */
     public void clear(Class<? extends RealmObject> clazz) {
+        checkIfValid();
         getTable(clazz).clear();
     }
 

@@ -1,7 +1,7 @@
     <E extends RealmObject> E get(Class<E> clazz, long rowIndex) {
         Table table = getTable(clazz);
         UncheckedRow row = table.getUncheckedRow(rowIndex);
-        E result = configuration.getSchemaMediator().newInstance(clazz);
+        E result = configuration.getSchemaMediator().newInstance(clazz, getColumnInfo(clazz));
         result.row = row;
         result.realm = this;
         return result;

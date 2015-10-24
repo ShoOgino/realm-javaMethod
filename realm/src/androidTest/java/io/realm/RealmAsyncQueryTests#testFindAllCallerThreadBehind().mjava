@@ -27,7 +27,7 @@
                         @Override
                         public boolean onInterceptMessage(int what) {
                             switch (what) {
-                                case Realm.REALM_CHANGED: {
+                                case HandlerController.REALM_CHANGED: {
                                     // should only intercept the first REALM_CHANGED coming from the
                                     // background update thread
 
@@ -37,11 +37,11 @@
                                     // upcoming REALM_CHANGED to batch update all async queries
                                     return numberOfInterceptedChangeMessage.getAndIncrement() == 0;
                                 }
-                                case Realm.REALM_COMPLETED_ASYNC_QUERY: {
+                                case HandlerController.REALM_COMPLETED_ASYNC_QUERY: {
                                     if (numberOfCompletedAsyncQuery.incrementAndGet() == 2) {
                                         // both queries have completed now (& their results should be ignored)
                                         // now send the REALM_CHANGED event that should batch update all queries
-                                        sendEmptyMessage(Realm.REALM_CHANGED);
+                                        sendEmptyMessage(HandlerController.REALM_CHANGED);
                                     }
                                 }
                             }
