@@ -1,0 +1,33 @@
+    public static Table initTable(ImplicitTransaction transaction) {
+        if (!transaction.hasTable("class_NullTypes")) {
+            Table table = transaction.getTable("class_NullTypes");
+            table.addColumn(ColumnType.STRING, "fieldStringNotNull", Table.NOT_NULLABLE);
+            table.addColumn(ColumnType.STRING, "fieldStringNull", Table.NULLABLE);
+            table.addColumn(ColumnType.BOOLEAN, "fieldBooleanNotNull", Table.NOT_NULLABLE);
+            table.addColumn(ColumnType.BOOLEAN, "fieldBooleanNull", Table.NULLABLE);
+            table.addColumn(ColumnType.BINARY, "fieldBytesNotNull", Table.NOT_NULLABLE);
+            table.addColumn(ColumnType.BINARY, "fieldBytesNull", Table.NULLABLE);
+            table.addColumn(ColumnType.INTEGER, "fieldByteNotNull", Table.NOT_NULLABLE);
+            table.addColumn(ColumnType.INTEGER, "fieldByteNull", Table.NULLABLE);
+            table.addColumn(ColumnType.INTEGER, "fieldShortNotNull", Table.NOT_NULLABLE);
+            table.addColumn(ColumnType.INTEGER, "fieldShortNull", Table.NULLABLE);
+            table.addColumn(ColumnType.INTEGER, "fieldIntegerNotNull", Table.NOT_NULLABLE);
+            table.addColumn(ColumnType.INTEGER, "fieldIntegerNull", Table.NULLABLE);
+            table.addColumn(ColumnType.INTEGER, "fieldLongNotNull", Table.NOT_NULLABLE);
+            table.addColumn(ColumnType.INTEGER, "fieldLongNull", Table.NULLABLE);
+            table.addColumn(ColumnType.FLOAT, "fieldFloatNotNull", Table.NOT_NULLABLE);
+            table.addColumn(ColumnType.FLOAT, "fieldFloatNull", Table.NULLABLE);
+            table.addColumn(ColumnType.DOUBLE, "fieldDoubleNotNull", Table.NOT_NULLABLE);
+            table.addColumn(ColumnType.DOUBLE, "fieldDoubleNull", Table.NULLABLE);
+            table.addColumn(ColumnType.DATE, "fieldDateNotNull", Table.NOT_NULLABLE);
+            table.addColumn(ColumnType.DATE, "fieldDateNull", Table.NULLABLE);
+            if (!transaction.hasTable("class_NullTypes")) {
+                NullTypesRealmProxy.initTable(transaction);
+            }
+            table.addColumnLink(ColumnType.LINK, "fieldObjectNull", transaction.getTable("class_NullTypes"));
+            table.setPrimaryKey("");
+            return table;
+        }
+        return transaction.getTable("class_NullTypes");
+    }
+
