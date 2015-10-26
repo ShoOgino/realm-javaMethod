@@ -65,21 +65,6 @@
             }
         });
 
-        // wait until the callback of our async query proceed
-        TestHelper.awaitOrFail(signalCallbackFinished);
-        if (backgroundLooper[0] != null) {
-            // failing to quit the looper will not execute the finally block responsible
-            // of closing the Realm
-            backgroundLooper[0].quit();
-        }
-
-        TestHelper.awaitOrFail(signalClosedRealm);
-
-        if (null != threadAssertionError[0]) {
-            // throw any assertion errors happened in the background thread
-            throw threadAssertionError[0];
-        }
-
-        executorService.shutdownNow();
+        exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
     }
 
