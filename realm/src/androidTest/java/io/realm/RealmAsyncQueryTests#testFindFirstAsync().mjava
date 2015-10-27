@@ -1,6 +1,7 @@
     // similar UC as #testFindAllAsync using 'findFirst'
     public void testFindFirstAsync() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
         final Looper[] backgroundLooper = new Looper[1];
         final RealmObject[] result = new RealmObject[1];
@@ -55,21 +56,11 @@
                     if (realm != null) {
                         realm.close();
                     }
+                    signalClosedRealm.countDown();
                 }
             }
         });
 
-        // wait until the callback of our async query proceed
-        TestHelper.awaitOrFail(signalCallbackFinished);
-        if (null != threadAssertionError[0]) {
-            // throw any assertion errors happened in the background thread
-            throw threadAssertionError[0];
-        }
-        if (backgroundLooper[0] != null) {
-            // failing to quit the looper will not execute the finally block responsible
-            // of closing the Realm
-            backgroundLooper[0].quit();
-        }
-        executorService.shutdownNow();
+        exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
     }
 
