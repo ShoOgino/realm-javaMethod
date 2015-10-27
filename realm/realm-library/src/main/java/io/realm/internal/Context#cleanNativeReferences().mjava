@@ -1,7 +1,7 @@
-    public void cleanRows() {
+    public void cleanNativeReferences() {
         NativeObjectReference reference = (NativeObjectReference) referenceQueue.poll();
         while (reference != null) {
-            UncheckedRow.nativeClose(reference.nativePointer);
+            reference.clear();
             rowReferences.remove(reference);
             reference = (NativeObjectReference) referenceQueue.poll();
         }
