@@ -1,6 +1,6 @@
     private void emitClassFields(JavaWriter writer) throws IOException {
         writer.emitField(columnInfoClassName(), "columnInfo", EnumSet.of(Modifier.PRIVATE, Modifier.FINAL));
-        Set<String> emptyRealmLists = new HashSet<String>();
+        List<String> emptyRealmListInitializations = new ArrayList<String>();
         for (VariableElement variableElement : metadata.getFields()) {
             if (Utils.isRealmList(variableElement)) {
                 String genericType = Utils.getGenericType(variableElement);
@@ -9,14 +9,14 @@
                 String emptyRealmListName = "EMPTY_REALM_LIST_" + variableElement.getSimpleName().toString().toUpperCase();
                 writer.emitField("RealmList<" + genericType + ">", emptyRealmListName,
                         EnumSet.of(Modifier.PRIVATE, Modifier.STATIC));
-                emptyRealmLists.add(emptyRealmListName);
+                emptyRealmListInitializations.add(String.format("%s = new RealmList<%s>()", emptyRealmListName, genericType));
             }
         }
 
         writer.emitField("List<String>", "FIELD_NAMES", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL));
         writer.beginInitializer(true);
-        for (String emptyRealmListName : emptyRealmLists) {
-            writer.emitStatement(emptyRealmListName + " = new RealmList()");
+        for (String emptyListInitializationStatement : emptyRealmListInitializations) {
+            writer.emitStatement(emptyListInitializationStatement);
         }
         writer.emitStatement("List<String> fieldNames = new ArrayList<String>()");
         for (VariableElement field : metadata.getFields()) {

@@ -8,10 +8,10 @@
                  * Primitives and boxed types
                  */
                 String realmType = Constants.JAVA_TO_REALM_TYPES.get(fieldTypeCanonicalName);
-                String castingType = Constants.CASTING_TYPES.get(fieldTypeCanonicalName);
 
                 // Getter
                 writer.emitAnnotation("Override");
+                writer.emitAnnotation("SuppressWarnings", "\"cast\"");
                 writer.beginMethod(fieldTypeCanonicalName, metadata.getGetter(fieldName), EnumSet.of(Modifier.PUBLIC));
                 writer.emitStatement("realm.checkIfValid()");
 
@@ -55,8 +55,8 @@
                         .endControlFlow();
                 }
                 writer.emitStatement(
-                        "row.set%s(%s, (%s) value)",
-                        realmType, fieldIndexVariableReference(field), castingType);
+                        "row.set%s(%s, value)",
+                        realmType, fieldIndexVariableReference(field));
                 writer.endMethod();
             } else if (Utils.isRealmObject(field)) {
                 /**

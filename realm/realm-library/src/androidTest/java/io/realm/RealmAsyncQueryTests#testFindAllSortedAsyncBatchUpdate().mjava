@@ -1,6 +1,7 @@
     // similar UC as #testFindAllAsyncBatchUpdate using 'findAllSorted'
     public void testFindAllSortedAsyncBatchUpdate() throws Throwable {
         final CountDownLatch signalCallbackFinished = new CountDownLatch(2);
+        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
         final Throwable[] threadAssertionError = new Throwable[1];
         final Looper[] backgroundLooper = new Looper[1];
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -147,24 +148,13 @@
                     if (realm != null) {
                         realm.close();
                     }
+                    signalClosedRealm.countDown();
                 }
             }
         });
 
-        TestHelper.awaitOrFail(signalCallbackFinished);
+        exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
         assertEquals(2, numberOfNotificationsQuery1.get());
         assertEquals(2, numberOfNotificationsQuery2.get());
-
-        if (null != threadAssertionError[0]) {
-            // throw any assertion errors happened in the background thread
-            throw threadAssertionError[0];
-        }
-        if (backgroundLooper[0] != null) {
-            // failing to quit the looper will not execute the finally block responsible
-            // of closing the Realm
-            backgroundLooper[0].quit();
-        }
-
-        executorService.shutdownNow();
     }
 
