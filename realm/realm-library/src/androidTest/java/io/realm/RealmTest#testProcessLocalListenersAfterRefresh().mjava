@@ -10,13 +10,13 @@
             @Override
             public void run() {
                 Realm bgRealm = Realm.getInstance(testConfig);
-                bgRealm.addChangeListener(new RealmChangeListener() {
-                    @Override
-                    public void onChange() {
-                        listenerWasCalled.set(true);
-                    }
-                });
                 try {
+                    bgRealm.addChangeListener(new RealmChangeListener() {
+                        @Override
+                        public void onChange() {
+                            listenerWasCalled.set(true);
+                        }
+                        });
                     bgThreadLatch.await(); // Wait for the main thread to do a write operation
                     bgRealm.refresh(); // This should call the listener
                     assertTrue(listenerWasCalled.get());
