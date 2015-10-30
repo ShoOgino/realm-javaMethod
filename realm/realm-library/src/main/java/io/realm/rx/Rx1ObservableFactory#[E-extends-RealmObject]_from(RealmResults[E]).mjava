@@ -1,0 +1,20 @@
+    /**
+     * Creates an Observable for a RealmResults. It will emit the initial results when subscribed to and on each
+     * update to the results.
+     *
+     * @param results RealmObject to listen to changes for.
+     * @param <E> Type of RealmObject
+     */
+    public static <E extends RealmObject> Observable<RealmResults<E>> from(final RealmResults<E> results) {
+        final BehaviorSubject<RealmResults<E>> subject = BehaviorSubject.create(results);
+        // TODO This currently triggers on all changes in Realm. Replace with fine-grained notifications when possible.
+        results.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                // TODO This should ideally be a threadsafe, immutable object. Currently it is not :(
+                subject.onNext(results);
+            }
+        });
+        return subject.asObservable();
+    }
+
