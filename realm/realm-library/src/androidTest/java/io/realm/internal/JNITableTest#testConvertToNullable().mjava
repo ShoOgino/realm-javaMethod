@@ -25,6 +25,7 @@
                         table.setBinaryByteArray(colIndex, 0, new byte[]{0});
                     else if (columnType == ColumnType.STRING)
                         table.setString(colIndex, 0, "Foo");
+                    // if column is nullable not exception should be thrown
                     try {
                         table.addEmptyRow();
                         if (columnType == ColumnType.BINARY)
@@ -38,6 +39,9 @@
                             fail();
                         }
                     } catch (IllegalArgumentException ignored) {
+                        if (nullable) {
+                            fail();
+                        }
                     }
                     table.removeLast();
                     assertEquals(1, table.size());
@@ -50,6 +54,7 @@
                     assertEquals(colIndex, table.getColumnIndex(columnName));
 
                     table.addEmptyRow();
+                    // after converting to nullable, it is fine to set value to null i.e. no exception is thrown
                     if (columnType == ColumnType.BINARY)
                         table.setBinaryByteArray(colIndex, 0, null);
                     else if (columnType == ColumnType.STRING)
