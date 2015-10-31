@@ -1,0 +1,34 @@
+    /**
+     * Creates an Observable for a RealmObject. It will emit the initial object when subscribed to and on each update
+     * to the object.
+     *
+     * RealmObject observables are effectively hot observables as RealmObjects auto-update.
+     *
+     * @param object RealmObject to listen to changes for.
+     * @param <E> Type of RealmObject
+     */
+    public static <E extends RealmObject> Observable<E> from(final E object) {
+        return Observable.create(new Observable.OnSubscribe<E>() {
+            @Override
+            public void call(final Subscriber<? super E> subscriber) {
+                final RealmChangeListener listener = new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        subscriber.onNext(object);
+                    }
+                };
+                object.addChangeListener(listener);
+                subscriber.add(Subscriptions.create(new Action0() {
+                    @Override
+                    public void call() {
+                        object.removeChangeListener(listener);
+                    }
+                }));
+
+                // Immediately call onNext with the current value as due to Realms auto-update it will be the latest
+                // value. This mimics a BehaviorSubject.
+                subscriber.onNext(object);
+            }
+        });
+    }
+
