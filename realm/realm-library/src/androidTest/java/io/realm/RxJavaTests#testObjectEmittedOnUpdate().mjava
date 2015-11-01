@@ -1,0 +1,21 @@
+    public void testObjectEmittedOnUpdate() {
+        final AtomicInteger subscriberCalled = new AtomicInteger(0);
+
+        realm.beginTransaction();
+        final AllTypes obj = realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        obj.observable().subscribe(new Action1<AllTypes>() {
+            @Override
+            public void call(AllTypes rxObject) {
+                subscriberCalled.addAndGet(1);
+            }
+        });
+
+        realm.beginTransaction();
+        obj.setColumnLong(1);
+        realm.commitTransaction();
+
+        assertEquals(2, subscriberCalled.get());
+    }
+
