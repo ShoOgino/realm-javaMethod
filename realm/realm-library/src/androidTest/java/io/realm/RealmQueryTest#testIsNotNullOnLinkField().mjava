@@ -35,12 +35,12 @@
         // 11 Object
         //assertEquals(1, testRealm.where(NullTypes.class).isNotNull(
         //        NullTypes.FIELD_OBJECT_NULL + "." + NullTypes.FIELD_OBJECT_NULL).count());
-        // FIXME: Currently, link queries don't work fully on null
+        // FIXME: Currently, Realm Core does not support isNotNull() query for nested link field.
         try {
             testRealm.where(NullTypes.class).isNotNull(
-                    NullTypes.FIELD_OBJECT_NULL + "." + NullTypes.FIELD_OBJECT_NULL).count();
+                    NullTypes.FIELD_OBJECT_NULL + "." + NullTypes.FIELD_OBJECT_NULL);
             fail();
-        } catch (RealmError ignored) {
+        } catch (IllegalArgumentException ignored) {
         }
     }
 
