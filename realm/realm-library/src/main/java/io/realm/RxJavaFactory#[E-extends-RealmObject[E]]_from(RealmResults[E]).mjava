@@ -1,13 +1,6 @@
-    /**
-     * Creates an Observable for a RealmResults. It will emit the initial results when subscribed to and on each
-     * update to the results.
-     *
-     * RealmResults observables are effectively hot observables as RealmObjects auto-update.
-     *
-     * @param results RealmResults to listen to changes for.
-     * @param <E> Type of RealmObject
-     */
-    public static <E extends RealmObject> Observable<RealmResults<E>> from(final RealmResults<E> results) {
+    @Override
+    public <E extends RealmObject<E>> Observable<RealmResults<E>> from(final RealmResults<E> results) {
+        checkRxJavaAvailable();
         return Observable.create(new Observable.OnSubscribe<RealmResults<E>>() {
             @Override
             public void call(final Subscriber<? super RealmResults<E>> subscriber) {
@@ -26,7 +19,7 @@
                 }));
 
                 // Immediately call onNext with the current value as due to Realms auto-update it will be the latest
-                // value. This mimics a BehaviorSubject.
+                // value.
                 subscriber.onNext(results);
             }
         });
