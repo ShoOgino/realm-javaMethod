@@ -9,7 +9,8 @@
     public static UncheckedRow getByRowIndex(Context context, Table table, long index) {
         long nativeRowPointer = table.nativeGetRowPtr(table.nativePtr, index);
         UncheckedRow row = new UncheckedRow(context, table, nativeRowPointer);
-        context.rowReferences.put(new NativeObjectReference(row, context.referenceQueue), Context.ROW_REFERENCES_VALUE);
+        context.rowReferences.put(new UncheckedRowNativeObjectReference(row, context.referenceQueue),
+                Context.NATIVE_REFERENCES_VALUE);
         return row;
     }
 
