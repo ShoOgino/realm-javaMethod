@@ -13,11 +13,12 @@
         try {
             transaction.execute(this);
             commitTransaction();
-        } catch (RuntimeException e) {
-            cancelTransaction();
-            throw new RealmException("Error during transaction.", e);
-        } catch (Error e) {
-            cancelTransaction();
+        } catch (Throwable e) {
+            if (isInTransaction()) {
+                cancelTransaction();
+            } else {
+                RealmLog.w("Could not cancel transaction, not currently in a transaction.");
+            }
             throw e;
         }
     }
