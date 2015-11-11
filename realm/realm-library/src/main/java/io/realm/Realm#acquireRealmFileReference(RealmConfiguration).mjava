@@ -1,0 +1,17 @@
+    /**
+     * Acquire a reference to the given Realm file.
+     * This function call should be called in a synchronized block on {@code BaseRealm.class}.
+     *
+     * @return the reference count after acquiring.
+     */
+    private static int acquireRealmFileReference(RealmConfiguration configuration) {
+        String path = configuration.getPath();
+        Integer refCount = typedRealmFileReferenceCounter.get(path);
+        if (refCount == null) {
+            refCount = 0;
+        }
+        refCount += 1;
+        typedRealmFileReferenceCounter.put(path, refCount);
+        return refCount;
+    }
+
