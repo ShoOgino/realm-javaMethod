@@ -1,0 +1,12 @@
+    public void testCannotRefreshInTransaction() {
+        testRealm.beginTransaction();
+        try {
+            testRealm.refresh();
+            fail("Cannot refresh in a Transaction. Expected IllegalStateException to be thrown.");
+        } catch (IllegalStateException e) {
+            assertEquals(e.getMessage(), "Cannot refresh inside of a transaction.");
+        } finally {
+            testRealm.cancelTransaction();
+        }
+    }
+
