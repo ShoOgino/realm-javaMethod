@@ -1,0 +1,10 @@
+    // Test sum on columns with partial null rows
+    public void testSumGivesCorrectValueForPartialNullRows() {
+        TestHelper.populatePartialNullRowsForNumericTesting(testRealm);
+        RealmQuery<NullTypes> query = testRealm.where(NullTypes.class);
+
+        assertEquals(7, query.sum(NullTypes.FIELD_INTEGER_NULL).intValue());
+        assertEquals(9f, query.sum(NullTypes.FIELD_FLOAT_NULL).floatValue());
+        assertEquals(11d, query.sum(NullTypes.FIELD_DOUBLE_NULL).doubleValue());
+    }
+
