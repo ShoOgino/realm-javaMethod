@@ -8,18 +8,16 @@
      *     <li>On every call to {@link io.realm.Realm#refresh()}</li>
      * </ul>
      *
+     * Listeners are stored as a strong reference, you need to remove the added listeners using {@link #removeChangeListener(RealmChangeListener)}
+     * or {@link #removeAllChangeListeners()} which removes all listeners including the ones added via anonymous classes.
+     *
      * @param listener the change listener.
      * @see io.realm.RealmChangeListener
+     * @see #removeChangeListener(RealmChangeListener)
+     * @see #removeAllChangeListeners()
      */
     public void addChangeListener(RealmChangeListener listener) {
         checkIfValid();
-        for (WeakReference<RealmChangeListener> ref : changeListeners) {
-            if (ref.get() == listener) {
-                // It has already been added before
-                return;
-            }
-        }
-
-        changeListeners.add(new WeakReference<RealmChangeListener>(listener));
+        changeListeners.addIfAbsent(listener);
     }
 
