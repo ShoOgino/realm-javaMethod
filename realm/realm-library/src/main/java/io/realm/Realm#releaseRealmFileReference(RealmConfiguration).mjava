@@ -1,0 +1,22 @@
+    /**
+     * Releases a reference to the Realm file. If reference count reaches 0 any cached configurations
+     * will be removed.
+     * This function call should be called in a synchronized block on BaseRealm.class
+     *
+     * @return the reference count after releasing.
+     */
+    private static int releaseRealmFileReference(RealmConfiguration configuration) {
+        String path = configuration.getPath();
+        Integer refCount = typedRealmFileReferenceCounter.get(path);
+        if (refCount == null || refCount <= 0) {
+            throw new IllegalStateException("Trying to release a Realm file that is already closed");
+        }
+        refCount -= 1;
+        if (refCount == 0) {
+            typedRealmFileReferenceCounter.remove(path);
+        } else {
+            typedRealmFileReferenceCounter.put(path, refCount);
+        }
+        return refCount;
+    }
+

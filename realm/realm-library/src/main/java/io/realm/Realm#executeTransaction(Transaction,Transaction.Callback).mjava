@@ -43,11 +43,19 @@
                                 });
                             }
                         } else {
-                            bgRealm.cancelTransaction();
+                            if (bgRealm.isInTransaction()) {
+                                bgRealm.cancelTransaction();
+                            } else {
+                                RealmLog.w("Thread is interrupted. Could not cancel transaction, not currently in a transaction.");
+                            }
                         }
 
                     } catch (final Exception e) {
-                        bgRealm.cancelTransaction();
+                        if (bgRealm.isInTransaction()) {
+                            bgRealm.cancelTransaction();
+                        } else {
+                            RealmLog.w("Could not cancel transaction, not currently in a transaction.");
+                        }
                         if (callback != null
                                 && handler != null
                                 && !Thread.currentThread().isInterrupted()
