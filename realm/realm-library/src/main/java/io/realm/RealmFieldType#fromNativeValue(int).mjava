@@ -1,0 +1,17 @@
+    /**
+     * Converts the underlying value used by the storage engine to the proper Realm type.
+     *
+     * @param value Value to convert
+     * @return The corresponding Realm type.
+     * @throws IllegalArgumentException if value isn't valid.
+     */
+    public static RealmFieldType fromNativeValue(int value) {
+        if (0 <= value && value < typeList.length) {
+            RealmFieldType e = typeList[value];
+            if (e != null) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Invalid native Realm type: " + value);
+    }
+

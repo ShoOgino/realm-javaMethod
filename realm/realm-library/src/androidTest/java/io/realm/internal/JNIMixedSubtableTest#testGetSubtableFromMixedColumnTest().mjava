@@ -1,8 +1,9 @@
     public void testGetSubtableFromMixedColumnTest() {
+        Util.setDebugLevel(2);
         Table table = new Table();
 
-        table.addColumn(ColumnType.INTEGER, "num");
-        table.addColumn(ColumnType.MIXED, "mix");
+        table.addColumn(RealmFieldType.INTEGER, "num");
+        table.addColumn(RealmFieldType.UNSUPPORTED_MIXED, "mix");
 
         // No rows added yet
         try { Table subtable = table.getSubtable(1, 0); fail("No rows added, index out of bounds"); } catch (ArrayIndexOutOfBoundsException e) { }
@@ -49,7 +50,7 @@
 
         /* FIXME: Subtable in Mixed is currently not supported
         // Now we specifically set the Mixed value to a subtable
-        table.setMixed(1, 0, new Mixed(ColumnType.TABLE));
+        table.setMixed(1, 0, new Mixed(RealmFieldType.UNSUPPORTED_TABLE));
         // Getting a subtable on the mixed column is now allowed
         Table subtable = table.getSubtable(1, 0);
         */

@@ -2,7 +2,7 @@
         // zero fields specified
         try {
             RealmResults<AllTypes> results = testRealm.where(AllTypes.class)
-                    .findAllSorted(new String[]{}, new boolean[]{});
+                    .findAllSorted(new String[]{}, new Sort[]{});
             fail();
         } catch (IllegalArgumentException ignored) {
         }
@@ -11,29 +11,27 @@
         try {
             RealmResults<AllTypes> results = testRealm.where(AllTypes.class)
                     .findAllSorted(new String[]{FIELD_STRING},
-                            new boolean[]{RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_ASCENDING});
+                            new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
             fail();
         } catch (IllegalArgumentException ignored) {
         }
 
         // null is not allowed
         try {
-            RealmResults<AllTypes> results = testRealm.where(AllTypes.class).findAllSorted((String[]) null, null);
+            testRealm.where(AllTypes.class).findAllSorted((String[]) null, null);
             fail();
         } catch (IllegalArgumentException ignored) {
         }
         try {
-            RealmResults<AllTypes> results = testRealm.where(AllTypes.class).findAllSorted(new String[]{FIELD_STRING},
-                    null);
+            testRealm.where(AllTypes.class).findAllSorted(new String[]{FIELD_STRING}, null);
             fail();
         } catch (IllegalArgumentException ignored) {
         }
 
         // non-existing field name
         try {
-            RealmResults<AllTypes> results = testRealm.where(AllTypes.class)
-                    .findAllSorted(new String[]{FIELD_STRING, "dont-exist"},
-                            new boolean[]{RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_ASCENDING});
+            testRealm.where(AllTypes.class)
+                    .findAllSorted(new String[]{FIELD_STRING, "dont-exist"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
             fail();
         } catch (IllegalArgumentException ignored) {
         }

@@ -1,0 +1,28 @@
+    /**
+     * Returns the value for the given field.
+     *
+     * @param fieldName name of the field.
+     * @return the field value.
+     * @throws ClassCastException if the field doesn't contain a field of the defined return type.
+     */
+    @SuppressWarnings("unchecked")
+    public <E> E get(String fieldName) {
+        long columnIndex = row.getColumnIndex(fieldName);
+        RealmFieldType type = row.getColumnType(columnIndex);
+        switch (type) {
+            case BOOLEAN: return (E) Boolean.valueOf(row.getBoolean(columnIndex));
+            case INTEGER: return (E) Long.valueOf(row.getLong(columnIndex));
+            case FLOAT: return (E) Float.valueOf(row.getFloat(columnIndex));
+            case DOUBLE: return (E) Double.valueOf(row.getDouble(columnIndex));
+            case STRING: return (E) row.getString(columnIndex);
+            case BINARY: return (E) row.getBinaryByteArray(columnIndex);
+            case DATE: return (E) row.getDate(columnIndex);
+            case OBJECT: return (E) getObject(fieldName);
+            case LIST: return (E) getList(fieldName);
+            case UNSUPPORTED_TABLE:
+            case UNSUPPORTED_MIXED:
+            default:
+                throw new IllegalStateException("Field type not supported: " + type);
+        }
+    }
+

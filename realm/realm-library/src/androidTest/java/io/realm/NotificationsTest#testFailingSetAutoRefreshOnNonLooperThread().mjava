@@ -17,6 +17,7 @@
             }
         });
         assertTrue(future.get());
-        assertTrue(Realm.realmsCache.get().isEmpty());
+        RealmCache.invokeWithGlobalRefCount(new RealmConfiguration.Builder(getContext()).build(),
+                new TestHelper.ExpectedCountCallback(this, 0));
     }
 

@@ -1,14 +1,14 @@
     public void testSortByString() {
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
         RealmResults<AllTypes> sortedList = resultList.where().findAll();
-        sortedList.sort(FIELD_STRING, RealmResults.SORT_ORDER_DESCENDING);
+        sortedList.sort(FIELD_STRING, Sort.DESCENDING);
 
         assertEquals(resultList.size(), sortedList.size());
         assertEquals(TEST_DATA_SIZE, sortedList.size());
         assertEquals(resultList.first().getColumnString(), sortedList.last().getColumnString());
 
         RealmResults<AllTypes> reverseList = sortedList.where().findAll();
-        reverseList.sort(FIELD_STRING, RealmResults.SORT_ORDER_ASCENDING);
+        reverseList.sort(FIELD_STRING, Sort.ASCENDING);
         assertEquals(TEST_DATA_SIZE, reverseList.size());
         assertEquals(resultList.first().getColumnString(), reverseList.first().getColumnString());
 
@@ -19,7 +19,7 @@
         largestNumber = largestNumber - 1;
         assertEquals(resultList.get(largestNumber).getColumnString(), reverseList.last().getColumnString());
         RealmResults<AllTypes> reverseSortedList = reverseList.where().findAll();
-        reverseList.sort(FIELD_STRING, RealmResults.SORT_ORDER_DESCENDING);
+        reverseList.sort(FIELD_STRING, Sort.DESCENDING);
         assertEquals(TEST_DATA_SIZE, reverseSortedList.size());
     }
 

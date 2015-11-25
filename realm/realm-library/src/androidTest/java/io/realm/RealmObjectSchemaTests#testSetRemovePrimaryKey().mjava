@@ -1,0 +1,12 @@
+    public void testSetRemovePrimaryKey() {
+        for (PrimaryKeyFieldType fieldType : PrimaryKeyFieldType.values()) {
+            String fieldName = "foo";
+            schema.addField(fieldName, fieldType.getType());
+            schema.addPrimaryKey(fieldName);
+            assertTrue(schema.hasPrimaryKey());
+            schema.removePrimaryKey();
+            assertFalse(schema.hasPrimaryKey());
+            schema.removeField(fieldName);
+        }
+    }
+

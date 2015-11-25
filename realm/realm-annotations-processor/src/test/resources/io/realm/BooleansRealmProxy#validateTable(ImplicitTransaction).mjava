@@ -4,7 +4,7 @@
             if (table.getColumnCount() != 4) {
                 throw new RealmMigrationNeededException(transaction.getPath(), "Field count does not match - expected 4 but was " + table.getColumnCount());
             }
-            Map<String, ColumnType> columnTypes = new HashMap<String, ColumnType>();
+            Map<String, RealmFieldType> columnTypes = new HashMap<String, RealmFieldType>();
             for (long i = 0; i < 4; i++) {
                 columnTypes.put(table.getColumnName(i), table.getColumnType(i));
             }
@@ -14,7 +14,7 @@
             if (!columnTypes.containsKey("done")) {
                 throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'done' in existing Realm file. Either remove field or migrate using io.realm.internal.Table.addColumn().");
             }
-            if (columnTypes.get("done") != ColumnType.BOOLEAN) {
+            if (columnTypes.get("done") != RealmFieldType.BOOLEAN) {
                 throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'boolean' for field 'done' in existing Realm file.");
             }
             if (table.isColumnNullable(columnInfo.doneIndex)) {
@@ -23,7 +23,7 @@
             if (!columnTypes.containsKey("isReady")) {
                 throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'isReady' in existing Realm file. Either remove field or migrate using io.realm.internal.Table.addColumn().");
             }
-            if (columnTypes.get("isReady") != ColumnType.BOOLEAN) {
+            if (columnTypes.get("isReady") != RealmFieldType.BOOLEAN) {
                 throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'boolean' for field 'isReady' in existing Realm file.");
             }
             if (table.isColumnNullable(columnInfo.isReadyIndex)) {
@@ -32,7 +32,7 @@
             if (!columnTypes.containsKey("mCompleted")) {
                 throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'mCompleted' in existing Realm file. Either remove field or migrate using io.realm.internal.Table.addColumn().");
             }
-            if (columnTypes.get("mCompleted") != ColumnType.BOOLEAN) {
+            if (columnTypes.get("mCompleted") != RealmFieldType.BOOLEAN) {
                 throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'boolean' for field 'mCompleted' in existing Realm file.");
             }
             if (table.isColumnNullable(columnInfo.mCompletedIndex)) {
@@ -41,7 +41,7 @@
             if (!columnTypes.containsKey("anotherBoolean")) {
                 throw new RealmMigrationNeededException(transaction.getPath(), "Missing field 'anotherBoolean' in existing Realm file. Either remove field or migrate using io.realm.internal.Table.addColumn().");
             }
-            if (columnTypes.get("anotherBoolean") != ColumnType.BOOLEAN) {
+            if (columnTypes.get("anotherBoolean") != RealmFieldType.BOOLEAN) {
                 throw new RealmMigrationNeededException(transaction.getPath(), "Invalid type 'boolean' for field 'anotherBoolean' in existing Realm file.");
             }
             if (table.isColumnNullable(columnInfo.anotherBooleanIndex)) {

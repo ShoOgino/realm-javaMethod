@@ -1,0 +1,22 @@
+    /**
+     * Renames a class already in the Realm.
+     *
+     * @param oldClassName old class name.
+     * @param newClassName new class name.
+     * @return a schema object for renamed class.
+     */
+    public RealmObjectSchema rename(String oldClassName, String newClassName) {
+        checkEmpty(oldClassName, "Class names cannot be empty or null");
+        checkEmpty(newClassName, "Class names cannot be empty or null");
+        String oldInternalName = TABLE_PREFIX + oldClassName;
+        String newInternalName = TABLE_PREFIX + newClassName;
+        checkHasTable(oldClassName, "Cannot rename class because it doesn't exist in this Realm: " + oldClassName);
+        if (transaction.hasTable(newInternalName)) {
+            throw new IllegalArgumentException(oldClassName + " cannot be renamed because the new class already exists: " + newClassName);
+        }
+        transaction.renameTable(oldInternalName, newInternalName);
+        Table table = transaction.getTable(newInternalName);
+        RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
+        return new RealmObjectSchema(realm, table, columnIndices);
+    }
+

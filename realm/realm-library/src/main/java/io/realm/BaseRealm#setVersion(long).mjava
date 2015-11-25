@@ -1,8 +1,8 @@
     // package protected so unit tests can access it
-    protected void setVersion(long version) {
-        Table metadataTable = sharedGroupManager.getTable("metadata");
+    void setVersion(long version) {
+        Table metadataTable = sharedGroupManager.getTable(Table.METADATA_TABLE_NAME);
         if (metadataTable.getColumnCount() == 0) {
-            metadataTable.addColumn(ColumnType.INTEGER, "version");
+            metadataTable.addColumn(RealmFieldType.INTEGER, "version");
             metadataTable.addEmptyRow();
         }
         metadataTable.setLong(0, 0, version);

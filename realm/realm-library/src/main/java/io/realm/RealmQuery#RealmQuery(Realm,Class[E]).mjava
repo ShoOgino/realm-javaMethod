@@ -1,15 +1,9 @@
-    /**
-     * Creates a RealmQuery instance.
-     *
-     * @param realm the realm to query within.
-     * @param clazz the class to query.
-     */
-    public RealmQuery(Realm realm, Class<E> clazz) {
+    private RealmQuery(Realm realm, Class<E> clazz) {
         this.realm = realm;
         this.clazz = clazz;
-        this.table = realm.getTable(clazz);
+        this.schema = realm.schema.getSchemaForClass(clazz);
+        this.table = schema.table;
         this.view = null;
         this.query = table.where();
-        this.columns = realm.columnIndices.getColumnInfo(clazz).getIndicesMap();
     }
 

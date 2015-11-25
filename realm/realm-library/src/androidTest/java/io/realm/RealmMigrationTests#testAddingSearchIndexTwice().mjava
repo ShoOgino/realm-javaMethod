@@ -7,8 +7,8 @@
 
             RealmMigration migration = new RealmMigration() {
                 @Override
-                public long execute(Realm realm, long version) {
-                    Table table = realm.getTable(clazz);
+                public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                    Table table = realm.schema.getTable(clazz);
                     long columnIndex = table.getColumnIndex("id");
                     table.addSearchIndex(columnIndex);
                     if (clazz == PrimaryKeyAsLong.class) {
@@ -16,7 +16,6 @@
                         table.convertColumnToNullable(columnIndex);
                     }
                     didMigrate[0] = true;
-                    return 42;
                 }
             };
             RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())

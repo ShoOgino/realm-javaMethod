@@ -1,0 +1,14 @@
+    /**
+     * Returns the {@link RealmList} of objects being linked to from this field.
+     *
+     * @param fieldName the name of the field.
+     * @return the {@link RealmList} data for this field.
+     * @throws IllegalArgumentException if field name doesn't exists or it doesn't contain a list of links.
+     */
+    public RealmList<DynamicRealmObject> getList(String fieldName) {
+        long columnIndex = row.getColumnIndex(fieldName);
+        LinkView linkView = row.getLinkList(columnIndex);
+        String className = linkView.getTable().getName().substring(Table.TABLE_PREFIX.length());
+        return new RealmList<DynamicRealmObject>(className, linkView, realm);
+    }
+

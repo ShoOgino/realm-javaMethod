@@ -1,0 +1,64 @@
+    /**
+     * Releases a given {@link Realm} or {@link DynamicRealm} from cache. The instance will be closed by this method
+     * if there is no more local reference to this Realm instance in current Thread.
+     *
+     * @param realm Realm instance to be released from cache.
+     */
+    static synchronized void release(BaseRealm realm) {
+        String canonicalPath = realm.getPath();
+        RealmCache cache = cachesMap.get(canonicalPath);
+        Integer refCount = null;
+        RefAndCount refAndCount = null;
+
+        if (cache != null) {
+            refAndCount = cache.refAndCountMap.get(RealmCacheType.valueOf(realm.getClass()));
+            refCount = refAndCount.localCount.get();
+        }
+        if (refCount == null) {
+            refCount = 0;
+        }
+
+        if (refCount <= 0) {
+            RealmLog.w("Realm " + canonicalPath + " has been closed already.");
+            return;
+        }
+
+        // Decrease the local counter.
+        refCount -= 1;
+
+        if (refCount == 0) {
+            // The last instance in this thread.
+            // Clear local ref & counter
+            refAndCount.localCount.set(null);
+            refAndCount.localRealm.set(null);
+
+            // Clear global counter
+            refAndCount.globalCount--;
+            if (refAndCount.globalCount < 0) {
+                // Should never happen.
+                throw new IllegalStateException("Global reference counter of Realm" + canonicalPath +
+                        " got corrupted.");
+            }
+
+            // Clear the column indices cache if needed
+            if (realm instanceof Realm && refAndCount.globalCount == 0) {
+                // All typed Realm instances of this file are cleared from cache
+                cache.typedColumnIndices = null;
+            }
+
+            int totalRefCount = 0;
+            for (RealmCacheType type : RealmCacheType.values()) {
+                totalRefCount += cache.refAndCountMap.get(type).globalCount;
+            }
+            // No more instance of typed Realm and dynamic Realm. Remove the configuration from cache.
+            if (totalRefCount == 0) {
+                cachesMap.remove(canonicalPath);
+            }
+
+            // No more local reference to this Realm in current thread, close the instance.
+            realm.doClose();
+        } else {
+            refAndCount.localCount.set(refCount);
+        }
+    }
+

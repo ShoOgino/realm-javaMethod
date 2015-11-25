@@ -1,4 +1,4 @@
-    // Check that only allowed methods are present in the model class
+    // Check that only allowed methods are present in the RealmObject class
     private boolean checkMethods() {
         for (ExecutableElement executableElement : methods) {
             String methodName = executableElement.getSimpleName().toString();
@@ -8,7 +8,7 @@
             if (modifiers.contains(Modifier.STATIC)) {
                 continue; // We're cool with static methods. Move along!
             } else if (!modifiers.contains(Modifier.PUBLIC)) {
-                Utils.error("The methods of the model must be public", executableElement);
+                Utils.error("The methods of the RealmObject class must be public", executableElement);
                 return false;
             }
 
@@ -24,7 +24,7 @@
                     return false;
                 }
             } else {
-                Utils.error("Only getters and setters should be defined in model classes", executableElement);
+                Utils.error("Only getters and setters should be defined in RealmObject classes", executableElement);
                 return false;
             }
         }

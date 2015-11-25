@@ -10,27 +10,6 @@
             throw new IllegalStateException(INCORRECT_THREAD_CLOSE_MESSAGE);
         }
 
-        Map<RealmConfiguration, Integer> localRefCount = getLocalReferenceCount();
-        String canonicalPath = configuration.getPath();
-        Integer references = localRefCount.get(configuration);
-        if (references == null) {
-            references = 0;
-        }
-        if (sharedGroupManager != null && references == 1) {
-            lastLocalInstanceClosed();
-            sharedGroupManager.close();
-            sharedGroupManager = null;
-            releaseFileReference(configuration);
-        }
-
-        int refCount = references - 1;
-        if (refCount < 0) {
-            RealmLog.w("Calling close() on a Realm that is already closed: " + canonicalPath);
-        }
-        localRefCount.put(configuration, Math.max(0, refCount));
-
-        if (handler != null && refCount <= 0) {
-            removeHandler();
-        }
+        RealmCache.release(this);
     }
 
