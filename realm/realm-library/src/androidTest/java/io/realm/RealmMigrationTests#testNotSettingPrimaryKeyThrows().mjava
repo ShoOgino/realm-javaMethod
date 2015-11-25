@@ -1,33 +1,38 @@
     public void testNotSettingPrimaryKeyThrows() {
+
+        // Create v0 of the Realm
+        RealmConfiguration originalConfig = new RealmConfiguration.Builder(getContext()).schema(AllTypes.class).build();
+        Realm.deleteRealm(originalConfig);
+        Realm.getInstance(originalConfig).close();
+
         RealmMigration migration = new RealmMigration() {
             @Override
-            public long execute(Realm realm, long version) {
-                Table table = realm.getTable(AnnotationTypes.class);
-                if (table.getColumnCount() == 0) {
-                    long columnIndex = table.addColumn(ColumnType.INTEGER, "id");
-                    table.addSearchIndex(columnIndex);
-                    // Forget to set @PrimaryKey
-                    columnIndex = table.addColumn(ColumnType.STRING, "indexString");
-                    table.addSearchIndex(columnIndex);
-                    table.addColumn(ColumnType.STRING, "notIndexString");
-                }
-                return 1;
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                RealmSchema schema = realm.getSchema();
+                schema.create("AnnotationTypes")
+                        .addField("id", long.class) // Forget to set @PrimaryKey
+                        .addField("indexString", String.class, FieldAttribute.INDEXED)
+                        .addField("notIndexString", String.class);
             }
         };
+
+        // Create v1 of the Realm
         RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
                 .schemaVersion(1)
-                .schema(AnnotationTypes.class)
+                .schema(AllTypes.class, AnnotationTypes.class)
                 .migration(migration)
                 .build();
-        Realm.deleteRealm(realmConfig);
-        Realm.migrateRealm(realmConfig);
-
         try {
             realm = Realm.getInstance(realmConfig);
             fail();
         } catch (RealmMigrationNeededException e) {
             if (!e.getMessage().equals("Primary key not defined for field 'id' in existing Realm file. Add @PrimaryKey.")) {
-                fail(e.getMessage());
+                fail(e.toString());
+            }
+        } finally {
+            if (realm != null) {
+                realm.close();
+                Realm.deleteRealm(realmConfig);
             }
         }
     }

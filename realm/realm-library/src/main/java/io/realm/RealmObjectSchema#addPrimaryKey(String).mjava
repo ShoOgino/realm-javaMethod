@@ -1,0 +1,19 @@
+    /**
+     * Adds a primary key to a given field. This is the same as adding the {@link io.realm.annotations.PrimaryKey}
+     * annotation on the field.
+     *
+     * @param fieldName field to set as primary key.
+     * @return the updated schema.
+     * @throws IllegalArgumentException if field name doesn't exists, the field cannot be a primary key or it already
+     * has a primary key defined.
+     */
+    public RealmObjectSchema addPrimaryKey(String fieldName) {
+        checkLegalName(fieldName);
+        checkFieldExists(fieldName);
+        if (table.hasPrimaryKey()) {
+            throw new IllegalStateException("A primary key is already defined");
+        }
+        table.setPrimaryKey(fieldName);
+        return this;
+    }
+

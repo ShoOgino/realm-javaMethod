@@ -81,11 +81,11 @@
                     realm.commitTransaction();
                     final RealmResults<AllTypes> realmResults1 = realm.where(AllTypes.class)
                             .findAllSortedAsync(new String[]{"columnString", "columnLong"},
-                                    new boolean[]{RealmResults.SORT_ORDER_ASCENDING, RealmResults.SORT_ORDER_DESCENDING});
+                                    new Sort[]{Sort.ASCENDING, Sort.DESCENDING});
                     final RealmResults<AllTypes> realmResults2 = realm.where(AllTypes.class)
                             .between("columnLong", 0, 5)
                             .findAllSortedAsync(new String[]{"columnString", "columnLong"},
-                                    new boolean[]{RealmResults.SORT_ORDER_DESCENDING, RealmResults.SORT_ORDER_ASCENDING});
+                                    new Sort[]{Sort.DESCENDING, Sort.ASCENDING});
 
                     assertFalse(realmResults1.isLoaded());
                     assertFalse(realmResults2.isLoaded());

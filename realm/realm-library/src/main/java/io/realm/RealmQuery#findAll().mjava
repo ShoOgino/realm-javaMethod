@@ -5,8 +5,13 @@
      * objects is returned.
      * @see io.realm.RealmResults
      */
+    @SuppressWarnings("unchecked")
     public RealmResults<E> findAll() {
         checkQueryIsNotReused();
-        return new RealmResults<E>(realm, query.findAll(), clazz);
+        if (isDynamicQuery()) {
+            return (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, query.findAll(), className);
+        } else {
+            return RealmResults.createFromTableOrView(realm, query.findAll(), clazz);
+        }
     }
 

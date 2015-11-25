@@ -19,14 +19,11 @@
         // V2 config
         RealmMigration migration = new RealmMigration() {
             @Override
-            public long execute(Realm realm, long version) {
-                Table languageTable = realm.getTable(FieldOrder.class);
-                if (languageTable.getColumnCount() == 0) {
-                    languageTable.addColumn(ColumnType.INTEGER, "field2");
-                    languageTable.addColumn(ColumnType.BOOLEAN, "field1");
-                }
-
-                return version + 1;
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                RealmSchema schema = realm.getSchema();
+                schema.create("FieldOrder")
+                        .addField("field2", int.class)
+                        .addField("field1", boolean.class);
             }
         };
 

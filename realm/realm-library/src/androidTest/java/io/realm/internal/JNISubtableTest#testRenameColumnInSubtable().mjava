@@ -2,18 +2,18 @@
 
         // Table definition
         Table persons = new Table();
-        persons.addColumn(ColumnType.STRING, "name");
-        persons.addColumn(ColumnType.STRING, "email");
-        persons.addColumn(ColumnType.TABLE, "addresses");
+        persons.addColumn(RealmFieldType.STRING, "name");
+        persons.addColumn(RealmFieldType.STRING, "email");
+        persons.addColumn(RealmFieldType.UNSUPPORTED_TABLE, "addresses");
 
         // Define subtable
         TableSchema addresses = persons.getSubtableSchema(2);
-        addresses.addColumn(ColumnType.STRING, "street");
-        addresses.addColumn(ColumnType.INTEGER, "zipcode");
-        addresses.addColumn(ColumnType.TABLE, "phone_numbers");
+        addresses.addColumn(RealmFieldType.STRING, "street");
+        addresses.addColumn(RealmFieldType.INTEGER, "zipcode");
+        addresses.addColumn(RealmFieldType.UNSUPPORTED_TABLE, "phone_numbers");
 
         TableSchema phone_numbers = addresses.getSubtableSchema(2);
-        phone_numbers.addColumn(ColumnType.INTEGER, "number");
+        phone_numbers.addColumn(RealmFieldType.INTEGER, "number");
 
         // Inserting data
         persons.add("Mr X", "xx@xxxx.com", new Object[][] {{ "X Street", 1234, new Object[][] {{ 12345678 }} }});

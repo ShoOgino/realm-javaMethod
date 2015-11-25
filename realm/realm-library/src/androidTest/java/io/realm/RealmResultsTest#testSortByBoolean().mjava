@@ -1,7 +1,7 @@
     public void testSortByBoolean() {
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class).findAll();
         RealmResults<AllTypes> sortedList = resultList.where().findAll();
-        sortedList.sort(FIELD_BOOLEAN, RealmResults.SORT_ORDER_DESCENDING);
+        sortedList.sort(FIELD_BOOLEAN, Sort.DESCENDING);
         assertEquals(resultList.size(), sortedList.size());
         assertEquals(TEST_DATA_SIZE, sortedList.size());
         assertEquals(false, sortedList.last().isColumnBoolean());
@@ -10,7 +10,7 @@
         assertEquals(false, sortedList.get(TEST_DATA_LAST_HALF).isColumnBoolean());
 
         RealmResults<AllTypes> reverseList = sortedList.where().findAll();
-        reverseList.sort(FIELD_BOOLEAN, RealmResults.SORT_ORDER_ASCENDING);
+        reverseList.sort(FIELD_BOOLEAN, Sort.ASCENDING);
         assertEquals(TEST_DATA_SIZE, reverseList.size());
         assertEquals(true, reverseList.last().isColumnBoolean());
         assertEquals(false, reverseList.first().isColumnBoolean());
@@ -18,7 +18,7 @@
         assertEquals(true, reverseList.get(TEST_DATA_LAST_HALF).isColumnBoolean());
 
         RealmResults<AllTypes> reserveSortedList = reverseList.where().findAll();
-        reserveSortedList.sort(FIELD_BOOLEAN, RealmResults.SORT_ORDER_DESCENDING);
+        reserveSortedList.sort(FIELD_BOOLEAN, Sort.DESCENDING);
         assertEquals(TEST_DATA_SIZE, reserveSortedList.size());
         assertEquals(reserveSortedList.first(), sortedList.first());
     }
