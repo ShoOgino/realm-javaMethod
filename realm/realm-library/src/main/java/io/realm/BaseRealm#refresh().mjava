@@ -5,6 +5,9 @@
     @SuppressWarnings("UnusedDeclaration")
     public void refresh() {
         checkIfValid();
+        if (isInTransaction()) {
+            throw new IllegalStateException(BaseRealm.CANNOT_REFRESH_INSIDE_OF_TRANSACTION_MESSAGE);
+        }
         sharedGroupManager.advanceRead();
         sendNotifications();
     }

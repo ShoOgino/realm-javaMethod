@@ -15,10 +15,12 @@
         }
 
         // Otherwise combine all mediators
-        CompositeMediator mediator = new CompositeMediator();
+        RealmProxyMediator[] mediators = new RealmProxyMediator[modules.size()];
+        int i = 0;
         for (Object module : modules) {
-            mediator.addMediator(getModuleMediator(module.getClass().getCanonicalName()));
+            mediators[i] = getModuleMediator(module.getClass().getCanonicalName());
+            i++;
         }
-        return mediator;
+        return new CompositeMediator(mediators);
     }
 

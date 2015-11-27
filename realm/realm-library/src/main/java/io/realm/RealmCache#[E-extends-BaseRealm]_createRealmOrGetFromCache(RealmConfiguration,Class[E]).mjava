@@ -1,0 +1,61 @@
+    /**
+     * Creates a new Realm instance or get an existing instance for current thread.
+     *
+     * @param configuration {@link RealmConfiguration} will be used to create or get the instance.
+     * @param realmClass class of {@link Realm} or {@link DynamicRealm} to be created in or gotten from the cache.
+     * @return the {@link Realm} or {@link DynamicRealm} instance.
+     */
+    static synchronized <E extends BaseRealm> E createRealmOrGetFromCache(RealmConfiguration configuration,
+                                                        Class<E> realmClass) {
+        boolean isCacheInMap = true;
+        RealmCache cache = cachesMap.get(configuration.getPath());
+        if (cache == null) {
+            // Create a new cache
+            cache = new RealmCache(configuration);
+            // The new cache should be added to the map later.
+            isCacheInMap = false;
+        } else {
+            // Throw the exception if validation failed.
+            cache.validateConfiguration(configuration);
+        }
+
+        RefAndCount refAndCount = cache.refAndCountMap.get(RealmCacheType.valueOf(realmClass));
+
+        if (refAndCount.localRealm.get() == null) {
+            // Create a new local Realm instance
+            BaseRealm realm;
+
+            if (realmClass == Realm.class) {
+                // RealmMigrationNeededException might be thrown here.
+                realm = Realm.createInstance(configuration, cache.typedColumnIndices);
+            } else if (realmClass == DynamicRealm.class) {
+                realm = DynamicRealm.createInstance(configuration);
+            } else {
+                throw new IllegalArgumentException(WRONG_REALM_CLASS_MESSAGE);
+            }
+
+            // The Realm instance has been created without exceptions. Cache and reference count can be updated now.
+
+            // The cache is not in the map yet. Add it to the map after the Realm instance created successfully.
+            if (!isCacheInMap) {
+                cachesMap.put(configuration.getPath(), cache);
+            }
+            refAndCount.localRealm.set(realm);
+            refAndCount.localCount.set(0);
+        }
+
+        Integer refCount = refAndCount.localCount.get();
+        if (refCount == 0) {
+            if (realmClass == Realm.class && refAndCount.globalCount == 0) {
+                cache.typedColumnIndices = refAndCount.localRealm.get().schema.columnIndices;
+            }
+            // This is the first instance in current thread, increase the global count.
+            refAndCount.globalCount++;
+        }
+        refAndCount.localCount.set(refCount + 1);
+
+        @SuppressWarnings("unchecked")
+        E realm = (E) refAndCount.localRealm.get();
+        return realm;
+    }
+

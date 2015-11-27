@@ -5,12 +5,12 @@
      * @return an instance of the Realm class.
      * @throws java.lang.NullPointerException if no default configuration has been defined.
      * @throws RealmMigrationNeededException if no migration has been provided by the default configuration and the
-     * model classes or version has has changed so a migration is required.
+     * RealmObject classes or version has has changed so a migration is required.
      */
     public static Realm getDefaultInstance() {
         if (defaultConfiguration == null) {
             throw new NullPointerException("No default RealmConfiguration was found. Call setDefaultConfiguration() first");
         }
-        return create(defaultConfiguration);
+        return RealmCache.createRealmOrGetFromCache(defaultConfiguration, Realm.class);
     }
 

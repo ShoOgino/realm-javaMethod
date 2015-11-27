@@ -1,0 +1,16 @@
+    /**
+     * Sets a new name for this RealmObject class. This is equivalent to renaming it.
+     *
+     * @param className the new name for this class.
+     * @see RealmSchema#rename(String, String)
+     */
+    public RealmObjectSchema setClassName(String className) {
+        checkEmpty(className);
+        String internalTableName = Table.TABLE_PREFIX + className;
+        if (transaction.hasTable(internalTableName)) {
+            throw new IllegalArgumentException("Class already exists: " + className);
+        }
+        transaction.renameTable(table.getName(), internalTableName);
+        return this;
+    }
+

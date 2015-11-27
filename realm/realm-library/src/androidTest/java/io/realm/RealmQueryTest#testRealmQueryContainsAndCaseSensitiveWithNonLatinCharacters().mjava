@@ -12,7 +12,7 @@
         testRealm.commitTransaction();
 
         RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class)
-                .contains("columnString", "Α", RealmQuery.CASE_INSENSITIVE)
+                .contains("columnString", "Α", Case.INSENSITIVE)
                 .or().contains("columnString", "δ")
                 .findAll();
         // Without case sensitive there is 3, Α = α
@@ -26,7 +26,7 @@
         assertEquals(0, resultList.size());
 
         resultList = testRealm.where(AllTypes.class).contains("columnString", "Δ",
-                RealmQuery.CASE_INSENSITIVE).findAll();
+                Case.INSENSITIVE).findAll();
         // Without case sensitive there is 1, Δ = δ
         // assertEquals(1,resultList.size());
         assertEquals(0, resultList.size());

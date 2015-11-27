@@ -1,0 +1,30 @@
+    /**
+     * Checks if the value of a given field is {@code null}.
+     *
+     * @param fieldName name of field.
+     * @param fieldName the name of the field.
+     * @return {@code true} if field value is null, {@code false} otherwise.
+     * @throws IllegalArgumentException if field name doesn't exists.
+     */
+    public boolean isNull(String fieldName) {
+        long columnIndex = row.getColumnIndex(fieldName);
+        RealmFieldType type = row.getColumnType(columnIndex);
+        switch (type) {
+            case OBJECT:
+                return row.isNullLink(columnIndex);
+            case BOOLEAN:
+            case INTEGER:
+            case FLOAT:
+            case DOUBLE:
+            case STRING:
+            case BINARY:
+            case DATE:
+                return row.isNull(columnIndex);
+            case LIST:
+            case UNSUPPORTED_TABLE:
+            case UNSUPPORTED_MIXED:
+            default:
+                return false;
+        }
+    }
+

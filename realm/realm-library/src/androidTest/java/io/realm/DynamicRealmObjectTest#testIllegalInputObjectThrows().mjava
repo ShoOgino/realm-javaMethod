@@ -1,0 +1,23 @@
+    public void testIllegalInputObjectThrows() {
+        try {
+            new DynamicRealmObject(null);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        try {
+            new DynamicRealmObject(dObj);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        realm.beginTransaction();
+        typedObj.removeFromRealm();
+        realm.commitTransaction();
+        try {
+            new DynamicRealmObject(typedObj);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

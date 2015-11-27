@@ -1,0 +1,20 @@
+    /**
+     * Runs the callback function with the total reference count of {@link Realm} and {@link DynamicRealm} who refer to
+     * the given {@link RealmConfiguration}.
+     *
+     * @param configuration the {@link RealmConfiguration} of {@link Realm} or {@link DynamicRealm}.
+     * @param callback the callback will be executed with the global reference count.
+     */
+    static synchronized void invokeWithGlobalRefCount(RealmConfiguration configuration, Callback callback) {
+        RealmCache cache = cachesMap.get(configuration.getPath());
+        if (cache == null) {
+            callback.onResult(0);
+            return;
+        }
+        int totalRefCount = 0;
+        for (RealmCacheType type : RealmCacheType.values()) {
+            totalRefCount += cache.refAndCountMap.get(type).globalCount;
+        }
+        callback.onResult(totalRefCount);
+    }
+

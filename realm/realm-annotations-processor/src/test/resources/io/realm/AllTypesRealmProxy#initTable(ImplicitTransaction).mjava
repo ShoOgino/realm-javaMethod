@@ -1,21 +1,21 @@
     public static Table initTable(ImplicitTransaction transaction) {
         if (!transaction.hasTable("class_AllTypes")) {
             Table table = transaction.getTable("class_AllTypes");
-            table.addColumn(ColumnType.STRING, "columnString", Table.NOT_NULLABLE);
-            table.addColumn(ColumnType.INTEGER, "columnLong", Table.NOT_NULLABLE);
-            table.addColumn(ColumnType.FLOAT, "columnFloat", Table.NOT_NULLABLE);
-            table.addColumn(ColumnType.DOUBLE, "columnDouble", Table.NOT_NULLABLE);
-            table.addColumn(ColumnType.BOOLEAN, "columnBoolean", Table.NOT_NULLABLE);
-            table.addColumn(ColumnType.DATE, "columnDate", Table.NOT_NULLABLE);
-            table.addColumn(ColumnType.BINARY, "columnBinary", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.STRING, "columnString", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.INTEGER, "columnLong", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.FLOAT, "columnFloat", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.DOUBLE, "columnDouble", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.BOOLEAN, "columnBoolean", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.DATE, "columnDate", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.BINARY, "columnBinary", Table.NOT_NULLABLE);
             if (!transaction.hasTable("class_AllTypes")) {
                 AllTypesRealmProxy.initTable(transaction);
             }
-            table.addColumnLink(ColumnType.LINK, "columnObject", transaction.getTable("class_AllTypes"));
+            table.addColumnLink(RealmFieldType.OBJECT, "columnObject", transaction.getTable("class_AllTypes"));
             if (!transaction.hasTable("class_AllTypes")) {
                 AllTypesRealmProxy.initTable(transaction);
             }
-            table.addColumnLink(ColumnType.LINK_LIST, "columnRealmList", transaction.getTable("class_AllTypes"));
+            table.addColumnLink(RealmFieldType.LIST, "columnRealmList", transaction.getTable("class_AllTypes"));
             table.addSearchIndex(table.getColumnIndex("columnString"));
             table.setPrimaryKey("columnString");
             return table;

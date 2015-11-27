@@ -21,7 +21,9 @@
                 } catch (Exception e) {
                     threadError[0] = e;
                 } finally {
-                    realm.close();
+                    if (!realm.isClosed()) {
+                        realm.close();
+                    }
                 }
             }
         }).start();

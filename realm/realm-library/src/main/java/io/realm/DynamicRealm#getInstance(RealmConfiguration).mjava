@@ -1,0 +1,15 @@
+    /**
+     * Realm static constructor that returns a dynamic variant of the Realm instance defined by provided
+     * {@link io.realm.RealmConfiguration}. Dynamic Realms do not care about schemaVersion and schemas, so opening a
+     * DynamicRealm will never trigger a migration.
+     *
+     * @return the DynamicRealm defined by the configuration.
+     * @see RealmConfiguration for details on how to configure a Realm.
+     */
+    public static DynamicRealm getInstance(RealmConfiguration configuration) {
+        if (configuration == null) {
+            throw new IllegalArgumentException("A non-null RealmConfiguration must be provided");
+        }
+        return RealmCache.createRealmOrGetFromCache(configuration, DynamicRealm.class);
+    }
+

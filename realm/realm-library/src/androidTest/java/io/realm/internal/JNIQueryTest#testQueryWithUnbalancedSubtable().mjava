@@ -1,9 +1,9 @@
     public void testQueryWithUnbalancedSubtable() {
         Table table = new Table();
-        table.addColumn(ColumnType.TABLE, "sub");
+        table.addColumn(RealmFieldType.UNSUPPORTED_TABLE, "sub");
 
         TableSchema tasks = table.getSubtableSchema(0);
-        tasks.addColumn(ColumnType.STRING, "name");
+        tasks.addColumn(RealmFieldType.STRING, "name");
 
         try { table.where().subtable(0).count();               assert(false); } catch (UnsupportedOperationException e) {}
         try { table.where().endSubtable().count();             assert(false); } catch (UnsupportedOperationException e) {}

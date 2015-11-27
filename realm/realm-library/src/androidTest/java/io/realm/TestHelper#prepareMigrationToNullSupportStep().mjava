@@ -3,11 +3,9 @@
     public static RealmMigration prepareMigrationToNullSupportStep() {
         RealmMigration realmMigration = new RealmMigration() {
             @Override
-            public long execute(Realm realm, long version) {
-                Table stringOnly = realm.getTable(StringOnly.class);
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                Table stringOnly = realm.schema.getTable(StringOnly.class);
                 stringOnly.convertColumnToNullable(stringOnly.getColumnIndex("chars"));
-
-                return 0;
             }
         };
         return realmMigration;

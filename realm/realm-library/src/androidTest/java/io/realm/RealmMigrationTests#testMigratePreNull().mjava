@@ -5,10 +5,9 @@
         TestHelper.copyRealmFromAssets(getContext(), "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
         RealmMigration migration = new RealmMigration() {
             @Override
-            public long execute(Realm realm, long version) {
-                Table table = realm.getTable(StringOnly.class);
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                Table table = realm.schema.getTable(StringOnly.class);
                 table.convertColumnToNullable(table.getColumnIndex("chars"));
-                return 1;
             }
         };
 

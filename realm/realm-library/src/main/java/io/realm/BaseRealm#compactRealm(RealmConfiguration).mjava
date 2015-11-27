@@ -1,15 +1,23 @@
     /**
      * Compacts the Realm file defined by the given configuration.
      */
-    public static synchronized boolean compactRealm(RealmConfiguration configuration) {
+    public static boolean compactRealm(final RealmConfiguration configuration) {
         if (configuration.getEncryptionKey() != null) {
             throw new IllegalArgumentException("Cannot currently compact an encrypted Realm.");
         }
 
-        if (isFileOpen(configuration)) {
-            throw new IllegalStateException("Cannot compact an open Realm");
-        }
+        final AtomicBoolean result = new AtomicBoolean(false);
 
-        return SharedGroupManager.compact(configuration);
+        RealmCache.invokeWithGlobalRefCount(configuration, new RealmCache.Callback() {
+            @Override
+            public void onResult(int count) {
+                if (count != 0) {
+                    throw new IllegalStateException("Cannot compact an open Realm");
+                }
+                result.set(SharedGroupManager.compact(configuration));
+            }
+        });
+
+        return result.get();
     }
 

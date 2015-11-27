@@ -3,15 +3,14 @@
      *
      * @param configuration {@link RealmConfiguration} used to open the Realm
      * @return an instance of the Realm class
-     * @throws RealmMigrationNeededException if no migration has been provided by the configuration and the model
+     * @throws RealmMigrationNeededException if no migration has been provided by the configuration and the RealmObject
      * classes or version has has changed so a migration is required.
-     * @throws RealmEncryptionNotSupportedException if the device doesn't support Realm encryption.
      * @see RealmConfiguration for details on how to configure a Realm.
      */
     public static Realm getInstance(RealmConfiguration configuration) {
         if (configuration == null) {
             throw new IllegalArgumentException("A non-null RealmConfiguration must be provided");
         }
-        return create(configuration);
+        return RealmCache.createRealmOrGetFromCache(configuration, Realm.class);
     }
 

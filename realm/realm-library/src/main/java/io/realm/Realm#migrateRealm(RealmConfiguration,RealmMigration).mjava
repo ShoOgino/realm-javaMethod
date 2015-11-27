@@ -7,15 +7,8 @@
      */
     public static void migrateRealm(RealmConfiguration configuration, RealmMigration migration) {
         BaseRealm.migrateRealm(configuration, migration, new MigrationCallback() {
-
-            @Override
-            public BaseRealm getRealm(RealmConfiguration configuration) {
-                return Realm.createAndValidate(configuration, false, Looper.myLooper() != null);
-           }
-
             @Override
             public void migrationComplete() {
-                realmsCache.remove();
             }
         });
     }
