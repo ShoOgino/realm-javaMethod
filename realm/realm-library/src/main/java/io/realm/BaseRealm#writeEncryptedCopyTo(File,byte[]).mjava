@@ -1,0 +1,21 @@
+    /**
+     * Writes a compacted and encrypted copy of the Realm to the given destination File.
+     * <p>
+     * The destination file cannot already exist.
+     * <p>
+     * Note that if this is called from within a transaction it writes the current data, and not the data as it was when
+     * the last transaction was committed.
+     * <p>
+     *
+     * @param destination file to save the Realm to.
+     * @param key a 64-byte encryption key.
+     * @throws java.io.IOException if any write operation fails.
+     */
+    public void writeEncryptedCopyTo(File destination, byte[] key) throws java.io.IOException {
+        if (destination == null) {
+            throw new IllegalArgumentException("The destination argument cannot be null");
+        }
+        checkIfValid();
+        sharedGroupManager.copyToFile(destination, key);
+    }
+
