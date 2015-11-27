@@ -6,9 +6,11 @@
         Realm.deleteRealm(realmConfig);
         Realm realm = Realm.getInstance(realmConfig);
         realm.close();
-        assertTrue(Realm.compactRealm(realmConfig));
-        realm = Realm.getInstance(realmConfig);
-        assertFalse(realm.isClosed());
-        realm.close();
+        // TODO: remove try/catch block when compacting encrypted Realms is supported
+        try {
+            assertTrue(Realm.compactRealm(realmConfig));
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
     }
 

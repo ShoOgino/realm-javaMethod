@@ -2,6 +2,10 @@
      * Compacts the Realm file defined by the given configuration.
      */
     public static boolean compactRealm(final RealmConfiguration configuration) {
+        if (configuration.getEncryptionKey() != null) {
+            throw new IllegalArgumentException("Cannot currently compact an encrypted Realm.");
+        }
+
         final AtomicBoolean result = new AtomicBoolean(false);
 
         RealmCache.invokeWithGlobalRefCount(configuration, new RealmCache.Callback() {
