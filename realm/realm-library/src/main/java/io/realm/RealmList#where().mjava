@@ -1,14 +1,14 @@
     /**
-     * Returns a RealmQuery, which can be used to query for specific objects of this class
+     * Returns a RealmQuery, which can be used to query for specific objects of this class.
      *
-     * @return A RealmQuery object
+     * @return a RealmQuery object.
      * @throws IllegalStateException if Realm instance has been closed or parent object has been removed.
      * @see io.realm.RealmQuery
      */
     public RealmQuery<E> where() {
         if (managedMode) {
             checkValidView();
-            return new RealmQuery<E>(this.realm, view, clazz);
+            return RealmQuery.createQueryFromList(this);
         } else {
             throw new RealmException(ONLY_IN_MANAGED_MODE_MESSAGE);
         }

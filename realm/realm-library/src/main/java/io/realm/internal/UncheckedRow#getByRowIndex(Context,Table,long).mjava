@@ -1,14 +1,16 @@
     /**
-     * Get the row object associated to an index in a Table
-     * @param context the Realm context
-     * @param table the Table that holds the row
-     * @param index the index of the row
-     * @return an instance of Row for the table and index specified
+     * Gets the row object associated to an index in a Table.
+     *
+     * @param context the Realm context.
+     * @param table the Table that holds the row.
+     * @param index the index of the row.
+     * @return an instance of Row for the table and index specified.
      */
     public static UncheckedRow getByRowIndex(Context context, Table table, long index) {
         long nativeRowPointer = table.nativeGetRowPtr(table.nativePtr, index);
         UncheckedRow row = new UncheckedRow(context, table, nativeRowPointer);
-        context.rowReferences.put(new NativeObjectReference(row, context.referenceQueue), Context.ROW_REFERENCES_VALUE);
+        context.rowReferences.put(new UncheckedRowNativeObjectReference(row, context.referenceQueue),
+                Context.NATIVE_REFERENCES_VALUE);
         return row;
     }
 

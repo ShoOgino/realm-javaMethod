@@ -1,0 +1,14 @@
+    /**
+     * Instantiates and adds a new object to the Realm.
+     *
+     * @param className the class name of the object to create.
+     * @return the new object.
+     * @throws RealmException if the object could not be created.
+     */
+    public DynamicRealmObject createObject(String className) {
+        checkIfValid();
+        Table table = schema.getTable(className);
+        long rowIndex = table.addEmptyRow();
+        return get(DynamicRealmObject.class, className, rowIndex);
+    }
+

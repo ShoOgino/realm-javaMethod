@@ -1,0 +1,22 @@
+    /**
+     * Make sure that the new configuration doesn't clash with any cached configurations for the
+     * Realm.
+     *
+     * @throws IllegalArgumentException if the new configuration isn't valid.
+     */
+    private void validateConfiguration(RealmConfiguration newConfiguration) {
+        if (configuration.equals(newConfiguration)) {
+            // Same configuration objects
+            return;
+        }
+
+        // Check that encryption keys aren't different. key is not in RealmConfiguration's toString.
+        if (!Arrays.equals(configuration.getEncryptionKey(), newConfiguration.getEncryptionKey())) {
+            throw new IllegalArgumentException(DIFFERENT_KEY_MESSAGE);
+        } else {
+            throw new IllegalArgumentException("Configurations cannot be different if used to open the same file. " +
+                    "\nCached configuration: \n" + configuration +
+                    "\n\nNew configuration: \n" + newConfiguration);
+        }
+    }
+

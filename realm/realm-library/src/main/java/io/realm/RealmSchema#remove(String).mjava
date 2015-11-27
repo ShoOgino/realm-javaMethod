@@ -1,0 +1,13 @@
+    /**
+     * Removes a class from the Realm. All data will be removed. Removing a class while other classes point
+     * to it will throw an {@link IllegalStateException}. Remove those classes or fields first.
+     *
+     * @param className name of the class to remove.
+     */
+    public void remove(String className) {
+        checkEmpty(className, EMPTY_STRING_MSG);
+        String internalTableName = TABLE_PREFIX + className;
+        checkHasTable(className, "Cannot remove class because it is not in this Realm: " + className);
+        transaction.removeTable(internalTableName);
+    }
+

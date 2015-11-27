@@ -8,14 +8,22 @@
             if (!json.isNull("columnString")) {
                 long rowIndex = table.findFirstString(pkColumnIndex, json.getString("columnString"));
                 if (rowIndex != TableOrView.NO_MATCH) {
-                    obj = new AllTypesRealmProxy(realm.getColumnInfo(AllTypes.class));
+                    obj = new AllTypesRealmProxy(realm.schema.getColumnInfo(AllTypes.class));
                     obj.realm = realm;
                     obj.row = table.getUncheckedRow(rowIndex);
                 }
             }
         }
         if (obj == null) {
-            obj = realm.createObject(AllTypes.class);
+            if (json.has("columnString")) {
+                if (json.isNull("columnString")) {
+                    obj = realm.createObject(AllTypes.class, null);
+                } else {
+                    obj = realm.createObject(AllTypes.class, json.getString("columnString"));
+                }
+            } else {
+                obj = realm.createObject(AllTypes.class);
+            }
         }
         if (json.has("columnString")) {
             if (json.isNull("columnString")) {

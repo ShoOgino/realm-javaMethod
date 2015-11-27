@@ -1,33 +1,32 @@
     public void testSetAnnotations() {
+
+        // Create v0 of the Realm
+        RealmConfiguration originalConfig = new RealmConfiguration.Builder(getContext()).schema(AllTypes.class).build();
+        Realm.deleteRealm(originalConfig);
+        Realm.getInstance(originalConfig).close();
+
         RealmMigration migration = new RealmMigration() {
             @Override
-            public long execute(Realm realm, long version) {
-                Table table = realm.getTable(AnnotationTypes.class);
-                if (table.getColumnCount() == 0) {
-                    long columnIndex = table.addColumn(ColumnType.INTEGER, "id");
-                    table.setPrimaryKey("id");
-                    // Primary key will be indexed automatically
-                    table.addSearchIndex(columnIndex);
-                    columnIndex = table.addColumn(ColumnType.STRING, "indexString", Table.NULLABLE);
-                    table.addSearchIndex(columnIndex);
-                    table.addColumn(ColumnType.STRING, "notIndexString", Table.NULLABLE);
-                }
-                return 1;
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                RealmSchema schema = realm.getSchema();
+                schema.create("AnnotationTypes")
+                        .addField("id", long.class, FieldAttribute.PRIMARY_KEY)
+                        .addField("indexString", String.class, FieldAttribute.INDEXED)
+                        .addField("notIndexString", String.class);
             }
         };
 
         RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
                 .schemaVersion(1)
-                .schema(AnnotationTypes.class)
+                .schema(AllTypes.class, AnnotationTypes.class)
                 .migration(migration)
                 .build();
-        Realm.deleteRealm(realmConfig);
-        Realm.migrateRealm(realmConfig);
 
         realm = Realm.getInstance(realmConfig);
         Table table = realm.getTable(AnnotationTypes.class);
         assertEquals(3, table.getColumnCount());
         assertTrue(table.hasPrimaryKey());
+        assertTrue(table.hasSearchIndex(table.getColumnIndex("id")));
         assertTrue(table.hasSearchIndex(table.getColumnIndex("indexString")));
     }
 

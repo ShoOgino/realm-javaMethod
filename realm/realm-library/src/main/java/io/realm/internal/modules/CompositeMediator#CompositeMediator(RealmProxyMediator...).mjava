@@ -1,0 +1,12 @@
+    public CompositeMediator(RealmProxyMediator... mediators) {
+        final HashMap<Class<? extends RealmObject>, RealmProxyMediator> tempMediators = new HashMap<>();
+        if (mediators != null) {
+            for (RealmProxyMediator mediator : mediators) {
+                for (Class<? extends RealmObject> realmClass : mediator.getModelClasses()) {
+                    tempMediators.put(realmClass, mediator);
+                }
+            }
+        }
+        this.mediators = Collections.unmodifiableMap(tempMediators);
+    }
+

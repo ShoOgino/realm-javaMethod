@@ -1,9 +1,8 @@
     /**
-     * Appends the specified row to the end of the table.
-     * For internal testing usage only.
+     * Appends the specified row to the end of the table. For internal testing usage only.
      *
-     * @param values
-     * @return The row index of the appended row
+     * @param values values.
+     * @return the row index of the appended row.
      */
     protected long add(Object... values) {
         long rowIndex = addEmptyRow();
@@ -18,18 +17,19 @@
                     ") does not match the number of columns in the table (" +
                     String.valueOf(columns) + ").");
         }
-        ColumnType colTypes[] = new ColumnType[columns];
+        RealmFieldType colTypes[] = new RealmFieldType[columns];
         for (int columnIndex = 0; columnIndex < columns; columnIndex++) {
             Object value = values[columnIndex];
-            ColumnType colType = getColumnType(columnIndex);
+            RealmFieldType colType = getColumnType(columnIndex);
             colTypes[columnIndex] = colType;
-            if (!colType.matchObject(value)) {
+            if (!colType.isValid(value)) {
                 //String representation of the provided value type
                 String providedType;
-                if (value == null)
+                if (value == null) {
                     providedType = "null";
-                else
+                } else {
                     providedType = value.getClass().toString();
+                }
 
                 throw new IllegalArgumentException("Invalid argument no " + String.valueOf(1 + columnIndex) +
                         ". Expected a value compatible with column type " + colType + ", but got " + providedType + ".");
@@ -57,14 +57,14 @@
             case STRING:
                 String stringValue = (String) value;
                 checkStringValueIsLegal(columnIndex, rowIndex, stringValue);
-                nativeSetString(nativePtr, columnIndex, rowIndex, (String)value);
+                nativeSetString(nativePtr, columnIndex, rowIndex, (String) value);
                 break;
             case DATE:
                 if (value == null)
                     throw new IllegalArgumentException("Null Date is not allowed.");
-                nativeSetDate(nativePtr, columnIndex, rowIndex, ((Date)value).getTime()/1000);
+                nativeSetDate(nativePtr, columnIndex, rowIndex, ((Date) value).getTime() / 1000);
                 break;
-            case MIXED:
+            case UNSUPPORTED_MIXED:
                 if (value == null)
                     throw new IllegalArgumentException("Null Mixed data is not allowed");
                 nativeSetMixed(nativePtr, columnIndex, rowIndex, Mixed.mixedValue(value));
@@ -74,7 +74,7 @@
                     throw new IllegalArgumentException("Null Array is not allowed");
                 nativeSetByteArray(nativePtr, columnIndex, rowIndex, (byte[])value);
                 break;
-            case TABLE:
+            case UNSUPPORTED_TABLE:
                 insertSubTable(columnIndex, rowIndex, value);
                 break;
             default:

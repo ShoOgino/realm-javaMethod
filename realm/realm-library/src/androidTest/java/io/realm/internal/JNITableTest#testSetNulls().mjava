@@ -1,12 +1,12 @@
     public void testSetNulls() {
         Table t = new Table();
-        t.addColumn(STRING, "");
-        t.addColumn(DATE, "");
-        t.addColumn(MIXED, "");
-        t.addColumn(BINARY, "");
+        t.addColumn(RealmFieldType.STRING, "");
+        t.addColumn(RealmFieldType.DATE, "");
+        t.addColumn(RealmFieldType.UNSUPPORTED_MIXED, "");
+        t.addColumn(RealmFieldType.BINARY, "");
         t.add("String val", new Date(), new Mixed(""), new byte[]{1, 2, 3});
 
-        try { t.setString(0, 0, null);  fail("null string not allowed"); } catch (IllegalArgumentException e) { }
-        try { t.setDate(1, 0, null);    fail("null Date not allowed"); } catch (IllegalArgumentException e) { }
+        try { t.setString(0, 0, null);  fail("null string not allowed"); } catch (IllegalArgumentException ignored) { }
+        try { t.setDate(1, 0, null);    fail("null Date not allowed"); } catch (IllegalArgumentException ignored) { }
     }
 

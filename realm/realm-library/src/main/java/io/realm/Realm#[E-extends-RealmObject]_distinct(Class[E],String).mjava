@@ -1,16 +1,14 @@
     /**
-     * Return a distinct set of objects of a specific class. As a Realm is unordered, it is undefined which objects are
+     * Returns a distinct set of objects of a specific class. As a Realm is unordered, it is undefined which objects are
      * returned in case of multiple occurrences.
      *
      * @param clazz the Class to get objects of.
      * @param fieldName the field name.
-     * @return A non-null {@link RealmResults} containing the distinct objects.
+     * @return a non-null {@link RealmResults} containing the distinct objects.
      * @throws IllegalArgumentException if a field name does not exist or the field is not indexed.
      */
     public <E extends RealmObject> RealmResults<E> distinct(Class<E> clazz, String fieldName) {
-        if (fieldName == null) {
-            throw new IllegalArgumentException("fieldName must be provided.");
-        }
+        checkNotNullFieldName(fieldName);
         checkIfValid();
         Table table = this.getTable(clazz);
         long columnIndex = table.getColumnIndex(fieldName);
@@ -19,6 +17,6 @@
         }
 
         TableView tableView = table.getDistinctView(columnIndex);
-        return new RealmResults<E>(this, tableView, clazz);
+        return RealmResults.createFromTableOrView(this, tableView, clazz);
     }
 

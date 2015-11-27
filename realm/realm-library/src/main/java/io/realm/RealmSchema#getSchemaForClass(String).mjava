@@ -1,0 +1,15 @@
+    RealmObjectSchema getSchemaForClass(String className) {
+        className = Table.TABLE_PREFIX + className;
+        RealmObjectSchema dynamicSchema = dynamicClassToSchema.get(className);
+        if (dynamicSchema == null) {
+            if (!transaction.hasTable(className)) {
+                throw new IllegalArgumentException("The class " + className + " doesn't exist in this Realm.");
+            }
+            Table table = transaction.getTable(className);
+            RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
+            dynamicSchema = new RealmObjectSchema(realm, table, columnIndices);
+            dynamicClassToSchema.put(className, dynamicSchema);
+        }
+        return dynamicSchema;
+    }
+

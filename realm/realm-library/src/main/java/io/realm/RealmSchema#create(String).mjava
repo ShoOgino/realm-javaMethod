@@ -1,0 +1,20 @@
+    /**
+     * Adds a new class to the Realm.
+     *
+     * @param className name of the class.
+     * @return a Realm schema object for that class.
+     */
+    public RealmObjectSchema create(String className) {
+        checkEmpty(className, EMPTY_STRING_MSG);
+        String internalTableName = TABLE_PREFIX + className;
+        if (internalTableName.length() > Table.TABLE_MAX_LENGTH) {
+            throw new IllegalArgumentException("Class name is to long. Limit is 57 characters: " + className.length());
+        }
+        if (transaction.hasTable(internalTableName)) {
+            throw new IllegalArgumentException("Class already exists: " + className);
+        }
+        Table table = transaction.getTable(internalTableName);
+        RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
+        return new RealmObjectSchema(realm, table, columnIndices);
+    }
+

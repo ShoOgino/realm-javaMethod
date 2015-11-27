@@ -1,0 +1,9 @@
+    public void cleanNativeReferences() {
+        NativeObjectReference reference = (NativeObjectReference) referenceQueue.poll();
+        while (reference != null) {
+            reference.clear();
+            rowReferences.remove(reference);
+            reference = (NativeObjectReference) referenceQueue.poll();
+        }
+    }
+

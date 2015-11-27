@@ -1,13 +1,17 @@
     /**
-     * Find all objects that fulfill the query conditions.
+     * Finds all objects that fulfill the query conditions.
      *
-     * @return A {@link io.realm.RealmResults} containing objects. If no objects match the condition,
-     * a list with zero objects is returned.
+     * @return a {@link io.realm.RealmResults} containing objects. If no objects match the condition, a list with zero
+     * objects is returned.
      * @see io.realm.RealmResults
-     * @throws java.lang.RuntimeException Any other error
      */
+    @SuppressWarnings("unchecked")
     public RealmResults<E> findAll() {
         checkQueryIsNotReused();
-        return new RealmResults<E>(realm, query.findAll(), clazz);
+        if (isDynamicQuery()) {
+            return (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, query.findAll(), className);
+        } else {
+            return RealmResults.createFromTableOrView(realm, query.findAll(), clazz);
+        }
     }
 

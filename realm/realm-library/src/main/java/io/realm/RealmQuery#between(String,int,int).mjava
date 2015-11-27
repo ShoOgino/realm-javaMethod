@@ -1,15 +1,14 @@
     /**
-     * Between condition
-     * @param fieldName  The field to compare
-     * @param from       Lowest value (inclusive)
-     * @param to         Highest value (inclusive)
-     * @return The query object
-     * @throws java.lang.IllegalArgumentException One or more arguments do not match class or
-     * field type
-     * @throws java.lang.RuntimeException Any other error
+     * Between condition.
+     *
+     * @param fieldName the field to compare.
+     * @param from lowest value (inclusive).
+     * @param to highest value (inclusive).
+     * @return the query object.
+     * @throws java.lang.IllegalArgumentException if one or more arguments do not match class or field type.
      */
     public RealmQuery<E> between(String fieldName, int from, int to) {
-        long columnIndices[] = getColumnIndices(fieldName, ColumnType.INTEGER);
+        long columnIndices[] = schema.getColumnIndices(fieldName, RealmFieldType.INTEGER);
         this.query.between(columnIndices, from, to);
         return this;
     }

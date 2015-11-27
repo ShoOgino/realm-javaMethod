@@ -1,0 +1,34 @@
+    // Automatically finds the appropriate setter based on the objects type
+    private void setValue(String fieldName, Object value) {
+        Class<?> valueClass = value.getClass();
+        if (valueClass == Boolean.class) {
+            setBoolean(fieldName, (Boolean) value);
+        } else if (valueClass == Short.class) {
+            setShort(fieldName, (Short) value);
+        } else if (valueClass == Integer.class) {
+            setInt(fieldName, (Integer) value);
+        } else if (valueClass == Long.class) {
+            setLong(fieldName, (Long) value);
+        } else if (valueClass == Byte.class) {
+            setByte(fieldName, (Byte) value);
+        } else if (valueClass == Float.class) {
+            setFloat(fieldName, (Float) value);
+        } else if (valueClass == Double.class) {
+            setDouble(fieldName, (Double) value);
+        } else if (valueClass == String.class) {
+            setString(fieldName, (String) value);
+        } else if (value instanceof Date) {
+            setDate(fieldName, (Date) value);
+        } else if (value instanceof byte[]) {
+            setBlob(fieldName, (byte[]) value);
+        } else if (valueClass == DynamicRealmObject.class) {
+            setObject(fieldName, (DynamicRealmObject) value);
+        } else if (valueClass == RealmList.class) {
+            @SuppressWarnings("unchecked")
+            RealmList<RealmObject> list = (RealmList<RealmObject>) value;
+            setList(fieldName, list);
+        } else {
+            throw new IllegalArgumentException("Value is of an type not supported: " + value.getClass());
+        }
+    }
+
