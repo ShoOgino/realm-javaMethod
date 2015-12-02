@@ -1,0 +1,51 @@
+    private void completedAsyncRealmObject(QueryUpdateTask.Result result) {
+        Set<WeakReference<RealmObject>> updatedRowKey = result.updatedRow.keySet();
+        if (updatedRowKey.size() > 0) {
+            WeakReference<RealmObject> realmObjectWeakReference = updatedRowKey.iterator().next();
+            RealmObject realmObject = realmObjectWeakReference.get();
+
+            if (realmObject != null) {
+                SharedGroup.VersionID callerVersionID = realm.sharedGroupManager.getVersion();
+                int compare = callerVersionID.compareTo(result.versionID);
+                // we always query on the same version
+                // only two use cases could happen 1. we're on the same version or 2. the caller has advanced in the meanwhile
+                if (compare == 0) { //same version import the handover
+                    long rowPointer = result.updatedRow.get(realmObjectWeakReference);
+                    if (rowPointer != 0 && emptyAsyncRealmObject.containsKey(realmObjectWeakReference)) {
+                        // cleanup a previously empty async RealmObject
+                        emptyAsyncRealmObject.remove(realmObjectWeakReference);
+                        realmObjects.put(realmObjectWeakReference, null);
+                    }
+                    realmObject.onCompleted(rowPointer);
+                    realmObject.notifyChangeListeners();
+
+                } else if (compare > 0) {
+                    // the caller has advanced we need to
+                    // retry against the current version of the caller if it's still empty
+                    if (realmObject.isValid()) { // already completed & has a valid pointer no need to re-run
+                        realmObject.notifyChangeListeners();
+                    } else {
+                        RealmQuery<?> realmQuery = realmObjects.get(realmObjectWeakReference);
+                        if (realmQuery == null) { // this is a retry of an empty RealmObject
+                            realmQuery = emptyAsyncRealmObject.get(realmObjectWeakReference);
+                        }
+
+                        QueryUpdateTask queryUpdateTask = QueryUpdateTask.newBuilder()
+                                .realmConfiguration(realm.getConfiguration())
+                                .addObject(realmObjectWeakReference,
+                                        realmQuery.handoverQueryPointer(),
+                                        realmQuery.getArgument())
+                                .sendToHandler(realm.handler, COMPLETED_ASYNC_REALM_OBJECT)
+                                .build();
+
+                        Realm.asyncQueryExecutor.submit(queryUpdateTask);
+                    }
+                } else {
+                    // should not happen, since the the background thread position itself against the provided version
+                    // and the caller thread can only go forward (advance_read)
+                    throw new IllegalStateException("Caller thread behind the worker thread");
+                }
+            } // else: element GC'd in the meanwhile
+        }
+    }
+

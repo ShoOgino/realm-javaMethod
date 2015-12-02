@@ -1,9 +1,9 @@
-    private void updateAsyncQueries () {
+    private void updateAsyncQueries() {
         if (updateAsyncQueriesTask != null && !updateAsyncQueriesTask.isDone()) {
             // try to cancel any pending update since we're submitting a new one anyway
             updateAsyncQueriesTask.cancel(true);
             Realm.asyncQueryExecutor.getQueue().remove(updateAsyncQueriesTask);
-            RealmLog.d("REALM_CHANGED realm:" + HandlerController.this + " cancelling pending REALM_UPDATE_ASYNC_QUERIES updates");
+            RealmLog.d("REALM_CHANGED realm:" + HandlerController.this + " cancelling pending COMPLETED_UPDATE_ASYNC_QUERIES updates");
         }
         RealmLog.d("REALM_CHANGED realm:"+ HandlerController.this + " updating async queries, total: " + asyncRealmResults.size());
         // prepare a QueryUpdateTask to current async queries in this thread
@@ -37,7 +37,7 @@
         }
         if (realmResultsQueryStep != null) {
             QueryUpdateTask queryUpdateTask = realmResultsQueryStep
-                    .sendToHandler(realm.handler, REALM_UPDATE_ASYNC_QUERIES)
+                    .sendToHandler(realm.handler, COMPLETED_UPDATE_ASYNC_QUERIES)
                     .build();
             updateAsyncQueriesTask = Realm.asyncQueryExecutor.submit(queryUpdateTask);
         }

@@ -1,0 +1,59 @@
+    public void test_refresh_should_notify_callbacks_realmobject_sync() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                realm = Realm.getInstance(configuration);
+
+                // Swallow all REALM_CHANGED events to test the behaviour of refresh
+                final Handler handler = new HandlerProxy(realm.handler) {
+                    @Override
+                    public boolean onInterceptMessage(int what) {
+                        switch (what) {
+                            case HandlerController.REALM_CHANGED: {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                };
+                realm.setHandler(handler);
+
+                realm.beginTransaction();
+                realm.createObject(Dog.class);
+                realm.commitTransaction();
+
+                final Dog dog = realm.where(Dog.class).findFirst();
+                assertNull(dog.getName());
+
+                dog.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        assertEquals("Akamaru", dog.getName());
+                        signalTestFinished.countDown();
+                    }
+                });
+
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        Realm bgRealm = Realm.getInstance(configuration);
+                        bgRealm.beginTransaction();
+                        bgRealm.where(Dog.class).findFirst().setName("Akamaru");
+                        bgRealm.commitTransaction();
+                        bgRealm.close();
+                    }
+                };
+                thread.start();
+
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    fail(e.getMessage());
+                }
+
+                realm.refresh();
+            }
+        });
+        TestHelper.awaitOrFail(signalTestFinished);
+    }
+
