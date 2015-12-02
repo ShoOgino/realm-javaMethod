@@ -37,9 +37,9 @@
                         @Override
                         public boolean onInterceptMessage(int what) {
                             switch (what) {
-                                case HandlerController.REALM_UPDATE_ASYNC_QUERIES: {
-                                    // posting this as a runnable guarantee that  REALM_UPDATE_ASYNC_QUERIES
-                                    // logic complete before resuming the awaiting REALM_COMPLETED_ASYNC_QUERY
+                                case HandlerController.COMPLETED_UPDATE_ASYNC_QUERIES: {
+                                    // posting this as a runnable guarantee that  COMPLETED_UPDATE_ASYNC_QUERIES
+                                    // logic complete before resuming the awaiting COMPLETED_ASYNC_REALM_RESULTS
                                     post(new Runnable() {
                                         @Override
                                         public void run() {
@@ -48,7 +48,7 @@
                                     });
                                     break;
                                 }
-                                case HandlerController.REALM_COMPLETED_ASYNC_QUERY: {
+                                case HandlerController.COMPLETED_ASYNC_REALM_RESULTS: {
                                     if (numberOfIntercept.getAndDecrement() > 0) {
                                         // we advance the Realm so we can simulate a retry
                                         // this is intercepted on the worker thread, we need to use

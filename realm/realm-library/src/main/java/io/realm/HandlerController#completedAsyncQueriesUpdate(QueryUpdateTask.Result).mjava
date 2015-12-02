@@ -2,9 +2,9 @@
         SharedGroup.VersionID callerVersionID = realm.sharedGroupManager.getVersion();
         int compare = callerVersionID.compareTo(result.versionID);
         if (compare > 0) {
-            RealmLog.d("REALM_UPDATE_ASYNC_QUERIES realm:" + HandlerController.this + " caller is more advanced, rerun updates");
+            RealmLog.d("COMPLETED_UPDATE_ASYNC_QUERIES realm:" + HandlerController.this + " caller is more advanced, rerun updates");
             // The caller is more advance than the updated queries ==>
-            // need to refresh them again (if there is still queries)
+            // need to refresh them again (if there is still async queries)
             realm.handler.sendEmptyMessage(REALM_CHANGED);
 
         } else {
@@ -16,7 +16,7 @@
                 // imperative TV, they will not rerun if the SharedGroup advance
 
                 // UC covered by this test: RealmAsyncQueryTests#testFindAllCallerThreadBehind
-                RealmLog.d("REALM_UPDATE_ASYNC_QUERIES realm:"+ HandlerController.this + " caller is behind  advance_read");
+                RealmLog.d("COMPLETED_UPDATE_ASYNC_QUERIES realm:"+ HandlerController.this + " caller is behind  advance_read");
                 // refresh the Realm to the version provided by the worker thread
                 // (advanceRead to the latest version may cause a version mismatch error) preventing us
                 // from importing correctly the handover table view
@@ -36,12 +36,10 @@
                     // it's dangerous to notify the callback about new results before updating
                     // the pointers, because the callback may use another RealmResults not updated yet
                     // this is why we defer the notification until we're done updating all pointers
-
-                    // TODO find a way to only notify callbacks if the underlying data changed compared
-                    //      to the existing value(s) for this RealmResults (use a hashCode?)
                     callbacksToNotify.add(realmResults);
 
-                    RealmLog.d("REALM_UPDATE_ASYNC_QUERIES realm:"+ HandlerController.this + " updating RealmResults " + weakRealmResults);
+                    RealmLog.d("COMPLETED_UPDATE_ASYNC_QUERIES realm:"+ HandlerController.this + " updating RealmResults " + weakRealmResults);
+
                     // update the instance with the new pointer
                     realmResults.swapTableViewPointer(query.getValue());
                 }
@@ -53,7 +51,10 @@
 
             // notify listeners only when we advanced
             if (compare != 0) {
-                realm.sendNotifications();
+                notifyGlobalListeners();
+                // notify RealmResults & RealmObject callbacks (type based notifications)
+                notifySyncRealmResultsCallbacks();
+                notifyRealmObjectCallbacks();
             }
 
             updateAsyncQueriesTask = null;

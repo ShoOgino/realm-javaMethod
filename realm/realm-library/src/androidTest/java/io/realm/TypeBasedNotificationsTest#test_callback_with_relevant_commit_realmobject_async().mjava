@@ -1,0 +1,80 @@
+    // UC 1 Async RealmObject
+    public void test_callback_with_relevant_commit_realmobject_async() {
+        // prevent GC, everything inside a Runnable will be eligible for GC
+        // as soon as the looper execute it, including any RealmObject/RealmResults
+        // and it's listeners (even though they're stored as strong reference)
+        final Dog[] dogs = new Dog[2];
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                realm = Realm.getInstance(configuration);
+                realm.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        globalCommitInvocations.incrementAndGet();
+                    }
+                });
+
+                final Dog dog = realm.where(Dog.class).findFirstAsync();
+                dogs[1] = dog;
+                assertTrue(dog.load());
+                dog.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        switch (typebasedCommitInvocations.incrementAndGet()) {
+                            case 1: {
+                                assertEquals("Akamaru", dog.getName());
+                                realm.handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // trigger second callback invocation
+                                        realm.beginTransaction();
+                                        dogs[0].setAge(17);
+                                        realm.commitTransaction();
+                                    }
+                                });
+                                break;
+                            }
+                            case 2: {
+                                assertEquals("Akamaru", dog.getName());
+                                assertEquals(17, dog.getAge());
+                                // posting as an event will give the handler a chance
+                                // to deliver the notification for globalCommitInvocations
+                                // otherwise, test will exit before the callback get a chance to be invoked
+                                realm.handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        signalTestFinished.countDown();
+                                    }
+                                });
+                                break;
+                            }
+                        }
+                    }
+                });
+
+                realm.handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        realm.beginTransaction();
+                        realm.commitTransaction();
+                    }
+                });
+
+                realm.handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // trigger first callback invocation
+                        realm.beginTransaction();
+                        dogs[0] = realm.createObject(Dog.class);
+                        dogs[0].setName("Akamaru");
+                        realm.commitTransaction();
+                    }
+                });
+            }
+        });
+        TestHelper.awaitOrFail(signalTestFinished);
+        assertEquals(3, globalCommitInvocations.get());
+        assertEquals(2, typebasedCommitInvocations.get());
+    }
+

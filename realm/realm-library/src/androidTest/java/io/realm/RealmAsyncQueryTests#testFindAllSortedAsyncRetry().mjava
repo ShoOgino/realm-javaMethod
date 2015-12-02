@@ -20,7 +20,7 @@
                         @Override
                         public boolean onInterceptMessage(int what) {
                             switch (what) {
-                                case HandlerController.REALM_COMPLETED_ASYNC_QUERY: {
+                                case HandlerController.COMPLETED_ASYNC_REALM_RESULTS: {
                                     if (numberOfIntercept.getAndDecrement() > 0) {
                                         // We advance the Realm so we can simulate a retry
                                         // This is intercepted on the worker thread, we need to use
@@ -87,6 +87,6 @@
             }
         });
 
-        exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
+        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
     }
 
