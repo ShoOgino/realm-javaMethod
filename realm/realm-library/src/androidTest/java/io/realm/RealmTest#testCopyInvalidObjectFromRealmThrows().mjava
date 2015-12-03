@@ -1,0 +1,19 @@
+    public void testCopyInvalidObjectFromRealmThrows() {
+        testRealm.beginTransaction();
+        AllTypes obj = testRealm.createObject(AllTypes.class);
+        obj.removeFromRealm();
+        testRealm.commitTransaction();
+
+        try {
+            testRealm.copyFromRealm(obj);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        try {
+            testRealm.copyFromRealm(new AllTypes());
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
