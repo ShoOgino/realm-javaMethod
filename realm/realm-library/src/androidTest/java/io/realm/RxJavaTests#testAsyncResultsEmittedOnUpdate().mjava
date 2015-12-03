@@ -1,0 +1,16 @@
+    public void testAsyncResultsEmittedOnUpdate() {
+        final AtomicInteger subscriberCalled = new AtomicInteger(0);
+        realm.allObjects(AllTypes.class).asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
+            @Override
+            public void call(RealmResults<AllTypes> rxResults) {
+                subscriberCalled.addAndGet(1);
+            }
+        });
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        assertEquals(2, subscriberCalled.get());
+    }
+

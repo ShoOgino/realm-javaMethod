@@ -1,9 +1,9 @@
     @Override
-    public <E extends BaseRealm> Observable<E> from(final E realm) {
+    public Observable<DynamicRealm> from(final DynamicRealm realm) {
         checkRxJavaAvailable();
-        return Observable.create(new Observable.OnSubscribe<E>() {
+        return Observable.create(new Observable.OnSubscribe<DynamicRealm>() {
             @Override
-            public void call(final Subscriber<? super E> subscriber) {
+            public void call(final Subscriber<? super DynamicRealm> subscriber) {
                 final RealmChangeListener listener = new RealmChangeListener() {
                     @Override
                     public void onChange() {

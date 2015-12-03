@@ -1,10 +1,12 @@
     /**
-     * Returns an Rx Observable that monitors changes to this Realm. It will output the last state when
+     * Returns an Rx Observable that monitors changes to this RealmObject. It will output the object when
      * subscribed to.
      *
      * @return RxJava Observable
      * @throws UnsupportedOperationException if the required RxJava framework is not on the classpath.
      * @see <a href="">RxJava and Realm</a>
      */
-    public abstract Observable observable();
+    public Observable<E> asObservable() {
+        return realm.configuration.getRxFactory().from((E) this);
+    }
 
