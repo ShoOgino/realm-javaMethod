@@ -1,0 +1,21 @@
+    /**
+     * Indicate the presence of empty {@code RealmObject} obtained asynchronously using {@link RealmQuery#findFirstAsync()}
+     * empty means no pointer to a valid Row. This will help to caller to decice when to rerun the query.
+     *
+     * @return {@code true} if there is at least one (non GC'ed) instance of {@link RealmObject} {@code false} otherwise.
+     */
+    boolean threadContainsAsyncEmptyRealmObject() {
+        boolean isEmpty = true;
+        Iterator<Map.Entry<WeakReference<RealmObject>, RealmQuery<?>>> iterator = emptyAsyncRealmObject.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<WeakReference<RealmObject>, RealmQuery<?>> next = iterator.next();
+            if (next.getKey().get() == null) {
+                iterator.remove();
+            } else {
+                isEmpty = false;
+            }
+        }
+
+        return !isEmpty;
+    }
+

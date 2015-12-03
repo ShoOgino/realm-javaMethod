@@ -1,0 +1,12 @@
+    @Override
+    protected void setUp() throws Exception {
+        handlerThread = new HandlerThread("LooperThread");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
+        signalTestFinished = new CountDownLatch(1);
+        globalCommitInvocations = new AtomicInteger(0);
+        typebasedCommitInvocations = new AtomicInteger(0);
+        configuration = new RealmConfiguration.Builder(getContext()).build();
+        Realm.deleteRealm(configuration);
+    }
+

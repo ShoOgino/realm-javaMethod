@@ -1,0 +1,67 @@
+    private void completedAsyncRealmResults(QueryUpdateTask.Result result) {
+        Set<WeakReference<RealmResults<? extends RealmObject>>> updatedTableViewsKeys = result.updatedTableViews.keySet();
+        if (updatedTableViewsKeys.size() > 0) {
+            WeakReference<RealmResults<? extends RealmObject>> weakRealmResults = updatedTableViewsKeys.iterator().next();
+
+            RealmResults<? extends RealmObject> realmResults = weakRealmResults.get();
+            if (realmResults == null) {
+                asyncRealmResults.remove(weakRealmResults);
+                RealmLog.d("[COMPLETED_ASYNC_REALM_RESULTS "+ weakRealmResults + "] realm:"+ HandlerController.this + " RealmResults GC'd ignore results");
+
+            } else {
+                SharedGroup.VersionID callerVersionID = realm.sharedGroupManager.getVersion();
+                int compare = callerVersionID.compareTo(result.versionID);
+                if (compare == 0) {
+                    // if the RealmResults is empty (has not completed yet) then use the value
+                    // otherwise a task (grouped update) has already updated this RealmResults
+                    if (!realmResults.isLoaded()) {
+                        RealmLog.d("[COMPLETED_ASYNC_REALM_RESULTS "+ weakRealmResults + "] , realm:"+ HandlerController.this + " same versions, using results (RealmResults is not loaded)");
+                        // swap pointer
+                        realmResults.swapTableViewPointer(result.updatedTableViews.get(weakRealmResults));
+                        // notify callbacks
+                        realmResults.notifyChangeListeners();
+                    } else {
+                        RealmLog.d("[COMPLETED_ASYNC_REALM_RESULTS "+ weakRealmResults + "] , realm:"+ HandlerController.this + " ignoring result the RealmResults (is already loaded)");
+                    }
+
+                } else if (compare > 0) {
+                    // we have two use cases:
+                    // 1- this RealmResults is not empty, this means that after we started the async
+                    //    query, we received a REALM_CHANGE that triggered an update of all async queries
+                    //    including the last async submitted, so no need to use the provided TableView pointer
+                    //    (or the user forced the sync behaviour .load())
+                    // 2- This RealmResults is still empty but this caller thread is advanced than the worker thread
+                    //    this could happen if the current thread advanced the shared_group (via a write or refresh)
+                    //    this means that we need to rerun the query against a newer worker thread.
+
+                    if (!realmResults.isLoaded()) { // UC2
+                        // UC covered by this test: RealmAsyncQueryTests#testFindAllAsyncRetry
+                        RealmLog.d("[COMPLETED_ASYNC_REALM_RESULTS " + weakRealmResults + "] , realm:"+ HandlerController.this + " caller is more advanced & RealmResults is not loaded, rerunning the query against the latest version");
+
+                        RealmQuery<?> query = asyncRealmResults.get(weakRealmResults);
+                        QueryUpdateTask queryUpdateTask = QueryUpdateTask.newBuilder()
+                                .realmConfiguration(realm.getConfiguration())
+                                .add(weakRealmResults,
+                                        query.handoverQueryPointer(),
+                                        query.getArgument())
+                                .sendToHandler(realm.handler, COMPLETED_ASYNC_REALM_RESULTS)
+                                .build();
+
+                        Realm.asyncQueryExecutor.submit(queryUpdateTask);
+
+                    } else {
+                        // UC covered by this test: RealmAsyncQueryTests#testFindAllCallerIsAdvanced
+                        RealmLog.d("[COMPLETED_ASYNC_REALM_RESULTS "+ weakRealmResults + "] , realm:"+ HandlerController.this + " caller is more advanced & RealmResults is loaded ignore the outdated result");
+                    }
+
+                } else {
+                    // the caller thread is behind the worker thread,
+                    // no need to rerun the query, since we're going to receive the update signal
+                    // & batch update all async queries including this one
+                    // UC covered by this test: RealmAsyncQueryTests#testFindAllCallerThreadBehind
+                    RealmLog.d("[COMPLETED_ASYNC_REALM_RESULTS "+ weakRealmResults + "] , realm:"+ HandlerController.this + " caller thread behind worker thread, ignore results (a batch update will update everything including this query)");
+                }
+            }
+        }
+    }
+
