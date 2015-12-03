@@ -7,8 +7,9 @@
         if (listener == null) {
             throw new IllegalArgumentException("Listener should not be null");
         }
-        if (realm != null) {
-            realm.checkIfValid();
+        realm.checkIfValid();
+        if (realm.handler == null) {
+            throw new IllegalStateException("You can't register a listener from a non-Looper thread ");
         }
         if (!listeners.contains(listener)) {
             listeners.add(listener);
