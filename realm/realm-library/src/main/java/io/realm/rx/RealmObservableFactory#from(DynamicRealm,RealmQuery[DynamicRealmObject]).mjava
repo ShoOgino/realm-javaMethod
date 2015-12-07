@@ -1,0 +1,21 @@
+    @Override
+    public Observable<RealmQuery<DynamicRealmObject>> from(final DynamicRealm realm, final RealmQuery<DynamicRealmObject> query) {
+        checkRxJavaAvailable();
+        return Observable.create(new Observable.OnSubscribe<RealmQuery<DynamicRealmObject>>() {
+            @Override
+            public void call(final Subscriber<? super RealmQuery<DynamicRealmObject>> subscriber) {
+                // Create an Realm instance that is open for as long as the subscription is alive.
+                final DynamicRealm subscriberRealm = DynamicRealm.getInstance(realm.getConfiguration());
+                RealmQuery<DynamicRealmObject> queryClone = RealmQuery.copyDynamicQuery(subscriberRealm, query);
+                subscriber.add(Subscriptions.create(new Action0() {
+                    @Override
+                    public void call() {
+                        subscriberRealm.close();
+                    }
+                }));
+                subscriber.onNext(queryClone);
+                subscriber.onCompleted();
+            }
+        });
+    }
+
