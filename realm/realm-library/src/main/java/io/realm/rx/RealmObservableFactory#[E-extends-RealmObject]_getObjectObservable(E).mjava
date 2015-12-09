@@ -5,7 +5,9 @@
                 final RealmChangeListener listener = new RealmChangeListener() {
                     @Override
                     public void onChange() {
-                        subscriber.onNext(object);
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(object);
+                        }
                     }
                 };
                 object.addChangeListener(listener);
