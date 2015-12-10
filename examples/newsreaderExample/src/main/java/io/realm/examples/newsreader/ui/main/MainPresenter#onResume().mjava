@@ -1,0 +1,22 @@
+    @Override
+    public void onResume() {
+        Subscription newsSubscription = model.getNewsFeed()
+                .subscribe(new Action1<List<NYTimesStory>>() {
+                    @Override
+                    public void call(List<NYTimesStory> stories) {
+                        storiesData = stories;
+                        view.showList(stories);
+                    }
+                });
+
+        Subscription loaderSubscription = model.isNetworkUsed()
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean networkInUse) {
+                        view.showNetworkLoading(networkInUse);
+                    }
+                });
+
+        subscriptions = new CompositeSubscription(newsSubscription, loaderSubscription);
+    }
+
