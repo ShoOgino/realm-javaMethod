@@ -1,0 +1,54 @@
+    public void testFindFirstAsync() {
+        final DynamicRealmObject[] keepStrongReferences = new DynamicRealmObject[1];
+        final CountDownLatch signalTestFinished = new CountDownLatch(1);
+
+        final HandlerThread handlerThread = new HandlerThread("LooperThread");
+        handlerThread.start();
+        final Handler handler = new Handler(handlerThread.getLooper());
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                final DynamicRealm realm = DynamicRealm.getInstance(defaultConfig);
+                populateTestRealm(realm, 10);
+
+                final DynamicRealmObject allTypes = realm.where(AllTypes.CLASS_NAME)
+                        .between(AllTypes.FIELD_LONG, 4, 9)
+                        .findFirstAsync();
+                keepStrongReferences[0] = allTypes;
+                assertTrue(allTypes.load());
+
+                allTypes.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        assertEquals("test data 4", allTypes.getString(AllTypes.FIELD_STRING));
+                        realm.close();
+                        signalTestFinished.countDown();
+                    }
+                });
+
+                realm.handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                Realm bgRealm = Realm.getInstance(defaultConfig);
+                                bgRealm.beginTransaction();
+                                bgRealm.createObject(AllTypes.class);
+                                bgRealm.commitTransaction();
+                                bgRealm.close();
+                            }
+                        }.start();
+                    }
+                });
+            }
+        });
+
+        try {
+            TestHelper.awaitOrFail(signalTestFinished);
+        } finally {
+            handlerThread.quit();
+        }
+    }
+

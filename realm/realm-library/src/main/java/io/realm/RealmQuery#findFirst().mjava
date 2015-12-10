@@ -6,9 +6,15 @@
      */
     public E findFirst() {
         checkQueryIsNotReused();
-        long rowIndex = this.query.find();
-        if (rowIndex >= 0) {
-            return realm.get(clazz, className, (view != null) ? view.getTargetRowIndex(rowIndex) : rowIndex);
+        long sourceRowIndex = getSourceRowIndexForFirstObject();
+        if (sourceRowIndex >= 0) {
+            E realmObject = realm.get(clazz, className, sourceRowIndex);
+            if (realm.handlerController != null) { // non Looper Thread doesn't have a handlerController
+                WeakReference<RealmObject> realmObjectWeakReference
+                        = new WeakReference<RealmObject>(realmObject, realm.handlerController.referenceQueueRealmObject);
+                realm.handlerController.realmObjects.put(realmObjectWeakReference, this);
+            }
+            return realmObject;
         } else {
             return null;
         }

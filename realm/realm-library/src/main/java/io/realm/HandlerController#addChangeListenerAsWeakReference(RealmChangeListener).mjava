@@ -1,0 +1,36 @@
+    /**
+     * For internal use only.
+     * Sometimes we don't know when to unregister listeners (ex: {@link RealmBaseAdapter}). Using
+     * a WeakReference the listener doesn't need to be explicitly unregistered.
+     *
+     * @param listener the change listener.
+     */
+    void addChangeListenerAsWeakReference(RealmChangeListener listener) {
+        Iterator<WeakReference<RealmChangeListener>> iterator = weakChangeListeners.iterator();
+        List<WeakReference<RealmChangeListener>> toRemoveList = null;
+        boolean addListener = true;
+        while (iterator.hasNext()) {
+            WeakReference<RealmChangeListener> weakRef = iterator.next();
+            RealmChangeListener weakListener = weakRef.get();
+
+            // Collect all listeners that are GC'ed
+            if (weakListener == null) {
+                if (toRemoveList == null) {
+                    toRemoveList = new ArrayList<WeakReference<RealmChangeListener>>(weakChangeListeners.size());
+                }
+                toRemoveList.add(weakRef);
+            }
+
+            // Check if Listener already exists
+            if (weakListener == listener) {
+                addListener = false;
+            }
+        }
+        if (toRemoveList != null) {
+            weakChangeListeners.removeAll(toRemoveList);
+        }
+        if (addListener) {
+            weakChangeListeners.add(new WeakReference<RealmChangeListener>(listener));
+        }
+    }
+

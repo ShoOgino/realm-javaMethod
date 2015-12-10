@@ -1,0 +1,43 @@
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_example);
+        rootLayout = ((LinearLayout) findViewById(R.id.container));
+        rootLayout.removeAllViews();
+
+        // Open the default Realm for the UI thread.
+        realm = Realm.getInstance(this);
+
+        // Clean up from previous run
+        cleanUp();
+
+        // Small operation that is ok to run on the main thread
+        basicCRUD(realm);
+
+        // More complex operations can be executed on another thread.
+        AsyncTask<Void, Void, String> foo = new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                String info = "";
+                info += complexQuery();
+                return info;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                showStatus(result);
+            }
+        };
+
+        foo.execute();
+
+        findViewById(R.id.clean_up).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setEnabled(false);
+                cleanUp();
+                v.setEnabled(true);
+            }
+        });
+    }
+

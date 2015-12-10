@@ -30,7 +30,7 @@
         });
 
         // Create a commit on another thread
-        awaitOrThrow(backgroundLooperStartedAndStopped);
+        TestHelper.awaitOrFail(backgroundLooperStartedAndStopped);
         Realm realm = Realm.getInstance(config);
         Logger logger = TestHelper.getFailureLogger(Log.WARN);
         RealmLog.add(logger);
@@ -38,7 +38,7 @@
         realm.beginTransaction();
         realm.commitTransaction(); // If the Handler on the background is notified it will trigger a Log warning.
         mainThreadCommitCompleted.countDown();
-        awaitOrThrow(backgroundThreadStopped);
+        TestHelper.awaitOrFail(backgroundThreadStopped);
 
         realm.close();
         RealmLog.remove(logger);

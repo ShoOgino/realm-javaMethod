@@ -1,0 +1,18 @@
+    // Test that the same Realm objects in a list result in the same Java in-memory copy.
+    // List: A -> [(B -> C), (B -> C)] should result in only 2 copied objects A and B and not A1, B1, A2, B2
+    public void testCopyListFromRealmSameElements() {
+        testRealm.beginTransaction();
+        CyclicType objA = testRealm.createObject(CyclicType.class); objA.setName("A");
+        CyclicType objB = testRealm.createObject(CyclicType.class); objB.setName("B");
+        CyclicType objC = testRealm.createObject(CyclicType.class); objC.setName("C");
+        objB.setObject(objC);
+        objA.getObjects().add(objB);
+        objA.getObjects().add(objB);
+        testRealm.commitTransaction();
+
+        List<CyclicType> results = testRealm.copyFromRealm(objA.getObjects());
+        assertEquals(2, results.size());
+        assertEquals("B", results.get(0).getName());
+        assertTrue(results.get(0) == results.get(1));
+    }
+

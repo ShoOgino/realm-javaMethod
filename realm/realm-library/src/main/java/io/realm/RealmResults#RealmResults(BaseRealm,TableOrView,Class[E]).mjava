@@ -1,5 +1,16 @@
-    RealmResults(BaseRealm realm, TableOrView table, Class<E> classSpec) {
-        this(realm, classSpec);
+    private RealmResults(BaseRealm realm, TableOrView table, Class<E> classSpec) {
+        this.realm = realm;
+        this.classSpec = classSpec;
         this.table = table;
+
+        this.pendingQuery = null;
+        this.query = null;
+        this.currentTableViewVersion = table.sync();
+
+        if (realm.handlerController != null) { // non Looper thread doesn't have a handlerController
+            WeakReference<RealmResults<? extends RealmObject>> realmResultsWeakReference
+                    = new WeakReference<RealmResults<? extends RealmObject>>(this, realm.handlerController.referenceQueueSyncRealmResults);
+            this.realm.handlerController.syncRealmResults.add(realmResultsWeakReference);
+        }
     }
 
