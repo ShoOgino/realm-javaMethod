@@ -1,0 +1,35 @@
+    /**
+     * Parse an integer located between 2 given offsets in a string
+     *
+     * @param value the string to parse
+     * @param beginIndex the start index for the integer in the string
+     * @param endIndex the end index for the integer in the string
+     * @return the int
+     * @throws NumberFormatException if the value is not a number
+     */
+    private static int parseInt(String value, int beginIndex, int endIndex) throws NumberFormatException {
+        if (beginIndex < 0 || endIndex > value.length() || beginIndex > endIndex) {
+            throw new NumberFormatException(value);
+        }
+        // use same logic as in Integer.parseInt() but less generic we're not supporting negative values
+        int i = beginIndex;
+        int result = 0;
+        int digit;
+        if (i < endIndex) {
+            digit = Character.digit(value.charAt(i++), 10);
+            if (digit < 0) {
+                throw new NumberFormatException("Invalid number: " + value.substring(beginIndex, endIndex));
+            }
+            result = -digit;
+        }
+        while (i < endIndex) {
+            digit = Character.digit(value.charAt(i++), 10);
+            if (digit < 0) {
+                throw new NumberFormatException("Invalid number: " + value.substring(beginIndex, endIndex));
+            }
+            result *= 10;
+            result -= digit;
+        }
+        return -result;
+    }
+
