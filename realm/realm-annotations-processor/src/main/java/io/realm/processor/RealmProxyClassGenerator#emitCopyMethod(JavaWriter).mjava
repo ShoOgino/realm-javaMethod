@@ -6,9 +6,11 @@
                 "Realm", "realm", className, "newObject", "boolean", "update", "Map<RealmObject,RealmObjectProxy>", "cache"); // Argument type & argument name
 
         if (metadata.hasPrimaryKey()) {
-            writer.emitStatement("%s realmObject = realm.createObject(%s.class, newObject.%s())", className, className, metadata.getPrimaryKeyGetter());
+            writer.emitStatement("%sRealmProxy realmObject = (%sRealmProxy) realm.createObject(%s.class, newObject.%s())",
+                    className, className, className, metadata.getPrimaryKeyGetter());
         } else {
-            writer.emitStatement("%s realmObject = realm.createObject(%s.class)", className, className);
+            writer.emitStatement("%sRealmProxy realmObject = (%sRealmProxy) realm.createObject(%s.class)",
+                    className, className, className);
         }
         writer.emitStatement("cache.put(newObject, (RealmObjectProxy) realmObject)");
         for (VariableElement field : metadata.getFields()) {
@@ -20,7 +22,8 @@
             if (Utils.isRealmObject(field)) {
                 writer
                     .emitEmptyLine()
-                    .emitStatement("%s %sObj = newObject.%s()", fieldType, fieldName, getter)
+                    .emitStatement("%s %sObj = ((%sRealmProxy) newObject).%s()",
+                            fieldType, fieldName, className, getter)
                     .beginControlFlow("if (%sObj != null)", fieldName)
                         .emitStatement("%s cache%s = (%s) cache.get(%sObj)", fieldType, fieldName, fieldType, fieldName)
                         .beginControlFlow("if (cache%s != null)", fieldName)
@@ -38,7 +41,8 @@
             } else if (Utils.isRealmList(field)) {
                 writer
                     .emitEmptyLine()
-                    .emitStatement("RealmList<%s> %sList = newObject.%s()", Utils.getGenericType(field), fieldName, getter)
+                    .emitStatement("RealmList<%s> %sList = ((%sRealmProxy) newObject).%s()", Utils.getGenericType
+                            (field), fieldName, className, getter)
                     .beginControlFlow("if (%sList != null)", fieldName)
                         .emitStatement("RealmList<%s> %sRealmList = realmObject.%s()", Utils.getGenericType(field), fieldName, getter)
                         .beginControlFlow("for (int i = 0; i < %sList.size(); i++)", fieldName)
@@ -54,7 +58,8 @@
                     .emitEmptyLine();
 
             } else {
-                writer.emitStatement("realmObject.%s(newObject.%s())", metadata.getSetter(fieldName), getter);
+                writer.emitStatement("realmObject.%s(((%sRealmProxy) newObject).%s())", metadata.getSetter(fieldName)
+                        , className, getter);
             }
         }
 

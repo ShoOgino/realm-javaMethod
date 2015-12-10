@@ -8,7 +8,8 @@
                 Arrays.asList("JSONException"));
 
         if (!metadata.hasPrimaryKey()) {
-            writer.emitStatement("%s obj = realm.createObject(%s.class)", className, className);
+            writer.emitStatement("%sRealmProxy obj = (%sRealmProxy) realm.createObject(%s.class)", className,
+                    className, className);
         } else {
             String pkType = Utils.isString(metadata.getPrimaryKey()) ? "String" : "Long";
             writer

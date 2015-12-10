@@ -7,7 +7,8 @@
                 Arrays.asList("Realm", "realm", "JsonReader", "reader"),
                 Arrays.asList("IOException"));
 
-        writer.emitStatement("%s obj = realm.createObject(%s.class)",className, className);
+        writer.emitStatement("%sRealmProxy obj = (%sRealmProxy) realm.createObject(%s.class)",className, className,
+                className);
         writer.emitStatement("reader.beginObject()");
         writer.beginControlFlow("while (reader.hasNext())");
         writer.emitStatement("String name = reader.nextName()");
