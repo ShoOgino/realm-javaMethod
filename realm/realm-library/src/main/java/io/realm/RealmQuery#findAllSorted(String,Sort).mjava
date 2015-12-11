@@ -20,10 +20,15 @@
         }
         tableView.sort(columnIndex, sortOrder);
 
+        RealmResults<E> realmResults;
         if (isDynamicQuery()) {
-            return (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, tableView, className);
+            realmResults = (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, tableView, className);
         } else {
-            return RealmResults.createFromTableOrView(realm, tableView, clazz);
+            realmResults = RealmResults.createFromTableOrView(realm, tableView, clazz);
         }
+        if (realm.handlerController != null) {
+            realm.handlerController.addToRealmResults(realmResults);
+        }
+        return realmResults;
     }
 
