@@ -1,5 +1,5 @@
-    //UC 0 using Realm.createOrUpdateObjectFromJson
-    public void test_callback_should_trigger_for_createOrUpdateObjectFromJson_InputStream() {
+    //UC 0 using Realm.copyToRealmOrUpdate
+    public void test_callback_should_trigger_for_createObjectFromJson() {
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -19,23 +19,9 @@
                 });
 
                 try {
-                    AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
-                    Date date = new Date(0);
-                    // ID
-                    obj.setColumnLong(1);
-                    obj.setColumnBinary(new byte[]{1});
-                    obj.setColumnBoolean(true);
-                    obj.setColumnDate(date);
-                    obj.setColumnDouble(1);
-                    obj.setColumnFloat(1);
-                    obj.setColumnString("1");
+                    InputStream in = TestHelper.loadJsonFromAssets(getContext(), "all_simple_types.json");
                     realm.beginTransaction();
-                    realm.copyToRealm(obj);
-                    realm.commitTransaction();
-
-                    InputStream in = TestHelper.loadJsonFromAssets(getContext(), "all_types_primary_key_field_only.json");
-                    realm.beginTransaction();
-                    final AllTypesPrimaryKey objectFromJson = realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, in);
+                    final AllTypes objectFromJson = realm.createObjectFromJson(AllTypes.class, in);
                     realm.commitTransaction();
                     in.close();
 
@@ -43,13 +29,11 @@
                         @Override
                         public void onChange() {
                             assertEquals("ObjectFromJson", objectFromJson.getColumnString());
-                            assertEquals(1L, objectFromJson.getColumnLong());
-                            assertEquals(1f, objectFromJson.getColumnFloat());
-                            assertEquals(1d, objectFromJson.getColumnDouble());
+                            assertEquals(1l, objectFromJson.getColumnLong());
+                            assertEquals(1.23f, objectFromJson.getColumnFloat());
+                            assertEquals(1.23d, objectFromJson.getColumnDouble());
                             assertEquals(true, objectFromJson.isColumnBoolean());
-                            assertArrayEquals(new byte[]{1}, objectFromJson.getColumnBinary());
-                            assertNull(objectFromJson.getColumnRealmObject());
-                            assertEquals(0, objectFromJson.getColumnRealmList().size());
+                            assertArrayEquals(new byte[]{1, 2, 3}, objectFromJson.getColumnBinary());
                             typebasedCommitInvocations.incrementAndGet();
                         }
                     });
