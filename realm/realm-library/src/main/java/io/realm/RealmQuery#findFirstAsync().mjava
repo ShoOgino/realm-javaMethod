@@ -29,8 +29,7 @@
             result = realm.getConfiguration().getSchemaMediator().newInstance(clazz, realm.getSchema().getColumnInfo(clazz));
         }
 
-        final WeakReference<RealmObject> realmObjectWeakReference = new WeakReference<RealmObject>(result, realm.handlerController.referenceQueueRealmObject);
-        realm.handlerController.realmObjects.put(realmObjectWeakReference, this);
+        final WeakReference<RealmObject> realmObjectWeakReference = realm.handlerController.addToAsyncRealmObject(result, this);
         result.realm = realm;
         result.row = Row.EMPTY_ROW;
 
@@ -49,8 +48,8 @@
                         long handoverRowPointer = query.findWithHandover(sharedGroup.getNativePointer(),
                                 sharedGroup.getNativeReplicationPointer(), handoverQueryPointer);
                         if (handoverRowPointer == 0) { // empty row
-                            realm.handlerController.emptyAsyncRealmObject.put(realmObjectWeakReference, RealmQuery.this);
-                            realm.handlerController.realmObjects.remove(realmObjectWeakReference);
+                            realm.handlerController.addToEmptyAsyncRealmObject(realmObjectWeakReference, RealmQuery.this);
+                            realm.handlerController.removeFromAsyncRealmObject(realmObjectWeakReference);
                         }
 
                         QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmObjectResponse();
@@ -61,7 +60,7 @@
                         return handoverRowPointer;
 
                     } catch (Exception e) {
-                        RealmLog.e(e.getMessage());
+                        RealmLog.e(e.getMessage(), e);
                         // handler can't throw a checked exception need to wrap it into unchecked Exception
                         sendMessageToHandler(weakHandler, HandlerController.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
 

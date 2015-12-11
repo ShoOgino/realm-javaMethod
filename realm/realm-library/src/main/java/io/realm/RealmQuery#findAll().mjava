@@ -8,10 +8,15 @@
     @SuppressWarnings("unchecked")
     public RealmResults<E> findAll() {
         checkQueryIsNotReused();
+        RealmResults<E> realmResults;
         if (isDynamicQuery()) {
-            return (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, query.findAll(), className);
+            realmResults =  (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, query.findAll(), className);
         } else {
-            return RealmResults.createFromTableOrView(realm, query.findAll(), clazz);
+            realmResults = RealmResults.createFromTableOrView(realm, query.findAll(), clazz);
         }
+        if (realm.handlerController != null) {
+            realm.handlerController.addToRealmResults(realmResults);
+        }
+        return realmResults;
     }
 
