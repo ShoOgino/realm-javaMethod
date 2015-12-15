@@ -1,8 +1,36 @@
-    public static Simple copy(Realm realm, Simple newObject, boolean update, Map<RealmObject,RealmObjectProxy> cache) {
-        Simple realmObject = realm.createObject(Simple.class);
-        cache.put(newObject, (RealmObjectProxy) realmObject);
-        realmObject.setName(newObject.getName());
-        realmObject.setAge(newObject.getAge());
-        return realmObject;
+    public static Simple copy(Realm realm, Simple from, boolean update, Map<RealmObject,RealmObjectProxy> cache) {
+        SimpleRealmProxy to = (SimpleRealmProxy) realm.createObject(Simple.class);
+        cache.put(from, (RealmObjectProxy) to);
+
+        final boolean isStandalone = !(from instanceof SimpleRealmProxy);
+        Class<? extends Simple> clazz;
+        if (isStandalone) {
+            clazz = from.getClass();
+        } else {
+            clazz = null;
+        }
+        Field field = null;
+
+        try {
+            if (isStandalone) {
+                field = clazz.getDeclaredField("name");
+                field.setAccessible(true);
+                to.realmSetter$name((java.lang.String) field.get(from));
+            } else {
+                to.realmSetter$name(from.realmGetter$name());
+            }
+            if (isStandalone) {
+                field = clazz.getDeclaredField("age");
+                field.setAccessible(true);
+                to.realmSetter$age((int) field.get(from));
+            } else {
+                to.realmSetter$age(from.realmGetter$age());
+            }
+        } catch (NoSuchFieldException e) {
+            throw new RealmException(e.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new RealmException(e.getMessage());
+        }
+        return to;
     }
 

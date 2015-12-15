@@ -1,23 +1,23 @@
     static AllTypes update(Realm realm, AllTypes realmObject, AllTypes newObject, Map<RealmObject, RealmObjectProxy> cache) {
-        realmObject.setColumnLong(newObject.getColumnLong());
-        realmObject.setColumnFloat(newObject.getColumnFloat());
-        realmObject.setColumnDouble(newObject.getColumnDouble());
-        realmObject.setColumnBoolean(newObject.isColumnBoolean());
-        realmObject.setColumnDate(newObject.getColumnDate());
-        realmObject.setColumnBinary(newObject.getColumnBinary());
-        AllTypes columnObjectObj = newObject.getColumnObject();
+        realmObject.realmSetter$columnLong(newObject.realmGetter$columnLong());
+        realmObject.realmSetter$columnFloat(newObject.realmGetter$columnFloat());
+        realmObject.realmSetter$columnDouble(newObject.realmGetter$columnDouble());
+        realmObject.realmSetter$columnBoolean(newObject.realmGetter$columnBoolean());
+        realmObject.realmSetter$columnDate(newObject.realmGetter$columnDate());
+        realmObject.realmSetter$columnBinary(newObject.realmGetter$columnBinary());
+        AllTypes columnObjectObj = newObject.realmGetter$columnObject();
         if (columnObjectObj != null) {
             AllTypes cachecolumnObject = (AllTypes) cache.get(columnObjectObj);
             if (cachecolumnObject != null) {
-                realmObject.setColumnObject(cachecolumnObject);
+                realmObject.realmSetter$columnObject(cachecolumnObject);
             } else {
-                realmObject.setColumnObject(AllTypesRealmProxy.copyOrUpdate(realm, columnObjectObj, true, cache));
+                realmObject.realmSetter$columnObject(AllTypesRealmProxy.copyOrUpdate(realm, columnObjectObj, true, cache));
             }
         } else {
-            realmObject.setColumnObject(null);
+            realmObject.realmSetter$columnObject(null);
         }
-        RealmList<AllTypes> columnRealmListList = newObject.getColumnRealmList();
-        RealmList<AllTypes> columnRealmListRealmList = realmObject.getColumnRealmList();
+        RealmList<AllTypes> columnRealmListList = newObject.realmGetter$columnRealmList();
+        RealmList<AllTypes> columnRealmListRealmList = realmObject.realmGetter$columnRealmList();
         columnRealmListRealmList.clear();
         if (columnRealmListList != null) {
             for (int i = 0; i < columnRealmListList.size(); i++) {

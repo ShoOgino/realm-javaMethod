@@ -1,40 +1,115 @@
-    public static AllTypes copy(Realm realm, AllTypes newObject, boolean update, Map<RealmObject,RealmObjectProxy> cache) {
-        AllTypes realmObject = realm.createObject(AllTypes.class, newObject.getColumnString());
-        cache.put(newObject, (RealmObjectProxy) realmObject);
-        realmObject.setColumnString(newObject.getColumnString());
-        realmObject.setColumnLong(newObject.getColumnLong());
-        realmObject.setColumnFloat(newObject.getColumnFloat());
-        realmObject.setColumnDouble(newObject.getColumnDouble());
-        realmObject.setColumnBoolean(newObject.isColumnBoolean());
-        realmObject.setColumnDate(newObject.getColumnDate());
-        realmObject.setColumnBinary(newObject.getColumnBinary());
+    public static AllTypes copy(Realm realm, AllTypes from, boolean update, Map<RealmObject,RealmObjectProxy> cache) {
+        AllTypesRealmProxy to = (AllTypesRealmProxy) realm.createObject(AllTypes.class, from.realmGetter$columnString());
+        cache.put(from, (RealmObjectProxy) to);
 
-        some.test.AllTypes columnObjectObj = newObject.getColumnObject();
-        if (columnObjectObj != null) {
-            some.test.AllTypes cachecolumnObject = (some.test.AllTypes) cache.get(columnObjectObj);
-            if (cachecolumnObject != null) {
-                realmObject.setColumnObject(cachecolumnObject);
-            } else {
-                realmObject.setColumnObject(AllTypesRealmProxy.copyOrUpdate(realm, columnObjectObj, update, cache));
-            }
+        final boolean isStandalone = !(from instanceof AllTypesRealmProxy);
+        Class<? extends AllTypes> clazz;
+        if (isStandalone) {
+            clazz = from.getClass();
         } else {
-            realmObject.setColumnObject(null);
+            clazz = null;
         }
+        Field field = null;
 
-        RealmList<AllTypes> columnRealmListList = newObject.getColumnRealmList();
-        if (columnRealmListList != null) {
-            RealmList<AllTypes> columnRealmListRealmList = realmObject.getColumnRealmList();
-            for (int i = 0; i < columnRealmListList.size(); i++) {
-                AllTypes columnRealmListItem = columnRealmListList.get(i);
-                AllTypes cachecolumnRealmList = (AllTypes) cache.get(columnRealmListItem);
-                if (cachecolumnRealmList != null) {
-                    columnRealmListRealmList.add(cachecolumnRealmList);
+        try {
+            if (isStandalone) {
+                field = clazz.getDeclaredField("columnString");
+                field.setAccessible(true);
+                to.realmSetter$columnString((java.lang.String) field.get(from));
+            } else {
+                to.realmSetter$columnString(from.realmGetter$columnString());
+            }
+            if (isStandalone) {
+                field = clazz.getDeclaredField("columnLong");
+                field.setAccessible(true);
+                to.realmSetter$columnLong((long) field.get(from));
+            } else {
+                to.realmSetter$columnLong(from.realmGetter$columnLong());
+            }
+            if (isStandalone) {
+                field = clazz.getDeclaredField("columnFloat");
+                field.setAccessible(true);
+                to.realmSetter$columnFloat((float) field.get(from));
+            } else {
+                to.realmSetter$columnFloat(from.realmGetter$columnFloat());
+            }
+            if (isStandalone) {
+                field = clazz.getDeclaredField("columnDouble");
+                field.setAccessible(true);
+                to.realmSetter$columnDouble((double) field.get(from));
+            } else {
+                to.realmSetter$columnDouble(from.realmGetter$columnDouble());
+            }
+            if (isStandalone) {
+                field = clazz.getDeclaredField("columnBoolean");
+                field.setAccessible(true);
+                to.realmSetter$columnBoolean((boolean) field.get(from));
+            } else {
+                to.realmSetter$columnBoolean(from.realmGetter$columnBoolean());
+            }
+            if (isStandalone) {
+                field = clazz.getDeclaredField("columnDate");
+                field.setAccessible(true);
+                to.realmSetter$columnDate((java.util.Date) field.get(from));
+            } else {
+                to.realmSetter$columnDate(from.realmGetter$columnDate());
+            }
+            if (isStandalone) {
+                field = clazz.getDeclaredField("columnBinary");
+                field.setAccessible(true);
+                to.realmSetter$columnBinary((byte[]) field.get(from));
+            } else {
+                to.realmSetter$columnBinary(from.realmGetter$columnBinary());
+            }
+
+            {
+                some.test.AllTypes columnObjectObj;
+                if (isStandalone) {
+                    field = clazz.getDeclaredField("columnObject");
+                    field.setAccessible(true);
+                    columnObjectObj = (some.test.AllTypes) field.get(from);
                 } else {
-                    columnRealmListRealmList.add(AllTypesRealmProxy.copyOrUpdate(realm, columnRealmListList.get(i), update, cache));
+                    columnObjectObj = from.realmGetter$columnObject();
+                }
+                if (columnObjectObj != null) {
+                    some.test.AllTypes cachecolumnObject = (some.test.AllTypes) cache.get(columnObjectObj);
+                    if (cachecolumnObject != null) {
+                        to.realmSetter$columnObject(cachecolumnObject);
+                    } else {
+                        to.realmSetter$columnObject(AllTypesRealmProxy.copyOrUpdate(realm, columnObjectObj, update, cache));
+                    }
+                } else {
+                    to.realmSetter$columnObject(null);
                 }
             }
-        }
 
-        return realmObject;
+            {
+                RealmList<AllTypes> columnRealmListList;
+                if (isStandalone) {
+                    field = clazz.getDeclaredField("columnRealmList");
+                    field.setAccessible(true);
+                    columnRealmListList = (RealmList<AllTypes>) field.get(from);
+                } else {
+                    columnRealmListList = from.realmGetter$columnRealmList();
+                }
+                if (columnRealmListList != null) {
+                    RealmList<AllTypes> columnRealmListRealmList = to.realmGetter$columnRealmList();
+                    for (int i = 0; i < columnRealmListList.size(); i++) {
+                        AllTypes columnRealmListItem = columnRealmListList.get(i);
+                        AllTypes cachecolumnRealmList = (AllTypes) cache.get(columnRealmListItem);
+                        if (cachecolumnRealmList != null) {
+                            columnRealmListRealmList.add(cachecolumnRealmList);
+                        } else {
+                            columnRealmListRealmList.add(AllTypesRealmProxy.copyOrUpdate(realm, columnRealmListList.get(i), update, cache));
+                        }
+                    }
+                }
+            }
+        } catch (NoSuchFieldException e) {
+            throw new RealmException(e.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new RealmException(e.getMessage());
+        }
+        return to;
     }
 
