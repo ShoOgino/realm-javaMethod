@@ -1,0 +1,15 @@
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        person = realm.createObject(Person.class);
+        person.setName("Jane");
+        person.setAge(42);
+        person.setId(UUID.randomUUID().toString());
+        realm.commitTransaction();
+
+        textContent.setText(person.toString());
+    }
+
