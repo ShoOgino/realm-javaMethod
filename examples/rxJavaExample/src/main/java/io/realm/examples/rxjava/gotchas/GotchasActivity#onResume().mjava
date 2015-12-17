@@ -1,0 +1,23 @@
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Subscription distinctSubscription = testDistinct();
+        Subscription bufferSubscription = testBuffer();
+        Subscription subscribeOnSubscription = testSubscribeOn();
+
+        // Trigger updates
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.allObjectsSorted(Person.class, "name", Sort.ASCENDING).get(0).setAge(new Random().nextInt(100));
+            }
+        });
+
+        subscription = new CompositeSubscription(
+                distinctSubscription,
+                bufferSubscription,
+                subscribeOnSubscription
+        );
+    }
+
