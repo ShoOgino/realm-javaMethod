@@ -1,0 +1,19 @@
+    public void testAsyncObjectEmittedOnUpdate() {
+        final AtomicInteger subscriberCalled = new AtomicInteger(0);
+        realm.beginTransaction();
+        AllTypes obj = realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+        realm.where(AllTypes.class).findFirstAsync().<AllTypes>asObservable().subscribe(new Action1<AllTypes>() {
+            @Override
+            public void call(AllTypes rxObject) {
+                subscriberCalled.incrementAndGet();
+            }
+        });
+
+        realm.beginTransaction();
+        obj.setColumnLong(1);
+        realm.commitTransaction();
+
+        assertEquals(1, subscriberCalled.get());
+    }
+
