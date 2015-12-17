@@ -11,7 +11,15 @@
             boolean updateSuccessful = false;
             if (updateMode == MODE_UPDATE_REALM_RESULTS) {
                 result = Result.newRealmResultsResponse();
-                updateSuccessful = updateRealmResultsQueries(sharedGroup, result);
+                AlignedQueriesParameters alignedParameters = prepareQueriesParameters();
+                long[] handoverTableViewPointer = TableQuery.nativeBatchUpdateQueries(sharedGroup.getNativePointer(),
+                        sharedGroup.getNativeReplicationPointer(),
+                        alignedParameters.handoverQueries,
+                        alignedParameters.queriesParameters,
+                        alignedParameters.multiSortColumnIndices,
+                        alignedParameters.multiSortOrder);
+                swapPointers(result, handoverTableViewPointer);
+                updateSuccessful = true;
                 result.versionID = sharedGroup.getVersion();
 
             } else {
@@ -26,8 +34,7 @@
             }
 
         } catch (Exception e) {
-            RealmLog.e(e.getMessage());
-            e.fillInStackTrace();
+            RealmLog.e(e.getMessage(), e);
 
         } finally {
             if (sharedGroup != null) {

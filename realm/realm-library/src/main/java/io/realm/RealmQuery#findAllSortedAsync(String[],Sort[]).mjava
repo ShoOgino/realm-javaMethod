@@ -47,9 +47,7 @@
                 realmResults = RealmResults.createFromTableQuery(realm, query, clazz);
             }
 
-            final WeakReference<RealmResults<? extends RealmObject>> weakRealmResults = new WeakReference<RealmResults<? extends RealmObject>>(realmResults,
-                    realm.handlerController.referenceQueueAsyncRealmResults);
-            realm.handlerController.asyncRealmResults.put(weakRealmResults, this);
+            final WeakReference<RealmResults<? extends RealmObject>> weakRealmResults = realm.handlerController.addToAsyncRealmResults(realmResults, this);
 
             final Future<Long> pendingQuery = Realm.asyncQueryExecutor.submit(new Callable<Long>() {
                 @Override
@@ -74,7 +72,7 @@
 
                             return handoverTableViewPointer;
                         } catch (Exception e) {
-                            RealmLog.e(e.getMessage());
+                            RealmLog.e(e.getMessage(), e);
                             sendMessageToHandler(weakHandler, HandlerController.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
 
                         } finally {

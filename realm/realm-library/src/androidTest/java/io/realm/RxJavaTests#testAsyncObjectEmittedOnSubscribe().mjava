@@ -4,8 +4,8 @@
         realm.commitTransaction();
 
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        final AllTypes asyncObj = realm.where(AllTypes.class).findFirst();
-        asyncObj.asObservable().subscribe(new Action1<AllTypes>() {
+        final AllTypes asyncObj = realm.where(AllTypes.class).findFirstAsync();
+        asyncObj.<AllTypes>asObservable().subscribe(new Action1<AllTypes>() {
             @Override
             public void call(AllTypes rxObject) {
                 assertTrue(rxObject == asyncObj);

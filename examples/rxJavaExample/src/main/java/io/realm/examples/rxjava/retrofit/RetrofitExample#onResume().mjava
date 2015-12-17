@@ -1,0 +1,52 @@
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Load all persons and merge them with their latest stats from GitHub (if they have any)
+        subscription = realm.where(Person.class).isNotNull("githubUserName").findAllSortedAsync("name").asObservable()
+                .filter(new Func1<RealmResults<Person>, Boolean>() {
+                    @Override
+                    public Boolean call(RealmResults<Person> persons) {
+                        // We only want the list once it is loaded.
+                        return persons.isLoaded();
+                    }
+                })
+                .flatMap(new Func1<RealmResults<Person>, Observable<Person>>() {
+                    @Override
+                    public Observable<Person> call(RealmResults<Person> persons) {
+                        // Emit each person individually
+                        return Observable.from(persons);
+                    }
+                })
+                .flatMap(new Func1<Person, Observable<GitHubUser>>() {
+                    @Override
+                    public Observable<GitHubUser> call(Person person) {
+                        // get GitHub statistics. Retrofit automatically does this on a separate thread.
+                        return api.user(person.getGithubUserName());
+                    }
+                })
+                .map(new Func1<GitHubUser, UserViewModel>() {
+                    @Override
+                    public UserViewModel call(GitHubUser gitHubUser) {
+                        // Map Network model to our View model
+                        return new UserViewModel(gitHubUser.name, gitHubUser.public_repos, gitHubUser.public_gists);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread()) // Retrofit put us on a worker thread. Move back to UI
+                .subscribe(new Action1<UserViewModel>() {
+                    @Override
+                    public void call(UserViewModel user) {
+                        // Print user info.
+                        TextView userView = new TextView(RetrofitExample.this);
+                        userView.setText(String.format("%s : %d/%d",
+                                user.getUsername(), user.getPublicRepos(), user.getPublicGists()));
+                        container.addView(userView);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                });
+    }
+

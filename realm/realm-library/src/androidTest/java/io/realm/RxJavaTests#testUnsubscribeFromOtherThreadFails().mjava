@@ -16,8 +16,9 @@
                     subscription.unsubscribe();
                     fail();
                 } catch (IllegalStateException ignored) {
+                } finally {
+                    unsubscribeCompleted.countDown();
                 }
-                unsubscribeCompleted.countDown();
             }
         }).start();
         TestHelper.awaitOrFail(unsubscribeCompleted);

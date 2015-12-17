@@ -1,0 +1,25 @@
+    /**
+     * Shows how to be careful with `buffer()`
+     */
+    private Subscription testBuffer() {
+        Observable<Person> personObserver = realm.asObservable().map(new Func1<Realm, Person>() {
+            @Override
+            public Person call(Realm realm) {
+                return realm.where(Person.class).findAllSorted("name").get(0);
+            }
+        });
+
+        // buffer() caches objects until the buffer is full. Due to Realms auto-update of all objects it means
+        // that all objects in the cache will contain the same data.
+        // Either avoid using buffer or copy data into an un-managed object.
+        return personObserver
+                .buffer(2)
+                .subscribe(new Action1<List<Person>>() {
+                    @Override
+                    public void call(List<Person> persons) {
+                        showStatus("Buffer[0] : " + persons.get(0).getName() + ":" + persons.get(0).getAge());
+                        showStatus("Buffer[1] : " + persons.get(1).getName() + ":" + persons.get(1).getAge());
+                    }
+                });
+    }
+
