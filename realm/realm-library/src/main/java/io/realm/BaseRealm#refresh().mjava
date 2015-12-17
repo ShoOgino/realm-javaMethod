@@ -9,6 +9,13 @@
             throw new IllegalStateException(BaseRealm.CANNOT_REFRESH_INSIDE_OF_TRANSACTION_MESSAGE);
         }
         sharedGroupManager.advanceRead();
-        sendNotifications();
+        if (handlerController != null) {
+            handlerController.notifyGlobalListeners();
+            handlerController.notifyTypeBasedListeners();
+            // if we have empty async RealmObject then rerun
+            if (handlerController.threadContainsAsyncEmptyRealmObject()) {
+                handlerController.updateAsyncEmptyRealmObject();
+            }
+        }
     }
 

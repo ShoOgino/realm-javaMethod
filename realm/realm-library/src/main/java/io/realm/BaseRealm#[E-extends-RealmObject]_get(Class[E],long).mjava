@@ -4,6 +4,10 @@
         E result = configuration.getSchemaMediator().newInstance(clazz, schema.getColumnInfo(clazz));
         result.row = row;
         result.realm = this;
+        result.setTableVersion();
+        if (handlerController != null) {
+            handlerController.addToRealmObjects(result);
+        }
         return result;
     }
 

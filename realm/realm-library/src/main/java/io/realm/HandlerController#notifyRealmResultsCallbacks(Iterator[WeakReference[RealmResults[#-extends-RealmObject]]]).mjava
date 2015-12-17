@@ -1,0 +1,13 @@
+    private void notifyRealmResultsCallbacks(Iterator<WeakReference<RealmResults<? extends RealmObject>>> iterator) {
+        while (iterator.hasNext()) {
+            WeakReference<RealmResults<? extends RealmObject>> weakRealmResults = iterator.next();
+            RealmResults<? extends RealmObject> realmResults = weakRealmResults.get();
+            if (realmResults == null) {
+                iterator.remove();
+
+            } else {
+                realmResults.notifyChangeListeners();
+            }
+        }
+    }
+

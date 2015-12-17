@@ -14,7 +14,13 @@
 
             // Notify at once on thread doing the commit
             if (handler.equals(this.handler)) {
-                sendNotifications();
+                handlerController.notifyGlobalListeners();
+                // notify RealmResults & RealmObject callbacks
+                handlerController.notifyTypeBasedListeners();
+                // if we have empty async RealmObject then rerun
+                if (handlerController.threadContainsAsyncEmptyRealmObject()) {
+                    handlerController.updateAsyncEmptyRealmObject();
+                }
                 continue;
             }
 

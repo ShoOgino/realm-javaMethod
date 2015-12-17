@@ -12,12 +12,16 @@
      * or {@link #removeAllChangeListeners()} which removes all listeners including the ones added via anonymous classes.
      *
      * @param listener the change listener.
+     * @throws IllegalStateException if you try to register a listener from a non-Looper Thread.
      * @see io.realm.RealmChangeListener
      * @see #removeChangeListener(RealmChangeListener)
      * @see #removeAllChangeListeners()
      */
     public void addChangeListener(RealmChangeListener listener) {
         checkIfValid();
-        changeListeners.addIfAbsent(listener);
+        if (handler == null) {
+            throw new IllegalStateException("You can't register a listener from a non-Looper thread ");
+        }
+        handlerController.addChangeListener(listener);
     }
 

@@ -1,0 +1,12 @@
+    public void testCopyFromRealmWithInvalidDepth() {
+        testRealm.beginTransaction();
+        AllTypes obj = testRealm.createObject(AllTypes.class);
+        testRealm.commitTransaction();
+
+        try {
+            testRealm.copyFromRealm(obj, -1);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

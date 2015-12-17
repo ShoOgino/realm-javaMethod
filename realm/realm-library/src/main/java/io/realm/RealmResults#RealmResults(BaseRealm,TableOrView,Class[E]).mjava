@@ -1,5 +1,10 @@
-    RealmResults(BaseRealm realm, TableOrView table, Class<E> classSpec) {
-        this(realm, classSpec);
+    private RealmResults(BaseRealm realm, TableOrView table, Class<E> classSpec) {
+        this.realm = realm;
+        this.classSpec = classSpec;
         this.table = table;
+
+        this.pendingQuery = null;
+        this.query = null;
+        this.currentTableViewVersion = table.sync();
     }
 

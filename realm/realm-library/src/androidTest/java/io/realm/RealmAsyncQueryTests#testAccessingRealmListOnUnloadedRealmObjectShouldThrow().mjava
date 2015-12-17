@@ -1,0 +1,52 @@
+    public void testAccessingRealmListOnUnloadedRealmObjectShouldThrow() throws Throwable {
+        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
+        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
+        final Throwable[] threadAssertionError = new Throwable[1];
+        final Looper[] backgroundLooper = new Looper[1];
+        final ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                backgroundLooper[0] = Looper.myLooper();
+
+                Realm realm = null;
+                try {
+                    realm = openRealmInstance("testAccessingRealmListOnUnloadedRealmObjectShouldThrow");
+                    Realm.asyncQueryExecutor.pause();
+
+                    populateTestRealm(realm, 10);
+                    final AllTypes alltypes1 = realm.where(AllTypes.class)
+                            .equalTo("columnLong", 0)
+                            .findFirstAsync();
+
+                    assertFalse(alltypes1.isLoaded());
+                    try {
+                        alltypes1.getColumnRealmList();
+                        fail("Accessing property on an empty row");
+                    } catch (IllegalStateException ignored) {
+                    }
+
+                    Realm.asyncQueryExecutor.resume();
+                    signalCallbackFinished.countDown();
+                    Looper.loop();
+
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    threadAssertionError[0] = e;
+
+                } finally {
+                    if (signalCallbackFinished.getCount() > 0) {
+                        signalCallbackFinished.countDown();
+                    }
+                    if (realm != null) {
+                        realm.close();
+                    }
+                    signalClosedRealm.countDown();
+                }
+            }
+        });
+
+        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
+    }
+

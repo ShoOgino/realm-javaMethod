@@ -1,0 +1,32 @@
+    // Test that the object graph is copied as it is and no extra copies are made
+    // 1) (A -> B/[B,C])
+    // 2) (C -> B/[B,A])
+    // A copy should result in only 3 distinct objects
+    public void testCopyFromRealmCyclicObjectGraph() {
+        testRealm.beginTransaction();
+        CyclicType objA = testRealm.createObject(CyclicType.class); objA.setName("A");
+        CyclicType objB = testRealm.createObject(CyclicType.class); objB.setName("B");
+        CyclicType objC = testRealm.createObject(CyclicType.class); objC.setName("C");
+        objA.setObject(objB);
+        objC.setObject(objB);
+        objA.getObjects().add(objB);
+        objA.getObjects().add(objC);
+        objC.getObjects().add(objB);
+        objC.getObjects().add(objA);
+        testRealm.commitTransaction();
+
+        CyclicType copyA = testRealm.copyFromRealm(objA);
+        CyclicType copyB = copyA.getObject();
+        CyclicType copyC = copyA.getObjects().get(1);
+
+        assertEquals("A", copyA.getName());
+        assertEquals("B", copyB.getName());
+        assertEquals("C", copyC.getName());
+
+        // Assert object equality on the object graph
+        assertTrue(copyA.getObject() == copyC.getObject());
+        assertTrue(copyA.getObjects().get(0) == copyC.getObjects().get(0));
+        assertTrue(copyA == copyC.getObjects().get(1));
+        assertTrue(copyC == copyA.getObjects().get(1));
+    }
+

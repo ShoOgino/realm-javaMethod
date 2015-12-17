@@ -1,0 +1,20 @@
+    @Override
+    protected void tearDown() throws Exception {
+        final CountDownLatch cleanup = new CountDownLatch(1);
+        if (realm != null && handler.getLooper().getThread().isAlive()) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (!realm.isClosed()) {
+                        realm.close();
+                    }
+                    Realm.deleteRealm(configuration);
+                    handlerThread.quit();
+                    realm = null;
+                    cleanup.countDown();
+                }
+            });
+            TestHelper.awaitOrFail(cleanup);
+        }
+    }
+

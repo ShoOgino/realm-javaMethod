@@ -8,33 +8,26 @@
         if (realm.sharedGroupManager != null) {
             switch (message.what) {
                 case REALM_CHANGED: {
-                    if (threadContainsAsyncQueries()) {
-                        updateAsyncQueries();
-
-                    } else {
-                        RealmLog.d("REALM_CHANGED realm:"+ HandlerController.this + " no async queries, advance_read");
-                        realm.sharedGroupManager.advanceRead();
-                        realm.sendNotifications();
-                    }
+                    realmChanged();
                     break;
                 }
-                case REALM_COMPLETED_ASYNC_QUERY: {
-                    // one async query has completed
+                case COMPLETED_ASYNC_REALM_RESULTS: {
                     QueryUpdateTask.Result result = (QueryUpdateTask.Result) message.obj;
-                    completedAsyncQueryUpdate(result);
+                    completedAsyncRealmResults(result);
                     break;
                 }
-                case REALM_UPDATE_ASYNC_QUERIES: {
+                case COMPLETED_ASYNC_REALM_OBJECT: {
+                    QueryUpdateTask.Result result = (QueryUpdateTask.Result) message.obj;
+                    completedAsyncRealmObject(result);
+                    break;
+                }
+                case COMPLETED_UPDATE_ASYNC_QUERIES: {
                     // this is called once the background thread completed the update of the async queries
                     QueryUpdateTask.Result result = (QueryUpdateTask.Result) message.obj;
                     completedAsyncQueriesUpdate(result);
                     break;
                 }
-                case REALM_COMPLETED_ASYNC_FIND_FIRST: {
-                    QueryUpdateTask.Result result = (QueryUpdateTask.Result) message.obj;
-                    completedAsyncFindFirst(result);
-                    break;
-                }
+
                 case REALM_ASYNC_BACKGROUND_EXCEPTION: {
                     // Don't fail silently in the background in case of Core exception
                     throw (Error) message.obj;

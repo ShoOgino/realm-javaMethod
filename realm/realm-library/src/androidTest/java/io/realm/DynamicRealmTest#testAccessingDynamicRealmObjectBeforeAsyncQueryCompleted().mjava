@@ -1,0 +1,59 @@
+    public void testAccessingDynamicRealmObjectBeforeAsyncQueryCompleted() {
+        final DynamicRealmObject[] dynamicRealmObject = new DynamicRealmObject[1];
+        final CountDownLatch signalTestFinished = new CountDownLatch(1);
+
+        final HandlerThread handlerThread = new HandlerThread("LooperThread");
+        handlerThread.start();
+        final Handler handler = new Handler(handlerThread.getLooper());
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                final DynamicRealm realm = DynamicRealm.getInstance(defaultConfig);
+
+                // Intercept completion of the async DynamicRealmObject query
+                final Handler handler = new HandlerProxy(realm.handler) {
+                    @Override
+                    public boolean onInterceptMessage(int what) {
+                        switch (what) {
+                            case HandlerController.COMPLETED_ASYNC_REALM_OBJECT: {
+                                post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        assertFalse(dynamicRealmObject[0].isLoaded());
+                                        assertFalse(dynamicRealmObject[0].isValid());
+                                        try {
+                                            dynamicRealmObject[0].getObject(AllTypes.FIELD_BINARY);
+                                            fail("trying to access a DynamicRealmObject property should throw");
+                                        } catch (IllegalStateException ignored) {
+
+                                        } finally {
+                                            realm.close();
+                                            signalTestFinished.countDown();
+                                        }
+                                    }
+                                });
+
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                };
+
+                realm.setHandler(handler);
+
+                populateTestRealm(realm, 10);
+
+                dynamicRealmObject[0] = realm.where(AllTypes.CLASS_NAME).
+                        between(AllTypes.FIELD_LONG, 4, 9).findFirstAsync();
+            }
+        });
+
+        try {
+            TestHelper.awaitOrFail(signalTestFinished);
+        } finally {
+            handlerThread.quit();
+        }
+    }
+

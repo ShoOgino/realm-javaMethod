@@ -2,9 +2,16 @@
      * Notifies all registered listeners.
      */
     void notifyChangeListeners() {
-        realm.checkIfValid();
-        for (RealmChangeListener listener : listeners) {
-            listener.onChange();
+        if (listeners != null && !listeners.isEmpty()) {
+            if (row.getTable() == null) return;
+
+            long version = row.getTable().version();
+            if (currentTableVersion != version) {
+                currentTableVersion = version;
+                for (RealmChangeListener listener : listeners) {
+                    listener.onChange();
+                }
+            }
         }
     }
 

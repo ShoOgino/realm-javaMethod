@@ -25,7 +25,7 @@
                 backgroundThreadReady.countDown();
             }
         });
-        awaitOrThrow(backgroundThreadReady);
+        TestHelper.awaitOrFail(backgroundThreadReady);
         // At this point the background thread started & registered the listener
 
         Realm realm = Realm.getInstance(getContext());
@@ -33,7 +33,7 @@
         realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
-        awaitOrThrow(numberOfInvocation);
+        TestHelper.awaitOrFail(numberOfInvocation);
         realm.close();
         handlerThread.quit();
         if (assertionFailedErrors[0] != null) {

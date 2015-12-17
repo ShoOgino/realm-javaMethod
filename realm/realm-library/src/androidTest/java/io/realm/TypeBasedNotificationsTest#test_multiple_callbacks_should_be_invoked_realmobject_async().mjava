@@ -1,0 +1,51 @@
+    // UC 2 Async RealmObject
+    public void test_multiple_callbacks_should_be_invoked_realmobject_async() {
+        final int NUMBER_OF_LISTENERS = 7;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                realm = Realm.getInstance(configuration);
+                RealmChangeListener listener = new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        if (globalCommitInvocations.incrementAndGet() == 3) {
+                            realm.handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    signalTestFinished.countDown();
+                                }
+                            });
+                        }
+                    }
+                };
+
+                realm.addChangeListener(listener);
+
+                realm.beginTransaction();
+                Dog akamaru = realm.createObject(Dog.class);
+                realm.commitTransaction();
+
+                Dog dog = realm.where(Dog.class).findFirstAsync();
+                assertTrue(dog.load());
+                for (int i = 0; i < NUMBER_OF_LISTENERS; i++) {
+                    dog.addChangeListener(new RealmChangeListener() {
+                        @Override
+                        public void onChange() {
+                            typebasedCommitInvocations.incrementAndGet();
+                        }
+                    });
+                }
+
+                realm.beginTransaction();
+                akamaru.setAge(17);
+                realm.commitTransaction();
+
+                realm.beginTransaction();
+                realm.commitTransaction();
+
+            }
+        });
+        TestHelper.awaitOrFail(signalTestFinished);
+        assertEquals(NUMBER_OF_LISTENERS, typebasedCommitInvocations.get());
+    }
+

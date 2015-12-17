@@ -2,12 +2,18 @@
         // From the AOSP FinalizationTest:
         // https://android.googlesource.com/platform/libcore/+/master/support/src/test/java/libcore/
         // java/lang/ref/FinalizationTester.java
-        // System.gc() does not garbage collect every time. Runtime.gc() is
-        // more likely to perform a gc.
+        // System.gc() does not garbage collect every time. Runtime.gc() is more likely to perform a gc.
         Runtime.getRuntime().gc();
-        Reference<? extends RealmResults<? extends RealmObject>> weakReference;
-        while ((weakReference = referenceQueue.poll()) != null ) { // Does not wait for a reference to become available.
-            asyncRealmResults.remove(weakReference);
+        Reference<? extends RealmResults<? extends RealmObject>> weakReferenceResults;
+        Reference<? extends RealmObject> weakReferenceObject;
+        while ((weakReferenceResults = referenceQueueAsyncRealmResults.poll()) != null ) { // Does not wait for a reference to become available.
+            asyncRealmResults.remove(weakReferenceResults);
+        }
+        while ((weakReferenceResults = referenceQueueSyncRealmResults.poll()) != null ) {
+            syncRealmResults.remove(weakReferenceResults);
+        }
+        while ((weakReferenceObject = referenceQueueRealmObject.poll()) != null ) {
+            realmObjects.remove(weakReferenceObject);
         }
     }
 

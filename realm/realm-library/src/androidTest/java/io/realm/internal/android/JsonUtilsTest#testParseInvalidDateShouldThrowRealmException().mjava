@@ -1,0 +1,11 @@
+    public void testParseInvalidDateShouldThrowRealmException() {
+        String invalidLongDate = "123abc";
+        try {
+            Date d = JsonUtils.stringToDate(invalidLongDate);
+            fail("Should fail with a RealmException.");
+        } catch (RealmException e) {
+            assertNotNull(e);
+            assertTrue(e.getCause() instanceof ParseException);
+        }
+    }
+

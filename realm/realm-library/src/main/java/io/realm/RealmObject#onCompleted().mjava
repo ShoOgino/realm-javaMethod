@@ -6,11 +6,16 @@
     boolean onCompleted() {
         try {
             Long handoverResult = pendingQuery.get();// make the query blocking
-            // this may fail with BadVersionException if the caller and/or the worker thread
-            // are not in sync (same shared_group version).
-            // REALM_COMPLETED_ASYNC_FIND_FIRST will be fired by the worker thread
-            // this should handle more complex use cases like retry, ignore etc
-            onCompleted(handoverResult);
+            if (handoverResult != 0) {
+                // this may fail with BadVersionException if the caller and/or the worker thread
+                // are not in sync (same shared_group version).
+                // COMPLETED_ASYNC_REALM_OBJECT will be fired by the worker thread
+                // this should handle more complex use cases like retry, ignore etc
+                onCompleted(handoverResult);
+                notifyChangeListeners();
+            } else {
+                isCompleted = true;
+            }
         } catch (Exception e) {
             RealmLog.d(e.getMessage());
             return false;

@@ -1,0 +1,21 @@
+    public void testParseRfc3339Examples() throws java.text.ParseException {
+        // Two digit milliseconds.
+        Date d = ISO8601Utils.parse("1985-04-12T23:20:50.52Z", new ParsePosition(0));
+        assertEquals(newDate(1985, 4, 12, 23, 20, 50, 520, 0), d);
+
+        d = ISO8601Utils.parse("1996-12-19T16:39:57-08:00", new ParsePosition(0));
+        assertEquals(newDate(1996, 12, 19, 16, 39, 57, 0, -8 * 60), d);
+
+        // Truncated leap second.
+        d = ISO8601Utils.parse("1990-12-31T23:59:60Z", new ParsePosition(0));
+        assertEquals(newDate(1990, 12, 31, 23, 59, 59, 0, 0), d);
+
+        // Truncated leap second.
+        d = ISO8601Utils.parse("1990-12-31T15:59:60-08:00", new ParsePosition(0));
+        assertEquals(newDate(1990, 12, 31, 15, 59, 59, 0, -8 * 60), d);
+
+        // Two digit milliseconds.
+        d = ISO8601Utils.parse("1937-01-01T12:00:27.87+00:20", new ParsePosition(0));
+        assertEquals(newDate(1937, 1, 1, 12, 0, 27, 870, 20), d);
+    }
+

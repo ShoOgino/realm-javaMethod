@@ -6,14 +6,8 @@
             return columnRealmListRealmList;
         } else {
             LinkView linkView = row.getLinkList(columnInfo.columnRealmListIndex);
-            if (linkView == null) {
-                // return empty non managed RealmList if the LinkView is null
-                // useful for non-initialized RealmObject (async query returns empty Row while the query is still running)
-                return EMPTY_REALM_LIST_COLUMNREALMLIST;
-            } else {
-                columnRealmListRealmList = new RealmList<AllTypes>(AllTypes.class, linkView, realm);
-                return columnRealmListRealmList;
-            }
+            columnRealmListRealmList = new RealmList<AllTypes>(AllTypes.class, linkView, realm);
+            return columnRealmListRealmList;
         }
     }
 

@@ -106,15 +106,9 @@
                         writer.emitStatement("return " + fieldName + "RealmList");
                 writer.nextControlFlow("else");
                     writer.emitStatement("LinkView linkView = row.getLinkList(%s)", fieldIndexVariableReference(field));
-                writer.beginControlFlow("if (linkView == null)");
-                writer.emitSingleLineComment("return empty non managed RealmList if the LinkView is null");
-                writer.emitSingleLineComment("useful for non-initialized RealmObject (async query returns empty Row while the query is still running)");
-                    writer.emitStatement("return EMPTY_REALM_LIST_" + fieldName.toUpperCase());
-                writer.nextControlFlow("else");
                     writer.emitStatement(fieldName + "RealmList = new RealmList<%s>(%s.class, linkView, realm)",
                         genericType, genericType);
                     writer.emitStatement("return " + fieldName + "RealmList");
-                writer.endControlFlow();
                 writer.endControlFlow();
 
                 writer.endMethod();

@@ -1,0 +1,18 @@
+    private void notifyRealmObjectCallbacks() {
+        Iterator<WeakReference<RealmObject>> iterator = realmObjects.keySet().iterator();
+        while (iterator.hasNext()) {
+            WeakReference<? extends RealmObject> weakRealmObject = iterator.next();
+            RealmObject realmObject = weakRealmObject.get();
+            if (realmObject == null) {
+                iterator.remove();
+
+            } else {
+                if (realmObject.row.isAttached()) {
+                    realmObject.notifyChangeListeners();
+                } else if (realmObject.row != Row.EMPTY_ROW) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+

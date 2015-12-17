@@ -38,7 +38,7 @@
                                     // upcoming REALM_CHANGED to batch update all async queries
                                     return numberOfInterceptedChangeMessage.getAndIncrement() == 0;
                                 }
-                                case HandlerController.REALM_COMPLETED_ASYNC_QUERY: {
+                                case HandlerController.COMPLETED_ASYNC_REALM_RESULTS: {
                                     if (numberOfCompletedAsyncQuery.incrementAndGet() == 2) {
                                         // both queries have completed now (& their results should be ignored)
                                         // now send the REALM_CHANGED event that should batch update all queries
@@ -135,6 +135,6 @@
             }
         });
 
-        exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
+        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
     }
 

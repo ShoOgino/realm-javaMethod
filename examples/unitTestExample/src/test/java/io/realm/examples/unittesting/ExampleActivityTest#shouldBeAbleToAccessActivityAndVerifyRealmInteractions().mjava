@@ -1,0 +1,36 @@
+    @Test
+    public void shouldBeAbleToAccessActivityAndVerifyRealmInteractions() {
+        assertThat(activity.getTitle().toString(), is("Unit Test Example"));
+
+        // Verify that two Realm.getInstance() calls took place.
+        verifyStatic(times(2));
+        Realm.getInstance(any(Context.class));
+
+        // verify that we have four begin and commit transaction calls
+        verify(mockRealm, times(4)).beginTransaction();
+        verify(mockRealm, times(4)).commitTransaction();
+
+        // Click the clean up button
+        activity.findViewById(R.id.clean_up).performClick();
+
+        // Verify that begin and commit transaction were called (been called a total of 5 times now)
+        verify(mockRealm, times(5)).beginTransaction();
+        verify(mockRealm, times(5)).commitTransaction();
+
+        // Verify that we queried for all Person instance two times in this run (in the original
+        // onCreate, and then again in the button click). Was called two times previously in the
+        // setup, therefore we need to check if it was called again.
+        verify(mockRealm, times(3)).allObjects(Person.class);
+
+        // Verify that the clear method was called. Clear is also called in the start of the
+        // activity to ensure we start with a clean db.
+        verify(people, times(2)).clear();
+
+        // Call the destroy method so we can verify that the .close() method was called (below)
+        activity.onDestroy();
+
+        // Verify that the realm got closed 2 separate times. Once in the AsyncTask, once
+        // in onDestroy
+        verify(mockRealm, times(2)).close();
+    }
+
