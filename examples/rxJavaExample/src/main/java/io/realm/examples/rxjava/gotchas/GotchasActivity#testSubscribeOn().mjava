@@ -1,0 +1,43 @@
+    /**
+     * Shows how to be careful with `subscribeOn()`
+     */
+    private Subscription testSubscribeOn() {
+        Subscription subscribeOn = realm.asObservable()
+                .map(new Func1<Realm, Person>() {
+                    @Override
+                    public Person call(Realm realm) {
+                        return realm.where(Person.class).findAllSorted("name").get(0);
+                    }
+                })
+                // The Realm was created on the UI thread. Accessing it on `Schedulers.io()` will crash.
+                // Avoid using subscribeOn() and use Realms `findAllAsync*()` methods instead.
+                .subscribeOn(Schedulers.io()) //
+                .subscribe(new Action1<Person>() {
+                    @Override
+                    public void call(Person person) {
+                        // Do nothing
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showStatus("subscribeOn: " + throwable.toString());
+                    }
+                });
+
+        // Use Realms Async API instead
+        Subscription asyncSubscribeOn = realm.where(Person.class).findAllSortedAsync("name").get(0).<Person>asObservable()
+                .subscribe(new Action1<Person>() {
+                    @Override
+                    public void call(Person person) {
+                        showStatus("subscribeOn/async: " + person.getName() + ":" + person.getAge());
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showStatus("subscribeOn/async: " + throwable.toString());
+                    }
+                });
+
+        return new CompositeSubscription(subscribeOn, asyncSubscribeOn);
+    }
+

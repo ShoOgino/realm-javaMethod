@@ -1,0 +1,16 @@
+    public void testRealmEmittedOnUpdate() {
+        final AtomicInteger subscriberCalled = new AtomicInteger(0);
+        realm.asObservable().subscribe(new Action1<Realm>() {
+            @Override
+            public void call(Realm rxRealm) {
+                subscriberCalled.incrementAndGet();
+            }
+        });
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        assertEquals(2, subscriberCalled.get());
+    }
+
