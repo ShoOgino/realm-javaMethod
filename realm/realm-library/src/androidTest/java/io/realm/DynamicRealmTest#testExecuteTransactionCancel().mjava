@@ -1,4 +1,6 @@
     public void testExecuteTransactionCancel() {
+        final AtomicReference<RuntimeException> thrownException = new AtomicReference<>(null);
+
         assertEquals(0, realm.allObjects(CLASS_OWNER).size());
         try {
             realm.executeTransaction(new DynamicRealm.Transaction() {
@@ -6,10 +8,13 @@
                 public void execute(DynamicRealm realm) {
                     DynamicRealmObject owner = realm.createObject(CLASS_OWNER);
                     owner.setString("name", "Owner");
-                    throw new RuntimeException("Boom");
+                    thrownException.set(new RuntimeException("Boom"));
+                    throw thrownException.get();
                 }
             });
-        } catch (RealmException ignore) {
+        } catch (RuntimeException e) {
+            //noinspection ThrowableResultOfMethodCallIgnored
+            assertTrue(e == thrownException.get());
         }
         assertEquals(0, realm.allObjects(CLASS_OWNER).size());
     }
