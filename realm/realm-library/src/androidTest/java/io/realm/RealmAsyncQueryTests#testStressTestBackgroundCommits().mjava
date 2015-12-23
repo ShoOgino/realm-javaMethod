@@ -1,88 +1,57 @@
     // keep advancing the Realm by sending 1 commit for each frame (16ms)
     // the async queries should keep up with the modification
+    @Test
+    @RunTestInLooperThread
     public void testStressTestBackgroundCommits() throws Throwable {
-        final int NUMBER_OF_COMMITS = 1000;
-        final CountDownLatch signalTestFinished = new CountDownLatch(1);
-        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
-        final Throwable[] threadAssertionError = new Throwable[1];
-        final Looper[] backgroundLooper = new Looper[1];
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
+        final int NUMBER_OF_COMMITS = 100;
+        final long[] latestLongValue = new long[1];
+        final float[] latestFloatValue = new float[1];
+        // start a background thread that pushes a commit every 16ms
+        final Thread backgroundThread = new Thread() {
             @Override
             public void run() {
-                Looper.prepare();
-                backgroundLooper[0] = Looper.myLooper();
+                Random random = new Random(System.currentTimeMillis());
+                Realm backgroundThreadRealm = Realm.getInstance(workerThread.realm.getConfiguration());
+                for (int i = 0; i < NUMBER_OF_COMMITS; i++) {
+                    backgroundThreadRealm.beginTransaction();
+                    AllTypes object = backgroundThreadRealm.createObject(AllTypes.class);
+                    latestLongValue[0] = random.nextInt(100);
+                    latestFloatValue[0] = random.nextFloat();
+                    object.setColumnFloat(latestFloatValue[0]);
+                    object.setColumnLong(latestLongValue[0]);
+                    backgroundThreadRealm.commitTransaction();
 
-                final Realm[] realm = new Realm[1];
-                try {
-                    realm[0] = openRealmInstance("testStressTestBackgroundCommits");
-                    final RealmConfiguration configuration = realm[0].getConfiguration();
-                    final long[] latestLongValue = new long[1];
-                    final float[] latestFloatValue = new float[1];
-                    // start a background thread that pushes a commit every 500ms
-                    final Thread backgroundThread = new Thread() {
-                        @Override
-                        public void run() {
-                            Random random = new Random(System.currentTimeMillis());
-                            Realm backgroundThreadRealm = Realm.getInstance(configuration);
-                            for (int i = 0; i < NUMBER_OF_COMMITS; i++) {
-                                backgroundThreadRealm.beginTransaction();
-                                AllTypes object = backgroundThreadRealm.createObject(AllTypes.class);
-                                latestLongValue[0] = random.nextInt(100);
-                                latestFloatValue[0] = random.nextFloat();
-                                object.setColumnFloat(latestFloatValue[0]);
-                                object.setColumnLong(latestLongValue[0]);
-                                backgroundThreadRealm.commitTransaction();
+                    // Wait 16ms. before adding the next commit.
+                    SystemClock.sleep(16);
+                }
+                backgroundThreadRealm.close();
+            }
+        };
 
-                                // Wait 16ms. before adding the next commit.
-                                SystemClock.sleep(16);
-                            }
-                            backgroundThreadRealm.close();
-                        }
-                    };
+        final RealmResults<AllTypes> allAsync = workerThread.realm.where(AllTypes.class).findAllAsync();
+        allAsync.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertTrue(allAsync.isLoaded());
+                if (allAsync.size() == NUMBER_OF_COMMITS) {
 
-                    final RealmResults<AllTypes> allAsync = realm[0].where(AllTypes.class).findAllAsync();
-                    allAsync.addChangeListener(new RealmChangeListener() {
-                        @Override
-                        public void onChange() {
-                            assertTrue(allAsync.isLoaded());
-                            if (allAsync.size() == NUMBER_OF_COMMITS) {
+                    AllTypes lastInserted = workerThread.realm.where(AllTypes.class)
+                            .equalTo("columnLong", latestLongValue[0])
+                            .equalTo("columnFloat", latestFloatValue[0])
+                            .findFirst();
 
-                                AllTypes lastInserted = realm[0].where(AllTypes.class)
-                                        .equalTo("columnLong", latestLongValue[0])
-                                        .equalTo("columnFloat", latestFloatValue[0])
-                                        .findFirst();
-
-                                assertNotNull(lastInserted);
-                                signalTestFinished.countDown();
-                            }
-                        }
-                    });
-
-                    realm[0].handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            backgroundThread.start();
-                        }
-                    }, 16);
-
-                    Looper.loop();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    threadAssertionError[0] = e;
-
-                } finally {
-                    if (signalTestFinished.getCount() > 0) {
-                        signalTestFinished.countDown();
-                    }
-                    if (realm[0] != null) {
-                        realm[0].close();
-                    }
-                    signalClosedRealm.countDown();
+                    assertNotNull(lastInserted);
+                    workerThread.signalTestCompleted.countDown();
                 }
             }
         });
+        workerThread.keepStrongReference.add(allAsync);
 
-        TestHelper.exitOrThrow(executorService, signalTestFinished, signalClosedRealm, backgroundLooper, threadAssertionError, 120);
+        workerThread.realm.handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                backgroundThread.start();
+            }
+        }, 16);
     }
 

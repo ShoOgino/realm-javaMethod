@@ -1,52 +1,22 @@
-    public void testCombiningAsyncAndSync() throws Throwable {
-        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
-        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
-        final Throwable[] threadAssertionError = new Throwable[1];// to catch both Exception & AssertionError
-        final Looper[] backgroundLooper = new Looper[1];
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
+    @Test
+    @RunTestInLooperThread
+    public void testCombiningAsyncAndSync() {
+        populateTestRealm(workerThread.realm, 10);
+
+        Realm.asyncQueryExecutor.pause();
+        final RealmResults<AllTypes> allTypesAsync = workerThread.realm.where(AllTypes.class).greaterThan("columnLong", 5).findAllAsync();
+        final RealmResults<AllTypes> allTypesSync = allTypesAsync.where().greaterThan("columnLong", 3).findAll();
+
+        assertEquals(0, allTypesAsync.size());
+        assertEquals(6, allTypesSync.size());
+        allTypesAsync.addChangeListener(new RealmChangeListener() {
             @Override
-            public void run() {
-                Looper.prepare();
-                backgroundLooper[0] = Looper.myLooper();
-
-                Realm realm = null;
-                try {
-                    realm = openRealmInstance("testCombiningAsyncAndSync");
-                    populateTestRealm(realm, 10);
-
-                    Realm.asyncQueryExecutor.pause();
-                    final RealmResults<AllTypes> allTypesAsync = realm.where(AllTypes.class).greaterThan("columnLong", 5).findAllAsync();
-                    final RealmResults<AllTypes> allTypesSync = allTypesAsync.where().greaterThan("columnLong", 3).findAll();
-
-                    assertEquals(0, allTypesAsync.size());
-                    assertEquals(6, allTypesSync.size());
-                    allTypesAsync.addChangeListener(new RealmChangeListener() {
-                        @Override
-                        public void onChange() {
-                            assertEquals(4, allTypesAsync.size());
-                            assertEquals(6, allTypesSync.size());
-                            signalCallbackFinished.countDown();
-                        }
-                    });
-                    Realm.asyncQueryExecutor.resume();
-                    Looper.loop();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    threadAssertionError[0] = e;
-
-                } finally {
-                    if (signalCallbackFinished.getCount() > 0) {
-                        signalCallbackFinished.countDown();
-                    }
-                    if (realm != null) {
-                        realm.close();
-                    }
-                    signalClosedRealm.countDown();
-                }
+            public void onChange() {
+                assertEquals(4, allTypesAsync.size());
+                assertEquals(6, allTypesSync.size());
+                workerThread.signalTestCompleted.countDown();
             }
         });
-
-        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
+        Realm.asyncQueryExecutor.resume();
     }
 

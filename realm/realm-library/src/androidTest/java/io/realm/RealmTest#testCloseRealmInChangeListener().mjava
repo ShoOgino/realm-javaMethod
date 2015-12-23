@@ -1,4 +1,5 @@
     // Test if close can be called from Realm change listener when there is no other listeners
+    @Test
     public void testCloseRealmInChangeListener() {
         final CountDownLatch signalTestFinished = new CountDownLatch(1);
         HandlerThread handlerThread = new HandlerThread("background");
@@ -15,7 +16,8 @@
                             realm.removeChangeListener(this);
                             realm.close();
                             signalTestFinished.countDown();
-                        }}
+                        }
+                    }
                 };
 
                 realm.addChangeListener(listener);
