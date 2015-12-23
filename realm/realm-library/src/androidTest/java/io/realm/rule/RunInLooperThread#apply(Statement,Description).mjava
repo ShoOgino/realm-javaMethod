@@ -1,0 +1,47 @@
+    @Override
+    public Statement apply(final Statement base, Description description) {
+        if (description.getAnnotation(RunTestInLooperThread.class) == null) {
+            return base;
+        }
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                before();
+                try {
+                    final CountDownLatch signalClosedRealm = new CountDownLatch(1);
+                    final Throwable[] threadAssertionError = new Throwable[1];
+                    final Looper[] backgroundLooper = new Looper[1];
+                    final ExecutorService executorService = Executors.newSingleThreadExecutor();
+                    executorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            Looper.prepare();
+                            backgroundLooper[0] = Looper.myLooper();
+                            try {
+                                realm = Realm.getInstance(realmConfiguration);
+
+                                base.evaluate();
+
+                                Looper.loop();
+                            } catch (Throwable e) {
+                                threadAssertionError[0] = e;
+
+                            } finally {
+                                if (signalTestCompleted.getCount() > 0) {
+                                    signalTestCompleted.countDown();
+                                }
+                                if (realm != null) {
+                                    realm.close();
+                                }
+                                signalClosedRealm.countDown();
+                            }
+                        }
+                    });
+                    TestHelper.exitOrThrow(executorService, signalTestCompleted, signalClosedRealm, backgroundLooper, threadAssertionError);
+                } finally {
+                    after();
+                }
+            }
+        };
+    }
+

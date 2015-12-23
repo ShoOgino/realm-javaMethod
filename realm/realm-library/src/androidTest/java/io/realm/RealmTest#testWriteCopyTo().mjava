@@ -1,6 +1,7 @@
+    @Test
     public void testWriteCopyTo() throws IOException {
-        RealmConfiguration configA = TestHelper.createConfiguration(getContext(), "file1.realm");
-        RealmConfiguration configB = TestHelper.createConfiguration(getContext(), "file2.realm");
+        RealmConfiguration configA = TestHelper.createConfiguration(context, "file1.realm");
+        RealmConfiguration configB = TestHelper.createConfiguration(context, "file2.realm");
         Realm.deleteRealm(configA);
         Realm.deleteRealm(configB);
 
@@ -12,7 +13,7 @@
             allTypes.setColumnString("Hello World");
             realm1.commitTransaction();
 
-            realm1.writeCopyTo(new File(getContext().getFilesDir(), "file2.realm"));
+            realm1.writeCopyTo(new File(context.getFilesDir(), "file2.realm"));
         } finally {
             if (realm1 != null) {
                 realm1.close();
@@ -20,8 +21,8 @@
         }
 
         // Copy is compacted i.e. smaller than original
-        File file1 = new File(getContext().getFilesDir(), "file1.realm");
-        File file2 = new File(getContext().getFilesDir(), "file2.realm");
+        File file1 = new File(context.getFilesDir(), "file1.realm");
+        File file2 = new File(context.getFilesDir(), "file2.realm");
         assertTrue(file1.length() >= file2.length());
 
         Realm realm2 = null;

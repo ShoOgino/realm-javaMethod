@@ -1,3 +1,4 @@
+    @Test
     public void testReferenceCounting() {
         // At this point reference count should be one because of the setUp method
         try {
@@ -7,14 +8,14 @@
         }
 
         // Make sure the reference counter is per realm file
-        RealmConfiguration anotherConfig = TestHelper.createConfiguration(getContext(), "anotherRealm.realm");
+        RealmConfiguration anotherConfig = TestHelper.createConfiguration(context, "anotherRealm.realm");
         Realm.deleteRealm(anotherConfig);
         Realm otherRealm = Realm.getInstance(anotherConfig);
 
         // Raise the reference
         Realm realm = null;
         try {
-            realm = Realm.getInstance(getContext());
+            realm = Realm.getInstance(context);
         } finally {
             if (realm != null) realm.close();
         }
