@@ -1,5 +1,5 @@
     private void createAndTestFilename(String language, String fileName) {
-        RealmConfiguration realmConfig = TestHelper.createConfiguration(getContext(), fileName);
+        RealmConfiguration realmConfig = TestHelper.createConfiguration(context, fileName);
         Realm.deleteRealm(realmConfig);
         Realm realm1 = Realm.getInstance(realmConfig);
         realm1.beginTransaction();
@@ -8,7 +8,7 @@
         realm1.commitTransaction();
         realm1.close();
 
-        File file = new File(getContext().getFilesDir(), fileName);
+        File file = new File(context.getFilesDir(), fileName);
         assertTrue(language, file.exists());
 
         Realm realm2 = Realm.getInstance(realmConfig);

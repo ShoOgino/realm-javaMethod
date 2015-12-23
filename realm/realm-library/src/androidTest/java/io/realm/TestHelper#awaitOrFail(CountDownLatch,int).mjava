@@ -1,10 +1,10 @@
     public static void awaitOrFail(CountDownLatch latch, int numberOfSeconds) {
         try {
             if (!latch.await(numberOfSeconds, TimeUnit.SECONDS)) {
-                fail();
+                fail("Test took longer than " + numberOfSeconds + " seconds");
             }
         } catch (InterruptedException e) {
-            fail();
+            fail(e.getMessage());
         }
     }
 

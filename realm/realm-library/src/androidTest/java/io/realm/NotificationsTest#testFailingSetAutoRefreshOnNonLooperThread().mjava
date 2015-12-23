@@ -1,9 +1,10 @@
+    @Test
     public void testFailingSetAutoRefreshOnNonLooperThread() throws ExecutionException, InterruptedException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                Realm realm = Realm.getInstance(getContext());
+                Realm realm = Realm.getInstance(context);
                 boolean autoRefresh = realm.isAutoRefresh();
                 assertFalse(autoRefresh);
                 try {
@@ -16,8 +17,9 @@
                 }
             }
         });
+
         assertTrue(future.get());
-        RealmCache.invokeWithGlobalRefCount(new RealmConfiguration.Builder(getContext()).build(),
-                new TestHelper.ExpectedCountCallback(this, 0));
+        RealmCache.invokeWithGlobalRefCount(new RealmConfiguration.Builder(context).build(),
+                new TestHelper.ExpectedCountCallback(0));
     }
 

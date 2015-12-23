@@ -1,7 +1,8 @@
     // Tests that if the same configuration is used on 2 different Looper threads that each gets its own Handler. This
     // prevents commitTransaction from accidentally posting messages to Handlers which might reference a closed Realm.
+    @Test
     public void testDoNotUseClosedHandler() throws InterruptedException {
-        final RealmConfiguration realmConfiguration = TestHelper.createConfiguration(getContext());
+        final RealmConfiguration realmConfiguration = TestHelper.createConfiguration(context);
         final AssertionFailedError[] threadAssertionError = new AssertionFailedError[1]; // Keep track of errors in test threads.
         Realm.deleteRealm(realmConfiguration);
 

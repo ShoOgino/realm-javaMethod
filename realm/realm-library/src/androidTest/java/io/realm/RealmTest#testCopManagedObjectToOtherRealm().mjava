@@ -1,10 +1,11 @@
+    @Test
     public void testCopManagedObjectToOtherRealm() {
         testRealm.beginTransaction();
         AllTypes allTypes = testRealm.createObject(AllTypes.class);
         allTypes.setColumnString("Test");
         testRealm.commitTransaction();
 
-        RealmConfiguration realmConfig = TestHelper.createConfiguration(getContext(), "other-realm");
+        RealmConfiguration realmConfig = TestHelper.createConfiguration(context, "other-realm");
         Realm.deleteRealm(realmConfig);
         Realm otherRealm = Realm.getInstance(realmConfig);
         otherRealm.beginTransaction();

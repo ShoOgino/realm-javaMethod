@@ -2,11 +2,15 @@
     // 1) (A -> B/[B,C])
     // 2) (C -> B/[B,A])
     // A copy should result in only 3 distinct objects
+    @Test
     public void testCopyFromRealmCyclicObjectGraph() {
         testRealm.beginTransaction();
-        CyclicType objA = testRealm.createObject(CyclicType.class); objA.setName("A");
-        CyclicType objB = testRealm.createObject(CyclicType.class); objB.setName("B");
-        CyclicType objC = testRealm.createObject(CyclicType.class); objC.setName("C");
+        CyclicType objA = testRealm.createObject(CyclicType.class);
+        objA.setName("A");
+        CyclicType objB = testRealm.createObject(CyclicType.class);
+        objB.setName("B");
+        CyclicType objC = testRealm.createObject(CyclicType.class);
+        objC.setName("C");
         objA.setObject(objB);
         objC.setObject(objB);
         objA.getObjects().add(objB);
