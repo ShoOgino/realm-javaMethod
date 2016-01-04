@@ -1,4 +1,4 @@
-    private void createIsNonEmptyDataSet(Realm realm) {
+    private void createIsNotEmptyDataSet(Realm realm) {
         realm.beginTransaction();
 
         AllJavaTypes emptyValues = new AllJavaTypes();
@@ -9,13 +9,13 @@
         emptyValues.setFieldList(new RealmList<AllJavaTypes>());
         realm.copyToRealm(emptyValues);
 
-        AllJavaTypes nonEmpty = new AllJavaTypes();
-        nonEmpty.setFieldLong(2);
-        nonEmpty.setFieldString("Foo");
-        nonEmpty.setFieldBinary(new byte[]{1, 2, 3});
-        nonEmpty.setFieldObject(nonEmpty);
-        nonEmpty.setFieldList(new RealmList<AllJavaTypes>(emptyValues));
-        realm.copyToRealmOrUpdate(nonEmpty);
+        AllJavaTypes notEmpty = new AllJavaTypes();
+        notEmpty.setFieldLong(2);
+        notEmpty.setFieldString("Foo");
+        notEmpty.setFieldBinary(new byte[]{1, 2, 3});
+        notEmpty.setFieldObject(notEmpty);
+        notEmpty.setFieldList(new RealmList<AllJavaTypes>(emptyValues));
+        realm.copyToRealmOrUpdate(notEmpty);
 
         realm.commitTransaction();
     }
