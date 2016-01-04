@@ -1,0 +1,12 @@
+    public void testIsNonEmptyInvalidFieldNameThrows() {
+        String[] fieldNames = new String[] {null, "", "foo", AllJavaTypes.FIELD_OBJECT + ".foo"};
+
+        for (String fieldName : fieldNames) {
+            try {
+                testRealm.where(AllJavaTypes.class).isNonEmpty(fieldName).findAll();
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+
