@@ -1,13 +1,19 @@
     private void notifyRealmResultsCallbacks(Iterator<WeakReference<RealmResults<? extends RealmObject>>> iterator) {
+        List<RealmResults<? extends RealmObject>> resultsToBeNotified =
+                new ArrayList<RealmResults<? extends RealmObject>>();
         while (iterator.hasNext()) {
             WeakReference<RealmResults<? extends RealmObject>> weakRealmResults = iterator.next();
             RealmResults<? extends RealmObject> realmResults = weakRealmResults.get();
             if (realmResults == null) {
                 iterator.remove();
-
             } else {
-                realmResults.notifyChangeListeners();
+                // It should be legal to modify asyncRealmResults and syncRealmResults in the listener
+                resultsToBeNotified.add(realmResults);
             }
+        }
+
+        for (RealmResults<? extends RealmObject> realmResults : resultsToBeNotified) {
+            realmResults.notifyChangeListeners();
         }
     }
 
