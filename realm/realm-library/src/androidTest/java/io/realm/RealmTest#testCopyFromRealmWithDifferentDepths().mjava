@@ -3,13 +3,19 @@
     // A -> B -> C -> D -> E
     // A -> D -> E
     // D is both at depth 1 and 3. For maxDepth = 3, E should still be copied.
+    @Test
     public void testCopyFromRealmWithDifferentDepths() {
         testRealm.beginTransaction();
-        CyclicType objA = testRealm.createObject(CyclicType.class); objA.setName("A");
-        CyclicType objB = testRealm.createObject(CyclicType.class); objB.setName("B");
-        CyclicType objC = testRealm.createObject(CyclicType.class); objC.setName("C");
-        CyclicType objD = testRealm.createObject(CyclicType.class); objD.setName("D");
-        CyclicType objE = testRealm.createObject(CyclicType.class); objE.setName("E");
+        CyclicType objA = testRealm.createObject(CyclicType.class);
+        objA.setName("A");
+        CyclicType objB = testRealm.createObject(CyclicType.class);
+        objB.setName("B");
+        CyclicType objC = testRealm.createObject(CyclicType.class);
+        objC.setName("C");
+        CyclicType objD = testRealm.createObject(CyclicType.class);
+        objD.setName("D");
+        CyclicType objE = testRealm.createObject(CyclicType.class);
+        objE.setName("E");
         objA.setObject(objB);
         objB.setObject(objC);
         objC.setObject(objD);

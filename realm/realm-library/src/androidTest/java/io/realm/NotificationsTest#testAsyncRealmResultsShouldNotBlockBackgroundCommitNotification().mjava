@@ -1,6 +1,7 @@
     // The presence of async RealmResults block any `REALM_CHANGE` notification causing historically the Realm
     // to advance to the latest version. We make sure in this test that all Realm listeners will be notified
     // regardless of the presence of an async RealmResults that will delay the `REALM_CHANGE` sometimes
+    @Test
     public void testAsyncRealmResultsShouldNotBlockBackgroundCommitNotification() throws Throwable {
         final AtomicInteger numberOfRealmCallbackInvocation = new AtomicInteger(0);
         final AtomicInteger numberOfAsyncRealmResultsCallbackInvocation = new AtomicInteger(0);
@@ -17,7 +18,7 @@
                 backgroundLooper[0] = Looper.myLooper();
 
                 try {
-                    realm[0] = Realm.getInstance(getContext());
+                    realm[0] = Realm.getInstance(context);
                     realm[0].addChangeListener(new RealmChangeListener() {
                         @Override
                         public void onChange() {
@@ -37,7 +38,7 @@
                                     new Thread() {
                                         @Override
                                         public void run() {
-                                            Realm realm = Realm.getInstance(getContext());
+                                            Realm realm = Realm.getInstance(context);
                                             realm.beginTransaction();
                                             realm.createObject(Dog.class);
                                             realm.commitTransaction();

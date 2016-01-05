@@ -1,54 +1,22 @@
+    @Test
+    @RunTestInLooperThread
     public void testReusingQuery() throws Throwable {
-        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
-        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
-        final Throwable[] threadAssertionError = new Throwable[1];
-        final Looper[] backgroundLooper = new Looper[1];
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                Looper.prepare();
-                backgroundLooper[0] = Looper.myLooper();
+        populateTestRealm(workerThread.realm, 10);
 
-                Realm realm = null;
-                try {
-                    realm = openRealmInstance("testResusingQuery");
-                    populateTestRealm(realm, 10);
+        RealmQuery<AllTypes> query = workerThread.realm.where(AllTypes.class)
+                .between("columnLong", 0, 4);
+        RealmResults<AllTypes> queryAllSync = query.findAll();
+        RealmResults<AllTypes> allAsync = query.findAllAsync();
 
-                    RealmQuery<AllTypes> query = realm.where(AllTypes.class)
-                            .between("columnLong", 0, 4);
-                    RealmResults<AllTypes> queryAllSync = query.findAll();
-                    RealmResults<AllTypes> allAsync = query.findAllAsync();
+        assertTrue(allAsync.load());
+        assertEquals(allAsync, queryAllSync);
 
-                    assertTrue(allAsync.load());
-                    assertEquals(allAsync, queryAllSync);
-
-                    // the RealmQuery already has an argumentHolder, can't reuse it
-                    try {
-                        RealmResults<AllTypes> allAsyncSorted = query.findAllSorted("columnLong");
-                        fail("Should throw an exception, can not reuse RealmQuery");
-                    } catch (IllegalStateException ignored) {
-                        signalCallbackFinished.countDown();
-                    }
-
-                    Looper.loop();
-
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    threadAssertionError[0] = e;
-
-                } finally {
-                    if (signalCallbackFinished.getCount() > 0) {
-                        signalCallbackFinished.countDown();
-                    }
-                    if (realm != null) {
-                        realm.close();
-                    }
-                    signalClosedRealm.countDown();
-                }
-            }
-        });
-
-        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
+        // the RealmQuery already has an argumentHolder, can't reuse it
+        try {
+            RealmResults<AllTypes> allAsyncSorted = query.findAllSorted("columnLong");
+            fail("Should throw an exception, can not reuse RealmQuery");
+        } catch (IllegalStateException ignored) {
+            workerThread.signalTestCompleted.countDown();
+        }
     }
 
