@@ -1,3 +1,4 @@
+    @Test
     public void testHandlerThreadShouldReceiveNotification() throws ExecutionException, InterruptedException {
         final AssertionFailedError[] assertionFailedErrors = new AssertionFailedError[1];
         final CountDownLatch backgroundThreadReady = new CountDownLatch(1);
@@ -14,7 +15,7 @@
                 } catch (AssertionFailedError e) {
                     assertionFailedErrors[0] = e;
                 }
-                final Realm backgroundRealm = Realm.getInstance(getContext());
+                final Realm backgroundRealm = Realm.getInstance(context);
                 backgroundRealm.addChangeListener(new RealmChangeListener() {
                     @Override
                     public void onChange() {
@@ -28,7 +29,7 @@
         TestHelper.awaitOrFail(backgroundThreadReady);
         // At this point the background thread started & registered the listener
 
-        Realm realm = Realm.getInstance(getContext());
+        Realm realm = Realm.getInstance(context);
         realm.beginTransaction();
         realm.createObject(AllTypes.class);
         realm.commitTransaction();

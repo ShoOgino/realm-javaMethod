@@ -1,9 +1,11 @@
     // Test that that a WeakReferenceListener can be removed.
     // This test is not a proper GC test, but just ensures that listeners can be removed from the list of weak listeners
     // without throwing an exception.
+    @Test
+    @UiThreadTest
     public void testRemovingWeakReferenceListener() throws InterruptedException {
         final AtomicInteger counter = new AtomicInteger(0);
-        realm = Realm.getInstance(getContext());
+        realm = Realm.getInstance(context);
         RealmChangeListener listenerA = new RealmChangeListener() {
             @Override
             public void onChange() {

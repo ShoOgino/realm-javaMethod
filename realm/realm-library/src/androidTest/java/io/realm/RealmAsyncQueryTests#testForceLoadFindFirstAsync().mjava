@@ -1,53 +1,22 @@
     // similar UC as #testForceLoadAsync using 'findFirst'
+    @Test
+    @RunTestInLooperThread
     public void testForceLoadFindFirstAsync() throws Throwable {
-        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
-        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
-        final Throwable[] threadAssertionError = new Throwable[1];
-        final Looper[] backgroundLooper = new Looper[1];
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                Looper.prepare();
-                backgroundLooper[0] = Looper.myLooper();
+        Realm.asyncQueryExecutor.pause();
 
-                Realm realm = null;
-                try {
-                    realm = openRealmInstance("testForceLoadFindFirstAsync");
-                    Realm.asyncQueryExecutor.pause();
+        populateTestRealm(workerThread.realm, 10);
+        final AllTypes realmResults = workerThread.realm.where(AllTypes.class)
+                .between("columnLong", 4, 9)
+                .findFirstAsync();
 
-                    populateTestRealm(realm, 10);
-                    final AllTypes realmResults = realm.where(AllTypes.class)
-                            .between("columnLong", 4, 9)
-                            .findFirstAsync();
+        assertFalse(realmResults.isLoaded());
 
-                    assertFalse(realmResults.isLoaded());
+        Realm.asyncQueryExecutor.resume();
 
-                    Realm.asyncQueryExecutor.resume();
+        assertTrue(realmResults.load());
+        assertTrue(realmResults.isLoaded());
+        assertEquals("test data 4", realmResults.getColumnString());
 
-                    assertTrue(realmResults.load());
-                    assertTrue(realmResults.isLoaded());
-                    assertEquals("test data 4", realmResults.getColumnString());
-
-                    signalCallbackFinished.countDown();
-                    Looper.loop();
-
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    threadAssertionError[0] = e;
-
-                } finally {
-                    if (signalCallbackFinished.getCount() > 0) {
-                        signalCallbackFinished.countDown();
-                    }
-                    if (realm != null) {
-                        realm.close();
-                    }
-                    signalClosedRealm.countDown();
-                }
-            }
-        });
-
-        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
+        workerThread.signalTestCompleted.countDown();
     }
 

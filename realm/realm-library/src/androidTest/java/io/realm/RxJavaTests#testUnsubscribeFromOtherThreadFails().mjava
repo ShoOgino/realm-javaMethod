@@ -1,0 +1,29 @@
+    @Test
+    @UiThreadTest
+    public void testUnsubscribeFromOtherThreadFails() {
+        final CountDownLatch unsubscribeCompleted = new CountDownLatch(1);
+        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
+        final Subscription subscription = realm.asObservable().subscribe(new Action1<Realm>() {
+            @Override
+            public void call(Realm rxRealm) {
+                assertTrue(rxRealm == realm);
+                subscribedNotified.set(true);
+            }
+        });
+        assertEquals(1, realm.handlerController.changeListeners.size());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    subscription.unsubscribe();
+                    fail();
+                } catch (IllegalStateException ignored) {
+                } finally {
+                    unsubscribeCompleted.countDown();
+                }
+            }
+        }).start();
+        TestHelper.awaitOrFail(unsubscribeCompleted);
+        assertEquals(1, realm.handlerController.changeListeners.size());
+    }
+
