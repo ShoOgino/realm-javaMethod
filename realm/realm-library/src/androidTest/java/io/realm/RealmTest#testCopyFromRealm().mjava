@@ -1,3 +1,4 @@
+    @Test
     public void testCopyFromRealm() {
         populateTestRealm();
         AllTypes realmObject = testRealm.where(AllTypes.class).findAllSorted("columnLong").first();
@@ -5,8 +6,8 @@
         assertArrayEquals(realmObject.getColumnBinary(), standaloneObject.getColumnBinary());
         assertEquals(realmObject.getColumnString(), standaloneObject.getColumnString());
         assertEquals(realmObject.getColumnLong(), standaloneObject.getColumnLong());
-        assertEquals(realmObject.getColumnFloat(), standaloneObject.getColumnFloat());
-        assertEquals(realmObject.getColumnDouble(), standaloneObject.getColumnDouble());
+        assertEquals(realmObject.getColumnFloat(), standaloneObject.getColumnFloat(), 0.00000000001);
+        assertEquals(realmObject.getColumnDouble(), standaloneObject.getColumnDouble(), 0.00000000001);
         assertEquals(realmObject.isColumnBoolean(), standaloneObject.isColumnBoolean());
         assertEquals(realmObject.getColumnDate(), standaloneObject.getColumnDate());
     }

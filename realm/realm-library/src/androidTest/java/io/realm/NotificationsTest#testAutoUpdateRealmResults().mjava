@@ -1,3 +1,4 @@
+    @Test
     public void testAutoUpdateRealmResults() throws InterruptedException, ExecutionException {
         final int TEST_SIZE = 10;
         final AtomicInteger counter = new AtomicInteger(0);
@@ -16,7 +17,7 @@
                 looper[0] = Looper.myLooper();
                 Realm realm = null;
                 try {
-                    realm = Realm.getInstance(getContext());
+                    realm = Realm.getInstance(context);
                     final RealmResults<Dog> dogs = realm.allObjects(Dog.class);
                     assertEquals(0, dogs.size());
                     listener[0] = new RealmChangeListener() {
@@ -45,7 +46,7 @@
         }
         Thread.sleep(100);
 
-        Realm realm = Realm.getInstance(getContext());
+        Realm realm = Realm.getInstance(context);
         realm.beginTransaction();
         for (int i = 0; i < TEST_SIZE; i++) {
             Dog dog = realm.createObject(Dog.class);
@@ -73,7 +74,7 @@
         assertEquals(TEST_SIZE, results.get(1).intValue());
 
         assertEquals(1, counter.get());
-        RealmCache.invokeWithGlobalRefCount(new RealmConfiguration.Builder(getContext()).build(),
-                new TestHelper.ExpectedCountCallback(this, 0));
+        RealmCache.invokeWithGlobalRefCount(new RealmConfiguration.Builder(context).build(),
+                new TestHelper.ExpectedCountCallback(0));
     }
 

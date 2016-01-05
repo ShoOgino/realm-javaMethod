@@ -1,7 +1,7 @@
     // clean resource, shutdown the executor service & throw any background exception
     public static void exitOrThrow(final ExecutorService executorService,
                      final CountDownLatch signalTestFinished,
-                     final CountDownLatch signalFinallyRun,
+                     final CountDownLatch signalClosedRealm,
                      final Looper[] looper,
                      final Throwable[] throwable,
                      int... timeout) throws Throwable {
@@ -19,7 +19,7 @@
         }
 
         // wait for the finally block to execute & close the Realm
-        TestHelper.awaitOrFail(signalFinallyRun, (timeout.length == 1) ? timeout[0] : 7);
+        TestHelper.awaitOrFail(signalClosedRealm, (timeout.length == 1) ? timeout[0] : 7);
 
         if (throwable[0] != null) {
             // throw any assertion errors happened in the background thread

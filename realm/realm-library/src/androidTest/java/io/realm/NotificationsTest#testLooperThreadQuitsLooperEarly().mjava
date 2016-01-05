@@ -1,7 +1,8 @@
     // Test that we handle a Looper thread quiting it's looper before it is done executing the current loop ( = Realm.close()
     // isn't called yet).
+    @Test
     public void testLooperThreadQuitsLooperEarly() throws InterruptedException {
-        RealmConfiguration config = TestHelper.createConfiguration(getContext());
+        RealmConfiguration config = TestHelper.createConfiguration(context);
         Realm.deleteRealm(config);
 
         final CountDownLatch backgroundLooperStartedAndStopped = new CountDownLatch(1);
@@ -15,7 +16,7 @@
             public void run() {
                 Looper.prepare(); // Fake background thread with a looper, eg. a IntentService
 
-                Realm realm = Realm.getInstance(getContext());
+                Realm realm = Realm.getInstance(context);
                 realm.setAutoRefresh(false);
                 Looper.myLooper().quit();
                 backgroundLooperStartedAndStopped.countDown();

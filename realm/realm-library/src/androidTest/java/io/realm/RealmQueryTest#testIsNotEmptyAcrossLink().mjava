@@ -1,0 +1,19 @@
+    public void testIsNotEmptyAcrossLink() {
+        createIsNotEmptyDataSet(testRealm);
+        for (RealmFieldType type : SUPPORTED_IS_NOTEMPTY_TYPES) {
+            switch (type) {
+                case STRING:
+                    assertEquals(1, testRealm.where(AllJavaTypes.class).isNotEmpty(AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_STRING).count());
+                    break;
+                case BINARY:
+                    assertEquals(1, testRealm.where(AllJavaTypes.class).isNotEmpty(AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_BINARY).count());
+                    break;
+                case LIST:
+                    assertEquals(1, testRealm.where(AllJavaTypes.class).isNotEmpty(AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_LIST).count());
+                    break;
+                default:
+                    fail("Unknown type: " + type);
+            }
+        }
+    }
+
