@@ -1,5 +1,6 @@
     /**
-     * This test requires an additional Realm to test against.
+     * Test that the {@link Realm#contains(Class)} method of one Realm will not contain a
+     * {@link RealmObject} from another Realm.
      */
     public void testContainsDoesNotContainAnItem() {
         RealmConfiguration realmConfig = TestHelper.createConfiguration(getContext(), "contains_test.realm");
@@ -26,7 +27,7 @@
             assertFalse("Should not be able to find one object in another Realm via contains",
                     owner1.getDogs().contains(dog2));
         } finally {
-            if(testRealmTwo != null && !testRealmTwo.isClosed()) {
+            if (testRealmTwo != null && !testRealmTwo.isClosed()) {
                 testRealmTwo.close();
             }
         }
