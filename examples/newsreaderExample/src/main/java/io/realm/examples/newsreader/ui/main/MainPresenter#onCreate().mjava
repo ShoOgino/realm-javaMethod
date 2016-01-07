@@ -1,5 +1,18 @@
     @Override
     public void onCreate() {
-        // Do nothing
+        sections = model.getSections();
+
+        // Sort sections alphabetically, but always have Home at the top
+        List<String> sectionList = new ArrayList<>(sections.keySet());
+        Collections.sort(sectionList, new Comparator<String>() {
+            @Override
+            public int compare(String lhs, String rhs) {
+                if (lhs.equals("Home")) return -1;
+                if (rhs.equals("Home")) return 1;
+                return lhs.compareToIgnoreCase(rhs);
+            }
+        });
+        view.configureToolbar(sectionList);
+        categorySelected(sectionList.get(0));
     }
 
