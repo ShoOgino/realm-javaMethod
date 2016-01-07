@@ -1,5 +1,5 @@
     // Converts data into a usable format and save it to Realm
-    private void processAndAddData(final Realm realm, final List<NYTimesStory> stories) {
+    private void processAndAddData(final Realm realm, final String sectionKey, final List<NYTimesStory> stories) {
         if (stories.isEmpty()) return;
 
         realm.executeTransaction(new Realm.Transaction() {
@@ -21,6 +21,7 @@
 
                     // Only create or update the local story if needed
                     if (persistedStory == null || !persistedStory.getUpdatedDate().equals(story.getUpdatedDate())) {
+                        story.setApiSection(sectionKey);
                         realm.copyToRealmOrUpdate(story);
                     }
                 }
