@@ -1,4 +1,5 @@
     private void notifyRealmObjectCallbacks() {
+        List<RealmObject> objectsToBeNotified = new ArrayList<RealmObject>();
         Iterator<WeakReference<RealmObject>> iterator = realmObjects.keySet().iterator();
         while (iterator.hasNext()) {
             WeakReference<? extends RealmObject> weakRealmObject = iterator.next();
@@ -8,11 +9,16 @@
 
             } else {
                 if (realmObject.row.isAttached()) {
-                    realmObject.notifyChangeListeners();
+                    // It should be legal to modify realmObjects in the listener
+                    objectsToBeNotified.add(realmObject);
                 } else if (realmObject.row != Row.EMPTY_ROW) {
                     iterator.remove();
                 }
             }
+        }
+
+        for (RealmObject realmObject : objectsToBeNotified) {
+            realmObject.notifyChangeListeners();
         }
     }
 
