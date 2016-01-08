@@ -1,4 +1,7 @@
     // UC 3 Sync RealmResults
+    // 1. Add listener to RealmResults which is queried synchronized.
+    // 2. Commit transaction in another non-looper thread
+    // 3. Listener on the RealmResults gets triggered.
     public void test_non_looper_thread_commit_realmresults_sync() {
         handler.post(new Runnable() {
             @Override
@@ -7,7 +10,7 @@
                 realm.addChangeListener(new RealmChangeListener() {
                     @Override
                     public void onChange() {
-                        if (globalCommitInvocations.incrementAndGet() == 2) {
+                        if (realm.where(Dog.class).count() == 2) {
                             realm.handler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -44,19 +47,12 @@
                 thread.start();
                 try {
                     thread.join();
-
-                    final int MAX_RETRIES = 60;
-                    int numberOfSleep = 0;
-                    while (numberOfSleep++ < MAX_RETRIES
-                            && typebasedCommitInvocations.incrementAndGet() != 1) {
-                        Thread.sleep(16);
-                    }
-                    assertEquals(1, typebasedCommitInvocations.get());
                 } catch (InterruptedException e) {
                     fail(e.getMessage());
                 }
             }
         });
         TestHelper.awaitOrFail(signalTestFinished);
+        assertEquals(typebasedCommitInvocations.get(), 1);
     }
 
