@@ -1,10 +1,6 @@
     @Test
     public void testCompactEncryptedEmptyRealmFile() {
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(context)
-                .name("enc.realm")
-                .encryptionKey(TestHelper.getRandomKey())
-                .build();
-        Realm.deleteRealm(realmConfig);
+        RealmConfiguration realmConfig = configFactory.createConfiguration("enc.realm", TestHelper.getRandomKey());
         Realm realm = Realm.getInstance(realmConfig);
         realm.close();
         // TODO: remove try/catch block when compacting encrypted Realms is supported

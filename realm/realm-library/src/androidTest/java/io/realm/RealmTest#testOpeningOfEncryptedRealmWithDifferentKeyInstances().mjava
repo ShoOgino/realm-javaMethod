@@ -8,21 +8,12 @@
         assertTrue(key1 != key2);
 
         final String ENCRYPTED_REALM = "differentKeys.realm";
-        Realm.deleteRealm(TestHelper.createConfiguration(context, ENCRYPTED_REALM));
         Realm realm1 = null;
         Realm realm2 = null;
         try {
-            realm1 = Realm.getInstance(new RealmConfiguration.Builder(context)
-                            .name(ENCRYPTED_REALM)
-                            .encryptionKey(key1)
-                            .build()
-            );
+            realm1 = Realm.getInstance(configFactory.createConfiguration(ENCRYPTED_REALM, key1));
             try {
-                realm2 = Realm.getInstance(new RealmConfiguration.Builder(context)
-                                .name(ENCRYPTED_REALM)
-                                .encryptionKey(key2)
-                                .build()
-                );
+                realm2 = Realm.getInstance(configFactory.createConfiguration(ENCRYPTED_REALM, key2));
             } catch (Exception e) {
                 fail();
             } finally {
