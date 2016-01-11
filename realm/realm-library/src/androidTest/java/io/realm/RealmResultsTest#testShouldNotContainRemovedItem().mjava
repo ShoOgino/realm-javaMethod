@@ -1,0 +1,9 @@
+    public void testShouldNotContainRemovedItem() {
+        RealmQuery<AllTypes> query = testRealm.where(AllTypes.class).findAll().where();
+        AllTypes item = testRealm.where(AllTypes.class).findFirst();
+        testRealm.beginTransaction();
+        item.removeFromRealm();
+        testRealm.commitTransaction();
+        assertFalse("Should not contain a removed item.", query.findAll().contains(item));
+    }
+
