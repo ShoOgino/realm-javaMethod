@@ -8,14 +8,14 @@
         }
 
         // Make sure the reference counter is per realm file
-        RealmConfiguration anotherConfig = TestHelper.createConfiguration(context, "anotherRealm.realm");
+        RealmConfiguration anotherConfig = configFactory.createConfiguration("anotherRealm.realm");
         Realm.deleteRealm(anotherConfig);
         Realm otherRealm = Realm.getInstance(anotherConfig);
 
         // Raise the reference
         Realm realm = null;
         try {
-            realm = Realm.getInstance(context);
+            realm = Realm.getInstance(configFactory.createConfiguration());
         } finally {
             if (realm != null) realm.close();
         }
