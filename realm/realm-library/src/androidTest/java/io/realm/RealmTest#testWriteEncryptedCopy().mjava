@@ -9,29 +9,16 @@
         final String RE_ENCRYPTED_REALM_FILE_NAME = "reEncryptedTestRealm.realm";
         final String DECRYPTED_REALM_FILE_NAME = "decryptedTestRealm.realm";
 
-        RealmConfiguration encryptedRealmConfig = new RealmConfiguration.Builder(context)
-                .name(ENCRYPTED_REALM_FILE_NAME)
-                .encryptionKey(TestHelper.getRandomKey())
-                .build();
+        RealmConfiguration encryptedRealmConfig = configFactory.createConfiguration(ENCRYPTED_REALM_FILE_NAME,
+                TestHelper.getRandomKey());
 
-        RealmConfiguration reEncryptedRealmConfig = new RealmConfiguration.Builder(context)
-                .name(RE_ENCRYPTED_REALM_FILE_NAME)
-                .encryptionKey(TestHelper.getRandomKey())
-                .build();
+        RealmConfiguration reEncryptedRealmConfig = configFactory.createConfiguration(RE_ENCRYPTED_REALM_FILE_NAME,
+                TestHelper.getRandomKey());
 
-        RealmConfiguration decryptedRealmConfig = new RealmConfiguration.Builder(context)
-                .name(DECRYPTED_REALM_FILE_NAME)
-                .build();
-
-        // Delete old test Realms if present
-        for (RealmConfiguration realmConfig : Arrays.asList(encryptedRealmConfig, reEncryptedRealmConfig, decryptedRealmConfig)) {
-            if (!Realm.deleteRealm(realmConfig)) {
-                fail();
-            }
-        }
+        RealmConfiguration decryptedRealmConfig = configFactory.createConfiguration(DECRYPTED_REALM_FILE_NAME);
 
         // Write encrypted copy from a unencrypted Realm
-        File destination = new File(context.getFilesDir(), ENCRYPTED_REALM_FILE_NAME);
+        File destination = new File(encryptedRealmConfig.getPath());
         try {
             testRealm.writeEncryptedCopyTo(destination, encryptedRealmConfig.getEncryptionKey());
         } catch (Exception e) {

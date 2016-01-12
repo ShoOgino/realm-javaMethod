@@ -1,0 +1,45 @@
+    // Test modifying realmObjects in RealmObject's change listener
+    public void test_change_realm_objects_map_in_listener() throws InterruptedException {
+        final CountDownLatch finishedLatch = new CountDownLatch(2);
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                realm = Realm.getInstance(configuration);
+
+                realm.beginTransaction();
+                // At least two objects are needed to make sure list modification happen during iterating.
+                final Cat cat = realm.createObject(Cat.class);
+                final Owner owner = realm.createObject(Owner.class);
+                owner.setCat(cat);
+                realm.commitTransaction();
+
+                RealmChangeListener listener = new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        Cat cat = owner.getCat();
+                        boolean foundKey = false;
+                        // Check if cat has been added to the realmObjects in case of the behaviour of getCat changes
+                        for (WeakReference<RealmObject> weakReference : realm.handlerController.realmObjects.keySet()) {
+                            if (weakReference.get() == cat) {
+                               foundKey = true;
+                               break;
+                            }
+                        }
+                        assertTrue(foundKey);
+                        finishedLatch.countDown();
+                    }
+                };
+
+                cat.addChangeListener(listener);
+                owner.addChangeListener(listener);
+
+                realm.beginTransaction();
+                // To make sure the shared group version changed
+                realm.createObject(Owner.class);
+                realm.commitTransaction();
+            }
+        });
+
+        finishedLatch.await();
+    }
+

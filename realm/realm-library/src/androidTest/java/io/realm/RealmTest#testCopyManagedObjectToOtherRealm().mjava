@@ -1,12 +1,11 @@
     @Test
-    public void testCopManagedObjectToOtherRealm() {
+    public void testCopyManagedObjectToOtherRealm() {
         testRealm.beginTransaction();
         AllTypes allTypes = testRealm.createObject(AllTypes.class);
         allTypes.setColumnString("Test");
         testRealm.commitTransaction();
 
-        RealmConfiguration realmConfig = TestHelper.createConfiguration(context, "other-realm");
-        Realm.deleteRealm(realmConfig);
+        RealmConfiguration realmConfig = configFactory.createConfiguration("other-realm");
         Realm otherRealm = Realm.getInstance(realmConfig);
         otherRealm.beginTransaction();
         AllTypes copiedAllTypes = otherRealm.copyToRealm(allTypes);

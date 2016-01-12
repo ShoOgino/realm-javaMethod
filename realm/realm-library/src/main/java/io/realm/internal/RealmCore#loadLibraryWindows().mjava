@@ -1,20 +1,17 @@
     private static String loadLibraryWindows() {
-///*
         try {
             addNativeLibraryPath(BINARIES_PATH);
             resetLibraryPath();
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             // Above can't be used on Android.
         }
-//*/
+
         // Load debug library first - if available
         String jnilib;
         jnilib = loadCorrectLibrary("realm_jni32d", "realm_jni64d");
         if (jnilib != null) {
             System.out.println("!!! Realm debug version loaded. !!!\n");
-        }
-        else {
+        } else {
             jnilib = loadCorrectLibrary("realm_jni32", "realm_jni64");
             if (jnilib == null) {
                 System.err.println("Searched java.library.path=" + System.getProperty("java.library.path"));

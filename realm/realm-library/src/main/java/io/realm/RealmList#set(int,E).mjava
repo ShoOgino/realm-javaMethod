@@ -21,10 +21,11 @@
         if (managedMode) {
             checkValidView();
             object = copyToRealmIfNeeded(object);
+            E oldObject = get(location);
             view.set(location, object.row.getIndex());
+            return oldObject;
         } else {
-            nonManagedList.set(location, object);
+            return nonManagedList.set(location, object);
         }
-        return object;
     }
 
