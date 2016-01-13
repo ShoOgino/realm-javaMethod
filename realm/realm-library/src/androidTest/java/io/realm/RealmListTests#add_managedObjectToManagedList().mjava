@@ -1,0 +1,12 @@
+    @Test
+    public void add_managedObjectToManagedList() {
+        testRealm.beginTransaction();
+        testRealm.clear(Owner.class);
+        Owner owner = testRealm.createObject(Owner.class);
+        Dog dog = testRealm.createObject(Dog.class);
+        owner.getDogs().add(dog);
+        testRealm.commitTransaction();
+
+        assertEquals(1, testRealm.where(Owner.class).findFirst().getDogs().size());
+    }
+

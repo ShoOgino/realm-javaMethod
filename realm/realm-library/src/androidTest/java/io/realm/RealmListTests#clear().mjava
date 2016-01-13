@@ -1,0 +1,10 @@
+    @Test
+    public void clear() {
+        Owner owner = testRealm.where(Owner.class).findFirst();
+        testRealm.beginTransaction();
+        assertEquals(TEST_OBJECTS, owner.getDogs().size());
+        owner.getDogs().clear();
+        assertEquals(0, owner.getDogs().size());
+        testRealm.commitTransaction();
+    }
+

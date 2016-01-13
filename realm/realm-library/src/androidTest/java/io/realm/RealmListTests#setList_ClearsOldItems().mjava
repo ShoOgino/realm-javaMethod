@@ -1,0 +1,12 @@
+    @Test
+    public void setList_ClearsOldItems() {
+        testRealm.beginTransaction();
+        CyclicType one = testRealm.copyToRealm(new CyclicType());
+        CyclicType two = testRealm.copyToRealm(new CyclicType());
+        two.setObjects(new RealmList<CyclicType>(one));
+        two.setObjects(new RealmList<CyclicType>(one));
+        testRealm.commitTransaction();
+
+        assertEquals(1, two.getObjects().size());
+    }
+

@@ -1,0 +1,15 @@
+    /*********************************************************
+     * Managed mode tests                                    *
+     *********************************************************/
+
+    @Test
+    public void isValid() {
+        Owner owner = testRealm.where(Owner.class).findFirst();
+        RealmList<Dog> dogs = owner.getDogs();
+
+        assertTrue(dogs.isValid());
+
+        testRealm.close();
+        assertFalse(dogs.isValid());
+    }
+

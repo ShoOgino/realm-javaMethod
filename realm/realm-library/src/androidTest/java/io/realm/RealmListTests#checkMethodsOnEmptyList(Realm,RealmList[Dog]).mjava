@@ -1,0 +1,24 @@
+    // Check that all methods work correctly on a empty RealmList
+    private void checkMethodsOnEmptyList(Realm realm, RealmList<Dog> list) {
+        realm.beginTransaction();
+        for (int i = 0; i < 4; i++) {
+            try {
+                switch (i) {
+                    case 0: list.get(0); break;
+                    case 1: list.remove(0); break;
+                    case 2: list.set(0, new Dog()); break;
+                    case 3: list.move(0, 0); break;
+                    default: break;
+                }
+                fail();
+            } catch (IndexOutOfBoundsException ignored) {
+            } catch (RealmException ignored) {
+            }
+        }
+        realm.cancelTransaction();
+
+        assertEquals(0, list.size());
+        assertNull(list.first());
+        assertNull(list.last());
+    }
+
