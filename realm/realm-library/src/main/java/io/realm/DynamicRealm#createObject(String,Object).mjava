@@ -10,6 +10,10 @@
     public DynamicRealmObject createObject(String className, Object primaryKeyValue) {
         Table table = schema.getTable(className);
         long index = table.addEmptyRowWithPrimaryKey(primaryKeyValue);
-        return new DynamicRealmObject(this, table.getCheckedRow(index));
+        DynamicRealmObject dynamicRealmObject = new DynamicRealmObject(this, table.getCheckedRow(index));
+        if (handlerController != null) {
+            handlerController.addToRealmObjects(dynamicRealmObject);
+        }
+        return dynamicRealmObject;
     }
 

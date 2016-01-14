@@ -1,69 +1,34 @@
     // finding elements [0-4] asynchronously then wait for the promise to be loaded
     // using a callback to be notified when the data is loaded
+    @Test
+    @RunTestInLooperThread
     public void testFindFirstAsyncWithNotification() throws Throwable {
-        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
-        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
-        final Throwable[] threadAssertionError = new Throwable[1];
-        final Looper[] backgroundLooper = new Looper[1];
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
+        Realm.asyncQueryExecutor.pause();
+
+        populateTestRealm(workerThread.realm, 10);
+        final AllTypes realmResults = workerThread.realm.where(AllTypes.class)
+                .between("columnLong", 4, 9)
+                .findFirstAsync();
+
+        realmResults.addChangeListener(new RealmChangeListener() {
             @Override
-            public void run() {
-                Looper.prepare();
-                backgroundLooper[0] = Looper.myLooper();
-                Realm realm = null;
-                try {
-                    realm = openRealmInstance("testFindFirstAsyncWithNotification");
-                    Realm.asyncQueryExecutor.pause();
-
-                    populateTestRealm(realm, 10);
-                    final AllTypes realmResults = realm.where(AllTypes.class)
-                            .between("columnLong", 4, 9)
-                            .findFirstAsync();
-
-                    realmResults.addChangeListener(new RealmChangeListener() {
-                        @Override
-                        public void onChange() {
-                            try {
-                                assertTrue(realmResults.isLoaded());
-                                assertTrue(realmResults.isValid());
-                                assertEquals("test data 4", realmResults.getColumnString());
-                            } catch (AssertionFailedError e) {
-                                threadAssertionError[0] = e;
-                            } finally {
-                                signalCallbackFinished.countDown();
-                            }
-                        }
-                    });
-
-                    assertFalse(realmResults.isLoaded());
-                    assertFalse(realmResults.isValid());
-                    try {
-                        realmResults.setColumnString("should fail");
-                        fail("Accessing an unloaded object should throw");
-                    } catch (IllegalStateException ignored) {
-                    }
-
-                    Realm.asyncQueryExecutor.resume();
-
-                    Looper.loop();
-
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    threadAssertionError[0] = e;
-
-                } finally {
-                    if (signalCallbackFinished.getCount() > 0) {
-                        signalCallbackFinished.countDown();
-                    }
-                    if (realm != null) {
-                        realm.close();
-                    }
-                    signalClosedRealm.countDown();
-                }
+            public void onChange() {
+                assertTrue(realmResults.isLoaded());
+                assertTrue(realmResults.isValid());
+                assertEquals("test data 4", realmResults.getColumnString());
+                workerThread.signalTestCompleted.countDown();
             }
         });
 
-        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
+        assertFalse(realmResults.isLoaded());
+        assertFalse(realmResults.isValid());
+        try {
+            realmResults.setColumnString("should fail");
+            fail("Accessing an unloaded object should throw");
+        } catch (IllegalStateException ignored) {
+        }
+
+        Realm.asyncQueryExecutor.resume();
+        workerThread.keepStrongReference.add(realmResults);
     }
 

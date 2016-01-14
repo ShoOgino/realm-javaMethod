@@ -7,6 +7,7 @@
      * @return created or updated {@link io.realm.RealmObject}.
      * @throws java.lang.IllegalArgumentException if trying to update a class without a
      * {@link io.realm.annotations.PrimaryKey}.
+     * @throws RealmException if failure to read JSON.
      * @see #createObjectFromJson(Class, java.io.InputStream)
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -22,7 +23,7 @@
         try {
             scanner = getFullStringScanner(in);
             JSONObject json = new JSONObject(scanner.next());
-            return configuration.getSchemaMediator().createOrUpdateUsingJsonObject(clazz, this, json, true);
+            return createOrUpdateObjectFromJson(clazz, json);
         } catch (JSONException e) {
             throw new RealmException("Failed to read JSON", e);
         } finally {

@@ -18,6 +18,10 @@
         }
 
         TableView tableView = table.getSortedView(columnIndex, sortOrder);
-        return RealmResults.createFromTableOrView(this, tableView, clazz);
+        RealmResults<E> realmResults = RealmResults.createFromTableOrView(this, tableView, clazz);
+        if (handlerController != null) {
+            handlerController.addToRealmResults(realmResults);
+        }
+        return realmResults;
     }
 

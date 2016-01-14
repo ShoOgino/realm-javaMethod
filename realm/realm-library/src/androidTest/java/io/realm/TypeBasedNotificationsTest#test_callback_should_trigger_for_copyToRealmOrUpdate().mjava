@@ -1,0 +1,53 @@
+    //UC 0 using Realm.copyToRealmOrUpdate
+    public void test_callback_should_trigger_for_copyToRealmOrUpdate() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                realm = Realm.getInstance(configuration);
+                realm.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        if (globalCommitInvocations.incrementAndGet() == 2) {
+                            realm.handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    signalTestFinished.countDown();
+                                }
+                            });
+                        }
+                    }
+                });
+
+                PrimaryKeyAsLong obj = new PrimaryKeyAsLong();
+                obj.setId(1);
+                obj.setName("Foo");
+
+                realm.beginTransaction();
+                final PrimaryKeyAsLong primaryKeyAsLong = realm.copyToRealmOrUpdate(obj);
+                realm.commitTransaction();
+
+                primaryKeyAsLong.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        assertEquals(1, primaryKeyAsLong.getId());
+                        assertEquals("Bar", primaryKeyAsLong.getName());
+                        assertEquals(1, realm.allObjects(PrimaryKeyAsLong.class).size());
+                        typebasedCommitInvocations.incrementAndGet();
+                    }
+                });
+
+                PrimaryKeyAsLong obj2 = new PrimaryKeyAsLong();
+                obj2.setId(1);
+                obj2.setName("Bar");
+                realm.beginTransaction();
+                PrimaryKeyAsLong primaryKeyAsLong2 = realm.copyToRealmOrUpdate(obj2);
+                realm.commitTransaction();
+
+                assertEquals(primaryKeyAsLong, primaryKeyAsLong2);
+            }
+        });
+
+        TestHelper.awaitOrFail(signalTestFinished);
+        assertEquals(1, typebasedCommitInvocations.get());
+    }
+

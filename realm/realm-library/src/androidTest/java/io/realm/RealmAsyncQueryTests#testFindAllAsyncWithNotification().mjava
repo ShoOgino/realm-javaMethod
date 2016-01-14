@@ -1,65 +1,29 @@
     // finding elements [0-4] asynchronously then wait for the promise to be loaded
     // using a callback to be notified when the data is loaded
+    @Test
+    @RunTestInLooperThread
     public void testFindAllAsyncWithNotification() throws Throwable {
-        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
-        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
-        final Throwable[] threadAssertionError = new Throwable[1];
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        final Looper[] backgroundLooper = new Looper[1];
-        executorService.submit(new Runnable() {
+        Realm.asyncQueryExecutor.pause();
+
+        populateTestRealm(workerThread.realm, 10);
+        final RealmResults<AllTypes> realmResults = workerThread.realm.where(AllTypes.class)
+                .between("columnLong", 0, 4)
+                .findAllAsync();
+
+        realmResults.addChangeListener(new RealmChangeListener() {
             @Override
-            public void run() {
-                Looper.prepare();
-                backgroundLooper[0] = Looper.myLooper();
-                Realm realm = null;
-                try {
-                    realm = openRealmInstance("testFindAllAsyncWithNotification");
-                    Realm.asyncQueryExecutor.pause();
-
-                    populateTestRealm(realm, 10);
-                    final RealmResults<AllTypes> realmResults = realm.where(AllTypes.class)
-                            .between("columnLong", 0, 4)
-                            .findAllAsync();
-
-                    realmResults.addChangeListener(new RealmChangeListener() {
-                        @Override
-                        public void onChange() {
-                            try {
-                                assertTrue(realmResults.isLoaded());
-                                assertEquals(5, realmResults.size());
-                                assertTrue(realmResults.get(4).isValid());
-                            } catch (AssertionFailedError e) {
-                                threadAssertionError[0] = e;
-                            } finally {
-                                signalCallbackFinished.countDown();
-                            }
-
-                        }
-                    });
-
-                    assertFalse(realmResults.isLoaded());
-                    assertEquals(0, realmResults.size());
-
-                    Realm.asyncQueryExecutor.resume();
-
-                    Looper.loop();
-
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    threadAssertionError[0] = e;
-
-                } finally {
-                    if (signalCallbackFinished.getCount() > 0) {
-                        signalCallbackFinished.countDown();
-                    }
-                    if (realm != null) {
-                        realm.close();
-                    }
-                    signalClosedRealm.countDown();
-                }
+            public void onChange() {
+                assertTrue(realmResults.isLoaded());
+                assertEquals(5, realmResults.size());
+                assertTrue(realmResults.get(4).isValid());
+                workerThread.signalTestCompleted.countDown();
             }
         });
 
-        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
+        assertFalse(realmResults.isLoaded());
+        assertEquals(0, realmResults.size());
+
+        Realm.asyncQueryExecutor.resume();
+        workerThread.keepStrongReference.add(realmResults);
     }
 

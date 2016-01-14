@@ -1,54 +1,22 @@
+    @Test
+    @RunTestInLooperThread
     public void testFindFirstAsyncWithInitialEmptyRow() throws Throwable {
-        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
-        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
-        final Throwable[] threadAssertionError = new Throwable[1];
-        final Looper[] backgroundLooper = new Looper[1];
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
+        final AllTypes firstAsync = workerThread.realm.where(AllTypes.class).findFirstAsync();
+        firstAsync.addChangeListener(new RealmChangeListener() {
             @Override
-            public void run() {
-                Looper.prepare();
-                backgroundLooper[0] = Looper.myLooper();
-
-                Realm realm = null;
-                try {
-                    realm = openRealmInstance("testFindFirstAsyncWithInitialEmptyRow");
-
-                    final AllTypes firstAsync = realm.where(AllTypes.class).findFirstAsync();
-                    firstAsync.addChangeListener(new RealmChangeListener() {
-                        @Override
-                        public void onChange() {
-                            assertTrue(firstAsync.load());
-                            assertTrue(firstAsync.isLoaded());
-                            assertTrue(firstAsync.isValid());
-                            assertEquals(0, firstAsync.getColumnLong());
-                            signalCallbackFinished.countDown();
-                        }
-                    });
-                    assertTrue(firstAsync.load());
-                    assertTrue(firstAsync.isLoaded());
-                    assertFalse(firstAsync.isValid());
-
-                    populateTestRealm(realm, 10);
-
-                    Looper.loop();
-
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    threadAssertionError[0] = e;
-
-                } finally {
-                    if (signalCallbackFinished.getCount() > 0) {
-                        signalCallbackFinished.countDown();
-                    }
-                    if (realm != null) {
-                        realm.close();
-                    }
-                    signalClosedRealm.countDown();
-                }
+            public void onChange() {
+                assertTrue(firstAsync.load());
+                assertTrue(firstAsync.isLoaded());
+                assertTrue(firstAsync.isValid());
+                assertEquals(0, firstAsync.getColumnLong());
+                workerThread.signalTestCompleted.countDown();
             }
         });
+        assertTrue(firstAsync.load());
+        assertTrue(firstAsync.isLoaded());
+        assertFalse(firstAsync.isValid());
 
-        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
+        populateTestRealm(workerThread.realm, 10);
+        workerThread.keepStrongReference.add(firstAsync);
     }
 

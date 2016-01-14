@@ -1,3 +1,4 @@
+    @Test
     public void testNonLooperThreadShouldNotifyLooperThreadAboutCommit() throws Throwable {
         final CountDownLatch mainThreadReady = new CountDownLatch(1);
         final CountDownLatch numberOfInvocation = new CountDownLatch(1);
@@ -5,7 +6,7 @@
             @Override
             public void run() {
                 TestHelper.awaitOrFail(mainThreadReady);
-                Realm realm = Realm.getInstance(getContext());
+                Realm realm = Realm.getInstance(context);
                 realm.beginTransaction();
                 realm.createObject(AllTypes.class);
                 realm.commitTransaction();
@@ -20,7 +21,7 @@
         handler.post(new Runnable() {
             @Override
             public void run() {
-                final Realm mainRealm = Realm.getInstance(getContext());
+                final Realm mainRealm = Realm.getInstance(context);
                 mainRealm.addChangeListener(new RealmChangeListener() {
                     @Override
                     public void onChange() {

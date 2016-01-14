@@ -1,8 +1,10 @@
+    @Test
+    @UiThreadTest
     public void testInternalRealmChangedHandlersRemoved() {
         testRealm.close(); // Clear handler created by testRealm in setUp()
-
+        assertEquals(0, Realm.getHandlers().size());
         final String REALM_NAME = "test-internalhandlers";
-        RealmConfiguration realmConfig = TestHelper.createConfiguration(getContext(), REALM_NAME);
+        RealmConfiguration realmConfig = configFactory.createConfiguration(REALM_NAME);
         Realm.deleteRealm(realmConfig);
 
         // Open and close first instance of a Realm

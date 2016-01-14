@@ -1,7 +1,8 @@
+    @Test
     public void testReferenceCountingDoubleClose() {
         testRealm.close();
         testRealm.close(); // Count down once too many. Counter is now potentially negative
-        testRealm = Realm.getInstance(getContext());
+        testRealm = Realm.getInstance(configFactory.createConfiguration());
         testRealm.beginTransaction();
         AllTypes allTypes = testRealm.createObject(AllTypes.class);
         RealmResults<AllTypes> queryResult = testRealm.allObjects(AllTypes.class);

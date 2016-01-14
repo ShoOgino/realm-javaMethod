@@ -17,6 +17,10 @@
         }
 
         TableView tableView = table.getDistinctView(columnIndex);
-        return RealmResults.createFromTableOrView(this, tableView, clazz);
+        RealmResults<E> realmResults = RealmResults.createFromTableOrView(this, tableView, clazz);
+        if (handlerController != null) {
+            handlerController.addToRealmResults(realmResults);
+        }
+        return realmResults;
     }
 

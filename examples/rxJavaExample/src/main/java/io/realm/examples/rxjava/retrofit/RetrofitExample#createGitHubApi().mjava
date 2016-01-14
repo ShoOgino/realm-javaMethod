@@ -1,0 +1,17 @@
+    private GithubApi createGitHubApi() {
+
+        RestAdapter.Builder builder = new RestAdapter.Builder().setEndpoint("https://api.github.com/");
+
+        final String githubToken = ""; // Set GitHub OAuth token to avoid throttling if example is used a lot
+        if (!isEmpty(githubToken)) {
+            builder.setRequestInterceptor(new RequestInterceptor() {
+                @Override
+                public void intercept(RequestFacade request) {
+                    request.addHeader("Authorization", format("token %s", githubToken));
+                }
+            });
+        }
+
+        return builder.build().create(GithubApi.class);
+    }
+

@@ -1,10 +1,9 @@
+    @Test
     public void testGetInstanceFileNoWritePermissionThrows() throws IOException {
         String REALM_FILE = "readonly.realm";
-        File folder = getContext().getFilesDir();
+        File folder = configFactory.getRoot();
         File realmFile = new File(folder, REALM_FILE);
-        if (realmFile.exists()) {
-            realmFile.delete(); // Reset old test data
-        }
+        assertFalse(realmFile.exists());
 
         assertTrue(realmFile.createNewFile());
         assertTrue(realmFile.setWritable(false));

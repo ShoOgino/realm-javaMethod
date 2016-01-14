@@ -1,12 +1,12 @@
+    @Test
     public void testCompactEmptyRealmFile() throws IOException {
         final String REALM_NAME = "test.realm";
-        RealmConfiguration realmConfig = TestHelper.createConfiguration(getContext(), REALM_NAME);
-        Realm.deleteRealm(realmConfig);
+        RealmConfiguration realmConfig = configFactory.createConfiguration(REALM_NAME);
         Realm realm = Realm.getInstance(realmConfig);
         realm.close();
-        long before = new File(getContext().getFilesDir(), REALM_NAME).length();
+        long before = new File(realmConfig.getPath()).length();
         assertTrue(Realm.compactRealm(realmConfig));
-        long after = new File(getContext().getFilesDir(), REALM_NAME).length();
+        long after = new File(realmConfig.getPath()).length();
         assertTrue(before >= after);
     }
 

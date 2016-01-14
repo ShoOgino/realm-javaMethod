@@ -1,7 +1,10 @@
-    @Override
-    protected void setUp() throws Exception {
-        testConfig = TestHelper.createConfiguration(getContext());
-        Realm.deleteRealm(testConfig);
+    @Before
+    public void setUp() throws Exception {
+        // Injecting the Instrumentation instance is required
+        // for your test to run with AndroidJUnitRunner.
+        context = InstrumentationRegistry.getInstrumentation().getContext();
+
+        testConfig = configFactory.createConfiguration();
         testRealm = Realm.getInstance(testConfig);
     }
 

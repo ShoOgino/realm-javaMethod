@@ -16,6 +16,10 @@
         Table table = schema.getTable(className);
         TableView tableView = doMultiFieldSort(fieldNames, sortOrders, table);
 
-        return RealmResults.createFromDynamicTableOrView(this, tableView, className);
+        RealmResults<DynamicRealmObject> realmResults = RealmResults.createFromDynamicTableOrView(this, tableView, className);
+        if (handlerController != null) {
+            handlerController.addToRealmResults(realmResults);
+        }
+        return realmResults;
     }
 

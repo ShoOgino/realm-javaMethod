@@ -1,9 +1,9 @@
     // Realm validation & initialization is done once, still ColumnIndices
     // should be populated for the subsequent Realm sharing the same configuration
     // even if we skip initialization & validation
+    @Test
     public void testColumnIndicesIsPopulatedWhenSkippingInitialization() throws Throwable {
-        final RealmConfiguration realmConfiguration = TestHelper.createConfiguration(getContext(), "columnIndices");
-        Realm.deleteRealm(realmConfiguration);
+        final RealmConfiguration realmConfiguration = configFactory.createConfiguration("columnIndices");
         final Exception threadError[] = new Exception[1];
         final CountDownLatch bgRealmOpened = new CountDownLatch(1);
         final CountDownLatch mainThreadRealmDone = new CountDownLatch(1);

@@ -1,0 +1,22 @@
+    @Test
+    @UiThreadTest
+    public void testResultsEmittedOnUpdate() {
+        final AtomicInteger subscriberCalled = new AtomicInteger(0);
+        realm.beginTransaction();
+        RealmResults<AllTypes> results = realm.allObjects(AllTypes.class);
+        realm.commitTransaction();
+
+        results.asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
+            @Override
+            public void call(RealmResults<AllTypes> allTypes) {
+                subscriberCalled.incrementAndGet();
+            }
+        });
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        assertEquals(2, subscriberCalled.get());
+    }
+

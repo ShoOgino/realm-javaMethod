@@ -1,4 +1,7 @@
     // UC 3 Async RealmObject
+    // 1. Create RealmObject async query
+    // 2. Wait COMPLETED_ASYNC_REALM_OBJECT then commit transaction in another non-looper thread
+    // 3. Listener on the RealmObject gets triggered again.
     public void test_non_looper_thread_commit_realmobject_async() {
         handler.post(new Runnable() {
             @Override
@@ -7,7 +10,8 @@
                 realm.addChangeListener(new RealmChangeListener() {
                     @Override
                     public void onChange() {
-                        if (globalCommitInvocations.incrementAndGet() == 2) {
+                        // Check if the 2nd transaction is committed.
+                        if (realm.where(Dog.class).count() == 2) {
                             realm.handler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -22,18 +26,16 @@
                 realm.createObject(Dog.class);
                 realm.commitTransaction();
 
-                Dog dog = realm.where(Dog.class).findFirstAsync();
-                assertTrue(dog.load());
-                dog.addChangeListener(new RealmChangeListener() {
-                    @Override
-                    public void onChange() {
-                        typebasedCommitInvocations.incrementAndGet();
-                    }
-                });
-
-                Thread thread = new Thread() {
+                final Thread thread = new Thread() {
                     @Override
                     public void run() {
+                        if (typebasedCommitInvocations.get() != 1) {
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                fail(e.getMessage());
+                            }
+                        }
                         Realm bgRealm = Realm.getInstance(realm.getConfiguration());
                         bgRealm.beginTransaction();
                         bgRealm.createObject(Dog.class);
@@ -41,23 +43,27 @@
                         bgRealm.close();
                     }
                 };
-                thread.start();
-                try {
-                    thread.join();
 
-                    final int MAX_RETRIES = 60;
-                    int numberOfSleep = 0;
-                    while (numberOfSleep++ < MAX_RETRIES
-                            && typebasedCommitInvocations.incrementAndGet() != 1) {
-                        Thread.sleep(16);
+                Dog dog = realm.where(Dog.class).findFirstAsync();
+                dog.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        typebasedCommitInvocations.incrementAndGet();
+
+                        if (typebasedCommitInvocations.get() == 1) {
+                            try {
+                                thread.join();
+                            } catch (InterruptedException e) {
+                                fail(e.getMessage());
+                            }
+                        }
                     }
-                    assertEquals(1, typebasedCommitInvocations.get());
-                } catch (InterruptedException e) {
-                    fail(e.getMessage());
-                }
+                });
+
+                thread.start();
             }
         });
         TestHelper.awaitOrFail(signalTestFinished);
-        assertEquals(1, typebasedCommitInvocations.get());
+        assertEquals(2, typebasedCommitInvocations.get());
     }
 

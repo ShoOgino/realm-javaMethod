@@ -1,9 +1,6 @@
+    @Test
     public void testCompactEncryptedPopulatedRealmFile() {
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
-                .name("enc.realm")
-                .encryptionKey(TestHelper.getRandomKey())
-                .build();
-        Realm.deleteRealm(realmConfig);
+        RealmConfiguration realmConfig = configFactory.createConfiguration("enc.realm", TestHelper.getRandomKey());
         Realm realm = Realm.getInstance(realmConfig);
 
         populateTestRealm(realm, 100);

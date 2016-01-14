@@ -1,0 +1,17 @@
+    @Override
+    protected void after() {
+        try {
+            for (RealmConfiguration configuration : configurations) {
+                Realm.deleteRealm(configuration);
+            }
+        } catch (IllegalStateException e) {
+            // Only throw the exception caused by deleting the opened Realm if the test case itself doesn't throw.
+            if (!unitTestFailed) {
+                throw e;
+            }
+        } finally {
+            // This will delete the temp folder.
+            super.after();
+        }
+    }
+

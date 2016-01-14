@@ -4,6 +4,7 @@
      * @param transaction {@link io.realm.Realm.Transaction} to execute.
      * @param callback optional, to receive the result of this query.
      * @return a {@link RealmAsyncTask} representing a cancellable task.
+     * @throws IllegalArgumentException if the {@code transaction} is {@code null}, or if the realm is opened from another thread.
      */
     public RealmAsyncTask executeTransaction(final Transaction transaction, final Transaction.Callback callback) {
         if (transaction == null)
@@ -35,6 +36,9 @@
                                     && handler != null
                                     && !Thread.currentThread().isInterrupted()
                                     && handler.getLooper().getThread().isAlive()) {
+                                // The bgRealm needs to be closed before post event to caller's handler to avoid concurrency problem
+                                // eg.: User wants to delete Realm in the callbacks.
+                                bgRealm.close();
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
@@ -60,6 +64,7 @@
                                 && handler != null
                                 && !Thread.currentThread().isInterrupted()
                                 && handler.getLooper().getThread().isAlive()) {
+                            bgRealm.close();
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -68,7 +73,9 @@
                             });
                         }
                     } finally {
-                        bgRealm.close();
+                        if (!bgRealm.isClosed()) {
+                            bgRealm.close();
+                        }
                     }
                 }
             }
