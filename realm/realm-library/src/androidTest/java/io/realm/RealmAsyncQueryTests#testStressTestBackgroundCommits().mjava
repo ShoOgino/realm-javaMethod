@@ -4,6 +4,7 @@
     @RunTestInLooperThread
     public void testStressTestBackgroundCommits() throws Throwable {
         final int NUMBER_OF_COMMITS = 100;
+        final CountDownLatch bgRealmClosed = new CountDownLatch(1);
         final long[] latestLongValue = new long[1];
         final float[] latestFloatValue = new float[1];
         // start a background thread that pushes a commit every 16ms
@@ -25,6 +26,7 @@
                     SystemClock.sleep(16);
                 }
                 backgroundThreadRealm.close();
+                bgRealmClosed.countDown();
             }
         };
 
@@ -34,14 +36,13 @@
             public void onChange() {
                 assertTrue(allAsync.isLoaded());
                 if (allAsync.size() == NUMBER_OF_COMMITS) {
-
                     AllTypes lastInserted = workerThread.realm.where(AllTypes.class)
                             .equalTo("columnLong", latestLongValue[0])
                             .equalTo("columnFloat", latestFloatValue[0])
                             .findFirst();
-
                     assertNotNull(lastInserted);
-                    workerThread.signalTestCompleted.countDown();
+                    TestHelper.awaitOrFail(bgRealmClosed);
+                    workerThread.testComplete();
                 }
             }
         });

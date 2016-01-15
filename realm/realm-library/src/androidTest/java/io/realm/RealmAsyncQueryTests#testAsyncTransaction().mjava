@@ -15,12 +15,12 @@
             public void onSuccess() {
                 assertEquals(1, workerThread.realm.allObjects(Owner.class).size());
                 assertEquals("Owner", workerThread.realm.where(Owner.class).findFirst().getName());
-                workerThread.signalTestCompleted.countDown();
+                workerThread.testComplete();
             }
 
             @Override
             public void onError(Exception e) {
-                workerThread.signalTestCompleted.countDown();
+                workerThread.testComplete();;
                 fail(e.getMessage());
             }
         });
