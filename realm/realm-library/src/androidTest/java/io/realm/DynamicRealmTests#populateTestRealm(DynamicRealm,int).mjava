@@ -1,0 +1,16 @@
+    private void populateTestRealm(DynamicRealm realm, int objects) {
+        realm.beginTransaction();
+        realm.allObjects(AllTypes.CLASS_NAME).clear();
+        for (int i = 0; i < objects; ++i) {
+            DynamicRealmObject allTypes = realm.createObject(AllTypes.CLASS_NAME);
+            allTypes.setBoolean(AllTypes.FIELD_BOOLEAN, (i % 3) == 0);
+            allTypes.setBlob(AllTypes.FIELD_BINARY, new byte[]{1, 2, 3});
+            allTypes.setDate(AllTypes.FIELD_DATE, new Date());
+            allTypes.setDouble(AllTypes.FIELD_DOUBLE, 3.1415D + i);
+            allTypes.setFloat(AllTypes.FIELD_FLOAT, 1.234567F + i);
+            allTypes.setString(AllTypes.FIELD_STRING, "test data " + i);
+            allTypes.setLong(AllTypes.FIELD_LONG, i);
+        }
+        realm.commitTransaction();
+    }
+

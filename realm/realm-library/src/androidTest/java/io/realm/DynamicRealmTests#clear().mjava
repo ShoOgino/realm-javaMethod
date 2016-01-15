@@ -1,0 +1,13 @@
+    @Test
+    public void clear() {
+        realm.beginTransaction();
+        realm.createObject(AllTypes.CLASS_NAME);
+        realm.commitTransaction();
+
+        assertEquals(1, realm.where(AllTypes.CLASS_NAME).count());
+        realm.beginTransaction();
+        realm.clear(AllTypes.CLASS_NAME);
+        realm.commitTransaction();
+        assertEquals(0, realm.where(AllTypes.CLASS_NAME).count());
+    }
+
