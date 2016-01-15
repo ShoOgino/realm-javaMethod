@@ -1,0 +1,23 @@
+    // Test that the SharedGroupManager is not reused across Realm/DynamicRealm on the same thread.
+    // This is done by starting a write transaction in one Realm and verifying that none of the data
+    // written (but not committed) is available in the other Realm.
+    @Test
+    public void separateSharedGroups() {
+        Realm typedRealm = Realm.getInstance(defaultConfig);
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(defaultConfig);
+
+        assertEquals(0, typedRealm.where(AllTypes.class).count());
+        assertEquals(0, dynamicRealm.where(AllTypes.CLASS_NAME).count());
+
+        typedRealm.beginTransaction();
+        try {
+            typedRealm.createObject(AllTypes.class);
+            assertEquals(1, typedRealm.where(AllTypes.class).count());
+            assertEquals(0, dynamicRealm.where(AllTypes.CLASS_NAME).count());
+            typedRealm.cancelTransaction();
+        } finally {
+            typedRealm.close();
+            dynamicRealm.close();
+        }
+    }
+

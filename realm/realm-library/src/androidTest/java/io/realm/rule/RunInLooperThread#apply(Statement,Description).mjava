@@ -19,13 +19,11 @@
                             backgroundLooper[0] = Looper.myLooper();
                             try {
                                 realm = Realm.getInstance(realmConfiguration);
-
                                 base.evaluate();
-
                                 Looper.loop();
                             } catch (Throwable e) {
                                 threadAssertionError[0] = e;
-
+                                unitTestFailed = true;
                             } finally {
                                 if (signalTestCompleted.getCount() > 0) {
                                     signalTestCompleted.countDown();
