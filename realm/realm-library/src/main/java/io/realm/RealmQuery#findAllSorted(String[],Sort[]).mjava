@@ -8,7 +8,8 @@
      * @param sortOrders how to sort the field names.
      * @return a {@link io.realm.RealmResults} containing objects. If no objects match the condition, a list with zero 
      *         objects is returned.
-     * @throws java.lang.IllegalArgumentException if a field name does not exist.
+     * @throws java.lang.IllegalArgumentException if one of the field names does not exist or it belongs to a child
+     * {@link RealmObject} or a child {@link RealmList}.
      */
     @SuppressWarnings("unchecked")
     public RealmResults<E> findAllSorted(String fieldNames[], Sort sortOrders[]) {
@@ -21,10 +22,7 @@
             List<Long> columnIndices = new ArrayList<Long>();
             for (int i = 0; i < fieldNames.length; i++) {
                 String fieldName = fieldNames[i];
-                Long columnIndex = schema.getFieldIndex(fieldName);
-                if (columnIndex == null || columnIndex < 0) {
-                    throw new IllegalArgumentException(String.format("Field name '%s' does not exist.", fieldName));
-                }
+                long columnIndex = getColumnIndexForSort(fieldName);
                 columnIndices.add(columnIndex);
             }
             tableView.sort(columnIndices, sortOrders);

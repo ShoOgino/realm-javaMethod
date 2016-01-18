@@ -6,6 +6,8 @@
      * @return immediately an empty {@link RealmResults}. Users need to register a listener
      * {@link io.realm.RealmResults#addChangeListener(RealmChangeListener)} to be notified when the query completes.
      * @see io.realm.RealmResults
+     * @throws java.lang.IllegalArgumentException if one of the field names does not exist or it belongs to a child
+     * {@link RealmObject} or a child {@link RealmList}.
      */
     public RealmResults<E> findAllSortedAsync(String fieldNames[], final Sort[] sortOrders) {
         checkQueryIsNotReused();
@@ -26,10 +28,7 @@
             final long indices[] = new long[fieldNames.length];
             for (int i = 0; i < fieldNames.length; i++) {
                 String fieldName = fieldNames[i];
-                Long columnIndex = schema.getFieldIndex(fieldName);
-                if (columnIndex == null || columnIndex < 0) {
-                    throw new IllegalArgumentException(String.format("Field name '%s' does not exist.", fieldName));
-                }
+                long columnIndex = getColumnIndexForSort(fieldName);
                 indices[i] = columnIndex;
             }
 
