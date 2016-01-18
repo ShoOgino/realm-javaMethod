@@ -1,0 +1,21 @@
+    @Test
+    public void greaterThanOrEqualTo() {
+        final int TEST_OBJECTS_COUNT = 200;
+        populateTestRealm(TEST_OBJECTS_COUNT);
+
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class)
+                .greaterThanOrEqualTo(AllTypes.FIELD_FLOAT, 10.234567f).findAll();
+        assertEquals(TEST_OBJECTS_COUNT - 9, resultList.size());
+
+        resultList = testRealm.where(AllTypes.class).beginsWith(AllTypes.FIELD_STRING, "test data 1")
+                .greaterThanOrEqualTo(AllTypes.FIELD_FLOAT, 50.234567f).findAll();
+        assertEquals(TEST_OBJECTS_COUNT - 100, resultList.size());
+
+        RealmQuery<AllTypes> query = testRealm.where(AllTypes.class)
+                .greaterThanOrEqualTo(AllTypes.FIELD_FLOAT, 11.234567f);
+        query = query.between(AllTypes.FIELD_LONG, 1, 20);
+
+        resultList = query.beginsWith(AllTypes.FIELD_STRING, "test data 15").findAll();
+        assertEquals(1, resultList.size());
+    }
+

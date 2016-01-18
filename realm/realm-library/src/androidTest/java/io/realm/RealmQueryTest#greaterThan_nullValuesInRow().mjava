@@ -1,0 +1,18 @@
+    // Querying with greaterThan and table has null values in row.
+    @Test
+    public void greaterThan_nullValuesInRow() {
+        TestHelper.populateTestRealmForNullTests(testRealm);
+
+        // 6 Integer
+        assertEquals(1, testRealm.where(NullTypes.class).greaterThan(NullTypes.FIELD_INTEGER_NULL, 2).count());
+        // 7 Long
+        assertEquals(1, testRealm.where(NullTypes.class).greaterThan(NullTypes.FIELD_LONG_NULL, 2L).count());
+        // 8 Float
+        assertEquals(1, testRealm.where(NullTypes.class).greaterThan(NullTypes.FIELD_FLOAT_NULL, 2F).count());
+        // 9 Double
+        assertEquals(1, testRealm.where(NullTypes.class).greaterThan(NullTypes.FIELD_DOUBLE_NULL, 2D).count());
+        // 10 Date
+        assertEquals(1, testRealm.where(NullTypes.class).greaterThan(NullTypes.FIELD_DATE_NULL,
+                new Date(5000)).count());
+    }
+
