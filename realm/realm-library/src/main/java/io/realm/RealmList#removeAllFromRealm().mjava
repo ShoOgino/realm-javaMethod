@@ -1,0 +1,20 @@
+    /**
+     * Removes all elements from this list and delete them from the corresponding Realm. This method can be called on a
+     * non-managed {@link RealmList} if all of the RealmObjects in the list are managed by Realm.
+     *
+     * @throws IllegalStateException if the Realm instance has been closed, the parent object has been removed, the
+     * method is called in a wrong thread or any RealmObject in the list is not managed by Realm.
+     * @see #clear()
+     */
+    public void removeAllFromRealm() {
+        if (managedMode) {
+            checkValidView();
+            view.removeAllTargetRows();
+        } else {
+            for (RealmObject object : nonManagedList) {
+                object.removeFromRealm();
+            }
+            nonManagedList.clear();
+        }
+    }
+

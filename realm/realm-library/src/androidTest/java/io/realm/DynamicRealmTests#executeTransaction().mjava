@@ -1,0 +1,16 @@
+    @Test
+    public void executeTransaction() {
+        assertEquals(0, realm.allObjects(Owner.CLASS_NAME).size());
+        realm.executeTransaction(new DynamicRealm.Transaction() {
+            @Override
+            public void execute(DynamicRealm realm) {
+                DynamicRealmObject owner = realm.createObject(Owner.CLASS_NAME);
+                owner.setString("name", "Owner");
+            }
+        });
+
+        RealmResults<DynamicRealmObject> allObjects = realm.allObjects(Owner.CLASS_NAME);
+        assertEquals(1, allObjects.size());
+        assertEquals("Owner", allObjects.get(0).getString("name"));
+    }
+

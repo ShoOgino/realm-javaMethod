@@ -1,0 +1,27 @@
+    @Test
+    public void clear_all() {
+        realm.beginTransaction();
+        realm.createObject(AllTypes.CLASS_NAME);
+        DynamicRealmObject cat = realm.createObject(Cat.CLASS_NAME);
+        DynamicRealmObject owner =  realm.createObject(Owner.CLASS_NAME);
+        owner.setObject("cat", cat);
+        realm.getSchema().create("TestRemoveAll").addField("Field1", String.class);
+        realm.createObject("TestRemoveAll");
+        realm.commitTransaction();
+
+        assertEquals(1, realm.where(AllTypes.CLASS_NAME).count());
+        assertEquals(1, realm.where(Owner.CLASS_NAME).count());
+        assertEquals(1, realm.where(Cat.CLASS_NAME).count());
+        assertEquals(1, realm.where("TestRemoveAll").count());
+
+        realm.beginTransaction();
+        realm.clear();
+        realm.commitTransaction();
+
+        assertEquals(0, realm.where(AllTypes.CLASS_NAME).count());
+        assertEquals(0, realm.where(Owner.CLASS_NAME).count());
+        assertEquals(0, realm.where(Cat.CLASS_NAME).count());
+        assertEquals(0, realm.where("TestRemoveAll").count());
+        assertTrue(realm.isEmpty());
+    }
+
