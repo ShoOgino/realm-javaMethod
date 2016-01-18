@@ -1,0 +1,13 @@
+    @Test
+    public void lessThanOrEqualTo() {
+        final int TEST_OBJECTS_COUNT = 200;
+        populateTestRealm(TEST_OBJECTS_COUNT);
+
+        RealmResults<AllTypes> resultList = testRealm.where(AllTypes.class)
+                .lessThanOrEqualTo(AllTypes.FIELD_FLOAT, 31.234567f).findAll();
+        assertEquals(31, resultList.size());
+        resultList = testRealm.where(AllTypes.class).lessThanOrEqualTo(AllTypes.FIELD_FLOAT, 31.234567f)
+                .between(AllTypes.FIELD_LONG, 11, 20).findAll();
+        assertEquals(10, resultList.size());
+    }
+
