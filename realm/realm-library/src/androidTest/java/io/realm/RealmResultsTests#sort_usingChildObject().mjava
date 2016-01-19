@@ -1,0 +1,20 @@
+    @Test
+    public void sort_usingChildObject() {
+        realm.beginTransaction();
+        Owner owner = realm.createObject(Owner.class);
+        owner.setName("owner");
+        Cat cat = realm.createObject(Cat.class);
+        cat.setName("cat");
+        owner.setCat(cat);
+        realm.commitTransaction();
+
+        RealmQuery<Owner> query = realm.where(Owner.class);
+        RealmResults<Owner> owners = query.findAll();
+
+        try {
+            owners.sort("cat.name");
+            fail("Sorting by child object properties should result in a IllegalArgumentException");
+        } catch (IllegalArgumentException ignore) {
+        }
+    }
+

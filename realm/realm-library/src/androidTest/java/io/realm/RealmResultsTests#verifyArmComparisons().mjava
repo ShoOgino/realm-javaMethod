@@ -1,0 +1,21 @@
+    // Triggered an ARM bug
+    @Test
+    public void verifyArmComparisons() {
+        realm.beginTransaction();
+        realm.clear(AllTypes.class);
+        long id = -1;
+        for (int i = 0; i < 10; i++) {
+            AllTypes allTypes = realm.createObject(AllTypes.class);
+            allTypes.setColumnLong(id--);
+        }
+        realm.commitTransaction();
+
+        assertEquals(10, realm.where(AllTypes.class).between(AllTypes.FIELD_LONG, -10, -1).findAll().size());
+        assertEquals(10, realm.where(AllTypes.class).greaterThan(AllTypes.FIELD_LONG, -11).findAll().size());
+        assertEquals(10, realm.where(AllTypes.class).greaterThanOrEqualTo(AllTypes.FIELD_LONG, -10).findAll().size());
+        assertEquals(10, realm.where(AllTypes.class).lessThan(AllTypes.FIELD_LONG, 128).findAll().size());
+        assertEquals(10, realm.where(AllTypes.class).lessThan(AllTypes.FIELD_LONG, 127).findAll().size());
+        assertEquals(10, realm.where(AllTypes.class).lessThanOrEqualTo(AllTypes.FIELD_LONG, -1).findAll().size());
+        assertEquals(10, realm.where(AllTypes.class).lessThan(AllTypes.FIELD_LONG, 0).findAll().size());
+    }
+
