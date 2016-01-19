@@ -1,0 +1,10 @@
+    public void testDistinctInvalidTypesLinkedFields() {
+        populateForDistinctInvalidTypesLinked(testRealm);
+
+        try {
+            testRealm.where(AllJavaTypes.class).findAll().distinct(AllJavaTypes.FIELD_OBJECT + ".columnBinary");
+            fail("Unsupported columnBinary linked field");
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
