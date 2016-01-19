@@ -1,4 +1,5 @@
-    public void testUntypedSetListMixedTypesThrows() {
+    @Test
+    public void untypedSetter_listMixedTypesThrows() {
         realm.beginTransaction();
         AllJavaTypes obj1 = realm.createObject(AllJavaTypes.class);
         obj1.setFieldLong(2);
@@ -7,10 +8,7 @@
         RealmList<DynamicRealmObject> list = new RealmList<DynamicRealmObject>();
         list.add(new DynamicRealmObject(obj1));
         list.add(new DynamicRealmObject(obj2));
-        try {
-            dObj.set(AllJavaTypes.FIELD_LIST, list);
-            fail();
-        } catch (IllegalArgumentException ignored) {
-        }
+        thrown.expect(IllegalArgumentException.class);
+        dObj.set(AllJavaTypes.FIELD_LIST, list);
     }
 

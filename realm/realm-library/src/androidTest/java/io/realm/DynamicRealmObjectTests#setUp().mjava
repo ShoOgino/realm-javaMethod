@@ -1,7 +1,6 @@
-    @Override
-    protected void setUp() throws Exception {
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext()).build();
-        Realm.deleteRealm(realmConfig);
+    @Before
+    public void setUp() {
+        RealmConfiguration realmConfig = configFactory.createConfiguration();
         realm = Realm.getInstance(realmConfig);
         realm.beginTransaction();
         typedObj = realm.createObject(AllJavaTypes.class);
