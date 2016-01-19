@@ -1,0 +1,21 @@
+    @Test
+    public void clear_all() {
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.createObject(Owner.class).setCat(realm.createObject(Cat.class));
+        realm.commitTransaction();
+
+        assertEquals(1, realm.where(AllTypes.class).count());
+        assertEquals(1, realm.where(Owner.class).count());
+        assertEquals(1, realm.where(Cat.class).count());
+
+        realm.beginTransaction();
+        realm.clear();
+        realm.commitTransaction();
+
+        assertEquals(0, realm.where(AllTypes.class).count());
+        assertEquals(0, realm.where(Owner.class).count());
+        assertEquals(0, realm.where(Cat.class).count());
+        assertTrue(realm.isEmpty());
+    }
+

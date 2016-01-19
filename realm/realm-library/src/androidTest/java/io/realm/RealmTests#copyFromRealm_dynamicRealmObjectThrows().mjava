@@ -1,0 +1,14 @@
+    @Test
+    public void copyFromRealm_dynamicRealmObjectThrows() {
+        realm.beginTransaction();
+        AllTypes obj = realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+        DynamicRealmObject dObj = new DynamicRealmObject(obj);
+
+        try {
+            realm.copyFromRealm(dObj);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

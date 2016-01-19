@@ -1,0 +1,12 @@
+    // Private API
+    @Test
+    public void remove() {
+        populateTestRealm();
+        realm.beginTransaction();
+        realm.remove(AllTypes.class, 0);
+        realm.commitTransaction();
+
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        assertEquals(TEST_DATA_SIZE - 1, resultList.size());
+    }
+

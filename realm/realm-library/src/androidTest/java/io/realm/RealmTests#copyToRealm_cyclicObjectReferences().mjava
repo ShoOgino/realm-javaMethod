@@ -1,0 +1,18 @@
+    @Test
+    public void copyToRealm_cyclicObjectReferences() {
+        CyclicType oneCyclicType = new CyclicType();
+        oneCyclicType.setName("One");
+        CyclicType anotherCyclicType = new CyclicType();
+        anotherCyclicType.setName("Two");
+        oneCyclicType.setObject(anotherCyclicType);
+        anotherCyclicType.setObject(oneCyclicType);
+
+        realm.beginTransaction();
+        CyclicType realmObject = realm.copyToRealm(oneCyclicType);
+        realm.commitTransaction();
+
+        assertEquals("One", realmObject.getName());
+        assertEquals("Two", realmObject.getObject().getName());
+        assertEquals(2, realm.allObjects(CyclicType.class).size());
+    }
+

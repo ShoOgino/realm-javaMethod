@@ -1,0 +1,21 @@
+    // Tests that a collection of objects with references all gets copied.
+    @Test
+    public void copyToRealmOrUpdate_iterableChildObjects() {
+        DogPrimaryKey dog = new DogPrimaryKey(1, "Snoop");
+
+        AllTypesPrimaryKey allTypes1 = new AllTypesPrimaryKey();
+        allTypes1.setColumnLong(1);
+        allTypes1.setColumnRealmObject(dog);
+
+        AllTypesPrimaryKey allTypes2 = new AllTypesPrimaryKey();
+        allTypes1.setColumnLong(2);
+        allTypes2.setColumnRealmObject(dog);
+
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(Arrays.asList(allTypes1, allTypes2));
+        realm.commitTransaction();
+
+        assertEquals(2, realm.allObjects(AllTypesPrimaryKey.class).size());
+        assertEquals(1, realm.allObjects(DogPrimaryKey.class).size());
+    }
+

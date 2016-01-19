@@ -1,0 +1,23 @@
+    @Test
+    public void copyToRealmOrUpdate_cyclicObject() {
+        CyclicTypePrimaryKey oneCyclicType = new CyclicTypePrimaryKey(1);
+        oneCyclicType.setName("One");
+        CyclicTypePrimaryKey anotherCyclicType = new CyclicTypePrimaryKey(2);
+        anotherCyclicType.setName("Two");
+        oneCyclicType.setObject(anotherCyclicType);
+        anotherCyclicType.setObject(oneCyclicType);
+
+        realm.beginTransaction();
+        realm.copyToRealm(oneCyclicType);
+        realm.commitTransaction();
+
+        oneCyclicType.setName("Three");
+        anotherCyclicType.setName("Four");
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(oneCyclicType);
+        realm.commitTransaction();
+
+        assertEquals(2, realm.allObjects(CyclicTypePrimaryKey.class).size());
+        assertEquals("Three", realm.where(CyclicTypePrimaryKey.class).equalTo("id", 1).findFirst().getName());
+    }
+

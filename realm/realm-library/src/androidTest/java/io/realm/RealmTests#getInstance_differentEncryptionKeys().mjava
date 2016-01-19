@@ -1,0 +1,30 @@
+    @Test
+    public void getInstance_differentEncryptionKeys() {
+        byte[] key1 = TestHelper.getRandomKey(42);
+        byte[] key2 = TestHelper.getRandomKey(42);
+
+        // Make sure the key is the same, but in two different instances
+        assertArrayEquals(key1, key2);
+        assertTrue(key1 != key2);
+
+        final String ENCRYPTED_REALM = "differentKeys.realm";
+        Realm realm1 = null;
+        Realm realm2 = null;
+        try {
+            realm1 = Realm.getInstance(configFactory.createConfiguration(ENCRYPTED_REALM, key1));
+            try {
+                realm2 = Realm.getInstance(configFactory.createConfiguration(ENCRYPTED_REALM, key2));
+            } catch (Exception e) {
+                fail();
+            } finally {
+                if (realm2 != null) {
+                    realm2.close();
+                }
+            }
+        } finally {
+            if (realm1 != null) {
+                realm1.close();
+            }
+        }
+    }
+

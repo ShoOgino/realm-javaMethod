@@ -1,0 +1,16 @@
+    @Test
+    public void distinct_noneIndexedFieldsThrows() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+
+        for (String fieldName : new String[]{"Boolean", "Long", "Date", "String"}) {
+            try {
+                realm.distinct(AnnotationIndexTypes.class, "notIndex" + fieldName);
+                fail("notIndex" + fieldName);
+            } catch (UnsupportedOperationException ignored) {
+            }
+        }
+    }
+

@@ -1,0 +1,19 @@
+    @Test
+    public void beginTransaction() throws IOException {
+        populateTestRealm();
+
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnFloat(3.1415f);
+        allTypes.setColumnString("a unique string");
+        realm.commitTransaction();
+
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        assertEquals(TEST_DATA_SIZE + 1, resultList.size());
+
+        resultList = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_STRING, "a unique string").findAll();
+        assertEquals(1, resultList.size());
+        resultList = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_FLOAT, 3.1415f).findAll();
+        assertEquals(1, resultList.size());
+    }
+
