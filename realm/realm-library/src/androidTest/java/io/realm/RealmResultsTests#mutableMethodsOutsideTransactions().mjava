@@ -1,0 +1,22 @@
+    // Test that all methods that require a transaction (ie. any function that mutates Realm data)
+    @Test
+    public void mutableMethodsOutsideTransactions() {
+        RealmResults<AllTypes> result = realm.where(AllTypes.class).findAll();
+
+        try {
+            result.clear();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+        try {
+            result.remove(0);
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+        try {
+            result.removeLast();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+    }
+

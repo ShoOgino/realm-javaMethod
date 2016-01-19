@@ -1,0 +1,31 @@
+    @Test
+    public void sort_greekCharacters() {
+        realm.beginTransaction();
+        realm.clear(AllTypes.class);
+        AllTypes at1 = realm.createObject(AllTypes.class);
+        at1.setColumnString("αύριο");
+        AllTypes at2 = realm.createObject(AllTypes.class);
+        at2.setColumnString("ημέρες");
+        AllTypes at3 = realm.createObject(AllTypes.class);
+        at3.setColumnString("δοκιμές");
+        realm.commitTransaction();
+
+        RealmResults<AllTypes> result = realm.allObjects(AllTypes.class);
+        RealmResults<AllTypes> sortedResult = result.where().findAll();
+        sortedResult.sort(AllTypes.FIELD_STRING);
+
+        assertEquals(3, sortedResult.size());
+        assertEquals("αύριο", sortedResult.first().getColumnString());
+        assertEquals("αύριο", sortedResult.get(0).getColumnString());
+        assertEquals("δοκιμές", sortedResult.get(1).getColumnString());
+        assertEquals("ημέρες", sortedResult.get(2).getColumnString());
+
+        RealmResults<AllTypes> reverseResult = result.where().findAll();
+        reverseResult.sort(AllTypes.FIELD_STRING, Sort.DESCENDING);
+        assertEquals(3, reverseResult.size());
+        assertEquals("αύριο", reverseResult.last().getColumnString());
+        assertEquals("ημέρες", reverseResult.get(0).getColumnString());
+        assertEquals("δοκιμές", reverseResult.get(1).getColumnString());
+        assertEquals("αύριο", reverseResult.get(2).getColumnString());
+    }
+
