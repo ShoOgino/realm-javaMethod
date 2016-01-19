@@ -1,0 +1,10 @@
+    @Test
+    public void distinct_unknownFieldThrows() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+        thrown.expect(IllegalArgumentException.class);
+        realm.distinct(AnnotationIndexTypes.class, "doesNotExist");
+    }
+

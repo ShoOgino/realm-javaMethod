@@ -1,0 +1,33 @@
+    @Test
+    public void deleteRealm_failures() {
+        final String OTHER_REALM_NAME = "yetAnotherRealm.realm";
+
+        RealmConfiguration configA = configFactory.createConfiguration();
+        RealmConfiguration configB = configFactory.createConfiguration(OTHER_REALM_NAME);
+
+        // This instance is already cached because of the setUp() method so this deletion should throw
+        try {
+            Realm.deleteRealm(configA);
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        // Create a new Realm file
+        Realm yetAnotherRealm = Realm.getInstance(configB);
+
+        // Deleting it should fail
+        try {
+            Realm.deleteRealm(configB);
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        // But now that we close it deletion should work
+        yetAnotherRealm.close();
+        try {
+            Realm.deleteRealm(configB);
+        } catch (Exception e) {
+            fail();
+        }
+    }
+

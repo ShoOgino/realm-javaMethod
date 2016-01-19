@@ -1,0 +1,13 @@
+    @Test
+    public void distinct_invalidTypeThrows() {
+        populateTestRealm();
+
+        for (String field : new String[]{"columnRealmObject", "columnRealmList", "columnDouble", "columnFloat"}) {
+            try {
+                realm.distinct(AllTypes.class, field);
+                fail(field);
+            } catch (UnsupportedOperationException ignored) {
+            }
+        }
+    }
+

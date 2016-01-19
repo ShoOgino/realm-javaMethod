@@ -1,0 +1,12 @@
+    // Check that if a field has a null value it gets converted to the default value for that type
+    @Test
+    public void copyToRealm_convertsNullToDefaultValue() {
+        realm.beginTransaction();
+        AllTypes realmTypes = realm.copyToRealm(new AllTypes());
+        realm.commitTransaction();
+
+        assertEquals("", realmTypes.getColumnString());
+        assertEquals(new Date(0), realmTypes.getColumnDate());
+        assertArrayEquals(new byte[0], realmTypes.getColumnBinary());
+    }
+

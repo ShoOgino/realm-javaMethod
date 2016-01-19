@@ -1,0 +1,26 @@
+    @Test
+    public void removeAllChangeListenersThrowExceptionOnNonLooperThread() {
+        final CountDownLatch signalTestFinished = new CountDownLatch(1);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(realmConfig);
+                try {
+                    realm.removeAllChangeListeners();
+                    fail("Should not be able to invoke removeChangeListener");
+                } catch (IllegalStateException ignored) {
+                } finally {
+                    realm.close();
+                    signalTestFinished.countDown();
+                }
+            }
+        });
+        thread.start();
+
+        try {
+            TestHelper.awaitOrFail(signalTestFinished);
+        } finally {
+            thread.interrupt();
+        }
+    }
+

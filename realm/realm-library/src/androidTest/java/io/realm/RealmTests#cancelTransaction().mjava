@@ -1,0 +1,16 @@
+    @Test
+    public void cancelTransaction() {
+        populateTestRealm();
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.cancelTransaction();
+        assertEquals(TEST_DATA_SIZE, realm.allObjects(AllTypes.class).size());
+
+        try {
+            realm.cancelTransaction();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+    }
+

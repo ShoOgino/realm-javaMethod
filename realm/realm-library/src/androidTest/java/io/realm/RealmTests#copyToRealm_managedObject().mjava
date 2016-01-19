@@ -1,0 +1,14 @@
+    @Test
+    public void copyToRealm_managedObject() {
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnString("Test");
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        AllTypes copiedAllTypes = realm.copyToRealm(allTypes);
+        realm.commitTransaction();
+
+        assertTrue(allTypes == copiedAllTypes);
+    }
+
