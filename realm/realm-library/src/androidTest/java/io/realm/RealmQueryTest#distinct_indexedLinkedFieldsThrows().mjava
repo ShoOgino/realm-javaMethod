@@ -1,0 +1,15 @@
+    @Test
+    public void distinct_indexedLinkedFieldsThrows(){
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+        populateForDistinct(testRealm, numberOfBlocks, numberOfObjects, true);
+
+        for (String fieldName : new String[]{"Boolean", "Long", "Date", "String"}) {
+            try {
+                testRealm.where(AnnotationIndexTypes.class).distinct(AnnotationIndexTypes.FIELD_OBJECT + ".index" + fieldName);
+                fail("Unsupported Index" + fieldName + " linked field");
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+
