@@ -1,0 +1,15 @@
+    // Test NaN value on float and double columns
+    @Test
+    public void float_double_NaN() {
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnFloat(Float.NaN);
+        allTypes.setColumnDouble(Double.NaN);
+        realm.commitTransaction();
+        assertEquals(Float.NaN, realm.where(AllTypes.class).findFirst().getColumnFloat(), 0.0F);
+        assertEquals(Double.NaN, realm.where(AllTypes.class).findFirst().getColumnDouble(), 0.0D);
+        // NaN != NaN !!!
+        assertEquals(0, realm.where(AllTypes.class).equalTo("columnFloat", Float.NaN).count());
+        assertEquals(0, realm.where(AllTypes.class).equalTo("columnDouble", Double.NaN).count());
+    }
+

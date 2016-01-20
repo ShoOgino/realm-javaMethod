@@ -1,0 +1,27 @@
+    @Test
+    public void setter_link_objectFromOtherRealm() {
+        RealmConfiguration config = configFactory.createConfiguration("another.realm");
+        Realm anotherRealm = Realm.getInstance(config);
+        //noinspection TryFinallyCanBeTryWithResources
+        try {
+            anotherRealm.beginTransaction();
+            CyclicType objFromAnotherRealm = anotherRealm.createObject(CyclicType.class);
+            anotherRealm.commitTransaction();
+
+            realm.beginTransaction();
+            try {
+                CyclicType target = realm.createObject(CyclicType.class);
+
+                try {
+                    target.setObject(objFromAnotherRealm);
+                    fail();
+                } catch (IllegalArgumentException ignored) {
+                }
+            } finally {
+                realm.cancelTransaction();
+            }
+        } finally {
+            anotherRealm.close();
+        }
+    }
+

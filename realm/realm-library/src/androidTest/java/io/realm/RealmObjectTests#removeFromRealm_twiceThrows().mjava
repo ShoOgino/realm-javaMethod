@@ -1,0 +1,19 @@
+    @Test
+    public void removeFromRealm_twiceThrows() {
+        realm.beginTransaction();
+        Dog dog = realm.createObject(Dog.class);
+        dog.setAge(42);
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        assertTrue(dog.isValid());
+        dog.removeFromRealm();
+        assertFalse(dog.isValid());
+
+        try {
+            dog.removeFromRealm();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+    }
+
