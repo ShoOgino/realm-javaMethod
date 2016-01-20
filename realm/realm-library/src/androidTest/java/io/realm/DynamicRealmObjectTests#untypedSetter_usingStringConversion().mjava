@@ -1,4 +1,5 @@
-    public void testUntypedSetUsingStringConversion() {
+    @Test
+    public void untypedSetter_usingStringConversion() {
         realm.beginTransaction();
         AllJavaTypes obj = realm.createObject(AllJavaTypes.class);
         DynamicRealmObject dObj = new DynamicRealmObject(obj);
@@ -23,26 +24,27 @@
                         break;
                     case FLOAT:
                         dObj.set(AllJavaTypes.FIELD_FLOAT, "1.23");
-                        assertEquals(1.23f, dObj.getFloat(AllJavaTypes.FIELD_FLOAT));
+                        assertEquals(1.23f, dObj.getFloat(AllJavaTypes.FIELD_FLOAT), 0f);
                         break;
                     case DOUBLE:
                         dObj.set(AllJavaTypes.FIELD_DOUBLE, "1.234");
-                        assertEquals(1.234d, dObj.getDouble(AllJavaTypes.FIELD_DOUBLE));
+                        assertEquals(1.234d, dObj.getDouble(AllJavaTypes.FIELD_DOUBLE), 0f);
                         break;
                     case DATE:
                         dObj.set(AllJavaTypes.FIELD_DATE, "1000");
                         assertEquals(new Date(1000), dObj.getDate(AllJavaTypes.FIELD_DATE));
-
+                        break;
                     // These types don't have a string representation that can be parsed.
                     case OBJECT:
                     case LIST:
                     case STRING:
                     case BINARY:
                     case BYTE:
-                        continue;
+                        break;
 
                     default:
                         fail("Unknown type: " + type);
+                        break;
                 }
             }
         } finally {

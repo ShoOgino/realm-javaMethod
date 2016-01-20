@@ -1,6 +1,6 @@
-    // Test that all getters fail if given an invalid field name
-    public void testTypedSetXXXIllegalFieldNameThrows() {
-
+    // Test that all getters fail if given invalid field name
+    @Test
+    public void typedGetter_illegalFieldNameThrows() {
         // Set arguments
         String linkedField = AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_STRING;
         List<String> arguments = Arrays.asList(null, "foo", AllJavaTypes.FIELD_STRING, linkedField);
@@ -8,9 +8,12 @@
 
         // Test all getters
         for (SupportedType type : SupportedType.values()) {
+
+            // We cannot modularize everything, so STRING is a special case with its own set
+            // of failing values. Only difference is the wrong type column has to be different.
             List<String> args = (type == SupportedType.STRING) ? stringArguments : arguments;
             try {
-                callSetter(type, args);
+                callGetter(type, args);
                 fail();
             } catch (IllegalArgumentException ignored) {
             }
