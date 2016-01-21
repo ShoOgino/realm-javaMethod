@@ -1,0 +1,27 @@
+    @Test
+    public void getter_afterDeleteFromOtherThreadThrows() {
+        realm.beginTransaction();
+        AllTypes obj = realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        final CountDownLatch objectDeletedInBackground = new CountDownLatch(1);
+        new java.lang.Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(realmConfig);
+                realm.beginTransaction();
+                realm.clear(AllTypes.class);
+                realm.commitTransaction();
+                realm.close();
+                objectDeletedInBackground.countDown();
+            }
+        }).start();
+        TestHelper.awaitOrFail(objectDeletedInBackground);
+        realm.refresh(); // Move to version where underlying object is deleted.
+
+        // Object should no longer be available
+        assertFalse(obj.isValid());
+        thrown.expect(IllegalStateException.class);
+        obj.getColumnLong();
+    }
+

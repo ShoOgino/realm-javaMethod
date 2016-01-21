@@ -1,0 +1,14 @@
+    @Test
+    public void equals_standAloneObject() {
+        realm.beginTransaction();
+        CyclicType ct1 = realm.createObject(CyclicType.class);
+        ct1.setName("Foo");
+        realm.commitTransaction();
+
+        CyclicType ct2 = new CyclicType();
+        ct2.setName("Bar");
+
+        assertFalse(ct1.equals(ct2));
+        assertFalse(ct2.equals(ct1));
+    }
+
