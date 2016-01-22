@@ -1,0 +1,12 @@
+    @Test
+    public void copyFromRealm_list_invalidListThrows() {
+        realm.beginTransaction();
+        AllTypes object = realm.createObject(AllTypes.class);
+        List<AllTypes> list = new RealmList<AllTypes>(object);
+        object.removeFromRealm();
+        realm.commitTransaction();
+
+        thrown.expect(IllegalArgumentException.class);
+        realm.copyFromRealm(list);
+    }
+

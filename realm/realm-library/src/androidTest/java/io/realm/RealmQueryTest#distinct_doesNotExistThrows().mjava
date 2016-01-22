@@ -1,0 +1,13 @@
+    @Test
+    public void distinct_doesNotExistThrows() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+        populateForDistinct(testRealm, numberOfBlocks, numberOfObjects, false);
+
+        try {
+            testRealm.where(AnnotationIndexTypes.class).distinct("doesNotExist");
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

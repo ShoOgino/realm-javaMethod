@@ -1,0 +1,15 @@
+    @Test
+    public void compactRealm_encryptedPopulatedRealm() {
+        RealmConfiguration realmConfig = configFactory.createConfiguration("enc.realm", TestHelper.getRandomKey());
+        Realm realm = Realm.getInstance(realmConfig);
+
+        populateTestRealm(realm, 100);
+        realm.close();
+        // TODO: remove try/catch block when compacting encrypted Realms is supported
+        try {
+            assertTrue(Realm.compactRealm(realmConfig));
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+    }
+

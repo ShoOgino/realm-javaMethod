@@ -1,0 +1,10 @@
+    @Test
+    public void setter_outsideTransactionThrows() {
+        realm.beginTransaction();
+        Dog dog = realm.createObject(Dog.class);
+        realm.commitTransaction();
+
+        thrown.expect(IllegalStateException.class);
+        dog.setName("Rex");
+    }
+

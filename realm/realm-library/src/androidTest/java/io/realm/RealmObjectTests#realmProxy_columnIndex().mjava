@@ -1,0 +1,21 @@
+    @Test
+    public void realmProxy_columnIndex() {
+        final RealmConfiguration configForSwapped = prepareColumnSwappedRealm();
+
+        // open swapped Realm in order to load column index
+        Realm.getInstance(configForSwapped).close();
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                final StringAndInt obj = RealmObjectTests.this.realm.createObject(StringAndInt.class);
+                /*
+                 * If https://github.com/realm/realm-java/issues/1611 issue exists,
+                 * setter/getter of RealmObjectProxy uses last loaded column index for every Realm.
+                 */
+                obj.setStr("foo");
+                obj.getStr();
+            }
+        });
+    }
+

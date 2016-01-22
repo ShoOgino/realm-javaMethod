@@ -1,0 +1,14 @@
+    @Test
+    public void checkIfValid() {
+        // checkIfValid() must not throw any Exception against valid Realm instance.
+        realm.checkIfValid();
+
+        realm.close();
+        try {
+            realm.checkIfValid();
+            fail("closed Realm instance must throw IllegalStateException.");
+        } catch (IllegalStateException ignored) {
+        }
+        realm = null;
+    }
+

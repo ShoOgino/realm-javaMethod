@@ -1,0 +1,18 @@
+    @Test
+    public void copyToRealm_list() {
+        Dog dog1 = new Dog();
+        dog1.setName("Dog 1");
+        Dog dog2 = new Dog();
+        dog2.setName("Dog 2");
+        RealmList<Dog> list = new RealmList<Dog>();
+        list.addAll(Arrays.asList(dog1, dog2));
+
+        realm.beginTransaction();
+        List<Dog> copiedList = new ArrayList<Dog>(realm.copyToRealm(list));
+        realm.commitTransaction();
+
+        assertEquals(2, copiedList.size());
+        assertEquals(dog1.getName(), copiedList.get(0).getName());
+        assertEquals(dog2.getName(), copiedList.get(1).getName());
+    }
+

@@ -1,0 +1,13 @@
+    @Test
+    public void isInTransaction() {
+        assertFalse(realm.isInTransaction());
+        realm.beginTransaction();
+        assertTrue(realm.isInTransaction());
+        realm.commitTransaction();
+        assertFalse(realm.isInTransaction());
+        realm.beginTransaction();
+        assertTrue(realm.isInTransaction());
+        realm.cancelTransaction();
+        assertFalse(realm.isInTransaction());
+    }
+

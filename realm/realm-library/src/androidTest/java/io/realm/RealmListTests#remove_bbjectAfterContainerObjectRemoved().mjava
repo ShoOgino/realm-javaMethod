@@ -1,0 +1,11 @@
+    @Test
+    public void remove_bbjectAfterContainerObjectRemoved() {
+        RealmList<Dog> dogs = createDeletedRealmList();
+
+        testRealm.beginTransaction();
+        Dog dog = testRealm.createObject(Dog.class);
+        dog.setName("Dog");
+        thrown.expect(IllegalStateException.class);
+        dogs.remove(dog);
+    }
+

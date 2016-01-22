@@ -1,0 +1,58 @@
+    // keep advancing the Realm by sending 1 commit for each frame (16ms)
+    // the async queries should keep up with the modification
+    @Test
+    @RunTestInLooperThread
+    public void stressTestBackgroundCommits() throws Throwable {
+        final int NUMBER_OF_COMMITS = 100;
+        final CountDownLatch bgRealmClosed = new CountDownLatch(1);
+        final long[] latestLongValue = new long[1];
+        final float[] latestFloatValue = new float[1];
+        // start a background thread that pushes a commit every 16ms
+        final Thread backgroundThread = new Thread() {
+            @Override
+            public void run() {
+                Random random = new Random(System.currentTimeMillis());
+                Realm backgroundThreadRealm = Realm.getInstance(looperThread.realm.getConfiguration());
+                for (int i = 0; i < NUMBER_OF_COMMITS; i++) {
+                    backgroundThreadRealm.beginTransaction();
+                    AllTypes object = backgroundThreadRealm.createObject(AllTypes.class);
+                    latestLongValue[0] = random.nextInt(100);
+                    latestFloatValue[0] = random.nextFloat();
+                    object.setColumnFloat(latestFloatValue[0]);
+                    object.setColumnLong(latestLongValue[0]);
+                    backgroundThreadRealm.commitTransaction();
+
+                    // Wait 16ms. before adding the next commit.
+                    SystemClock.sleep(16);
+                }
+                backgroundThreadRealm.close();
+                bgRealmClosed.countDown();
+            }
+        };
+
+        final RealmResults<AllTypes> allAsync = looperThread.realm.where(AllTypes.class).findAllAsync();
+        allAsync.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertTrue(allAsync.isLoaded());
+                if (allAsync.size() == NUMBER_OF_COMMITS) {
+                    AllTypes lastInserted = looperThread.realm.where(AllTypes.class)
+                            .equalTo("columnLong", latestLongValue[0])
+                            .equalTo("columnFloat", latestFloatValue[0])
+                            .findFirst();
+                    assertNotNull(lastInserted);
+                    TestHelper.awaitOrFail(bgRealmClosed);
+                    looperThread.testComplete();
+                }
+            }
+        });
+        looperThread.keepStrongReference.add(allAsync);
+
+        looperThread.realm.handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                backgroundThread.start();
+            }
+        }, 16);
+    }
+

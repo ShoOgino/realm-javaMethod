@@ -1,0 +1,16 @@
+    @Test
+    public void isValid() {
+        realm.beginTransaction();
+        Dog dog = realm.createObject(Dog.class);
+        dog.setName("Fido");
+        realm.commitTransaction();
+
+        assertTrue(dog.isValid());
+
+        realm.beginTransaction();
+        dog.removeFromRealm();
+        realm.commitTransaction();
+
+        assertFalse(dog.isValid());
+    }
+

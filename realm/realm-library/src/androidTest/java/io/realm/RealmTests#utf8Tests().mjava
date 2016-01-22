@@ -1,0 +1,33 @@
+    @Test
+    public void utf8Tests() {
+        realm.beginTransaction();
+        realm.clear(AllTypes.class);
+        realm.commitTransaction();
+
+        String file = "assets/unicode_codepoints.csv";
+        Scanner scanner = new Scanner(getClass().getClassLoader().getResourceAsStream(file), "UTF-8");
+        int i = 0;
+        String currentUnicode = null;
+        try {
+            realm.beginTransaction();
+            while (scanner.hasNextLine()) {
+                currentUnicode = scanner.nextLine();
+                char[] chars = Character.toChars(Integer.parseInt(currentUnicode, 16));
+                String codePoint = new String(chars);
+                AllTypes o = realm.createObject(AllTypes.class);
+                o.setColumnLong(i);
+                o.setColumnString(codePoint);
+
+                AllTypes realmType = realm.where(AllTypes.class).equalTo("columnLong", i).findFirst();
+                if (i > 1) {
+                    assertEquals("Codepoint: " + i + " / " + currentUnicode, codePoint,
+                            realmType.getColumnString()); // codepoint 0 is NULL, ignore for now.
+                }
+                i++;
+            }
+            realm.commitTransaction();
+        } catch (Exception e) {
+            fail("Failure, Codepoint: " + i + " / " + currentUnicode + " " + e.getMessage());
+        }
+    }
+

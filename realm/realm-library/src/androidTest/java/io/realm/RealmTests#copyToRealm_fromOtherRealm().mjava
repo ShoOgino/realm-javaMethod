@@ -1,0 +1,18 @@
+    @Test
+    public void copyToRealm_fromOtherRealm() {
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnString("Test");
+        realm.commitTransaction();
+
+        RealmConfiguration realmConfig = configFactory.createConfiguration("other-realm");
+        Realm otherRealm = Realm.getInstance(realmConfig);
+        otherRealm.beginTransaction();
+        AllTypes copiedAllTypes = otherRealm.copyToRealm(allTypes);
+        otherRealm.commitTransaction();
+
+        assertNotSame(allTypes, copiedAllTypes); // Same object in different Realms is not the same
+        assertEquals(allTypes.getColumnString(), copiedAllTypes.getColumnString()); // But data is still the same
+        otherRealm.close();
+    }
+

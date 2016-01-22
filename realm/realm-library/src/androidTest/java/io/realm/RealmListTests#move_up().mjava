@@ -1,0 +1,15 @@
+    // Test move where oldPosition < newPosition
+    @Test
+    public void move_up() {
+        Owner owner = testRealm.where(Owner.class).findFirst();
+        int oldIndex = TEST_OBJECTS / 2;
+        int newIndex = oldIndex + 1;
+        Dog dog = owner.getDogs().get(oldIndex);
+        testRealm.beginTransaction();
+        owner.getDogs().move(oldIndex, newIndex); // This doesn't do anything as oldIndex is now empty so the index's above gets shifted to the left.
+        testRealm.commitTransaction();
+
+        assertEquals(TEST_OBJECTS, owner.getDogs().size());
+        assertEquals(newIndex, owner.getDogs().indexOf(dog));
+    }
+

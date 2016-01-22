@@ -1,0 +1,39 @@
+    // Test if the background Realm is closed when transaction success returned.
+    @Test
+    @RunTestInLooperThread
+    public void executeTransaction_async_realmClosedOnSuccess() {
+        final AtomicInteger counter = new AtomicInteger(100);
+        final Realm realm = Realm.getInstance(looperThread.createConfiguration("testClosedBeforeAsyncTransactionSuccess"));
+        final RealmCache.Callback cacheCallback = new RealmCache.Callback() {
+            @Override
+            public void onResult(int count) {
+                assertEquals(1, count);
+                if (counter.decrementAndGet() == 0) {
+                    realm.close();
+                    looperThread.testComplete();
+                }
+            }
+        };
+        final Realm.Transaction.Callback transactionCallback = new Realm.Transaction.Callback() {
+            @Override
+            public void onSuccess() {
+                RealmCache.invokeWithGlobalRefCount(realm.getConfiguration(), cacheCallback);
+                if (counter.get() == 0) {
+                    // Finish testing
+                    return;
+                }
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                    }
+                }, this);
+            }
+        };
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+            }
+        }, transactionCallback);
+    }
+

@@ -1,0 +1,9 @@
+    @Test
+    public void sort_singleField() {
+        RealmResults<AllTypes> sortedList = realm.allObjects(AllTypes.class);
+        sortedList.sort(new String[]{AllTypes.FIELD_LONG}, new Sort[]{Sort.DESCENDING});
+        assertEquals(TEST_DATA_SIZE, sortedList.size());
+        assertEquals(TEST_DATA_SIZE - 1, sortedList.first().getColumnLong());
+        assertEquals(0, sortedList.last().getColumnLong());
+    }
+

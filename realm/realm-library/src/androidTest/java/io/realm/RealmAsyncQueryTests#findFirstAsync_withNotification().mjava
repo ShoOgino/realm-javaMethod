@@ -1,0 +1,34 @@
+    // finding elements [0-4] asynchronously then wait for the promise to be loaded
+    // using a callback to be notified when the data is loaded
+    @Test
+    @RunTestInLooperThread
+    public void findFirstAsync_withNotification() throws Throwable {
+        Realm.asyncQueryExecutor.pause();
+
+        populateTestRealm(looperThread.realm, 10);
+        final AllTypes realmResults = looperThread.realm.where(AllTypes.class)
+                .between("columnLong", 4, 9)
+                .findFirstAsync();
+
+        realmResults.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertTrue(realmResults.isLoaded());
+                assertTrue(realmResults.isValid());
+                assertEquals("test data 4", realmResults.getColumnString());
+                looperThread.testComplete();
+            }
+        });
+
+        assertFalse(realmResults.isLoaded());
+        assertFalse(realmResults.isValid());
+        try {
+            realmResults.setColumnString("should fail");
+            fail("Accessing an unloaded object should throw");
+        } catch (IllegalStateException ignored) {
+        }
+
+        Realm.asyncQueryExecutor.resume();
+        looperThread.keepStrongReference.add(realmResults);
+    }
+

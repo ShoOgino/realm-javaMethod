@@ -1,0 +1,24 @@
+    @Test
+    public void setter_list_withDeletedObject() {
+        realm.beginTransaction();
+        try {
+            CyclicType target = realm.createObject(CyclicType.class);
+
+            CyclicType removed = realm.createObject(CyclicType.class);
+            removed.removeFromRealm();
+
+            RealmList<CyclicType> list = new RealmList<>();
+            list.add(realm.createObject(CyclicType.class));
+            list.add(removed); // List contains a deleted object
+            list.add(realm.createObject(CyclicType.class));
+
+            try {
+                target.setObjects(list);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

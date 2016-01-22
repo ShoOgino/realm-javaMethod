@@ -1,0 +1,23 @@
+    @Test
+    public void setter_link_closedObject() {
+        realm.beginTransaction();
+        CyclicType closed = realm.createObject(CyclicType.class);
+        realm.commitTransaction();
+        realm.close();
+        assertTrue(realm.isClosed());
+
+        realm = Realm.getInstance(realmConfig);
+        realm.beginTransaction();
+        try {
+            CyclicType target = realm.createObject(CyclicType.class);
+
+            try {
+                target.setObject(closed);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

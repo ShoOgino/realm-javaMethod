@@ -1,0 +1,20 @@
+    @Test
+    public void sort_twoLanguages() {
+        realm.beginTransaction();
+        realm.clear(AllTypes.class);
+        AllTypes allTypes1 = realm.createObject(AllTypes.class);
+        allTypes1.setColumnString("test");
+        AllTypes allTypes2 = realm.createObject(AllTypes.class);
+        allTypes2.setColumnString("αύριο");
+        AllTypes allTypes3 = realm.createObject(AllTypes.class);
+        allTypes3.setColumnString("work");
+        realm.commitTransaction();
+
+        try {
+            RealmResults<AllTypes> result = realm.allObjects(AllTypes.class);
+            result.sort(AllTypes.FIELD_STRING);
+        } catch (IllegalArgumentException e) {
+            fail("Failed to sort with two kinds of alphabets");
+        }
+    }
+

@@ -1,0 +1,14 @@
+    // Test min value on float and double columns
+    @Test
+    public void float_double_minValue() {
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnFloat(Float.MIN_VALUE);
+        allTypes.setColumnDouble(Double.MIN_VALUE);
+        realm.commitTransaction();
+        assertEquals(Float.MIN_VALUE, realm.where(AllTypes.class).findFirst().getColumnFloat(), 0.0F);
+        assertEquals(Double.MIN_VALUE, realm.where(AllTypes.class).findFirst().getColumnDouble(), 0.0D);
+        assertEquals(1, realm.where(AllTypes.class).equalTo("columnFloat", Float.MIN_VALUE).count());
+        assertEquals(1, realm.where(AllTypes.class).equalTo("columnDouble", Double.MIN_VALUE).count());
+    }
+
