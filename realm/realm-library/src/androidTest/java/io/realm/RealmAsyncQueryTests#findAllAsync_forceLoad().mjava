@@ -1,0 +1,34 @@
+    // transforming an async query into sync by calling load to force
+    // the blocking behaviour
+    @Test
+    @RunTestInLooperThread
+    public void findAllAsync_forceLoad() throws Throwable {
+        Realm.asyncQueryExecutor.pause();
+
+        populateTestRealm(looperThread.realm, 10);
+        final RealmResults<AllTypes> realmResults = looperThread.realm.where(AllTypes.class)
+                .between("columnLong", 0, 4)
+                .findAllAsync();
+
+        // notification should be called as well
+        realmResults.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertTrue(realmResults.isLoaded());
+                assertEquals(5, realmResults.size());
+                looperThread.testComplete();
+
+            }
+        });
+
+        assertFalse(realmResults.isLoaded());
+        assertEquals(0, realmResults.size());
+
+        Realm.asyncQueryExecutor.resume();
+        boolean successful = realmResults.load();
+
+        assertTrue(successful);
+        assertTrue(realmResults.isLoaded());
+        assertEquals(5, realmResults.size());
+    }
+
