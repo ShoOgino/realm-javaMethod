@@ -1,19 +1,20 @@
-    public void testRenameClassInvalidArgumentsThrows() {
+    @Test
+    public void rename_invalidArgumentThrows() {
         String[] illegalNames = new String[] { null, "" };
 
-        // Test as first parameters
+        // Test as first parameter
         for (String illegalName : illegalNames) {
             try {
-                realmSchema.rename(CLASS_ALL_JAVA_TYPES, illegalName);
+                realmSchema.rename(illegalName, AllJavaTypes.CLASS_NAME);
                 fail(illegalName + " should throw an exception");
             } catch (IllegalArgumentException ignored) {
             }
         }
 
-        // Test as last parameter
+        // Test as last parameters
         for (String illegalName : illegalNames) {
             try {
-                realmSchema.rename(illegalName, CLASS_ALL_JAVA_TYPES);
+                realmSchema.rename(AllJavaTypes.CLASS_NAME, illegalName);
                 fail(illegalName + " should throw an exception");
             } catch (IllegalArgumentException ignored) {
             }
