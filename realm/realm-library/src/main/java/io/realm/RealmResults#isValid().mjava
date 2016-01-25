@@ -5,6 +5,10 @@
      * @return {@code true} if still valid to use, {@code false} otherwise.
      */
     public boolean isValid() {
-        return realm != null && !realm.isClosed();
+        if (realm == null || realm.isClosed()) {
+            return false;
+        }
+
+        return syncToCheckIfValid("Calling isValid on RealmResults whose parent RealmList has been deleted already.");
     }
 

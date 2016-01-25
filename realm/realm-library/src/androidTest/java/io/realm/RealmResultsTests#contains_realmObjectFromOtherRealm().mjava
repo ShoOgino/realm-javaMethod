@@ -2,15 +2,15 @@
     @Test
     public void contains_realmObjectFromOtherRealm() {
         RealmConfiguration realmConfig = configFactory.createConfiguration("contains_test.realm");
-        Realm testRealmTwo = Realm.getInstance(realmConfig);
+        Realm realmTwo = Realm.getInstance(realmConfig);
         try {
 
-            testRealmTwo.beginTransaction();
-            testRealmTwo.allObjects(AllTypes.class).clear();
-            testRealmTwo.allObjects(NonLatinFieldNames.class).clear();
+            realmTwo.beginTransaction();
+            realmTwo.allObjects(AllTypes.class).clear();
+            realmTwo.allObjects(NonLatinFieldNames.class).clear();
 
             for (int i = 0; i < TEST_DATA_SIZE; ++i) {
-                AllTypes allTypes = testRealmTwo.createObject(AllTypes.class);
+                AllTypes allTypes = realmTwo.createObject(AllTypes.class);
                 allTypes.setColumnBoolean((i % 2) == 0);
                 allTypes.setColumnBinary(new byte[]{1, 2, 3});
                 allTypes.setColumnDate(new Date(YEAR_MILLIS * (i - TEST_DATA_SIZE / 2)));
@@ -18,24 +18,24 @@
                 allTypes.setColumnFloat(1.234567f + i);
                 allTypes.setColumnString("test data " + i);
                 allTypes.setColumnLong(i);
-                Dog d = testRealmTwo.createObject(Dog.class);
+                Dog d = realmTwo.createObject(Dog.class);
                 d.setName("Foo " + i);
                 allTypes.setColumnRealmObject(d);
                 allTypes.getColumnRealmList().add(d);
-                NonLatinFieldNames nonLatinFieldNames = testRealmTwo.createObject(NonLatinFieldNames.class);
+                NonLatinFieldNames nonLatinFieldNames = realmTwo.createObject(NonLatinFieldNames.class);
                 nonLatinFieldNames.set델타(i);
                 nonLatinFieldNames.setΔέλτα(i);
             }
-            testRealmTwo.commitTransaction();
+            realmTwo.commitTransaction();
 
-            final AllTypes item = testRealmTwo.where(AllTypes.class).findFirst();
+            final AllTypes item = realmTwo.where(AllTypes.class).findFirst();
 
             assertFalse("Should not be able to find one object in another Realm via RealmResults#contains",
                     realm.where(AllTypes.class).findAll().contains(item));
 
         } finally {
-            if (testRealmTwo != null && !testRealmTwo.isClosed()) {
-                testRealmTwo.close();
+            if (realmTwo != null && !realmTwo.isClosed()) {
+                realmTwo.close();
             }
         }
     }
