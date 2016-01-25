@@ -1,0 +1,21 @@
+    private RealmResults<Dog> populateRealmResultsOnDeletedLinkView() {
+        testRealm.beginTransaction();
+        Owner owner = testRealm.createObject(Owner.class);
+        for (int i = 0; i < 10; i++) {
+            Dog dog = new Dog();
+            dog.setName("name_" + i);
+            dog.setOwner(owner);
+            owner.getDogs().add(dog);
+        }
+        testRealm.commitTransaction();
+
+
+        RealmResults<Dog> dogs = owner.getDogs().where().equalTo(Dog.FIELD_NAME, "name_0").findAll();
+        //dogs = dogs.where().findFirst().getOwner().getDogs().where().equalTo(Dog.FIELD_NAME, "name_0").findAll();
+
+        testRealm.beginTransaction();
+        owner.removeFromRealm();
+        testRealm.commitTransaction();
+        return dogs;
+    }
+

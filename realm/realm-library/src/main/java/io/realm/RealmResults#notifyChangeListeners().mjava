@@ -10,12 +10,26 @@
             //FIXME: still waiting for Core to provide a fix
             //       for crash when calling _sync_if_needed on a cleared View.
             //       https://github.com/realm/realm-core/pull/1390
-            long version = table.sync();
+            long version;
+            try {
+                version = table.sync();
+            } catch (DeletedRealmListException e) {
+                // Although this RealmResults won't be updated anymore, it is good to give user a chance to do update.
+                // When the onChange called this time, user can use isValid to check if the RealmList has been deleted.
+                version = TABLE_VIEW_VERSION_REALM_LIST_DELETED;
+                RealmLog.d("The parent RealmList has been deleted already.");
+            }
             if (currentTableViewVersion != version) {
                 currentTableViewVersion = version;
                 for (RealmChangeListener listener : listeners) {
                     listener.onChange();
                 }
+            }
+
+            // Since the parent RealmList has been removed, this RealmResults won't be updated anymore.
+            // We just remove the change listeners from this to avoid unnecessary callings in the future.
+            if (version == TABLE_VIEW_VERSION_REALM_LIST_DELETED) {
+                listeners.clear();
             }
         }
     }
