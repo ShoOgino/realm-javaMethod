@@ -1,14 +1,14 @@
     // The presence of async RealmResults block any `REALM_CHANGE` notification causing historically the Realm
     // to advance to the latest version. We make sure in this test that all Realm listeners will be notified
-    // regardless of the presence of an async RealmObject that will delay the `REALM_CHANGE` sometimes
+    // regardless of the presence of an async RealmResults that will delay the `REALM_CHANGE` sometimes
     @Test
-    public void testAsyncRealmObjectShouldNotBlockBackgroundCommitNotification() throws Throwable {
+    public void asyncRealmResultsShouldNotBlockBackgroundCommitNotification() throws Throwable {
         final AtomicInteger numberOfRealmCallbackInvocation = new AtomicInteger(0);
-        final AtomicInteger numberOfAsyncRealmObjectCallbackInvocation = new AtomicInteger(0);
-        final CountDownLatch signalTestFinished = new CountDownLatch(1);
+        final AtomicInteger numberOfAsyncRealmResultsCallbackInvocation = new AtomicInteger(0);
+        final CountDownLatch signalTestFinished = new CountDownLatch(2);
         final CountDownLatch signalClosedRealm = new CountDownLatch(1);
         final Realm[] realm = new Realm[1];
-        final Throwable[] threadAssertionError = new Throwable[1];// to catch both Exception & AssertionError
+        final Throwable[] threadAssertionError = new Throwable[1];
         final Looper[] backgroundLooper = new Looper[1];
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new Runnable() {
@@ -18,31 +18,32 @@
                 backgroundLooper[0] = Looper.myLooper();
 
                 try {
-                    realm[0] = Realm.getInstance(context);
+                    realm[0] = Realm.getInstance(realmConfig);
                     realm[0].addChangeListener(new RealmChangeListener() {
                         @Override
                         public void onChange() {
-                            Dog dog = null; // to keep it as a strong reference
+                            RealmResults<Dog> dogs; // to keep it as a strong reference
                             switch (numberOfRealmCallbackInvocation.incrementAndGet()) {
                                 case 1: {
                                     // first commit
-                                    dog = realm[0].where(Dog.class).findFirstAsync();
-                                    assertTrue(dog.load());
-                                    dog.addChangeListener(new RealmChangeListener() {
+                                    dogs = realm[0].where(Dog.class).findAllAsync();
+                                    assertTrue(dogs.load());
+                                    dogs.addChangeListener(new RealmChangeListener() {
                                         @Override
                                         public void onChange() {
-                                            numberOfAsyncRealmObjectCallbackInvocation.incrementAndGet();
+                                            numberOfAsyncRealmResultsCallbackInvocation.incrementAndGet();
                                         }
                                     });
 
                                     new Thread() {
                                         @Override
                                         public void run() {
-                                            Realm realm = Realm.getInstance(context);
+                                            Realm realm = Realm.getInstance(realmConfig);
                                             realm.beginTransaction();
                                             realm.createObject(Dog.class);
                                             realm.commitTransaction();
                                             realm.close();
+                                            signalTestFinished.countDown();
                                         }
                                     }.start();
                                     break;

@@ -1,11 +1,11 @@
     @Test
-    public void testSetAutoRefreshOnHandlerThread() throws ExecutionException, InterruptedException {
+    public void setAutoRefresh_onHandlerThread() throws ExecutionException, InterruptedException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 Looper.prepare();
-                Realm realm = Realm.getInstance(context);
+                Realm realm = Realm.getInstance(realmConfig);
                 assertTrue(realm.isAutoRefresh());
                 realm.setAutoRefresh(false);
                 assertFalse(realm.isAutoRefresh());
@@ -15,8 +15,8 @@
                 return true;
             }
         });
+
         assertTrue(future.get());
-        RealmCache.invokeWithGlobalRefCount(new RealmConfiguration.Builder(context).build(),
-                new TestHelper.ExpectedCountCallback(0));
+        RealmCache.invokeWithGlobalRefCount(realmConfig, new TestHelper.ExpectedCountCallback(0));
     }
 
