@@ -1,0 +1,21 @@
+    @Test
+    public void setter_link_null() {
+        realm.beginTransaction();
+        CyclicType objA = realm.createObject(CyclicType.class);
+        objA.setName("Foo");
+        CyclicType objB = realm.createObject(CyclicType.class);
+        objB.setName("Bar");
+
+        objA.setObject(objB);
+
+        assertNotNull(objA.getObject());
+
+        try {
+            objA.setObject(null);
+        } catch (NullPointerException nullPointer) {
+            fail();
+        }
+        realm.commitTransaction();
+        assertNull(objA.getObject());
+    }
+

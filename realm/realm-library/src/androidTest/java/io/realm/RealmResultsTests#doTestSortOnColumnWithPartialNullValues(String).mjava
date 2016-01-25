@@ -1,0 +1,19 @@
+    private void doTestSortOnColumnWithPartialNullValues(String fieldName) {
+        RealmResults<NullTypes> resultList = realm.where(NullTypes.class).findAll();
+        // Ascending
+        RealmResults<NullTypes> sortedList = realm.allObjects(NullTypes.class);
+        sortedList.sort(fieldName, Sort.ASCENDING);
+        assertEquals("Should have same size", resultList.size(), sortedList.size());
+        // Null should always be the first one in the ascending sorted list
+        assertEquals(2, sortedList.first().getId());
+        assertEquals(1, sortedList.last().getId());
+
+        // Descending
+        sortedList = realm.allObjects(NullTypes.class);
+        sortedList.sort(fieldName, Sort.DESCENDING);
+        assertEquals("Should have same size", resultList.size(), sortedList.size());
+        assertEquals(1, sortedList.first().getId());
+        // Null should always be the last one in the descending sorted list
+        assertEquals(2, sortedList.last().getId());
+    }
+

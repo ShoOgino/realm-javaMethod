@@ -1,0 +1,20 @@
+    @Test
+    public void sort_float() {
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        RealmResults<AllTypes> sortedList = resultList.where().findAll();
+        sortedList.sort(AllTypes.FIELD_FLOAT, Sort.DESCENDING);
+        assertEquals(resultList.size(), sortedList.size());
+        assertEquals(TEST_DATA_SIZE, sortedList.size());
+        assertEquals(resultList.first().getColumnFloat(), sortedList.last().getColumnFloat(), 0D);
+
+        RealmResults<AllTypes> reverseList = sortedList.where().findAll();
+        reverseList.sort(AllTypes.FIELD_FLOAT, Sort.ASCENDING);
+        assertEquals(TEST_DATA_SIZE, reverseList.size());
+        assertEquals(resultList.first().getColumnFloat(), reverseList.first().getColumnFloat(), 0D);
+        assertEquals(resultList.last().getColumnFloat(), reverseList.last().getColumnFloat(), 0D);
+
+        RealmResults<AllTypes> reverseSortedList = reverseList.where().findAll();
+        reverseSortedList.sort(AllTypes.FIELD_FLOAT, Sort.DESCENDING);
+        assertEquals(TEST_DATA_SIZE, reverseSortedList.size());
+    }
+

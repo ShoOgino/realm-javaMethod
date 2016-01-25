@@ -8,16 +8,14 @@
      * @param sortOrder how to sort the results.
      * @return a {@link io.realm.RealmResults} containing objects. If no objects match the condition, a list with zero
      * objects is returned.
-     * @throws java.lang.IllegalArgumentException if field name does not exist.
+     * @throws java.lang.IllegalArgumentException if field name does not exist or it belongs to a child
+     * {@link RealmObject} or a child {@link RealmList}.
      */
     @SuppressWarnings("unchecked")
     public RealmResults<E> findAllSorted(String fieldName, Sort sortOrder) {
         checkQueryIsNotReused();
         TableView tableView = query.findAll();
-        Long columnIndex = schema.getFieldIndex(fieldName);
-        if (columnIndex == null || columnIndex < 0) {
-            throw new IllegalArgumentException(String.format("Field name '%s' does not exist.", fieldName));
-        }
+        long columnIndex = getColumnIndexForSort(fieldName);
         tableView.sort(columnIndex, sortOrder);
 
         RealmResults<E> realmResults;
@@ -25,9 +23,6 @@
             realmResults = (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, tableView, className);
         } else {
             realmResults = RealmResults.createFromTableOrView(realm, tableView, clazz);
-        }
-        if (realm.handlerController != null) {
-            realm.handlerController.addToRealmResults(realmResults);
         }
         return realmResults;
     }

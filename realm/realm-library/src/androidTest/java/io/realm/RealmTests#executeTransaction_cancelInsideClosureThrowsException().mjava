@@ -1,0 +1,24 @@
+    @Test
+    public void executeTransaction_cancelInsideClosureThrowsException() {
+        assertEquals(0, realm.allObjects(Owner.class).size());
+        TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
+        try {
+            RealmLog.add(testLogger);
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Owner owner = realm.createObject(Owner.class);
+                    owner.setName("Owner");
+                    realm.cancelTransaction();
+                    throw new RuntimeException("Boom");
+                }
+            });
+        } catch (RuntimeException ignored) {
+            // Ensure that we pass a valuable error message to the logger for developers.
+            assertEquals(testLogger.message, "Could not cancel transaction, not currently in a transaction.");
+        } finally {
+            RealmLog.remove(testLogger);
+        }
+        assertEquals(0, realm.allObjects(Owner.class).size());
+    }
+

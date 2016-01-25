@@ -1,0 +1,28 @@
+    @Test
+    @RunTestInLooperThread
+    public void findFirstAsync_updatedIfsyncRealmObjectIsUpdated() throws Throwable {
+        populateTestRealm(looperThread.realm, 1);
+        AllTypes firstSync = looperThread.realm.where(AllTypes.class).findFirst();
+        assertEquals(0, firstSync.getColumnLong());
+        assertEquals("test data 0", firstSync.getColumnString());
+
+        final AllTypes firstAsync = looperThread.realm.where(AllTypes.class).findFirstAsync();
+        assertTrue(firstAsync.load());
+        assertTrue(firstAsync.isLoaded());
+        assertTrue(firstAsync.isValid());
+        assertEquals(0, firstAsync.getColumnLong());
+        assertEquals("test data 0", firstAsync.getColumnString());
+
+        firstAsync.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals("Galacticon", firstAsync.getColumnString());
+                looperThread.testComplete();
+            }
+        });
+
+        looperThread.realm.beginTransaction();
+        firstSync.setColumnString("Galacticon");
+        looperThread.realm.commitTransaction();
+    }
+

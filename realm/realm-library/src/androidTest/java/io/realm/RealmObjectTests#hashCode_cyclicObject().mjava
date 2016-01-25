@@ -1,0 +1,13 @@
+    @Test
+    public void hashCode_cyclicObject() {
+        // Don't use the configFactory as we need absolute control over the path to be able to calculate the hashCode
+        realm.close();
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(InstrumentationRegistry.getTargetContext()).build();
+        realm = Realm.getInstance(realmConfig);
+
+        realm.beginTransaction();
+        CyclicType foo = createCyclicData();
+        realm.commitTransaction();
+        assertEquals(1344723738, foo.hashCode());
+    }
+

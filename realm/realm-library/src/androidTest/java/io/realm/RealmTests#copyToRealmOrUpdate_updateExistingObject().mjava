@@ -1,0 +1,50 @@
+    @Test
+    public void copyToRealmOrUpdate_updateExistingObject() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
+                obj.setColumnString("Foo");
+                obj.setColumnLong(1);
+                obj.setColumnFloat(1.23F);
+                obj.setColumnDouble(1.234D);
+                obj.setColumnBoolean(false);
+                obj.setColumnBinary(new byte[]{1, 2, 3});
+                obj.setColumnDate(new Date(1000));
+                obj.setColumnRealmObject(new DogPrimaryKey(1, "Dog1"));
+                obj.setColumnRealmList(new RealmList<DogPrimaryKey>(new DogPrimaryKey(2, "Dog2")));
+                obj.setColumnBoxedBoolean(true);
+                realm.copyToRealm(obj);
+
+                AllTypesPrimaryKey obj2 = new AllTypesPrimaryKey();
+                obj2.setColumnString("Bar");
+                obj2.setColumnLong(1);
+                obj2.setColumnFloat(2.23F);
+                obj2.setColumnDouble(2.234D);
+                obj2.setColumnBoolean(true);
+                obj2.setColumnBinary(new byte[]{2, 3, 4});
+                obj2.setColumnDate(new Date(2000));
+                obj2.setColumnRealmObject(new DogPrimaryKey(3, "Dog3"));
+                obj2.setColumnRealmList(new RealmList<DogPrimaryKey>(new DogPrimaryKey(4, "Dog4")));
+                obj2.setColumnBoxedBoolean(false);
+                realm.copyToRealmOrUpdate(obj2);
+            }
+        });
+
+        assertEquals(1, realm.allObjects(AllTypesPrimaryKey.class).size());
+        AllTypesPrimaryKey obj = realm.allObjects(AllTypesPrimaryKey.class).first();
+
+        // Check that the the only element has all its properties updated
+        assertEquals("Bar", obj.getColumnString());
+        assertEquals(1, obj.getColumnLong());
+        assertEquals(2.23F, obj.getColumnFloat(), 0);
+        assertEquals(2.234D, obj.getColumnDouble(), 0);
+        assertEquals(true, obj.isColumnBoolean());
+        assertArrayEquals(new byte[]{2, 3, 4}, obj.getColumnBinary());
+        assertEquals(new Date(2000), obj.getColumnDate());
+        assertEquals("Dog3", obj.getColumnRealmObject().getName());
+        assertEquals(1, obj.getColumnRealmList().size());
+        assertEquals("Dog4", obj.getColumnRealmList().get(0).getName());
+        assertFalse(obj.getColumnBoxedBoolean());
+    }
+

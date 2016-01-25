@@ -1,0 +1,23 @@
+    @Test
+    public void setter_list_withStandaloneObject() {
+        CyclicType standalone = new CyclicType();
+
+        realm.beginTransaction();
+        try {
+            CyclicType target = realm.createObject(CyclicType.class);
+
+            RealmList<CyclicType> list = new RealmList<>();
+            list.add(realm.createObject(CyclicType.class));
+            list.add(standalone); // List contains a standalone object
+            list.add(realm.createObject(CyclicType.class));
+
+            try {
+                target.setObjects(list);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

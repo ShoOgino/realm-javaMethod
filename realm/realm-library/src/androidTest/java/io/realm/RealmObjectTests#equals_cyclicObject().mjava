@@ -1,0 +1,9 @@
+    @Test
+    public void equals_cyclicObject() {
+        realm.beginTransaction();
+        CyclicType foo = createCyclicData();
+        realm.commitTransaction();
+
+        assertEquals(foo, realm.where(CyclicType.class).equalTo("name", "Foo").findFirst());
+    }
+

@@ -1,0 +1,22 @@
+    @Test
+    @RunTestInLooperThread
+    public void findFirstAsync_initalEmptyRow() throws Throwable {
+        final AllTypes firstAsync = looperThread.realm.where(AllTypes.class).findFirstAsync();
+        firstAsync.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertTrue(firstAsync.load());
+                assertTrue(firstAsync.isLoaded());
+                assertTrue(firstAsync.isValid());
+                assertEquals(0, firstAsync.getColumnLong());
+                looperThread.testComplete();
+            }
+        });
+        assertTrue(firstAsync.load());
+        assertTrue(firstAsync.isLoaded());
+        assertFalse(firstAsync.isValid());
+
+        populateTestRealm(looperThread.realm, 10);
+        looperThread.keepStrongReference.add(firstAsync);
+    }
+

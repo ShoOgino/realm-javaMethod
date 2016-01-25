@@ -1,0 +1,16 @@
+    @Test
+    public void findAllSorted_singleField() {
+        testRealm.beginTransaction();
+        for (int i = 0; i < TEST_DATA_SIZE; i++) {
+            AllTypes allTypes = testRealm.createObject(AllTypes.class);
+            allTypes.setColumnLong(i);
+        }
+        testRealm.commitTransaction();
+
+        RealmResults<AllTypes> sortedList = testRealm.where(AllTypes.class)
+                .findAllSorted(new String[]{AllTypes.FIELD_LONG}, new Sort[]{Sort.DESCENDING});
+        assertEquals(TEST_DATA_SIZE, sortedList.size());
+        assertEquals(TEST_DATA_SIZE - 1, sortedList.first().getColumnLong());
+        assertEquals(0, sortedList.last().getColumnLong());
+    }
+

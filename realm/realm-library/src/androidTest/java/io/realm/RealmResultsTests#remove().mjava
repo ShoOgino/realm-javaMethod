@@ -1,0 +1,13 @@
+    @Test
+    public void remove() {
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        realm.beginTransaction();
+        resultList.remove(0);
+        realm.commitTransaction();
+
+        assertEquals(TEST_DATA_SIZE - 1, resultList.size());
+
+        AllTypes allTypes = resultList.get(0);
+        assertEquals(1, allTypes.getColumnLong());
+    }
+

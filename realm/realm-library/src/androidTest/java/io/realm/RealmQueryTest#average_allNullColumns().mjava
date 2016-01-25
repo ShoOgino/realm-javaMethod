@@ -1,0 +1,11 @@
+    // Test average on columns with all null rows
+    @Test
+    public void average_allNullColumns() {
+        TestHelper.populateAllNullRowsForNumericTesting(testRealm);
+
+        RealmQuery<NullTypes> query = testRealm.where(NullTypes.class);
+        assertEquals(0d, query.average(NullTypes.FIELD_INTEGER_NULL), 0d);
+        assertEquals(0d, query.average(NullTypes.FIELD_FLOAT_NULL), 0d);
+        assertEquals(0d, query.average(NullTypes.FIELD_DOUBLE_NULL), 0d);
+    }
+

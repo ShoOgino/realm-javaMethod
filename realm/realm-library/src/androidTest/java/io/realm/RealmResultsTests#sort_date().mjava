@@ -1,0 +1,20 @@
+    @Test
+    public void sort_date() {
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        RealmResults<AllTypes> sortedList = resultList.where().findAll();
+        sortedList.sort(AllTypes.FIELD_DATE, Sort.DESCENDING);
+        assertEquals(resultList.size(), sortedList.size());
+        assertEquals(TEST_DATA_SIZE, sortedList.size());
+        assertEquals(resultList.first().getColumnDate(), sortedList.last().getColumnDate());
+
+        RealmResults<AllTypes> reverseList = sortedList.where().findAll();
+        reverseList.sort(AllTypes.FIELD_DATE, Sort.ASCENDING);
+        assertEquals(TEST_DATA_SIZE, reverseList.size());
+        assertEquals(resultList.first().getColumnDate(), reverseList.first().getColumnDate());
+        assertEquals(resultList.last().getColumnDate(), reverseList.last().getColumnDate());
+
+        RealmResults<AllTypes> reserveSortedList = reverseList.where().findAll();
+        reserveSortedList.sort(AllTypes.FIELD_DATE, Sort.DESCENDING);
+        assertEquals(TEST_DATA_SIZE, reserveSortedList.size());
+    }
+

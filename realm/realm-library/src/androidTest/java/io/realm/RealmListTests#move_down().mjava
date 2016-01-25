@@ -1,0 +1,12 @@
+    // Test move where oldPosition > newPosition
+    @Test
+    public void move_down() {
+        Owner owner = testRealm.where(Owner.class).findFirst();
+        Dog dog1 = owner.getDogs().get(1);
+        testRealm.beginTransaction();
+        owner.getDogs().move(1, 0);
+        testRealm.commitTransaction();
+
+        assertEquals(0, owner.getDogs().indexOf(dog1));
+    }
+

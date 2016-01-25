@@ -1,0 +1,94 @@
+    // Setting a not-nullable field to null is an error
+    // TODO Move this to RealmObjectTests?
+    @Test
+    public void setter_nullValueInRequiredField() {
+        TestHelper.populateTestRealmForNullTests(realm);
+        RealmResults<NullTypes> list = realm.allObjects(NullTypes.class);
+
+        // 1 String
+        try {
+            realm.beginTransaction();
+            list.first().setFieldStringNotNull(null);
+            fail();
+        }
+        catch (IllegalArgumentException ignored) {
+        }
+        finally {
+            realm.cancelTransaction();
+        }
+
+        // 2 Bytes
+        try {
+            realm.beginTransaction();
+            list.first().setFieldBytesNotNull(null);
+            fail();
+        }
+        catch (IllegalArgumentException ignored) {
+        }
+        finally {
+            realm.cancelTransaction();
+        }
+
+        // 3 Boolean
+        try {
+            realm.beginTransaction();
+            list.first().setFieldBooleanNotNull(null);
+            fail();
+        }
+        catch (IllegalArgumentException ignored) {
+        }
+        finally {
+            realm.cancelTransaction();
+        }
+
+        // 4 Byte
+        try {
+            realm.beginTransaction();
+            list.first().setFieldBytesNotNull(null);
+            fail();
+        }
+        catch (IllegalArgumentException ignored) {
+        }
+        finally {
+            realm.cancelTransaction();
+        }
+
+        // 5 Short 6 Integer 7 Long are skipped for this case, same with Bytes
+
+        // 8 Float
+        try {
+            realm.beginTransaction();
+            list.first().setFieldFloatNotNull(null);
+            fail();
+        }
+        catch (IllegalArgumentException ignored) {
+        }
+        finally {
+            realm.cancelTransaction();
+        }
+
+        // 9 Double
+        try {
+            realm.beginTransaction();
+            list.first().setFieldDoubleNotNull(null);
+            fail();
+        }
+        catch (IllegalArgumentException ignored) {
+        }
+        finally {
+            realm.cancelTransaction();
+        }
+
+        // 10 Date
+        try {
+            realm.beginTransaction();
+            list.first().setFieldDateNotNull(null);
+            fail();
+        }
+        catch (IllegalArgumentException ignored) {
+        }
+        finally {
+            realm.cancelTransaction();
+        }
+    }
+

@@ -1,0 +1,13 @@
+    @Test
+    public void commitTransaction() {
+        populateTestRealm();
+
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnBoolean(true);
+        realm.commitTransaction();
+
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        assertEquals(TEST_DATA_SIZE + 1, resultList.size());
+    }
+

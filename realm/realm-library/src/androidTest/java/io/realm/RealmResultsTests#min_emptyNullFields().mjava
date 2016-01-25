@@ -1,0 +1,12 @@
+    // Test min on nullable rows with all null values
+    @Test
+    public void min_emptyNullFields() {
+        TestHelper.populateAllNullRowsForNumericTesting(realm);
+
+        RealmResults<NullTypes> results = realm.where(NullTypes.class).findAll();
+        assertNull(results.max(NullTypes.FIELD_INTEGER_NULL));
+        assertNull(results.max(NullTypes.FIELD_FLOAT_NULL));
+        assertNull(results.max(NullTypes.FIELD_DOUBLE_NULL));
+        assertNull(results.maxDate(NullTypes.FIELD_DATE_NULL));
+    }
+

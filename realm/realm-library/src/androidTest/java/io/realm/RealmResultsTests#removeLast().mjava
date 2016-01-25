@@ -1,0 +1,16 @@
+    @Test
+    public void removeLast() {
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        realm.beginTransaction();
+        resultList.removeLast();
+        realm.commitTransaction();
+
+        assertEquals("ResultList.removeLast did not remove record", TEST_DATA_SIZE - 1, resultList.size());
+
+        AllTypes allTypes = resultList.get(resultList.size() - 1);
+        assertEquals("ResultList.removeLast unexpected last record", TEST_DATA_SIZE - 2, allTypes.getColumnLong());
+
+        RealmResults<AllTypes> resultListCheck = realm.where(AllTypes.class).findAll();
+        assertEquals("ResultList.removeLast not committed", TEST_DATA_SIZE - 1, resultListCheck.size());
+    }
+

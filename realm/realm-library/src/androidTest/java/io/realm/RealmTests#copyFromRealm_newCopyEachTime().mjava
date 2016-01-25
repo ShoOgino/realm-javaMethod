@@ -1,0 +1,10 @@
+    @Test
+    public void copyFromRealm_newCopyEachTime() {
+        populateTestRealm();
+        AllTypes realmObject = realm.where(AllTypes.class).findAllSorted("columnLong").first();
+        AllTypes standaloneObject1 = realm.copyFromRealm(realmObject);
+        AllTypes standaloneObject2 = realm.copyFromRealm(realmObject);
+        assertFalse(standaloneObject1 == standaloneObject2);
+        assertNotSame(standaloneObject1, standaloneObject2);
+    }
+

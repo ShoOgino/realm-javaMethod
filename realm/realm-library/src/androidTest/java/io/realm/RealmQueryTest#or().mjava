@@ -1,0 +1,15 @@
+    @Test
+    public void or() {
+        populateTestRealm(200);
+
+        RealmQuery<AllTypes> query = testRealm.where(AllTypes.class).equalTo(AllTypes.FIELD_FLOAT, 31.234567f);
+        RealmResults<AllTypes> resultList = query.or().between(AllTypes.FIELD_LONG, 1, 20).findAll();
+        assertEquals(21, resultList.size());
+
+        resultList = query.or().equalTo(AllTypes.FIELD_STRING, "test data 15").findAll();
+        assertEquals(21, resultList.size());
+
+        resultList = query.or().equalTo(AllTypes.FIELD_STRING, "test data 117").findAll();
+        assertEquals(22, resultList.size());
+    }
+

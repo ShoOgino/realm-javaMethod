@@ -1,0 +1,69 @@
+    // Calling methods on a wrong thread will fail.
+    private boolean runMethodOnWrongThread(final Method method) throws InterruptedException, ExecutionException {
+        if (method != Method.METHOD_BEGIN) {
+            realm.beginTransaction();
+            realm.createObject(Dog.class);
+        }
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                try {
+                    switch (method) {
+                        case METHOD_BEGIN:
+                            realm.beginTransaction();
+                            break;
+                        case METHOD_COMMIT:
+                            realm.commitTransaction();
+                            break;
+                        case METHOD_CANCEL:
+                            realm.cancelTransaction();
+                            break;
+                        case METHOD_CLEAR:
+                            realm.clear(AllTypes.class);
+                            break;
+                        case METHOD_CLEAR_ALL:
+                            realm.clear();
+                            break;
+                        case METHOD_DISTINCT:
+                            realm.distinct(AllTypesPrimaryKey.class, "columnLong");
+                            break;
+                        case METHOD_CREATE_OBJECT:
+                            realm.createObject(AllTypes.class);
+                            break;
+                        case METHOD_COPY_TO_REALM:
+                            realm.copyToRealm(new AllTypes());
+                            break;
+                        case METHOD_COPY_TO_REALM_OR_UPDATE:
+                            realm.copyToRealm(new AllTypesPrimaryKey());
+                            break;
+                        case METHOD_CREATE_ALL_FROM_JSON:
+                            realm.createAllFromJson(AllTypes.class, "[{}]");
+                            break;
+                        case METHOD_CREATE_OR_UPDATE_ALL_FROM_JSON:
+                            realm.createOrUpdateAllFromJson(AllTypesPrimaryKey.class, "[{\"columnLong\":1}]");
+                            break;
+                        case METHOD_CREATE_FROM_JSON:
+                            realm.createObjectFromJson(AllTypes.class, "{}");
+                            break;
+                        case METHOD_CREATE_OR_UPDATE_FROM_JSON:
+                            realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, "{\"columnLong\":1}");
+                            break;
+                    }
+                    return false;
+                } catch (IllegalStateException ignored) {
+                    return true;
+                } catch (RealmException jsonFailure) {
+                    // TODO: Eew. Reconsider how our JSON methods reports failure. See https://github.com/realm/realm-java/issues/1594
+                    return (jsonFailure.getMessage().equals("Could not map Json"));
+                }
+            }
+        });
+
+        boolean result = future.get();
+        if (method != Method.METHOD_BEGIN) {
+            realm.cancelTransaction();
+        }
+        return result;
+    }
+

@@ -1,0 +1,19 @@
+    // List is not a simple getter, test separately.
+    @Test
+    public void getList() {
+        realm.beginTransaction();
+        AllTypes obj = realm.createObject(AllTypes.class);
+        Dog dog = realm.createObject(Dog.class);
+        dog.setName("fido");
+        obj.getColumnRealmList().add(dog);
+        realm.commitTransaction();
+
+        DynamicRealmObject dynamicAllTypes = new DynamicRealmObject(obj);
+        RealmList<DynamicRealmObject> list = dynamicAllTypes.getList(AllTypes.FIELD_REALMLIST);
+        DynamicRealmObject listObject = list.get(0);
+
+        assertEquals(1, list.size());
+        assertEquals(Dog.CLASS_NAME, listObject.getType());
+        assertEquals("fido", listObject.getString(Dog.FIELD_NAME));
+    }
+
