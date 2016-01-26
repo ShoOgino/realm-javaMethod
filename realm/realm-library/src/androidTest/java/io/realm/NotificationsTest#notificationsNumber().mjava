@@ -1,5 +1,5 @@
     @Test
-    public void testNotificationsNumber() throws InterruptedException, ExecutionException {
+    public void notificationsNumber() throws InterruptedException, ExecutionException {
         final AtomicInteger counter = new AtomicInteger(0);
         final AtomicBoolean isReady = new AtomicBoolean(false);
         final Looper[] looper = new Looper[1];
@@ -19,7 +19,7 @@
                 try {
                     Looper.prepare();
                     looper[0] = Looper.myLooper();
-                    realm = Realm.getInstance(context);
+                    realm = Realm.getInstance(realmConfig);
                     realm.addChangeListener(listener);
                     isReady.set(true);
                     Looper.loop();
@@ -40,7 +40,7 @@
         Thread.sleep(100);
 
         // Trigger OnRealmChanged on background thread
-        realm = Realm.getInstance(context);
+        realm = Realm.getInstance(realmConfig);
         realm.beginTransaction();
         Dog dog = realm.createObject(Dog.class);
         dog.setName("Rex");
@@ -60,7 +60,6 @@
         }
 
         assertEquals(1, counter.get());
-        RealmCache.invokeWithGlobalRefCount(new RealmConfiguration.Builder(context).build(),
-                new TestHelper.ExpectedCountCallback(0));
+        RealmCache.invokeWithGlobalRefCount(realmConfig, new TestHelper.ExpectedCountCallback(0));
     }
 

@@ -1,11 +1,8 @@
     // Tests that if the same configuration is used on 2 different Looper threads that each gets its own Handler. This
     // prevents commitTransaction from accidentally posting messages to Handlers which might reference a closed Realm.
     @Test
-    public void testDoNotUseClosedHandler() throws InterruptedException {
-        final RealmConfiguration realmConfiguration = TestHelper.createConfiguration(context);
+    public void doNotUseClosedHandler() throws InterruptedException {
         final AssertionFailedError[] threadAssertionError = new AssertionFailedError[1]; // Keep track of errors in test threads.
-        Realm.deleteRealm(realmConfiguration);
-
         final CountDownLatch handlerNotified = new CountDownLatch(1);
         final CountDownLatch backgroundThreadClosed = new CountDownLatch(1);
 
@@ -15,7 +12,7 @@
             @Override
             public void run() {
                 Looper.prepare();
-                final Realm realm = Realm.getInstance(realmConfiguration);
+                final Realm realm = Realm.getInstance(realmConfig);
                 RealmChangeListener listener = new RealmChangeListener() {
                     @Override
                     public void onChange() {
@@ -33,7 +30,7 @@
             @Override
             public void run() {
                 Looper.prepare();
-                Realm realm = Realm.getInstance(realmConfiguration);
+                Realm realm = Realm.getInstance(realmConfig);
                 RealmChangeListener listener = new RealmChangeListener() {
                     @Override
                     public void onChange() {
@@ -55,7 +52,7 @@
 
         // Any REALM_CHANGED message should now only reach the open Handler on Thread1
         backgroundThreadClosed.await();
-        Realm realm = Realm.getInstance(realmConfiguration);
+        Realm realm = Realm.getInstance(realmConfig);
         realm.beginTransaction();
         realm.commitTransaction();
         try {

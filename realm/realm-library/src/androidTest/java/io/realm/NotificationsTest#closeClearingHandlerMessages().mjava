@@ -1,5 +1,5 @@
-    // TODO Disabled until we can figure out why this times out so often on the build server
-    public void DISABLEDtestCloseClearingHandlerMessages() throws InterruptedException, TimeoutException, ExecutionException {
+    @Test
+    public void closeClearingHandlerMessages() throws InterruptedException, TimeoutException, ExecutionException {
         final int TEST_SIZE = 10;
         final CountDownLatch backgroundLooperStarted = new CountDownLatch(1);
         final CountDownLatch addHandlerMessages = new CountDownLatch(1);
@@ -9,7 +9,7 @@
             @Override
             public Boolean call() throws Exception {
                 Looper.prepare(); // Fake background thread with a looper, eg. a IntentService
-                Realm realm = Realm.getInstance(context);
+                Realm realm = Realm.getInstance(realmConfig);
                 backgroundLooperStarted.countDown();
 
                 // Random operation in the client code
@@ -32,7 +32,7 @@
                 threadHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Looper.myLooper().quit();
+                        TestHelper.quitLooperOrFail();
                     }
                 });
 
@@ -49,7 +49,7 @@
         backgroundLooperStarted.await(1, TimeUnit.SECONDS);
 
         // Execute a transaction that will trigger a Realm update
-        Realm realm = Realm.getInstance(context);
+        Realm realm = Realm.getInstance(realmConfig);
         realm.beginTransaction();
         for (int i = 0; i < TEST_SIZE; i++) {
             Dog dog = realm.createObject(Dog.class);
