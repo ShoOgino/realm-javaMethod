@@ -19,10 +19,11 @@
                     .beginControlFlow("if (%sObj != null)", fieldName)
                         .emitStatement("%s cache%s = (%s) cache.get(%sObj)", Utils.getFieldTypeSimpleName(field), fieldName, Utils.getFieldTypeSimpleName(field), fieldName)
                         .beginControlFlow("if (cache%s != null)", fieldName)
-                            .emitStatement("realmObject.%s(cache%s)", metadata.getSetter(fieldName), fieldName)
+                            .emitStatement("((%sRealmProxy) realmObject).%s(cache%s)", className, setter, fieldName)
                         .nextControlFlow("else")
-                            .emitStatement("realmObject.%s(%s.copyOrUpdate(realm, %sObj, true, cache))",
-                                    metadata.getSetter(fieldName),
+                            .emitStatement("((%sRealmProxy) realmObject).%s(%s.copyOrUpdate(realm, %sObj, true, cache))",
+                                    className,
+                                    setter,
                                     Utils.getProxyClassSimpleName(field),
                                     fieldName,
                                     Utils.getFieldTypeSimpleName(field)
@@ -30,7 +31,7 @@
                         .endControlFlow()
                     .nextControlFlow("else")
                         // No need to throw exception here if the field is not nullable. A exception will be thrown in setter.
-                        .emitStatement("realmObject.%s(null)", setter)
+                        .emitStatement("((%sRealmProxy) realmObject).%s(null)", className, setter)
                     .endControlFlow();
             } else if (Utils.isRealmList(field)) {
                 writer
@@ -53,7 +54,24 @@
                 if (field == metadata.getPrimaryKey()) {
                     continue;
                 }
-                writer.emitStatement("realmObject.%s(newObject.%s())", metadata.getSetter(fieldName), getter);
+                writer
+                    .beginControlFlow("if (newObject.realm == null)")
+                        .emitStatement("Field field")
+                        .emitStatement("Class<? extends %s> clazz = newObject.getClass()", className)
+                        .beginControlFlow("try")
+                            .emitStatement("field = clazz.getDeclaredField(\"%s\")", fieldName)
+                        .nextControlFlow("catch (NoSuchFieldException e)")
+                            .emitStatement("throw new RealmException(e.getMessage())")
+                        .endControlFlow()
+                        .emitStatement("field.setAccessible(true)")
+                        .beginControlFlow("try")
+                            .emitStatement("((%sRealmProxy) realmObject).%s(((%s) field.get(newObject)))", className, setter, Utils.getFieldTypeSimpleName(field))
+                        .nextControlFlow("catch (IllegalAccessException e)")
+                            .emitStatement("throw new RealmException(e.getMessage())")
+                        .endControlFlow()
+                    .nextControlFlow("else")
+                        .emitStatement("((%sRealmProxy) realmObject).%s(((%sRealmProxy) newObject).%s())", className, setter, className, getter)
+                    .endControlFlow();
             }
         }
 
