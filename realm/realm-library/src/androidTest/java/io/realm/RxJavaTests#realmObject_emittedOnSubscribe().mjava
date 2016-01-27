@@ -1,16 +1,15 @@
     @Test
     @UiThreadTest
-    public void testAsyncObjectEmittedOnSubscribe() {
+    public void realmObject_emittedOnSubscribe() {
         realm.beginTransaction();
-        realm.createObject(AllTypes.class);
+        final AllTypes obj = realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        final AllTypes asyncObj = realm.where(AllTypes.class).findFirstAsync();
-        asyncObj.<AllTypes>asObservable().subscribe(new Action1<AllTypes>() {
+        obj.<AllTypes>asObservable().subscribe(new Action1<AllTypes>() {
             @Override
             public void call(AllTypes rxObject) {
-                assertTrue(rxObject == asyncObj);
+                assertTrue(rxObject == obj);
                 subscribedNotified.set(true);
             }
         });

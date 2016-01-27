@@ -1,20 +1,20 @@
     @Test
     @UiThreadTest
-    public void testResultsEmittedOnUpdate() {
+    public void realmObject_emittedOnUpdate() {
         final AtomicInteger subscriberCalled = new AtomicInteger(0);
         realm.beginTransaction();
-        RealmResults<AllTypes> results = realm.allObjects(AllTypes.class);
+        final AllTypes obj = realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
-        results.asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
+        obj.<AllTypes>asObservable().subscribe(new Action1<AllTypes>() {
             @Override
-            public void call(RealmResults<AllTypes> allTypes) {
+            public void call(AllTypes rxObject) {
                 subscriberCalled.incrementAndGet();
             }
         });
 
         realm.beginTransaction();
-        realm.createObject(AllTypes.class);
+        obj.setColumnLong(1);
         realm.commitTransaction();
 
         assertEquals(2, subscriberCalled.get());

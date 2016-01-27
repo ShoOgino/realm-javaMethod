@@ -1,8 +1,8 @@
     @Test
     @UiThreadTest
-    public void testRealmResultsEmittedOnSubscribe() {
+    public void findAllAsync_emittedOnSubscribe() {
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        final RealmResults<AllTypes> results = realm.allObjects(AllTypes.class);
+        final RealmResults<AllTypes> results = realm.where(AllTypes.class).findAllAsync();
         results.asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
             @Override
             public void call(RealmResults<AllTypes> rxResults) {
