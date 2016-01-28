@@ -1,7 +1,7 @@
     @SuppressWarnings("cast")
     public static AllTypes createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
-            throws JSONException {
-        AllTypes obj = null;
+        throws JSONException {
+        AllTypesRealmProxy obj = null;
         if (update) {
             Table table = realm.getTable(AllTypes.class);
             long pkColumnIndex = table.getPrimaryKey();
@@ -17,12 +17,12 @@
         if (obj == null) {
             if (json.has("columnString")) {
                 if (json.isNull("columnString")) {
-                    obj = realm.createObject(AllTypes.class, null);
+                    obj = (AllTypesRealmProxy) realm.createObject(AllTypes.class, null);
                 } else {
-                    obj = realm.createObject(AllTypes.class, json.getString("columnString"));
+                    obj = (AllTypesRealmProxy) realm.createObject(AllTypes.class, json.getString("columnString"));
                 }
             } else {
-                obj = realm.createObject(AllTypes.class);
+                obj = (AllTypesRealmProxy) realm.createObject(AllTypes.class);
             }
         }
         if (json.has("columnString")) {

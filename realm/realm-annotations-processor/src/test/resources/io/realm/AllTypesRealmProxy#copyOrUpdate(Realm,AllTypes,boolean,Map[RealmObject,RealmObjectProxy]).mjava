@@ -7,10 +7,28 @@
         if (canUpdate) {
             Table table = realm.getTable(AllTypes.class);
             long pkColumnIndex = table.getPrimaryKey();
-            if (object.realmGetter$columnString() == null) {
+            String primaryKey;
+            if (object.realm != null) {
+                primaryKey = ((AllTypesRealmProxy)object).realmGetter$columnString();
+            } else {
+                Field field = null;;
+                Class<? extends AllTypes> clazz = object.getClass();
+                try {
+                    field = clazz.getDeclaredField("columnString");
+                } catch (NoSuchFieldException e) {
+                    throw new RealmException(e.getMessage());
+                }
+                field.setAccessible(true);
+                try {
+                    primaryKey = (String) field.get(object);
+                } catch (IllegalAccessException e) {
+                    throw new RealmException(e.getMessage());
+                }
+            }
+            if (primaryKey == null) {
                 throw new IllegalArgumentException("Primary key value must not be null.");
             }
-            long rowIndex = table.findFirstString(pkColumnIndex, object.realmGetter$columnString());
+            long rowIndex = table.findFirstString(pkColumnIndex, primaryKey);
             if (rowIndex != TableOrView.NO_MATCH) {
                 realmObject = new AllTypesRealmProxy(realm.schema.getColumnInfo(AllTypes.class));
                 realmObject.realm = realm;
