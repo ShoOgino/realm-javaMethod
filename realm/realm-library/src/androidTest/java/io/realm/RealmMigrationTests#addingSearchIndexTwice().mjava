@@ -1,5 +1,6 @@
     // adding search index is idempotent
-    public void testAddingSearchIndexTwice() throws IOException {
+    @Test
+    public void addingSearchIndexTwice() throws IOException {
         Class[] classes = {PrimaryKeyAsLong.class, PrimaryKeyAsString.class};
 
         for (final Class clazz : classes){
@@ -18,13 +19,14 @@
                     didMigrate[0] = true;
                 }
             };
-            RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
+            RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                     .schemaVersion(42)
                     .schema(clazz)
                     .migration(migration)
                     .build();
             Realm.deleteRealm(realmConfig);
-            TestHelper.copyRealmFromAssets(getContext(), "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
+            configFactory.copyRealmFromAssets(context,
+                    "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
             Realm.migrateRealm(realmConfig);
             realm = Realm.getInstance(realmConfig);
             assertEquals(42, realm.getVersion());

@@ -1,5 +1,6 @@
     // If a required field was nullable before, a RealmMigrationNeededException should be thrown
-    public void testNotSettingRequiredForNotNullableThrows() {
+    @Test
+    public void notSettingRequiredForNotNullableThrows() {
         String[] notNullableFields = {"fieldStringNotNull", "fieldBytesNotNull", "fieldBooleanNotNull",
                 "fieldByteNotNull", "fieldShortNotNull", "fieldIntegerNotNull", "fieldLongNotNull",
                 "fieldFloatNotNull", "fieldDoubleNotNull", "fieldDateNotNull"};
@@ -41,7 +42,7 @@
             };
 
             @SuppressWarnings("unchecked")
-            RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
+            RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                     .schemaVersion(1)
                     .schema(NullTypes.class)
                     .migration(migration)

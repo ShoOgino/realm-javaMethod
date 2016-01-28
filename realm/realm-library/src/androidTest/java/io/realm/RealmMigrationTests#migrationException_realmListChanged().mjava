@@ -1,0 +1,13 @@
+    // In default-before-migration.realm, CatOwner has a RealmList<Dog> field.
+    // This is changed to RealmList<Cat> and getInstance() must throw an exception.
+    @Test
+    public void migrationException_realmListChanged() throws IOException {
+        configFactory.copyRealmFromAssets(context,
+                "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
+        try {
+            realm = Realm.getInstance(configFactory.createConfiguration());
+            fail();
+        } catch (RealmMigrationNeededException expected) {
+        }
+    }
+

@@ -1,9 +1,11 @@
-    public void testGetInstanceClearsCacheWhenFailed() {
+    @Test
+    public void getInstanceClearsCacheWhenFailed() {
         String REALM_NAME = "invalid_cache.realm";
-        RealmConfiguration configA = TestHelper.createConfiguration(getContext(), REALM_NAME, TestHelper.getRandomKey(42));
-        RealmConfiguration configB = TestHelper.createConfiguration(getContext(), REALM_NAME, TestHelper.getRandomKey(43));
+        RealmConfiguration configA = configFactory.createConfiguration(REALM_NAME,
+                TestHelper.getRandomKey(42));
+        RealmConfiguration configB = configFactory.createConfiguration(REALM_NAME,
+                TestHelper.getRandomKey(43));
 
-        Realm.deleteRealm(configA);
         Realm realm = Realm.getInstance(configA); // Create starting Realm with key1
         realm.close();
         try {

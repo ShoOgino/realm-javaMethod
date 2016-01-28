@@ -1,12 +1,13 @@
-    public void testDeletingRealmAlsoClearsConfigurationCache() throws IOException {
+    @Test
+    public void deletingRealmAlsoClearsConfigurationCache() throws IOException {
         String REALM_NAME = "encrypted.realm";
         byte[] oldPassword = TestHelper.SHA512("realm");
         byte[] newPassword = TestHelper.SHA512("realm-copy");
 
-        TestHelper.copyRealmFromAssets(getContext(), REALM_NAME, REALM_NAME);
+        configFactory.copyRealmFromAssets(context, REALM_NAME, REALM_NAME);
         RealmMigration realmMigration = TestHelper.prepareMigrationToNullSupportStep();
 
-        RealmConfiguration config = new RealmConfiguration.Builder(getContext())
+        RealmConfiguration config = configFactory.createConfigurationBuilder()
                 .name(REALM_NAME)
                 .encryptionKey(oldPassword)
                 .migration(realmMigration)
@@ -31,7 +32,7 @@
         // 4. Try to open the file again with the new password
         // If the configuration cache wasn't cleared this would fail as we would detect two
         // configurations with 2 different passwords pointing to the same file.
-        RealmConfiguration newConfig = new RealmConfiguration.Builder(getContext())
+        RealmConfiguration newConfig = configFactory.createConfigurationBuilder()
                 .name(REALM_NAME)
                 .encryptionKey(newPassword)
                 .migration(realmMigration)
