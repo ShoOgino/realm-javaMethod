@@ -1,8 +1,10 @@
-    public void testNotSettingPrimaryKeyThrows() {
+    @Test
+    public void notSettingPrimaryKeyThrows() {
 
         // Create v0 of the Realm
-        RealmConfiguration originalConfig = new RealmConfiguration.Builder(getContext()).schema(AllTypes.class).build();
-        Realm.deleteRealm(originalConfig);
+        RealmConfiguration originalConfig = configFactory.createConfigurationBuilder()
+                .schema(AllTypes.class)
+                .build();
         Realm.getInstance(originalConfig).close();
 
         RealmMigration migration = new RealmMigration() {
@@ -17,7 +19,7 @@
         };
 
         // Create v1 of the Realm
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                 .schemaVersion(1)
                 .schema(AllTypes.class, AnnotationTypes.class)
                 .migration(migration)
@@ -32,7 +34,6 @@
         } finally {
             if (realm != null) {
                 realm.close();
-                Realm.deleteRealm(realmConfig);
             }
         }
     }

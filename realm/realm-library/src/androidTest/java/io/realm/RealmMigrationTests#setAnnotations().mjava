@@ -1,8 +1,10 @@
-    public void testSetAnnotations() {
+    @Test
+    public void setAnnotations() {
 
         // Create v0 of the Realm
-        RealmConfiguration originalConfig = new RealmConfiguration.Builder(getContext()).schema(AllTypes.class).build();
-        Realm.deleteRealm(originalConfig);
+        RealmConfiguration originalConfig = configFactory.createConfigurationBuilder()
+                .schema(AllTypes.class)
+                .build();
         Realm.getInstance(originalConfig).close();
 
         RealmMigration migration = new RealmMigration() {
@@ -16,7 +18,7 @@
             }
         };
 
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                 .schemaVersion(1)
                 .schema(AllTypes.class, AnnotationTypes.class)
                 .migration(migration)

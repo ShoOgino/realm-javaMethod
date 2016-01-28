@@ -1,9 +1,11 @@
     // Pre-null Realms will leave columns not-nullable after the underlying storage engine has
     // migrated the file format. If the user adds the @Required annotation to a field and does not
     // change the schema version, no migration is needed. But then, null cannot be used as a value.
-    public void testOpenPreNullWithRequired() throws IOException {
-        TestHelper.copyRealmFromAssets(getContext(), "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
+    @Test
+    public void openPreNullWithRequired() throws IOException {
+        configFactory.copyRealmFromAssets(context,
+                "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                 .schemaVersion(0)
                 .schema(AllTypes.class)
                 .build();

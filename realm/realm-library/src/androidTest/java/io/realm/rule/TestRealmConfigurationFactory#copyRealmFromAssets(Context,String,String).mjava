@@ -1,0 +1,16 @@
+    // Copies a Realm file from assets to temp dir
+    public void copyRealmFromAssets(Context context, String realmPath, String newName)
+            throws IOException {
+        AssetManager assetManager = context.getAssets();
+        InputStream is = assetManager.open(realmPath);
+        File file = new File(getRoot(), newName);
+        FileOutputStream outputStream = new FileOutputStream(file);
+        byte[] buf = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = is.read(buf)) > -1) {
+            outputStream.write(buf, 0, bytesRead);
+        }
+        outputStream.close();
+        is.close();
+    }
+

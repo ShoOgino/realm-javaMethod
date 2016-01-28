@@ -1,18 +1,19 @@
     // We should not cache wrong configurations
-    public void testDontCacheWrongConfigurations() throws IOException {
+    @Test
+    public void dontCacheWrongConfigurations() throws IOException {
         Realm testRealm;
         String REALM_NAME = "encrypted.realm";
-        TestHelper.copyRealmFromAssets(getContext(), REALM_NAME, REALM_NAME);
+        configFactory.copyRealmFromAssets(context, REALM_NAME, REALM_NAME);
         RealmMigration realmMigration = TestHelper.prepareMigrationToNullSupportStep();
 
-        RealmConfiguration wrongConfig = new RealmConfiguration.Builder(getContext())
+        RealmConfiguration wrongConfig = configFactory.createConfigurationBuilder()
                 .name(REALM_NAME)
                 .encryptionKey(TestHelper.SHA512("foo"))
                 .migration(realmMigration)
                 .schema(StringOnly.class)
                 .build();
 
-        RealmConfiguration rightConfig = new RealmConfiguration.Builder(getContext())
+        RealmConfiguration rightConfig = configFactory.createConfigurationBuilder()
                 .name(REALM_NAME)
                 .encryptionKey(TestHelper.SHA512("realm"))
                 .migration(realmMigration)

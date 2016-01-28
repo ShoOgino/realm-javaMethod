@@ -1,8 +1,8 @@
-    public void testRealmClosedAfterMigrationException() throws IOException {
+    @Test
+    public void getInstance_realmClosedAfterMigrationException() throws IOException {
         String REALM_NAME = "default0.realm";
-        RealmConfiguration realmConfig = TestHelper.createConfiguration(getContext(), REALM_NAME);
-        Realm.deleteRealm(realmConfig);
-        TestHelper.copyRealmFromAssets(getContext(), REALM_NAME, REALM_NAME);
+        RealmConfiguration realmConfig = configFactory.createConfiguration(REALM_NAME);
+        configFactory.copyRealmFromAssets(context, REALM_NAME, REALM_NAME);
         try {
             Realm.getInstance(realmConfig);
             fail("A migration should be triggered");

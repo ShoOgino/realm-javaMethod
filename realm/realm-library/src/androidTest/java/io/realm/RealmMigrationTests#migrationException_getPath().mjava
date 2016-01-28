@@ -1,0 +1,12 @@
+    @Test
+    public void migrationException_getPath() throws IOException {
+        configFactory.copyRealmFromAssets(context, "default0.realm", Realm.DEFAULT_REALM_NAME);
+        File realm = new File(configFactory.getRoot(), Realm.DEFAULT_REALM_NAME);
+        try {
+            Realm.getInstance(configFactory.createConfiguration());
+            fail();
+        } catch (RealmMigrationNeededException expected) {
+            assertEquals(expected.getPath(), realm.getCanonicalPath());
+        }
+    }
+

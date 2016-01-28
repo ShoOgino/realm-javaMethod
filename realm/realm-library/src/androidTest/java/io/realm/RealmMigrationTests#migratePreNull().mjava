@@ -1,8 +1,10 @@
     // Pre-null Realms will leave columns not-nullable after the underlying storage engine has
     // migrated the file format. An explicit migration step to convert to nullable, and the
     // old class (without @Required) can be used,
-    public void testMigratePreNull() throws IOException {
-        TestHelper.copyRealmFromAssets(getContext(), "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
+    @Test
+    public void migratePreNull() throws IOException {
+        configFactory.copyRealmFromAssets(context,
+                "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
         RealmMigration migration = new RealmMigration() {
             @Override
             public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
@@ -11,7 +13,7 @@
             }
         };
 
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                 .schemaVersion(1)
                 .schema(StringOnly.class)
                 .migration(migration)
