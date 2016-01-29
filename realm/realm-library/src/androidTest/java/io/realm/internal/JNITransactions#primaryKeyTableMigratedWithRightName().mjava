@@ -4,13 +4,14 @@
     // In 0.84.2, the class names in pk table has been renamed to some incorrect names like "Thclass", "Mclass",
     // "NClass", "Meclass" and etc..
     // The 0841_pk_migration.realm is made to produce the issue.
-    public void testPrimaryKeyTableMigratedWithRightName() throws IOException {
+    @Test
+    public void primaryKeyTableMigratedWithRightName() throws IOException {
         List<String> tableNames = Arrays.asList(
                 "ChatList", "Drafts", "Member", "Message", "Notifs", "NotifyLink", "PopularPost",
                 "Post", "Tags", "Threads", "User");
 
-        TestHelper.copyRealmFromAssets(getContext(), "0841_pk_migration.realm", "default.realm");
-        SharedGroup db = new SharedGroup(new File(getContext().getFilesDir(),
+        configFactory.copyRealmFromAssets(context, "0841_pk_migration.realm", "default.realm");
+        SharedGroup db = new SharedGroup(new File(configFactory.getRoot(),
                 Realm.DEFAULT_REALM_NAME).getAbsolutePath(), SharedGroup.Durability.FULL, null);
 
         ImplicitTransaction tr = db.beginImplicitTransaction();

@@ -1,5 +1,9 @@
-    @Override
-    protected void setUp() throws Exception {
-        createDBFileName();
+    @Before
+    public void setUp() throws Exception {
+        testFile = new File(
+                configFactory.getRoot(),
+                System.currentTimeMillis() + "_transact.realm").getAbsolutePath();
+        context = InstrumentationRegistry.getInstrumentation().getContext();
+        RealmCore.loadLibrary(context);
     }
 
