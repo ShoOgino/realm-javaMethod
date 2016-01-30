@@ -1,0 +1,51 @@
+    @Test
+    @RunTestInLooperThread
+    public void refresh_should_notify_callbacks_realmresults_async() {
+        final Realm realm = looperThread.realm;
+        // Swallow all REALM_CHANGED events to test the behaviour of refresh
+        final Handler handler = new HandlerProxy(realm.handler) {
+            @Override
+            public boolean onInterceptMessage(int what) {
+                switch (what) {
+                    case HandlerController.REALM_CHANGED: {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+        realm.setHandler(handler);
+
+        final RealmResults<Dog> dogs = realm.where(Dog.class).findAllAsync();
+        assertTrue(dogs.load());
+
+        dogs.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals("Akamaru", dogs.get(0).getName());
+                looperThread.testComplete();
+            }
+        });
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                Realm bgRealm = Realm.getInstance(looperThread.realmConfiguration);
+                bgRealm.beginTransaction();
+                Dog akamaru = bgRealm.createObject(Dog.class);
+                akamaru.setName("Akamaru");
+                bgRealm.commitTransaction();
+                bgRealm.close();
+            }
+        };
+        thread.start();
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
+
+        realm.refresh();
+    }
+
