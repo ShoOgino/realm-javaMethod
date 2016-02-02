@@ -1,0 +1,57 @@
+    // UC 3 Async RealmResults
+    // 1. Create RealmResults async query
+    // 2. Wait COMPLETED_ASYNC_REALM_RESULTS then commit transaction in another non-looper thread
+    // 3. Listener on the RealmResults gets triggered again.
+    @Test
+    @RunTestInLooperThread
+    public void non_looper_thread_commit_realmresults_async() {
+        final Realm realm = looperThread.realm;
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                if (realm.where(Dog.class).count() == 2) {
+                    realm.handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            assertEquals(2,typebasedCommitInvocations.get());
+                            looperThread.testComplete();
+                        }
+                    });
+                }
+            }
+        });
+
+        realm.beginTransaction();
+        realm.createObject(Dog.class);
+        realm.commitTransaction();
+
+        final Thread thread = new Thread() {
+            @Override
+            public void run() {
+                Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+                bgRealm.beginTransaction();
+                bgRealm.createObject(Dog.class);
+                bgRealm.commitTransaction();
+                bgRealm.close();
+            }
+        };
+
+        final RealmResults<Dog> dogs = realm.where(Dog.class).findAllAsync();
+        dogs.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                typebasedCommitInvocations.incrementAndGet();
+                if (typebasedCommitInvocations.get() == 1) {
+                    // COMPLETED_ASYNC_REALM_RESULTS arrived
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        fail(e.getMessage());
+                    }
+                }
+            }
+        });
+
+        thread.start();
+    }
+

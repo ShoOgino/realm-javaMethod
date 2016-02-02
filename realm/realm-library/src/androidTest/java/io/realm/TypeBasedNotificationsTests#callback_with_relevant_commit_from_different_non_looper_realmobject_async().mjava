@@ -1,0 +1,86 @@
+    // UC 1 Async RealmObject
+    @Test
+    @RunTestInLooperThread
+    public void callback_with_relevant_commit_from_different_non_looper_realmobject_async() throws Throwable {
+        final CountDownLatch waitForInsert = new CountDownLatch(1);
+        final Realm realm = looperThread.realm;
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                globalCommitInvocations.incrementAndGet();
+            }
+        });
+
+        final Dog dog = realm.where(Dog.class).findFirstAsync();
+        assertTrue(dog.load());
+        dog.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                switch (typebasedCommitInvocations.incrementAndGet()) {
+                    case 1: {
+                        assertEquals("Akamaru", dog.getName());
+                        realm.handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // trigger second callback invocation
+                                new Thread() {
+                                    @Override
+                                    public void run() {
+                                        TestHelper.awaitOrFail(waitForInsert);
+                                        Realm realmNonLooperThread3 = Realm.getInstance(realm.getConfiguration());
+                                        realmNonLooperThread3.beginTransaction();
+                                        realmNonLooperThread3.where(Dog.class).findFirst().setAge(17);
+                                        realmNonLooperThread3.commitTransaction();
+                                        realmNonLooperThread3.close();
+                                    }
+                                }.start();
+                            }
+                        }, TimeUnit.SECONDS.toMillis(0));
+                        break;
+                    }
+                    case 2: {
+                        assertEquals("Akamaru", dog.getName());
+                        assertEquals(17, dog.getAge());
+                        // posting as an event will give the handler a chance
+                        // to deliver the notification for globalCommitInvocations
+                        // otherwise, test will exit before the callback get a chance to be invoked
+                        realm.handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                assertEquals(3, globalCommitInvocations.get());
+                                assertEquals(2, typebasedCommitInvocations.get());
+                                looperThread.testComplete();
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+        });
+
+        new Thread() {
+            @Override
+            public void run() {
+                Realm realmNonLooperThread1 = Realm.getInstance(realm.getConfiguration());
+                realmNonLooperThread1.beginTransaction();
+                realmNonLooperThread1.commitTransaction();
+                realmNonLooperThread1.close();
+            }
+        }.start();
+
+        new Thread() {
+            @Override
+            public void run() {
+                Realm realmNonLooperThread2 = Realm.getInstance(realm.getConfiguration());
+                // trigger first callback invocation
+                realmNonLooperThread2.beginTransaction();
+                Dog dog = realmNonLooperThread2.createObject(Dog.class);
+                dog.setName("Akamaru");
+                realmNonLooperThread2.commitTransaction();
+                realmNonLooperThread2.close();
+
+                waitForInsert.countDown();
+            }
+        }.start();
+    }
+

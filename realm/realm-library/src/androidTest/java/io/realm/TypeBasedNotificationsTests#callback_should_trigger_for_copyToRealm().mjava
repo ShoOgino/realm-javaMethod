@@ -1,0 +1,39 @@
+    //UC 0 using Realm.copyToRealm
+    @Test
+    @RunTestInLooperThread
+    public void callback_should_trigger_for_copyToRealm() {
+        final Realm realm = looperThread.realm;
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                if (globalCommitInvocations.incrementAndGet() == 2) {
+                    realm.handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            assertEquals(1, typebasedCommitInvocations.get());
+                            looperThread.testComplete();
+                        }
+                    });
+                }
+            }
+        });
+
+        realm.beginTransaction();
+        Dog akamaru = new Dog();
+        akamaru.setName("Akamaru");
+        final Dog dog = realm.copyToRealm(akamaru);
+        realm.commitTransaction();
+
+        dog.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals(8, dog.getAge());
+                typebasedCommitInvocations.incrementAndGet();
+            }
+        });
+
+        realm.beginTransaction();
+        dog.setAge(8);
+        realm.commitTransaction();
+    }
+
