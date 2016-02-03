@@ -1,0 +1,34 @@
+    @Test
+    public void setAnnotations() {
+
+        // Create v0 of the Realm
+        RealmConfiguration originalConfig = configFactory.createConfigurationBuilder()
+                .schema(AllTypes.class)
+                .build();
+        Realm.getInstance(originalConfig).close();
+
+        RealmMigration migration = new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                RealmSchema schema = realm.getSchema();
+                schema.create("AnnotationTypes")
+                        .addField("id", long.class, FieldAttribute.PRIMARY_KEY)
+                        .addField("indexString", String.class, FieldAttribute.INDEXED)
+                        .addField("notIndexString", String.class);
+            }
+        };
+
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+                .schemaVersion(1)
+                .schema(AllTypes.class, AnnotationTypes.class)
+                .migration(migration)
+                .build();
+
+        realm = Realm.getInstance(realmConfig);
+        Table table = realm.getTable(AnnotationTypes.class);
+        assertEquals(3, table.getColumnCount());
+        assertTrue(table.hasPrimaryKey());
+        assertTrue(table.hasSearchIndex(table.getColumnIndex("id")));
+        assertTrue(table.hasSearchIndex(table.getColumnIndex("indexString")));
+    }
+

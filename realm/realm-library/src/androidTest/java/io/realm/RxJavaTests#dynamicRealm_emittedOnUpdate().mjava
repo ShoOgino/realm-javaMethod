@@ -1,0 +1,20 @@
+    @Test
+    @UiThreadTest
+    public void dynamicRealm_emittedOnUpdate() {
+        final DynamicRealm dynamicRealm = DynamicRealm.createInstance(realm.getConfiguration());
+        final AtomicInteger subscriberCalled = new AtomicInteger(0);
+        dynamicRealm.asObservable().subscribe(new Action1<DynamicRealm>() {
+            @Override
+            public void call(DynamicRealm rxRealm) {
+                subscriberCalled.incrementAndGet();
+            }
+        });
+
+        dynamicRealm.beginTransaction();
+        dynamicRealm.createObject("AllTypes");
+        dynamicRealm.commitTransaction();
+
+        assertEquals(2, subscriberCalled.get());
+        dynamicRealm.close();
+    }
+

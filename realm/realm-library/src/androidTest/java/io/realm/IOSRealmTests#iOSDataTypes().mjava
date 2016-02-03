@@ -1,0 +1,31 @@
+    // Test relationships and that data in general can be retrieved from an iOS realm
+    @Test
+    public void iOSDataTypes() throws IOException {
+        for (String iosVersion : IOS_VERSIONS) {
+            configFactory.copyRealmFromAssets(context,
+                    "ios/" + iosVersion + "-alltypes.realm", REALM_NAME);
+            realm = Realm.getDefaultInstance();
+            RealmResults<IOSAllTypes> result = realm.allObjectsSorted(IOSAllTypes.class, "id", Sort.ASCENDING);
+
+            // Verify metadata
+            Table table = realm.getTable(IOSAllTypes.class);
+            assertTrue(table.hasPrimaryKey());
+            assertTrue(table.hasSearchIndex(table.getColumnIndex("id")));
+
+            IOSAllTypes obj = result.get(1);
+            assertTrue(obj.isBoolCol());
+            assertEquals(2, obj.getShortCol());
+            assertEquals(11, obj.getIntCol());
+            assertEquals(101L, obj.getLongCol());
+            assertEquals(2.23F, obj.getFloatCol(), 0F);
+            assertEquals(2.234D, obj.getDoubleCol(), 0D);
+            assertArrayEquals(new byte[]{1, 2, 3}, obj.getByteCol());
+            assertEquals("String 1", obj.getStringCol());
+            assertEquals(new Date(1001 * 1000), obj.getDateCol());
+            assertEquals("Foo", result.get(1).getChild().getName());
+            assertEquals(10, result.size());
+            assertEquals(10, result.get(1).getChildren().size());
+            assertEquals("Name: 1", result.get(1).getChildren().get(1).getName());
+        }
+    }
+

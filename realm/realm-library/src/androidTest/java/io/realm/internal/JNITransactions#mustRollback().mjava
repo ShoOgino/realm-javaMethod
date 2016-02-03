@@ -1,0 +1,14 @@
+    @Test
+    public void mustRollback() {
+        SharedGroup db = new SharedGroup(testFile, SharedGroup.Durability.FULL, null);
+        writeOneTransaction(db, 1);
+        WriteTransaction trans = db.beginWrite();
+        Table tbl = trans.getTable("EmployeeTable");
+
+        tbl.add("Hello", 1);
+        assertEquals(2, tbl.size());
+        trans.rollback();
+
+        checkRead(db, 1); // Only 1 row now.
+    }
+

@@ -1,10 +1,10 @@
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        RealmConfiguration defaultConfiguration = new RealmConfiguration.Builder(getContext())
+    @Before
+    public void setUp() {
+        RealmConfiguration defaultConfiguration = configFactory.createConfigurationBuilder()
                 .name(REALM_NAME)
                 .schema(IOSAllTypes.class, IOSChild.class)
                 .build();
         Realm.setDefaultConfiguration(defaultConfiguration);
+        context = InstrumentationRegistry.getInstrumentation().getContext();
     }
 

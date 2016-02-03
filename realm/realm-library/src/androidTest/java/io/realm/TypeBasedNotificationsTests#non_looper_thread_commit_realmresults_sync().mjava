@@ -1,0 +1,54 @@
+    // UC 3 Sync RealmResults
+    // 1. Add listener to RealmResults which is queried synchronized.
+    // 2. Commit transaction in another non-looper thread
+    // 3. Listener on the RealmResults gets triggered.
+    @Test
+    @RunTestInLooperThread
+    public void non_looper_thread_commit_realmresults_sync() {
+        final Realm realm = looperThread.realm;
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                if (realm.where(Dog.class).count() == 2) {
+                    realm.handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            assertEquals(typebasedCommitInvocations.get(),1);
+                            looperThread.testComplete();
+                        }
+                    });
+                }
+            }
+        });
+
+        realm.beginTransaction();
+        realm.createObject(Dog.class);
+        realm.commitTransaction();
+
+        final RealmResults<Dog> dogs = realm.where(Dog.class).findAll();
+        dogs.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                typebasedCommitInvocations.incrementAndGet();
+                assertEquals(2, dogs.size());
+            }
+        });
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+                bgRealm.beginTransaction();
+                bgRealm.createObject(Dog.class);
+                bgRealm.commitTransaction();
+                bgRealm.close();
+            }
+        };
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
+    }
+
