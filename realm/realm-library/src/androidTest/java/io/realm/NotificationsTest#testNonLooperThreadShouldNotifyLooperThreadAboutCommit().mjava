@@ -1,0 +1,39 @@
+    @Test
+    public void testNonLooperThreadShouldNotifyLooperThreadAboutCommit() throws Throwable {
+        final CountDownLatch mainThreadReady = new CountDownLatch(1);
+        final CountDownLatch numberOfInvocation = new CountDownLatch(1);
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                TestHelper.awaitOrFail(mainThreadReady);
+                Realm realm = Realm.getInstance(context);
+                realm.beginTransaction();
+                realm.createObject(AllTypes.class);
+                realm.commitTransaction();
+                realm.close();
+            }
+        };
+        thread.start();
+
+        HandlerThread mainThread = new HandlerThread("mainThread");
+        mainThread.start();
+        Handler handler = new Handler(mainThread.getLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                final Realm mainRealm = Realm.getInstance(context);
+                mainRealm.addChangeListener(new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        mainRealm.close();
+                        numberOfInvocation.countDown();
+                    }
+                });
+                mainThreadReady.countDown();
+            }
+        });
+
+        TestHelper.awaitOrFail(numberOfInvocation);
+        mainThread.quit();
+    }
+

@@ -1,11 +1,13 @@
-    @Before
-    public void setUp() {
-        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getContext())
                 .schema(AllJavaTypes.class, Owner.class)
                 .build();
+        Realm.deleteRealm(realmConfig);
         Realm.getInstance(realmConfig).close(); // create Schema
-        realm = DynamicRealm.getInstance(realmConfig);
+        this.realm = DynamicRealm.getInstance(realmConfig);
         realmSchema = this.realm.getSchema();
-        realm.beginTransaction();
+        this.realm.beginTransaction();
     }
 

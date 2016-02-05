@@ -1,0 +1,19 @@
+    // Test that it if { A -> B  && B -> A } you should remove the individual fields first before removing the entire
+    // class. This also include transitive dependencies :/
+    // Re-enable when this if fixed: https://github.com/realm/realm-core/pull/1267
+    public void FIMXEtestRemoveClassWithReferencesThrows() {
+        Util.setDebugLevel(2);
+        try {
+            realmSchema.remove("Cat");
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        RealmObjectSchema ownerSchema = realmSchema.get("Owner");
+        RealmObjectSchema catSchema = realmSchema.get("Cat");
+        ownerSchema.removeField("cat");
+        catSchema.removeField("owner");
+        realmSchema.remove("Cat");
+        assertFalse(realmSchema.contains("Cat"));
+    }
+
