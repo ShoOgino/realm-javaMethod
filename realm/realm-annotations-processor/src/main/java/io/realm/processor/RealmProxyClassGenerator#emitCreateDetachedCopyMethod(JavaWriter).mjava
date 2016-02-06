@@ -23,50 +23,28 @@
                 .emitStatement("cache.put(realmObject, new RealmObjectProxy.CacheData<RealmObject>(currentDepth, standaloneObject))")
             .endControlFlow();
 
-        writer.emitStatement("Class<?> clazz = standaloneObject.getClass()");
-        writer.emitStatement("Field field = null");
-
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
+            String setter = metadata.getSetter(fieldName);
             String getter = metadata.getGetter(fieldName);
-
-            writer.beginControlFlow("try");
-            writer.emitStatement("field = clazz.getDeclaredField(\"%s\")", fieldName);
-            writer.nextControlFlow("catch (NoSuchFieldException e)");
-            writer.emitStatement("throw new RealmException(e.getMessage())");
-            writer.endControlFlow();
-            writer.emitStatement("field.setAccessible(true)");
 
             if (Utils.isRealmObject(field)) {
                 writer
                     .emitEmptyLine()
                     .emitSingleLineComment("Deep copy of %s", fieldName)
-                    .beginControlFlow("try")
-                        .emitStatement("field.set(standaloneObject, %s.createDetachedCopy( ((%sRealmProxy) " +
-                                "realmObject).%s(), currentDepth + 1, maxDepth, cache))",
-                            Utils.getProxyClassSimpleName(field), className, getter)
-                    .nextControlFlow("catch (IllegalAccessException e)")
-                        .emitStatement("throw new RealmException(e.getMessage())")
-                    .endControlFlow();
+                    .emitStatement("((%s) standaloneObject).%s(%s.createDetachedCopy(((%s) realmObject).%s(), currentDepth + 1, maxDepth, cache))",
+                                interfaceName, setter, Utils.getProxyClassSimpleName(field), interfaceName, getter);
             } else if (Utils.isRealmList(field)) {
                 writer
                     .emitEmptyLine()
                     .emitSingleLineComment("Deep copy of %s", fieldName)
                     .beginControlFlow("if (currentDepth == maxDepth)")
-                        .beginControlFlow("try")
-                            .emitStatement("field.set(standaloneObject, null)")
-                        .nextControlFlow("catch (IllegalAccessException e)")
-                            .emitStatement("throw new RealmException(e.getMessage())")
-                        .endControlFlow()
+                        .emitStatement("((%s) standaloneObject).%s(null)", interfaceName, setter)
                     .nextControlFlow("else")
-                        .emitStatement("RealmList<%s> managed%sList = ((%sRealmProxy) realmObject).%s()",
-                                Utils.getGenericType(field), fieldName, className, getter)
+                        .emitStatement("RealmList<%s> managed%sList = ((%s) realmObject).%s()",
+                                Utils.getGenericType(field), fieldName, interfaceName, getter)
                         .emitStatement("RealmList<%1$s> standalone%2$sList = new RealmList<%1$s>()", Utils.getGenericType(field), fieldName)
-                        .beginControlFlow("try")
-                            .emitStatement("field.set(standaloneObject, standalone%sList)", fieldName)
-                        .nextControlFlow("catch (IllegalAccessException e)")
-                            .emitStatement("throw new RealmException(e.getMessage())")
-                        .endControlFlow()
+                        .emitStatement("((%s) standaloneObject).%s(standalone%sList)", interfaceName, setter, fieldName)
                         .emitStatement("int nextDepth = currentDepth + 1")
                         .emitStatement("int size = managed%sList.size()", fieldName)
                         .beginControlFlow("for (int i = 0; i < size; i++)")
@@ -76,13 +54,8 @@
                         .endControlFlow()
                     .endControlFlow();
             } else {
-                writer.beginControlFlow("try");
-                writer.emitStatement("field.%s(standaloneObject, ((%sRealmProxy) realmObject).%s())",
-                        Constants.JAVA_TO_FIELD_SETTER.get(field.asType().toString()), className, getter);
-                writer.nextControlFlow("catch (IllegalAccessException e)");
-                writer.emitStatement("throw new RealmException(e.getMessage())");
-                writer.endControlFlow();
-
+                writer.emitStatement("((%s) standaloneObject).%s(((%s) realmObject).%s())",
+                        interfaceName, setter, interfaceName, getter);
             }
         }
 

@@ -1,5 +1,7 @@
         @Override
-        public void emitTypeConversion(String setter, String fieldName, String fieldType, JavaWriter writer)
+        public void emitTypeConversion(String interfaceName, String setter, String fieldName, String fieldType,
+                                       JavaWriter
+                writer)
                 throws IOException {
             String statementSetNullOrThrow;
             if (Utils.isPrimitiveType(fieldType)) {
@@ -7,14 +9,15 @@
                 // the setter.
                 statementSetNullOrThrow = String.format(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName);
             } else {
-                statementSetNullOrThrow = String.format("obj.%s(null)", setter);
+                statementSetNullOrThrow = String.format("((%s) obj).%s(null)", interfaceName, setter);
             }
             writer
                 .beginControlFlow("if (json.has(\"%s\"))", fieldName)
                     .beginControlFlow("if (json.isNull(\"%s\"))", fieldName)
                         .emitStatement(statementSetNullOrThrow)
                     .nextControlFlow("else")
-                        .emitStatement("obj.%s((%s) json.get%s(\"%s\"))", setter, castType, jsonType, fieldName)
+                        .emitStatement("((%s) obj).%s((%s) json.get%s(\"%s\"))", interfaceName, setter, castType,
+                                jsonType, fieldName)
                     .endControlFlow()
                 .endControlFlow();
         }

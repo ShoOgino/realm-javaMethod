@@ -1,5 +1,6 @@
         @Override
-        public void emitStreamTypeConversion(String setter, String fieldName, String fieldType, JavaWriter writer)
+        public void emitStreamTypeConversion(String interfaceName, String setter, String fieldName, String fieldType,
+                                             JavaWriter writer)
                 throws IOException {
             String statementSetNullOrThrow;
             if (Utils.isPrimitiveType(fieldType)) {
@@ -7,14 +8,14 @@
                 // the setter.
                 statementSetNullOrThrow = String.format(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName);
             } else {
-                statementSetNullOrThrow = String.format("obj.%s(null)", setter);
+                statementSetNullOrThrow = String.format("((%s) obj).%s(null)", interfaceName, setter);
             }
             writer
                 .beginControlFlow("if (reader.peek() == JsonToken.NULL)")
                     .emitStatement("reader.skipValue()")
                     .emitStatement(statementSetNullOrThrow)
                 .nextControlFlow("else")
-                    .emitStatement("obj.%s((%s) reader.next%s())", setter, castType, jsonType)
+                    .emitStatement("((%s) obj).%s((%s) reader.next%s())", interfaceName, setter, castType, jsonType)
                 .endControlFlow();
         }
 

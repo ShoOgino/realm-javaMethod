@@ -21,55 +21,18 @@
                 .beginControlFlow("if (canUpdate)")
                     .emitStatement("Table table = realm.getTable(%s.class)", className)
                     .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
-            if (Utils.isString(metadata.getPrimaryKey())) {
-                writer.emitStatement("String primaryKey");
-            } else {
-                writer.emitStatement("long primaryKey");
-            }
 
+            String primaryKeyGetter = metadata.getPrimaryKeyGetter();
             if (Utils.isString(metadata.getPrimaryKey())) {
                 writer
-                    .beginControlFlow("if (object.realm != null)")
-                        .emitStatement("primaryKey = ((%sRealmProxy)object).%s()", className, metadata.getPrimaryKeyGetter())
-                    .nextControlFlow("else")
-                        .emitStatement("Field field = null;")
-                        .emitStatement("Class<? extends %s> clazz = object.getClass()", className)
-                        .beginControlFlow("try")
-                            .emitStatement("field = clazz.getDeclaredField(\"%s\")", metadata.getPrimaryKey())
-                        .nextControlFlow("catch (NoSuchFieldException e)")
-                            .emitStatement("throw new RealmException(e.getMessage())")
-                        .endControlFlow()
-                        .emitStatement("field.setAccessible(true)")
-                        .beginControlFlow("try")
-                            .emitStatement("primaryKey = (String) field.get(object)")
-                        .nextControlFlow("catch (IllegalAccessException e)")
-                            .emitStatement("throw new RealmException(e.getMessage())")
-                        .endControlFlow()
-                    .endControlFlow()
-                    .beginControlFlow("if (primaryKey == null)")
+                    .beginControlFlow("if (((%s) object).%s() == null)", interfaceName, primaryKeyGetter)
                         .emitStatement("throw new IllegalArgumentException(\"Primary key value must not be null.\")")
                     .endControlFlow()
-                    .emitStatement("long rowIndex = table.findFirstString(pkColumnIndex, primaryKey)", metadata.getPrimaryKeyGetter());
+                    .emitStatement("long rowIndex = table.findFirstString(pkColumnIndex, ((%s) object).%s())",
+                            interfaceName, primaryKeyGetter);
             } else {
-                writer
-                    .beginControlFlow("if (object.realm != null)")
-                        .emitStatement("primaryKey = ((%sRealmProxy)object).%s()", className, metadata.getPrimaryKeyGetter())
-                    .nextControlFlow("else")
-                        .emitStatement("Field field = null;")
-                        .emitStatement("Class<? extends %s> clazz = object.getClass()", className)
-                        .beginControlFlow("try")
-                            .emitStatement("field = clazz.getDeclaredField(\"%s\")", metadata.getPrimaryKey())
-                        .nextControlFlow("catch (NoSuchFieldException e)")
-                            .emitStatement("throw new RealmException(e.getMessage())")
-                        .endControlFlow()
-                        .emitStatement("field.setAccessible(true)")
-                        .beginControlFlow("try")
-                            .emitStatement("primaryKey = (Long) field.get(object)")
-                        .nextControlFlow("catch (IllegalAccessException e)")
-                            .emitStatement("throw new RealmException(e.getMessage())")
-                        .endControlFlow()
-                    .endControlFlow()
-                    .emitStatement("long rowIndex = table.findFirstLong(pkColumnIndex, primaryKey)");
+                writer.emitStatement("long rowIndex = table.findFirstLong(pkColumnIndex, ((%s) object).%s())",
+                        interfaceName, primaryKeyGetter);
             }
 
             writer

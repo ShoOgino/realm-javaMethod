@@ -8,12 +8,11 @@
                 Collections.singletonList("JSONException"));
 
         if (!metadata.hasPrimaryKey()) {
-            writer.emitStatement("%sRealmProxy obj = (%sRealmProxy) realm.createObject(%s.class)", className,
-                    className, className);
+            writer.emitStatement("%s obj = realm.createObject(%s.class)", className, className);
         } else {
             String pkType = Utils.isString(metadata.getPrimaryKey()) ? "String" : "Long";
             writer
-                .emitStatement("%sRealmProxy obj = null", className)
+                .emitStatement("%s obj = null", className)
                 .beginControlFlow("if (update)")
                     .emitStatement("Table table = realm.getTable(%s.class)", className)
                     .emitStatement("long pkColumnIndex = table.getPrimaryKey()")
@@ -42,6 +41,7 @@
             String qualifiedFieldType = field.asType().toString();
             if (Utils.isRealmObject(field)) {
                 RealmJsonTypeHelper.emitFillRealmObjectWithJsonValue(
+                        interfaceName,
                         metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
@@ -51,6 +51,7 @@
 
             } else if (Utils.isRealmList(field)) {
                 RealmJsonTypeHelper.emitFillRealmListWithJsonValue(
+                        interfaceName,
                         metadata.getGetter(fieldName),
                         metadata.getSetter(fieldName),
                         fieldName,
@@ -60,6 +61,7 @@
 
             } else {
                 RealmJsonTypeHelper.emitFillJavaTypeWithJsonValue(
+                        interfaceName,
                         metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
