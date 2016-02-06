@@ -16,30 +16,8 @@
             standaloneObject = new Simple();
             cache.put(realmObject, new RealmObjectProxy.CacheData<RealmObject>(currentDepth, standaloneObject));
         }
-        Class<?> clazz = standaloneObject.getClass();
-        Field field = null;
-        try {
-            field = clazz.getDeclaredField("name");
-        } catch (NoSuchFieldException e) {
-            throw new RealmException(e.getMessage());
-        }
-        field.setAccessible(true);
-        try {
-            field.set(standaloneObject, ((SimpleRealmProxy) realmObject).realmGetter$name());
-        } catch (IllegalAccessException e) {
-            throw new RealmException(e.getMessage());
-        }
-        try {
-            field = clazz.getDeclaredField("age");
-        } catch (NoSuchFieldException e) {
-            throw new RealmException(e.getMessage());
-        }
-        field.setAccessible(true);
-        try {
-            field.setInt(standaloneObject, ((SimpleRealmProxy) realmObject).realmGetter$age());
-        } catch (IllegalAccessException e) {
-            throw new RealmException(e.getMessage());
-        }
+        ((SimpleRealmProxyInterface) standaloneObject).realmSet$name(((SimpleRealmProxyInterface) realmObject).realmGet$name());
+        ((SimpleRealmProxyInterface) standaloneObject).realmSet$age(((SimpleRealmProxyInterface) realmObject).realmGet$age());
         return standaloneObject;
     }
 

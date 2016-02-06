@@ -1,51 +1,10 @@
-    public static Booleans copy(Realm realm, Booleans from, boolean update, Map<RealmObject,RealmObjectProxy> cache) {
-        final boolean isStandalone = !(from instanceof BooleansRealmProxy);
-        Class<? extends Booleans> clazz;
-        Field field = null;
-        if (isStandalone) {
-            clazz = from.getClass();
-        } else {
-            clazz = null;
-        }
-        BooleansRealmProxy to;
-
-        to = (BooleansRealmProxy) realm.createObject(Booleans.class);
-        cache.put(from, (RealmObjectProxy) to);
-
-        try {
-            if (isStandalone) {
-                field = clazz.getDeclaredField("done");
-                field.setAccessible(true);
-                to.realmSetter$done((boolean) field.get(from));
-            } else {
-                to.realmSetter$done(((BooleansRealmProxy) from).realmGetter$done());
-            }
-            if (isStandalone) {
-                field = clazz.getDeclaredField("isReady");
-                field.setAccessible(true);
-                to.realmSetter$isReady((boolean) field.get(from));
-            } else {
-                to.realmSetter$isReady(((BooleansRealmProxy) from).realmGetter$isReady());
-            }
-            if (isStandalone) {
-                field = clazz.getDeclaredField("mCompleted");
-                field.setAccessible(true);
-                to.realmSetter$mCompleted((boolean) field.get(from));
-            } else {
-                to.realmSetter$mCompleted(((BooleansRealmProxy) from).realmGetter$mCompleted());
-            }
-            if (isStandalone) {
-                field = clazz.getDeclaredField("anotherBoolean");
-                field.setAccessible(true);
-                to.realmSetter$anotherBoolean((boolean) field.get(from));
-            } else {
-                to.realmSetter$anotherBoolean(((BooleansRealmProxy) from).realmGetter$anotherBoolean());
-            }
-        } catch (NoSuchFieldException e) {
-            throw new RealmException(e.getMessage());
-        } catch (IllegalAccessException e) {
-            throw new RealmException(e.getMessage());
-        }
-        return to;
+    public static Booleans copy(Realm realm, Booleans newObject, boolean update, Map<RealmObject,RealmObjectProxy> cache) {
+        Booleans realmObject = realm.createObject(Booleans.class);
+        cache.put(newObject, (RealmObjectProxy) realmObject);
+        ((BooleansRealmProxyInterface) realmObject).realmSet$done(((BooleansRealmProxyInterface)newObject).realmGet$done());
+        ((BooleansRealmProxyInterface) realmObject).realmSet$isReady(((BooleansRealmProxyInterface)newObject).realmGet$isReady());
+        ((BooleansRealmProxyInterface) realmObject).realmSet$mCompleted(((BooleansRealmProxyInterface)newObject).realmGet$mCompleted());
+        ((BooleansRealmProxyInterface) realmObject).realmSet$anotherBoolean(((BooleansRealmProxyInterface)newObject).realmGet$anotherBoolean());
+        return realmObject;
     }
 

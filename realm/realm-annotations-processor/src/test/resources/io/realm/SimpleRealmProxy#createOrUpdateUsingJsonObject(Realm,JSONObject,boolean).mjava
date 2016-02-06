@@ -1,19 +1,19 @@
     @SuppressWarnings("cast")
     public static Simple createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
         throws JSONException {
-        SimpleRealmProxy obj = (SimpleRealmProxy) realm.createObject(Simple.class);
+        Simple obj = realm.createObject(Simple.class);
         if (json.has("name")) {
             if (json.isNull("name")) {
-                obj.realmSetter$name(null);
+                ((SimpleRealmProxyInterface) obj).realmSet$name(null);
             } else {
-                obj.realmSetter$name((String) json.getString("name"));
+                ((SimpleRealmProxyInterface) obj).realmSet$name((String) json.getString("name"));
             }
         }
         if (json.has("age")) {
             if (json.isNull("age")) {
                 throw new IllegalArgumentException("Trying to set non-nullable field age to null.");
             } else {
-                obj.realmSetter$age((int) json.getInt("age"));
+                ((SimpleRealmProxyInterface) obj).realmSet$age((int) json.getInt("age"));
             }
         }
         return obj;
