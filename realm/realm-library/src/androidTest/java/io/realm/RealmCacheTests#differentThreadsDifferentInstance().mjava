@@ -1,0 +1,25 @@
+    @Test
+    public void differentThreadsDifferentInstance() throws InterruptedException {
+        final CountDownLatch closeLatch = new CountDownLatch(1);
+
+        final Realm realmA = Realm.getInstance(defaultConfig);
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realmB = Realm.getInstance(defaultConfig);
+                assertFalse(realmA == realmB);
+                RealmCache.invokeWithGlobalRefCount(defaultConfig,
+                        new TestHelper.ExpectedCountCallback(2));
+                realmB.close();
+                closeLatch.countDown();
+            }
+        });
+        thread.start();
+
+        closeLatch.await();
+        RealmCache.invokeWithGlobalRefCount(defaultConfig, new TestHelper.ExpectedCountCallback(1));
+        realmA.close();
+        RealmCache.invokeWithGlobalRefCount(defaultConfig, new TestHelper.ExpectedCountCallback(0));
+    }
+

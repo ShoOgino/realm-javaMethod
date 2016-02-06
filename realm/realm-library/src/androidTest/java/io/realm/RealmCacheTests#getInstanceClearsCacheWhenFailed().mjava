@@ -1,0 +1,21 @@
+    @Test
+    public void getInstanceClearsCacheWhenFailed() {
+        String REALM_NAME = "invalid_cache.realm";
+        RealmConfiguration configA = configFactory.createConfiguration(REALM_NAME,
+                TestHelper.getRandomKey(42));
+        RealmConfiguration configB = configFactory.createConfiguration(REALM_NAME,
+                TestHelper.getRandomKey(43));
+
+        Realm realm = Realm.getInstance(configA); // Create starting Realm with key1
+        realm.close();
+        try {
+            Realm.getInstance(configB); // Try to open with key 2
+        } catch (IllegalArgumentException ignored) {
+            // Delete Realm so key 2 works. This should work as a Realm shouldn't be cached
+            // if initialization failed.
+            assertTrue(Realm.deleteRealm(configA));
+            realm = Realm.getInstance(configB);
+            realm.close();
+        }
+    }
+

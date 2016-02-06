@@ -1,0 +1,37 @@
+    //UC 0 using Realm.createObject
+    @Test
+    @RunTestInLooperThread
+    public void callback_should_trigger_for_createObject() {
+        final Realm realm = looperThread.realm;
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                if (globalCommitInvocations.incrementAndGet() == 2) {
+                    realm.handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            assertEquals(1, typebasedCommitInvocations.get());
+                            looperThread.testComplete();
+                        }
+                    });
+                }
+            }
+        });
+
+        realm.beginTransaction();
+        final Dog dog = realm.createObject(Dog.class);
+        realm.commitTransaction();
+
+        dog.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals("Akamaru", dog.getName());
+                typebasedCommitInvocations.incrementAndGet();
+            }
+        });
+
+        realm.beginTransaction();
+        dog.setName("Akamaru");
+        realm.commitTransaction();
+    }
+

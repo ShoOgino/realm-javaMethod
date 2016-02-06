@@ -1,0 +1,49 @@
+    // ********************************************************************************* //
+    // UC 1.
+    // Callback should be invoked after a relevant commit (one that should impact the
+    // query from which we obtained our RealmObject or RealmResults)
+    // ********************************************************************************* //
+    // UC 1 for Sync RealmObject
+    @Test
+    @RunTestInLooperThread
+    public void callback_with_relevant_commit_realmobject_sync() {
+        final Realm realm = looperThread.realm;
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                if (globalCommitInvocations.incrementAndGet() == 3) {
+                    realm.handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            assertEquals(1, typebasedCommitInvocations.get());
+                            looperThread.testComplete();
+                        }
+                    });
+                }
+            }
+        });
+
+        realm.beginTransaction();
+        Dog akamaru = realm.createObject(Dog.class);
+        akamaru.setName("Akamaru");
+        realm.commitTransaction();
+
+        final Dog dog = realm.where(Dog.class).findFirst();
+        dog.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals("Akamaru", dog.getName());
+                typebasedCommitInvocations.incrementAndGet();
+            }
+        });
+
+        // this commit should not trigger the type based callback
+        // it will re-run the query in the background though
+        realm.beginTransaction();
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        akamaru.setAge(17);
+        realm.commitTransaction();
+    }
+
