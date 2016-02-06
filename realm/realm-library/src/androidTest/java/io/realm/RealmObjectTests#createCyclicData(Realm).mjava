@@ -1,0 +1,12 @@
+    private CyclicType createCyclicData(Realm realm) {
+        CyclicType foo = realm.createObject(CyclicType.class);
+        foo.setName("Foo");
+        CyclicType bar = realm.createObject(CyclicType.class);
+        bar.setName("Bar");
+
+        // Setup cycle on normal object references
+        foo.setObject(bar);
+        bar.setObject(foo);
+        return foo;
+    }
+
