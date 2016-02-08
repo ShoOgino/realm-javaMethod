@@ -1,6 +1,6 @@
     // Test that an async transaction that throws an exception propagate it properly to the user.
     @Test
-    public void executeTransaction_async_exceptionHandling() throws Throwable {
+    public void executeTransactionAsync_exceptionHandling() throws Throwable {
         final TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
         final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
         final CountDownLatch signalClosedRealm = new CountDownLatch(1);
@@ -20,7 +20,7 @@
 
                     assertEquals(0, realm[0].allObjects(Owner.class).size());
 
-                    realm[0].executeTransaction(new Realm.Transaction() {
+                    realm[0].executeTransactionAsync(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
                             Owner owner = realm.createObject(Owner.class);
@@ -28,7 +28,7 @@
                             realm.cancelTransaction(); // Cancel the transaction then throw
                             throw new RuntimeException("Boom");
                         }
-                    }, new Realm.Transaction.Callback() {
+                    }, new Realm.Transaction.OnSuccess() {
                         @Override
                         public void onSuccess() {
                             try {
@@ -39,9 +39,9 @@
                                 signalCallbackFinished.countDown();
                             }
                         }
-
+                    }, new Realm.Transaction.OnError() {
                         @Override
-                        public void onError(Exception e) {
+                        public void onError(Throwable error) {
                             try {
                                 // Ensure we are giving developers quality messages in the logs.
                                 assertEquals(testLogger.message, "Could not cancel transaction, not currently in a transaction.");

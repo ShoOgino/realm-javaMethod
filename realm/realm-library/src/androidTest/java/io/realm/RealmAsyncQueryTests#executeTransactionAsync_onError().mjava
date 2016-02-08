@@ -1,0 +1,20 @@
+    @Test
+    @RunTestInLooperThread
+    public void executeTransactionAsync_onError() throws Throwable {
+        assertEquals(0, looperThread.realm.allObjects(Owner.class).size());
+
+        looperThread.realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                throw new RuntimeException("Oh! What a Terrible Failure");
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                assertEquals(0, looperThread.realm.allObjects(Owner.class).size());
+                assertNull(looperThread.realm.where(Owner.class).findFirst());
+                looperThread.testComplete();
+            }
+        });
+    }
+
