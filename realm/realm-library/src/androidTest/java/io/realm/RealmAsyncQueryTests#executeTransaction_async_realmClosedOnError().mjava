@@ -3,7 +3,7 @@
     @RunTestInLooperThread
     public void executeTransaction_async_realmClosedOnError() {
         final AtomicInteger counter = new AtomicInteger(100);
-        final Realm realm = Realm.getInstance(looperThread.createConfiguration("testClosedBeforeAsyncTransactionSuccess"));
+        final Realm realm = looperThread.realm;
         final RealmCache.Callback cacheCallback = new RealmCache.Callback() {
             @Override
             public void onResult(int count) {
@@ -14,15 +14,15 @@
                 }
             }
         };
-        final Realm.Transaction.Callback transactionCallback = new Realm.Transaction.Callback() {
+        final Realm.Transaction.OnError transactionCallback = new Realm.Transaction.OnError() {
             @Override
-            public void onError(Exception e) {
+            public void onError(Throwable error) {
                 RealmCache.invokeWithGlobalRefCount(realm.getConfiguration(), cacheCallback);
                 if (counter.get() == 0) {
                     // Finish testing
                     return;
                 }
-                realm.executeTransaction(new Realm.Transaction() {
+                realm.executeTransactionAsync(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
                         throw new RuntimeException("Dummy exception");
@@ -31,7 +31,7 @@
             }
         };
 
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 throw new RuntimeException("Dummy exception");
