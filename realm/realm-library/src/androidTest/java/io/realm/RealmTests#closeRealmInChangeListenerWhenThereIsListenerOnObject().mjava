@@ -35,11 +35,11 @@
         // Step 1: Change listener on Realm Object
         final AllTypes allTypes = realm.where(AllTypes.class).findFirst();
         allTypes.addChangeListener(dummyListener);
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 realm.createObject(AllTypes.class);
             }
-        }, new Realm.Transaction.Callback());
+        });
     }
 
