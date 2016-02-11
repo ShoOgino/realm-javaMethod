@@ -1,0 +1,15 @@
+    @Test
+    public void isValid_removedParent() {
+        populateTestRealm(realm, 1);
+        final AllTypes obj = realm.where(AllTypes.class).findFirst();
+        final RealmQuery<Dog> query = obj.getColumnRealmList().where();
+        assertTrue(query.isValid());
+
+        realm.beginTransaction();
+        obj.removeFromRealm();
+        realm.commitTransaction();
+
+        // invalid if parent has been removed
+        assertFalse(query.isValid());
+    }
+

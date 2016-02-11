@@ -1,0 +1,11 @@
+    // test for https://github.com/realm/realm-java/issues/1905
+    @Test
+    public void resultOfTableViewQuery() {
+        populateTestRealm();
+
+        final RealmResults<AllTypes> results = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, 3L).findAll();
+        final RealmQuery<AllTypes> tableViewQuery = results.where();
+        assertEquals("test data 3", tableViewQuery.findAll().first().getColumnString());
+        assertEquals("test data 3", tableViewQuery.findFirst().getColumnString());
+    }
+
