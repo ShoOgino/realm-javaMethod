@@ -6,22 +6,22 @@
 
         // Add a person
         Person person = realm.createObject(Person.class);
-        person.setId(1);
-        person.setName("Young Person");
-        person.setAge(14);
+        person.id = 1;
+        person.name = "Young Person";
+        person.age = 14;
 
         // When the transaction is committed, all changes a synced to disk.
         realm.commitTransaction();
 
         // Find the first person (no query conditions) and read a field
         person = realm.where(Person.class).findFirst();
-        showStatus(person.getName() + ":" + person.getAge());
+        showStatus(person.name + ":" + person.age);
 
         // Update person in a transaction
         realm.beginTransaction();
-        person.setName("Senior Person");
-        person.setAge(99);
-        showStatus(person.getName() + " got older: " + person.getAge());
+        person.name = "Senior Person";
+        person.age = 99;
+        showStatus(person.name + " got older: " + person.age);
         realm.commitTransaction();
 
         // Delete all persons
