@@ -1,0 +1,15 @@
+    @Test
+    public void distinctAsync_notIndexedFields() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10;
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+
+        for (String field : AnnotationIndexTypes.NOT_INDEX_FIELDS) {
+            try {
+                realm.where(AnnotationIndexTypes.class).distinctAsync(field);
+                fail(field);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

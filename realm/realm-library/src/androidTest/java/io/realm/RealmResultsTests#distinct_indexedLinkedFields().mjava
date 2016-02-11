@@ -4,10 +4,10 @@
         final long numberOfObjects = 10; // must be greater than 1
         populateForDistinct(realm, numberOfBlocks, numberOfObjects, true);
 
-        for (String fieldName : new String[]{"Boolean", "Long", "Date", "String"}) {
+        for (String field : AnnotationIndexTypes.INDEX_FIELDS) {
             try {
-                realm.where(AnnotationIndexTypes.class).findAll().distinct(AnnotationIndexTypes.FIELD_OBJECT + ".index" + fieldName);
-                fail("Unsupported Index" + fieldName + " linked field");
+                realm.where(AnnotationIndexTypes.class).findAll().distinct(AnnotationIndexTypes.FIELD_OBJECT + "." + field);
+                fail("Unsupported Index" + field + " linked field");
             } catch (IllegalArgumentException ignored) {
             }
         }

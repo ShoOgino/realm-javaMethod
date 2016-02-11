@@ -1,0 +1,22 @@
+    // Find and validate the column index for the field name used to create a distinctive TableView.
+    static long getAndValidateDistinctColumnIndex(String fieldName, Table table) {
+        // Check empty field name
+        if (fieldName == null || fieldName.isEmpty()) {
+            throw new IllegalArgumentException("Non-empty field name must be provided.");
+        }
+        long columnIndex = table.getColumnIndex(fieldName);
+        // Check if field exists
+        if (columnIndex == -1) {
+            throw new IllegalArgumentException(String.format("Field name '%s' does not exist.", fieldName));
+        }
+        // Check linked fields
+        if (fieldName.contains(".")) {
+            throw new IllegalArgumentException("Distinct operation on linked properties is not supported: " + fieldName);
+        }
+        // check if the field is indexed
+        if (!table.hasSearchIndex(columnIndex)) {
+            throw new IllegalArgumentException(String.format("Field name '%s' must be indexed in order to use it for distinct queries.", fieldName));
+        }
+        return columnIndex;
+    }
+

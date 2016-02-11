@@ -1,0 +1,13 @@
+    @Test
+    public void isValid_tableQuery() {
+        final RealmQuery<AllTypes> query = realm.where(AllTypes.class);
+
+        assertTrue(query.isValid());
+        populateTestRealm(realm, 1);
+        // still valid if result changed
+        assertTrue(query.isValid());
+
+        realm.close();
+        assertFalse(query.isValid());
+    }
+

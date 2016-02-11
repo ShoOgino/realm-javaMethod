@@ -1,0 +1,32 @@
+    @Test
+    public void isEmpty_illegalFieldTypeThrows() {
+        for (RealmFieldType type : NOT_SUPPORTED_IS_EMPTY_TYPES) {
+            try {
+                switch (type) {
+                    case INTEGER:
+                        realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LONG).findAll();
+                        break;
+                    case FLOAT:
+                        realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_FLOAT).findAll();
+                        break;
+                    case DOUBLE:
+                        realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_DOUBLE).findAll();
+                        break;
+                    case BOOLEAN:
+                        realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_BOOLEAN).findAll();
+                        break;
+                    case OBJECT:
+                        realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_OBJECT).findAll();
+                        break;
+                    case DATE:
+                        realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_DATE).findAll();
+                        break;
+                    default:
+                        fail("Unknown type: " + type);
+                }
+                fail(type + " should throw an exception");
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

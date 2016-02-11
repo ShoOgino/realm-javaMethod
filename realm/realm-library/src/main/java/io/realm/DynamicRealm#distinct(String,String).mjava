@@ -5,17 +5,13 @@
      * @param className the Class to get objects of.
      * @param fieldName the field name.
      * @return A non-null {@link RealmResults} containing the distinct objects.
-     * @throws IllegalArgumentException if a field name does not exist or the field is not indexed.
+     * @throws IllegalArgumentException if a field is null, does not exist, is an unsupported type,
+     * is not indexed, or points to linked fields.
      */
     public RealmResults<DynamicRealmObject> distinct(String className, String fieldName) {
-        checkNotNullFieldName(fieldName);
         checkIfValid();
         Table table = schema.getTable(className);
-        long columnIndex = table.getColumnIndex(fieldName);
-        if (columnIndex == -1) {
-            throw new IllegalArgumentException(String.format("Field name '%s' does not exist.", fieldName));
-        }
-
+        long columnIndex = RealmQuery.getAndValidateDistinctColumnIndex(fieldName, table);
         TableView tableView = table.getDistinctView(columnIndex);
         return RealmResults.createFromDynamicTableOrView(this, tableView, className);
     }
