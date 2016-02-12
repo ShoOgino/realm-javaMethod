@@ -1,23 +1,18 @@
     @Test
     @RunTestInLooperThread
     public void accessingRealmListOnUnloadedRealmObjectShouldThrow() {
-        Realm.asyncQueryExecutor.pause();
-
-        populateTestRealm(looperThread.realm, 10);
-        final AllTypes alltypes1 = looperThread.realm.where(AllTypes.class)
+        Realm realm = looperThread.realm;
+        populateTestRealm(realm, 10);
+        final AllTypes results = realm.where(AllTypes.class)
                 .equalTo("columnLong", 0)
                 .findFirstAsync();
 
-        assertFalse(alltypes1.isLoaded());
+        assertFalse(results.isLoaded());
         try {
-            alltypes1.getColumnRealmList();
+            results.getColumnRealmList();
             fail("Accessing property on an empty row");
         } catch (IllegalStateException ignored) {
         }
-
-        Realm.asyncQueryExecutor.resume();
         looperThread.testComplete();
-        Looper.loop();
-
     }
 

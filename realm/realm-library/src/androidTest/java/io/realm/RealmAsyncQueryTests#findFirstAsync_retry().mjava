@@ -1,98 +1,73 @@
     // similar UC as #testFindAllAsyncRetry using 'findFirst'
+    // UC:
+    //   1- insert 10 objects
+    //   2- start an async query to find object [0-4]
+    //   3- assert current RealmResults is empty (Worker Thread didn't complete)
+    //   4- when the worker thread complete, advance the Realm
+    //   5- the caller thread is ahead of the result provided by the worker thread
+    //   6- retry automatically the async query
+    //   7- the returned RealmResults is now in the same version as the caller thread
+    //   8- the notification should be called once (when we retry automatically we shouldn't
+    //      notify the user).
     @Test
+    @RunTestInLooperThread
     public void findFirstAsync_retry() throws Throwable {
-        final CountDownLatch signalCallbackFinished = new CountDownLatch(1);
-        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
-        final Throwable[] threadAssertionError = new Throwable[1];
-        final Looper[] backgroundLooper = new Looper[1];
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
+        final AtomicInteger numberOfIntercept = new AtomicInteger(0);
+        final Realm realm = looperThread.realm;
+        populateTestRealm(realm, 10);
+
+        // Configure interceptor handler
+        final Handler handler = new HandlerProxy(realm.handlerController) {
             @Override
-            public void run() {
-                Looper.prepare();
-                backgroundLooper[0] = Looper.myLooper();
-                final Realm[] realm = new Realm[1];
-                try {
-                    final AtomicInteger numberOfIntercept = new AtomicInteger(1);
-                    realm[0] = openRealmInstance("testFindFirstAsyncRetry");
-                    final Handler handler = new HandlerProxy(realm[0].handler) {
-                        @Override
-                        public boolean onInterceptMessage(int what) {
-                            switch (what) {
-                                case HandlerController.COMPLETED_ASYNC_REALM_OBJECT: {
-                                    if (numberOfIntercept.getAndDecrement() > 0) {
-                                        // we advance the Realm so we can simulate a retry
-                                        // this is intercepted on the worker thread, we need to use
-                                        // the Realm on the original thread
-                                        postAtFront(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                realm[0].beginTransaction();
-                                                realm[0].clear(AllTypes.class);
-                                                AllTypes object = realm[0].createObject(AllTypes.class);
+            public boolean onInterceptOutMessage(int what) {
+                return false;
+            }
 
-                                                object.setColumnString("The Endless River");
-                                                object.setColumnLong(5);
-                                                realm[0].commitTransaction();
-                                            }
-                                        });
-                                    }
-                                    break;
-                                }
-                            }
-                            return false;
+            @Override
+            public boolean onInterceptInMessage(int what) {
+                Log.d("HandlerBug", "onInterceptInMessage: " + what);
+                int intercepts = numberOfIntercept.incrementAndGet();
+                switch (what) {
+                    case HandlerController.COMPLETED_ASYNC_REALM_OBJECT: {
+                        if (intercepts == 1) {
+                            // we advance the Realm so we can simulate a retry
+                            realm.beginTransaction();
+                            realm.clear(AllTypes.class);
+                            AllTypes object = realm.createObject(AllTypes.class);
+                            object.setColumnString("The Endless River");
+                            object.setColumnLong(5);
+                            realm.commitTransaction();
                         }
-                    };
-                    realm[0].setHandler(handler);
-                    Realm.asyncQueryExecutor.pause();
-
-                    populateTestRealm(realm[0], 10);
-                    final AllTypes realmResults = realm[0].where(AllTypes.class)
-                            .between("columnLong", 4, 6)
-                            .findFirstAsync();
-                    assertFalse(realmResults.isLoaded());
-                    try {
-                        realmResults.getColumnString();
-                        fail("Accessing property on an empty row");
-                    } catch (IllegalStateException ignored) {
                     }
-
-                    Realm.asyncQueryExecutor.resume();
-
-                    final AtomicInteger numberOfInvocation = new AtomicInteger(0);
-                    realmResults.addChangeListener(new RealmChangeListener() {
-                        @Override
-                        public void onChange() {
-                            try {
-                                assertEquals(1, numberOfInvocation.incrementAndGet());
-                                assertTrue(realmResults.isLoaded());
-                                assertEquals(5, realmResults.getColumnLong());
-                                assertEquals("The Endless River", realmResults.getColumnString());
-                            } catch (AssertionFailedError e) {
-                                threadAssertionError[0] = e;
-                            } finally {
-                                signalCallbackFinished.countDown();
-                            }
-
-                        }
-                    });
-                    Looper.loop();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    threadAssertionError[0] = e;
-
-                } finally {
-                    if (signalCallbackFinished.getCount() > 0) {
-                        signalCallbackFinished.countDown();
-                    }
-                    if (realm[0] != null) {
-                        realm[0].close();
-                    }
-                    signalClosedRealm.countDown();
                 }
+                return false;
+            }
+        };
+        realm.setHandler(handler);
+
+        // Create a async query and verify it is not still loaded.
+        final AllTypes realmResults = realm.where(AllTypes.class)
+                .between("columnLong", 4, 6)
+                .findFirstAsync();
+
+        assertFalse(realmResults.isLoaded());
+
+        try {
+            realmResults.getColumnString();
+            fail("Accessing property on an empty row");
+        } catch (IllegalStateException ignored) {
+        }
+
+        // Add change listener that should only be called once after the retry completed.
+        realmResults.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals(2, numberOfIntercept.get());
+                assertTrue(realmResults.isLoaded());
+                assertEquals(5, realmResults.getColumnLong());
+                assertEquals("The Endless River", realmResults.getColumnString());
+                looperThread.testComplete();
             }
         });
-
-        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
     }
 

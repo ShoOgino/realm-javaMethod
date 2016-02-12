@@ -1,4 +1,5 @@
     private void populateTestRealm(final Realm testRealm, int objects) {
+        testRealm.setAutoRefresh(false);
         testRealm.beginTransaction();
         testRealm.allObjects(AllTypes.class).clear();
         testRealm.allObjects(NonLatinFieldNames.class).clear();
@@ -18,6 +19,6 @@
             nonLatinFieldNames.setΒήτα(1.234567f + i);
         }
         testRealm.commitTransaction();
-        testRealm.refresh();
+        testRealm.setAutoRefresh(true);
     }
 
