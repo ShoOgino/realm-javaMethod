@@ -1,9 +1,10 @@
     @Test
     @RunTestInLooperThread
     public void findAllAsync_reusingQuery() throws Throwable {
-        populateTestRealm(looperThread.realm, 10);
+        Realm realm = looperThread.realm;
+        populateTestRealm(realm, 10);
 
-        RealmQuery<AllTypes> query = looperThread.realm.where(AllTypes.class)
+        RealmQuery<AllTypes> query = realm.where(AllTypes.class)
                 .between("columnLong", 0, 4);
         RealmResults<AllTypes> queryAllSync = query.findAll();
         RealmResults<AllTypes> allAsync = query.findAllAsync();
@@ -13,7 +14,7 @@
 
         // the RealmQuery already has an argumentHolder, can't reuse it
         try {
-            RealmResults<AllTypes> allAsyncSorted = query.findAllSorted("columnLong");
+            query.findAllSorted("columnLong");
             fail("Should throw an exception, can not reuse RealmQuery");
         } catch (IllegalStateException ignored) {
             looperThread.testComplete();

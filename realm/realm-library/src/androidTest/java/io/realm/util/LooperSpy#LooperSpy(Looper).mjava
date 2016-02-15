@@ -1,0 +1,14 @@
+    private LooperSpy(Looper looper) {
+        try {
+            Field queueField = Looper.class.getDeclaredField("mQueue");
+            queueField.setAccessible(true);
+            messagesField = MessageQueue.class.getDeclaredField("mMessages");
+            messagesField.setAccessible(true);
+            nextField = Message.class.getDeclaredField("next");
+            nextField.setAccessible(true);
+            mainMessageQueue = (MessageQueue) queueField.get(looper);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+

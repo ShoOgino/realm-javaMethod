@@ -1,7 +1,8 @@
     @Test
     @RunTestInLooperThread
     public void findFirstAsync_initalEmptyRow() throws Throwable {
-        final AllTypes firstAsync = looperThread.realm.where(AllTypes.class).findFirstAsync();
+        Realm realm = looperThread.realm;
+        final AllTypes firstAsync = realm.where(AllTypes.class).findFirstAsync();
         firstAsync.addChangeListener(new RealmChangeListener() {
             @Override
             public void onChange() {
@@ -16,7 +17,8 @@
         assertTrue(firstAsync.isLoaded());
         assertFalse(firstAsync.isValid());
 
-        populateTestRealm(looperThread.realm, 10);
-        looperThread.keepStrongReference.add(firstAsync);
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class).setColumnLong(0);
+        realm.commitTransaction();
     }
 

@@ -7,9 +7,9 @@
 
         final Realm realm = looperThread.realm;
         // Swallow all REALM_CHANGED events to test the behaviour of an explicit refresh
-        final Handler handler = new HandlerProxy(realm.handler) {
+        final Handler handler = new HandlerProxy(realm.handlerController) {
             @Override
-            public boolean onInterceptMessage(int what) {
+            public boolean onInterceptInMessage(int what) {
                 switch (what) {
                     case HandlerController.REALM_CHANGED: {
                         return true;

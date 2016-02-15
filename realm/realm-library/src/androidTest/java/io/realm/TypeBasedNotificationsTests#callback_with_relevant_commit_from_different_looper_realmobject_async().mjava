@@ -25,12 +25,13 @@
             @Override
             public void onChange() {
                 switch (typebasedCommitInvocations.incrementAndGet()) {
-                    case 1:  // triggered by COMPLETED_ASYNC_REALM_OBJECT
-                    case 2: // triggered by the irrelevant commit (not affecting Dog table)
+                    case 1: // triggered by COMPLETED_ASYNC_REALM_OBJECT from caling dog.load()
+                    case 2: // triggered by the irrelevant commit (not affecting Dog table) from LooperThread1
                         assertTrue(dog.isLoaded());
                         assertFalse(dog.isValid());
                         break;
-                    case 3:
+
+                    case 3: // triggered by relevant commmit from LooperThread2
                         assertEquals("Akamaru", dog.getName());
                         realm.handler.post(new Runnable() {
                             @Override
@@ -89,6 +90,7 @@
         new Handler(looperThread2.getLooper()).post(new Runnable() {
             @Override
             public void run() {
+                TestHelper.awaitOrFail(looperThread1Done);
                 Realm realmLooperThread2 = Realm.getInstance(realm.getConfiguration());
                 // trigger first callback invocation
                 realmLooperThread2.beginTransaction();
