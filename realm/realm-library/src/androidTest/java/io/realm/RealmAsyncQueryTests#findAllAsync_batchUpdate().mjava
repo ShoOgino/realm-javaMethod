@@ -18,11 +18,6 @@
         // 1. Configure Handler interceptor
         Handler handler = new HandlerProxy(realm.handlerController) {
             @Override
-            public boolean onInterceptOutMessage(int what) {
-                return false;
-            }
-
-            @Override
             public boolean onInterceptInMessage(int what) {
                 int intercepts = numberOfIntercept.getAndIncrement();
                 if (what == HandlerController.COMPLETED_ASYNC_REALM_RESULTS && intercepts == 1) {
