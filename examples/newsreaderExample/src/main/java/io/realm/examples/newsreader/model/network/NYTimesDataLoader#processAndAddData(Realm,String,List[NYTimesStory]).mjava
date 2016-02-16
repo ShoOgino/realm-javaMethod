@@ -2,7 +2,7 @@
     private void processAndAddData(final Realm realm, final String sectionKey, final List<NYTimesStory> stories) {
         if (stories.isEmpty()) return;
 
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 for (NYTimesStory story : stories) {
@@ -26,6 +26,11 @@
                     }
                 }
             }
-        }, new DefaultTransactionCallback());
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable throwable) {
+                Timber.e(throwable, "Could not save data");
+            }
+        });
     }
 
