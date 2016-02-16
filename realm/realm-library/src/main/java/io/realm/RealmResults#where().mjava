@@ -3,14 +3,11 @@
      *
      * @return a typed RealmQuery.
      * @see io.realm.RealmQuery
-     * @throws IllegalStateException if the RealmList which this RealmResults is created on has been deleted.
+     * @throws IllegalStateException if the corresponding Realm is closed or in an incorrect thread.
      */
     public RealmQuery<E> where() {
         realm.checkIfValid();
 
-        if (!syncToCheckIfValid("Calling where on RealmResults whose parent RealmList has been deleted already.")) {
-            throw new IllegalStateException("The RealmList which this RealmResults is created on has been deleted.");
-        }
         return RealmQuery.createQueryFromResult(this);
     }
 
