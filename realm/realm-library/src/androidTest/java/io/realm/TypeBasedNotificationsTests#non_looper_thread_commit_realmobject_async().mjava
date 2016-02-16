@@ -1,0 +1,65 @@
+    // UC 3 Async RealmObject
+    // 1. Create RealmObject async query
+    // 2. Wait COMPLETED_ASYNC_REALM_OBJECT then commit transaction in another non-looper thread
+    // 3. Listener on the RealmObject gets triggered again.
+    @Test
+    @RunTestInLooperThread
+    public void non_looper_thread_commit_realmobject_async() {
+        final Realm realm = looperThread.realm;
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                // Check if the 2nd transaction is committed.
+                if (realm.where(Dog.class).count() == 2) {
+                    realm.handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            assertEquals(2,typebasedCommitInvocations.get());
+                            looperThread.testComplete();
+                        }
+                    });
+                }
+            }
+        });
+
+        realm.beginTransaction();
+        realm.createObject(Dog.class);
+        realm.commitTransaction();
+
+        final Thread thread = new Thread() {
+            @Override
+            public void run() {
+                if (typebasedCommitInvocations.get() != 1) {
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        fail(e.getMessage());
+                    }
+                }
+                Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+                bgRealm.beginTransaction();
+                bgRealm.createObject(Dog.class);
+                bgRealm.commitTransaction();
+                bgRealm.close();
+            }
+        };
+
+        Dog dog = realm.where(Dog.class).findFirstAsync();
+        dog.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                typebasedCommitInvocations.incrementAndGet();
+
+                if (typebasedCommitInvocations.get() == 1) {
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        fail(e.getMessage());
+                    }
+                }
+            }
+        });
+
+        thread.start();
+    }
+

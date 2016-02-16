@@ -1,50 +1,19 @@
     @Test
+    @RunTestInLooperThread
     public void distinctAsync_notIndexedFields() throws Throwable {
-        final CountDownLatch signalCallbackFinished = new CountDownLatch(4);
-        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
-        final Throwable[] threadAssertionError = new Throwable[1];
-        final Looper[] backgroundLooper = new Looper[1];
-        final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                Looper.prepare();
-                backgroundLooper[0] = Looper.myLooper();
+        Realm realm = looperThread.realm;
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
 
-                Realm realm = null;
-                try {
-                    realm = openRealmInstance("testAsyncDistinctNotIndexedFields");
-                    final long numberOfBlocks = 25;
-                    final long numberOfObjects = 10; // must be greater than 1
-
-                    populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
-
-                    for (String fieldName : new String[]{"Boolean", "Long", "Date", "String"}) {
-                        try {
-                            realm.distinctAsync(AnnotationIndexTypes.class, "notIndex" + fieldName);
-                            fail("notIndex" + fieldName);
-                        } catch (IllegalArgumentException ignored) {
-                            signalCallbackFinished.countDown();
-                        }
-                    }
-
-                    Looper.loop();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    threadAssertionError[0] = e;
-
-                } finally {
-                    if (signalCallbackFinished.getCount() > 0) {
-                        signalCallbackFinished.countDown();
-                    }
-                    if (realm != null) {
-                        realm.close();
-                    }
-                    signalClosedRealm.countDown();
-                }
+        for (String fieldName : new String[]{"Boolean", "Long", "Date", "String"}) {
+            try {
+                realm.distinctAsync(AnnotationIndexTypes.class, "notIndex" + fieldName);
+                fail("notIndex" + fieldName);
+            } catch (IllegalArgumentException ignored) {
             }
-        });
+        }
 
-        TestHelper.exitOrThrow(executorService, signalCallbackFinished, signalClosedRealm, backgroundLooper, threadAssertionError);
+        looperThread.testComplete();
     }
 

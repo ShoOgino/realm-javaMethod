@@ -1,0 +1,16 @@
+    @Test
+    public void iOSDataTypesMinimumValues() throws IOException {
+        for (String iosVersion : IOS_VERSIONS) {
+            configFactory.copyRealmFromAssets(context,
+                    "ios/" + iosVersion + "-alltypes-min.realm", REALM_NAME);
+            realm = Realm.getDefaultInstance();
+
+            IOSAllTypes obj = realm.allObjects(IOSAllTypes.class).first();
+            assertEquals(Short.MIN_VALUE, obj.getShortCol());
+            assertEquals(Integer.MIN_VALUE, obj.getIntCol());
+            assertEquals(Long.MIN_VALUE, obj.getLongCol());
+            assertEquals(Float.MIN_NORMAL, obj.getFloatCol(), 0F);
+            assertEquals(Double.MIN_NORMAL, obj.getDoubleCol(), 0D);
+        }
+    }
+

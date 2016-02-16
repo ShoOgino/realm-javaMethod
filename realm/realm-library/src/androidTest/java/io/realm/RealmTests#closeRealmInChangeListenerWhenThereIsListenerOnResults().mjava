@@ -30,11 +30,11 @@
         RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
         results.addChangeListener(dummyListener);
 
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 realm.createObject(AllTypes.class);
             }
-        }, new Realm.Transaction.Callback());
+        });
     }
 

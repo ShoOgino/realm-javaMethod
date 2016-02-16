@@ -1,0 +1,22 @@
+    @Test
+    public void sOSDataTypesDefaultValues() throws IOException {
+        for (String iosVersion : IOS_VERSIONS) {
+            configFactory.copyRealmFromAssets(context,
+                    "ios/" + iosVersion + "-alltypes-default.realm", REALM_NAME);
+            realm = Realm.getDefaultInstance();
+
+            IOSAllTypes obj = realm.allObjects(IOSAllTypes.class).first();
+            assertFalse(obj.isBoolCol());
+            assertEquals(0, obj.getShortCol());
+            assertEquals(0, obj.getIntCol());
+            assertEquals(0L, obj.getLongCol());
+            assertEquals(0.0F, obj.getFloatCol(), 0F);
+            assertEquals(0.0D, obj.getDoubleCol(), 0D);
+            assertArrayEquals(new byte[0], obj.getByteCol());
+            assertEquals("", obj.getStringCol());
+            assertEquals(new Date(0), obj.getDateCol());
+            assertNull(obj.getChild());
+            assertEquals(0, obj.getChildren().size());
+        }
+    }
+

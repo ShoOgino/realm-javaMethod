@@ -1,0 +1,32 @@
+    // UC 4 RealmObject
+    @Test
+    public void should_throw_on_non_looper_thread_realmresults() {
+        final CountDownLatch signalTestFinished = new CountDownLatch(1);
+        new Thread() {
+            @Override
+            public void run() {
+                Realm bgRealm = Realm.getInstance(configFactory.createConfiguration());
+                try {
+                    bgRealm.beginTransaction();
+                    bgRealm.createObject(Dog.class);
+                    bgRealm.commitTransaction();
+
+                    RealmResults<Dog> dogs = bgRealm.where(Dog.class).findAll();
+                    dogs.addChangeListener(new RealmChangeListener() {
+                        @Override
+                        public void onChange() {
+                            fail("Callback should not be registered and invoked on a non-Looper thread");
+                        }
+                    });
+                    fail("Callback should not be registered and invoked on a non-Looper thread");
+                } catch (IllegalStateException ignored) {
+
+                } finally {
+                    bgRealm.close();
+                    signalTestFinished.countDown();
+                }
+            }
+        }.start();
+        TestHelper.awaitOrFail(signalTestFinished);
+    }
+

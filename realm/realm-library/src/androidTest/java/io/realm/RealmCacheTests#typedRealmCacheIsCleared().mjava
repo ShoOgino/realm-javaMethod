@@ -1,0 +1,19 @@
+    // Test that the closed Realm isn't kept in the Realm instance cache
+    @Test
+    public void typedRealmCacheIsCleared() {
+        Realm typedRealm = Realm.getInstance(defaultConfig);
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(defaultConfig);
+
+        typedRealm.close(); // Still a dynamic instance open, but the typed Realm cache must still be cleared.
+        dynamicRealm.close();
+
+        Realm typedRealm1 = Realm.getInstance(defaultConfig);
+        try {
+            assertFalse(typedRealm == typedRealm1); // Must be different instance
+            // If cache isn't cleared this would crash because of a closed shared group.
+            assertEquals(0, typedRealm1.where(AllTypes.class).count());
+        } finally {
+            typedRealm1.close();
+        }
+    }
+

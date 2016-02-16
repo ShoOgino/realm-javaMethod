@@ -1,0 +1,29 @@
+    // See https://github.com/realm/realm-java/issues/1775 .
+    // Before 0.84.2, pk table added prefix "class_" to every class's name.
+    // After 0.84.2, the pk table should be migrated automatically to remove the "class_".
+    // In 0.84.2, the class names in pk table has been renamed to some incorrect names like "Thclass", "Mclass",
+    // "NClass", "Meclass" and etc..
+    // The 0841_pk_migration.realm is made to produce the issue.
+    @Test
+    public void primaryKeyTableMigratedWithRightName() throws IOException {
+        List<String> tableNames = Arrays.asList(
+                "ChatList", "Drafts", "Member", "Message", "Notifs", "NotifyLink", "PopularPost",
+                "Post", "Tags", "Threads", "User");
+
+        configFactory.copyRealmFromAssets(context, "0841_pk_migration.realm", "default.realm");
+        SharedGroup db = new SharedGroup(new File(configFactory.getRoot(),
+                Realm.DEFAULT_REALM_NAME).getAbsolutePath(), SharedGroup.Durability.FULL, null);
+
+        ImplicitTransaction tr = db.beginImplicitTransaction();
+        // To trigger migratePrimaryKeyTableIfNeeded.
+        tr.getTable("class_ChatList").getPrimaryKey();
+
+        Table table =  tr.getTable("pk");
+        for (int i = 0; i < table.size(); i++) {
+            UncheckedRow row = table.getUncheckedRow(i);
+            // io_realm_internal_Table_PRIMARY_KEY_CLASS_COLUMN_INDEX 0LL
+            assertTrue(tableNames.contains(row.getString(0)));
+        }
+        db.close();
+    }
+

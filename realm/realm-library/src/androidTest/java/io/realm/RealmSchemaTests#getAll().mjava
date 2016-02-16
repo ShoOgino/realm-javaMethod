@@ -1,0 +1,13 @@
+    @Test
+    public void getAll() {
+        Set<RealmObjectSchema> objectSchemas = realmSchema.getAll();
+        assertEquals(5, objectSchemas.size());
+
+        List<String> expectedTables = Arrays.asList(AllJavaTypes.CLASS_NAME, "Owner", "Cat", "Dog", "DogPrimaryKey");
+        for (RealmObjectSchema objectSchema : objectSchemas) {
+            if (!expectedTables.contains(objectSchema.getClassName())) {
+                fail(objectSchema.getClassName() + " was not found");
+            }
+        }
+    }
+

@@ -1,0 +1,15 @@
+    @Test
+    public void equalTo() {
+        populateTestRealm(realm, 200);
+
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class)
+                .equalTo(AllTypes.FIELD_FLOAT, 31.234567f).findAll();
+        assertEquals(1, resultList.size());
+        resultList = realm.where(AllTypes.class).greaterThan(AllTypes.FIELD_FLOAT, 11.0f)
+                .equalTo(AllTypes.FIELD_LONG, 10).findAll();
+        assertEquals(1, resultList.size());
+        resultList = realm.where(AllTypes.class).greaterThan(AllTypes.FIELD_FLOAT, 11.0f)
+                .equalTo(AllTypes.FIELD_LONG, 1).findAll();
+        assertEquals(0, resultList.size());
+    }
+

@@ -1,0 +1,15 @@
+    @Test
+    public void isValid_tableViewQuery() {
+        populateTestRealm();
+        final RealmQuery<AllTypes> query = realm.where(AllTypes.class).greaterThan(AllTypes.FIELD_FLOAT, 5f)
+                .findAll().where();
+        assertTrue(query.isValid());
+
+        populateTestRealm(realm, 1);
+        // still valid if table view changed
+        assertTrue(query.isValid());
+
+        realm.close();
+        assertFalse(query.isValid());
+    }
+

@@ -1,0 +1,29 @@
+    // Pre-null Realms will leave columns not-nullable after the underlying storage engine has
+    // migrated the file format. But @Required must be added, and forgetting so will give you
+    // a RealmMigrationNeeded exception.
+    @Test
+    public void openPreNullRealmRequiredMissing() throws IOException {
+        configFactory.copyRealmFromAssets(context,
+                "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
+        RealmMigration realmMigration = new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                // intentionally left empty
+            }
+        };
+
+        try {
+            RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+                    .schemaVersion(0)
+                    .schema(StringOnly.class)
+                    .migration(realmMigration)
+                    .build();
+            Realm realm = Realm.getInstance(realmConfig);
+            realm.close();
+            fail();
+        } catch (RealmMigrationNeededException e) {
+            assertEquals("Field 'chars' is required. Either set @Required to field 'chars' or migrate using io.realm.internal.Table.convertColumnToNullable().",
+                    e.getMessage());
+        }
+    }
+

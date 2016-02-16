@@ -1,7 +1,6 @@
     @Override
     public boolean sendMessageAtTime(Message msg, long uptimeMillis) {
-        boolean eventConsumed = onInterceptMessage(msg.what);
-        return !eventConsumed && handler.sendMessageAtTime(msg, uptimeMillis);
-
+        boolean eventConsumed = onInterceptOutMessage(msg.what);
+        return !eventConsumed && super.sendMessageAtTime(msg, uptimeMillis);
     }
 

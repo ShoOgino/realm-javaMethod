@@ -1,0 +1,68 @@
+    // If a field is not required but was not nullable before, a RealmMigrationNeededException should be thrown
+    @Test
+    public void settingRequiredForNullableThrows() {
+        String[] notNullableFields = {"fieldStringNull", "fieldBytesNull", "fieldBooleanNull",
+                "fieldByteNull", "fieldShortNull", "fieldIntegerNull", "fieldLongNull",
+                "fieldFloatNull", "fieldDoubleNull", "fieldDateNull"};
+        for (final String field : notNullableFields) {
+            final RealmMigration migration = new RealmMigration() {
+                @Override
+                public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                    if (oldVersion == -1) {  // -1 == UNVERSIONED i.e., not been initialized
+                        // No @Required for not nullable field
+                        TestHelper.initNullTypesTableExcludes(realm, field);
+                        Table table = realm.schema.getTable(NullTypes.class);
+                        if (field.equals("fieldStringNull")) {
+                            // 1 String
+                            table.addColumn(RealmFieldType.STRING, field, Table.NOT_NULLABLE);
+                        } else if (field.equals("fieldBytesNull")) {
+                            // 2 Bytes
+                            table.addColumn(RealmFieldType.BINARY, field, Table.NOT_NULLABLE);
+                        } else if (field.equals("fieldBooleanNull")) {
+                            // 3 Boolean
+                            table.addColumn(RealmFieldType.BOOLEAN, field, Table.NOT_NULLABLE);
+                        } else if (field.equals("fieldByteNull") || field.equals("fieldShortNull") ||
+                                field.equals("fieldIntegerNull") || field.equals("fieldLongNull")) {
+                            // 4 Byte 5 Short 6 Integer 7 Long
+                            table.addColumn(RealmFieldType.INTEGER, field, Table.NOT_NULLABLE);
+                        } else if (field.equals("fieldFloatNull")) {
+                            // 8 Float
+                            table.addColumn(RealmFieldType.FLOAT, field, Table.NOT_NULLABLE);
+                        } else if (field.equals("fieldDoubleNull")) {
+                            // 9 Double
+                            table.addColumn(RealmFieldType.DOUBLE, field, Table.NOT_NULLABLE);
+                        } else if (field.equals("fieldDateNull")) {
+                            // 10 Date
+                            table.addColumn(RealmFieldType.DATE, field, Table.NOT_NULLABLE);
+                        }
+                        // 11 Object skipped
+                    }
+                }
+            };
+
+            @SuppressWarnings("unchecked")
+            RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+                    .schemaVersion(1)
+                    .schema(NullTypes.class)
+                    .migration(migration)
+                    .build();
+            Realm.deleteRealm(realmConfig);
+            Realm.migrateRealm(realmConfig);
+
+            try {
+                realm = Realm.getInstance(realmConfig);
+                fail("Failed on " + field);
+            } catch (RealmMigrationNeededException e) {
+                if (field.equals("fieldStringNull") || field.equals("fieldBytesNull") || field.equals("fieldDateNull")) {
+                    assertEquals("Field '" + field + "' is required. Either set @Required to field '" +
+                            field + "' " +
+                            "or migrate using io.realm.internal.Table.convertColumnToNullable().", e.getMessage());
+                } else {
+                    assertEquals("Field '" + field + "' does not support null values in the existing Realm file."
+                                    + " Either set @Required, use the primitive type for field '"
+                                    + field + "' or migrate using io.realm.internal.Table.convertColumnToNullable().",  e.getMessage());
+                }
+            }
+        }
+    }
+

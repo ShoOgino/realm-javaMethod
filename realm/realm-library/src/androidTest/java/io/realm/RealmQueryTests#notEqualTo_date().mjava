@@ -1,0 +1,18 @@
+    @Test
+    public void notEqualTo_date() {
+        final int TEST_OBJECTS_COUNT = 200;
+        populateTestRealm(realm, TEST_OBJECTS_COUNT);
+
+        RealmResults<AllTypes> resultList;
+        resultList = realm.where(AllTypes.class).notEqualTo(AllTypes.FIELD_DATE, new Date(Long.MIN_VALUE)).findAll();
+        assertEquals(TEST_OBJECTS_COUNT, resultList.size());
+        resultList = realm.where(AllTypes.class).notEqualTo(AllTypes.FIELD_DATE, new Date(DECADE_MILLIS * -80)).findAll();
+        assertEquals(TEST_OBJECTS_COUNT - 1, resultList.size());
+        resultList = realm.where(AllTypes.class).notEqualTo(AllTypes.FIELD_DATE, new Date(0)).findAll();
+        assertEquals(TEST_OBJECTS_COUNT - 1, resultList.size());
+        resultList = realm.where(AllTypes.class).notEqualTo(AllTypes.FIELD_DATE, new Date(DECADE_MILLIS * 80)).findAll();
+        assertEquals(TEST_OBJECTS_COUNT - 1, resultList.size());
+        resultList = realm.where(AllTypes.class).notEqualTo(AllTypes.FIELD_DATE, new Date(Long.MAX_VALUE)).findAll();
+        assertEquals(TEST_OBJECTS_COUNT, resultList.size());
+    }
+

@@ -1,0 +1,25 @@
+    // Tests that if the same Realm file is opened on multiple threads, we only need to validate the
+    // schema on the first thread
+    // When there is a transaction holding by a typed Realm in one thread, getInstance from the
+    // other thread should not be blocked since we have cached the schemas already.
+    @Test
+    public void getInstance_shouldNotBeBlockedByTransactionInAnotherThread()
+            throws InterruptedException {
+        Realm realm = Realm.getInstance(defaultConfig);
+        final CountDownLatch latch = new CountDownLatch(1);
+        realm.beginTransaction();
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(defaultConfig);
+                realm.close();
+                latch.countDown();
+            }
+        });
+        thread.start();
+        TestHelper.awaitOrFail(latch);
+        realm.cancelTransaction();
+        realm.close();
+    }
+
