@@ -1,0 +1,12 @@
+    @Test
+    public void equals_configurationsReturnCachedRealm() {
+        Realm realm1 = Realm.getInstance(new RealmConfiguration.Builder(configFactory.getRoot()).build());
+        Realm realm2 = Realm.getInstance(new RealmConfiguration.Builder(configFactory.getRoot()).build());
+        try {
+            assertEquals(realm1, realm2);
+        } finally {
+            realm1.close();
+            realm2.close();
+        }
+    }
+

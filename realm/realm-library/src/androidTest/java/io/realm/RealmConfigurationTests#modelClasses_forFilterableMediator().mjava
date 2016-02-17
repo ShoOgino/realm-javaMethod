@@ -1,0 +1,21 @@
+    @Test
+    public void modelClasses_forFilterableMediator() throws Exception {
+        //noinspection unchecked
+        final RealmConfiguration config = new RealmConfiguration.Builder(configFactory.getRoot())
+                .schema(AllTypes.class, CatOwner.class).build();
+        assertTrue(config.getSchemaMediator() instanceof FilterableMediator);
+
+        final Set<Class<? extends RealmObject>> realmClasses = config.getRealmObjectClasses();
+
+        assertTrue(realmClasses.contains(AllTypes.class));
+        assertTrue(realmClasses.contains(CatOwner.class));
+        assertFalse(realmClasses.contains(Cat.class));
+
+        // tests returned Set is unmodifiable.
+        try {
+            realmClasses.add(AllTypes.class);
+            fail();
+        } catch (UnsupportedOperationException ignored) {
+        }
+    }
+
