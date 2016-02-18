@@ -2,8 +2,8 @@
     @RunTestInLooperThread
     public void findAllSortedAsync_usingMultipleFields() {
         final DynamicRealm dynamicRealm = initializeDynamicRealm();
-        final CountDownLatch callbacksDone = new CountDownLatch(2);
 
+        dynamicRealm.setAutoRefresh(false);
         dynamicRealm.beginTransaction();
         dynamicRealm.clear(AllTypes.CLASS_NAME);
         for (int i = 0; i < 5; ) {
@@ -16,6 +16,7 @@
             allTypes.set(AllTypes.FIELD_STRING, "data " + (++i % 3));
         }
         dynamicRealm.commitTransaction();
+        dynamicRealm.setAutoRefresh(true);
 
         // Sort first set by using: String[ASC], Long[DESC]
         final RealmResults<DynamicRealmObject> realmResults1 = dynamicRealm.where(AllTypes.CLASS_NAME)
@@ -32,11 +33,11 @@
                         new Sort[]{Sort.DESCENDING, Sort.ASCENDING}
                 );
 
-        final Runnable callbackDoneTask = new Runnable() {
+        final Runnable signalCallbackDone = new Runnable() {
+            final AtomicInteger callbacksDone = new AtomicInteger(2);
             @Override
             public void run() {
-                callbacksDone.countDown();
-                if (callbacksDone.getCount() == 0) {
+                if (callbacksDone.decrementAndGet() == 0) {
                     dynamicRealm.close();
                     looperThread.testComplete();
                 }
@@ -69,7 +70,7 @@
                 assertEquals("data 2", realmResults1.get(9).get(AllTypes.FIELD_STRING));
                 assertEquals(1L, realmResults1.get(9).get(AllTypes.FIELD_LONG));
 
-                callbackDoneTask.run();
+                signalCallbackDone.run();
             }
         });
 
@@ -99,7 +100,7 @@
                 assertEquals("data 0", realmResults2.get(9).get(AllTypes.FIELD_STRING));
                 assertEquals(3L, realmResults2.get(9).get(AllTypes.FIELD_LONG));
 
-                callbackDoneTask.run();
+                signalCallbackDone.run();
             }
         });
     }

@@ -1,6 +1,7 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void addRemoveListenerConcurrency() {
+        final Realm realm = looperThread.realm;
         final AtomicInteger counter1 = new AtomicInteger(0);
         final AtomicInteger counter2 = new AtomicInteger(0);
         final AtomicInteger counter3 = new AtomicInteger(0);
@@ -12,7 +13,16 @@
         final RealmChangeListener listener1 = new RealmChangeListener() {
             @Override
             public void onChange() {
+                // Step 7: Last listener called. Should only be called once
                 counter1.incrementAndGet();
+
+                // after listener2.onChange
+                // Since duplicated entries will be ignored, we still have:
+                // [listener2, listener1]
+                assertEquals(1, counter1.get());
+                assertEquals(2, counter2.get());
+                assertEquals(1, counter3.get());
+                looperThread.testComplete();
             }
         };
 
@@ -20,6 +30,9 @@
         final RealmChangeListener listener2 = new RealmChangeListener() {
             @Override
             public void onChange() {
+                // Step 3: Listener2 called
+                // Listener state [listener2, listener3, listener1]
+                // Listener 1 will not be called this time around
                 counter2.incrementAndGet();
                 realm.addChangeListener(listener1);
             }
@@ -29,37 +42,32 @@
         RealmChangeListener listener3 = new RealmChangeListener() {
             @Override
             public void onChange() {
+                // Step 4: Listener3 called
+                // Listener state [listener2, listener1]
                 counter3.incrementAndGet();
                 realm.removeChangeListener(this);
+
+                // Step 5: Assert proper state
+                // [listener2, listener1]
+                assertEquals(0, counter1.get());
+                assertEquals(1, counter2.get());
+                assertEquals(1, counter3.get());
+
+                // Step 6: Trigger next round of changes on [listener2, listener1]
+                realm.beginTransaction();
+                realm.createObject(AllTypes.class);
+                realm.commitTransaction();
             }
         };
 
-        realm = Realm.getInstance(realmConfig);
+        // Step 1: Add initial listeners
+        // Listener state [listener2, listener3]
         realm.addChangeListener(listener2);
         realm.addChangeListener(listener3);
 
+        // Step 2: Trigger change listeners
         realm.beginTransaction();
         realm.createObject(AllTypes.class);
-        // [listener2, listener3]
         realm.commitTransaction();
-        // after listener2.onChange
-        // [listener2, listener3, listener1]
-        // after listener3.onChange
-        // [listener2, listener1]
-        assertEquals(0, counter1.get());
-        assertEquals(1, counter2.get());
-        assertEquals(1, counter3.get());
-
-        realm.beginTransaction();
-        realm.createObject(AllTypes.class);
-        // [listener2, listener1]
-        realm.commitTransaction();
-        // after listener2.onChange
-        // Since duplicated entries will be ignored, we still have:
-        // [listener2, listener1]
-
-        assertEquals(1, counter1.get());
-        assertEquals(2, counter2.get());
-        assertEquals(1, counter3.get());
     }
 

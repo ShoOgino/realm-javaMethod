@@ -1,4 +1,8 @@
     private void populateTestRealm(DynamicRealm realm, int objects) {
+        boolean autoRefreshEnabled = realm.isAutoRefresh();
+        if (autoRefreshEnabled) {
+            realm.setAutoRefresh(false);
+        }
         realm.beginTransaction();
         realm.allObjects(AllTypes.CLASS_NAME).clear();
         for (int i = 0; i < objects; ++i) {
@@ -14,5 +18,8 @@
             allTypes.getList(AllTypes.FIELD_REALMLIST).add(realm.createObject(Dog.CLASS_NAME));
         }
         realm.commitTransaction();
+        if (autoRefreshEnabled) {
+            realm.setAutoRefresh(true);
+        }
     }
 

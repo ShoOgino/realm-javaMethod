@@ -7,15 +7,13 @@
         RealmChangeListener listener = new RealmChangeListener() {
             @Override
             public void onChange() {
-                if (globalCommitInvocations.incrementAndGet() == 3) {
-                    realm.handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            assertEquals(NUMBER_OF_LISTENERS, typebasedCommitInvocations.get());
-                            looperThread.testComplete();
-                        }
-                    });
-                }
+                realm.handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        assertEquals(NUMBER_OF_LISTENERS, typebasedCommitInvocations.get());
+                        looperThread.testComplete();
+                    }
+                });
             }
         };
 
@@ -38,9 +36,6 @@
 
         realm.beginTransaction();
         akamaru.setAge(17);
-        realm.commitTransaction();
-
-        realm.beginTransaction();
         realm.commitTransaction();
     }
 

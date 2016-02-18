@@ -49,13 +49,11 @@
                 query.notifyChangeListeners();
             }
 
-            // notify listeners only when we advanced
-            if (compare != 0) {
-                notifyGlobalListeners();
-                // notify RealmResults & RealmObject callbacks (type based notifications)
-                notifySyncRealmResultsCallbacks();
-                notifyRealmObjectCallbacks();
-            }
+            // We need to notify the rest of listeners, since the original REALM_CHANGE
+            // was delayed/swallowed in order to be able to update async queries
+            notifyGlobalListeners();
+            notifySyncRealmResultsCallbacks();
+            notifyRealmObjectCallbacks();
 
             updateAsyncQueriesTask = null;
         }

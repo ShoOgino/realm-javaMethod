@@ -1,8 +1,7 @@
     @Test
     @RunTestInLooperThread
     public void distinctAsync() {
-        final CountDownLatch signalTestFinished = new CountDownLatch(4);
-        final DynamicRealm dynamicRealm = initializeDynamicRealm();
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.realmConfiguration);
         final long numberOfBlocks = 25;
         final long numberOfObjects = 10; // must be greater than 1
         populateForDistinct(dynamicRealm, numberOfBlocks, numberOfObjects, false);
@@ -13,6 +12,7 @@
         final RealmResults<DynamicRealmObject> distinctString = dynamicRealm.distinctAsync(AnnotationIndexTypes.CLASS_NAME, AnnotationIndexTypes.FIELD_INDEX_STRING);
 
         final Runnable callbackDoneTask = new Runnable() {
+            final CountDownLatch signalTestFinished = new CountDownLatch(4);
             @Override
             public void run() {
                 signalTestFinished.countDown();
