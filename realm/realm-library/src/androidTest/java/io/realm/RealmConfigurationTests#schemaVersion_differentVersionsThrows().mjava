@@ -1,0 +1,15 @@
+    @Test
+    public void schemaVersion_differentVersionsThrows() {
+        RealmConfiguration config1 = new RealmConfiguration.Builder(configFactory.getRoot()).schemaVersion(1).build();
+        RealmConfiguration config2 = new RealmConfiguration.Builder(configFactory.getRoot()).schemaVersion(2).build();
+
+        Realm realm1 = Realm.getInstance(config1);
+        try {
+            Realm.getInstance(config2);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm1.close();
+        }
+    }
+

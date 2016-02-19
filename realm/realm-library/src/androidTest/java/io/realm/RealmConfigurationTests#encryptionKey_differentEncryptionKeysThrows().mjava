@@ -1,0 +1,17 @@
+    @Test
+    public void encryptionKey_differentEncryptionKeysThrows() {
+        RealmConfiguration config1 = new RealmConfiguration.Builder(configFactory.getRoot())
+                .encryptionKey(TestHelper.getRandomKey()).build();
+        RealmConfiguration config2 = new RealmConfiguration.Builder(configFactory.getRoot())
+                .encryptionKey(TestHelper.getRandomKey()).build();
+
+        Realm realm1 = Realm.getInstance(config1);
+        try {
+            realm = Realm.getInstance(config2);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm1.close();
+        }
+    }
+
