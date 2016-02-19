@@ -1,0 +1,19 @@
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        context = this;
+
+        initializeTimber();
+        RxJavaPlugins.getInstance().registerErrorHandler(new RxJavaErrorHandler() {
+            @Override
+            public void handleError(Throwable e) {
+                super.handleError(e);
+                Timber.e(e.toString());
+            }
+        });
+
+        // Configure default configuration for Realm
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this).build();
+        Realm.setDefaultConfiguration(realmConfig);
+    }
+

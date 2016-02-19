@@ -1,0 +1,26 @@
+    /**
+     * Updates a story.
+     *
+     * @param storyId story to update
+     * @param read {@code true} if the story has been read, {@code false} otherwise.
+     */
+    @UiThread
+    public void updateStoryReadState(final String storyId, final boolean read) {
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                NYTimesStory persistedStory = realm.where(NYTimesStory.class).equalTo(NYTimesStory.URL, storyId).findFirst();
+                if (persistedStory != null) {
+                    persistedStory.setRead(read);
+                } else {
+                    Timber.e("Trying to update a story that no longer exists: " + storyId);
+                }
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable throwable) {
+                Timber.e(throwable, "Failed to save data.");
+            }
+        });
+    }
+
