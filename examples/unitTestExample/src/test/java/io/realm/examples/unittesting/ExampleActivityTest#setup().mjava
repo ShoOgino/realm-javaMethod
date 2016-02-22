@@ -7,8 +7,9 @@
         // Create the mock
         final Realm mockRealm = mock(Realm.class);
 
-        // Anytime getInstance is called with any context, then return the mockRealm
-        when(Realm.getInstance(any(Context.class))).thenReturn(mockRealm);
+        // Anytime getInstance is called with any configuration, then return the mockRealm
+        // FIXME: Final class Realm cannot be mocked by Mockito! https://github.com/realm/realm-java/issues/2303
+        when(Realm.getInstance(any(RealmConfiguration.class))).thenReturn(mockRealm);
 
         // Anytime we ask Realm to create a Person, return a new instance.
         when(mockRealm.createObject(Person.class)).thenReturn(new Person());
