@@ -1,0 +1,16 @@
+    @Test
+    public void iOSDataTypesNullValues() throws IOException {
+        for (String iosVersion : IOS_VERSIONS) {
+            configFactory.copyRealmFromAssets(context,
+                    "ios/" + iosVersion + "-alltypes-null-value.realm", REALM_NAME);
+            realm = Realm.getDefaultInstance();
+
+            IOSAllTypes obj = realm.allObjects(IOSAllTypes.class).first();
+            assertEquals(null, obj.getByteCol());
+            assertEquals(null, obj.getStringCol());
+            assertEquals(null, obj.getDateCol());
+            assertEquals(null, obj.getChild());
+            assertEquals(new RealmList<IOSChild>(), obj.getChildren());
+        }
+    }
+
