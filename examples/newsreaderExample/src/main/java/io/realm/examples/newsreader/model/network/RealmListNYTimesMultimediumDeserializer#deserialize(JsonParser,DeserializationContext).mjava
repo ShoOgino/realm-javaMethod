@@ -1,0 +1,18 @@
+    @Override
+    public List<NYTimesMultimedium> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+        RealmList<NYTimesMultimedium> list = new RealmList<>();
+
+        TreeNode treeNode = jp.getCodec().readTree(jp);
+        if (!(treeNode instanceof ArrayNode)) {
+            return list;
+        }
+
+        ArrayNode arrayNode = (ArrayNode) treeNode;
+        for (JsonNode node : arrayNode) {
+            NYTimesMultimedium nyTimesMultimedium =
+                    objectMapper.treeToValue(node, NYTimesMultimedium.class);
+            list.add(nyTimesMultimedium);
+        }
+        return list;
+    }
+

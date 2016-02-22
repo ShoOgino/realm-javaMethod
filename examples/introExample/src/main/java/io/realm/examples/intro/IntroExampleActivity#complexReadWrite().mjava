@@ -3,7 +3,7 @@
 
         // Open the default realm. All threads must use it's own reference to the realm.
         // Those can not be transferred across threads.
-        Realm realm = Realm.getInstance(this);
+        Realm realm = Realm.getInstance(realmConfig);
 
         // Add ten persons in one transaction
         realm.beginTransaction();
@@ -42,18 +42,13 @@
                 dogName = pers.getDog().getName();
             }
             status += "\n" + pers.getName() + ":" + pers.getAge() + " : " + dogName + " : " + pers.getCats().size();
-
-            // The field tempReference is annotated with @Ignore
-            // Though we initially set its value to 42, it has
-            // not been saved as part of the Person RealmObject:
-            assert(pers.getTempReference() == 0);
         }
 
         // Sorting
         RealmResults<Person> sortedPersons = realm.allObjects(Person.class);
         sortedPersons.sort("age", Sort.DESCENDING);
-        assert(realm.allObjects(Person.class).last().getName() == sortedPersons.first().getName());
-        status += "\nSorting " + sortedPersons.last().getName() + " == " + realm.allObjects(Person.class).first().getName();
+        status += "\nSorting " + sortedPersons.last().getName() + " == "
+                + realm.allObjects(Person.class).first().getName();
 
         realm.close();
         return status;

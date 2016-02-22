@@ -1,0 +1,13 @@
+    @Test
+    public void getInstance_idForHashCollision() {
+        // Ea.hashCode() == FB.hashCode()
+        RealmConfiguration configA = configFactory.createConfiguration("Ea");
+        RealmConfiguration configB = configFactory.createConfiguration("FB");
+
+        Realm r1 = Realm.getInstance(configA);
+        Realm r2 = Realm.getInstance(configB);
+        assertNotSame(r1, r2);
+        r1.close();
+        r2.close();
+    }
+
