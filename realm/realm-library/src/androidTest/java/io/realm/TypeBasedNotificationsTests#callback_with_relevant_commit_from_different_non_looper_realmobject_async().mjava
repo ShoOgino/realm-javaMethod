@@ -2,10 +2,7 @@
     @Test
     @RunTestInLooperThread
     public void callback_with_relevant_commit_from_different_non_looper_realmobject_async() throws Throwable {
-        final CountDownLatch asyncQueryComplete = new CountDownLatch(1);
-        final CountDownLatch nonRelevantCommitComplete = new CountDownLatch(1);
-        final CountDownLatch dogCreatedCompelte = new CountDownLatch(1);
-
+        final CountDownLatch nonLooperThread3CloseLatch = new CountDownLatch(1);
         final Realm realm = looperThread.realm;
         realm.addChangeListener(new RealmChangeListener() {
             @Override
@@ -58,6 +55,7 @@
                                         realmNonLooperThread3.where(Dog.class).findFirst().setAge(17);
                                         realmNonLooperThread3.commitTransaction();
                                         realmNonLooperThread3.close();
+                                        nonLooperThread3CloseLatch.countDown();
                                     }
                                 }.start();
                             }
@@ -75,6 +73,7 @@
                             public void run() {
                                 assertEquals(3, globalCommitInvocations.get());
                                 assertEquals(4, typebasedCommitInvocations.get());
+                                TestHelper.awaitOrFail(nonLooperThread3CloseLatch);
                                 looperThread.testComplete();
                             }
                         });
