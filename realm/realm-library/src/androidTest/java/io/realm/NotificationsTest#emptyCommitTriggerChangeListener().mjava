@@ -1,17 +1,15 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void emptyCommitTriggerChangeListener() {
-        final AtomicBoolean success = new AtomicBoolean(false);
         final RealmChangeListener listener = new RealmChangeListener() {
             @Override
             public void onChange() {
-                success.set(true);
+                looperThread.testComplete();
             }
         };
-        realm = Realm.getInstance(realmConfig);
+        Realm realm = looperThread.realm;
         realm.addChangeListener(listener);
         realm.beginTransaction();
         realm.commitTransaction();
-        assertTrue(success.get());
     }
 

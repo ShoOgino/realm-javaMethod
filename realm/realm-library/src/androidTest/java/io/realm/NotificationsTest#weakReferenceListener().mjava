@@ -1,27 +1,47 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void weakReferenceListener() throws InterruptedException {
-        final AtomicInteger counter = new AtomicInteger(0);
-        realm = Realm.getInstance(realmConfig);
-        RealmChangeListener listener = new RealmChangeListener() {
+        final AtomicInteger weakCounter = new AtomicInteger(0);
+        final AtomicInteger strongCounter = new AtomicInteger(0);
+
+        final Realm realm = looperThread.realm;
+
+        // Setup weak listener
+        RealmChangeListener weakListener = new RealmChangeListener() {
             @Override
             public void onChange() {
-                counter.incrementAndGet();
+                weakCounter.incrementAndGet();
             }
         };
-        realm.handlerController.addChangeListenerAsWeakReference(listener);
+        realm.handlerController.addChangeListenerAsWeakReference(weakListener);
+        assertEquals(1, realm.handlerController.weakChangeListeners.size());
 
-        // There is no guaranteed way to release the WeakReference,
-        // just clear it.
+        // This is not a weak listener so will be called. When this is triggered the weak references have not been
+        // removed yet. So make another change to ensure that they really are removed before validating.
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                int count = strongCounter.incrementAndGet();
+                if (count == 1) {
+                    realm.beginTransaction();
+                    realm.createObject(AllTypes.class);
+                    realm.commitTransaction();
+                } else if (count == 2) {
+                    assertEquals(0, weakCounter.get());
+                    assertEquals(0, realm.handlerController.weakChangeListeners.size());
+                    looperThread.testComplete();
+                }
+            }
+        });
+
+        // Hack: There is no guaranteed way to release the WeakReference, just clear it.
         for (WeakReference<RealmChangeListener> weakRef : realm.handlerController.weakChangeListeners) {
             weakRef.clear();
         }
 
+        // Trigger change listeners
         realm.beginTransaction();
         realm.createObject(AllTypes.class);
         realm.commitTransaction();
-
-        assertEquals(0, counter.get());
-        assertEquals(0, realm.handlerController.weakChangeListeners.size());
     }
 

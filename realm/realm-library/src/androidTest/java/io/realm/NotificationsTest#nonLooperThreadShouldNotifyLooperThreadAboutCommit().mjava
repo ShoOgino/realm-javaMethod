@@ -1,6 +1,7 @@
     @Test
-    public void nonLooperThreadShouldNotifyLooperThreadAboutCommit() throws Throwable {
+    public void nonLooperThreadShouldNotifyLooperThreadAboutCommit() {
         final CountDownLatch mainThreadReady = new CountDownLatch(1);
+        final CountDownLatch backgroundThreadClosed = new CountDownLatch(1);
         final CountDownLatch numberOfInvocation = new CountDownLatch(1);
         Thread thread = new Thread() {
             @Override
@@ -11,6 +12,7 @@
                 realm.createObject(AllTypes.class);
                 realm.commitTransaction();
                 realm.close();
+                backgroundThreadClosed.countDown();
             }
         };
         thread.start();
@@ -34,6 +36,7 @@
         });
 
         TestHelper.awaitOrFail(numberOfInvocation);
+        TestHelper.awaitOrFail(backgroundThreadClosed);
         mainThread.quit();
     }
 

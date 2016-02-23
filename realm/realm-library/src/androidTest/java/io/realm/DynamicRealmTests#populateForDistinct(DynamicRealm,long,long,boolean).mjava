@@ -1,4 +1,8 @@
     private void populateForDistinct(DynamicRealm realm, long numberOfBlocks, long numberOfObjects, boolean withNull) {
+        boolean autoRefreshEnabled = realm.isAutoRefresh();
+        if (autoRefreshEnabled) {
+            realm.setAutoRefresh(false);
+        }
         realm.beginTransaction();
         for (int i = 0; i < numberOfObjects * numberOfBlocks; i++) {
             for (int j = 0; j < numberOfBlocks; j++) {
@@ -14,5 +18,8 @@
             }
         }
         realm.commitTransaction();
+        if (autoRefreshEnabled) {
+            realm.setAutoRefresh(true);
+        }
     }
 

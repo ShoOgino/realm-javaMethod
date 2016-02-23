@@ -20,7 +20,6 @@
         final Handler handler = new HandlerProxy(realm.handlerController) {
             @Override
             public boolean onInterceptInMessage(int what) {
-                Log.d("HandlerBug", "onInterceptInMessage: " + what);
                 int intercepts = numberOfIntercept.incrementAndGet();
                 switch (what) {
                     case HandlerController.COMPLETED_ASYNC_REALM_OBJECT: {
@@ -57,7 +56,7 @@
         realmResults.addChangeListener(new RealmChangeListener() {
             @Override
             public void onChange() {
-                assertEquals(2, numberOfIntercept.get());
+                assertEquals(3, numberOfIntercept.get());
                 assertTrue(realmResults.isLoaded());
                 assertEquals(5, realmResults.getColumnLong());
                 assertEquals("The Endless River", realmResults.getColumnString());
