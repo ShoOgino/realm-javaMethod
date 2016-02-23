@@ -17,7 +17,8 @@
             }
         }
 
-        for (RealmObject realmObject : objectsToBeNotified) {
+        for (Iterator<RealmObject> it = objectsToBeNotified.iterator(); it.hasNext() && !realm.isClosed(); ) {
+            RealmObject realmObject = it.next();
             realmObject.notifyChangeListeners();
         }
     }

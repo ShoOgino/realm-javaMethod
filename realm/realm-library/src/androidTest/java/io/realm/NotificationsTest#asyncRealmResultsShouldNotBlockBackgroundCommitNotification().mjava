@@ -72,13 +72,14 @@
                     threadAssertionError[0] = e;
 
                 } finally {
-                    if (signalTestFinished.getCount() > 0) {
-                        signalTestFinished.countDown();
-                    }
                     if (realm.length > 0 && realm[0] != null) {
                         realm[0].close();
                     }
                     signalClosedRealm.countDown();
+
+                    if (signalTestFinished.getCount() > 0) {
+                        signalTestFinished.countDown();
+                    }
                 }
             }
         });

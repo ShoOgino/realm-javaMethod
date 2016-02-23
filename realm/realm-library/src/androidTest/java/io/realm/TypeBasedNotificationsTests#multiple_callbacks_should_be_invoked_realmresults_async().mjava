@@ -4,22 +4,18 @@
     public void multiple_callbacks_should_be_invoked_realmresults_async() {
         final int NUMBER_OF_LISTENERS = 7;
         final Realm realm = looperThread.realm;
-        RealmChangeListener listener = new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener() {
             @Override
             public void onChange() {
-                if (globalCommitInvocations.incrementAndGet() == 3) {
-                    realm.handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            assertEquals(NUMBER_OF_LISTENERS, typebasedCommitInvocations.get());
-                            looperThread.testComplete();
-                        }
-                    });
-                }
+                realm.handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        assertEquals(NUMBER_OF_LISTENERS, typebasedCommitInvocations.get());
+                        looperThread.testComplete();
+                    }
+                });
             }
-        };
-
-        realm.addChangeListener(listener);
+        });
 
         realm.beginTransaction();
         Dog akamaru = realm.createObject(Dog.class);
@@ -27,6 +23,7 @@
 
         RealmResults<Dog> dogs = realm.where(Dog.class).findAllAsync();
         assertTrue(dogs.load());
+
         for (int i = 0; i < NUMBER_OF_LISTENERS; i++) {
             dogs.addChangeListener(new RealmChangeListener() {
                 @Override
@@ -38,9 +35,6 @@
 
         realm.beginTransaction();
         akamaru.setAge(17);
-        realm.commitTransaction();
-
-        realm.beginTransaction();
         realm.commitTransaction();
     }
 
