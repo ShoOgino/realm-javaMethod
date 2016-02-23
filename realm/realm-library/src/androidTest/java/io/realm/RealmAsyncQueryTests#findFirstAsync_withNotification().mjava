@@ -3,10 +3,9 @@
     @Test
     @RunTestInLooperThread
     public void findFirstAsync_withNotification() throws Throwable {
-        Realm.asyncQueryExecutor.pause();
-
-        populateTestRealm(looperThread.realm, 10);
-        final AllTypes realmResults = looperThread.realm.where(AllTypes.class)
+        Realm realm = looperThread.realm;
+        populateTestRealm(realm, 10);
+        final AllTypes realmResults = realm.where(AllTypes.class)
                 .between("columnLong", 4, 9)
                 .findFirstAsync();
 
@@ -27,8 +26,5 @@
             fail("Accessing an unloaded object should throw");
         } catch (IllegalStateException ignored) {
         }
-
-        Realm.asyncQueryExecutor.resume();
-        looperThread.keepStrongReference.add(realmResults);
     }
 

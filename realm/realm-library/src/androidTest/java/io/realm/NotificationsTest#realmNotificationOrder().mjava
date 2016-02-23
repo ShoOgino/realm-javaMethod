@@ -1,0 +1,44 @@
+    @Test
+    @RunTestInLooperThread
+    public void realmNotificationOrder() {
+        // Tests that global notifications are called in the order they are added
+        // Test both ways to check accidental ordering from unordered collections.
+        final AtomicInteger listenerACalled = new AtomicInteger(0);
+        final AtomicInteger listenerBCalled = new AtomicInteger(0);
+        final Realm realm = looperThread.realm;
+
+        final RealmChangeListener listenerA = new RealmChangeListener() {
+
+            @Override
+            public void onChange() {
+                int called = listenerACalled.incrementAndGet();
+                if (called == 2) {
+                    assertEquals(2, listenerBCalled.get());
+                    looperThread.testComplete();
+                }
+            }
+        };
+        final RealmChangeListener listenerB = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                listenerBCalled.incrementAndGet();
+                if (listenerACalled.get() == 1) {
+                    // 2. Reverse order
+                    realm.removeAllChangeListeners();
+                    realm.addChangeListener(this);
+                    realm.addChangeListener(listenerA);
+                    realm.beginTransaction();
+                    realm.commitTransaction();
+
+                }
+            }
+        };
+
+        // 1. Add initial ordering
+        realm.addChangeListener(listenerA);
+        realm.addChangeListener(listenerB);
+
+        realm.beginTransaction();
+        realm.commitTransaction();
+    }
+

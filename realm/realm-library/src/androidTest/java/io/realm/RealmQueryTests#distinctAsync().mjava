@@ -1,0 +1,72 @@
+    @Test
+    @RunTestInLooperThread
+    public void distinctAsync() throws Throwable {
+        final AtomicInteger changeListenerCalled = new AtomicInteger(4);
+        final Realm realm = looperThread.realm;
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+
+        final RealmResults<AnnotationIndexTypes> distinctBool = realm.where(AnnotationIndexTypes.class).distinctAsync(AnnotationIndexTypes.FIELD_INDEX_BOOL);
+        final RealmResults<AnnotationIndexTypes> distinctLong = realm.where(AnnotationIndexTypes.class).distinctAsync(AnnotationIndexTypes.FIELD_INDEX_LONG);
+        final RealmResults<AnnotationIndexTypes> distinctDate = realm.where(AnnotationIndexTypes.class).distinctAsync(AnnotationIndexTypes.FIELD_INDEX_DATE);
+        final RealmResults<AnnotationIndexTypes> distinctString = realm.where(AnnotationIndexTypes.class).distinctAsync(AnnotationIndexTypes.FIELD_INDEX_STRING);
+
+        assertFalse(distinctBool.isLoaded());
+        assertTrue(distinctBool.isValid());
+        assertTrue(distinctBool.isEmpty());
+
+        assertFalse(distinctLong.isLoaded());
+        assertTrue(distinctLong.isValid());
+        assertTrue(distinctLong.isEmpty());
+
+        assertFalse(distinctDate.isLoaded());
+        assertTrue(distinctDate.isValid());
+        assertTrue(distinctDate.isEmpty());
+
+        assertFalse(distinctString.isLoaded());
+        assertTrue(distinctString.isValid());
+        assertTrue(distinctString.isEmpty());
+
+        final Runnable endTest = new Runnable() {
+            @Override
+            public void run() {
+                if (changeListenerCalled.decrementAndGet() == 0) {
+                    looperThread.testComplete();
+                }
+            }
+        };
+
+        distinctBool.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals(2, distinctBool.size());
+                endTest.run();
+            }
+        });
+
+        distinctLong.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals(numberOfBlocks, distinctLong.size());
+                endTest.run();
+            }
+        });
+
+        distinctDate.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals(numberOfBlocks, distinctDate.size());
+                endTest.run();
+            }
+        });
+
+        distinctString.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals(numberOfBlocks, distinctString.size());
+                endTest.run();
+            }
+        });
+    }
+

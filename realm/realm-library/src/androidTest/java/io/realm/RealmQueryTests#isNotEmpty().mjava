@@ -1,0 +1,20 @@
+    @Test
+    public void isNotEmpty() {
+        createIsNotEmptyDataSet(realm);
+        for (RealmFieldType type : SUPPORTED_IS_NOT_EMPTY_TYPES) {
+            switch (type) {
+                case STRING:
+                    assertEquals(1, realm.where(AllJavaTypes.class).isNotEmpty(AllJavaTypes.FIELD_STRING).count());
+                    break;
+                case BINARY:
+                    assertEquals(1, realm.where(AllJavaTypes.class).isNotEmpty(AllJavaTypes.FIELD_BINARY).count());
+                    break;
+                case LIST:
+                    assertEquals(1, realm.where(AllJavaTypes.class).isNotEmpty(AllJavaTypes.FIELD_LIST).count());
+                    break;
+                default:
+                    fail("Unknown type: " + type);
+            }
+        }
+    }
+

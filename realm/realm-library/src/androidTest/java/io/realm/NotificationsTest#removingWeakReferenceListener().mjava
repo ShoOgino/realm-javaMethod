@@ -2,10 +2,10 @@
     // This test is not a proper GC test, but just ensures that listeners can be removed from the list of weak listeners
     // without throwing an exception.
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void removingWeakReferenceListener() throws InterruptedException {
         final AtomicInteger counter = new AtomicInteger(0);
-        realm = Realm.getInstance(realmConfig);
+        final Realm realm = looperThread.realm;
         RealmChangeListener listenerA = new RealmChangeListener() {
             @Override
             public void onChange() {
@@ -15,7 +15,9 @@
         RealmChangeListener listenerB = new RealmChangeListener() {
             @Override
             public void onChange() {
-                counter.incrementAndGet();
+                assertEquals(0, counter.get());
+                assertEquals(1, realm.handlerController.weakChangeListeners.size());
+                looperThread.testComplete();
             }
         };
         realm.handlerController.addChangeListenerAsWeakReference(listenerA);
@@ -31,8 +33,5 @@
         realm.beginTransaction();
         realm.createObject(AllTypes.class);
         realm.commitTransaction();
-
-        assertEquals(1, counter.get());
-        assertEquals(1, realm.handlerController.weakChangeListeners.size());
     }
 

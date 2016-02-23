@@ -1,0 +1,22 @@
+    @Test
+    public void isValid_linkViewQuery() {
+        populateTestRealm(realm, 1);
+        final RealmList<Dog> list = realm.where(AllTypes.class).findFirst().getColumnRealmList();
+        final RealmQuery<Dog> query = list.where();
+        final long listLength = query.count();
+        assertTrue(query.isValid());
+
+        realm.beginTransaction();
+        final Dog dog = realm.createObject(Dog.class);
+        dog.setName("Dog");
+        list.add(dog);
+        realm.commitTransaction();
+
+        // still valid if base view changed
+        assertEquals(listLength + 1, query.count());
+        assertTrue(query.isValid());
+
+        realm.close();
+        assertFalse(query.isValid());
+    }
+

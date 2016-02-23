@@ -1,0 +1,18 @@
+    // Calling isNotNull on fields with the RealmList type will trigger an exception
+    @Test
+    public void isNotNull_listFieldThrows() {
+        try {
+            realm.where(Owner.class).isNotNull("dogs");
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertEquals("Illegal Argument: RealmList is not nullable.", expected.getMessage());
+        }
+
+        try {
+            realm.where(Cat.class).isNotNull("owner.dogs");
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertEquals("Illegal Argument: RealmList is not nullable.", expected.getMessage());
+        }
+    }
+

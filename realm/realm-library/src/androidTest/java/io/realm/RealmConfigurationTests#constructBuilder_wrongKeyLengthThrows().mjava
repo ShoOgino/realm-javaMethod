@@ -1,0 +1,16 @@
+    @Test
+    public void constructBuilder_wrongKeyLengthThrows() {
+        byte[][] wrongKeys = new byte[][] {
+                new byte[0],
+                new byte[RealmConfiguration.KEY_LENGTH - 1],
+                new byte[RealmConfiguration.KEY_LENGTH + 1]
+        };
+        for (byte[] key : wrongKeys) {
+            try {
+                new RealmConfiguration.Builder(configFactory.getRoot()).encryptionKey(key).build();
+                fail("Key with length " + key.length + " should throw an exception");
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

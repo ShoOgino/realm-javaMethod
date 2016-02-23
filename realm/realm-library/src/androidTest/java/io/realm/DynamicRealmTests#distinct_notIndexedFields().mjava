@@ -5,11 +5,11 @@
 
         populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
 
-        for (String fieldName : new String[]{"Boolean", "Long", "Date", "String"}) {
+        for (String field : AnnotationIndexTypes.NOT_INDEX_FIELDS) {
             try {
-                realm.distinct(AnnotationIndexTypes.CLASS_NAME, "notIndex" + fieldName);
-                fail("notIndex" + fieldName);
-            } catch (UnsupportedOperationException ignored) {
+                realm.distinct(AnnotationIndexTypes.CLASS_NAME, field);
+                fail(field);
+            } catch (IllegalArgumentException ignored) {
             }
         }
     }

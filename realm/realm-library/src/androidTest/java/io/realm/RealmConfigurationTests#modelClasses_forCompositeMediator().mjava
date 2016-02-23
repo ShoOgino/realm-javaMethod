@@ -1,0 +1,20 @@
+    @Test
+    public void modelClasses_forCompositeMediator() throws Exception {
+        final RealmConfiguration config = new RealmConfiguration.Builder(configFactory.getRoot())
+                .setModules(new HumanModule(), new AnimalModule()).build();
+        assertTrue(config.getSchemaMediator() instanceof CompositeMediator);
+
+        final Set<Class<? extends RealmObject>> realmClasses = config.getRealmObjectClasses();
+
+        assertFalse(realmClasses.contains(AllTypes.class));
+        assertTrue(realmClasses.contains(CatOwner.class));
+        assertTrue(realmClasses.contains(Cat.class));
+
+        // tests returned Set is unmodifiable.
+        try {
+            realmClasses.add(AllTypes.class);
+            fail();
+        } catch (UnsupportedOperationException ignored) {
+        }
+    }
+

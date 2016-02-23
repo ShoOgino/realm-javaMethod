@@ -1,0 +1,12 @@
+    @Test
+    public void hashCode_withCustomModules() {
+        RealmConfiguration config1 = new RealmConfiguration.Builder(configFactory.getRoot())
+                .setModules(new HumanModule(), new AnimalModule())
+                .build();
+        RealmConfiguration config2 = new RealmConfiguration.Builder(configFactory.getRoot())
+                .setModules(new AnimalModule(), new HumanModule())
+                .build();
+
+        assertEquals(config1.hashCode(), config2.hashCode());
+    }
+

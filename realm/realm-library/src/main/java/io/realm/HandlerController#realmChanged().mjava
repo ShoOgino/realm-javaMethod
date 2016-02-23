@@ -4,18 +4,9 @@
             updateAsyncQueries();
 
         } else {
-            RealmLog.d("REALM_CHANGED realm:"+ HandlerController.this + " no async queries, advance_read");
+            RealmLog.d("REALM_CHANGED realm:" + HandlerController.this + " no async queries, advance_read");
             realm.sharedGroupManager.advanceRead();
-            notifyGlobalListeners();
-            // notify RealmResults & RealmObject callbacks (type based notifications)
-            if (!realm.isClosed()) {
-                // Realm could be closed in the above listener.
-                notifySyncRealmResultsCallbacks();
-            }
-            if (!realm.isClosed()) {
-                notifyRealmObjectCallbacks();
-            }
-
+            notifyAllListeners();
             // empty async RealmObject shouldn't block the realm to advance
             // they're empty so no risk on running into a corrupt state
             // where the pointer (Row) is using one version of a Realm, whereas the

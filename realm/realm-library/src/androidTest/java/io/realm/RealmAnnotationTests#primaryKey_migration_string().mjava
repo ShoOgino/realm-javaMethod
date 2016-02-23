@@ -1,0 +1,16 @@
+    // Test migrating primary key from long to str with existing data
+    @Test
+    public void primaryKey_migration_string() {
+        realm.beginTransaction();
+        for (int i = 1; i <= 2; i++) {
+            PrimaryKeyAsLong obj = realm.createObject(PrimaryKeyAsLong.class);
+            obj.setId(i);
+            obj.setName("String" + i);
+        }
+
+        Table table = realm.getTable(PrimaryKeyAsLong.class);
+        table.setPrimaryKey("name");
+        assertEquals(1, table.getPrimaryKey());
+        realm.cancelTransaction();
+    }
+

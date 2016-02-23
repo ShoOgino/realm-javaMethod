@@ -1,0 +1,12 @@
+    @Test
+    public void primaryKey_checkPrimaryKeyOnCreate() {
+        realm.beginTransaction();
+        try {
+            realm.createObject(AnnotationTypes.class);
+            fail("Two empty objects cannot be created on the same table if a primary key is defined");
+        } catch (RealmPrimaryKeyConstraintException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

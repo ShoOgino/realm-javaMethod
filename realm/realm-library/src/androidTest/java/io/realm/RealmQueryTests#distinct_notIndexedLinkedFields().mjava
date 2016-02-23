@@ -1,0 +1,15 @@
+    @Test
+    public void distinct_notIndexedLinkedFields() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10;
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, true);
+
+        for (String field : AnnotationIndexTypes.NOT_INDEX_FIELDS) {
+            try {
+                realm.where(AnnotationIndexTypes.class).distinct(AnnotationIndexTypes.FIELD_OBJECT + "." + field);
+                fail("Unsupported notIndex" + field + " linked field");
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

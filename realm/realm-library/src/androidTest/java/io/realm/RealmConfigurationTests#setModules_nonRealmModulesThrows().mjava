@@ -1,0 +1,17 @@
+    @Test
+    public void setModules_nonRealmModulesThrows() {
+        // Test first argument
+        try {
+            new RealmConfiguration.Builder(configFactory.getRoot()).setModules(new Object());
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // Test second argument
+        try {
+            new RealmConfiguration.Builder(configFactory.getRoot()).setModules(Realm.getDefaultModule(), new Object());
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
