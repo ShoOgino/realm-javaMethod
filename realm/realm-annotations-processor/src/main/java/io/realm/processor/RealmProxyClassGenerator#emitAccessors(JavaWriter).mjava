@@ -12,11 +12,11 @@
                 // Getter
                 writer.emitAnnotation("SuppressWarnings", "\"cast\"");
                 writer.beginMethod(fieldTypeCanonicalName, metadata.getGetter(fieldName), EnumSet.of(Modifier.PUBLIC));
-                writer.emitStatement("realm.checkIfValid()");
+                writer.emitStatement("((RealmObject) this).realm.checkIfValid()");
 
                 // For String and bytes[], null value will be returned by JNI code. Try to save one JNI call here.
                 if (metadata.isNullable(field) && !Utils.isString(field) && !Utils.isByteArray(field)) {
-                    writer.beginControlFlow("if (row.isNull(%s))", fieldIndexVariableReference(field));
+                    writer.beginControlFlow("if (((RealmObject) this).row.isNull(%s))", fieldIndexVariableReference(field));
                     writer.emitStatement("return null");
                     writer.endControlFlow();
                 }
@@ -30,19 +30,19 @@
                     castingBackType = fieldTypeCanonicalName;
                 }
                 writer.emitStatement(
-                        "return (%s) row.get%s(%s)",
+                        "return (%s) ((RealmObject) this).row.get%s(%s)",
                         castingBackType, realmType, fieldIndexVariableReference(field));
                 writer.endMethod();
                 writer.emitEmptyLine();
 
                 // Setter
                 writer.beginMethod("void", metadata.getSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
-                writer.emitStatement("realm.checkIfValid()");
+                writer.emitStatement("((RealmObject) this).realm.checkIfValid()");
                 // Although setting null value for String and bytes[] can be handled by the JNI code, we still generate the same code here.
                 // Compared with getter, null value won't trigger more native calls in setter which is relatively cheaper.
                 if (metadata.isNullable(field)) {
                     writer.beginControlFlow("if (value == null)")
-                        .emitStatement("row.setNull(%s)", fieldIndexVariableReference(field))
+                        .emitStatement("((RealmObject) this).row.setNull(%s)", fieldIndexVariableReference(field))
                         .emitStatement("return")
                     .endControlFlow();
                 } else if (!metadata.isNullable(field) && !Utils.isPrimitiveType(field)) {
@@ -53,7 +53,7 @@
                         .endControlFlow();
                 }
                 writer.emitStatement(
-                        "row.set%s(%s, value)",
+                        "((RealmObject) this).row.set%s(%s, value)",
                         realmType, fieldIndexVariableReference(field));
                 writer.endMethod();
             } else if (Utils.isRealmObject(field)) {
@@ -63,20 +63,20 @@
 
                 // Getter
                 writer.beginMethod(fieldTypeCanonicalName, metadata.getGetter(fieldName), EnumSet.of(Modifier.PUBLIC));
-                writer.emitStatement("realm.checkIfValid()");
-                writer.beginControlFlow("if (row.isNullLink(%s))", fieldIndexVariableReference(field));
+                writer.emitStatement("((RealmObject) this).realm.checkIfValid()");
+                writer.beginControlFlow("if (((RealmObject) this).row.isNullLink(%s))", fieldIndexVariableReference(field));
                         writer.emitStatement("return null");
                         writer.endControlFlow();
-                writer.emitStatement("return realm.get(%s.class, row.getLink(%s))",
+                writer.emitStatement("return ((RealmObject) this).realm.get(%s.class, ((RealmObject) this).row.getLink(%s))",
                         fieldTypeCanonicalName, fieldIndexVariableReference(field));
                 writer.endMethod();
                 writer.emitEmptyLine();
 
                 // Setter
                 writer.beginMethod("void", metadata.getSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
-                writer.emitStatement("realm.checkIfValid()");
+                writer.emitStatement("((RealmObject) this).realm.checkIfValid()");
                 writer.beginControlFlow("if (value == null)");
-                    writer.emitStatement("row.nullifyLink(%s)", fieldIndexVariableReference(field));
+                    writer.emitStatement("((RealmObject) this).row.nullifyLink(%s)", fieldIndexVariableReference(field));
                     writer.emitStatement("return");
                 writer.endControlFlow();
                 writer.beginControlFlow("if (!value.isValid())");
@@ -85,7 +85,7 @@
                 writer.beginControlFlow("if (value.realm != this.realm)");
                     writer.emitStatement("throw new IllegalArgumentException(\"'value' belongs to a different Realm.\")");
                 writer.endControlFlow();
-                writer.emitStatement("row.setLink(%s, value.row.getIndex())", fieldIndexVariableReference(field));
+                writer.emitStatement("((RealmObject) this).row.setLink(%s, ((RealmObject) value).row.getIndex())", fieldIndexVariableReference(field));
                 writer.endMethod();
             } else if (Utils.isRealmList(field)) {
                 /**
@@ -95,12 +95,12 @@
 
                 // Getter
                 writer.beginMethod(fieldTypeCanonicalName, metadata.getGetter(fieldName), EnumSet.of(Modifier.PUBLIC));
-                writer.emitStatement("realm.checkIfValid()");
+                writer.emitStatement("((RealmObject) this).realm.checkIfValid()");
                 writer.emitSingleLineComment("use the cached value if available");
                 writer.beginControlFlow("if (" + fieldName + "RealmList != null)");
                         writer.emitStatement("return " + fieldName + "RealmList");
                 writer.nextControlFlow("else");
-                    writer.emitStatement("LinkView linkView = row.getLinkList(%s)", fieldIndexVariableReference(field));
+                    writer.emitStatement("LinkView linkView = ((RealmObject) this).row.getLinkList(%s)", fieldIndexVariableReference(field));
                     writer.emitStatement(fieldName + "RealmList = new RealmList<%s>(%s.class, linkView, realm)",
                         genericType, genericType);
                     writer.emitStatement("return " + fieldName + "RealmList");
@@ -111,8 +111,8 @@
 
                 // Setter
                 writer.beginMethod("void", metadata.getSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
-                writer.emitStatement("realm.checkIfValid()");
-                writer.emitStatement("LinkView links = row.getLinkList(%s)", fieldIndexVariableReference(field));
+                writer.emitStatement("((RealmObject) this).realm.checkIfValid()");
+                writer.emitStatement("LinkView links = ((RealmObject) this).row.getLinkList(%s)", fieldIndexVariableReference(field));
                 writer.emitStatement("links.clear()");
                 writer.beginControlFlow("if (value == null)");
                     writer.emitStatement("return");
@@ -124,7 +124,7 @@
                     writer.beginControlFlow("if (linkedObject.realm != this.realm)");
                         writer.emitStatement("throw new IllegalArgumentException(\"Each element of 'value' must belong to the same Realm.\")");
                     writer.endControlFlow();
-                    writer.emitStatement("links.add(linkedObject.row.getIndex())");
+                    writer.emitStatement("links.add(((RealmObject) linkedObject).row.getIndex())");
                 writer.endControlFlow();
                 writer.endMethod();
             } else {

@@ -1,6 +1,6 @@
     @SuppressWarnings("cast")
     public static AllTypes createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
-        throws JSONException {
+            throws JSONException {
         AllTypes obj = null;
         if (update) {
             Table table = realm.getTable(AllTypes.class);
@@ -9,8 +9,8 @@
                 long rowIndex = table.findFirstString(pkColumnIndex, json.getString("columnString"));
                 if (rowIndex != TableOrView.NO_MATCH) {
                     obj = new AllTypesRealmProxy(realm.schema.getColumnInfo(AllTypes.class));
-                    obj.realm = realm;
-                    obj.row = table.getUncheckedRow(rowIndex);
+                    ((RealmObject) obj).realm = realm;
+                    ((RealmObject) obj).row = table.getUncheckedRow(rowIndex);
                 }
             }
         }

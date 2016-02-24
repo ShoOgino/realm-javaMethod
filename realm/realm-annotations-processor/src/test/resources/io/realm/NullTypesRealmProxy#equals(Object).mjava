@@ -4,15 +4,15 @@
         if (o == null || getClass() != o.getClass()) return false;
         NullTypesRealmProxy aNullTypes = (NullTypesRealmProxy)o;
 
-        String path = realm.getPath();
-        String otherPath = aNullTypes.realm.getPath();
+        String path = ((RealmObject) this).realm.getPath();
+        String otherPath = ((RealmObject) aNullTypes).realm.getPath();
         if (path != null ? !path.equals(otherPath) : otherPath != null) return false;;
 
-        String tableName = row.getTable().getName();
-        String otherTableName = aNullTypes.row.getTable().getName();
+        String tableName = ((RealmObject) this).row.getTable().getName();
+        String otherTableName = ((RealmObject) aNullTypes).row.getTable().getName();
         if (tableName != null ? !tableName.equals(otherTableName) : otherTableName != null) return false;
 
-        if (row.getIndex() != aNullTypes.row.getIndex()) return false;
+        if (((RealmObject) this).row.getIndex() != ((RealmObject) aNullTypes).row.getIndex()) return false;
 
         return true;
     }
