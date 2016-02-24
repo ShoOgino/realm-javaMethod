@@ -1,0 +1,11 @@
+    @Test
+    public void distinctMultiArgs() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+
+        RealmQuery<AnnotationIndexTypes> query = realm.where(AnnotationIndexTypes.class);
+        RealmResults<AnnotationIndexTypes> distinctMulti = query.distinct(AnnotationIndexTypes.FIELD_INDEX_BOOL, AnnotationIndexTypes.INDEX_FIELDS);
+        assertEquals(numberOfBlocks, distinctMulti.size());
+    }
+

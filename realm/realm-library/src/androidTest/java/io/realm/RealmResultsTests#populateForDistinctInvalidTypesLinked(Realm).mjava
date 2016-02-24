@@ -2,6 +2,8 @@
         realm.beginTransaction();
         AllJavaTypes notEmpty = new AllJavaTypes();
         notEmpty.setFieldBinary(new byte[]{1, 2, 3});
+        notEmpty.setFieldObject(notEmpty);
+        notEmpty.setFieldList(new RealmList<AllJavaTypes>(notEmpty));
         realm.copyToRealm(notEmpty);
         realm.commitTransaction();
     }

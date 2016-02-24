@@ -1,0 +1,11 @@
+    @Test
+    public void distinctMultiArgs_invalidTypesFields() {
+        populateTestRealm();
+
+        RealmResults<AnnotationIndexTypes> results = realm.where(AnnotationIndexTypes.class).findAll();
+        try {
+            results.distinct(AllTypes.FIELD_REALMOBJECT, AllTypes.INVALID_TYPES_FIELDS_FOR_DISTINCT);
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

@@ -1,0 +1,13 @@
+    @Test
+    public void distinctMultiArgs_notIndexedLinkedFields() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10;
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, true);
+
+        RealmQuery<AnnotationIndexTypes> query = realm.where(AnnotationIndexTypes.class);
+        try {
+            query.distinct(AnnotationIndexTypes.NOT_INDEX_LINKED_FILED_STRING, AnnotationIndexTypes.NOT_INDEX_LINKED_FIELDS);
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
