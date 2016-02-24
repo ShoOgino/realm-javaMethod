@@ -1,0 +1,9 @@
+    private void populateForDistinctInvalidTypesLinked(DynamicRealm realm) {
+        realm.beginTransaction();
+        DynamicRealmObject notEmpty = realm.createObject(AllJavaTypes.CLASS_NAME);
+        notEmpty.setBlob(AllJavaTypes.FIELD_BINARY, new byte[]{1, 2, 3});
+        notEmpty.setObject(AllJavaTypes.FIELD_OBJECT, notEmpty);
+        notEmpty.setList(AllJavaTypes.FIELD_LIST, new RealmList<DynamicRealmObject>(notEmpty));
+        realm.commitTransaction();
+    }
+

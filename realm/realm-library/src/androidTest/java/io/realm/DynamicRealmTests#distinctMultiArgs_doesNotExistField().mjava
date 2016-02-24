@@ -1,0 +1,12 @@
+    @Test
+    public void distinctMultiArgs_doesNotExistField() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10;
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+
+        try {
+            realm.distinct(AnnotationIndexTypes.CLASS_NAME, AnnotationIndexTypes.FIELD_INDEX_INT, AnnotationIndexTypes.NONEXISTANT_MIX_FIELDS);
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
