@@ -4,8 +4,10 @@
      * @param configuration the{@link RealmConfiguration}.
      * @param migration the {@link RealmMigration} to run on the Realm. This will override any migration set on the
      *                  configuration.
+     * @throws FileNotFoundException if the Realm file doesn't exist.
      */
-    public static void migrateRealm(RealmConfiguration configuration, RealmMigration migration) {
+    public static void migrateRealm(RealmConfiguration configuration, RealmMigration migration)
+            throws FileNotFoundException {
         BaseRealm.migrateRealm(configuration, migration, new MigrationCallback() {
             @Override
             public void migrationComplete() {

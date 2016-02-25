@@ -1,39 +1,41 @@
     // If a field is not required but was not nullable before, a RealmMigrationNeededException should be thrown
     @Test
     public void settingRequiredForNullableThrows() {
-        String[] notNullableFields = {"fieldStringNull", "fieldBytesNull", "fieldBooleanNull",
-                "fieldByteNull", "fieldShortNull", "fieldIntegerNull", "fieldLongNull",
-                "fieldFloatNull", "fieldDoubleNull", "fieldDateNull"};
+        String[] notNullableFields = {NullTypes.FIELD_STRING_NULL, NullTypes.FIELD_BYTES_NULL,
+                NullTypes.FIELD_BOOLEAN_NULL, NullTypes.FIELD_BYTE_NULL, NullTypes.FIELD_SHORT_NULL,
+                NullTypes.FIELD_INTEGER_NULL, NullTypes.FIELD_LONG_NULL, NullTypes.FIELD_FLOAT_NULL,
+                NullTypes.FIELD_DOUBLE_NULL, NullTypes.FIELD_DATE_NULL};
         for (final String field : notNullableFields) {
             final RealmMigration migration = new RealmMigration() {
                 @Override
                 public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
-                    if (oldVersion == -1) {  // -1 == UNVERSIONED i.e., not been initialized
+                    if (oldVersion == 0) { // 0 after initNullTypesTableExcludes
                         // No @Required for not nullable field
-                        TestHelper.initNullTypesTableExcludes(realm, field);
-                        Table table = realm.schema.getTable(NullTypes.class);
-                        if (field.equals("fieldStringNull")) {
+                        RealmObjectSchema nullTypesSchema = realm.getSchema().getSchemaForClass(NullTypes.CLASS_NAME);
+                        if (field.equals(NullTypes.FIELD_STRING_NULL)) {
                             // 1 String
-                            table.addColumn(RealmFieldType.STRING, field, Table.NOT_NULLABLE);
-                        } else if (field.equals("fieldBytesNull")) {
+                            nullTypesSchema.addField(field, String.class, FieldAttribute.REQUIRED);
+                        } else if (field.equals(NullTypes.FIELD_BYTES_NULL)) {
                             // 2 Bytes
-                            table.addColumn(RealmFieldType.BINARY, field, Table.NOT_NULLABLE);
-                        } else if (field.equals("fieldBooleanNull")) {
+                            nullTypesSchema.addField(field, byte[].class, FieldAttribute.REQUIRED);
+                        } else if (field.equals(NullTypes.FIELD_BOOLEAN_NULL)) {
                             // 3 Boolean
-                            table.addColumn(RealmFieldType.BOOLEAN, field, Table.NOT_NULLABLE);
-                        } else if (field.equals("fieldByteNull") || field.equals("fieldShortNull") ||
-                                field.equals("fieldIntegerNull") || field.equals("fieldLongNull")) {
+                            nullTypesSchema.addField(field, boolean.class);
+                        } else if (field.equals(NullTypes.FIELD_BYTE_NULL) ||
+                                field.equals(NullTypes.FIELD_SHORT_NULL) ||
+                                field.equals(NullTypes.FIELD_INTEGER_NULL) ||
+                                field.equals(NullTypes.FIELD_LONG_NULL)) {
                             // 4 Byte 5 Short 6 Integer 7 Long
-                            table.addColumn(RealmFieldType.INTEGER, field, Table.NOT_NULLABLE);
-                        } else if (field.equals("fieldFloatNull")) {
+                            nullTypesSchema.addField(field, int.class);
+                        } else if (field.equals(NullTypes.FIELD_FLOAT_NULL)) {
                             // 8 Float
-                            table.addColumn(RealmFieldType.FLOAT, field, Table.NOT_NULLABLE);
-                        } else if (field.equals("fieldDoubleNull")) {
+                            nullTypesSchema.addField(field, float.class);
+                        } else if (field.equals(NullTypes.FIELD_DOUBLE_NULL)) {
                             // 9 Double
-                            table.addColumn(RealmFieldType.DOUBLE, field, Table.NOT_NULLABLE);
-                        } else if (field.equals("fieldDateNull")) {
+                            nullTypesSchema.addField(field, double.class);
+                        } else if (field.equals(NullTypes.FIELD_DATE_NULL)) {
                             // 10 Date
-                            table.addColumn(RealmFieldType.DATE, field, Table.NOT_NULLABLE);
+                            nullTypesSchema.addField(field, Date.class, FieldAttribute.REQUIRED);
                         }
                         // 11 Object skipped
                     }
@@ -47,13 +49,17 @@
                     .migration(migration)
                     .build();
             Realm.deleteRealm(realmConfig);
-            Realm.migrateRealm(realmConfig);
+            // Prepare the version 0 db
+            DynamicRealm dynamicRealm = DynamicRealm.getInstance(realmConfig);
+            TestHelper.initNullTypesTableExcludes(dynamicRealm, field);
+            dynamicRealm.close();
 
             try {
                 realm = Realm.getInstance(realmConfig);
                 fail("Failed on " + field);
             } catch (RealmMigrationNeededException e) {
-                if (field.equals("fieldStringNull") || field.equals("fieldBytesNull") || field.equals("fieldDateNull")) {
+                if (field.equals(NullTypes.FIELD_STRING_NULL) || field.equals(NullTypes.FIELD_BYTES_NULL) ||
+                        field.equals(NullTypes.FIELD_DATE_NULL)) {
                     assertEquals("Field '" + field + "' is required. Either set @Required to field '" +
                             field + "' " +
                             "or migrate using io.realm.internal.Table.convertColumnToNullable().", e.getMessage());

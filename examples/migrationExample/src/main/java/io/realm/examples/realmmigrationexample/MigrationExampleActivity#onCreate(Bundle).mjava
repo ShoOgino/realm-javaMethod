@@ -19,7 +19,11 @@
                 .build();
 
         // You can then manually call Realm.migrateRealm().
-        Realm.migrateRealm(config0, new Migration());
+        try {
+            Realm.migrateRealm(config0, new Migration());
+        } catch (FileNotFoundException ignored) {
+            // If the Realm file doesn't exist, just ignore.
+        }
         realm = Realm.getInstance(config0);
         showStatus("Default0");
         showStatus(realm);
