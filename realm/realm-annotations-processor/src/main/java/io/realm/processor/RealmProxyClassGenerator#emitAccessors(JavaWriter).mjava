@@ -10,7 +10,6 @@
                 String realmType = Constants.JAVA_TO_REALM_TYPES.get(fieldTypeCanonicalName);
 
                 // Getter
-                writer.emitAnnotation("Override");
                 writer.emitAnnotation("SuppressWarnings", "\"cast\"");
                 writer.beginMethod(fieldTypeCanonicalName, metadata.getGetter(fieldName), EnumSet.of(Modifier.PUBLIC));
                 writer.emitStatement("realm.checkIfValid()");
@@ -37,7 +36,6 @@
                 writer.emitEmptyLine();
 
                 // Setter
-                writer.emitAnnotation("Override");
                 writer.beginMethod("void", metadata.getSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
                 writer.emitStatement("realm.checkIfValid()");
                 // Although setting null value for String and bytes[] can be handled by the JNI code, we still generate the same code here.
@@ -64,7 +62,6 @@
                  */
 
                 // Getter
-                writer.emitAnnotation("Override");
                 writer.beginMethod(fieldTypeCanonicalName, metadata.getGetter(fieldName), EnumSet.of(Modifier.PUBLIC));
                 writer.emitStatement("realm.checkIfValid()");
                 writer.beginControlFlow("if (row.isNullLink(%s))", fieldIndexVariableReference(field));
@@ -76,7 +73,6 @@
                 writer.emitEmptyLine();
 
                 // Setter
-                writer.emitAnnotation("Override");
                 writer.beginMethod("void", metadata.getSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
                 writer.emitStatement("realm.checkIfValid()");
                 writer.beginControlFlow("if (value == null)");
@@ -98,7 +94,6 @@
                 String genericType = Utils.getGenericType(field);
 
                 // Getter
-                writer.emitAnnotation("Override");
                 writer.beginMethod(fieldTypeCanonicalName, metadata.getGetter(fieldName), EnumSet.of(Modifier.PUBLIC));
                 writer.emitStatement("realm.checkIfValid()");
                 writer.emitSingleLineComment("use the cached value if available");
@@ -115,7 +110,6 @@
                 writer.emitEmptyLine();
 
                 // Setter
-                writer.emitAnnotation("Override");
                 writer.beginMethod("void", metadata.getSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
                 writer.emitStatement("realm.checkIfValid()");
                 writer.emitStatement("LinkView links = row.getLinkList(%s)", fieldIndexVariableReference(field));

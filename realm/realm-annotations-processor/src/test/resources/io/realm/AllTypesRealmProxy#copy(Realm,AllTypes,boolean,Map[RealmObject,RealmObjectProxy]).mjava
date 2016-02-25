@@ -1,29 +1,29 @@
     public static AllTypes copy(Realm realm, AllTypes newObject, boolean update, Map<RealmObject,RealmObjectProxy> cache) {
-        AllTypes realmObject = realm.createObject(AllTypes.class, newObject.getColumnString());
+        AllTypes realmObject = realm.createObject(AllTypes.class, ((AllTypesRealmProxyInterface) newObject).realmGet$columnString());
         cache.put(newObject, (RealmObjectProxy) realmObject);
-        realmObject.setColumnString(newObject.getColumnString());
-        realmObject.setColumnLong(newObject.getColumnLong());
-        realmObject.setColumnFloat(newObject.getColumnFloat());
-        realmObject.setColumnDouble(newObject.getColumnDouble());
-        realmObject.setColumnBoolean(newObject.isColumnBoolean());
-        realmObject.setColumnDate(newObject.getColumnDate());
-        realmObject.setColumnBinary(newObject.getColumnBinary());
+        ((AllTypesRealmProxyInterface) realmObject).realmSet$columnString(((AllTypesRealmProxyInterface)newObject).realmGet$columnString());
+        ((AllTypesRealmProxyInterface) realmObject).realmSet$columnLong(((AllTypesRealmProxyInterface)newObject).realmGet$columnLong());
+        ((AllTypesRealmProxyInterface) realmObject).realmSet$columnFloat(((AllTypesRealmProxyInterface)newObject).realmGet$columnFloat());
+        ((AllTypesRealmProxyInterface) realmObject).realmSet$columnDouble(((AllTypesRealmProxyInterface)newObject).realmGet$columnDouble());
+        ((AllTypesRealmProxyInterface) realmObject).realmSet$columnBoolean(((AllTypesRealmProxyInterface)newObject).realmGet$columnBoolean());
+        ((AllTypesRealmProxyInterface) realmObject).realmSet$columnDate(((AllTypesRealmProxyInterface)newObject).realmGet$columnDate());
+        ((AllTypesRealmProxyInterface) realmObject).realmSet$columnBinary(((AllTypesRealmProxyInterface)newObject).realmGet$columnBinary());
 
-        some.test.AllTypes columnObjectObj = newObject.getColumnObject();
+        some.test.AllTypes columnObjectObj = ((AllTypesRealmProxyInterface) newObject).realmGet$columnObject();
         if (columnObjectObj != null) {
             some.test.AllTypes cachecolumnObject = (some.test.AllTypes) cache.get(columnObjectObj);
             if (cachecolumnObject != null) {
-                realmObject.setColumnObject(cachecolumnObject);
+                ((AllTypesRealmProxyInterface) realmObject).realmSet$columnObject(cachecolumnObject);
             } else {
-                realmObject.setColumnObject(AllTypesRealmProxy.copyOrUpdate(realm, columnObjectObj, update, cache));
+                ((AllTypesRealmProxyInterface) realmObject).realmSet$columnObject(AllTypesRealmProxy.copyOrUpdate(realm, columnObjectObj, update, cache));
             }
         } else {
-            realmObject.setColumnObject(null);
+            ((AllTypesRealmProxyInterface) realmObject).realmSet$columnObject(null);
         }
 
-        RealmList<AllTypes> columnRealmListList = newObject.getColumnRealmList();
+        RealmList<AllTypes> columnRealmListList = ((AllTypesRealmProxyInterface) newObject).realmGet$columnRealmList();
         if (columnRealmListList != null) {
-            RealmList<AllTypes> columnRealmListRealmList = realmObject.getColumnRealmList();
+            RealmList<AllTypes> columnRealmListRealmList = ((AllTypesRealmProxyInterface) realmObject).realmGet$columnRealmList();
             for (int i = 0; i < columnRealmListList.size(); i++) {
                 AllTypes columnRealmListItem = columnRealmListList.get(i);
                 AllTypes cachecolumnRealmList = (AllTypes) cache.get(columnRealmListItem);

@@ -1,6 +1,6 @@
     @SuppressWarnings("cast")
     public static Simple createUsingJsonStream(Realm realm, JsonReader reader)
-            throws IOException {
+        throws IOException {
         Simple obj = realm.createObject(Simple.class);
         reader.beginObject();
         while (reader.hasNext()) {
@@ -8,16 +8,16 @@
             if (name.equals("name")) {
                 if (reader.peek() == JsonToken.NULL) {
                     reader.skipValue();
-                    obj.setName(null);
+                    ((SimpleRealmProxyInterface) obj).realmSet$name(null);
                 } else {
-                    obj.setName((String) reader.nextString());
+                    ((SimpleRealmProxyInterface) obj).realmSet$name((String) reader.nextString());
                 }
             } else if (name.equals("age")) {
                 if (reader.peek() == JsonToken.NULL) {
                     reader.skipValue();
                     throw new IllegalArgumentException("Trying to set non-nullable field age to null.");
                 } else {
-                    obj.setAge((int) reader.nextInt());
+                    ((SimpleRealmProxyInterface) obj).realmSet$age((int) reader.nextInt());
                 }
             } else {
                 reader.skipValue();

@@ -1,0 +1,13 @@
+    public static void emitFillRealmObjectFromStream(String interfaceName, String setter, String fieldName, String
+            fieldTypeCanonicalName, String proxyClass, JavaWriter writer) throws IOException {
+        writer
+            .beginControlFlow("if (reader.peek() == JsonToken.NULL)")
+                .emitStatement("reader.skipValue()")
+                .emitStatement("((%s) obj).%s(null)", interfaceName, setter)
+            .nextControlFlow("else")
+                .emitStatement("%s %sObj = %s.createUsingJsonStream(realm, reader)", fieldTypeCanonicalName, fieldName,
+                        proxyClass)
+                .emitStatement("((%s) obj).%s(%sObj)", interfaceName, setter, fieldName)
+            .endControlFlow();
+    }
+

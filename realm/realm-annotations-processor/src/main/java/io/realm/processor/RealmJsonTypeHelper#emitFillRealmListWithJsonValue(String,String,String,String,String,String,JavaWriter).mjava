@@ -1,0 +1,18 @@
+    public static void emitFillRealmListWithJsonValue(String interfaceName, String getter, String setter, String
+            fieldName, String fieldTypeCanonicalName, String proxyClass, JavaWriter writer) throws IOException {
+        writer
+            .beginControlFlow("if (json.has(\"%s\"))", fieldName)
+                .beginControlFlow("if (json.isNull(\"%s\"))", fieldName)
+                    .emitStatement("((%s) obj).%s(null)", interfaceName, setter)
+                .nextControlFlow("else")
+                    .emitStatement("((%s) obj).%s().clear()", interfaceName, getter)
+                    .emitStatement("JSONArray array = json.getJSONArray(\"%s\")", fieldName)
+                    .beginControlFlow("for (int i = 0; i < array.length(); i++)")
+                        .emitStatement("%s item = %s.createOrUpdateUsingJsonObject(realm, array.getJSONObject(i), update)",
+                                fieldTypeCanonicalName, proxyClass, fieldTypeCanonicalName)
+                        .emitStatement("((%s) obj).%s().add(item)", interfaceName, getter)
+                    .endControlFlow()
+                .endControlFlow()
+            .endControlFlow();
+    }
+

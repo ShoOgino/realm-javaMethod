@@ -3,8 +3,8 @@
         JavaFileObject sourceFile = processingEnvironment.getFiler().createSourceFile(qualifiedGeneratedClassName);
         JavaWriter writer = new JavaWriter(new BufferedWriter(sourceFile.openWriter()));
 
-        // Set source code indent to 4 spaces
-        writer.setIndent("    ");
+        // Set source code indent
+        writer.setIndent(Constants.INDENT);
 
         writer.emitPackage(Constants.REALM_PACKAGE_NAME)
                 .emitEmptyLine();
@@ -54,7 +54,8 @@
                 "class",                     // the type of the item
                 EnumSet.of(Modifier.PUBLIC), // modifiers to apply
                 className,                   // class to extend
-                "RealmObjectProxy")          // interfaces to implement
+                "RealmObjectProxy",          // interfaces to implement
+                interfaceName)
                 .emitEmptyLine();
 
         emitColumnIndicesClass(writer);

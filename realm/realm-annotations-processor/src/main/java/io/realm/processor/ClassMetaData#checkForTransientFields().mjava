@@ -1,0 +1,11 @@
+    private boolean checkForTransientFields() {
+        for (VariableElement field : fields) {
+            if (field.getModifiers().contains(Modifier.TRANSIENT)) {
+                Utils.error("Transient fields are not allowed. Class: " + className + ", Field: " +
+                        field.getSimpleName().toString());
+                return false;
+            }
+        }
+        return true;
+    }
+

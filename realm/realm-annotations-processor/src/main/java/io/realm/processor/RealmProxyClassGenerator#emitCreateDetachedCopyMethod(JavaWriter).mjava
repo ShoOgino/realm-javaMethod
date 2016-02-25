@@ -32,18 +32,19 @@
                 writer
                     .emitEmptyLine()
                     .emitSingleLineComment("Deep copy of %s", fieldName)
-                    .emitStatement("standaloneObject.%s(%s.createDetachedCopy(realmObject.%s(), currentDepth + 1, maxDepth, cache))",
-                                setter, Utils.getProxyClassSimpleName(field), getter);
+                    .emitStatement("((%s) standaloneObject).%s(%s.createDetachedCopy(((%s) realmObject).%s(), currentDepth + 1, maxDepth, cache))",
+                                interfaceName, setter, Utils.getProxyClassSimpleName(field), interfaceName, getter);
             } else if (Utils.isRealmList(field)) {
                 writer
                     .emitEmptyLine()
                     .emitSingleLineComment("Deep copy of %s", fieldName)
                     .beginControlFlow("if (currentDepth == maxDepth)")
-                        .emitStatement("standaloneObject.%s(null)", setter)
+                        .emitStatement("((%s) standaloneObject).%s(null)", interfaceName, setter)
                     .nextControlFlow("else")
-                        .emitStatement("RealmList<%s> managed%sList = realmObject.%s()", Utils.getGenericType(field), fieldName, getter)
+                        .emitStatement("RealmList<%s> managed%sList = ((%s) realmObject).%s()",
+                                Utils.getGenericType(field), fieldName, interfaceName, getter)
                         .emitStatement("RealmList<%1$s> standalone%2$sList = new RealmList<%1$s>()", Utils.getGenericType(field), fieldName)
-                        .emitStatement("standaloneObject.%s(standalone%sList)", setter, fieldName)
+                        .emitStatement("((%s) standaloneObject).%s(standalone%sList)", interfaceName, setter, fieldName)
                         .emitStatement("int nextDepth = currentDepth + 1")
                         .emitStatement("int size = managed%sList.size()", fieldName)
                         .beginControlFlow("for (int i = 0; i < size; i++)")
@@ -53,7 +54,8 @@
                         .endControlFlow()
                     .endControlFlow();
             } else {
-                writer.emitStatement("standaloneObject.%s(realmObject.%s())", metadata.getSetter(fieldName), getter);
+                writer.emitStatement("((%s) standaloneObject).%s(((%s) realmObject).%s())",
+                        interfaceName, setter, interfaceName, getter);
             }
         }
 
