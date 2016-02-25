@@ -1,0 +1,12 @@
+    @Test
+    public void migrateRealm_config_nonExistingRealmFile() throws FileNotFoundException {
+        RealmConfiguration config = configFactory.createConfigurationBuilder().migration(new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+
+            }
+        }).build();
+        thrown.expect(FileNotFoundException.class);
+        Realm.migrateRealm(config);
+    }
+
