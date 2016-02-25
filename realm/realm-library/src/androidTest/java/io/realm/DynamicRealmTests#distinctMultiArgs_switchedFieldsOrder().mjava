@@ -1,0 +1,13 @@
+    @Test
+    public void distinctMultiArgs_switchedFieldsOrder() {
+        final long numberOfBlocks = 25;
+        populateForDistinctFieldsOrder(realm, numberOfBlocks);
+
+        // Regardless of the block size defined above, the output size is expected to be the same, 4 in this case, due to receiving unique combinations of tuples
+        RealmResults<DynamicRealmObject> distinctStringLong = realm.distinct(AnnotationIndexTypes.CLASS_NAME, AnnotationIndexTypes.FIELD_INDEX_STRING, AnnotationIndexTypes.FIELD_INDEX_LONG);
+        RealmResults<DynamicRealmObject> distinctLongString = realm.distinct(AnnotationIndexTypes.CLASS_NAME, AnnotationIndexTypes.FIELD_INDEX_LONG, AnnotationIndexTypes.FIELD_INDEX_STRING);
+        assertEquals(4, distinctStringLong.size());
+        assertEquals(4, distinctLongString.size());
+        assertEquals(distinctStringLong.size(), distinctLongString.size());
+    }
+
