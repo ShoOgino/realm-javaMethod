@@ -8,7 +8,7 @@
 
         // If object is already in the Realm there is nothing to update
         writer
-            .beginControlFlow("if (object.realm != null && object.realm.getPath().equals(realm.getPath()))")
+            .beginControlFlow("if (((RealmObject) object).realm != null && ((RealmObject) object).realm.getPath().equals(realm.getPath()))")
                 .emitStatement("return object")
             .endControlFlow();
 
@@ -40,8 +40,8 @@
                     .emitStatement("realmObject = new %s(realm.schema.getColumnInfo(%s.class))",
                             Utils.getProxyClassName(className),
                             className)
-                    .emitStatement("realmObject.realm = realm")
-                    .emitStatement("realmObject.row = table.getUncheckedRow(rowIndex)")
+                    .emitStatement("((RealmObject) realmObject).realm = realm")
+                    .emitStatement("((RealmObject) realmObject).row = table.getUncheckedRow(rowIndex)")
                     .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
                 .nextControlFlow("else")
                     .emitStatement("canUpdate = false")

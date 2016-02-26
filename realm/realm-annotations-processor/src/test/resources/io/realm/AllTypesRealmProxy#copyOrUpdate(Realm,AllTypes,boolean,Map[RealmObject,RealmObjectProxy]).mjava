@@ -1,5 +1,5 @@
     public static AllTypes copyOrUpdate(Realm realm, AllTypes object, boolean update, Map<RealmObject,RealmObjectProxy> cache) {
-        if (object.realm != null && object.realm.getPath().equals(realm.getPath())) {
+        if (((RealmObject) object).realm != null && ((RealmObject) object).realm.getPath().equals(realm.getPath())) {
             return object;
         }
         AllTypes realmObject = null;
@@ -13,8 +13,8 @@
             long rowIndex = table.findFirstString(pkColumnIndex, ((AllTypesRealmProxyInterface) object).realmGet$columnString());
             if (rowIndex != TableOrView.NO_MATCH) {
                 realmObject = new AllTypesRealmProxy(realm.schema.getColumnInfo(AllTypes.class));
-                realmObject.realm = realm;
-                realmObject.row = table.getUncheckedRow(rowIndex);
+                ((RealmObject) realmObject).realm = realm;
+                ((RealmObject) realmObject).row = table.getUncheckedRow(rowIndex);
                 cache.put(object, (RealmObjectProxy) realmObject);
             } else {
                 canUpdate = false;

@@ -1,7 +1,7 @@
     public void realmSet$fieldObjectNull(NullTypes value) {
-        realm.checkIfValid();
+        ((RealmObject) this).realm.checkIfValid();
         if (value == null) {
-            row.nullifyLink(columnInfo.fieldObjectNullIndex);
+            ((RealmObject) this).row.nullifyLink(columnInfo.fieldObjectNullIndex);
             return;
         }
         if (!value.isValid()) {
@@ -10,6 +10,6 @@
         if (value.realm != this.realm) {
             throw new IllegalArgumentException("'value' belongs to a different Realm.");
         }
-        row.setLink(columnInfo.fieldObjectNullIndex, value.row.getIndex());
+        ((RealmObject) this).row.setLink(columnInfo.fieldObjectNullIndex, ((RealmObject) value).row.getIndex());
     }
 
