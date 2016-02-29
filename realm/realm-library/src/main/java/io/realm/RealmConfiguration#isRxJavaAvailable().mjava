@@ -1,0 +1,17 @@
+    /**
+     * Check if RxJava is can be loaded.
+     *
+     * @return true if RxJava dependency exist.
+     */
+    private static synchronized boolean isRxJavaAvailable() {
+        if (rxJavaAvailable == null) {
+            try {
+                Class.forName("rx.Observable");
+                rxJavaAvailable = true;
+            } catch (ClassNotFoundException ignore) {
+                rxJavaAvailable = false;
+            }
+        }
+        return rxJavaAvailable;
+    }
+
