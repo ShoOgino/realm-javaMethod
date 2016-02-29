@@ -1,0 +1,34 @@
+    /**
+     * Test a nullable field already has a non-null value, update it through JSON with null value
+     * of the corresponding field.
+     */
+    @Test
+    public void createObjectFromJson_updateNullTypesJSONWithNulls() throws IOException, JSONException {
+        String json = TestHelper.streamToString(TestHelper.loadJsonFromAssets(context, "nulltypes.json"));
+        // Nullable fields with values
+        JSONArray jsonArray = new JSONArray(json);
+        JSONObject jsonObject = jsonArray.getJSONObject(1);
+        jsonObject.put("id", 1);
+
+        // Now object with id 1 has values for all nullable fields.
+        realm.beginTransaction();
+        realm.createObjectFromJson(NullTypes.class, jsonObject);
+        realm.commitTransaction();
+
+        RealmResults<NullTypes> nullTypesRealmResults = realm.allObjects(NullTypes.class);
+        assertEquals(2, nullTypesRealmResults.size());
+        checkNullableValuesAreNotNull(nullTypesRealmResults.first());
+
+        // Update object with id 1, nullable fields should have null values
+        JSONArray array = new JSONArray(json);
+        realm.beginTransaction();
+        realm.createOrUpdateAllFromJson(NullTypes.class, array);
+        realm.commitTransaction();
+
+        nullTypesRealmResults = realm.allObjects(NullTypes.class);
+        assertEquals(3, nullTypesRealmResults.size());
+
+        NullTypes nullTypes1 = nullTypesRealmResults.where().equalTo("id", 1).findFirst();
+        checkNullableValuesAreNull(nullTypes1);
+    }
+

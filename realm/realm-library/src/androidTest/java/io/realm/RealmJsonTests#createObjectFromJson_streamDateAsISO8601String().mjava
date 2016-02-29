@@ -1,0 +1,20 @@
+    @Test
+    public void createObjectFromJson_streamDateAsISO8601String() throws IOException {
+        InputStream in = TestHelper.loadJsonFromAssets(context, "date_as_iso8601_string.json");
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, in);
+        realm.commitTransaction();
+        in.close();
+
+        Calendar cal = new GregorianCalendar(2007, 8 - 1, 13, 19, 51, 23);
+        cal.setTimeZone(TimeZone.getTimeZone("GMT"));
+        cal.set(Calendar.MILLISECOND, 789);
+        Date date = cal.getTime();
+        cal.set(Calendar.MILLISECOND, 0);
+        Date dateZeroMillis = cal.getTime();
+
+        // Check that all primitive types are imported correctly
+        AllTypes obj = realm.allObjects(AllTypes.class).first();
+        assertEquals(dateZeroMillis, obj.getColumnDate());
+    }
+

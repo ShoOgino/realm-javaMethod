@@ -1,0 +1,20 @@
+    @Test
+    public void createObjectFromJson_dateAsStringTimeZone() throws JSONException {
+        // Oct 03 2015 14:45.33
+        JSONObject json = new JSONObject();
+        json.put("columnDate", "/Date(1443854733376+0800)/");
+
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, json);
+        realm.commitTransaction();
+
+        AllTypes obj = realm.allObjects(AllTypes.class).first();
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.setTimeZone(TimeZone.getTimeZone("Australia/West"));
+        cal.set(2015, Calendar.OCTOBER, 03, 14, 45, 33);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date convDate = obj.getColumnDate();
+
+        assertEquals(convDate.getTime(), cal.getTime().getTime());
+    }
+

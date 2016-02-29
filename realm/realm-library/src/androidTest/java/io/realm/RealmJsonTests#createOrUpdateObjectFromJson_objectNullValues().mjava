@@ -1,0 +1,36 @@
+    // Test update a existing object with JSON object with only primary key.
+    // No value should be changed.
+    @Test
+    public void createOrUpdateObjectFromJson_objectNullValues() throws IOException {
+        AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
+        Date date = new Date(0);
+        obj.setColumnLong(1); // ID
+        obj.setColumnBinary(new byte[]{1});
+        obj.setColumnBoolean(true);
+        obj.setColumnDate(date);
+        obj.setColumnDouble(1);
+        obj.setColumnFloat(1);
+        obj.setColumnString("1");
+
+        realm.beginTransaction();
+        realm.copyToRealm(obj);
+        realm.commitTransaction();
+
+        String json = TestHelper.streamToString(TestHelper.loadJsonFromAssets(context, "all_types_primary_key_field_only.json"));
+        realm.beginTransaction();
+        realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, json);
+        realm.commitTransaction();
+
+        // Check that all primitive types are imported correctly
+        obj = realm.allObjects(AllTypesPrimaryKey.class).first();
+        assertEquals("1", obj.getColumnString());
+        assertEquals(1L, obj.getColumnLong());
+        assertEquals(1F, obj.getColumnFloat(), 0F);
+        assertEquals(1D, obj.getColumnDouble(), 0D);
+        assertEquals(true, obj.isColumnBoolean());
+        assertEquals(date, obj.getColumnDate());
+        assertArrayEquals(new byte[]{1}, obj.getColumnBinary());
+        assertNull(obj.getColumnRealmObject());
+        assertEquals(0, obj.getColumnRealmList().size());
+    }
+

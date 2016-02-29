@@ -1,0 +1,15 @@
+    // Assert that the list of AllTypesPrimaryKey objects where inserted and updated properly.
+    private void assertAllTypesPrimaryKeyUpdated() {
+        assertEquals(1, realm.allObjects(AllTypesPrimaryKey.class).size());
+        AllTypesPrimaryKey obj = realm.allObjects(AllTypesPrimaryKey.class).first();
+        assertEquals("Bar", obj.getColumnString());
+        assertEquals(2.23F, obj.getColumnFloat(), 0F);
+        assertEquals(2.234D, obj.getColumnDouble(), 0D);
+        assertEquals(true, obj.isColumnBoolean());
+        assertArrayEquals(new byte[]{1, 2, 3}, obj.getColumnBinary());
+        assertEquals(new Date(2000), obj.getColumnDate());
+        assertEquals("Dog4", obj.getColumnRealmObject().getName());
+        assertEquals(2, obj.getColumnRealmList().size());
+        assertEquals("Dog5", obj.getColumnRealmList().get(0).getName());
+    }
+

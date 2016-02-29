@@ -1,0 +1,13 @@
+    @Test
+    public void createObjectFromJson_streamDateAsString() throws IOException {
+        InputStream in = TestHelper.loadJsonFromAssets(context, "date_as_string.json");
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, in);
+        realm.commitTransaction();
+        in.close();
+
+        // Check that all primitive types are imported correctly
+        AllTypes obj = realm.allObjects(AllTypes.class).first();
+        assertEquals(new Date(1000), obj.getColumnDate());
+    }
+
