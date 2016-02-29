@@ -1,0 +1,20 @@
+    // Test that given an exception everything up to the exception is saved
+    @Test
+    public void createObjectFromJson_jsonException() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("columnString", "Foo");
+        json.put("columnDate", "Boom");
+
+        realm.beginTransaction();
+        try {
+            realm.createObjectFromJson(AllTypes.class, json);
+        } catch (RealmException ignored) {
+        } finally {
+            realm.commitTransaction();
+        }
+
+        AllTypes obj = realm.allObjects(AllTypes.class).first();
+        assertEquals("Foo", obj.getColumnString());
+        assertEquals(new Date(0), obj.getColumnDate());
+    }
+

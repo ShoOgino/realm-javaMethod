@@ -1,0 +1,12 @@
+    @Test
+    public void createObjectFromJson_stringFaultyJsonThrows() {
+        realm.beginTransaction();
+        try {
+            realm.createObjectFromJson(Dog.class, "{ name \"Foo\" }");
+            fail("Faulty JSON should result in a RealmException");
+        } catch (RealmException ignored) {
+        } finally {
+            realm.commitTransaction();
+        }
+    }
+

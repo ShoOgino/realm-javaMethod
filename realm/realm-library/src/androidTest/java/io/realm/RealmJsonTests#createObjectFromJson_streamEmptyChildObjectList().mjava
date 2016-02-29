@@ -1,0 +1,12 @@
+    @Test
+    public void createObjectFromJson_streamEmptyChildObjectList() throws IOException {
+        InputStream in = TestHelper.loadJsonFromAssets(context, "realmlist_empty.json");
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, in);
+        realm.commitTransaction();
+        in.close();
+
+        AllTypes obj = realm.allObjects(AllTypes.class).first();
+        assertEquals(0, obj.getColumnRealmList().size());
+    }
+

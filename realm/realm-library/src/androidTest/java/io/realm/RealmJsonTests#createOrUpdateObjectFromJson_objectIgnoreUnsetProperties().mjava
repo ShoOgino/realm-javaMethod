@@ -1,0 +1,16 @@
+    @Test
+    public void createOrUpdateObjectFromJson_objectIgnoreUnsetProperties() throws IOException {
+        String json = TestHelper.streamToString(TestHelper.loadJsonFromAssets(context, "list_alltypes_primarykey.json"));
+
+        realm.beginTransaction();
+        realm.createOrUpdateAllFromJson(AllTypesPrimaryKey.class, json);
+        realm.commitTransaction();
+
+        // No-op as no properties should be updated
+        realm.beginTransaction();
+        realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, "{ \"columnLong\":1 }");
+        realm.commitTransaction();
+
+        assertAllTypesPrimaryKeyUpdated();
+    }
+

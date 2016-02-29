@@ -1,0 +1,18 @@
+    /**
+     * Check that using createOrUpdateObject will set the primary key directly instead of first setting
+     * it to the default value (which can fail)
+     */
+    @Test
+    public void createOrUpdateObjectFromJson_objectWithPrimaryKeySetValueDirectlyFromStream() throws JSONException, IOException {
+        InputStream stream = TestHelper.stringToStream("{\"id\": 1, \"name\": \"bar\"}");
+        realm.beginTransaction();
+        realm.createObject(OwnerPrimaryKey.class); // id = 0
+        realm.createOrUpdateObjectFromJson(OwnerPrimaryKey.class, stream);
+        realm.commitTransaction();
+
+        RealmResults<OwnerPrimaryKey> owners = realm.where(OwnerPrimaryKey.class).findAll();
+        assertEquals(2, owners.size());
+        assertEquals(1, owners.get(1).getId());
+        assertEquals("bar", owners.get(1).getName());
+    }
+

@@ -1,0 +1,17 @@
+    @Test
+    public void createOrUpdateObjectFromJson_inputStream() throws IOException {
+        realm.beginTransaction();
+
+        AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
+        obj.setColumnLong(1);
+        obj.setColumnString("Foo");
+        realm.copyToRealm(obj);
+
+        InputStream in = TestHelper.stringToStream("{ \"columnLong\" : 1, \"columnString\" : \"bar\" }");
+        AllTypesPrimaryKey newObj = realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, in);
+        realm.commitTransaction();
+
+        assertEquals(1, realm.allObjects(AllTypesPrimaryKey.class).size());
+        assertEquals("bar", newObj.getColumnString());
+    }
+

@@ -1,0 +1,20 @@
+    @Test
+    public void createOrUpdateObjectFromJson_withJsonObject() throws JSONException {
+        realm.beginTransaction();
+
+        AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
+        obj.setColumnLong(1);
+        obj.setColumnString("Foo");
+        realm.copyToRealm(obj);
+
+        JSONObject json = new JSONObject();
+        json.put("columnLong", 1);
+        json.put("columnString", "bar");
+        AllTypesPrimaryKey newObj = realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, json);
+
+        realm.commitTransaction();
+
+        assertEquals(1, realm.allObjects(AllTypesPrimaryKey.class).size());
+        assertEquals("bar", newObj.getColumnString());
+    }
+

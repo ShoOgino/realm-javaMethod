@@ -1,0 +1,11 @@
+    @Test
+    public void createAllFromJson_streamArray() throws IOException {
+        InputStream in = TestHelper.loadJsonFromAssets(context, "array.json");
+        realm.beginTransaction();
+        realm.createAllFromJson(Dog.class, in);
+        realm.commitTransaction();
+
+        assertEquals(3, realm.allObjects(Dog.class).size());
+        assertEquals(1, realm.where(Dog.class).equalTo("name", "Fido-3").findAll().size());
+    }
+

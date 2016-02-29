@@ -1,0 +1,21 @@
+    @Test
+    public void createObjectFromJson_childObjectList() throws JSONException {
+        JSONObject allTypesObject = new JSONObject();
+        JSONObject dog1 = new JSONObject(); dog1.put("name", "Fido-1");
+        JSONObject dog2 = new JSONObject(); dog2.put("name", "Fido-2");
+        JSONObject dog3 = new JSONObject(); dog3.put("name", "Fido-3");
+        JSONArray dogList = new JSONArray();
+        dogList.put(dog1);
+        dogList.put(dog2);
+        dogList.put(dog3);
+        allTypesObject.put("columnRealmList", dogList);
+
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, allTypesObject);
+        realm.commitTransaction();
+
+        AllTypes obj = realm.allObjects(AllTypes.class).first();
+        assertEquals(3, obj.getColumnRealmList().size());
+        assertEquals("Fido-3", obj.getColumnRealmList().get(2).getName());
+    }
+
