@@ -1,0 +1,11 @@
+    @Test
+    public void setObject_objectBelongToTypedRealmThrows() {
+        dynamicRealm.beginTransaction();
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Cannot add an object from another Realm instance.");
+        dynamicRealm.where(AllJavaTypes.CLASS_NAME).findFirst().setObject(AllJavaTypes.FIELD_OBJECT, dObjTyped);
+
+        dynamicRealm.cancelTransaction();
+    }
+
