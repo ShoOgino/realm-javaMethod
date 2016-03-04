@@ -1,0 +1,42 @@
+    @Test
+    public void add_set_objectFromOtherThread() {
+        final CountDownLatch finishedLatch = new CountDownLatch(1);
+        final Dog dog = testRealm.where(Dog.class).findFirst();
+        final String expectedMsg = "Cannot copy an object from another Realm instance.";
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(testRealm.getConfiguration());
+                realm.beginTransaction();
+                RealmList<Dog> list = realm.createObject(Owner.class).getDogs();
+                list.add(realm.createObject(Dog.class));
+                try {
+                    list.add(dog);
+                    fail();
+                } catch (IllegalArgumentException expected) {
+                    assertEquals(expectedMsg, expected.getMessage());
+                }
+
+                try {
+                    list.add(0, dog);
+                    fail();
+                } catch (IllegalArgumentException expected) {
+                    assertEquals(expectedMsg, expected.getMessage());
+                }
+
+                try {
+                    list.set(0, dog);
+                    fail();
+                } catch (IllegalArgumentException expected) {
+                    assertEquals(expectedMsg, expected.getMessage());
+                }
+
+                realm.cancelTransaction();
+                realm.close();
+                finishedLatch.countDown();
+            }
+        }).start();
+        TestHelper.awaitOrFail(finishedLatch);
+    }
+

@@ -8,7 +8,7 @@
     public RealmList<DynamicRealmObject> getList(String fieldName) {
         long columnIndex = row.getColumnIndex(fieldName);
         LinkView linkView = row.getLinkList(columnIndex);
-        String className = linkView.getTable().getLinkTarget(columnIndex).getName().substring(Table.TABLE_PREFIX.length());
+        String className = RealmSchema.getSchemaForTable(linkView.getTargetTable());
         return new RealmList<DynamicRealmObject>(className, linkView, realm);
     }
 
