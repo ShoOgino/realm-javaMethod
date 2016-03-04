@@ -1,0 +1,14 @@
+    @Test
+    public void setList_elementBelongToTypedRealmThrows() {
+        RealmList<DynamicRealmObject> list = new RealmList<DynamicRealmObject>();
+        list.add(dObjTyped);
+
+        dynamicRealm.beginTransaction();
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Each element in 'list' must belong to the same Realm instance.");
+        dynamicRealm.where(AllJavaTypes.CLASS_NAME).findFirst().setList(AllJavaTypes.FIELD_LIST, list);
+
+        dynamicRealm.cancelTransaction();
+    }
+

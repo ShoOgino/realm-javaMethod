@@ -16,7 +16,10 @@
         typedObj.setFieldDate(new Date(1000));
         typedObj.setFieldObject(typedObj);
         typedObj.getFieldList().add(typedObj);
-        dObj = new DynamicRealmObject(typedObj);
+        dObjTyped = new DynamicRealmObject(typedObj);
         realm.commitTransaction();
+
+        dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
+        dObjDynamic = dynamicRealm.where(AllJavaTypes.CLASS_NAME).findFirst();
     }
 

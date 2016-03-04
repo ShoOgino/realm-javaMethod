@@ -1,0 +1,24 @@
+    @Test
+    public void setList_listWithDynamicRealmObject() {
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.configuration);
+        dynamicRealm.beginTransaction();
+
+        DynamicRealmObject allTypes = dynamicRealm.createObject(AllTypes.CLASS_NAME);
+        allTypes.setString(AllTypes.FIELD_STRING, "bender");
+
+        DynamicRealmObject dog = dynamicRealm.createObject(Dog.CLASS_NAME);
+        dog.setString(Dog.FIELD_NAME, "nibbler");
+
+        RealmList<DynamicRealmObject> list = new RealmList<DynamicRealmObject>();
+        list.add(dog);
+        allTypes.setList(AllTypes.FIELD_REALMLIST, list);
+
+        dynamicRealm.commitTransaction();
+
+        allTypes = dynamicRealm.where(AllTypes.CLASS_NAME)
+                .equalTo(AllTypes.FIELD_STRING, "bender")
+                .findFirst();
+        assertEquals("nibbler", allTypes.getList(AllTypes.FIELD_REALMLIST).first().get(Dog.FIELD_NAME));
+        dynamicRealm.close();
+    }
+

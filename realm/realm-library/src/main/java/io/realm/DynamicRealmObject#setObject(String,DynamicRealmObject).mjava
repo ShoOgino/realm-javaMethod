@@ -3,8 +3,8 @@
      *
      * @param fieldName field name.
      * @param value object to link to.
-     * @throws IllegalArgumentException if field name doesn't exists, it doesn't link to other Realm objects, or the type
-     * of DynamicRealmObject doesn't match.
+     * @throws IllegalArgumentException if field name doesn't exists, it doesn't link to other Realm objects, the type
+     * of DynamicRealmObject doesn't match or it belongs to a different Realm.
      */
     public void setObject(String fieldName, DynamicRealmObject value) {
         long columnIndex = row.getColumnIndex(fieldName);
@@ -14,8 +14,8 @@
             if (value.realm == null || value.row == null) {
                 throw new IllegalArgumentException("Cannot link to objects that are not part of the Realm.");
             }
-            if (!realm.getConfiguration().equals(value.realm.getConfiguration())) {
-                throw new IllegalArgumentException("Cannot add an object from another Realm");
+            if (realm != value.realm) {
+                throw new IllegalArgumentException("Cannot add an object from another Realm instance.");
             }
             Table table = row.getTable().getLinkTarget(columnIndex);
             Table inputTable = value.row.getTable();
