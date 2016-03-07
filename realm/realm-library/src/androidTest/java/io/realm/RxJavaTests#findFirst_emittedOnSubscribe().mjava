@@ -6,7 +6,7 @@
         realm.commitTransaction();
 
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, 42).findFirst().<AllTypes>asObservable()
+        subscription = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, 42).findFirst().<AllTypes>asObservable()
                 .subscribe(new Action1<AllTypes>() {
                     @Override
                     public void call(AllTypes rxObject) {
@@ -14,5 +14,6 @@
                     }
                 });
         assertTrue(subscribedNotified.get());
+        subscription.unsubscribe();
     }
 

@@ -3,7 +3,7 @@
     public void realm_emittedOnUpdate() {
         final AtomicInteger subscriberCalled = new AtomicInteger(0);
         Realm realm = looperThread.realm;
-        realm.asObservable().subscribe(new Action1<Realm>() {
+        subscription = realm.asObservable().subscribe(new Action1<Realm>() {
             @Override
             public void call(Realm rxRealm) {
                 if (subscriberCalled.incrementAndGet() == 2) {

@@ -28,6 +28,14 @@
                                 threadAssertionError[0] = e;
                                 unitTestFailed = true;
                             } finally {
+                                try {
+                                    looperTearDown();
+                                } catch (Throwable t) {
+                                    if (threadAssertionError[0] == null) {
+                                        threadAssertionError[0] = t;
+                                    }
+                                    unitTestFailed = true;
+                                }
                                 if (signalTestCompleted.getCount() > 0) {
                                     signalTestCompleted.countDown();
                                 }

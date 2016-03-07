@@ -3,7 +3,7 @@
     public void findAllAsync_emittedOnSubscribe() {
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         final RealmResults<AllTypes> results = realm.where(AllTypes.class).findAllAsync();
-        results.asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
+        subscription = results.asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
             @Override
             public void call(RealmResults<AllTypes> rxResults) {
                 assertTrue(rxResults == results);
@@ -11,5 +11,6 @@
             }
         });
         assertTrue(subscribedNotified.get());
+        subscription.unsubscribe();
     }
 
