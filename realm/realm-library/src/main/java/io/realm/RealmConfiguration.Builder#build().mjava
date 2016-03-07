@@ -4,6 +4,9 @@
          * @return the created {@link RealmConfiguration}.
          */
         public RealmConfiguration build() {
+            if (rxFactory == null && isRxJavaAvailable()) {
+                rxFactory = new RealmObservableFactory();
+            }
             return new RealmConfiguration(this);
         }
 
