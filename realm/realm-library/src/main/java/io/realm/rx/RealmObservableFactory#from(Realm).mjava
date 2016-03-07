@@ -1,24 +1,29 @@
     @Override
-    public Observable<Realm> from(final Realm realm) {
+    public Observable<Realm> from(Realm realm) {
+        final RealmConfiguration realmConfig = realm.getConfiguration();
         return Observable.create(new Observable.OnSubscribe<Realm>() {
             @Override
             public void call(final Subscriber<? super Realm> subscriber) {
+                // Get instance to make sure that the Realm is open for as long as the
+                // Observable is subscribed to it.
+                final Realm observableRealm = Realm.getInstance(realmConfig);
                 final RealmChangeListener listener = new RealmChangeListener() {
                     @Override
                     public void onChange() {
                         if (!subscriber.isUnsubscribed()) {
-                            subscriber.onNext(realm);
+                            subscriber.onNext(observableRealm);
                         }
                     }
                 };
-                realm.addChangeListener(listener);
+                observableRealm.addChangeListener(listener);
                 subscriber.add(Subscriptions.create(new Action0() {
                     @Override
                     public void call() {
-                        realm.removeChangeListener(listener);
+                        observableRealm.removeChangeListener(listener);
+                        observableRealm.close();
                     }
                 }));
-                subscriber.onNext(realm);
+                subscriber.onNext(observableRealm);
             }
         });
     }

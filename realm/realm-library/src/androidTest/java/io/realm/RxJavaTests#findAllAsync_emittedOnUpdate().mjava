@@ -1,18 +1,19 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void findAllAsync_emittedOnUpdate() {
         final AtomicInteger subscriberCalled = new AtomicInteger(0);
-        realm.where(AllTypes.class).findAllAsync().asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
+        Realm realm = looperThread.realm;
+        subscription = realm.where(AllTypes.class).findAllAsync().asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
             @Override
             public void call(RealmResults<AllTypes> rxResults) {
-                subscriberCalled.incrementAndGet();
+                if (subscriberCalled.incrementAndGet() == 2) {
+                    looperThread.testComplete();
+                }
             }
         });
 
         realm.beginTransaction();
         realm.createObject(AllTypes.class);
         realm.commitTransaction();
-
-        assertEquals(1, subscriberCalled.get());
     }
 

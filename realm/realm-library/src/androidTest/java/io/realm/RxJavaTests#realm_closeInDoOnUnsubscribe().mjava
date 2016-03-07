@@ -1,0 +1,21 @@
+    @Test
+    @UiThreadTest
+    public void realm_closeInDoOnUnsubscribe() {
+        Observable<Realm> observable = realm.asObservable()
+                .doOnUnsubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        realm.close();
+                    }
+                });
+
+        subscription = observable.subscribe(new Action1<Realm>() {
+            @Override
+            public void call(Realm rxRealm) {
+            }
+        });
+
+        subscription.unsubscribe();
+        assertTrue(realm.isClosed());
+    }
+

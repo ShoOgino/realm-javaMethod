@@ -1,16 +1,23 @@
     @Test
     @UiThreadTest
     public void dynamicRealm_emittedOnSubscribe() {
-        final DynamicRealm dynamicRealm = DynamicRealm.createInstance(realm.getConfiguration());
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        dynamicRealm.asObservable().subscribe(new Action1<DynamicRealm>() {
+        subscription = dynamicRealm.asObservable().subscribe(new Action1<DynamicRealm>() {
             @Override
             public void call(DynamicRealm rxRealm) {
                 assertTrue(rxRealm == dynamicRealm);
                 subscribedNotified.set(true);
             }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                throwable.printStackTrace();
+            }
         });
+
         assertTrue(subscribedNotified.get());
         dynamicRealm.close();
+        subscription.unsubscribe();
     }
 

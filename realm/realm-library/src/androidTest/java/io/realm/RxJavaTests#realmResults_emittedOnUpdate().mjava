@@ -7,7 +7,7 @@
         RealmResults<AllTypes> results = realm.allObjects(AllTypes.class);
         realm.commitTransaction();
 
-        results.asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
+        subscription = results.asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
             @Override
             public void call(RealmResults<AllTypes> allTypes) {
                 if (subscriberCalled.incrementAndGet() == 2) {
