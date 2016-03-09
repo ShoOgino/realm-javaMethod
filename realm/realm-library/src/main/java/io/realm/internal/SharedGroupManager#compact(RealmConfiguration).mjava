@@ -1,5 +1,6 @@
     /**
      * Compacts a Realm file. It cannot be open when calling this method.
+     * Returns true if compaction succeeded, false otherwise.
      */
     public static boolean compact(RealmConfiguration configuration) {
         SharedGroup sharedGroup = null;
@@ -12,6 +13,7 @@
                     configuration.getEncryptionKey());
             result = sharedGroup.compact();
         } catch (Exception e) {
+            RealmLog.i(e.getMessage());
             return false;
         } finally {
             if (sharedGroup != null) {
