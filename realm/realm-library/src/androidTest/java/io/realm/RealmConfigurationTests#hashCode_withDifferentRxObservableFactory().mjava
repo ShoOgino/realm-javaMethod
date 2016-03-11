@@ -1,0 +1,17 @@
+    @Test
+    public void hashCode_withDifferentRxObservableFactory() {
+        RealmConfiguration config1 = new RealmConfiguration.Builder(configFactory.getRoot())
+                .rxFactory(new RealmObservableFactory())
+                .build();
+        RealmConfiguration config2 = new RealmConfiguration.Builder(configFactory.getRoot())
+                .rxFactory(new RealmObservableFactory() {
+                    @Override
+                    public int hashCode() {
+                        return super.hashCode() + 1;
+                    }
+                })
+                .build();
+
+        assertNotEquals(config1.hashCode(), config2.hashCode());
+    }
+
