@@ -1,0 +1,30 @@
+    /**
+     * Utilizes the regular system call to attempt to load a native library. If a failure occurs,
+     * then the function extracts native .so library out of the app's APK and attempts to load it.
+     * <p>
+     *     <strong>Note: This is a synchronous operation</strong>
+     */
+    public static void loadLibrary(final Context context, final String library) {
+        if (context == null) {
+            throw new IllegalArgumentException("Given context is null");
+        }
+
+        if (TextUtils.isEmpty(library)) {
+            throw new IllegalArgumentException("Given library is either null or empty");
+        }
+
+        try {
+            System.loadLibrary(library);
+            return;
+        } catch (final UnsatisfiedLinkError ignored) {
+            // :-(
+        }
+
+        final File workaroundFile = getWorkaroundLibFile(context, library);
+        if (!workaroundFile.exists()) {
+            unpackLibrary(context, library);
+        }
+
+        System.load(workaroundFile.getAbsolutePath());
+    }
+
