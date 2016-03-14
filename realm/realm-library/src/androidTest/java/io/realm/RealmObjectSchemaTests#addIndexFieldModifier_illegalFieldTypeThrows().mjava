@@ -1,14 +1,15 @@
-    public void testAddPrimaryKeyFieldModifier_illegalFieldTypeThrows() {
+    @Test
+    public void addIndexFieldModifier_illegalFieldTypeThrows() {
         String fieldName = "foo";
-        for (InvalidPrimaryKeyFieldType fieldType : InvalidPrimaryKeyFieldType.values()) {
+        for (InvalidIndexFieldType fieldType : InvalidIndexFieldType.values()) {
             switch (fieldType) {
                 case OBJECT: schema.addRealmObjectField(fieldName, DOG_SCHEMA); break;
                 case LIST: schema.addRealmListField(fieldName, DOG_SCHEMA); break;
                 default: schema.addField(fieldName, fieldType.getType());
             }
             try {
-                schema.addPrimaryKey(fieldName);
-                fail(fieldType + " should not be a legal primary key");
+                schema.addIndex(fieldName);
+                fail(fieldType + " should not be allowed to be indexed.");
             } catch (IllegalArgumentException ignored) {
             }
             schema.removeField(fieldName);
