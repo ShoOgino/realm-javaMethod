@@ -1,0 +1,11 @@
+    @Test
+    public void createOrUpdateAllFromJson_jsonArray() throws JSONException, IOException {
+        String json = TestHelper.streamToString(TestHelper.loadJsonFromAssets(context, "list_alltypes_primarykey.json"));
+        JSONArray array = new JSONArray(json);
+        realm.beginTransaction();
+        realm.createOrUpdateAllFromJson(AllTypesPrimaryKey.class, array);
+        realm.commitTransaction();
+
+        assertAllTypesPrimaryKeyUpdated();
+    }
+

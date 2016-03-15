@@ -1,0 +1,56 @@
+    // The presence of async RealmResults block any `REALM_CHANGE` notification causing historically the Realm
+    // to advance to the latest version. We make sure in this test that all Realm listeners will be notified
+    // regardless of the presence of an async RealmObject that will delay the `REALM_CHANGE` sometimes
+    @Test
+    @RunTestInLooperThread
+    public void asyncRealmObjectShouldNotBlockBackgroundCommitNotification() {
+        final AtomicInteger numberOfRealmCallbackInvocation = new AtomicInteger(0);
+        final CountDownLatch signalClosedRealm = new CountDownLatch(1);
+        looperThread.realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                switch (numberOfRealmCallbackInvocation.incrementAndGet()) {
+                    case 1: {
+                        // first commit
+                        Dog dog = looperThread.realm.where(Dog.class).findFirstAsync();
+                        assertTrue(dog.load());
+                        dog.addChangeListener(new RealmChangeListener() {
+                            @Override
+                            public void onChange() {
+                            }
+                        });
+                        looperThread.keepStrongReference.add(dog);
+
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                Realm realm = Realm.getInstance(looperThread.realmConfiguration);
+                                realm.beginTransaction();
+                                realm.createObject(Dog.class);
+                                realm.commitTransaction();
+                                realm.close();
+                                signalClosedRealm.countDown();
+                            }
+                        }.start();
+                        break;
+                    }
+                    case 2: {
+                        // finish test
+                        TestHelper.awaitOrFail(signalClosedRealm);
+                        looperThread.testComplete();
+                        break;
+                    }
+                }
+            }
+        });
+
+        looperThread.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                looperThread.realm.beginTransaction();
+                looperThread.realm.createObject(Dog.class);
+                looperThread.realm.commitTransaction();
+            }
+        });
+    }
+

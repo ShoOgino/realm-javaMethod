@@ -8,7 +8,7 @@
 
         // If object is already in the Realm there is nothing to update
         writer
-            .beginControlFlow("if (object.realm != null && object.realm.getPath().equals(realm.getPath()))")
+            .beginControlFlow("if (((RealmObject) object).realm != null && ((RealmObject) object).realm.getPath().equals(realm.getPath()))")
                 .emitStatement("return object")
             .endControlFlow();
 
@@ -22,14 +22,17 @@
                     .emitStatement("Table table = realm.getTable(%s.class)", className)
                     .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
 
+            String primaryKeyGetter = metadata.getPrimaryKeyGetter();
             if (Utils.isString(metadata.getPrimaryKey())) {
                 writer
-                    .beginControlFlow("if (object.%s() == null)", metadata.getPrimaryKeyGetter())
+                    .beginControlFlow("if (((%s) object).%s() == null)", interfaceName, primaryKeyGetter)
                         .emitStatement("throw new IllegalArgumentException(\"Primary key value must not be null.\")")
                     .endControlFlow()
-                    .emitStatement("long rowIndex = table.findFirstString(pkColumnIndex, object.%s())", metadata.getPrimaryKeyGetter());
+                    .emitStatement("long rowIndex = table.findFirstString(pkColumnIndex, ((%s) object).%s())",
+                            interfaceName, primaryKeyGetter);
             } else {
-                writer.emitStatement("long rowIndex = table.findFirstLong(pkColumnIndex, object.%s())", metadata.getPrimaryKeyGetter());
+                writer.emitStatement("long rowIndex = table.findFirstLong(pkColumnIndex, ((%s) object).%s())",
+                        interfaceName, primaryKeyGetter);
             }
 
             writer
@@ -37,8 +40,8 @@
                     .emitStatement("realmObject = new %s(realm.schema.getColumnInfo(%s.class))",
                             Utils.getProxyClassName(className),
                             className)
-                    .emitStatement("realmObject.realm = realm")
-                    .emitStatement("realmObject.row = table.getUncheckedRow(rowIndex)")
+                    .emitStatement("((RealmObject) realmObject).realm = realm")
+                    .emitStatement("((RealmObject) realmObject).row = table.getUncheckedRow(rowIndex)")
                     .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
                 .nextControlFlow("else")
                     .emitStatement("canUpdate = false")

@@ -1,0 +1,36 @@
+    public void generate() throws IOException {
+        String qualifiedGeneratedInterfaceName =
+                String.format("%s.%s", Constants.REALM_PACKAGE_NAME, Utils.getProxyInterfaceName(className));
+        JavaFileObject sourceFile = processingEnvironment.getFiler().createSourceFile(qualifiedGeneratedInterfaceName);
+        JavaWriter writer = new JavaWriter(new BufferedWriter(sourceFile.openWriter()));
+
+        writer.setIndent(Constants.INDENT);
+
+        writer
+                .emitPackage(Constants.REALM_PACKAGE_NAME)
+                .emitEmptyLine()
+                .beginType(qualifiedGeneratedInterfaceName, "interface", EnumSet.of(Modifier.PUBLIC));
+        for (VariableElement field : metaData.getFields()) {
+            // The field is neither static nor ignored
+            if (!field.getModifiers().contains(Modifier.STATIC) && field.getAnnotation(Ignore.class) == null) {
+                String fieldName = field.getSimpleName().toString();
+                String fieldTypeCanonicalName = field.asType().toString();
+                writer
+                        .beginMethod(
+                                fieldTypeCanonicalName,
+                                metaData.getGetter(fieldName),
+                                EnumSet.of(Modifier.PUBLIC))
+                        .endMethod()
+                        .beginMethod(
+                                "void",
+                                metaData.getSetter(fieldName),
+                                EnumSet.of(Modifier.PUBLIC),
+                                fieldTypeCanonicalName,
+                                "value")
+                        .endMethod();
+            }
+        }
+        writer.endType();
+        writer.close();
+    }
+

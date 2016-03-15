@@ -1,0 +1,14 @@
+    @Test
+    public void realmListRemoveAllFromRealm() {
+        populateTestRealm(realm, 1);
+        RealmList<DynamicRealmObject> list = realm.where(AllTypes.CLASS_NAME).findFirst().getList(AllTypes.FIELD_REALMLIST);
+        assertEquals(2, list.size());
+
+        realm.beginTransaction();
+        list.deleteAllFromRealm();
+        realm.commitTransaction();
+
+        assertEquals(0, list.size());
+        assertEquals(0, realm.where(Dog.CLASS_NAME).count());
+    }
+

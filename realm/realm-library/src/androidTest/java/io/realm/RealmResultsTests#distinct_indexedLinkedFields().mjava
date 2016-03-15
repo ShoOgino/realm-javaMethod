@@ -1,0 +1,15 @@
+    @Test
+    public void distinct_indexedLinkedFields() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, true);
+
+        for (String field : AnnotationIndexTypes.INDEX_FIELDS) {
+            try {
+                realm.where(AnnotationIndexTypes.class).findAll().distinct(AnnotationIndexTypes.FIELD_OBJECT + "." + field);
+                fail("Unsupported Index" + field + " linked field");
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

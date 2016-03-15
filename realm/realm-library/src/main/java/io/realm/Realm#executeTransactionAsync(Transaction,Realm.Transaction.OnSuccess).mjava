@@ -1,0 +1,16 @@
+    /**
+     * Similar to {@link #executeTransactionAsync(Transaction)}, but also accepts an OnSuccess callback.
+     *
+     * @param transaction {@link io.realm.Realm.Transaction} to execute.
+     * @param onSuccess callback invoked when the transaction succeeds.
+     * @return a {@link RealmAsyncTask} representing a cancellable task.
+     * @throws IllegalArgumentException if the {@code transaction} is {@code null}, or if the realm is opened from another thread.
+     */
+    public RealmAsyncTask executeTransactionAsync(final Transaction transaction, final Realm.Transaction.OnSuccess onSuccess) {
+        if (onSuccess == null) {
+            throw new IllegalArgumentException("onSuccess callback can't be null");
+        }
+
+        return executeTransactionAsync(transaction, onSuccess, null);
+    }
+

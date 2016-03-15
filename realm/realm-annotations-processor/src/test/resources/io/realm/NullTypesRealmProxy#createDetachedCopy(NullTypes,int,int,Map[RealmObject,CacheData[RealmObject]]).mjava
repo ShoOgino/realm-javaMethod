@@ -2,43 +2,43 @@
         if (currentDepth > maxDepth || realmObject == null) {
             return null;
         }
-        CacheData<NullTypes> cachedObject = (CacheData) cache.get(realmObject);
+        CacheData<RealmObject> cachedObject = cache.get(realmObject);
         NullTypes standaloneObject;
         if (cachedObject != null) {
             // Reuse cached object or recreate it because it was encountered at a lower depth.
             if (currentDepth >= cachedObject.minDepth) {
-                return cachedObject.object;
+                return (NullTypes)cachedObject.object;
             } else {
-                standaloneObject = cachedObject.object;
+                standaloneObject = (NullTypes)cachedObject.object;
                 cachedObject.minDepth = currentDepth;
             }
         } else {
             standaloneObject = new NullTypes();
             cache.put(realmObject, new RealmObjectProxy.CacheData<RealmObject>(currentDepth, standaloneObject));
         }
-        standaloneObject.setFieldStringNotNull(realmObject.getFieldStringNotNull());
-        standaloneObject.setFieldStringNull(realmObject.getFieldStringNull());
-        standaloneObject.setFieldBooleanNotNull(realmObject.getFieldBooleanNotNull());
-        standaloneObject.setFieldBooleanNull(realmObject.getFieldBooleanNull());
-        standaloneObject.setFieldBytesNotNull(realmObject.getFieldBytesNotNull());
-        standaloneObject.setFieldBytesNull(realmObject.getFieldBytesNull());
-        standaloneObject.setFieldByteNotNull(realmObject.getFieldByteNotNull());
-        standaloneObject.setFieldByteNull(realmObject.getFieldByteNull());
-        standaloneObject.setFieldShortNotNull(realmObject.getFieldShortNotNull());
-        standaloneObject.setFieldShortNull(realmObject.getFieldShortNull());
-        standaloneObject.setFieldIntegerNotNull(realmObject.getFieldIntegerNotNull());
-        standaloneObject.setFieldIntegerNull(realmObject.getFieldIntegerNull());
-        standaloneObject.setFieldLongNotNull(realmObject.getFieldLongNotNull());
-        standaloneObject.setFieldLongNull(realmObject.getFieldLongNull());
-        standaloneObject.setFieldFloatNotNull(realmObject.getFieldFloatNotNull());
-        standaloneObject.setFieldFloatNull(realmObject.getFieldFloatNull());
-        standaloneObject.setFieldDoubleNotNull(realmObject.getFieldDoubleNotNull());
-        standaloneObject.setFieldDoubleNull(realmObject.getFieldDoubleNull());
-        standaloneObject.setFieldDateNotNull(realmObject.getFieldDateNotNull());
-        standaloneObject.setFieldDateNull(realmObject.getFieldDateNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldStringNotNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldStringNotNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldStringNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldStringNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldBooleanNotNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldBooleanNotNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldBooleanNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldBooleanNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldBytesNotNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldBytesNotNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldBytesNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldBytesNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldByteNotNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldByteNotNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldByteNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldByteNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldShortNotNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldShortNotNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldShortNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldShortNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldIntegerNotNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldIntegerNotNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldIntegerNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldIntegerNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldLongNotNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldLongNotNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldLongNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldLongNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldFloatNotNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldFloatNotNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldFloatNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldFloatNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldDoubleNotNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldDoubleNotNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldDoubleNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldDoubleNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldDateNotNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldDateNotNull());
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldDateNull(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldDateNull());
 
         // Deep copy of fieldObjectNull
-        standaloneObject.setFieldObjectNull(NullTypesRealmProxy.createDetachedCopy(realmObject.getFieldObjectNull(), currentDepth + 1, maxDepth, cache));
+        ((NullTypesRealmProxyInterface) standaloneObject).realmSet$fieldObjectNull(NullTypesRealmProxy.createDetachedCopy(((NullTypesRealmProxyInterface) realmObject).realmGet$fieldObjectNull(), currentDepth + 1, maxDepth, cache));
         return standaloneObject;
     }
 

@@ -1,0 +1,36 @@
+    @Test
+    public void setRemoveNullable() {
+        for (FieldType fieldType : FieldType.values()) {
+            String fieldName = "foo";
+            switch (fieldType) {
+                case OBJECT:
+                    // Objects are always nullable and cannot be changed.
+                    schema.addRealmObjectField(fieldName, schema);
+                    assertTrue(schema.isNullable(fieldName));
+                    try {
+                        schema.setNullable(fieldName, false);
+                        fail();
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                    break;
+                case LIST:
+                    // Lists are not nullable and cannot be configured to be so.
+                    schema.addRealmListField(fieldName, schema);
+                    assertFalse(schema.isNullable(fieldName));
+                    try {
+                        schema.setNullable(fieldName, true);
+                        fail();
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                    break;
+                default:
+                    // All simple types
+                    schema.addField(fieldName, fieldType.getType());
+                    assertEquals(fieldType.isNullable(), schema.isNullable(fieldName));
+                    schema.setNullable(fieldName, !fieldType.isNullable());
+                    assertEquals(!fieldType.isNullable(), schema.isNullable(fieldName));
+            }
+            schema.removeField(fieldName);
+        }
+    }
+

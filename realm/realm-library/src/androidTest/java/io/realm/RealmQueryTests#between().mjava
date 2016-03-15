@@ -1,0 +1,25 @@
+    @Test
+    public void between() {
+        final int TEST_OBJECTS_COUNT = 200;
+        populateTestRealm(realm, TEST_OBJECTS_COUNT);
+
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class)
+                .between(AllTypes.FIELD_LONG, 0, 9).findAll();
+        assertEquals(10, resultList.size());
+
+        resultList = realm.where(AllTypes.class).beginsWith(AllTypes.FIELD_STRING, "test data ").findAll();
+        assertEquals(TEST_OBJECTS_COUNT, resultList.size());
+
+        resultList = realm.where(AllTypes.class).beginsWith(AllTypes.FIELD_STRING, "test data 1")
+                .between(AllTypes.FIELD_LONG, 2, 20).findAll();
+        assertEquals(10, resultList.size());
+
+        resultList = realm.where(AllTypes.class).between(AllTypes.FIELD_LONG, 2, 20)
+                .beginsWith(AllTypes.FIELD_STRING, "test data 1").findAll();
+        assertEquals(10, resultList.size());
+
+        assertEquals(51, realm.where(AllTypes.class).between(AllTypes.FIELD_DATE,
+                new Date(0),
+                new Date(DECADE_MILLIS * 50)).count());
+    }
+

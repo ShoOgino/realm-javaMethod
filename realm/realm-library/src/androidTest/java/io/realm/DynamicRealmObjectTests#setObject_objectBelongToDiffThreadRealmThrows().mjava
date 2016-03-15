@@ -1,0 +1,26 @@
+    @Test
+    public void setObject_objectBelongToDiffThreadRealmThrows() {
+        final CountDownLatch finishedLatch = new CountDownLatch(1);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
+                dynamicRealm.beginTransaction();
+
+                try {
+                    // ExpectedException doesn't work in another thread.
+                    dynamicRealm.where(AllJavaTypes.CLASS_NAME).findFirst()
+                            .setObject(AllJavaTypes.FIELD_OBJECT, dObjDynamic);
+                    fail();
+                } catch (IllegalArgumentException expected) {
+                    assertEquals(expected.getMessage(), "Cannot add an object from another Realm instance.");
+                }
+
+                dynamicRealm.cancelTransaction();
+                dynamicRealm.close();
+                finishedLatch.countDown();
+            }
+        }).start();
+        TestHelper.awaitOrFail(finishedLatch);
+    }
+

@@ -1,0 +1,54 @@
+    @Test
+    public void untypedSetter_usingStringConversion() {
+        realm.beginTransaction();
+        AllJavaTypes obj = realm.createObject(AllJavaTypes.class);
+        DynamicRealmObject dObj = new DynamicRealmObject(obj);
+        try {
+            for (SupportedType type : SupportedType.values()) {
+                switch (type) {
+                    case BOOLEAN:
+                        dObj.set(AllJavaTypes.FIELD_BOOLEAN, "true");
+                        assertTrue(dObj.getBoolean(AllJavaTypes.FIELD_BOOLEAN));
+                        break;
+                    case SHORT:
+                        dObj.set(AllJavaTypes.FIELD_SHORT, "42");
+                        assertEquals((short) 42, dObj.getShort(AllJavaTypes.FIELD_SHORT));
+                        break;
+                    case INT:
+                        dObj.set(AllJavaTypes.FIELD_INT, "42");
+                        assertEquals(42, dObj.getInt(AllJavaTypes.FIELD_INT));
+                        break;
+                    case LONG:
+                        dObj.set(AllJavaTypes.FIELD_LONG, "42");
+                        assertEquals((long) 42, dObj.getLong(AllJavaTypes.FIELD_LONG));
+                        break;
+                    case FLOAT:
+                        dObj.set(AllJavaTypes.FIELD_FLOAT, "1.23");
+                        assertEquals(1.23f, dObj.getFloat(AllJavaTypes.FIELD_FLOAT), 0f);
+                        break;
+                    case DOUBLE:
+                        dObj.set(AllJavaTypes.FIELD_DOUBLE, "1.234");
+                        assertEquals(1.234d, dObj.getDouble(AllJavaTypes.FIELD_DOUBLE), 0f);
+                        break;
+                    case DATE:
+                        dObj.set(AllJavaTypes.FIELD_DATE, "1000");
+                        assertEquals(new Date(1000), dObj.getDate(AllJavaTypes.FIELD_DATE));
+                        break;
+                    // These types don't have a string representation that can be parsed.
+                    case OBJECT:
+                    case LIST:
+                    case STRING:
+                    case BINARY:
+                    case BYTE:
+                        break;
+
+                    default:
+                        fail("Unknown type: " + type);
+                        break;
+                }
+            }
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

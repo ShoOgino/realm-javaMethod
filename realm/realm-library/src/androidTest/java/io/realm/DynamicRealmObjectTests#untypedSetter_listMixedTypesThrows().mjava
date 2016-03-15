@@ -1,0 +1,14 @@
+    @Test
+    public void untypedSetter_listMixedTypesThrows() {
+        realm.beginTransaction();
+        AllJavaTypes obj1 = realm.createObject(AllJavaTypes.class);
+        obj1.setFieldLong(2);
+        CyclicType obj2 = realm.createObject(CyclicType.class);
+
+        RealmList<DynamicRealmObject> list = new RealmList<DynamicRealmObject>();
+        list.add(new DynamicRealmObject(obj1));
+        list.add(new DynamicRealmObject(obj2));
+        thrown.expect(IllegalArgumentException.class);
+        dObjTyped.set(AllJavaTypes.FIELD_LIST, list);
+    }
+

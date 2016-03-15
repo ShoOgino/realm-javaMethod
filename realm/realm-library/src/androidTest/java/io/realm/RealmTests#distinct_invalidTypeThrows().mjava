@@ -1,0 +1,13 @@
+    @Test
+    public void distinct_invalidTypeThrows() {
+        populateTestRealm();
+
+        for (String field : new String[]{AllTypes.FIELD_REALMOBJECT, AllTypes.FIELD_REALMLIST, AllTypes.FIELD_DOUBLE, AllTypes.FIELD_FLOAT}) {
+            try {
+                realm.distinct(AllTypes.class, field);
+                fail(field);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

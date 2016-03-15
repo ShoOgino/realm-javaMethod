@@ -5,7 +5,7 @@
                 "createUsingJsonStream",
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
                 Arrays.asList("Realm", "realm", "JsonReader", "reader"),
-                Arrays.asList("IOException"));
+                Collections.singletonList("IOException"));
 
         writer.emitStatement("%s obj = realm.createObject(%s.class)",className, className);
         writer.emitStatement("reader.beginObject()");
@@ -25,6 +25,7 @@
             }
             if (Utils.isRealmObject(field)) {
                 RealmJsonTypeHelper.emitFillRealmObjectFromStream(
+                        interfaceName,
                         metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
@@ -34,6 +35,7 @@
 
             } else if (Utils.isRealmList(field)) {
                 RealmJsonTypeHelper.emitFillRealmListFromStream(
+                        interfaceName,
                         metadata.getGetter(fieldName),
                         metadata.getSetter(fieldName),
                         ((DeclaredType) field.asType()).getTypeArguments().get(0).toString(),
@@ -42,6 +44,7 @@
 
             } else {
                 RealmJsonTypeHelper.emitFillJavaTypeFromStream(
+                        interfaceName,
                         metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,

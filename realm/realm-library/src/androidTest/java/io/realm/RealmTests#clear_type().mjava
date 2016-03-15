@@ -1,0 +1,34 @@
+    @Test
+    public void clear_type() {
+        // ** clear non existing table should succeed
+
+        realm.beginTransaction();
+        realm.clear(AllTypes.class);
+        realm.commitTransaction();
+
+        // ** clear existing class, but leave other classes classes
+
+        // Add two classes
+        populateTestRealm();
+        realm.beginTransaction();
+        Dog dog = realm.createObject(Dog.class);
+        dog.setName("Castro");
+        realm.commitTransaction();
+        // Clear
+        realm.beginTransaction();
+        realm.clear(Dog.class);
+        realm.commitTransaction();
+        // Check one class is cleared but other class is still there
+        RealmResults<AllTypes> resultListTypes = realm.where(AllTypes.class).findAll();
+        assertEquals(TEST_DATA_SIZE, resultListTypes.size());
+        RealmResults<Dog> resultListDogs = realm.where(Dog.class).findAll();
+        assertEquals(0, resultListDogs.size());
+
+        // ** clear() must throw outside a transaction
+        try {
+            realm.clear(AllTypes.class);
+            fail("Expected exception");
+        } catch (IllegalStateException ignored) {
+        }
+    }
+

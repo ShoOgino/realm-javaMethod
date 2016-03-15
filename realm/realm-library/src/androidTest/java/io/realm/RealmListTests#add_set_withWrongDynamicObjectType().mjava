@@ -1,0 +1,39 @@
+    @Test
+    public void add_set_withWrongDynamicObjectType() {
+        final String expectedMsg = "The object has a different type from list's. Type of the list is 'Dog'," +
+                        " type of object is 'Cat'.";
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(testRealm.getConfiguration());
+
+        dynamicRealm.beginTransaction();
+        RealmList<DynamicRealmObject> list = dynamicRealm.createObject(Owner.CLASS_NAME)
+                .getList(Owner.FIELD_DOGS);
+        DynamicRealmObject dynCat = dynamicRealm.createObject(Cat.CLASS_NAME);
+
+        try {
+            list.add(dynCat);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertEquals(expectedMsg, expected.getMessage());
+
+        }
+
+        try {
+            list.add(0, dynCat);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertEquals(expectedMsg, expected.getMessage());
+
+        }
+
+        try {
+            list.set(0, dynCat);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertEquals(expectedMsg, expected.getMessage());
+
+        }
+
+        dynamicRealm.cancelTransaction();
+        dynamicRealm.close();
+    }
+

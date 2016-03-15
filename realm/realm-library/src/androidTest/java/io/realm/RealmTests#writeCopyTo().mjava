@@ -1,0 +1,41 @@
+    @Test
+    public void writeCopyTo() throws IOException {
+        RealmConfiguration configA = configFactory.createConfiguration("file1.realm");
+        RealmConfiguration configB = configFactory.createConfiguration("file2.realm");
+        Realm.deleteRealm(configA);
+        Realm.deleteRealm(configB);
+
+        Realm realm1 = null;
+        try {
+            realm1 = Realm.getInstance(configA);
+            realm1.beginTransaction();
+            AllTypes allTypes = realm1.createObject(AllTypes.class);
+            allTypes.setColumnString("Hello World");
+            realm1.commitTransaction();
+
+            realm1.writeCopyTo(new File(configB.getPath()));
+        } finally {
+            if (realm1 != null) {
+                realm1.close();
+            }
+        }
+
+        // Copy is compacted i.e. smaller than original
+        File file1 = new File(configA.getPath());
+        File file2 = new File(configB.getPath());
+        assertTrue(file1.length() >= file2.length());
+
+        Realm realm2 = null;
+        try {
+            // Contents is copied too
+            realm2 = Realm.getInstance(configB);
+            RealmResults<AllTypes> results = realm2.allObjects(AllTypes.class);
+            assertEquals(1, results.size());
+            assertEquals("Hello World", results.first().getColumnString());
+        } finally {
+            if (realm2 != null) {
+                realm2.close();
+            }
+        }
+    }
+

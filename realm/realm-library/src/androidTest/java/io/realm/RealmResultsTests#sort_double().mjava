@@ -1,0 +1,20 @@
+    @Test
+    public void sort_double() {
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).findAll();
+        RealmResults<AllTypes> sortedList = resultList.where().findAll();
+        sortedList.sort(AllTypes.FIELD_DOUBLE, Sort.DESCENDING);
+        assertEquals(resultList.size(), sortedList.size());
+        assertEquals(TEST_DATA_SIZE, sortedList.size());
+        assertEquals(resultList.first().getColumnDouble(), sortedList.last().getColumnDouble(), 0D);
+
+        RealmResults<AllTypes> reverseList = sortedList.where().findAll();
+        reverseList.sort(AllTypes.FIELD_DOUBLE, Sort.ASCENDING);
+        assertEquals(TEST_DATA_SIZE, reverseList.size());
+        assertEquals(resultList.first().getColumnDouble(), reverseList.first().getColumnDouble(), 0D);
+        assertEquals(resultList.last().getColumnDouble(), reverseList.last().getColumnDouble(), 0D);
+
+        RealmResults<AllTypes> reverseSortedList = reverseList.where().findAll();
+        reverseSortedList.sort(AllTypes.FIELD_DOUBLE, Sort.DESCENDING);
+        assertEquals(TEST_DATA_SIZE, reverseSortedList.size());
+    }
+

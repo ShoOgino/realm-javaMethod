@@ -1,0 +1,11 @@
+    @Test
+    public void distinctMultiArgs_withNullValues() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10;
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, true);
+
+        RealmQuery<AnnotationIndexTypes> query = realm.where(AnnotationIndexTypes.class);
+        RealmResults<AnnotationIndexTypes> distinctMulti = query.distinct(AnnotationIndexTypes.FIELD_INDEX_DATE, AnnotationIndexTypes.FIELD_INDEX_STRING);
+        assertEquals(1, distinctMulti.size());
+    }
+

@@ -1,0 +1,13 @@
+    @Test
+    public void executeTransaction_success() {
+        assertEquals(0, realm.allObjects(Owner.class).size());
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Owner owner = realm.createObject(Owner.class);
+                owner.setName("Owner");
+            }
+        });
+        assertEquals(1, realm.allObjects(Owner.class).size());
+    }
+

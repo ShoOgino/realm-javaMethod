@@ -4,15 +4,15 @@
         if (o == null || getClass() != o.getClass()) return false;
         BooleansRealmProxy aBooleans = (BooleansRealmProxy)o;
 
-        String path = realm.getPath();
-        String otherPath = aBooleans.realm.getPath();
+        String path = ((RealmObject) this).realm.getPath();
+        String otherPath = ((RealmObject) aBooleans).realm.getPath();
         if (path != null ? !path.equals(otherPath) : otherPath != null) return false;;
 
-        String tableName = row.getTable().getName();
-        String otherTableName = aBooleans.row.getTable().getName();
+        String tableName = ((RealmObject) this).row.getTable().getName();
+        String otherTableName = ((RealmObject) aBooleans).row.getTable().getName();
         if (tableName != null ? !tableName.equals(otherTableName) : otherTableName != null) return false;
 
-        if (row.getIndex() != aBooleans.row.getIndex()) return false;
+        if (((RealmObject) this).row.getIndex() != ((RealmObject) aBooleans).row.getIndex()) return false;
 
         return true;
     }

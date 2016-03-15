@@ -6,7 +6,6 @@
 
             if (elementKind.equals(ElementKind.FIELD)) {
                 VariableElement variableElement = (VariableElement) element;
-                String fieldName = variableElement.getSimpleName().toString();
 
                 Set<Modifier> modifiers = variableElement.getModifiers();
                 if (modifiers.contains(Modifier.STATIC)) {
@@ -14,10 +13,6 @@
                 }
 
                 if (variableElement.getAnnotation(Ignore.class) != null) {
-                    // The field has the @Ignore annotation. No need to go any further.
-                    String ignoredFieldName = variableElement.getSimpleName().toString();
-                    fieldNames.add(ignoredFieldName);
-                    ignoreFieldNames.add(ignoredFieldName);
                     continue;
                 }
 
@@ -89,25 +84,11 @@
                     }
                 }
 
-                if (!variableElement.getModifiers().contains(Modifier.PRIVATE)) {
-                    Utils.error("The fields of the RealmObject class must be private", variableElement);
-                    return false;
-                }
-
                 fields.add(variableElement);
-                expectedGetters.add(fieldName);
-                expectedSetters.add(fieldName);
             } else if (elementKind.equals(ElementKind.CONSTRUCTOR)) {
                 hasDefaultConstructor =  hasDefaultConstructor || Utils.isDefaultConstructor(element);
 
-            } else if (elementKind.equals(ElementKind.METHOD)) {
-                ExecutableElement executableElement = (ExecutableElement) element;
-                methods.add(executableElement);
             }
-        }
-
-        for (VariableElement field : fields) {
-            fieldNames.add(field.getSimpleName().toString());
         }
 
         if (fields.size() == 0) {

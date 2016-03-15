@@ -1,0 +1,21 @@
+    // Test migrating primary key from long to str with existing data
+    @Test
+    public void primaryKey_migration_stringDuplicateValues() {
+        realm.beginTransaction();
+        for (int i = 1; i <= 2; i++) {
+            PrimaryKeyAsLong obj = realm.createObject(PrimaryKeyAsLong.class);
+            obj.setId(i);
+            obj.setName("String"); // Create duplicate values
+        }
+
+        Table table = realm.getTable(PrimaryKeyAsLong.class);
+        try {
+            table.setPrimaryKey("name");
+            fail("It should not be possible to set a primary key column which already contains duplicate values.");
+        } catch (IllegalArgumentException ignored) {
+            assertEquals(0, table.getPrimaryKey());
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

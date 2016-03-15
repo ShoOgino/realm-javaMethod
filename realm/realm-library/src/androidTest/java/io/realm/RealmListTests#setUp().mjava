@@ -1,0 +1,16 @@
+    @Before
+    public void setUp() throws Exception {
+        RealmConfiguration realmConfig = configFactory.createConfiguration();
+        testRealm = Realm.getInstance(realmConfig);
+
+        testRealm.beginTransaction();
+        Owner owner = testRealm.createObject(Owner.class);
+        owner.setName("Owner");
+        for (int i = 0; i < TEST_OBJECTS; i++) {
+            Dog dog = testRealm.createObject(Dog.class);
+            dog.setName("Dog " + i);
+            owner.getDogs().add(dog);
+        }
+        testRealm.commitTransaction();
+    }
+

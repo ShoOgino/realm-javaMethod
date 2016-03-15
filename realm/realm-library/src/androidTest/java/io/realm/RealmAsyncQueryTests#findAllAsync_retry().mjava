@@ -1,0 +1,66 @@
+    // UC:
+    //   1- insert 10 objects
+    //   2- start an async query to find object [0-4]
+    //   3- assert current RealmResults is empty (Worker Thread didn't complete)
+    //   4- when the worker thread complete, advance the Realm
+    //   5- the caller thread is ahead of the result provided by the worker thread
+    //   6- retry automatically the async query
+    //   7- the returned RealmResults is now in the same version as the caller thread
+    //   8- the notification should be called once (when we retry automatically we shouldn't
+    //      notify the user).
+    @Test
+    @RunTestInLooperThread
+    public void findAllAsync_retry() throws Throwable {
+        final AtomicInteger numberOfIntercept = new AtomicInteger(0);
+        final AtomicInteger numberOfInvocation = new AtomicInteger(0);
+        final Realm realm = looperThread.realm;
+
+        // 1. Populate initial data
+        realm.setAutoRefresh(false);
+        populateTestRealm(realm, 10);
+        realm.setAutoRefresh(true);
+
+        // 2. Configure handler interceptor
+        final Handler handler = new HandlerProxy(realm.handlerController) {
+            @Override
+            public boolean onInterceptInMessage(int what) {
+                // Intercepts in order: [QueryComplete, RealmChanged, QueryUpdated]
+                int intercepts = numberOfIntercept.incrementAndGet();
+                switch (what) {
+                    // 5. Intercept all messages from other threads. On the first complete, we advance the tread
+                    // which will cause the async query to rerun instead of triggering the change listener.
+                    case HandlerController.COMPLETED_ASYNC_REALM_RESULTS:
+                        if (intercepts == 1) {
+                            // We advance the Realm so we can simulate a retry
+                            realm.beginTransaction();
+                            realm.clear(AllTypes.class);
+                            realm.commitTransaction();
+                        }
+                }
+                return false;
+            }
+        };
+        realm.setHandler(handler);
+
+        // 3. Create a async query
+        final RealmResults<AllTypes> realmResults = realm.where(AllTypes.class)
+                .between("columnLong", 0, 4)
+                .findAllAsync();
+
+        // 4. Ensure that query isn't loaded yet
+        assertFalse(realmResults.isLoaded());
+        assertEquals(0, realmResults.size());
+
+        // 6. Callback triggered after retry has completed
+        realmResults.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals(3, numberOfIntercept.get());
+                assertEquals(1, numberOfInvocation.incrementAndGet());
+                assertTrue(realmResults.isLoaded());
+                assertEquals(0, realmResults.size());
+                looperThread.testComplete();
+            }
+        });
+    }
+

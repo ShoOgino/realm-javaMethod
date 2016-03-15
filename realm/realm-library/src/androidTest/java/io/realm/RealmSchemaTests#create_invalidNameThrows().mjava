@@ -1,0 +1,13 @@
+    @Test
+    public void create_invalidNameThrows() {
+        String[] names = { null, "", TestHelper.getRandomString(57) };
+
+        for (String name : names) {
+            try {
+                realmSchema.create(name);
+            } catch (IllegalArgumentException ignored) {
+            }
+            assertFalse(String.format("'%s' failed", name), realmSchema.contains(name));
+        }
+    }
+

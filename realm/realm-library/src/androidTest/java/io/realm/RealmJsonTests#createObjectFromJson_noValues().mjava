@@ -1,0 +1,23 @@
+    // Test if Json object doesn't have the field, then the field should have default value.
+    @Test
+    public void createObjectFromJson_noValues() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("noThingHere", JSONObject.NULL);
+
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, json);
+        realm.commitTransaction();
+
+        // Check that all primitive types are imported correctly
+        AllTypes obj = realm.allObjects(AllTypes.class).first();
+        assertEquals("", obj.getColumnString());
+        assertEquals(0L, obj.getColumnLong());
+        assertEquals(0F, obj.getColumnFloat(), 0F);
+        assertEquals(0D, obj.getColumnDouble(), 0D);
+        assertEquals(false, obj.isColumnBoolean());
+        assertEquals(new Date(0), obj.getColumnDate());
+        assertArrayEquals(new byte[0], obj.getColumnBinary());
+        assertNull(obj.getColumnRealmObject());
+        assertEquals(0, obj.getColumnRealmList().size());
+    }
+

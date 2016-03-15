@@ -1,0 +1,12 @@
+    @Test
+    public void invalidIndexedFieldAttributeThrows() {
+        for (InvalidIndexFieldType fieldType : InvalidIndexFieldType.values()) {
+            String fieldName = "foo";
+            try {
+                schema.addField(fieldName, fieldType.getType(), FieldAttribute.INDEXED);
+                fail(fieldType + " should not be allowed to be indexed");
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

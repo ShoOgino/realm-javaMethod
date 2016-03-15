@@ -1,0 +1,101 @@
+    /**
+     * If JSON has a field with value null, and corresponding object's field is not nullable,
+     * an exception should be throw. Stream version.
+     */
+    @Test
+    public void createObjectFromJson_nullTypesJSONStreamToNotNullFields() throws IOException, JSONException {
+        String json = TestHelper.streamToString(TestHelper.loadJsonFromAssets(context, "nulltypes_invalid.json"));
+        JSONArray array = new JSONArray(json);
+
+        // 1 String
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(0)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+        // 2 Bytes
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(1)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+        // 3 Boolean
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(2)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+        // 4 Byte
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(3)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+        // 5 Short
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(4)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+        // 6 Integer
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(5)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+        // 7 Long
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(6)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+        // 8 Float
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(7)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+        // 9 Double
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(8)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+        // 10 Date
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(9)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

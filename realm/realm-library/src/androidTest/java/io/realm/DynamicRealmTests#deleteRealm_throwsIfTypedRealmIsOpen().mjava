@@ -1,0 +1,18 @@
+    // Test that Realms can only be deleted after all Typed and Dynamic instances are closed.
+    @Test
+    public void deleteRealm_throwsIfTypedRealmIsOpen() {
+        realm.close(); // Close Realm opened in setUp();
+        Realm typedRealm = Realm.getInstance(defaultConfig);
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(defaultConfig);
+
+        dynamicRealm.close();
+        try {
+            Realm.deleteRealm(defaultConfig);
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        typedRealm.close();
+        assertTrue(Realm.deleteRealm(defaultConfig));
+    }
+

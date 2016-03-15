@@ -1,0 +1,12 @@
+    @Test
+    public void createObjectFromJson_streamChildObjectList() throws IOException {
+        InputStream in = TestHelper.loadJsonFromAssets(context, "realmlist.json");
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, in);
+        realm.commitTransaction();
+        in.close();
+
+        assertEquals(3, realm.allObjects(Dog.class).size());
+        assertEquals(1, realm.where(Dog.class).equalTo("name", "Fido-3").findAll().size());
+    }
+

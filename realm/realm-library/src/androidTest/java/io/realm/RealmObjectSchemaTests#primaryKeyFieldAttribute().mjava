@@ -1,0 +1,12 @@
+    @Test
+    public void primaryKeyFieldAttribute() {
+        for (PrimaryKeyFieldType fieldType : PrimaryKeyFieldType.values()) {
+            String fieldName = "foo";
+            schema.addField(fieldName, fieldType.getType(), FieldAttribute.PRIMARY_KEY);
+            assertTrue(schema.hasPrimaryKey());
+            assertTrue(schema.isPrimaryKey(fieldName));
+            assertFalse(schema.isNullable(fieldName));
+            schema.removeField(fieldName);
+        }
+    }
+

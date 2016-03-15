@@ -1,0 +1,15 @@
+    @Test
+    @RunTestInLooperThread
+    public void emptyCommitTriggerChangeListener() {
+        final RealmChangeListener listener = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                looperThread.testComplete();
+            }
+        };
+        Realm realm = looperThread.realm;
+        realm.addChangeListener(listener);
+        realm.beginTransaction();
+        realm.commitTransaction();
+    }
+

@@ -1,0 +1,18 @@
+    @Test
+    public void createAllFromJson_jsonArray() throws JSONException {
+        JSONObject dog1 = new JSONObject(); dog1.put("name", "Fido-1");
+        JSONObject dog2 = new JSONObject(); dog2.put("name", "Fido-2");
+        JSONObject dog3 = new JSONObject(); dog3.put("name", "Fido-3");
+        JSONArray dogList = new JSONArray();
+        dogList.put(dog1);
+        dogList.put(dog2);
+        dogList.put(dog3);
+
+        realm.beginTransaction();
+        realm.createAllFromJson(Dog.class, dogList);
+        realm.commitTransaction();
+
+        assertEquals(3, realm.allObjects(Dog.class).size());
+        assertEquals(1, realm.where(Dog.class).equalTo("name", "Fido-3").findAll().size());
+    }
+

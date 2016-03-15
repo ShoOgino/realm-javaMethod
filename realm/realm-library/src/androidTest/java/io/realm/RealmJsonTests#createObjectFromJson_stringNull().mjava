@@ -1,0 +1,11 @@
+    @Test
+    public void createObjectFromJson_stringNull() {
+        realm.beginTransaction();
+        Dog dog = realm.createObjectFromJson(Dog.class, (String) null);
+        realm.commitTransaction();
+
+        //noinspection ConstantConditions
+        assertNull(dog);
+        assertEquals(0, realm.allObjects(Dog.class).size());
+    }
+

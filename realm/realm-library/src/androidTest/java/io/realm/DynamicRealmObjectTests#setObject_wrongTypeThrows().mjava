@@ -1,0 +1,11 @@
+    @Test
+    public void setObject_wrongTypeThrows() {
+        realm.beginTransaction();
+        AllJavaTypes obj = realm.createObject(AllJavaTypes.class);
+        Dog otherObj = realm.createObject(Dog.class);
+        DynamicRealmObject dynamicObj = new DynamicRealmObject(obj);
+        DynamicRealmObject dynamicWrongType = new DynamicRealmObject(otherObj);
+        thrown.expect(IllegalArgumentException.class);
+        dynamicObj.setObject(AllJavaTypes.FIELD_OBJECT, dynamicWrongType);
+    }
+

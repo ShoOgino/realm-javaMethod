@@ -1,0 +1,14 @@
+    // Test max value on float and double columns
+    @Test
+    public void float_double_maxValue() {
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnFloat(Float.MAX_VALUE);
+        allTypes.setColumnDouble(Double.MAX_VALUE);
+        realm.commitTransaction();
+        assertEquals(Float.MAX_VALUE, realm.where(AllTypes.class).findFirst().getColumnFloat(), 0.0F);
+        assertEquals(Double.MAX_VALUE, realm.where(AllTypes.class).findFirst().getColumnDouble(), 0.0D);
+        assertEquals(1, realm.where(AllTypes.class).equalTo("columnFloat", Float.MAX_VALUE).count());
+        assertEquals(1, realm.where(AllTypes.class).equalTo("columnDouble", Double.MAX_VALUE).count());
+    }
+

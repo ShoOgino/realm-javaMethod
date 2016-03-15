@@ -10,5 +10,18 @@
                 typeUtils.getPrimitiveType(TypeKind.LONG),
                 typeUtils.getPrimitiveType(TypeKind.BYTE)
         );
+
+        for (Element element : classType.getEnclosedElements()) {
+            if (element instanceof ExecutableElement) {
+                Name name = element.getSimpleName();
+                if (name.contentEquals("toString")) {
+                    this.containsToString = true;
+                } else if (name.contentEquals("equals")) {
+                    this.containsEquals = true;
+                } else if (name.contentEquals("hashCode")) {
+                    this.containsHashCode = true;
+                }
+            }
+        }
     }
 

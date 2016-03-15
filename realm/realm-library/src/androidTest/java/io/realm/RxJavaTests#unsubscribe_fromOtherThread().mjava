@@ -1,0 +1,33 @@
+    @Test
+    @UiThreadTest
+    public void unsubscribe_fromOtherThread() {
+        final CountDownLatch unsubscribeCompleted = new CountDownLatch(1);
+        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
+        final Subscription subscription = realm.asObservable().subscribe(new Action1<Realm>() {
+            @Override
+            public void call(Realm rxRealm) {
+                assertTrue(rxRealm == realm);
+                subscribedNotified.set(true);
+            }
+        });
+        assertTrue(subscribedNotified.get());
+        assertEquals(1, realm.handlerController.changeListeners.size());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    subscription.unsubscribe();
+                    fail();
+                } catch (IllegalStateException ignored) {
+                } finally {
+                    unsubscribeCompleted.countDown();
+                }
+            }
+        }).start();
+        TestHelper.awaitOrFail(unsubscribeCompleted);
+        assertEquals(1, realm.handlerController.changeListeners.size());
+        // We cannot call subscription.unsubscribe() again, so manually close the extra Realm instance opened by
+        // the Observable.
+        realm.close();
+    }
+

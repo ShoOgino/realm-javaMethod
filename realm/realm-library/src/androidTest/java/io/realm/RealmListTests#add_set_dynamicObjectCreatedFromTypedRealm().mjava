@@ -1,0 +1,35 @@
+    @Test
+    public void add_set_dynamicObjectCreatedFromTypedRealm() {
+        final String expectedMsg = "Cannot copy DynamicRealmObject between Realm instances.";
+        DynamicRealmObject dynDog = new DynamicRealmObject(testRealm.where(Dog.class).findFirst());
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(testRealm.getConfiguration());
+
+        dynamicRealm.beginTransaction();
+        RealmList<DynamicRealmObject> list = dynamicRealm.createObject(Owner.CLASS_NAME)
+                .getList(Owner.FIELD_DOGS);
+
+        try {
+            list.add(dynDog);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertEquals(expectedMsg, expected.getMessage());
+        }
+
+        try {
+            list.add(0, dynDog);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertEquals(expectedMsg, expected.getMessage());
+        }
+
+        try {
+            list.set(0, dynDog);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertEquals(expectedMsg, expected.getMessage());
+        }
+
+        dynamicRealm.cancelTransaction();
+        dynamicRealm.close();
+    }
+

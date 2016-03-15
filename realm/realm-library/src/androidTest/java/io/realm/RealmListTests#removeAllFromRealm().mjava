@@ -1,0 +1,13 @@
+    @Test
+    public void removeAllFromRealm() {
+        Owner owner = testRealm.where(Owner.class).findFirst();
+        RealmList<Dog> dogs = owner.getDogs();
+        assertEquals(TEST_OBJECTS, dogs.size());
+
+        testRealm.beginTransaction();
+        dogs.deleteAllFromRealm();
+        testRealm.commitTransaction();
+        assertEquals(0, dogs.size());
+        assertEquals(0, testRealm.where(Dog.class).count());
+    }
+

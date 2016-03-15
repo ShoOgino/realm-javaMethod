@@ -1,0 +1,16 @@
+    @Test
+    public void createObjectFromJson_respectIgnoredFields() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("indexString", "Foo");
+        json.put("notIndexString", "Bar");
+        json.put("ignoreString", "Baz");
+
+        realm.beginTransaction();
+        realm.createObjectFromJson(AnnotationTypes.class, json);
+        realm.commitTransaction();
+
+        AnnotationTypes annotationsObject = realm.allObjects(AnnotationTypes.class).first();
+        assertEquals("Foo", annotationsObject.getIndexString());
+        assertEquals(null, annotationsObject.getIgnoreString());
+    }
+

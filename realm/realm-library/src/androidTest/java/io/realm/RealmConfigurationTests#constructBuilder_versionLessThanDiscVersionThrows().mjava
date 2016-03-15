@@ -1,0 +1,16 @@
+    @Test
+    public void constructBuilder_versionLessThanDiscVersionThrows() {
+        realm = Realm.getInstance(new RealmConfiguration.Builder(configFactory.getRoot()).schemaVersion(42).build());
+        realm.close();
+
+        int[] wrongVersions = new int[] { 0, 1, 41 };
+        for (int version : wrongVersions) {
+            try {
+                realm = Realm.getInstance(new RealmConfiguration.Builder(configFactory.getRoot())
+                        .schemaVersion(version).build());
+                fail("Version " + version + " should throw an exception");
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

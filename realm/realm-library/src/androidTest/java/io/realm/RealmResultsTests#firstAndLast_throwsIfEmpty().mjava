@@ -1,0 +1,22 @@
+    // first() and last() will throw an exception when no element exist
+    @Test
+    public void firstAndLast_throwsIfEmpty() {
+        realm.beginTransaction();
+        realm.clear(AllTypes.class);
+        realm.commitTransaction();
+
+        RealmResults<AllTypes> allTypes = realm.allObjects(AllTypes.class);
+        assertEquals(0, allTypes.size());
+        try {
+            allTypes.first();
+            fail();
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+
+        try {
+            allTypes.last();
+            fail();
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+    }
+

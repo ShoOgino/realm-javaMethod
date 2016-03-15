@@ -3,8 +3,9 @@
      *
      * @param fieldName field name.
      * @param list list of references.
-     * @throws IllegalArgumentException if field name doesn't exists, it is not a list field or the type
-     * of the object represented by the DynamicRealmObject doesn't match.
+     * @throws IllegalArgumentException if field name doesn't exist, it is not a list field, the type
+     * of the object represented by the DynamicRealmObject doesn't match or any element in the list belongs to a
+     * different Realm.
      */
     public void setList(String fieldName, RealmList<? extends RealmObject> list) {
         if (list == null) {
@@ -29,14 +30,16 @@
         long columnIndex = row.getColumnIndex(fieldName);
         LinkView links = row.getLinkList(columnIndex);
         links.clear();
+        Table linkTargetTable = links.getTargetTable();
         for (int i = 0; i < list.size(); i++) {
             RealmObject obj = list.get(i);
-            if (!typeValidated) {
-                String elementType = obj.row.getTable().getName();
-                if (!tableName.equals(elementType)) {
-                    throw new IllegalArgumentException(String.format("Element at index %d is not the proper type. " +
-                            "Was %s expected %s.", i, elementType, tableName));
-                }
+            if (obj.realm != realm) {
+                throw new IllegalArgumentException("Each element in 'list' must belong to the same Realm instance.");
+            }
+            if (!typeValidated && !linkTargetTable.hasSameSchema(obj.row.getTable())) {
+                throw new IllegalArgumentException(String.format(Locale.ENGLISH,
+                        "Element at index %d is not the proper type. " +
+                                "Was '%s' expected '%s'.", i, obj.row.getTable().getName(), linkTargetTable.getName()));
             }
             links.add(obj.row.getIndex());
         }

@@ -1,0 +1,25 @@
+    @Test
+    @UiThreadTest
+    public void realmObject_closeInDoOnUnsubscribe() {
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        Observable<AllTypes> observable = realm.allObjects(AllTypes.class).first().<AllTypes>asObservable()
+                .doOnUnsubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        realm.close();
+                    }
+                });
+
+        subscription = observable.subscribe(new Action1<AllTypes>() {
+            @Override
+            public void call(AllTypes allTypes) {
+            }
+        });
+
+        subscription.unsubscribe();
+        assertTrue(realm.isClosed());
+    }
+

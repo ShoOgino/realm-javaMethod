@@ -1,0 +1,12 @@
+    @Test
+    public void distinctAsync_doesNotExist() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10;
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+
+        try {
+            realm.where(AnnotationIndexTypes.class).distinctAsync("doesNotExist");
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

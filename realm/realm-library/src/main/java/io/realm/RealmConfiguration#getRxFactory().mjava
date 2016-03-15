@@ -1,9 +1,16 @@
     /**
      * Returns the {@link RxObservableFactory} that is used to create Rx Observables from Realm objects.
      *
+     * @throws UnsupportedOperationException if the required RxJava framework is not on the classpath.
      * @return the factory instance used to create Rx Observables.
      */
     public RxObservableFactory getRxFactory() {
+        // Since RxJava doesn't exist, rxObservableFactory is not initialized.
+        if (rxObservableFactory == null) {
+            throw new UnsupportedOperationException("RxJava seems to be missing from the classpath. " +
+                    "Remember to add it as a compile dependency." +
+                    " See https://realm.io/docs/java/latest/#rxjava for more details.");
+        }
         return rxObservableFactory;
     }
 

@@ -1,0 +1,10 @@
+    @Test
+    public void IsValid_deletedObject() {
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        assertTrue(allTypes.isValid());
+        realm.clear(AllTypes.class);
+        realm.commitTransaction();
+        assertFalse(allTypes.isValid());
+    }
+

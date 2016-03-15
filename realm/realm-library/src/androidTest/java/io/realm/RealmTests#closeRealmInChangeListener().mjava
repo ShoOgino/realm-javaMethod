@@ -1,0 +1,36 @@
+    // Test if close can be called from Realm change listener when there is no other listeners
+    @Test
+    public void closeRealmInChangeListener() {
+        realm.close();
+        final CountDownLatch signalTestFinished = new CountDownLatch(1);
+        HandlerThread handlerThread = new HandlerThread("background");
+        handlerThread.start();
+        final Handler handler = new Handler(handlerThread.getLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                final Realm realm = Realm.getInstance(realmConfig);
+                final RealmChangeListener listener = new RealmChangeListener() {
+                    @Override
+                    public void onChange() {
+                        if (realm.where(AllTypes.class).count() == 1) {
+                            realm.removeChangeListener(this);
+                            realm.close();
+                            signalTestFinished.countDown();
+                        }
+                    }
+                };
+
+                realm.addChangeListener(listener);
+
+                realm.executeTransactionAsync(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        realm.createObject(AllTypes.class);
+                    }
+                });
+            }
+        });
+        TestHelper.awaitOrFail(signalTestFinished);
+    }
+

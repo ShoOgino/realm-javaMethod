@@ -1,0 +1,86 @@
+    // UC 1 Async RealmObject
+    @Test
+    @RunTestInLooperThread
+    public void callback_with_relevant_commit_from_different_non_looper_realmobject_async() throws Throwable {
+        final CountDownLatch nonLooperThread3CloseLatch = new CountDownLatch(1);
+        final Realm realm = looperThread.realm;
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                globalCommitInvocations.incrementAndGet();
+            }
+        });
+
+        final Dog dog = realm.where(Dog.class).findFirstAsync();
+        assertTrue(dog.load());
+        dog.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                switch (typebasedCommitInvocations.incrementAndGet()) {
+                    case 1:  // triggered by COMPLETED_ASYNC_REALM_OBJECT
+                        new RealmBackgroundTask(realm.configuration) {
+                            @Override
+                            protected void doInBackground(Realm realm) {
+                                realm.beginTransaction();
+                                realm.commitTransaction();
+                            }
+                        }.awaitOrFail();
+                        break;
+
+                    case 2: {// triggered by the irrelevant commit (not affecting Dog table)
+                        assertTrue(dog.isLoaded());
+                        assertFalse(dog.isValid());
+                        new RealmBackgroundTask(realm.configuration) {
+                            @Override
+                            protected void doInBackground(Realm realm) {
+                                realm.beginTransaction();
+                                realm.createObject(Dog.class).setName("Akamaru");
+                                realm.commitTransaction();
+
+                            }
+                        }.awaitOrFail();
+                        break;
+                    }
+                    case 3: {
+                        assertEquals("Akamaru", dog.getName());
+                        realm.handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // trigger second callback invocation
+                                new Thread() {
+                                    @Override
+                                    public void run() {
+                                        Realm realmNonLooperThread3 = Realm.getInstance(realm.getConfiguration());
+                                        realmNonLooperThread3.beginTransaction();
+                                        realmNonLooperThread3.where(Dog.class).findFirst().setAge(17);
+                                        realmNonLooperThread3.commitTransaction();
+                                        realmNonLooperThread3.close();
+                                        nonLooperThread3CloseLatch.countDown();
+                                    }
+                                }.start();
+                            }
+                        }, TimeUnit.SECONDS.toMillis(0));
+                        break;
+                    }
+                    case 4: {
+                        assertEquals("Akamaru", dog.getName());
+                        assertEquals(17, dog.getAge());
+                        // posting as an event will give the handler a chance
+                        // to deliver the notification for globalCommitInvocations
+                        // otherwise, test will exit before the callback get a chance to be invoked
+                        realm.handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                assertEquals(3, globalCommitInvocations.get());
+                                assertEquals(4, typebasedCommitInvocations.get());
+                                TestHelper.awaitOrFail(nonLooperThread3CloseLatch);
+                                looperThread.testComplete();
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+        });
+    }
+

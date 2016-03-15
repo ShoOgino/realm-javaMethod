@@ -1,0 +1,25 @@
+    @Before
+    public void setUp() {
+        RealmConfiguration realmConfig = configFactory.createConfiguration();
+        realm = Realm.getInstance(realmConfig);
+        realm.beginTransaction();
+        typedObj = realm.createObject(AllJavaTypes.class);
+        typedObj.setFieldString("str");
+        typedObj.setFieldShort((short) 1);
+        typedObj.setFieldInt(1);
+        typedObj.setFieldLong(1);
+        typedObj.setFieldByte((byte) 4);
+        typedObj.setFieldFloat(1.23f);
+        typedObj.setFieldDouble(1.234d);
+        typedObj.setFieldBinary(new byte[]{1, 2, 3});
+        typedObj.setFieldBoolean(true);
+        typedObj.setFieldDate(new Date(1000));
+        typedObj.setFieldObject(typedObj);
+        typedObj.getFieldList().add(typedObj);
+        dObjTyped = new DynamicRealmObject(typedObj);
+        realm.commitTransaction();
+
+        dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
+        dObjDynamic = dynamicRealm.where(AllJavaTypes.CLASS_NAME).findFirst();
+    }
+

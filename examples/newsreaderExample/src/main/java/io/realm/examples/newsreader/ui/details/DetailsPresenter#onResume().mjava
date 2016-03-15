@@ -1,0 +1,26 @@
+    @Override
+    public void onResume() {
+        // Show story details
+        Subscription detailsSubscription = model.getStory(storyId)
+                .subscribe(new Action1<NYTimesStory>() {
+                    @Override
+                    public void call(NYTimesStory story) {
+                        view.hideLoader();
+                        view.showStory(story);
+                        view.setRead(story.isRead());
+                    }
+                });
+
+        // Mark story as read if screen is visible for 2 seconds
+        Subscription timerSubscription = Observable.timer(2, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        model.markAsRead(storyId, true);
+                    }
+                });
+        
+        subscriptions = new CompositeSubscription(detailsSubscription, timerSubscription);
+    }
+

@@ -1,0 +1,19 @@
+    @Test
+    public void realmOpenBeforeMigrationThrows() throws FileNotFoundException {
+        RealmConfiguration config = configFactory.createConfiguration();
+        realm = Realm.getInstance(config);
+
+        try {
+            // Trigger manual migration. This can potentially change the schema, so should only be allowed when
+            // no-one else is working on the Realm.
+            Realm.migrateRealm(config, new RealmMigration() {
+                @Override
+                public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                    // Do nothing
+                }
+            });
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+    }
+

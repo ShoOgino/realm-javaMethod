@@ -1,0 +1,23 @@
+    @Test
+    @RunTestInLooperThread
+    public void combiningAsyncAndSync() {
+        populateTestRealm(looperThread.realm, 10);
+
+        Realm.asyncQueryExecutor.pause();
+        final RealmResults<AllTypes> allTypesAsync = looperThread.realm.where(AllTypes.class).greaterThan("columnLong", 5).findAllAsync();
+        final RealmResults<AllTypes> allTypesSync = allTypesAsync.where().greaterThan("columnLong", 3).findAll();
+
+        assertEquals(0, allTypesAsync.size());
+        assertEquals(6, allTypesSync.size());
+        allTypesAsync.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals(4, allTypesAsync.size());
+                assertEquals(6, allTypesSync.size());
+                looperThread.testComplete();
+            }
+        });
+        Realm.asyncQueryExecutor.resume();
+        looperThread.keepStrongReference.add(allTypesAsync);
+    }
+

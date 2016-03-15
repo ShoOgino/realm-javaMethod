@@ -1,0 +1,107 @@
+    @Test
+    @RunTestInLooperThread
+    public void findAllSortedAsync_usingMultipleFields() {
+        final DynamicRealm dynamicRealm = initializeDynamicRealm();
+
+        dynamicRealm.setAutoRefresh(false);
+        dynamicRealm.beginTransaction();
+        dynamicRealm.clear(AllTypes.CLASS_NAME);
+        for (int i = 0; i < 5; ) {
+            DynamicRealmObject allTypes = dynamicRealm.createObject(AllTypes.CLASS_NAME);
+            allTypes.set(AllTypes.FIELD_LONG, i);
+            allTypes.set(AllTypes.FIELD_STRING, "data " + i % 3);
+
+            allTypes = dynamicRealm.createObject(AllTypes.CLASS_NAME);
+            allTypes.set(AllTypes.FIELD_LONG, i);
+            allTypes.set(AllTypes.FIELD_STRING, "data " + (++i % 3));
+        }
+        dynamicRealm.commitTransaction();
+        dynamicRealm.setAutoRefresh(true);
+
+        // Sort first set by using: String[ASC], Long[DESC]
+        final RealmResults<DynamicRealmObject> realmResults1 = dynamicRealm.where(AllTypes.CLASS_NAME)
+                .findAllSortedAsync(
+                        new String[]{AllTypes.FIELD_STRING, AllTypes.FIELD_LONG},
+                        new Sort[]{Sort.ASCENDING, Sort.DESCENDING}
+                );
+
+        // Sort second set by using: String[DESC], Long[ASC]
+        final RealmResults<DynamicRealmObject> realmResults2 = dynamicRealm.where(AllTypes.CLASS_NAME)
+                .between(AllTypes.FIELD_LONG, 0, 5)
+                .findAllSortedAsync(
+                        new String[]{AllTypes.FIELD_STRING, AllTypes.FIELD_LONG},
+                        new Sort[]{Sort.DESCENDING, Sort.ASCENDING}
+                );
+
+        final Runnable signalCallbackDone = new Runnable() {
+            final AtomicInteger callbacksDone = new AtomicInteger(2);
+            @Override
+            public void run() {
+                if (callbacksDone.decrementAndGet() == 0) {
+                    dynamicRealm.close();
+                    looperThread.testComplete();
+                }
+            }
+        };
+
+        realmResults1.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals("data 0", realmResults1.get(0).get(AllTypes.FIELD_STRING));
+                assertEquals(3L, realmResults1.get(0).get(AllTypes.FIELD_LONG));
+                assertEquals("data 0", realmResults1.get(1).get(AllTypes.FIELD_STRING));
+                assertEquals(2L, realmResults1.get(1).get(AllTypes.FIELD_LONG));
+                assertEquals("data 0", realmResults1.get(2).get(AllTypes.FIELD_STRING));
+                assertEquals(0L, realmResults1.get(2).get(AllTypes.FIELD_LONG));
+
+                assertEquals("data 1", realmResults1.get(3).get(AllTypes.FIELD_STRING));
+                assertEquals(4L, realmResults1.get(3).get(AllTypes.FIELD_LONG));
+                assertEquals("data 1", realmResults1.get(4).get(AllTypes.FIELD_STRING));
+                assertEquals(3L, realmResults1.get(4).get(AllTypes.FIELD_LONG));
+                assertEquals("data 1", realmResults1.get(5).get(AllTypes.FIELD_STRING));
+                assertEquals(1L, realmResults1.get(5).get(AllTypes.FIELD_LONG));
+                assertEquals("data 1", realmResults1.get(6).get(AllTypes.FIELD_STRING));
+                assertEquals(0L, realmResults1.get(6).get(AllTypes.FIELD_LONG));
+
+                assertEquals("data 2", realmResults1.get(7).get(AllTypes.FIELD_STRING));
+                assertEquals(4L, realmResults1.get(7).get(AllTypes.FIELD_LONG));
+                assertEquals("data 2", realmResults1.get(8).get(AllTypes.FIELD_STRING));
+                assertEquals(2L, realmResults1.get(8).get(AllTypes.FIELD_LONG));
+                assertEquals("data 2", realmResults1.get(9).get(AllTypes.FIELD_STRING));
+                assertEquals(1L, realmResults1.get(9).get(AllTypes.FIELD_LONG));
+
+                signalCallbackDone.run();
+            }
+        });
+
+        realmResults2.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals("data 2", realmResults2.get(0).get(AllTypes.FIELD_STRING));
+                assertEquals(1L, realmResults2.get(0).get(AllTypes.FIELD_LONG));
+                assertEquals("data 2", realmResults2.get(1).get(AllTypes.FIELD_STRING));
+                assertEquals(2L, realmResults2.get(1).get(AllTypes.FIELD_LONG));
+                assertEquals("data 2", realmResults2.get(2).get(AllTypes.FIELD_STRING));
+                assertEquals(4L, realmResults2.get(2).get(AllTypes.FIELD_LONG));
+
+                assertEquals("data 1", realmResults2.get(3).get(AllTypes.FIELD_STRING));
+                assertEquals(0L, realmResults2.get(3).get(AllTypes.FIELD_LONG));
+                assertEquals("data 1", realmResults2.get(4).get(AllTypes.FIELD_STRING));
+                assertEquals(1L, realmResults2.get(4).get(AllTypes.FIELD_LONG));
+                assertEquals("data 1", realmResults2.get(5).get(AllTypes.FIELD_STRING));
+                assertEquals(3L, realmResults2.get(5).get(AllTypes.FIELD_LONG));
+                assertEquals("data 1", realmResults2.get(6).get(AllTypes.FIELD_STRING));
+                assertEquals(4L, realmResults2.get(6).get(AllTypes.FIELD_LONG));
+
+                assertEquals("data 0", realmResults2.get(7).get(AllTypes.FIELD_STRING));
+                assertEquals(0L, realmResults2.get(7).get(AllTypes.FIELD_LONG));
+                assertEquals("data 0", realmResults2.get(8).get(AllTypes.FIELD_STRING));
+                assertEquals(2L, realmResults2.get(8).get(AllTypes.FIELD_LONG));
+                assertEquals("data 0", realmResults2.get(9).get(AllTypes.FIELD_STRING));
+                assertEquals(3L, realmResults2.get(9).get(AllTypes.FIELD_LONG));
+
+                signalCallbackDone.run();
+            }
+        });
+    }
+

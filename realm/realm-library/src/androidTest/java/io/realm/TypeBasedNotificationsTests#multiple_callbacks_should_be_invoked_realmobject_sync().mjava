@@ -1,0 +1,42 @@
+    // ********************************************************************************* //
+    // UC 2.
+    // Multiple callbacks should be invoked after a relevant commit
+    // ********************************************************************************* //
+    // UC 2 for Sync RealmObject
+    @Test
+    @RunTestInLooperThread
+    public void multiple_callbacks_should_be_invoked_realmobject_sync() {
+        final int NUMBER_OF_LISTENERS = 7;
+        final Realm realm = looperThread.realm;
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                realm.handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        assertEquals(NUMBER_OF_LISTENERS, typebasedCommitInvocations.get());
+                        looperThread.testComplete();
+                    }
+                });
+            }
+        });
+
+        realm.beginTransaction();
+        Dog akamaru = realm.createObject(Dog.class);
+        realm.commitTransaction();
+
+        Dog dog = realm.where(Dog.class).findFirst();
+        for (int i = 0; i < NUMBER_OF_LISTENERS; i++) {
+            dog.addChangeListener(new RealmChangeListener() {
+                @Override
+                public void onChange() {
+                    typebasedCommitInvocations.incrementAndGet();
+                }
+            });
+        }
+
+        realm.beginTransaction();
+        akamaru.setAge(17);
+        realm.commitTransaction();
+    }
+

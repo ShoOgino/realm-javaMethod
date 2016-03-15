@@ -1,0 +1,12 @@
+    @Test
+    public void nestedTransaction() {
+        realm.beginTransaction();
+        try {
+            realm.beginTransaction();
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("Nested transactions are not allowed. Use commitTransaction() after each beginTransaction().", e.getMessage());
+        }
+        realm.commitTransaction();
+    }
+

@@ -1,0 +1,27 @@
+    @Test
+    @RunTestInLooperThread
+    public void addChangeListener_duplicatedListener() {
+        final AtomicInteger counter = new AtomicInteger(0);
+        RealmChangeListener listener = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                counter.incrementAndGet();
+            }
+        };
+
+        Realm realm = looperThread.realm;
+        realm.addChangeListener(listener);
+        realm.addChangeListener(listener);
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals(1, counter.get());
+                looperThread.testComplete();
+            }
+        });
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+    }
+

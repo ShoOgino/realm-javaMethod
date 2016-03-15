@@ -1,0 +1,53 @@
+    @Test
+    public void distinctMultiArgs_emptyFields() {
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10;
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+
+        // an empty string field in the middle
+        try {
+            realm.distinct(AnnotationIndexTypes.CLASS_NAME, AnnotationIndexTypes.FIELD_INDEX_BOOL, "", AnnotationIndexTypes.FIELD_INDEX_INT);
+        } catch (IllegalArgumentException ignored) {
+        }
+        // an empty string field at the end
+        try {
+            realm.distinct(AnnotationIndexTypes.CLASS_NAME, AnnotationIndexTypes.FIELD_INDEX_BOOL, AnnotationIndexTypes.FIELD_INDEX_INT, "");
+        } catch (IllegalArgumentException ignored) {
+        }
+        // a null string field in the middle
+        try {
+            realm.distinct(AnnotationIndexTypes.CLASS_NAME, AnnotationIndexTypes.FIELD_INDEX_BOOL, (String)null, AnnotationIndexTypes.FIELD_INDEX_INT);
+        } catch (IllegalArgumentException ignored) {
+        }
+        // a null string field at the end
+        try {
+            realm.distinct(AnnotationIndexTypes.CLASS_NAME, AnnotationIndexTypes.FIELD_INDEX_BOOL, AnnotationIndexTypes.FIELD_INDEX_INT, (String)null);
+        } catch (IllegalArgumentException ignored) {
+        }
+        // (String)null makes varargs a null array.
+        try {
+            realm.distinct(AnnotationIndexTypes.CLASS_NAME, AnnotationIndexTypes.FIELD_INDEX_BOOL, (String)null);
+        } catch (IllegalArgumentException ignored) {
+        }
+        // Two (String)null for first and varargs fields
+        try {
+            realm.distinct(AnnotationIndexTypes.CLASS_NAME, (String)null, (String)null);
+        } catch (IllegalArgumentException ignored) {
+        }
+        // "" & (String)null combination
+        try {
+            realm.distinct(AnnotationIndexTypes.CLASS_NAME, "", (String)null);
+        } catch (IllegalArgumentException ignored) {
+        }
+        // "" & (String)null combination
+        try {
+            realm.distinct(AnnotationIndexTypes.CLASS_NAME, (String)null, "");
+        } catch (IllegalArgumentException ignored) {
+        }
+        // Two empty fields tests
+        try {
+            realm.distinct(AnnotationIndexTypes.CLASS_NAME, "", "");
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

@@ -1,14 +1,27 @@
     @Before
-    public void setup() {
+    public void setup() throws Exception {
 
         // Setup Realm to be mocked
         mockStatic(Realm.class);
+        mockStatic(RealmConfiguration.class);
+        mockStatic(RealmCore.class);
 
         // Create the mock
         final Realm mockRealm = mock(Realm.class);
+        final RealmConfiguration mockRealmConfig = mock(RealmConfiguration.class);
 
-        // Anytime getInstance is called with any context, then return the mockRealm
-        when(Realm.getInstance(any(Context.class))).thenReturn(mockRealm);
+        // TODO: Better solution would be just mock the RealmConfiguration.Builder class. But it seems there is some
+        // problems for powermock to mock it (static inner class). We just mock the RealmCore.loadLibrary(Context) which
+        // will be called by RealmConfiguration.Builder's constructor.
+        doNothing().when(RealmCore.class);
+        RealmCore.loadLibrary(any(Context.class));
+
+        // TODO: Mock the RealmConfiguration's constructor. If the RealmConfiguration.Builder.build can be mocked, this
+        // is not necessary anymore.
+        whenNew(RealmConfiguration.class).withAnyArguments().thenReturn(mockRealmConfig);
+
+        // Anytime getInstance is called with any configuration, then return the mockRealm
+        when(Realm.getInstance(any(RealmConfiguration.class))).thenReturn(mockRealm);
 
         // Anytime we ask Realm to create a Person, return a new instance.
         when(mockRealm.createObject(Person.class)).thenReturn(new Person());
@@ -76,8 +89,5 @@
 
         this.mockRealm = mockRealm;
         this.people = people;
-
-        // Get the activity so we can start testing
-        activity = Robolectric.setupActivity(ExampleActivity.class);
     }
 

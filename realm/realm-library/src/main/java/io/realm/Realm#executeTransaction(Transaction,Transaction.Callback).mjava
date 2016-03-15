@@ -1,14 +1,18 @@
     /**
-     * Similar to {@link #executeTransaction(Transaction)} but runs asynchronously from a worker thread.
+     * Similar to {@link #executeTransaction(Transaction)} but runs asynchronously on a worker thread.
      *
      * @param transaction {@link io.realm.Realm.Transaction} to execute.
      * @param callback optional, to receive the result of this query.
      * @return a {@link RealmAsyncTask} representing a cancellable task.
      * @throws IllegalArgumentException if the {@code transaction} is {@code null}, or if the realm is opened from another thread.
+     * @deprecated replaced by {@link #executeTransactionAsync(Transaction)}, {@link #executeTransactionAsync(Transaction, Transaction.OnSuccess)}, {@link #executeTransactionAsync(Transaction, io.realm.Realm.Transaction.OnError)} and {@link #executeTransactionAsync(Transaction, Transaction.OnSuccess, Transaction.OnError)}.
      */
+    @Deprecated
     public RealmAsyncTask executeTransaction(final Transaction transaction, final Transaction.Callback callback) {
-        if (transaction == null)
+        checkIfValid();
+        if (transaction == null) {
             throw new IllegalArgumentException("Transaction should not be null");
+        }
 
         // If the user provided a Callback then we make sure, the current Realm has a Handler
         // we can use to deliver the result
@@ -24,57 +28,61 @@
         final Future<?> pendingQuery = asyncQueryExecutor.submit(new Runnable() {
             @Override
             public void run() {
-                if (!Thread.currentThread().isInterrupted()) {
-                    Realm bgRealm = Realm.getInstance(realmConfiguration);
-                    bgRealm.beginTransaction();
-                    try {
-                        transaction.execute(bgRealm);
+                if (Thread.currentThread().isInterrupted()) {
+                    return;
+                }
 
-                        if (!Thread.currentThread().isInterrupted()) {
-                            bgRealm.commitTransaction();
-                            if (callback != null
-                                    && handler != null
-                                    && !Thread.currentThread().isInterrupted()
-                                    && handler.getLooper().getThread().isAlive()) {
-                                // The bgRealm needs to be closed before post event to caller's handler to avoid concurrency problem
-                                // eg.: User wants to delete Realm in the callbacks.
+                boolean transactionCommitted = false;
+                final Exception[] exception = new Exception[1];
+                final Realm bgRealm = Realm.getInstance(realmConfiguration);
+                bgRealm.beginTransaction();
+                try {
+                    transaction.execute(bgRealm);
+
+                    if (!Thread.currentThread().isInterrupted()) {
+                        bgRealm.commitTransaction(false, new Runnable() {
+                            @Override
+                            public void run() {
+                                // The bgRealm needs to be closed before post event to caller's handler to avoid
+                                // concurrency problem. eg.: User wants to delete Realm in the callbacks.
+                                // This will close Realm before sending REALM_CHANGED.
                                 bgRealm.close();
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        callback.onSuccess();
-                                    }
-                                });
                             }
-                        } else {
-                            if (bgRealm.isInTransaction()) {
-                                bgRealm.cancelTransaction();
-                            } else {
-                                RealmLog.w("Thread is interrupted. Could not cancel transaction, not currently in a transaction.");
-                            }
-                        }
-
-                    } catch (final Exception e) {
+                        });
+                        transactionCommitted = true;
+                    }
+                } catch (final Exception e) {
+                    exception[0] = e;
+                } finally {
+                    if (!bgRealm.isClosed()) {
                         if (bgRealm.isInTransaction()) {
                             bgRealm.cancelTransaction();
-                        } else {
+                        } else if (exception[0] != null) {
                             RealmLog.w("Could not cancel transaction, not currently in a transaction.");
                         }
-                        if (callback != null
-                                && handler != null
-                                && !Thread.currentThread().isInterrupted()
-                                && handler.getLooper().getThread().isAlive()) {
-                            bgRealm.close();
+                        bgRealm.close();
+                    }
+
+                    // Send response as the final step to ensure the bg thread quit before others get the response!
+                    if (callback != null
+                            && handler != null
+                            && !Thread.currentThread().isInterrupted()
+                            && handler.getLooper().getThread().isAlive()) {
+                        if (transactionCommitted) {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    callback.onError(e);
+                                    callback.onSuccess();
                                 }
                             });
-                        }
-                    } finally {
-                        if (!bgRealm.isClosed()) {
-                            bgRealm.close();
+                        } else if (exception[0] != null) {
+                            // transaction has not been canceled by there is a exception during transaction.
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    callback.onError(exception[0]);
+                                }
+                            });
                         }
                     }
                 }

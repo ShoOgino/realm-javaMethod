@@ -1,0 +1,33 @@
+    @Test
+    public void iOSDataTypes() throws IOException {
+        for (String iosVersion : IOS_VERSIONS) {
+            configFactory.copyRealmFromAssets(context,
+                    "ios/" + iosVersion + "-alltypes.realm", REALM_NAME);
+            realm = Realm.getDefaultInstance();
+            RealmResults<IOSAllTypes> result = realm.allObjectsSorted(IOSAllTypes.class, "id", Sort.ASCENDING);
+            // Verify metadata
+            Table table = realm.getTable(IOSAllTypes.class);
+            assertTrue(table.hasPrimaryKey());
+            assertTrue(table.hasSearchIndex(table.getColumnIndex("id")));
+            // iterative check
+            for (int i = 0; i < 10; i++) {
+                IOSAllTypes obj = result.get(i);
+                assertTrue(obj.isBoolCol());
+                assertEquals(i + 1, obj.getShortCol());
+                assertEquals(10 + i, obj.getIntCol());
+                assertEquals(100 + i, obj.getLongCol());
+                assertEquals(100000000L + (long)i, obj.getLongLongCol());
+                assertEquals(1.23F + (float)i, obj.getFloatCol(), 0F);
+                assertEquals(1.234D + (double)i, obj.getDoubleCol(), 0D);
+                assertArrayEquals(new byte[]{1, 2, 3}, obj.getByteCol());
+                assertEquals("String " + Integer.toString(i), obj.getStringCol());
+                assertEquals(new Date((1000 + i) * 1000), obj.getDateCol());
+                assertEquals("Foo", result.get(i).getChild().getName());
+                assertEquals(10, result.get(i).getChildren().size());
+                for (int j = 0; j < 10; j++) {
+                    assertEquals("Name: " + Integer.toString(i), result.get(i).getChildren().get(j).getName());
+                }
+            }
+        }
+    }
+

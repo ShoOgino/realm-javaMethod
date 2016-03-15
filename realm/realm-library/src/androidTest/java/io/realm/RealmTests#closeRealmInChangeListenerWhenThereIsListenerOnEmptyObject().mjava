@@ -1,0 +1,41 @@
+    // Test if close can be called from Realm change listener when there is a listener on empty Realm Object
+    @Test
+    @RunTestInLooperThread
+    public void closeRealmInChangeListenerWhenThereIsListenerOnEmptyObject() {
+        final Realm realm = Realm.getInstance(looperThread.createConfiguration());
+        final RealmChangeListener dummyListener = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+            }
+        };
+
+        // Change listener on Realm
+        final RealmChangeListener listener = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                if (realm.where(AllTypes.class).count() == 1) {
+                    realm.removeChangeListener(this);
+                    realm.close();
+                    looperThread.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            looperThread.testComplete();
+                        }
+                    });
+                }
+            }
+        };
+        realm.addChangeListener(listener);
+
+        // Change listener on Empty Object
+        final AllTypes allTypes = realm.where(AllTypes.class).findFirstAsync();
+        allTypes.addChangeListener(dummyListener);
+
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.createObject(AllTypes.class);
+            }
+        });
+    }
+

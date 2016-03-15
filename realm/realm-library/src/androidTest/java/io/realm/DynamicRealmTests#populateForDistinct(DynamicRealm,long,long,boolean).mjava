@@ -1,0 +1,25 @@
+    private void populateForDistinct(DynamicRealm realm, long numberOfBlocks, long numberOfObjects, boolean withNull) {
+        boolean autoRefreshEnabled = realm.isAutoRefresh();
+        if (autoRefreshEnabled) {
+            realm.setAutoRefresh(false);
+        }
+        realm.beginTransaction();
+        for (int i = 0; i < numberOfObjects * numberOfBlocks; i++) {
+            for (int j = 0; j < numberOfBlocks; j++) {
+                DynamicRealmObject obj = realm.createObject("AnnotationIndexTypes");
+                obj.setBoolean("indexBoolean", j % 2 == 0);
+                obj.setLong("indexLong", j);
+                obj.setDate("indexDate", withNull ? null : new Date(1000 * ((long) j)));
+                obj.setString("indexString", withNull ? null : "Test " + j);
+                obj.setBoolean("notIndexBoolean", j % 2 == 0);
+                obj.setLong("notIndexLong", j);
+                obj.setDate("notIndexDate", withNull ? null : new Date(1000 * ((long) j)));
+                obj.setString("notIndexString", withNull ? null : "Test " + j);
+            }
+        }
+        realm.commitTransaction();
+        if (autoRefreshEnabled) {
+            realm.setAutoRefresh(true);
+        }
+    }
+

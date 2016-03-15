@@ -1,0 +1,57 @@
+    // TODO Move to RealmQueryTests?
+    @Test
+    public void where_equalTo_wrongFieldTypeAsInput() throws IOException {
+        populateTestRealm();
+        setColumnData();
+
+        for (int i = 0; i < columnData.size(); i++) {
+            try {
+                realm.where(AllTypes.class).equalTo(columnData.get(i), true).findAll();
+                if (i != 0) {
+                    fail("Realm.where should fail with illegal argument");
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+
+            try {
+                realm.where(AllTypes.class).equalTo(columnData.get(i), new Date()).findAll();
+                if (i != 1) {
+                    fail("Realm.where should fail with illegal argument");
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+
+            try {
+                realm.where(AllTypes.class).equalTo(columnData.get(i), 13.37d).findAll();
+                if (i != 2) {
+                    fail("Realm.where should fail with illegal argument");
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+
+            try {
+                realm.where(AllTypes.class).equalTo(columnData.get(i), 13.3711f).findAll();
+                if (i != 3) {
+                    fail("Realm.where should fail with illegal argument");
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+
+            try {
+                realm.where(AllTypes.class).equalTo(columnData.get(i), "test").findAll();
+                if (i != 4) {
+                    fail("Realm.where should fail with illegal argument");
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+
+            try {
+                realm.where(AllTypes.class).equalTo(columnData.get(i), 1337).findAll();
+                if (i != 5) {
+                    fail("Realm.where should fail with illegal argument");
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

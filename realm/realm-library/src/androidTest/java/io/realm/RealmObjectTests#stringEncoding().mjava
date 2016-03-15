@@ -1,0 +1,23 @@
+    @Test
+    public void stringEncoding() {
+        String[] strings = {"ABCD", "ÆØÅ", "Ö∫Ë", "ΠΑΟΚ", "Здравей"};
+
+        realm.beginTransaction();
+        realm.clear(AllTypes.class);
+
+        for (String str : strings) {
+            AllTypes obj1 = realm.createObject(AllTypes.class);
+            obj1.setColumnString(str);
+        }
+        realm.commitTransaction();
+
+        RealmResults<AllTypes> objects = realm.allObjects(AllTypes.class);
+        assertEquals(strings.length, objects.size());
+        int i = 0;
+        for (AllTypes obj : objects) {
+            String s = obj.getColumnString();
+            assertEquals(strings[i], s);
+            i++;
+        }
+    }
+

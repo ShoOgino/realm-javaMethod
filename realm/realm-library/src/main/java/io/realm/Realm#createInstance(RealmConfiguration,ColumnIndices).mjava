@@ -14,7 +14,12 @@
             if (configuration.shouldDeleteRealmIfMigrationNeeded()) {
                 deleteRealm(configuration);
             } else {
-                migrateRealm(configuration);
+                try {
+                    migrateRealm(configuration);
+                } catch (FileNotFoundException fileNotFoundException) {
+                    // Should never happen
+                    throw new RealmIOException(fileNotFoundException);
+                }
             }
 
             return createAndValidate(configuration, columnIndices);

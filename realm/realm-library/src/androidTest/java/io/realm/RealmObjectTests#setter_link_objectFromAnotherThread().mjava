@@ -1,0 +1,48 @@
+    @Test
+    public void setter_link_objectFromAnotherThread() throws InterruptedException {
+        final CountDownLatch createLatch = new CountDownLatch(1);
+        final CountDownLatch testEndLatch = new CountDownLatch(1);
+
+        final AtomicReference<CyclicType> objFromAnotherThread = new AtomicReference<>();
+
+        java.lang.Thread thread = new java.lang.Thread() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(realmConfig);
+
+                // 1. create an object
+                realm.beginTransaction();
+                objFromAnotherThread.set(realm.createObject(CyclicType.class));
+                realm.commitTransaction();
+
+                createLatch.countDown();
+                try {
+                    testEndLatch.await();
+                } catch (InterruptedException ignored) {
+                }
+
+                // 3. close Realm in this thread and finish.
+                realm.close();
+            }
+        };
+        thread.start();
+
+        createLatch.await();
+        // 2. set created object to target
+        realm.beginTransaction();
+        try {
+            CyclicType target = realm.createObject(CyclicType.class);
+            try {
+                target.setObject(objFromAnotherThread.get());
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+        } finally {
+            testEndLatch.countDown();
+            realm.cancelTransaction();
+        }
+
+        // wait for finishing the thread
+        thread.join();
+    }
+

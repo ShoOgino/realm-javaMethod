@@ -1,0 +1,19 @@
+    @Test
+    public void copyToRealm_doNotCopyReferencedObjectIfManaged() {
+        realm.beginTransaction();
+
+        // Child object is managed by Realm
+        CyclicTypePrimaryKey childObj = realm.createObject(CyclicTypePrimaryKey.class);
+        childObj.setName("Child");
+        childObj.setId(1);
+
+        // Parent object is a standalone object
+        CyclicTypePrimaryKey parentObj = new CyclicTypePrimaryKey(2);
+        parentObj.setObject(childObj);
+
+        realm.copyToRealm(parentObj);
+        realm.commitTransaction();
+
+        assertEquals(2, realm.where(CyclicTypePrimaryKey.class).count());
+    }
+

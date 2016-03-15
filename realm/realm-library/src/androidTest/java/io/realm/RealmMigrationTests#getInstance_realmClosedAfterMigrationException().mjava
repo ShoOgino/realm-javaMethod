@@ -1,0 +1,19 @@
+    @Test
+    public void getInstance_realmClosedAfterMigrationException() throws IOException {
+        String REALM_NAME = "default0.realm";
+        RealmConfiguration realmConfig = configFactory.createConfiguration(REALM_NAME);
+        configFactory.copyRealmFromAssets(context, REALM_NAME, REALM_NAME);
+        try {
+            Realm.getInstance(realmConfig);
+            fail("A migration should be triggered");
+        } catch (RealmMigrationNeededException expected) {
+            Realm.deleteRealm(realmConfig); // Delete old realm
+        }
+
+        // This should recreate the Realm with proper schema
+        Realm realm = Realm.getInstance(realmConfig);
+        int result = realm.where(AllTypes.class).equalTo("columnString", "Foo").findAll().size();
+        assertEquals(0, result);
+        realm.close();
+    }
+

@@ -1,0 +1,10 @@
+    @Test
+    public void setList_wrongTypeThrows() {
+        realm.beginTransaction();
+        AllTypes wrongObj = realm.createObject(AllTypes.class);
+        DynamicRealmObject wrongDynamicObject = new DynamicRealmObject(wrongObj);
+        RealmList<DynamicRealmObject> wrongDynamicList = wrongDynamicObject.getList(AllTypes.FIELD_REALMLIST);
+        thrown.expect(IllegalArgumentException.class);
+        dObjTyped.setList(AllJavaTypes.FIELD_LIST, wrongDynamicList);
+    }
+

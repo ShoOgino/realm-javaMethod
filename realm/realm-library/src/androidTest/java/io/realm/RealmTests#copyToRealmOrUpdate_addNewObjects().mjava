@@ -1,0 +1,20 @@
+    @Test
+    public void copyToRealmOrUpdate_addNewObjects() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                PrimaryKeyAsLong obj = new PrimaryKeyAsLong();
+                obj.setId(1);
+                obj.setName("Foo");
+                realm.copyToRealm(obj);
+
+                PrimaryKeyAsLong obj2 = new PrimaryKeyAsLong();
+                obj2.setId(2);
+                obj2.setName("Bar");
+                realm.copyToRealmOrUpdate(obj2);
+            }
+        });
+
+        assertEquals(2, realm.allObjects(PrimaryKeyAsLong.class).size());
+    }
+

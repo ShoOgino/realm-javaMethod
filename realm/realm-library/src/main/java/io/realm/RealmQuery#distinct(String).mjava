@@ -1,0 +1,26 @@
+    /**
+     * Returns a distinct set of objects of a specific class. If the result is sorted, the first
+     * object will be returned in case of multiple occurrences, otherwise it is undefined which
+     * object is returned.
+     *
+     * @param fieldName the field name.
+     * @return a non-null {@link RealmResults} containing the distinct objects.
+     * @throws IllegalArgumentException if a field is null, does not exist, is an unsupported type,
+     * is not indexed, or points to linked fields.
+     */
+    public RealmResults<E> distinct(String fieldName) {
+        checkQueryIsNotReused();
+        long columnIndex = getAndValidateDistinctColumnIndex(fieldName, this.table.getTable());
+        TableView tableView = this.query.findAll();
+        tableView.distinct(columnIndex);
+
+        RealmResults<E> realmResults;
+        if (isDynamicQuery()) {
+            //noinspection unchecked
+            realmResults = (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, tableView, className);
+        } else {
+            realmResults = RealmResults.createFromTableOrView(realm, tableView, clazz);
+        }
+        return realmResults;
+    }
+

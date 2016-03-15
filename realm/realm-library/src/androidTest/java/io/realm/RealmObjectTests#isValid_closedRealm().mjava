@@ -1,0 +1,12 @@
+    @Test
+    public void isValid_closedRealm() {
+        RealmConfiguration otherConfig = configFactory.createConfiguration("other-realm");
+        Realm testRealm = Realm.getInstance(otherConfig);
+        testRealm.beginTransaction();
+        AllTypes allTypes = testRealm.createObject(AllTypes.class);
+        assertTrue(allTypes.isValid());
+        testRealm.commitTransaction();
+        testRealm.close();
+        assertFalse(allTypes.isValid());
+    }
+

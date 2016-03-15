@@ -1,0 +1,18 @@
+    @Test
+    public void equals_afterModification() {
+        realm.beginTransaction();
+        CyclicType ct = realm.createObject(CyclicType.class);
+        ct.setName("Foo");
+        realm.commitTransaction();
+
+        CyclicType ct1 = realm.where(CyclicType.class).findFirst();
+        CyclicType ct2 = realm.where(CyclicType.class).findFirst();
+
+        realm.beginTransaction();
+        ct1.setName("Baz");
+        realm.commitTransaction();
+
+        assertTrue(ct1.equals(ct2));
+        assertTrue(ct2.equals(ct1));
+    }
+

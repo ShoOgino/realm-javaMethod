@@ -1,0 +1,19 @@
+    @Test
+    @RunTestInLooperThread
+    public void realm_emittedOnUpdate() {
+        final AtomicInteger subscriberCalled = new AtomicInteger(0);
+        Realm realm = looperThread.realm;
+        subscription = realm.asObservable().subscribe(new Action1<Realm>() {
+            @Override
+            public void call(Realm rxRealm) {
+                if (subscriberCalled.incrementAndGet() == 2) {
+                    looperThread.testComplete();
+                }
+            }
+        });
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+    }
+

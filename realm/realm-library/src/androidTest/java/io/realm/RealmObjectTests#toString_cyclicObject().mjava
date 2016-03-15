@@ -1,0 +1,9 @@
+    @Test
+    public void toString_cyclicObject() {
+        realm.beginTransaction();
+        CyclicType foo = createCyclicData();
+        realm.commitTransaction();
+        String expected = "CyclicType = [{name:Foo},{object:CyclicType},{otherObject:null},{objects:RealmList<CyclicType>[0]}]";
+        assertEquals(expected, foo.toString());
+    }
+

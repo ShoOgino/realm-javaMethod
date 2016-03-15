@@ -1,0 +1,21 @@
+    // Test that for (A -> B -> C) for maxDepth = 1, result is (A -> B -> null)
+    @Test
+    public void copyFromRealm_checkMaxDepth() {
+        realm.beginTransaction();
+        CyclicType objA = realm.createObject(CyclicType.class);
+        objA.setName("A");
+        CyclicType objB = realm.createObject(CyclicType.class);
+        objB.setName("B");
+        CyclicType objC = realm.createObject(CyclicType.class);
+        objC.setName("C");
+        objA.setObject(objB);
+        objC.setObject(objC);
+        objA.getObjects().add(objB);
+        objA.getObjects().add(objC);
+        realm.commitTransaction();
+
+        CyclicType copyA = realm.copyFromRealm(objA, 1);
+
+        assertNull(copyA.getObject().getObject());
+    }
+

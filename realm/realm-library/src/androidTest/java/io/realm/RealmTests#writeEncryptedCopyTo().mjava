@@ -1,0 +1,86 @@
+    @Test
+    public void writeEncryptedCopyTo() throws Exception {
+        populateTestRealm();
+        long before = realm.where(AllTypes.class).count();
+        assertEquals(TEST_DATA_SIZE, before);
+
+        // Configure test realms
+        final String ENCRYPTED_REALM_FILE_NAME = "encryptedTestRealm.realm";
+        final String RE_ENCRYPTED_REALM_FILE_NAME = "reEncryptedTestRealm.realm";
+        final String DECRYPTED_REALM_FILE_NAME = "decryptedTestRealm.realm";
+
+        RealmConfiguration encryptedRealmConfig = configFactory.createConfiguration(ENCRYPTED_REALM_FILE_NAME,
+                TestHelper.getRandomKey());
+
+        RealmConfiguration reEncryptedRealmConfig = configFactory.createConfiguration(RE_ENCRYPTED_REALM_FILE_NAME,
+                TestHelper.getRandomKey());
+
+        RealmConfiguration decryptedRealmConfig = configFactory.createConfiguration(DECRYPTED_REALM_FILE_NAME);
+
+        // Write encrypted copy from a unencrypted Realm
+        File destination = new File(encryptedRealmConfig.getPath());
+        try {
+            realm.writeEncryptedCopyTo(destination, encryptedRealmConfig.getEncryptionKey());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+        Realm encryptedRealm = null;
+        try {
+
+            // Verify encrypted Realm and write new encrypted copy with a new key
+            encryptedRealm = Realm.getInstance(encryptedRealmConfig);
+            assertEquals(TEST_DATA_SIZE, encryptedRealm.where(AllTypes.class).count());
+
+            destination = new File(reEncryptedRealmConfig.getPath());
+            try {
+                encryptedRealm.writeEncryptedCopyTo(destination, reEncryptedRealmConfig.getEncryptionKey());
+            } catch (Exception e) {
+                fail(e.getMessage());
+            }
+
+            // Verify re-encrypted copy
+            Realm reEncryptedRealm = null;
+            try {
+                reEncryptedRealm = Realm.getInstance(reEncryptedRealmConfig);
+                assertEquals(TEST_DATA_SIZE, reEncryptedRealm.where(AllTypes.class).count());
+            } finally {
+                if (reEncryptedRealm != null) {
+                    reEncryptedRealm.close();
+                    if (!Realm.deleteRealm(reEncryptedRealmConfig)) {
+                        fail();
+                    }
+                }
+            }
+
+            // Write non-encrypted copy from the encrypted version
+            destination = new File(decryptedRealmConfig.getPath());
+            try {
+                encryptedRealm.writeEncryptedCopyTo(destination, null);
+            } catch (Exception e) {
+                fail(e.getMessage());
+            }
+
+            // Verify decrypted Realm and cleanup
+            Realm decryptedRealm = null;
+            try {
+                decryptedRealm = Realm.getInstance(decryptedRealmConfig);
+                assertEquals(TEST_DATA_SIZE, decryptedRealm.where(AllTypes.class).count());
+            } finally {
+                if (decryptedRealm != null) {
+                    decryptedRealm.close();
+                    if (!Realm.deleteRealm(decryptedRealmConfig)) {
+                        fail();
+                    }
+                }
+            }
+        } finally {
+            if (encryptedRealm != null) {
+                encryptedRealm.close();
+                if (!Realm.deleteRealm(encryptedRealmConfig)) {
+                    fail();
+                }
+            }
+        }
+    }
+

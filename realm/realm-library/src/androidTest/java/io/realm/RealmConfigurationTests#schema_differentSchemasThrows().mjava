@@ -1,0 +1,17 @@
+    @Test
+    public void schema_differentSchemasThrows() {
+        RealmConfiguration config1 = new RealmConfiguration.Builder(configFactory.getRoot())
+                .schema(AllTypes.class).build();
+        RealmConfiguration config2 = new RealmConfiguration.Builder(configFactory.getRoot())
+                .schema(CyclicType.class).build();
+
+        Realm realm1 = Realm.getInstance(config1);
+        try {
+            Realm.getInstance(config2);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm1.close();
+        }
+    }
+

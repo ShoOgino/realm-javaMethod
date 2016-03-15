@@ -1,0 +1,57 @@
+    // UC 1 Sync RealmResults
+    @Test
+    @RunTestInLooperThread
+    public void callback_with_relevant_commit_realmresults_sync() {
+        final Realm realm = looperThread.realm;
+
+        // Step 1: Trigger global Realm change listener
+        realm.beginTransaction();
+        final Dog akamaru = realm.createObject(Dog.class);
+        akamaru.setName("Akamaru");
+        realm.commitTransaction();
+
+        final RealmResults<Dog> dogs = realm.where(Dog.class).findAll();
+        dogs.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                // Step 4: Respond to relevant change
+                typebasedCommitInvocations.incrementAndGet();
+                assertEquals(1, dogs.size());
+                assertEquals("Akamaru", dogs.get(0).getName());
+                assertEquals(17, dogs.get(0).getAge());
+            }
+        });
+
+        realm.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                int commits = globalCommitInvocations.incrementAndGet();
+                switch (commits) {
+                    case 1:
+                        // Step 2: Trigger non-related commit
+                        realm.beginTransaction();
+                        realm.commitTransaction();
+                        break;
+
+                    case 2:
+                        // Step 3: Trigger related commit
+                        realm.beginTransaction();
+                        akamaru.setAge(17);
+                        realm.commitTransaction();
+                        break;
+
+                    case 3:
+                        // Step 5: Complete test
+                        realm.handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                assertEquals(1, typebasedCommitInvocations.get());
+                                looperThread.testComplete();
+                            }
+                        });
+
+                }
+            }
+        });
+    }
+

@@ -1,0 +1,20 @@
+    @Test
+    public void iOSDataTypesMaximumValues() throws IOException {
+        for (String iosVersion : IOS_VERSIONS) {
+            configFactory.copyRealmFromAssets(context,
+                    "ios/" + iosVersion + "-alltypes-max.realm", REALM_NAME);
+            realm = Realm.getDefaultInstance();
+
+            IOSAllTypes obj = realm.allObjects(IOSAllTypes.class).first();
+            assertEquals(Short.MAX_VALUE, obj.getShortCol());
+            assertEquals(Integer.MAX_VALUE, obj.getIntCol());
+            assertEquals(Integer.MAX_VALUE, obj.getLongCol());
+            assertEquals(Long.MAX_VALUE, obj.getLongLongCol());
+            assertEquals(Float.MAX_VALUE, obj.getFloatCol(), 0F);
+            assertEquals(Double.MAX_VALUE, obj.getDoubleCol(), 0D);
+            assertArrayEquals(new byte[0], obj.getByteCol());
+            assertEquals("", obj.getStringCol());
+            assertEquals(0x8000000000000000L * 1000L, obj.getDateCol().getTime());
+        }
+    }
+

@@ -1,0 +1,21 @@
+    @Test
+    public void standardSetup() {
+        RealmConfiguration config = new RealmConfiguration.Builder(configFactory.getRoot())
+                .name("foo.realm")
+                .encryptionKey(TestHelper.getRandomKey())
+                .schemaVersion(42)
+                .migration(new RealmMigration() {
+                    @Override
+                    public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                        // no-op
+                    }
+                })
+                .deleteRealmIfMigrationNeeded()
+                .build();
+
+        Realm.deleteRealm(config);
+        realm = Realm.getInstance(config);
+        assertTrue(realm.getPath().endsWith("foo.realm"));
+        assertEquals(42, realm.getVersion());
+    }
+

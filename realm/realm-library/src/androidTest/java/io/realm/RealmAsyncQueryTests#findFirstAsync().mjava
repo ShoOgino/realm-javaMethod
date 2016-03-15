@@ -1,0 +1,21 @@
+    // similar UC as #testFindAllAsync using 'findFirst'
+    @Test
+    @RunTestInLooperThread
+    public void findFirstAsync() {
+        Realm realm = looperThread.realm;
+        populateTestRealm(realm, 10);
+
+        final AllTypes asyncObj = realm.where(AllTypes.class).findFirstAsync();
+        assertFalse(asyncObj.isValid());
+        assertFalse(asyncObj.isLoaded());
+
+        asyncObj.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertTrue(asyncObj.isLoaded());
+                assertTrue(asyncObj.isValid());
+                looperThread.testComplete();
+            }
+        });
+    }
+

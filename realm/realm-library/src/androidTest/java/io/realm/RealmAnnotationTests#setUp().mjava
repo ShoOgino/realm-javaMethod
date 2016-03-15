@@ -1,0 +1,12 @@
+    @Before
+    public void setUp() {
+        RealmConfiguration realmConfig = configFactory.createConfiguration();
+        realm = Realm.getInstance(realmConfig);
+        realm.beginTransaction();
+        AnnotationTypes object = realm.createObject(AnnotationTypes.class);
+        object.setNotIndexString("String 1");
+        object.setIndexString("String 2");
+        object.setIgnoreString("String 3");
+        realm.commitTransaction();
+    }
+

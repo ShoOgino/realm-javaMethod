@@ -1,0 +1,19 @@
+    @Test
+    public void setter_link_deletedObject() {
+        realm.beginTransaction();
+        try {
+            CyclicType target = realm.createObject(CyclicType.class);
+
+            CyclicType removed = realm.createObject(CyclicType.class);
+            removed.removeFromRealm();
+
+            try {
+                target.setObject(removed);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

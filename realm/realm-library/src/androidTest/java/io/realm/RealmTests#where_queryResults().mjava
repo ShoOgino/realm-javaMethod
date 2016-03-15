@@ -1,0 +1,21 @@
+    // Note that this test is relying on the values set while initializing the test dataset
+    // TODO Move to RealmQueryTests?
+    @Test
+    public void where_queryResults() throws IOException {
+        populateTestRealm(realm, 159);
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, 33).findAll();
+        assertEquals(1, resultList.size());
+
+        resultList = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, 3333).findAll();
+        assertEquals(0, resultList.size());
+
+        resultList = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_STRING, "test data 0").findAll();
+        assertEquals(1, resultList.size());
+
+        resultList = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_STRING, "test data 0", Case.INSENSITIVE).findAll();
+        assertEquals(1, resultList.size());
+
+        resultList = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_STRING, "Test data 0", Case.SENSITIVE).findAll();
+        assertEquals(0, resultList.size());
+    }
+

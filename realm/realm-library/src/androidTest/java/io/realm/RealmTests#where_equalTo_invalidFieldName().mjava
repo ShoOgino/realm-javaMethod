@@ -1,0 +1,34 @@
+    // TODO Move to RealmQueryTests?
+    @Test
+    public void where_equalTo_invalidFieldName() throws IOException {
+        try {
+            realm.where(AllTypes.class).equalTo("invalidcolumnname", 33).findAll();
+            fail("Invalid field name");
+        } catch (Exception ignored) {
+        }
+
+        try {
+            realm.where(AllTypes.class).equalTo("invalidcolumnname", "test").findAll();
+            fail("Invalid field name");
+        } catch (Exception ignored) {
+        }
+
+        try {
+            realm.where(AllTypes.class).equalTo("invalidcolumnname", true).findAll();
+            fail("Invalid field name");
+        } catch (Exception ignored) {
+        }
+
+        try {
+            realm.where(AllTypes.class).equalTo("invalidcolumnname", 3.1415d).findAll();
+            fail("Invalid field name");
+        } catch (Exception ignored) {
+        }
+
+        try {
+            realm.where(AllTypes.class).equalTo("invalidcolumnname", 3.1415f).findAll();
+            fail("Invalid field name");
+        } catch (Exception ignored) {
+        }
+    }
+

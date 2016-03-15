@@ -1,0 +1,19 @@
+    @Test
+    public void removeAllFromRealm_notManagedList() {
+        Owner owner = testRealm.where(Owner.class).findFirst();
+        RealmList<Dog> dogs = owner.getDogs();
+        assertEquals(TEST_OBJECTS, dogs.size());
+
+        RealmList<Dog> notManagedDogs = new RealmList<Dog>();
+        for (Dog dog : dogs) {
+            notManagedDogs.add(dog);
+        }
+
+        testRealm.beginTransaction();
+        notManagedDogs.deleteAllFromRealm();
+        testRealm.commitTransaction();
+        assertEquals(0, dogs.size());
+        assertEquals(0, notManagedDogs.size());
+        assertEquals(0, testRealm.where(Dog.class).count());
+    }
+

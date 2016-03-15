@@ -3,13 +3,15 @@
      * will not be reflected in the Realm copy. This is a deep copy, so all referenced objects will be copied. Objects
      * already in this Realm will be ignored.
      *
+     * Please note, copying an object will copy all field values. All unset fields in this and child objects will be
+     * set to their default value if not provided.
+     *
      * @param object the {@link io.realm.RealmObject} to copy to the Realm.
      * @return a managed RealmObject with its properties backed by the Realm.
      * @throws java.lang.IllegalArgumentException if RealmObject is {@code null}.
      */
     public <E extends RealmObject> E copyToRealm(E object) {
         checkNotNullObject(object);
-        E realmObject = copyOrUpdate(object, false);
-        return realmObject;
+        return copyOrUpdate(object, false);
     }
 

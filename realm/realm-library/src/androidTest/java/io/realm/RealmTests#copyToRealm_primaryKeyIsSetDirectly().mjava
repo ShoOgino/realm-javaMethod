@@ -1,0 +1,11 @@
+    // Check that using copyToRealm will set the primary key directly instead of first setting
+    // it to the default value (which can fail).
+    @Test
+    public void copyToRealm_primaryKeyIsSetDirectly() {
+        realm.beginTransaction();
+        realm.createObject(OwnerPrimaryKey.class);
+        realm.copyToRealm(new OwnerPrimaryKey(1, "Foo"));
+        realm.commitTransaction();
+        assertEquals(2, realm.where(OwnerPrimaryKey.class).count());
+    }
+

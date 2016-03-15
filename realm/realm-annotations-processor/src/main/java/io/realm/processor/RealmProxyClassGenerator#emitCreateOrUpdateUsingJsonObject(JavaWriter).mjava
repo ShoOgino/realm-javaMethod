@@ -5,7 +5,7 @@
                 "createOrUpdateUsingJsonObject",
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
                 Arrays.asList("Realm", "realm", "JSONObject", "json", "boolean", "update"),
-                Arrays.asList("JSONException"));
+                Collections.singletonList("JSONException"));
 
         if (!metadata.hasPrimaryKey()) {
             writer.emitStatement("%s obj = realm.createObject(%s.class)", className, className);
@@ -23,8 +23,8 @@
                             .emitStatement("obj = new %s(realm.schema.getColumnInfo(%s.class))",
                                     Utils.getProxyClassName(className),
                                     className)
-                            .emitStatement("obj.realm = realm")
-                            .emitStatement("obj.row = table.getUncheckedRow(rowIndex)")
+                            .emitStatement("((RealmObject) obj).realm = realm")
+                            .emitStatement("((RealmObject) obj).row = table.getUncheckedRow(rowIndex)")
                         .endControlFlow()
                     .endControlFlow()
                 .endControlFlow();
@@ -41,6 +41,7 @@
             String qualifiedFieldType = field.asType().toString();
             if (Utils.isRealmObject(field)) {
                 RealmJsonTypeHelper.emitFillRealmObjectWithJsonValue(
+                        interfaceName,
                         metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
@@ -50,6 +51,7 @@
 
             } else if (Utils.isRealmList(field)) {
                 RealmJsonTypeHelper.emitFillRealmListWithJsonValue(
+                        interfaceName,
                         metadata.getGetter(fieldName),
                         metadata.getSetter(fieldName),
                         fieldName,
@@ -59,6 +61,7 @@
 
             } else {
                 RealmJsonTypeHelper.emitFillJavaTypeWithJsonValue(
+                        interfaceName,
                         metadata.getSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
