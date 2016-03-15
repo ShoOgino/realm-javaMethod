@@ -20,7 +20,13 @@
                 // refresh the Realm to the version provided by the worker thread
                 // (advanceRead to the latest version may cause a version mismatch error) preventing us
                 // from importing correctly the handover table view
-                realm.sharedGroupManager.advanceRead(result.versionID);
+                try {
+                    realm.sharedGroupManager.advanceRead(result.versionID);
+                } catch (BadVersionException e) {
+                    // The version comparison above should have ensured that that the Caller version is less than the
+                    // Worker version. In that case it should always be safe to advance_read.
+                    throw new IllegalStateException("Failed to advance Caller Realm to Worker Realm version", e);
+                }
             }
 
             ArrayList<RealmResults<? extends RealmObject>> callbacksToNotify = new ArrayList<RealmResults<? extends RealmObject>>(result.updatedTableViews.size());
@@ -33,15 +39,15 @@
                     asyncRealmResults.remove(weakRealmResults);
 
                 } else {
+                    // update the instance with the new pointer
+                    realmResults.swapTableViewPointer(query.getValue());
+
                     // it's dangerous to notify the callback about new results before updating
                     // the pointers, because the callback may use another RealmResults not updated yet
                     // this is why we defer the notification until we're done updating all pointers
                     callbacksToNotify.add(realmResults);
 
                     RealmLog.d("COMPLETED_UPDATE_ASYNC_QUERIES realm:"+ HandlerController.this + " updating RealmResults " + weakRealmResults);
-
-                    // update the instance with the new pointer
-                    realmResults.swapTableViewPointer(query.getValue());
                 }
             }
 
