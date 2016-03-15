@@ -1,0 +1,12 @@
+    @Test
+    public void setRemoveIndex() {
+        for (IndexFieldType fieldType : IndexFieldType.values()) {
+            String fieldName = "foo";
+            schema.addField(fieldName, fieldType.getType(), FieldAttribute.INDEXED);
+            assertTrue(schema.hasIndex(fieldName));
+            schema.removeIndex(fieldName);
+            assertFalse(schema.hasIndex(fieldName));
+            schema.removeField(fieldName);
+        }
+    }
+

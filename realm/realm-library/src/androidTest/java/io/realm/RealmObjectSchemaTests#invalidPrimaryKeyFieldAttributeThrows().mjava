@@ -1,0 +1,12 @@
+    @Test
+    public void invalidPrimaryKeyFieldAttributeThrows() {
+        for (InvalidPrimaryKeyFieldType fieldType : InvalidPrimaryKeyFieldType.values()) {
+            String fieldName = "foo";
+            try {
+                schema.addField(fieldName, fieldType.getType(), FieldAttribute.PRIMARY_KEY);
+                fail(fieldType + " should not be allowed to be a primary key");
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

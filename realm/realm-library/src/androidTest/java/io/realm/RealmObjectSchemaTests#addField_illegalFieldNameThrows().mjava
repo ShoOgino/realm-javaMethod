@@ -1,0 +1,20 @@
+    @Test
+    public void addField_illegalFieldNameThrows() {
+        String[] fieldNames = new String[] { null, "", "foo.bar", TestHelper.getRandomString(65) };
+        for (SchemaFieldType schemaFieldType : SchemaFieldType.values()) {
+            for (String fieldName : fieldNames) {
+                try {
+                    switch(schemaFieldType) {
+                        case SIMPLE: schema.addField(fieldName, String.class); break;
+                        case OBJECT: schema.addRealmObjectField(fieldName, DOG_SCHEMA); break;
+                        case LIST: schema.addRealmListField(fieldName, DOG_SCHEMA); break;
+                        default:
+                            fail("Unknown type: " + schemaFieldType);
+                    }
+                    fail(schemaFieldType + " didn't throw");
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
+    }
+

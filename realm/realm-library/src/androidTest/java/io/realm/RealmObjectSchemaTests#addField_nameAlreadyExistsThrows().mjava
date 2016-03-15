@@ -1,0 +1,34 @@
+    @Test
+    public void addField_nameAlreadyExistsThrows() {
+        for (SchemaFieldType schemaFieldType : SchemaFieldType.values()) {
+            switch (schemaFieldType) {
+                case SIMPLE:
+                    checkAddFieldTwice(AllJavaTypes.FIELD_STRING, new FieldRunnable() {
+                        @Override
+                        public void run(String fieldName) {
+                            schema.addField(fieldName, String.class);
+                        }
+                    });
+                    break;
+                case OBJECT:
+                    checkAddFieldTwice(AllJavaTypes.FIELD_OBJECT, new FieldRunnable() {
+                        @Override
+                        public void run(String fieldName) {
+                            schema.addRealmObjectField(fieldName, DOG_SCHEMA);
+                        }
+                    });
+                    break;
+                case LIST:
+                    checkAddFieldTwice(AllJavaTypes.FIELD_LIST, new FieldRunnable() {
+                        @Override
+                        public void run(String fieldName) {
+                            schema.addRealmListField(fieldName, DOG_SCHEMA);
+                        }
+                    });
+                    break;
+                default:
+                    fail("Unknown type: " + schemaFieldType);
+            }
+        }
+    }
+
