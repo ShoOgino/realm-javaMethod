@@ -57,6 +57,11 @@
 
                         return handoverTableViewPointer;
 
+                    } catch (BadVersionException e) {
+                        // In some rare race conditions, this can happen. In that case, just ignore the error.
+                        RealmLog.d("findAllAsync handover could not complete due to a BadVersionException. " +
+                                "Retry is scheduled by a REALM_CHANGED event.");
+
                     } catch (Exception e) {
                         RealmLog.e(e.getMessage(), e);
                         closeSharedGroupAndSendMessageToHandler(sharedGroup,
