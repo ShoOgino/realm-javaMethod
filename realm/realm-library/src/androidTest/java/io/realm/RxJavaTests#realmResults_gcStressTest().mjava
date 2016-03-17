@@ -1,0 +1,43 @@
+    // Tests that Observables keep strong references to their parent, so they are not accidentally GC'ed while
+    // waiting for results from the async API's.
+    @Test
+    @RunTestInLooperThread
+    public void realmResults_gcStressTest() {
+        final int TEST_SIZE = 50;
+        final AtomicLong innerCounter = new AtomicLong();
+        final Realm realm = looperThread.realm;
+
+        realm.beginTransaction();
+        for (int i = 0; i < TEST_SIZE; i++) {
+            realm.createObject(AllTypes.class).setColumnLong(i);
+        }
+        realm.commitTransaction();
+
+        for (int i = 0; i < TEST_SIZE; i++) {
+            // Don't keep a reference to the Observable
+            realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, i).findAllAsync().asObservable()
+                    .filter(new Func1<RealmResults<AllTypes>, Boolean>() {
+                        @Override
+                        public Boolean call(RealmResults<AllTypes> results) {
+                            return results.isLoaded();
+                        }
+                    })
+                    .take(1) // Unsubscribes from Realm
+                    .subscribe(new Action1<RealmResults<AllTypes>>() {
+                        @Override
+                        public void call(RealmResults<AllTypes> result) {
+                            // Not guaranteed, but can result in the GC of other RealmResults waiting for a result
+                            Runtime.getRuntime().gc();
+                            if (innerCounter.incrementAndGet() == TEST_SIZE) {
+                                looperThread.testComplete();
+                            }
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            fail(throwable.toString());
+                        }
+                    });
+        }
+    }
+
