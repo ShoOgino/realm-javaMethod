@@ -1,0 +1,30 @@
+    @Test
+    public void copyToRealm_objectInOtherThreadThrows() {
+        final CountDownLatch bgThreadDoneLatch = new CountDownLatch(1);
+
+        realm.beginTransaction();
+        final Dog dog = realm.createObject(Dog.class);
+        realm.commitTransaction();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+                bgRealm.beginTransaction();
+                try {
+                    bgRealm.copyToRealm(dog);
+                    fail();
+                } catch (IllegalArgumentException expected) {
+                    assertEquals("Objects which belong to Realm instances in other threads cannot be copied into this" +
+                                    " Realm instance.",
+                            expected.getMessage());
+                }
+                bgRealm.cancelTransaction();
+                bgRealm.close();
+                bgThreadDoneLatch.countDown();
+            }
+        }).start();
+
+        TestHelper.awaitOrFail(bgThreadDoneLatch);
+    }
+
