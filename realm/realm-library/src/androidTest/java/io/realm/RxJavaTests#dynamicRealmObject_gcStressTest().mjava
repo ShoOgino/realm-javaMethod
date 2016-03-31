@@ -1,0 +1,44 @@
+    // Tests that Observables keep strong references to their parent, so they are not accidentally GC'ed while
+    // waiting for results from the async API's.
+    @Test
+    @RunTestInLooperThread
+    public void dynamicRealmObject_gcStressTest() {
+        final int TEST_SIZE = 50;
+        final AtomicLong innerCounter = new AtomicLong();
+        final DynamicRealm realm = DynamicRealm.getInstance(looperThread.realmConfiguration);
+
+        realm.beginTransaction();
+        for (int i = 0; i < TEST_SIZE; i++) {
+            realm.createObject(AllTypes.CLASS_NAME).set(AllTypes.FIELD_LONG, i);
+        }
+        realm.commitTransaction();
+
+        for (int i = 0; i < TEST_SIZE; i++) {
+            // Don't keep a reference to the Observable
+            realm.where(AllTypes.CLASS_NAME).equalTo(AllTypes.FIELD_LONG, i).findFirstAsync().<DynamicRealmObject>asObservable()
+                    .filter(new Func1<DynamicRealmObject, Boolean>() {
+                        @Override
+                        public Boolean call(DynamicRealmObject obj) {
+                            return obj.isLoaded();
+                        }
+                    })
+                    .take(1) // Unsubscribes from Realm
+                    .subscribe(new Action1<DynamicRealmObject>() {
+                        @Override
+                        public void call(DynamicRealmObject result) {
+                            // Not guaranteed, but can result in the GC of other RealmResults waiting for a result
+                            Runtime.getRuntime().gc();
+                            if (innerCounter.incrementAndGet() == TEST_SIZE) {
+                                realm.close();
+                                looperThread.testComplete();
+                            }
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            fail(throwable.toString());
+                        }
+                    });
+        }
+    }
+
