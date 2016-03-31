@@ -7,6 +7,8 @@
                 // Get instance to make sure that the Realm is open for as long as the
                 // Observable is subscribed to it.
                 final DynamicRealm observableRealm = DynamicRealm.getInstance(realmConfig);
+                objectRefs.get().acquireReference(object);
+
                 final RealmChangeListener listener = new RealmChangeListener() {
                     @Override
                     public void onChange() {
@@ -21,6 +23,7 @@
                     public void call() {
                         object.removeChangeListener(listener);
                         observableRealm.close();
+                        objectRefs.get().releaseReference(object);
                     }
                 }));
 
