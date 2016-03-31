@@ -1,0 +1,50 @@
+    // Test sort on nullable fields with null values partially
+    @Test
+    public void sort_rowsWithPartialNullValues() {
+        populatePartialNullRowsForNumericTesting(realm);
+        OrderedRealmCollection<NullTypes> original;
+        OrderedRealmCollection<NullTypes> copy;
+        switch (collectionClass) {
+            case MANAGED_REALMLIST:
+                realm.beginTransaction();
+                RealmResults<NullTypes> objects = realm.allObjects(NullTypes.class);
+                NullTypes parent = realm.createObject(NullTypes.class, 0);
+                for (int i = 0; i < objects.size(); i++) {
+                    NullTypes object = objects.get(i);
+                    if (object.getId() != 0) {
+                        parent.getFieldListNull().add(object);
+                    }
+                }
+                realm.commitTransaction();
+                original = parent.getFieldListNull().where().findAll();
+                copy = parent.getFieldListNull();
+                break;
+
+            case REALMRESULTS:
+                original = realm.allObjects(NullTypes.class);
+                copy = realm.allObjects(NullTypes.class);
+                break;
+
+            default:
+                throw new AssertionError("Unknown collection class: " + collectionClass);
+        }
+
+        // 1 String
+        doTestSortOnColumnWithPartialNullValues(NullTypes.FIELD_STRING_NULL, original, copy);
+
+        // 3 Boolean
+        doTestSortOnColumnWithPartialNullValues(NullTypes.FIELD_BOOLEAN_NULL, original, copy);
+
+        // 6 Integer
+        doTestSortOnColumnWithPartialNullValues(NullTypes.FIELD_INTEGER_NULL, original, copy);
+
+        // 7 Float
+        doTestSortOnColumnWithPartialNullValues(NullTypes.FIELD_FLOAT_NULL, original, copy);
+
+        // 8 Double
+        doTestSortOnColumnWithPartialNullValues(NullTypes.FIELD_DOUBLE_NULL, original, copy);
+
+        // 10 Date
+        doTestSortOnColumnWithPartialNullValues(NullTypes.FIELD_DATE_NULL, original, copy);
+    }
+

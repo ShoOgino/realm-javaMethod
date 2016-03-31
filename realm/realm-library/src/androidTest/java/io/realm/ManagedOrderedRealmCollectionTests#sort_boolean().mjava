@@ -1,0 +1,21 @@
+    @Test
+    public void sort_boolean() {
+        OrderedRealmCollection<AllJavaTypes> sortedList = collection.sort(AllJavaTypes.FIELD_BOOLEAN, Sort.DESCENDING);
+        assertEquals(TEST_SIZE, sortedList.size());
+        assertEquals(false, sortedList.last().isFieldBoolean());
+        assertEquals(true, sortedList.first().isFieldBoolean());
+        assertEquals(true, sortedList.get(TEST_DATA_FIRST_HALF).isFieldBoolean());
+        assertEquals(false, sortedList.get(TEST_DATA_LAST_HALF).isFieldBoolean());
+
+        RealmResults<AllJavaTypes> reverseList = sortedList.sort(AllJavaTypes.FIELD_BOOLEAN, Sort.ASCENDING);
+        assertEquals(TEST_SIZE, reverseList.size());
+        assertEquals(true, reverseList.last().isFieldBoolean());
+        assertEquals(false, reverseList.first().isFieldBoolean());
+        assertEquals(false, reverseList.get(TEST_DATA_FIRST_HALF).isFieldBoolean());
+        assertEquals(true, reverseList.get(TEST_DATA_LAST_HALF).isFieldBoolean());
+
+        RealmResults<AllJavaTypes> reserveSortedList = reverseList.sort(AllJavaTypes.FIELD_BOOLEAN, Sort.DESCENDING);
+        assertEquals(TEST_SIZE, reserveSortedList.size());
+        assertEquals(reserveSortedList.first(), sortedList.first());
+    }
+

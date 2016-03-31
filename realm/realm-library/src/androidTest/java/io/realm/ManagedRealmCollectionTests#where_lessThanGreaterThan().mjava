@@ -1,0 +1,11 @@
+    /**
+     * Test to see if a particular item that does exist in the same Realm does not
+     * exist in the result set of another query.
+     */
+    @Test
+    public void where_lessThanGreaterThan() {
+        RealmResults<AllJavaTypes> items = realm.where(AllJavaTypes.class).lessThan(AllJavaTypes.FIELD_LONG, 1000).findAll();
+        AllJavaTypes anotherType = realm.where(AllJavaTypes.class).greaterThan(AllJavaTypes.FIELD_LONG, 1000).findFirst();
+        assertFalse("Should not be able to find item in another result list.", items.contains(anotherType));
+    }
+

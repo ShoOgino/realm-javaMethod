@@ -1,0 +1,31 @@
+    private OrderedRealmCollection<Dog> createNonCyclicCollection(Realm realm, ManagedCollection collectionClass) {
+        realm.beginTransaction();
+        realm.deleteAll();
+        switch (collectionClass) {
+            case MANAGED_REALMLIST:
+                Owner owner = realm.createObject(Owner.class);
+                RealmList<Dog> dogs = owner.getDogs();
+                for (int i = 0; i < TEST_SIZE; i++) {
+                    Dog dog = realm.createObject(Dog.class);
+                    dog.setName("Dog " + i);
+                    dog.setAge(i);
+                    dogs.add(dog);
+                }
+                realm.commitTransaction();
+                return dogs;
+
+            case REALMRESULTS:
+                for (int i = 0; i < TEST_SIZE; i++) {
+                    Dog dog = realm.createObject(Dog.class);
+                    dog.setAge(i);
+                    dog.setName("Dog " + i);
+                }
+                realm.commitTransaction();
+                return realm.allObjects(Dog.class);
+
+            default:
+                throw new AssertionError("Unknown collection class: " + collectionClass);
+        }
+
+    }
+

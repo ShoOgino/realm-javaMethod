@@ -1,8 +1,7 @@
     private void populateTestRealm(final Realm testRealm, int objects) {
         testRealm.setAutoRefresh(false);
         testRealm.beginTransaction();
-        testRealm.allObjects(AllTypes.class).clear();
-        testRealm.allObjects(NonLatinFieldNames.class).clear();
+        testRealm.deleteAll();
         for (int i = 0; i < objects; ++i) {
             AllTypes allTypes = testRealm.createObject(AllTypes.class);
             allTypes.setColumnBoolean((i % 3) == 0);

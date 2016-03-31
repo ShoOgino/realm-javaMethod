@@ -1,0 +1,12 @@
+    private void removeListener(OrderedRealmCollection<T> data) {
+        if (data instanceof RealmResults) {
+            RealmResults realmResults = (RealmResults) data;
+            realmResults.realm.handlerController.removeWeakChangeListener(listener);
+        } else if (data instanceof RealmList) {
+            RealmList realmList = (RealmList) data;
+            realmList.realm.handlerController.removeWeakChangeListener(listener);
+        } else {
+            throw new IllegalArgumentException("RealmCollection not supported: " + data.getClass());
+        }
+    }
+

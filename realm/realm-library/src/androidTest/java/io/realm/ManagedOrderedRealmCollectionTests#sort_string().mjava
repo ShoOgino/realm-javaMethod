@@ -1,0 +1,23 @@
+    @Test
+    public void sort_string() {
+        OrderedRealmCollection<AllJavaTypes> resultList = collection;
+        OrderedRealmCollection<AllJavaTypes> sortedList = createCollection(collectionClass);
+        sortedList = sortedList.sort(AllJavaTypes.FIELD_STRING, Sort.DESCENDING);
+
+        assertEquals(resultList.size(), sortedList.size());
+        assertEquals(TEST_SIZE, sortedList.size());
+        assertEquals(resultList.first().getFieldString(), sortedList.last().getFieldString());
+
+        RealmResults<AllJavaTypes> reverseList = sortedList.sort(AllJavaTypes.FIELD_STRING, Sort.ASCENDING);
+        assertEquals(TEST_SIZE, reverseList.size());
+        assertEquals(resultList.first().getFieldString(), reverseList.first().getFieldString());
+
+        int numberOfDigits = 1 + ((int) Math.log10(TEST_SIZE));
+        int largestNumber = 1;
+        largestNumber = (int) (largestNumber * Math.pow(10, numberOfDigits - 1));
+        largestNumber = largestNumber - 1;
+        assertEquals(resultList.get(largestNumber).getFieldString(), reverseList.last().getFieldString());
+        RealmResults<AllJavaTypes> reverseSortedList = reverseList.sort(AllJavaTypes.FIELD_STRING, Sort.DESCENDING);
+        assertEquals(TEST_SIZE, reverseSortedList.size());
+    }
+

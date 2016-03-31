@@ -1,20 +1,20 @@
     @Test
     public void removeAllFromRealm_emptyList() {
-        RealmList<Dog> dogs = testRealm.where(Owner.class).findFirst().getDogs();
-        assertEquals(TEST_OBJECTS, dogs.size());
+        RealmList<Dog> dogs = realm.where(Owner.class).findFirst().getDogs();
+        assertEquals(TEST_SIZE, dogs.size());
 
-        testRealm.beginTransaction();
+        realm.beginTransaction();
         dogs.deleteAllFromRealm();
-        testRealm.commitTransaction();
+        realm.commitTransaction();
         assertEquals(0, dogs.size());
-        assertEquals(0, testRealm.where(Dog.class).count());
+        assertEquals(0, realm.where(Dog.class).count());
 
         // The dogs is empty now.
-        testRealm.beginTransaction();
+        realm.beginTransaction();
         dogs.deleteAllFromRealm();
-        testRealm.commitTransaction();
+        realm.commitTransaction();
         assertEquals(0, dogs.size());
-        assertEquals(0, testRealm.where(Dog.class).count());
+        assertEquals(0, realm.where(Dog.class).count());
 
     }
 

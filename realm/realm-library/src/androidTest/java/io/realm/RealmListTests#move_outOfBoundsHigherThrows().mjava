@@ -1,16 +1,16 @@
     @Test
     public void move_outOfBoundsHigherThrows() {
-        Owner owner = testRealm.where(Owner.class).findFirst();
-        testRealm.beginTransaction();
+        Owner owner = realm.where(Owner.class).findFirst();
+        realm.beginTransaction();
         try {
-            int lastIndex = TEST_OBJECTS - 1;
-            int outOfBoundsIndex = TEST_OBJECTS;
+            int lastIndex = TEST_SIZE - 1;
+            int outOfBoundsIndex = TEST_SIZE;
             owner.getDogs().move(lastIndex, outOfBoundsIndex);
             fail("Indexes >= size() should throw an exception");
         } catch (IndexOutOfBoundsException ignored) {
             ignored.printStackTrace();
         } finally {
-            testRealm.cancelTransaction();
+            realm.cancelTransaction();
         }
     }
 

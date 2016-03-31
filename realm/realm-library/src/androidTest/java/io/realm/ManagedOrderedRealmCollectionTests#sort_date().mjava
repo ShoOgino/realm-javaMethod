@@ -1,0 +1,18 @@
+    @Test
+    public void sort_date() {
+        OrderedRealmCollection<AllJavaTypes> resultList = collection;
+        OrderedRealmCollection<AllJavaTypes> sortedList = createCollection(collectionClass);
+        sortedList = sortedList.sort(AllJavaTypes.FIELD_DATE, Sort.DESCENDING);
+        assertEquals(resultList.size(), sortedList.size());
+        assertEquals(TEST_SIZE, sortedList.size());
+        assertEquals(resultList.first().getFieldDate(), sortedList.last().getFieldDate());
+
+        sortedList = sortedList.sort(AllJavaTypes.FIELD_DATE, Sort.ASCENDING);
+        assertEquals(TEST_SIZE, sortedList.size());
+        assertEquals(resultList.first().getFieldDate(), sortedList.first().getFieldDate());
+        assertEquals(resultList.last().getFieldDate(), sortedList.last().getFieldDate());
+
+        sortedList = sortedList.sort(AllJavaTypes.FIELD_DATE, Sort.DESCENDING);
+        assertEquals(TEST_SIZE, sortedList.size());
+    }
+

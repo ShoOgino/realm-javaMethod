@@ -1,18 +1,18 @@
     // Test that set correctly uses Realm.copyToRealm() on standalone objects.
     @Test
     public void set_nonManagedObjectToManagedList() {
-        testRealm.beginTransaction();
-        CyclicType parent = testRealm.copyToRealm(new CyclicType("Parent"));
+        realm.beginTransaction();
+        CyclicType parent = realm.copyToRealm(new CyclicType("Parent"));
         RealmList<CyclicType> children = parent.getObjects();
         children.add(new CyclicType());
         children.add(new CyclicType("original"));
         children.add(new CyclicType());
         children.set(1, new CyclicType("updated"));
-        testRealm.commitTransaction();
+        realm.commitTransaction();
 
-        RealmList<CyclicType> list = testRealm.where(CyclicType.class).findFirst().getObjects();
+        RealmList<CyclicType> list = realm.where(CyclicType.class).findFirst().getObjects();
         assertEquals(3, list.size());
         assertEquals("updated", list.get(1).getName());
-        assertEquals(5, testRealm.where(CyclicType.class).count());
+        assertEquals(5, realm.where(CyclicType.class).count());
     }
 

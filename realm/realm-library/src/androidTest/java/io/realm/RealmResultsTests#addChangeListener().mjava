@@ -1,0 +1,18 @@
+    @Test
+    @RunTestInLooperThread
+    public void addChangeListener() {
+        Realm realm = looperThread.realm;
+        RealmResults<AllTypes> collection = realm.allObjects(AllTypes.class);
+
+        collection.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                looperThread.testComplete();
+            }
+        });
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+    }
+

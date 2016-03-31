@@ -1,16 +1,42 @@
+    @SuppressWarnings("deprecation")
     @Test
     public void unsupportedMethods() {
-        RealmResults<AllTypes> result = realm.where(AllTypes.class).findAll();
+        for (CollectionMutatorMethod method : CollectionMutatorMethod.values()) {
+            try {
+                switch (method) {
+                    case ADD_OBJECT: collection.add(new AllTypes());
+                    case ADD_ALL_OBJECTS: collection.addAll(Collections.singletonList(new AllTypes())); break;
+                    case CLEAR: collection.clear(); break;
+                    case REMOVE_OBJECT: collection.remove(new AllTypes());
+                    case REMOVE_ALL: collection.removeAll(Collections.singletonList(new AllTypes())); break;
+                    case RETAIN_ALL: collection.retainAll(Collections.singletonList(new AllTypes())); break;
 
-        try { //noinspection deprecation
-            result.add(null);
-            fail();
-        } catch (UnsupportedOperationException ignored) {
+                    // Supported methods
+                    case DELETE_ALL:
+                        continue;
+                }
+                fail("Unknown method or failed to throw:" + method);
+            } catch (UnsupportedOperationException ignored) {
+            }
         }
-        try {
-            result.set(0, null);
-            fail();
-        } catch (UnsupportedOperationException ignored) {
+
+        for (OrderedCollectionMutatorMethod method : OrderedCollectionMutatorMethod.values()) {
+            try {
+                switch (method) {
+                    case ADD_INDEX: collection.add(0, new AllTypes()); break;
+                    case ADD_ALL_INDEX: collection.addAll(0, Collections.singletonList(new AllTypes())); break;
+                    case SET: collection.set(0, new AllTypes()); break;
+                    case REMOVE_INDEX: collection.remove(0); break;
+
+                    // Supported methods
+                    case DELETE_INDEX:
+                    case DELETE_FIRST:
+                    case DELETE_LAST:
+                        continue;
+                }
+                fail("Unknown method or failed to throw:" + method);
+            } catch (UnsupportedOperationException ignored) {
+            }
         }
     }
 

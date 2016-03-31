@@ -4,11 +4,13 @@
         try {
             Looper.prepare();
             realm = Realm.getDefaultInstance();
+            realmOpen = new CountDownLatch(1);
             workerHandler = new WorkerHandler(realm);
             Looper.loop();
         } finally {
             if (realm != null) {
                 realm.close();
+                realmOpen.countDown();
             }
         }
     }

@@ -1,0 +1,21 @@
+    private OrderedRealmCollection<AllJavaTypes> createCollection(Realm realm, CollectionClass collectionClass) {
+        switch (collectionClass) {
+            case MANAGED_REALMLIST:
+                populateRealm(realm, TEST_SIZE);
+                return realm.where(AllJavaTypes.class)
+                        .equalTo(AllJavaTypes.FIELD_LONG, 0)
+                        .findFirst()
+                        .getFieldList();
+
+            case UNMANAGED_REALMLIST:
+                return populateInMemoryList(TEST_SIZE);
+
+            case REALMRESULTS:
+                populateRealm(realm, TEST_SIZE);
+                return realm.allObjects(AllJavaTypes.class);
+
+            default:
+                throw new AssertionError("Unsupported class: " + collectionClass);
+        }
+    }
+

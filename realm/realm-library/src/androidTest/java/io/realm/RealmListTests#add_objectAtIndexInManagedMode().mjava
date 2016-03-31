@@ -1,0 +1,10 @@
+    @Test
+    public void add_objectAtIndexInManagedMode() {
+        realm.beginTransaction();
+        Dog obj = collection.get(0);
+        collection.add(0, new Dog("Dog 42"));
+        realm.commitTransaction();
+        assertEquals(obj.getName(), collection.get(1).getName());
+        assertEquals("Dog 42", collection.get(0).getName());
+    }
+

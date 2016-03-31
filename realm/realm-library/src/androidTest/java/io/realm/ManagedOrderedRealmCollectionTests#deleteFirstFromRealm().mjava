@@ -1,0 +1,12 @@
+    @Test
+    public void deleteFirstFromRealm() {
+        OrderedRealmCollection<Dog> collection = createNonCyclicCollection(realm, collectionClass);
+        assertEquals(0, collection.get(0).getAge());
+
+        realm.beginTransaction();
+        assertTrue(collection.deleteFirstFromRealm());
+        realm.commitTransaction();
+        assertEquals(TEST_SIZE - 1, collection.size());
+        assertEquals(1, collection.get(0).getAge());
+    }
+

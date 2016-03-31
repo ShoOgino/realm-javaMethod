@@ -1,0 +1,22 @@
+    @Test
+    public void sort_greekCharacters() {
+        OrderedRealmCollection<AllJavaTypes> collection = createStringCollection(realm, collectionClass,
+                "αύριο",
+                "ημέρες",
+                "δοκιμές"
+        );
+
+        collection = collection.sort(AllJavaTypes.FIELD_STRING);
+
+        assertEquals(3, collection.size());
+        assertEquals("αύριο", collection.get(0).getFieldString());
+        assertEquals("δοκιμές", collection.get(1).getFieldString());
+        assertEquals("ημέρες", collection.get(2).getFieldString());
+
+        collection = collection.sort(AllJavaTypes.FIELD_STRING, Sort.DESCENDING);
+        assertEquals(3, collection.size());
+        assertEquals("ημέρες", collection.get(0).getFieldString());
+        assertEquals("δοκιμές", collection.get(1).getFieldString());
+        assertEquals("αύριο", collection.get(2).getFieldString());
+    }
+

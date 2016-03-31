@@ -1,0 +1,12 @@
+    private void addListener(OrderedRealmCollection<T> data) {
+        if (data instanceof RealmResults) {
+            RealmResults realmResults = (RealmResults) data;
+            realmResults.realm.handlerController.addChangeListenerAsWeakReference(listener);
+        } else if (data instanceof RealmList) {
+            RealmList realmList = (RealmList) data;
+            realmList.realm.handlerController.addChangeListenerAsWeakReference(listener);
+        } else {
+            throw new IllegalArgumentException("RealmCollection not supported: " + data.getClass());
+        }
+    }
+

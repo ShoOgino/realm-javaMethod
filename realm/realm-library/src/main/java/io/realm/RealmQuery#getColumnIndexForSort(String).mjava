@@ -1,6 +1,9 @@
     // Get the column index for sorting related functions. A proper exception will be thrown if the field doesn't exist
     // or it belongs to the child object.
     private long getColumnIndexForSort(String fieldName) {
+        if (fieldName == null || fieldName.isEmpty()) {
+            throw new IllegalArgumentException("Non-empty fieldname required.");
+        }
         if (fieldName.contains(".")) {
             throw new IllegalArgumentException("Sorting using child object fields is not supported: " + fieldName);
         }

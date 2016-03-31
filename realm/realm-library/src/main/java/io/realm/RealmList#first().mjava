@@ -7,10 +7,12 @@
     public E first() {
         if (managedMode) {
             checkValidView();
-            return view.isEmpty() ? null : get(0);
+            if (!view.isEmpty()) {
+                return get(0);
+            }
         } else if (nonManagedList != null && nonManagedList.size() > 0) {
             return nonManagedList.get(0);
         }
-        return null;
+        throw new IndexOutOfBoundsException("The list is empty.");
     }
 

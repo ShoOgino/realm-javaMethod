@@ -1,0 +1,55 @@
+    private boolean runMethodOnWrongThread(final CollectionMethod method) throws ExecutionException, InterruptedException {
+        realm.beginTransaction();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+
+                // Define expected exception
+                Class<? extends Throwable> expected = IllegalStateException.class;
+                if (collectionClass == ManagedCollection.REALMRESULTS) {
+                    switch (method) {
+                        case ADD_OBJECT:
+                        case ADD_ALL_OBJECTS:
+                        case CLEAR:
+                        case REMOVE_OBJECT:
+                        case REMOVE_ALL:
+                        case RETAIN_ALL:
+                            expected = UnsupportedOperationException.class;
+                    }
+                }
+
+                try {
+                    switch (method) {
+                        case ADD_OBJECT: collection.add(new AllJavaTypes()); break;
+                        case ADD_ALL_OBJECTS: collection.addAll(Collections.singletonList(new AllJavaTypes())); break;
+                        case CLEAR: collection.clear(); case CONTAINS:
+                        case CONTAINS_ALL: collection.containsAll(Collections.singletonList(new AllJavaTypes())); break;
+                        case EQUALS: collection.equals(createCollection(collectionClass)); break;
+                        case HASHCODE:
+                            //noinspection ResultOfMethodCallIgnored
+                            collection.hashCode();
+                            break;
+                        case IS_EMPTY: collection.isEmpty(); break;
+                        case ITERATOR: return true; // Creating an iterator should be safe. Accessing it will fail, but tested elsewhere.
+                        case REMOVE_OBJECT: collection.remove(new AllJavaTypes()); break;
+                        case REMOVE_ALL: collection.removeAll(Collections.singletonList(new AllJavaTypes())); break;
+                        case RETAIN_ALL: collection.retainAll(Collections.singletonList(new AllJavaTypes())); break;
+                        case SIZE: collection.size(); break;
+                        case TO_ARRAY: collection.toArray(); break;
+                        case TO_ARRAY_INPUT: collection.toArray(new Object[collection.size()]); break;
+                    }
+                    return false;
+                } catch (Throwable t) {
+                    if (!t.getClass().equals(expected)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        });
+        Boolean result = future.get();
+        realm.cancelTransaction();
+        return result;
+    }
+

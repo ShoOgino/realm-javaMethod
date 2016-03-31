@@ -1,0 +1,25 @@
+    @Test
+    public void unsupportedMethods_unManagedCollections() {
+        // RealmCollection methods
+        for (RealmCollectionMethod method : RealmCollectionMethod.values()) {
+            try {
+                switch (method) {
+                    // Unsupported methods
+                    case WHERE: collection.where(); break;
+                    case MIN: collection.min(AllJavaTypes.FIELD_LONG); break;
+                    case MAX: collection.max(AllJavaTypes.FIELD_LONG); break;
+                    case SUM: collection.sum(AllJavaTypes.FIELD_LONG); break;
+                    case AVERAGE: collection.average(AllJavaTypes.FIELD_LONG); break;
+                    case MIN_DATE: collection.minDate(AllJavaTypes.FIELD_DATE); break;
+                    case MAX_DATE: collection.maxDate(AllJavaTypes.FIELD_DATE); break;
+                    case DELETE_ALL_FROM_REALM: collection.deleteAllFromRealm(); break;
+
+                    // Supported methods
+                    case IS_VALID: assertFalse(collection.isValid()); continue;
+                }
+                fail(method + " should have thrown an exception.");
+            } catch (UnsupportedOperationException ignored) {
+            }
+        }
+    }
+

@@ -1,0 +1,12 @@
+    @Test
+    public void add_managedObjectAtIndexInNonManagedMode() {
+        RealmList<AllTypes> list = new RealmList<AllTypes>();
+        list.add(new AllTypes());
+        realm.beginTransaction();
+        AllTypes managedAllTypes = realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+        list.add(0, managedAllTypes);
+
+        assertEquals(managedAllTypes, list.get(0));
+    }
+

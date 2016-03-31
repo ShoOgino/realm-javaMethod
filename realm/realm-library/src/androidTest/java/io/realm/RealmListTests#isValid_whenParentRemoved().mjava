@@ -1,11 +1,11 @@
     @Test
     public void isValid_whenParentRemoved() {
-        Owner owner = testRealm.where(Owner.class).findFirst();
+        Owner owner = realm.where(Owner.class).findFirst();
         RealmList<Dog> dogs = owner.getDogs();
 
-        testRealm.beginTransaction();
-        owner.removeFromRealm();
-        testRealm.commitTransaction();
+        realm.beginTransaction();
+        owner.deleteFromRealm();
+        realm.commitTransaction();
 
         // RealmList contained in removed object is invalid.
         assertFalse(dogs.isValid());

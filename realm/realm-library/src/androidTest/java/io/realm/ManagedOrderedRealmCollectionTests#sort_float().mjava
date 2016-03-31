@@ -1,0 +1,18 @@
+    @Test
+    public void sort_float() {
+        OrderedRealmCollection<AllJavaTypes> resultList = collection;
+        OrderedRealmCollection<AllJavaTypes> sortedList = createCollection(collectionClass);
+        sortedList = sortedList.sort(AllJavaTypes.FIELD_FLOAT, Sort.DESCENDING);
+        assertEquals(resultList.size(), sortedList.size());
+        assertEquals(TEST_SIZE, sortedList.size());
+        assertEquals(resultList.first().getFieldFloat(), sortedList.last().getFieldFloat(), 0D);
+
+        RealmResults<AllJavaTypes> reverseList = sortedList.sort(AllJavaTypes.FIELD_FLOAT, Sort.ASCENDING);
+        assertEquals(TEST_SIZE, reverseList.size());
+        assertEquals(resultList.first().getFieldFloat(), reverseList.first().getFieldFloat(), 0D);
+        assertEquals(resultList.last().getFieldFloat(), reverseList.last().getFieldFloat(), 0D);
+
+        RealmResults<AllJavaTypes> reverseSortedList = reverseList.sort(AllJavaTypes.FIELD_FLOAT, Sort.DESCENDING);
+        assertEquals(TEST_SIZE, reverseSortedList.size());
+    }
+

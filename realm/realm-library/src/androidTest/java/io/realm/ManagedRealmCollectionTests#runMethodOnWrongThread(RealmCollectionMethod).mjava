@@ -1,0 +1,29 @@
+    private boolean runMethodOnWrongThread(final RealmCollectionMethod method) throws ExecutionException, InterruptedException {
+        realm.beginTransaction();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                try {
+                    switch (method) {
+                        case WHERE: collection.where(); break;
+                        case MIN: collection.min(AllJavaTypes.FIELD_LONG); break;
+                        case MAX: collection.min(AllJavaTypes.FIELD_LONG); break;
+                        case SUM: collection.sum(AllJavaTypes.FIELD_LONG); break;
+                        case AVERAGE: collection.average(AllJavaTypes.FIELD_LONG); break;
+                        case MIN_DATE: collection.minDate(AllJavaTypes.FIELD_DATE); break;
+                        case MAX_DATE: collection.maxDate(AllJavaTypes.FIELD_DATE); break;
+                        case DELETE_ALL_FROM_REALM: collection.deleteAllFromRealm(); break;
+                        case IS_VALID: collection.isValid(); break;
+                    }
+                    return false;
+                } catch (IllegalStateException ignored) {
+                    return true;
+                }
+            }
+        });
+        Boolean result = future.get();
+        realm.cancelTransaction();
+        return result;
+    }
+

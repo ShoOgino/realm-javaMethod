@@ -1,0 +1,41 @@
+    @Test
+    @RunTestInLooperThread
+    public void removeAllChangeListeners() {
+        final AtomicInteger listenersTriggered = new AtomicInteger(0);
+        final Realm realm = looperThread.realm;
+        RealmResults<AllTypes> collection = realm.allObjects(AllTypes.class);
+
+        RealmChangeListener listenerA = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                listenersTriggered.incrementAndGet();
+            }
+        };
+        RealmChangeListener listenerB = new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                listenersTriggered.incrementAndGet();
+            }
+        };
+
+        collection.addChangeListener(listenerA);
+        collection.addChangeListener(listenerB);
+        collection.removeChangeListeners();
+
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        // The above commit should have put a REALM_CHANGED event on the Looper queue before this runnable.
+        looperThread.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                if (listenersTriggered.get() == 0) {
+                    looperThread.testComplete();
+                } else {
+                    fail("Listeners wasn't removed");
+                }
+            }
+        });
+    }
+

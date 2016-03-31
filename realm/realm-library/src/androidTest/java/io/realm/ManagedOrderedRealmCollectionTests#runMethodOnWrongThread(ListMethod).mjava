@@ -1,0 +1,50 @@
+    private boolean runMethodOnWrongThread(final ListMethod method) throws ExecutionException, InterruptedException {
+        realm.beginTransaction();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                // Define expected exception
+                Class<? extends Throwable> expected = IllegalStateException.class;
+                if (collectionClass == ManagedCollection.REALMRESULTS) {
+                    switch (method) {
+                        case ADD_INDEX:
+                        case ADD_ALL_INDEX:
+                        case SET:
+                        case REMOVE_INDEX:
+                            expected = UnsupportedOperationException.class;
+                            break;
+                        default:
+                            // Use default exception
+                    }
+                }
+
+                try {
+                    switch (method) {
+                        case FIRST: collection.first(); break;
+                        case LAST: collection.last(); break;
+                        case ADD_INDEX: collection.add(0, new AllJavaTypes()); break;
+                        case ADD_ALL_INDEX: collection.addAll(0, Collections.singletonList(new AllJavaTypes())); break;
+                        case GET_INDEX: collection.get(0); break;
+                        case INDEX_OF: collection.indexOf(new AllJavaTypes()); break;
+                        case LAST_INDEX_OF: collection.lastIndexOf(new AllJavaTypes()); break;
+                        case LIST_ITERATOR: collection.listIterator(); break;
+                        case LIST_ITERATOR_INDEX: collection.listIterator(0); break;
+                        case REMOVE_INDEX: collection.remove(0); break;
+                        case SET: collection.set(0, new AllJavaTypes()); break;
+                        case SUBLIST: collection.subList(0, 1); break;
+                    }
+                    return false;
+                } catch (Throwable t) {
+                    if (!t.getClass().equals(expected)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        });
+        Boolean result = future.get();
+        realm.cancelTransaction();
+        return result;
+    }
+

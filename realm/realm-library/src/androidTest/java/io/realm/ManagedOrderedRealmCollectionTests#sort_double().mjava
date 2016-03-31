@@ -1,0 +1,18 @@
+    @Test
+    public void sort_double() {
+        OrderedRealmCollection<AllJavaTypes> resultList = collection;
+        OrderedRealmCollection<AllJavaTypes> sortedList = createCollection(collectionClass);
+        sortedList = sortedList.sort(AllJavaTypes.FIELD_DOUBLE, Sort.DESCENDING);
+        assertEquals(resultList.size(), sortedList.size());
+        assertEquals(TEST_SIZE, sortedList.size());
+            assertEquals(resultList.first().getFieldDouble(), sortedList.last().getFieldDouble(), 0D);
+
+        RealmResults<AllJavaTypes> reverseList = sortedList.sort(AllJavaTypes.FIELD_DOUBLE, Sort.ASCENDING);
+        assertEquals(TEST_SIZE, reverseList.size());
+        assertEquals(resultList.first().getFieldDouble(), reverseList.first().getFieldDouble(), 0D);
+        assertEquals(resultList.last().getFieldDouble(), reverseList.last().getFieldDouble(), 0D);
+
+        RealmResults<AllJavaTypes> reverseSortedList = reverseList.sort(AllJavaTypes.FIELD_DOUBLE, Sort.DESCENDING);
+        assertEquals(TEST_SIZE, reverseSortedList.size());
+    }
+
