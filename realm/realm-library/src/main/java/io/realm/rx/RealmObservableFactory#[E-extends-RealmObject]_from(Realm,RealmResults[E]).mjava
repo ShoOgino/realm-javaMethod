@@ -1,12 +1,15 @@
     @Override
     public <E extends RealmObject> Observable<RealmResults<E>> from(final Realm realm, final RealmResults<E> results) {
         final RealmConfiguration realmConfig = realm.getConfiguration();
+
         return Observable.create(new Observable.OnSubscribe<RealmResults<E>>() {
             @Override
             public void call(final Subscriber<? super RealmResults<E>> subscriber) {
                 // Get instance to make sure that the Realm is open for as long as the
                 // Observable is subscribed to it.
                 final Realm observableRealm = Realm.getInstance(realmConfig);
+                resultsRefs.get().acquireReference(results);
+
                 final RealmChangeListener listener = new RealmChangeListener() {
                     @Override
                     public void onChange() {
@@ -21,6 +24,7 @@
                     public void call() {
                         results.removeChangeListener(listener);
                         observableRealm.close();
+                        resultsRefs.get().releaseReference(results);
                     }
                 }));
 
