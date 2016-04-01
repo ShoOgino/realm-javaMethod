@@ -1,0 +1,42 @@
+    @Test
+    public void realmMethods_onDeletedLinkView() {
+        OrderedRealmCollection<CyclicType> results = populateCollectionOnDeletedLinkView(realm, ManagedCollection.MANAGED_REALMLIST);
+
+        for (RealmCollectionMethod method : RealmCollectionMethod.values()) {
+            try {
+                switch (method) {
+                    case WHERE: results.where(); break;
+                    case MIN: results.min(CyclicType.FIELD_ID); break;
+                    case MAX: results.max(CyclicType.FIELD_ID); break;
+                    case SUM: results.sum(CyclicType.FIELD_ID); break;
+                    case AVERAGE: results.average(CyclicType.FIELD_ID); break;
+                    case MIN_DATE: results.minDate(CyclicType.FIELD_DATE); break;
+                    case MAX_DATE: results.maxDate(CyclicType.FIELD_DATE); break;
+                    case DELETE_ALL_FROM_REALM: results.deleteAllFromRealm(); break;
+                    case IS_VALID: continue; // Does not throw
+                }
+                fail(method + " should have thrown an Exception.");
+            } catch (IllegalStateException ignored) {
+            }
+        }
+
+        for (OrderedRealmCollectionMethod method : OrderedRealmCollectionMethod.values()) {
+            realm.beginTransaction();
+            try {
+                switch (method) {
+                    case DELETE_INDEX: results.deleteFromRealm(0); break;
+                    case DELETE_FIRST: results.deleteFirstFromRealm(); break;
+                    case DELETE_LAST: results.deleteLastFromRealm(); break;
+                    case SORT: results.sort(CyclicType.FIELD_NAME); break;
+                    case SORT_FIELD: results.sort(CyclicType.FIELD_NAME, Sort.ASCENDING); break;
+                    case SORT_2FIELDS: results.sort(CyclicType.FIELD_NAME, Sort.ASCENDING, CyclicType.FIELD_DATE, Sort.DESCENDING); break;
+                    case SORT_MULTI: results.sort(new String[] { CyclicType.FIELD_NAME, CyclicType.FIELD_DATE }, new Sort[] { Sort.ASCENDING, Sort.DESCENDING});
+                }
+                fail(method + " should have thrown an Exception");
+            } catch (IllegalStateException ignored) {
+            } finally {
+                realm.cancelTransaction();
+            }
+        }
+    }
+

@@ -1,0 +1,30 @@
+    @Test
+    public void realmMethods_invalidFieldType() {
+        String fieldName = AllJavaTypes.FIELD_STRING;
+        for (RealmCollectionMethod realmMethod : RealmCollectionMethod.values()) {
+            try {
+                switch (realmMethod) {
+                    case MIN: collection.min(fieldName); break;
+                    case MAX: collection.max(fieldName); break;
+                    case SUM: collection.sum(fieldName); break;
+                    case AVERAGE: collection.average(fieldName); break;
+                    case MIN_DATE: collection.minDate(fieldName); break;
+                    case MAX_DATE: collection.maxDate(fieldName); break;
+
+                    // These methods doesn't take any arguments.
+                    // Just skip them.
+                    case WHERE:
+                    case DELETE_ALL_FROM_REALM:
+                    case IS_VALID:
+                        continue;
+
+                    default:
+                        fail("Unknown method: " + realmMethod);
+
+                }
+                fail(realmMethod + " did not throw an exception for input: " + fieldName);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

@@ -1,0 +1,22 @@
+    @Test
+    public void sort_russianCharacters() {
+        OrderedRealmCollection<AllJavaTypes> collection = createStringCollection(realm, collectionClass,
+                "Санкт-Петербург",
+                "Москва",
+                "Новороссийск"
+        );
+
+        collection = collection.sort(AllJavaTypes.FIELD_STRING);
+
+        assertEquals(3, collection.size());
+        assertEquals("Москва", collection.get(0).getFieldString());
+        assertEquals("Новороссийск", collection.get(1).getFieldString());
+        assertEquals("Санкт-Петербург", collection.get(2).getFieldString());
+
+        collection = collection.sort(AllJavaTypes.FIELD_STRING, Sort.DESCENDING);
+        assertEquals(3, collection.size());
+        assertEquals("Санкт-Петербург", collection.get(0).getFieldString());
+        assertEquals("Новороссийск", collection.get(1).getFieldString());
+        assertEquals("Москва", collection.get(2).getFieldString());
+    }
+

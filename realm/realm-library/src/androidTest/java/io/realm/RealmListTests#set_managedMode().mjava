@@ -1,17 +1,17 @@
     @Test
     public void set_managedMode() {
-        testRealm.beginTransaction();
+        realm.beginTransaction();
         try {
-            RealmList<Dog> list = testRealm.createObject(Owner.class).getDogs();
-            Dog dog1 = testRealm.createObject(Dog.class);
+            RealmList<Dog> list = realm.createObject(Owner.class).getDogs();
+            Dog dog1 = realm.createObject(Dog.class);
             dog1.setName("dog1");
-            Dog dog2 = testRealm.createObject(Dog.class);
+            Dog dog2 = realm.createObject(Dog.class);
             dog2.setName("dog2");
             list.add(dog1);
             assertEquals(dog1, list.set(0, dog2));
             assertEquals(1, list.size());
         } finally {
-            testRealm.cancelTransaction();
+            realm.cancelTransaction();
         }
     }
 

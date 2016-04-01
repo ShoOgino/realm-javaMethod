@@ -1,0 +1,24 @@
+    @Test
+    public void where_findAllSorted() {
+        RealmResults<AllJavaTypes> results = realm.where(AllJavaTypes.class).findAllSorted(AllJavaTypes.FIELD_LONG, Sort.ASCENDING);
+        assertEquals(TEST_SIZE, results.size());
+        //noinspection ConstantConditions
+        assertEquals(0, results.first().getFieldLong());
+        //noinspection ConstantConditions
+        assertEquals(TEST_SIZE - 1, results.last().getFieldLong());
+
+        RealmResults<AllJavaTypes> reverseList = realm.where(AllJavaTypes.class).findAllSorted(AllJavaTypes.FIELD_LONG, Sort.DESCENDING);
+        assertEquals(TEST_SIZE, reverseList.size());
+        //noinspection ConstantConditions
+        assertEquals(0, reverseList.last().getFieldLong());
+        //noinspection ConstantConditions
+        assertEquals(TEST_SIZE - 1, reverseList.first().getFieldLong());
+
+        try {
+            realm.where(AllJavaTypes.class).findAllSorted("invalid",
+                    Sort.DESCENDING);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

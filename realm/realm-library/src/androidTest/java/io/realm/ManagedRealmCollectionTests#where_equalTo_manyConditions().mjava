@@ -1,0 +1,11 @@
+    @Test
+    public void where_equalTo_manyConditions() {
+        RealmQuery<AllJavaTypes> query = realm.where(AllJavaTypes.class);
+        query.equalTo(AllJavaTypes.FIELD_LONG, 0);
+        for (int i = 1; i < TEST_SIZE; i++) {
+            query.or().equalTo(AllJavaTypes.FIELD_LONG, i);
+        }
+        RealmResults<AllJavaTypes> allTypesRealmResults = query.findAll();
+        assertEquals(TEST_SIZE, allTypesRealmResults.size());
+    }
+

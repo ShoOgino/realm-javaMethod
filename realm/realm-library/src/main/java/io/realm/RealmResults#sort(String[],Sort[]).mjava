@@ -1,32 +1,8 @@
     /**
-     * Sorts existing {@link io.realm.RealmResults}.
-     *
-     * @param fieldNames an array of field names to sort by. Only fields of type boolean, short, int, long, float,
-     *                   double, Date, and String are supported.
-     * @param sortOrders the directions to sort by.
-     * @throws java.lang.IllegalArgumentException if a field name does not exist.
+     * {@inheritDoc}
      */
-    public void sort(String fieldNames[], Sort sortOrders[]) {
-        if (fieldNames == null) {
-            throw new IllegalArgumentException("fieldNames must be provided.");
-        } else if (sortOrders == null) {
-            throw new IllegalArgumentException("sortOrder must be provided.");
-        }
-
-        if (fieldNames.length == 1 && sortOrders.length == 1) {
-            sort(fieldNames[0], sortOrders[0]);
-        } else {
-            realm.checkIfValid();
-            TableOrView table = getTable();
-            if (table instanceof TableView) {
-                List<Long> columnIndices = new ArrayList<Long>();
-                for (int i = 0; i < fieldNames.length; i++) {
-                    String fieldName = fieldNames[i];
-                    long columnIndex = getColumnIndex(fieldName);
-                    columnIndices.add(columnIndex);
-                }
-                ((TableView) table).sort(columnIndices, sortOrders);
-            }
-        }
+    @Override
+    public RealmResults<E> sort(String fieldNames[], Sort sortOrders[]) {
+        return where().findAllSorted(fieldNames, sortOrders);
     }
 

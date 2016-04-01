@@ -1,0 +1,24 @@
+    /**
+     * Removes all occurrences in this {@code Collection} of each object in the
+     * specified {@code Collection}. After this method returns none of the
+     * elements in the passed {@code Collection} can be found in this {@code Collection}
+     * anymore.
+     * <p>
+     * This implementation iterates over this {@code Collection} and tests for each
+     * element {@code e} returned by the iterator, whether it is contained in
+     * the specified {@code Collection}. If this test is positive, then the {@code
+     * remove} method is called on the iterator.
+     *
+     * @param collection the collection of objects to remove.
+     * @return {@code true} if this {@code Collection} is modified, {@code false} otherwise.
+     * @throws ClassCastException if one or more elements of {@code collection} isn't of the correct type.
+     * @throws NullPointerException if {@code collection} is {@code null}.
+     */
+    @Override
+    public boolean removeAll(Collection<?> collection) {
+        if (managedMode && !realm.isInTransaction()) {
+            throw new IllegalStateException(REMOVE_OUTSIDE_TRANSACTION_ERROR);
+        }
+        return super.removeAll(collection);
+    }
+

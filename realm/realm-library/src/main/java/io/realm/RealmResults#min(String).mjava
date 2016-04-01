@@ -1,15 +1,9 @@
     /**
-     * Finds the minimum value of a field.
-     *
-     * @param fieldName the field to look for a minimum on. Only number fields are supported.
-     * @return if no objects exist or they all have {@code null} as the value for the given field, {@code null} will be
-     * returned. Otherwise the minimum value is returned. When determining the minimum value, objects with {@code null}
-     * values are ignored.
-     * @throws java.lang.IllegalArgumentException if the field is not a number type.
+     * {@inheritDoc}
      */
     public Number min(String fieldName) {
         realm.checkIfValid();
-        long columnIndex = table.getColumnIndex(fieldName);
+        long columnIndex = getColumnIndexForSort(fieldName);
         switch (table.getColumnType(columnIndex)) {
             case INTEGER:
                 return table.minimumLong(columnIndex);

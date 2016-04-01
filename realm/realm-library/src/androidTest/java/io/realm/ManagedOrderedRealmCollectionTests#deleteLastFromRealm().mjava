@@ -1,0 +1,10 @@
+    @Test
+    public void deleteLastFromRealm() {
+        assertEquals(TEST_SIZE - 1, collection.last().getFieldLong());
+        realm.beginTransaction();
+        assertTrue(collection.deleteLastFromRealm());
+        realm.commitTransaction();
+        assertEquals(TEST_SIZE - 1, collection.size());
+        assertEquals(TEST_SIZE - 2, collection.last().getFieldLong());
+    }
+

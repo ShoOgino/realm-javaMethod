@@ -1,0 +1,22 @@
+    // PRE-CONDITION: populateRealm() was called as part of setUp()
+    private OrderedRealmCollection<NonLatinFieldNames> createNonLatinCollection(Realm realm, ManagedCollection collectionClass) {
+        switch (collectionClass) {
+
+            case MANAGED_REALMLIST:
+                realm.beginTransaction();
+                RealmResults<NonLatinFieldNames> results = realm.allObjects(NonLatinFieldNames.class);
+                RealmList<NonLatinFieldNames> list = results.get(0).getChildren();
+                for (int i = 0; i < results.size(); i++) {
+                    list.add(results.get(i));
+                }
+                realm.commitTransaction();
+                return list;
+
+            case REALMRESULTS:
+                return realm.allObjects(NonLatinFieldNames.class);
+
+            default:
+                throw new AssertionError("Unknown collection: " + collectionClass);
+        }
+    }
+

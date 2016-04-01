@@ -1,0 +1,15 @@
+    @Test
+    public void deleteFromRealm_invalidIndex() {
+        Integer[] indexes = new Integer[] { Integer.MIN_VALUE, -1, TEST_SIZE, Integer.MAX_VALUE };
+        for (Integer index : indexes) {
+            try {
+                realm.beginTransaction();
+                collection.deleteFromRealm(index);
+                fail("Index should have thrown exception: " + index);
+            } catch (ArrayIndexOutOfBoundsException ignored) {
+            } finally {
+                realm.cancelTransaction();
+            }
+        }
+    }
+

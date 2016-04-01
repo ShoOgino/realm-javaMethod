@@ -1,0 +1,25 @@
+    /**
+     * Removes one instance of the specified object from this {@code Collection} if one
+     * is contained . This implementation iterates over this
+     * {@code Collection} and tests for each element {@code e} returned by the iterator,
+     * whether {@code e} is equal to the given object. If {@code object != null}
+     * then this test is performed using {@code object.equals(e)}, otherwise
+     * using {@code object == null}. If an element equal to the given object is
+     * found, then the {@code remove} method is called on the iterator and
+     * {@code true} is returned, {@code false} otherwise. If the iterator does
+     * not support removing elements, an {@code UnsupportedOperationException}
+     * is thrown.
+     *
+     * @param object the object to remove.
+     * @return {@code true} if this {@code Collection} is modified, {@code false} otherwise.
+     * @throws ClassCastException if the object passed is not of the correct type.
+     * @throws NullPointerException  if {@code object} is {@code null}.
+     */
+    @Override
+    public boolean remove(Object object) {
+        if (managedMode && !realm.isInTransaction()) {
+            throw new IllegalStateException(REMOVE_OUTSIDE_TRANSACTION_ERROR);
+        }
+        return super.remove(object);
+    }
+

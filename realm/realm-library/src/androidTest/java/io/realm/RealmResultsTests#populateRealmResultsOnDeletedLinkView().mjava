@@ -11,10 +11,9 @@
 
 
         RealmResults<Dog> dogs = owner.getDogs().where().equalTo(Dog.FIELD_NAME, "name_0").findAll();
-        //dogs = dogs.where().findFirst().getOwner().getDogs().where().equalTo(Dog.FIELD_NAME, "name_0").findAll();
 
         realm.beginTransaction();
-        owner.removeFromRealm();
+        owner.deleteFromRealm();
         realm.commitTransaction();
         return dogs;
     }

@@ -1,0 +1,21 @@
+    @Test
+    public void deleteAllFromRealm() {
+        // If we have a self-referencing collection, removing all objects will crash
+        // any following method. To avoid that scenario we make sure to use a collection
+        // without cycles.
+        int size = TEST_SIZE;
+        if (collectionClass == ManagedCollection.MANAGED_REALMLIST) {
+            RealmList list = (RealmList) collection;
+            realm.beginTransaction();
+            list.remove(0); // Break the cycle
+            realm.commitTransaction();
+            size = TEST_SIZE - 1;
+        }
+
+        assertEquals(size, collection.size());
+        realm.beginTransaction();
+        assertTrue(collection.deleteAllFromRealm());
+        realm.commitTransaction();
+        assertEquals(0, collection.size());
+    }
+

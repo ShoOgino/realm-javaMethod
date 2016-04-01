@@ -1,7 +1,7 @@
     private void removeOneByOne(boolean atFirst) {
         Set<Long> ages = new HashSet<Long>();
         realm.beginTransaction();
-        realm.clear(Dog.class);
+        realm.delete(Dog.class);
         for (int i = 0; i < TEST_SIZE; i++) {
             Dog dog = realm.createObject(Dog.class);
             dog.setAge(i);
@@ -21,7 +21,7 @@
                 dogToRemove = dogs.last();
             }
             ages.remove(dogToRemove.getAge());
-            dogToRemove.removeFromRealm();
+            dogToRemove.deleteFromRealm();
 
             // object is no longer valid
             try {

@@ -1,0 +1,30 @@
+    // Creates a collection that is based on a RealmList that was deleted.
+    protected OrderedRealmCollection<CyclicType> populateCollectionOnDeletedLinkView(Realm realm, ManagedCollection collectionClass) {
+        realm.beginTransaction();
+        CyclicType parent = realm.createObject(CyclicType.class);
+        for (int i = 0; i < 10; i++) {
+            CyclicType child = new CyclicType();
+            child.setName("name_" + i);
+            child.setObject(parent);
+            parent.getObjects().add(child);
+        }
+        realm.commitTransaction();
+
+        OrderedRealmCollection<CyclicType> result;
+        switch(collectionClass) {
+            case MANAGED_REALMLIST:
+                result = parent.getObjects();
+                break;
+            case REALMRESULTS:
+                result = parent.getObjects().where().equalTo(CyclicType.FIELD_NAME, "name_0").findAll();
+                break;
+            default:
+                throw new AssertionError("Unknown collection: " + collectionClass);
+        }
+
+        realm.beginTransaction();
+        parent.deleteFromRealm();
+        realm.commitTransaction();
+        return result;
+    }
+

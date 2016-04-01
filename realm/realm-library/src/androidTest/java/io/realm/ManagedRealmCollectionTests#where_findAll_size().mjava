@@ -1,0 +1,18 @@
+    @Test
+    public void where_findAll_size() {
+        RealmResults<AllJavaTypes> results = realm.where(AllJavaTypes.class).findAll();
+        assertEquals(TEST_SIZE, results.size());
+
+        // querying a RealmResults should find objects that fulfill the condition
+        RealmResults<AllJavaTypes> onedigits = results.where().lessThan(AllJavaTypes.FIELD_LONG, 10).findAll();
+        assertEquals(Math.min(10, TEST_SIZE), onedigits.size());
+
+        // if no objects fulfill conditions, the result has zero objects
+        RealmResults<AllJavaTypes> none = results.where().greaterThan(AllJavaTypes.FIELD_LONG, TEST_SIZE).findAll();
+        assertEquals(0, none.size());
+
+        // querying a result with zero objects must give zero objects
+        RealmResults<AllJavaTypes> stillNone = none.where().greaterThan(AllJavaTypes.FIELD_LONG, TEST_SIZE).findAll();
+        assertEquals(0, stillNone.size());
+    }
+

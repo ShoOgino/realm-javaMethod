@@ -1,18 +1,11 @@
     /**
-     * Removes an object at a given index. This also deletes the object from the underlying Realm.
+     * Not supported by RealmResults.
      *
-     * Using this method while iterating the list can result in a undefined behavior. Use
-     * {@link io.realm.RealmResults.RealmResultsIterator#remove()} instead.
-     *
-     * @param index the array index identifying the object to be removed.
-     * @return always return {@code null}.
-     * @throws IllegalStateException if the corresponding Realm is closed or in an incorrect thread.
+     * @throws UnsupportedOperationException always.
      */
+    @Deprecated
     @Override
     public E remove(int index) {
-        realm.checkIfValid();
-        TableOrView table = getTable();
-        table.remove(index);
-        return null; // Returning the object doesn't make sense, since it could no longer access any data.
+        throw new UnsupportedOperationException(NOT_SUPPORTED_MESSAGE);
     }
 

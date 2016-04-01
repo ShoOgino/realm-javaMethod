@@ -1,0 +1,13 @@
+    @Test
+    public void contains_realmObjectFromOtherRealm() {
+        Realm realm2 = Realm.getInstance(configFactory.createConfiguration("other_realm.realm"));
+        populateRealm(realm2, TEST_SIZE);
+        AllJavaTypes otherRealmObj = realm2.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_LONG, 0).findFirst();
+
+        try {
+            assertFalse(collection.contains(otherRealmObj));
+        } finally {
+            realm2.close();
+        }
+    }
+

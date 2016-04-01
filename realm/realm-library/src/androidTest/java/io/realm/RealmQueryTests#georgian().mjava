@@ -2,11 +2,12 @@
     public void georgian() {
         String words[] = {"მონაცემთა ბაზა", "მიწისქვეშა გადასასვლელი", "რუსთაველის გამზირი",
                 "მთავარი ქუჩა", "სადგურის მოედანი", "ველოცირაპტორების ჯოგი"};
+
         String sorted[] = {"ველოცირაპტორების ჯოგი", "მთავარი ქუჩა", "მიწისქვეშა გადასასვლელი",
                 "მონაცემთა ბაზა", "რუსთაველის გამზირი", "სადგურის მოედანი"};
 
         realm.beginTransaction();
-        realm.clear(StringOnly.class);
+        realm.delete(StringOnly.class);
         for (String word : words) {
             StringOnly stringOnly = realm.createObject(StringOnly.class);
             stringOnly.setChars(word);
@@ -17,7 +18,7 @@
         assertEquals(1, stringOnlies1.size());
 
         RealmResults<StringOnly> stringOnlies2 = realm.allObjects(StringOnly.class);
-        stringOnlies2.sort("chars");
+        stringOnlies2 = stringOnlies2.sort("chars");
         for (int i = 0; i < stringOnlies2.size(); i++) {
             assertEquals(sorted[i], stringOnlies2.get(i).getChars());
         }

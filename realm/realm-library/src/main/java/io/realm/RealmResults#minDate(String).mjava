@@ -1,16 +1,9 @@
     /**
-     * Finds the minimum date.
-     *
-     * @param fieldName the field to look for the minimum date. If fieldName is not of Date type, an exception is
-     *                  thrown.
-     * @return if no objects exist or they all have {@code null} as the value for the given date field, {@code null}
-     * will be returned. Otherwise the minimum date is returned. When determining the minimum date, objects with
-     * {@code null} values are ignored.
-     * @throws java.lang.IllegalArgumentException if fieldName is not a Date field.
+     * {@inheritDoc}
      */
     public Date minDate(String fieldName) {
         realm.checkIfValid();
-        long columnIndex = table.getColumnIndex(fieldName);
+        long columnIndex = getColumnIndexForSort(fieldName);
         if (table.getColumnType(columnIndex) == RealmFieldType.DATE) {
             return table.minimumDate(columnIndex);
         }

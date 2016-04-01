@@ -1,0 +1,22 @@
+    @Test
+    public void sort_danishCharacters() {
+        OrderedRealmCollection<AllJavaTypes> collection = createStringCollection(realm, collectionClass,
+                "Æble",
+                "Øl",
+                "Århus"
+        );
+
+        collection = collection.sort(AllJavaTypes.FIELD_STRING);
+
+        assertEquals(3, collection.size());
+        assertEquals("Æble", collection.get(0).getFieldString());
+        assertEquals("Øl", collection.get(1).getFieldString());
+        assertEquals("Århus", collection.get(2).getFieldString());
+
+        collection = collection.sort(AllJavaTypes.FIELD_STRING, Sort.DESCENDING);
+        assertEquals(3, collection.size());
+        assertEquals("Århus", collection.get(0).getFieldString());
+        assertEquals("Øl", collection.get(1).getFieldString());
+        assertEquals("Æble", collection.get(2).getFieldString());
+    }
+

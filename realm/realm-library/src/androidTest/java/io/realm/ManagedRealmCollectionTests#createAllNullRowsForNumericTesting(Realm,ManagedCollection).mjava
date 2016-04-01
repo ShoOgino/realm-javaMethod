@@ -1,0 +1,19 @@
+    private OrderedRealmCollection<NullTypes> createAllNullRowsForNumericTesting(Realm realm, ManagedCollection collectionClass) {
+        TestHelper.populateAllNullRowsForNumericTesting(realm);
+        switch(collectionClass) {
+            case MANAGED_REALMLIST:
+                RealmResults<NullTypes> results = realm.allObjects(NullTypes.class);
+                RealmList<NullTypes> list = results.get(0).getFieldListNull();
+                realm.beginTransaction();
+                for (int i = 0; i < results.size(); i++) {
+                    list.add(results.get(i));
+                }
+                realm.commitTransaction();
+                return list;
+
+            case REALMRESULTS:
+                return realm.where(NullTypes.class).findAll();
+        }
+        throw new AssertionError("Unknown collection: " + collectionClass);
+    }
+

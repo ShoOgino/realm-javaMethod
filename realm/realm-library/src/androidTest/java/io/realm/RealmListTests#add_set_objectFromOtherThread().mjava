@@ -1,13 +1,13 @@
     @Test
     public void add_set_objectFromOtherThread() {
         final CountDownLatch finishedLatch = new CountDownLatch(1);
-        final Dog dog = testRealm.where(Dog.class).findFirst();
+        final Dog dog = realm.where(Dog.class).findFirst();
         final String expectedMsg = "Cannot copy an object from another Realm instance.";
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Realm realm = Realm.getInstance(testRealm.getConfiguration());
+                Realm realm = Realm.getInstance(RealmListTests.this.realm.getConfiguration());
                 realm.beginTransaction();
                 RealmList<Dog> list = realm.createObject(Owner.class).getDogs();
                 list.add(realm.createObject(Dog.class));

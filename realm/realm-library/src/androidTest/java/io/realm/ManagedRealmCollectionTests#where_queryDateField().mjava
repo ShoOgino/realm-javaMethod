@@ -1,0 +1,20 @@
+    @Test
+    public void where_queryDateField() {
+        RealmQuery<AllJavaTypes> query = realm.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_DATE, new Date(YEAR_MILLIS * 20));
+        RealmResults<AllJavaTypes> all = query.findAll();
+        assertEquals(1, query.count());
+        assertEquals(1, all.size());
+
+        // before 1901
+        query = realm.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_DATE, new Date(YEAR_MILLIS * -100));
+        all = query.findAll();
+        assertEquals(1, query.count());
+        assertEquals(1, all.size());
+
+        // after 2038
+        query = realm.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_DATE, new Date(YEAR_MILLIS * 80));
+        all = query.findAll();
+        assertEquals(1, query.count());
+        assertEquals(1, all.size());
+    }
+

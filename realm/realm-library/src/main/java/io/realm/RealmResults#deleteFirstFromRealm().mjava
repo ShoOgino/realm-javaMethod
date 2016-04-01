@@ -1,0 +1,17 @@
+    /**
+     * Removes the first object in the list. This also deletes the object from the underlying Realm.
+     *
+     * @throws IllegalStateException if the corresponding Realm is closed or in an incorrect thread.
+     */
+    @Override
+    public boolean deleteFirstFromRealm() {
+        realm.checkIfValid();
+        if (size() > 0) {
+            TableOrView table = getTable();
+            table.removeFirst();
+            return true;
+        } else {
+            return false;
+        }
+    }
+

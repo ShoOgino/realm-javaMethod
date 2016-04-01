@@ -1,0 +1,57 @@
+    // Check that all releveant methods throw a correct IndexOutOfBounds
+    @Test
+    public void methods_indexOutOfBounds() {
+        collection = createEmptyCollection(realm, collectionClass);
+
+        for (ListMethod method : ListMethod.values()) {
+            realm.beginTransaction();
+            try {
+                switch (method) {
+                    case ADD_INDEX: collection.add(1, new AllJavaTypes()); break;
+                    case ADD_ALL_INDEX: collection.addAll(1, Collections.singleton(new AllJavaTypes())); break;
+                    case GET_INDEX: collection.get(1); break;
+                    case LIST_ITERATOR_INDEX: collection.listIterator(1); break;
+                    case REMOVE_INDEX: collection.remove(1);
+                    case SET: collection.set(1, new AllJavaTypes());
+                    case SUBLIST: collection.subList(1, 2);
+
+                    // Cannot fail with IndexOutOfBounds
+                    case FIRST:
+                    case LAST:
+                    case INDEX_OF:
+                    case LAST_INDEX_OF:
+                    case LIST_ITERATOR:
+                        continue;
+                }
+                fail(method + " did not throw an exception");
+            } catch (IndexOutOfBoundsException ignored) {
+            } catch (UnsupportedOperationException ignored) {
+            } finally {
+                realm.cancelTransaction();
+            }
+        }
+
+        for (OrderedRealmCollectionMethod method : OrderedRealmCollectionMethod.values()) {
+            realm.beginTransaction();
+            try {
+                switch (method) {
+                    case DELETE_INDEX: collection.deleteFromRealm(1); break;
+
+                    // Cannot fail with IndexOutOfBounds
+                    case DELETE_FIRST:
+                    case DELETE_LAST:
+                    case SORT:
+                    case SORT_FIELD:
+                    case SORT_2FIELDS:
+                    case SORT_MULTI:
+                        continue;
+                }
+                fail(method + " did not throw an exception");
+            } catch (IndexOutOfBoundsException ignored) {
+            } catch (UnsupportedOperationException ignored) {
+            } finally {
+                realm.cancelTransaction();
+            }
+        }
+    }
+

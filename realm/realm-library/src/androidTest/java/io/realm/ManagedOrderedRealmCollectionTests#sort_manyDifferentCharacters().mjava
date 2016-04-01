@@ -1,0 +1,21 @@
+    //No sorting order defined. There are Korean, Arabic and Chinese characters.
+    @Test
+    public void sort_manyDifferentCharacters() {
+        OrderedRealmCollection<AllJavaTypes> collection = createStringCollection(realm, collectionClass,
+                "단위",
+                "테스트",
+                "وحدة",
+                "اختبار",
+                "单位",
+                "试验",
+                "單位",
+                "測試"
+        );
+
+        collection.sort(AllJavaTypes.FIELD_STRING);
+        assertEquals(8, collection.size());
+
+        collection.sort(AllJavaTypes.FIELD_STRING, Sort.DESCENDING);
+        assertEquals(8, collection.size());
+    }
+

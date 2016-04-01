@@ -1,0 +1,31 @@
+    // Create a list of AllJavaTypes with its `fieldString` field set to a given value.
+    protected OrderedRealmCollection<AllJavaTypes> createStringCollection(Realm realm, ManagedCollection collectionClass, String... args) {
+        realm.beginTransaction();
+        realm.deleteAll();
+        switch (collectionClass) {
+            case MANAGED_REALMLIST:
+                int id = 0;
+                for (String arg : args) {
+                    AllJavaTypes obj = realm.createObject(AllJavaTypes.class, id++);
+                    obj.setFieldString(arg);
+                }
+                realm.commitTransaction();
+                return realm.allObjects(AllJavaTypes.class);
+
+            case REALMRESULTS:
+                AllJavaTypes first = realm.createObject(AllJavaTypes.class);
+                first.setFieldString(args[0]);
+                first.getFieldList().add(first);
+                for (int i = 1; i < args.length; i++) {
+                    AllJavaTypes obj = realm.createObject(AllJavaTypes.class, i);
+                    obj.setFieldString(args[i]);
+                    first.getFieldList().add(obj);
+                }
+                realm.commitTransaction();
+                return first.getFieldList();
+
+            default:
+                throw new AssertionError("Unknown collection: " + collectionClass);
+        }
+    }
+

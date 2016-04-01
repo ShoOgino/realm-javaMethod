@@ -1,0 +1,10 @@
+    @Test
+    public void clear_notDeleting() {
+        Owner owner = realm.where(Owner.class).findFirst();
+        realm.beginTransaction();
+        assertEquals(TEST_SIZE, realm.allObjects(Dog.class).size());
+        owner.getDogs().clear();
+        assertEquals(TEST_SIZE, realm.allObjects(Dog.class).size());
+        realm.commitTransaction();
+    }
+

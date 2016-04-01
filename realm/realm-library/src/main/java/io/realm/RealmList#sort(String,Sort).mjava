@@ -1,0 +1,12 @@
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealmResults<E> sort(String fieldName, Sort sortOrder) {
+        if (managedMode) {
+            return this.where().findAllSorted(fieldName, sortOrder);
+        } else {
+            throw new UnsupportedOperationException(ONLY_IN_MANAGED_MODE_MESSAGE);
+        }
+    }
+

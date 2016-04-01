@@ -1,14 +1,14 @@
     @Test
     public void remove_byIndex() {
-        Owner owner = testRealm.where(Owner.class).findFirst();
+        Owner owner = realm.where(Owner.class).findFirst();
         RealmList<Dog> dogs = owner.getDogs();
         Dog dog5 = dogs.get(5);
 
-        testRealm.beginTransaction();
+        realm.beginTransaction();
         Dog removedDog = dogs.remove(5);
-        testRealm.commitTransaction();
+        realm.commitTransaction();
 
         assertEquals(dog5, removedDog);
-        assertEquals(TEST_OBJECTS - 1, dogs.size());
+        assertEquals(TEST_SIZE - 1, dogs.size());
     }
 
