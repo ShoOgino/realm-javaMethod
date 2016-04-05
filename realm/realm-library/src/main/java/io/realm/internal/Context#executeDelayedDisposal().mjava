@@ -1,24 +1,22 @@
-    public void executeDelayedDisposal() {
-        synchronized (this) {
-            for (int i = 0; i < abandonedTables.size(); i++) {
-                long nativePointer = abandonedTables.get(i);
-                Table.nativeClose(nativePointer);
-            }
-            abandonedTables.clear();
-
-            for (int i = 0; i < abandonedTableViews.size(); i++) {
-                long nativePointer = abandonedTableViews.get(i);
-                TableView.nativeClose(nativePointer);
-            }
-            abandonedTableViews.clear();
-
-            for (int i = 0; i < abandonedQueries.size(); i++) {
-                long nativePointer = abandonedQueries.get(i);
-                TableQuery.nativeClose(nativePointer);
-            }
-            abandonedQueries.clear();
-
-            cleanNativeReferences();
+    public synchronized void executeDelayedDisposal() {
+        for (int i = 0; i < abandonedTables.size(); i++) {
+            long nativePointer = abandonedTables.get(i);
+            Table.nativeClose(nativePointer);
         }
+        abandonedTables.clear();
+
+        for (int i = 0; i < abandonedTableViews.size(); i++) {
+            long nativePointer = abandonedTableViews.get(i);
+            TableView.nativeClose(nativePointer);
+        }
+        abandonedTableViews.clear();
+
+        for (int i = 0; i < abandonedQueries.size(); i++) {
+            long nativePointer = abandonedQueries.get(i);
+            TableQuery.nativeClose(nativePointer);
+        }
+        abandonedQueries.clear();
+
+        cleanNativeReferences();
     }
 
