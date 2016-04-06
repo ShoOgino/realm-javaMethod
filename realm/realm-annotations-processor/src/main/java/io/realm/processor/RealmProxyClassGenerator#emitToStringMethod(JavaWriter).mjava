@@ -1,4 +1,7 @@
     private void emitToStringMethod(JavaWriter writer) throws IOException {
+        if (metadata.containsToString()) {
+            return;
+        }
         writer.emitAnnotation("Override");
         writer.beginMethod("String", "toString", EnumSet.of(Modifier.PUBLIC));
         writer.beginControlFlow("if (!isValid())");

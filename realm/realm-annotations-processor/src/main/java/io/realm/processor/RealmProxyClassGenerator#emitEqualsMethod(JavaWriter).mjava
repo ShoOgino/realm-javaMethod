@@ -1,4 +1,7 @@
     private void emitEqualsMethod(JavaWriter writer) throws IOException {
+        if (metadata.containsEquals()) {
+            return;
+        }
         String proxyClassName = className + Constants.PROXY_SUFFIX;
         writer.emitAnnotation("Override");
         writer.beginMethod("boolean", "equals", EnumSet.of(Modifier.PUBLIC), "Object", "o");
