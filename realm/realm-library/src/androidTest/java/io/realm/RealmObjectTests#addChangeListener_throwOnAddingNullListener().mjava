@@ -1,0 +1,14 @@
+    @Test
+    @RunTestInLooperThread
+    public void addChangeListener_throwOnAddingNullListener() {
+        final Realm realm = looperThread.realm;
+        Dog dog = createManagedDogObjectFromRealmInstance(realm);
+
+        try {
+            dog.addChangeListener((RealmChangeListener) null);
+            fail("Failed on adding null change listener.");
+        } catch (IllegalArgumentException ignore) {
+            looperThread.testComplete();
+        }
+    }
+
