@@ -1,12 +1,8 @@
     @Test
     public void createOrUpdateObjectFromJson_inputString() throws IOException {
+        TestHelper.populateSimpleAllTypesPrimaryKey(realm);
+
         realm.beginTransaction();
-
-        AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
-        obj.setColumnLong(1);
-        obj.setColumnString("Foo");
-        realm.copyToRealm(obj);
-
         AllTypesPrimaryKey newObj = realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, "{ \"columnLong\" : 1, \"columnString\" : \"bar\" }");
         realm.commitTransaction();
 

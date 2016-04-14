@@ -1,0 +1,20 @@
+    @Test
+    public void createOrUpdateObjectFromJson_streamInvalidJson() throws IOException {
+        AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
+        obj.setColumnLong(1);
+        realm.beginTransaction();
+        realm.copyToRealm(obj);
+        realm.commitTransaction();
+
+        InputStream in = TestHelper.loadJsonFromAssets(context, "all_types_invalid.json");
+        realm.beginTransaction();
+        try {
+            realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, in);
+            fail();
+        } catch (RealmException ignored) {
+        } finally {
+            realm.commitTransaction();
+            in.close();
+        }
+    }
+
