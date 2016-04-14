@@ -1,0 +1,15 @@
+    @Test
+    public void createOrUpdateObjectFromJson_jsonObjectNullClass() throws JSONException {
+        TestHelper.populateSimpleAllTypesPrimaryKey(realm);
+
+        realm.beginTransaction();
+        JSONObject json = new JSONObject();
+        json.put("columnLong", 1);
+        json.put("columnString", "bar");
+        assertNull(realm.createOrUpdateObjectFromJson(null, json));
+        realm.commitTransaction();
+
+        AllTypesPrimaryKey obj2 = realm.allObjects(AllTypesPrimaryKey.class).first();
+        assertEquals("Foo", obj2.getColumnString());
+    }
+

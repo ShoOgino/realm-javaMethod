@@ -1,0 +1,12 @@
+    @Test
+    public void createOrUpdateAllFromJson_inputStringInvalidJson() {
+        realm.beginTransaction();
+        try {
+            realm.createOrUpdateAllFromJson(AllTypesPrimaryKey.class, "{ \"columnLong\" : 1");
+            fail();
+        } catch (RealmException ignored) {
+        } finally {
+            realm.commitTransaction();
+        }
+    }
+

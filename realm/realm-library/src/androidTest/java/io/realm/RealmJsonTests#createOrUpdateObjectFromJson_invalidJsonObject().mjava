@@ -1,0 +1,18 @@
+    @Test
+    public void createOrUpdateObjectFromJson_invalidJsonObject() throws JSONException {
+        TestHelper.populateSimpleAllTypesPrimaryKey(realm);
+
+        realm.beginTransaction();
+        JSONObject json = new JSONObject();
+        json.put("columnLong", "A");
+        try {
+            realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, json);
+            fail();
+        } catch (RealmException ignored) {
+        } finally {
+            realm.commitTransaction();
+        }
+        AllTypesPrimaryKey obj2 = realm.allObjects(AllTypesPrimaryKey.class).first();
+        assertEquals("Foo", obj2.getColumnString());
+    }
+

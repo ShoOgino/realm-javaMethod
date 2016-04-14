@@ -1,0 +1,14 @@
+    @Test
+    public void createOrUpdateObjectFromJson_invalidInputString() throws IOException {
+        TestHelper.populateSimpleAllTypesPrimaryKey(realm);
+
+        realm.beginTransaction();
+        try {
+            realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, "{ \"columnLong\" : 1,");
+            fail();
+        } catch (RealmException ignored) {
+        } finally {
+            realm.commitTransaction();
+        }
+    }
+
