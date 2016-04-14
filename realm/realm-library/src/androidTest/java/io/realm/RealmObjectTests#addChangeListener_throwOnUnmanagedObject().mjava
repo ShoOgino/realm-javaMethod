@@ -1,0 +1,17 @@
+    @Test
+    @RunTestInLooperThread
+    public void addChangeListener_throwOnUnmanagedObject() {
+        Dog dog = new Dog();
+
+        try {
+            dog.addChangeListener(new RealmChangeListener() {
+                @Override
+                public void onChange() {
+                }
+            });
+            fail("Failed on adding listener on null realm.");
+        } catch (IllegalArgumentException ignore) {
+            looperThread.testComplete();
+        }
+    }
+
