@@ -1,0 +1,35 @@
+    @Test
+    public void initialDataTransactionNotNull() {
+        // Remove default instance
+        Realm.deleteRealm(defaultConfig);
+
+        RealmConfiguration configuration = configFactory.createConfigurationBuilder()
+                .initialData(new Realm.Transaction() {
+                    @Override
+                    public void execute(final Realm realm) {
+                        realm.createObject(AllTypes.class);
+                        realm.createObject(Owner.class).setCat(realm.createObject(Cat.class));
+                    }
+                }).build();
+
+        realm = Realm.getInstance(configuration);
+
+        // First time check for initial data
+        assertEquals(1, realm.where(AllTypes.class).count());
+        assertEquals(1, realm.where(Owner.class).count());
+        assertEquals(1, realm.where(Cat.class).count());
+
+        realm.beginTransaction();
+        realm.delete(AllTypes.class);
+        realm.commitTransaction();
+
+        assertEquals(0, realm.where(AllTypes.class).count());
+
+        realm.close();
+        realm = Realm.getInstance(configuration);
+        // Check if there is still the same data
+        assertEquals(0, realm.where(AllTypes.class).count());
+        assertEquals(1, realm.where(Owner.class).count());
+        assertEquals(1, realm.where(Cat.class).count());
+    }
+
