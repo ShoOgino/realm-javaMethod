@@ -1,0 +1,19 @@
+    @Test
+    public void initialDataTransactionExecutionCount() {
+        // Remove default instance
+        Realm.deleteRealm(defaultConfig);
+
+        Realm.Transaction transaction = mock(Realm.Transaction.class);
+        RealmConfiguration configuration = configFactory.createConfigurationBuilder()
+                .initialData(transaction)
+                .build();
+
+        realm = Realm.getInstance(configuration);
+        realm.close();
+        verify(transaction, times(1)).execute(realm);
+
+        realm = Realm.getInstance(configuration);
+        realm.close();
+        verify(transaction, never()).execute(realm);
+    }
+

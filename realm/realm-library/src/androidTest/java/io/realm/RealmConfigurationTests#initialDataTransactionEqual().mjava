@@ -1,0 +1,15 @@
+    @Test
+    public void initialDataTransactionEqual() {
+        final Realm.Transaction transaction = new Realm.Transaction() {
+            @Override
+            public void execute(final Realm realm) {
+            }
+        };
+
+        RealmConfiguration configuration = configFactory.createConfigurationBuilder()
+                .initialData(transaction)
+                .build();
+
+        assertEquals(transaction, configuration.getInitialDataTransaction());
+    }
+
