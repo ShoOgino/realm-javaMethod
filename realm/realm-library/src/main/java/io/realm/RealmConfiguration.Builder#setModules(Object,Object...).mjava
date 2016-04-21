@@ -1,27 +1,9 @@
         /**
-         * Replaces the existing module(s) with one or more {@link RealmModule}s. Using this method will replace the
-         * current schema for this Realm with the schema defined by the provided modules.
-         *
-         * A reference to the default Realm module containing all Realm classes in the project (but not dependencies),
-         * can be found using {@link Realm#getDefaultModule()}. Combining the schema from the app project and a library
-         * dependency is thus done using the following code:
-         *
-         * {@code builder.setModules(Realm.getDefaultMode(), new MyLibraryModule()); }
-         *
-         * @param baseModule the first Realm module (required).
-         * @param additionalModules the additional Realm modules
-         * @throws IllegalArgumentException if any of the modules doesn't have the {@link RealmModule} annotation.
-         * @see Realm#getDefaultModule()
+         * DEPRECATED: Use {@link #modules(Object, Object...)} instead.
          */
+        @Deprecated
         public Builder setModules(Object baseModule, Object... additionalModules) {
-            modules.clear();
-            addModule(baseModule);
-            if (additionalModules != null) {
-                for (int i = 0; i < additionalModules.length; i++) {
-                    Object module = additionalModules[i];
-                    addModule(module);
-                }
-            }
+            modules(baseModule, additionalModules);
             return this;
         }
 
