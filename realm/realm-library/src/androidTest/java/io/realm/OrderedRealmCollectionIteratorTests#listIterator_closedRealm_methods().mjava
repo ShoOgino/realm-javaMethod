@@ -1,0 +1,49 @@
+    @Test
+    public void listIterator_closedRealm_methods() {
+        if (skipTest(CollectionClass.UNMANAGED_REALMLIST)) {
+            return;
+        }
+
+        int location = TEST_SIZE / 2;
+        ListIterator<AllJavaTypes> it = collection.listIterator(location);
+        realm.close();
+
+        try {
+            assertEquals(location - 1, it.previousIndex());
+        } catch (IllegalStateException e) {
+            fail();
+        }
+
+        try {
+            assertEquals(location, it.nextIndex());
+        } catch (IllegalStateException e) {
+            fail();
+        }
+
+        try {
+            assertTrue(it.hasNext());
+        } catch (IllegalStateException ignored) {
+        }
+
+        try {
+            it.next();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        try {
+            it.previous();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        try {
+            it.remove();
+            fail();
+        } catch (IllegalStateException e) {
+            assertNotEquals(CollectionClass.REALMRESULTS, collectionClass);
+        } catch (UnsupportedOperationException ignored) {
+            assertEquals(CollectionClass.REALMRESULTS, collectionClass);
+        }
+    }
+

@@ -1,0 +1,30 @@
+    @Test
+    public void iterator_closedRealm_methodsThrows() {
+        if (skipTest(CollectionClass.UNMANAGED_REALMLIST)) {
+            return;
+        }
+
+        Iterator<AllJavaTypes> it = collection.iterator();
+        realm.close();
+        try {
+            it.hasNext();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        try {
+            it.next();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        try {
+            it.remove();
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals(CollectionClass.MANAGED_REALMLIST, collectionClass);
+        } catch (UnsupportedOperationException e) {
+            assertEquals(CollectionClass.REALMRESULTS, collectionClass);
+        }
+    }
+

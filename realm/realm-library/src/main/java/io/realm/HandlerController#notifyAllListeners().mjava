@@ -1,5 +1,13 @@
     void notifyAllListeners() {
         notifyGlobalListeners();
         notifyTypeBasedListeners();
+
+        // empty async RealmObject shouldn't block the realm to advance
+        // they're empty so no risk for running into a corrupt state
+        // where the pointer (Row) is using one version of a Realm, whereas the
+        // current Realm is advancing to a newer version (they're empty anyway)
+        if (!realm.isClosed() && threadContainsAsyncEmptyRealmObject()) {
+            updateAsyncEmptyRealmObject();
+        }
     }
 

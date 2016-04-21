@@ -1,0 +1,21 @@
+    /**
+     * Refreshes all synchronous RealmResults by calling `sync_if_needed` on them. This will cause any backing queries
+     * to be rerun and any deleted objects will be removed from the TableView.
+     *
+     * WARNING: This will _NOT_ refresh TableViews created from async queries.
+     *
+     * Note this will _not_ notify any registered listeners.
+     */
+    public void refreshSynchronousTableViews() {
+        Iterator<WeakReference<RealmResults<? extends RealmModel>>> iterator = syncRealmResults.keySet().iterator();
+        while (iterator.hasNext()) {
+            WeakReference<RealmResults<? extends RealmModel>> weakRealmResults = iterator.next();
+            RealmResults<? extends RealmModel> realmResults = weakRealmResults.get();
+            if (realmResults == null) {
+                iterator.remove();
+            } else {
+                realmResults.syncIfNeeded();
+            }
+        }
+    }
+

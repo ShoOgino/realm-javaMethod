@@ -1,0 +1,20 @@
+        /**
+         * Adding a new object to the RealmList. If the object is not already manage by Realm it will be transparently
+         * copied using {@link Realm#copyToRealmOrUpdate(RealmObject)}
+         *
+         * @see #add(RealmObject)
+         */
+        public void add(E e) {
+            realm.checkIfValid();
+            checkConcurrentModification();
+            try {
+                int i = cursor;
+                RealmList.this.add(i, e);
+                lastRet = -1;
+                cursor = i + 1;
+                expectedModCount = modCount;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new ConcurrentModificationException();
+            }
+        }
+

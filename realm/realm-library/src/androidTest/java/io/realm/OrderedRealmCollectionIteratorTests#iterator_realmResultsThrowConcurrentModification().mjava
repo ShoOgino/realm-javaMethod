@@ -1,0 +1,20 @@
+    @Test
+    public void iterator_realmResultsThrowConcurrentModification() {
+        if (skipTest(CollectionClass.MANAGED_REALMLIST, CollectionClass.UNMANAGED_REALMLIST)) {
+            return;
+        }
+
+        // Verify that ConcurrentModification is correctly detected on non-looper threads
+        Iterator<AllJavaTypes> it = collection.iterator();
+        realm.beginTransaction();
+        realm.createObject(AllJavaTypes.class, TEST_SIZE);
+        realm.commitTransaction();
+        realm.refresh();
+
+        try {
+            it.next();
+            fail();
+        } catch (ConcurrentModificationException ignored) {
+        }
+    }
+

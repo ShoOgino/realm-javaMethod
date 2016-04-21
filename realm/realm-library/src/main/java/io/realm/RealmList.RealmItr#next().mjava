@@ -1,0 +1,18 @@
+        /**
+         * {@inheritDoc}
+         */
+        public E next() {
+            realm.checkIfValid();
+            checkConcurrentModification();
+            int i = cursor;
+            try {
+                E next = get(i);
+                lastRet = i;
+                cursor = i + 1;
+                return next;
+            } catch (IndexOutOfBoundsException e) {
+                checkConcurrentModification();
+                throw new NoSuchElementException("Cannot access index " + i + " when size is " + size() +  ". Remember to check hasNext() before using next().");
+            }
+        }
+

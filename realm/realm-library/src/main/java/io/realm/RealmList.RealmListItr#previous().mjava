@@ -1,0 +1,16 @@
+        /**
+         * {@inheritDoc}
+         */
+        public E previous() {
+            checkConcurrentModification();
+            int i = cursor - 1;
+            try {
+                E previous = get(i);
+                lastRet = cursor = i;
+                return previous;
+            } catch (IndexOutOfBoundsException e) {
+                checkConcurrentModification();
+                throw new NoSuchElementException("Cannot access index less than zero. This was " + i + ". Remember to check hasPrevious() before using previous().");
+            }
+        }
+

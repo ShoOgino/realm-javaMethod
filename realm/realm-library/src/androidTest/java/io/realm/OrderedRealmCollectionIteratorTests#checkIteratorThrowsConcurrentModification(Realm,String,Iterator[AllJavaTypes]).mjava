@@ -1,0 +1,12 @@
+    private void checkIteratorThrowsConcurrentModification(Realm realm, String method, Iterator<AllJavaTypes> it) {
+        try {
+            it.next();
+            fail("Method should have thrown: " + method);
+        } catch (ConcurrentModificationException ignored) {
+        } catch (Exception e) {
+            throw new RuntimeException("Method failed: " + method, e);
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

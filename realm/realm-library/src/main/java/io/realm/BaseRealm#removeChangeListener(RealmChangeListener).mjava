@@ -8,7 +8,7 @@
      */
     public void removeChangeListener(RealmChangeListener listener) {
         checkIfValid();
-        if (handlerController == null) {
+        if (!handlerController.isAutoRefreshEnabled()) {
             throw new IllegalStateException("You can't remove a listener from a non-Looper thread ");
         }
         handlerController.removeChangeListener(listener);

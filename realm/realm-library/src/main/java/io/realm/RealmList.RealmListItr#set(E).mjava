@@ -1,0 +1,18 @@
+        /**
+         * {@inheritDoc}
+         */
+        public void set(E e) {
+            realm.checkIfValid();
+            if (lastRet < 0) {
+                throw new IllegalStateException();
+            }
+            checkConcurrentModification();
+
+            try {
+                RealmList.this.set(lastRet, e);
+                expectedModCount = modCount;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new ConcurrentModificationException();
+            }
+        }
+

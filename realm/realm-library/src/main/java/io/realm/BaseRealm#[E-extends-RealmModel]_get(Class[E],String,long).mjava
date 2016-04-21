@@ -14,13 +14,15 @@
         }
 
         RealmObjectProxy proxy = (RealmObjectProxy) result;
-        proxy.realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex));
         proxy.realmGet$proxyState().setRealm$realm(this);
-        proxy.realmGet$proxyState().setTableVersion$realm();
-
-        if (handlerController != null) {
-            handlerController.addToRealmObjects(result);
+        if (rowIndex != Table.NO_MATCH) {
+            proxy.realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex));
+            proxy.realmGet$proxyState().setTableVersion$realm();
+        } else {
+            proxy.realmGet$proxyState().setRow$realm(InvalidRow.INSTANCE);
         }
+
+        handlerController.addToRealmObjects(result);
         return result;
     }
 

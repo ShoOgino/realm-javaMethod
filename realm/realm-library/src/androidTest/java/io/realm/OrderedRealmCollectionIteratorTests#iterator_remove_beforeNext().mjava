@@ -1,0 +1,15 @@
+    @Test
+    public void iterator_remove_beforeNext() {
+        Iterator<AllJavaTypes> it = collection.iterator();
+        realm.beginTransaction();
+
+        try {
+            it.remove();
+            fail();
+        } catch (UnsupportedOperationException e) {
+            assertEquals(CollectionClass.REALMRESULTS, collectionClass);
+        } catch (IllegalStateException ignored) {
+            assertNotEquals(CollectionClass.REALMRESULTS, collectionClass);
+        }
+    }
+

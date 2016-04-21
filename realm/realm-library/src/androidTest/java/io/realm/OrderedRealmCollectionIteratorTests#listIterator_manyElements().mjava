@@ -1,0 +1,32 @@
+    @Test
+    public void listIterator_manyElements() {
+        ListIterator<AllJavaTypes> it = collection.listIterator();
+
+        // Test beginning of the list
+        assertFalse(it.hasPrevious());
+        assertTrue(it.hasNext());
+        assertEquals(-1, it.previousIndex());
+        assertEquals(0, it.nextIndex());
+
+        // Test 1st element in the list
+        AllJavaTypes firstObject = it.next();
+        assertEquals(0, firstObject.getFieldLong());
+        assertTrue(it.hasPrevious());
+        assertEquals(0, it.previousIndex());
+
+        // Move to second last element
+        for (int i = 1; i < TEST_SIZE - 1; i++) {
+            it.next();
+        }
+        assertTrue(it.hasPrevious());
+        assertTrue(it.hasNext());
+        assertEquals(TEST_SIZE - 1, it.nextIndex());
+
+        // Test end of the list
+        AllJavaTypes lastObject = it.next();
+        assertEquals(TEST_SIZE - 1, lastObject.getFieldLong());
+        assertTrue(it.hasPrevious());
+        assertFalse(it.hasNext());
+        assertEquals(TEST_SIZE, it.nextIndex());
+    }
+

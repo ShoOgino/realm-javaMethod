@@ -1,0 +1,66 @@
+    @Test
+    public void iterator_outsideChangeToSizeThrowsConcurrentModification() {
+        if (skipTest(CollectionClass.REALMRESULTS)) {
+            return;
+        }
+
+        // Test all standard collection methods
+        for (CollectionMethod method : CollectionMethod.values()) {
+            collection = createCollection(realm, collectionClass, TEST_SIZE);
+            realm.beginTransaction();
+            Iterator<AllJavaTypes> it = collection.iterator();
+            switch (method) {
+                case ADD_OBJECT: collection.add(new AllJavaTypes(TEST_SIZE)); break;
+                case ADD_ALL_OBJECTS: collection.addAll(Collections.singletonList(new AllJavaTypes(TEST_SIZE))); break;
+                case CLEAR: collection.clear(); break;
+                case REMOVE_OBJECT: collection.remove(collection.get(0)); break;
+                case REMOVE_ALL: collection.removeAll(Collections.singletonList(collection.get(0))); break;
+                case RETAIN_ALL: collection.retainAll(Collections.singletonList(collection.get(0))); break;
+
+                // Does not impact size, so does not trigger ConcurrentModificationException
+                case CONTAINS:
+                case CONTAINS_ALL:
+                case EQUALS:
+                case HASHCODE:
+                case IS_EMPTY:
+                case ITERATOR:
+                case SIZE:
+                case TO_ARRAY:
+                case TO_ARRAY_INPUT:
+                    realm.cancelTransaction();
+                    continue;
+                default:
+                    fail("Unknown method: " + method);
+            }
+            checkIteratorThrowsConcurrentModification(realm, method.toString(), it);
+        }
+
+        for (ListMethod method : ListMethod.values()) {
+            collection = createCollection(realm, collectionClass, TEST_SIZE);
+            realm.beginTransaction();
+            Iterator<AllJavaTypes> it = collection.iterator();
+            switch (method) {
+                case ADD_INDEX: collection.add(0, new AllJavaTypes(TEST_SIZE)); break;
+                case ADD_ALL_INDEX: collection.addAll(0, Collections.singleton(new AllJavaTypes(TEST_SIZE))); break;
+                case REMOVE_INDEX: collection.remove(0); break;
+
+                // Does not impact size, so does not trigger ConcurrentModificationException
+                case FIRST:
+                case LAST:
+                case GET_INDEX:
+                case INDEX_OF:
+                case LAST_INDEX_OF:
+                case LIST_ITERATOR:
+                case LIST_ITERATOR_INDEX:
+                case SET:
+                case SUBLIST:
+                    realm.cancelTransaction();
+                    continue;
+
+                default:
+                    fail("Unknown method: " + method);
+            }
+            checkIteratorThrowsConcurrentModification(realm, method.toString(), it);
+        }
+    }
+

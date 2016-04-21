@@ -1,0 +1,25 @@
+    @Test
+    public void listIterator_deleteManagedObjectIndirectly() {
+        realm.beginTransaction();
+        Iterator<AllJavaTypes> it = collection.iterator();
+        it.next();
+        it.next().deleteFromRealm();
+        realm.commitTransaction();
+
+        switch (collectionClass) {
+            case MANAGED_REALMLIST:
+                assertEquals(TEST_SIZE - 1, collection.size());
+                break;
+            case UNMANAGED_REALMLIST:
+            case REALMRESULTS:
+                assertEquals(TEST_SIZE, collection.size());
+                break;
+        }
+        it = collection.listIterator();
+        it.next();
+        AllJavaTypes types = it.next(); // Iterator can still access the deleted object
+
+        //noinspection SimplifiableConditionalExpression
+        assertTrue(collectionClass == CollectionClass.MANAGED_REALMLIST ? types.isValid() : !types.isValid());
+    }
+

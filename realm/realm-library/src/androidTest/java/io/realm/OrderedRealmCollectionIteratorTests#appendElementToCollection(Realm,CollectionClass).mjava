@@ -1,0 +1,17 @@
+    private void appendElementToCollection(Realm realm, CollectionClass collection) {
+        realm.beginTransaction();
+        switch (collectionClass) {
+            case MANAGED_REALMLIST:
+                realm.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_LONG, 0).findFirst().getFieldList().add(new AllJavaTypes(TEST_SIZE + 1));
+                break;
+
+            case UNMANAGED_REALMLIST:
+            case REALMRESULTS:
+                realm.createObject(AllJavaTypes.class, TEST_SIZE + 1);
+                break;
+            default:
+                fail("Unknown class: " + collection);
+        }
+        realm.commitTransaction();
+    }
+

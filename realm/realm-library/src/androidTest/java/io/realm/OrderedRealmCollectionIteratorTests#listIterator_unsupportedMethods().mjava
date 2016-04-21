@@ -1,0 +1,31 @@
+    @Test
+    public void listIterator_unsupportedMethods() {
+        ListIterator<AllJavaTypes> it = collection.listIterator();
+        try {
+            it.remove();
+            fail();
+        } catch (UnsupportedOperationException e) {
+            assertEquals(CollectionClass.REALMRESULTS, collectionClass);
+        } catch (IllegalStateException e) {
+            assertNotEquals(CollectionClass.REALMRESULTS, collectionClass);
+        }
+
+        try {
+            it.add(null);
+            fail();
+        } catch (UnsupportedOperationException e) {
+            assertEquals(CollectionClass.REALMRESULTS, collectionClass);
+        } catch (IllegalArgumentException e) {
+            assertNotEquals(CollectionClass.REALMRESULTS, collectionClass);
+        }
+
+        try {
+            it.set(new AllJavaTypes());
+            fail();
+        } catch (UnsupportedOperationException e) {
+            assertEquals(CollectionClass.REALMRESULTS, collectionClass);
+        } catch (IllegalStateException e) {
+            assertNotEquals(CollectionClass.REALMRESULTS, collectionClass);
+        }
+    }
+

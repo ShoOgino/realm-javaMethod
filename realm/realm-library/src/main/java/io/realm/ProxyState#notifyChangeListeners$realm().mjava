@@ -1,8 +1,8 @@
     /**
      * Notifies all registered listeners.
      */
-    public void notifyChangeListeners$realm() {
-        if (listeners != null && !listeners.isEmpty()) {
+    void notifyChangeListeners$realm() {
+        if (!listeners.isEmpty()) {
             boolean notify = false;
 
             Table table = row.getTable();
@@ -13,7 +13,7 @@
                 // should trigger a RealmChangeListener.
                 notify = true;
             } else {
-                long version = table.version();
+                long version = table.getVersion();
                 if (currentTableVersion != version) {
                     currentTableVersion = version;
                     notify = true;

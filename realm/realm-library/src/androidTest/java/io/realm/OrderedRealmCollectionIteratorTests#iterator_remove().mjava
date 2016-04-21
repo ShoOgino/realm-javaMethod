@@ -1,0 +1,23 @@
+    @Test
+    public void iterator_remove() {
+        Iterator<AllJavaTypes> it = collection.iterator();
+        AllJavaTypes obj = it.next();
+        assertEquals("test data 0", obj.getFieldString());
+        realm.beginTransaction();
+
+        try {
+            it.remove();
+        } catch (UnsupportedOperationException e) {
+            // RealmResults doesn't support remove
+            assertEquals(CollectionClass.REALMRESULTS, collectionClass);
+            return;
+        }
+
+        // un-managed objects are always invalid, but cannot be GC'ed while we have a reference.
+        // managed objects should not be deleted (= invalid).
+        assertNotEquals(CollectionClass.REALMRESULTS, collectionClass);
+        assertTrue(obj.isValid());
+        assertEquals("test data 1", collection.iterator().next().getFieldString());
+        assertEquals(TEST_SIZE - 1, collection.size());
+    }
+

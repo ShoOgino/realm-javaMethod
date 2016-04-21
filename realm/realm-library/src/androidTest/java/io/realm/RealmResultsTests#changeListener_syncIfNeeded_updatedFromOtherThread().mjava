@@ -1,0 +1,26 @@
+    @Test
+    @RunTestInLooperThread
+    public void changeListener_syncIfNeeded_updatedFromOtherThread() {
+        final Realm realm = Realm.getInstance(looperThread.createConfiguration("Foo"));
+        populateTestRealm(realm, 10);
+
+        final RealmResults<AllTypes> results = realm.where(AllTypes.class).lessThan(AllTypes.FIELD_LONG, 10).findAll();
+        assertEquals(10, results.size());
+
+        // 1. Delete first object from another thread.
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+               realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, 0).findFirst().removeFromRealm();
+            }
+        }, new Realm.Transaction.Callback() {
+            @Override
+            public void onSuccess() {
+                // 2. RealmResults are refreshed before onSuccess is called
+                assertEquals(9, results.size());
+                realm.close();
+                looperThread.testComplete();
+            }
+        });
+    }
+

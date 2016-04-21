@@ -1,0 +1,15 @@
+    @Test
+    public void iterator_removeCalledTwice() {
+        if (skipTest(CollectionClass.REALMRESULTS)) {
+            return; // remove() not supported by RealmResults
+        }
+
+        Iterator<AllJavaTypes> it = collection.iterator();
+        it.next();
+        realm.beginTransaction();
+        it.remove();
+
+        thrown.expect(IllegalStateException.class);
+        it.remove();
+    }
+

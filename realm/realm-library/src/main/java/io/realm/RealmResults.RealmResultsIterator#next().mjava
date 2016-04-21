@@ -1,8 +1,12 @@
+        /**
+         * {@inheritDoc}
+         */
         public E next() {
-            assertRealmIsStable();
+            realm.checkIfValid();
+            checkRealmIsStable();
             pos++;
             if (pos >= size()) {
-                throw new IndexOutOfBoundsException("Cannot access index " + pos + " when size is " + size() +  ". Remember to check hasNext() before using next().");
+                throw new NoSuchElementException("Cannot access index " + pos + " when size is " + size() +  ". Remember to check hasNext() before using next().");
             }
             return get(pos);
         }

@@ -2,17 +2,6 @@
      * Notifies all registered listeners.
      */
     void notifyChangeListeners() {
-        if (!listeners.isEmpty()) {
-            // table might be null (if the async query didn't complete
-            // but we have already registered listeners for it)
-            if (pendingQuery != null && !isCompleted) return;
-            long version = table.sync();
-            if (currentTableViewVersion != version) {
-                currentTableViewVersion = version;
-                for (RealmChangeListener listener : listeners) {
-                    listener.onChange();
-                }
-            }
-        }
+        notifyChangeListeners(true, false);
     }
 

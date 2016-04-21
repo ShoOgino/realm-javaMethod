@@ -1,0 +1,23 @@
+    @Test
+    public void listIterator_empty() {
+        collection = createCollection(realm, collectionClass, 0);
+        ListIterator<AllJavaTypes> it = collection.listIterator();
+
+        assertFalse(it.hasPrevious());
+        assertFalse(it.hasNext());
+        assertEquals(0, it.nextIndex());
+        assertEquals(-1, it.previousIndex());
+
+        try {
+            it.next();
+            fail();
+        } catch (NoSuchElementException ignored) {
+        }
+
+        try {
+            it.previous();
+            fail();
+        } catch (NoSuchElementException ignored) {
+        }
+    }
+

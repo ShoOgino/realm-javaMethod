@@ -1,0 +1,26 @@
+    @Test
+    public void listIterator_set() {
+        if (skipTest(CollectionClass.REALMRESULTS)) {
+            return;
+        }
+
+        realm.beginTransaction();
+        ListIterator<AllJavaTypes> it = collection.listIterator();
+
+        // Calling set() before next() should throw
+        try {
+            it.set(new AllJavaTypes());
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        AllJavaTypes obj = it.next();
+        assertEquals(0, obj.getFieldLong());
+        it.set(new AllJavaTypes(42));
+
+        it.next();
+        it.previous(); // A big ListIterator WTF!, but it is by design.
+        obj = it.previous();
+        assertEquals(42, obj.getFieldLong());
+    }
+

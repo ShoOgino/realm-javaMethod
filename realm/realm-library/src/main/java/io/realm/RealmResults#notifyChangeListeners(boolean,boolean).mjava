@@ -1,0 +1,16 @@
+    private void notifyChangeListeners(boolean syncBeforeNotifying, boolean forceNotify) {
+        if (syncBeforeNotifying) {
+            syncIfNeeded();
+        }
+        if (!listeners.isEmpty()) {
+            // table might be null (if the async query didn't complete
+            // but we have already registered listeners for it)
+            if (pendingQuery != null && !asyncQueryCompleted) return;
+            if (!viewUpdated && !forceNotify) return;
+            viewUpdated = false;
+            for (RealmChangeListener listener : listeners) {
+                listener.onChange();
+            }
+        }
+    }
+

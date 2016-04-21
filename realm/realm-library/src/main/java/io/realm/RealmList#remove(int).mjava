@@ -8,13 +8,15 @@
      */
     @Override
     public E remove(int location) {
+        E removedItem;
         if (managedMode) {
             checkValidView();
-            E removedItem = get(location);
+            removedItem = get(location);
             view.remove(location);
-            return removedItem;
         } else {
-            return nonManagedList.remove(location);
+            removedItem = nonManagedList.remove(location);
         }
+        modCount++;
+        return removedItem;
     }
 

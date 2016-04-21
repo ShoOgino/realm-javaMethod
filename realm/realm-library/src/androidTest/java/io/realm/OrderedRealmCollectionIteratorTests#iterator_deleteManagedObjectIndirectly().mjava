@@ -1,0 +1,27 @@
+    @Test
+    public void iterator_deleteManagedObjectIndirectly() {
+        realm.beginTransaction();
+        Iterator<AllJavaTypes> it = collection.iterator();
+        it.next(); // First item is a cyclic reference to the entire graph, avoid deleting that.
+        it.next().deleteFromRealm();
+        realm.commitTransaction();
+
+        switch (collectionClass) {
+            // Managed RealmLists are directly associated with their table. Thus any indirect deletion will
+            // also remove it from the LinkView.
+            case MANAGED_REALMLIST:
+                assertEquals(TEST_SIZE - 1, collection.size());
+                break;
+
+            // Un-managed collections are not affected by changes to Realm and RealmResult should maintain a stable
+            // view until next time sync_if_needed is called.
+            case UNMANAGED_REALMLIST:
+            case REALMRESULTS:
+                assertEquals(TEST_SIZE, collection.size());
+                break;
+
+            default:
+                fail();
+        }
+    }
+

@@ -1,0 +1,12 @@
+        final void checkConcurrentModification() {
+            // A Realm ListView is backed by the original Table and not a TableView, this means
+            // that all changes are reflected immediately. It is therefore not possible to use
+            // the same version pinning trick we use for RealmResults (avoiding calling sync_if_needed)
+            // Fortunately a LinkView does not change unless manually altered (unlike RealmResults)
+            // So therefore it should be acceptable to use the same heuristic as a normal AbstractList
+            // when detecting concurrent modifications.
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
+

@@ -1,0 +1,17 @@
+    @Test
+    public void listIterator_remove_doesNotDeleteObject() {
+        ListIterator<AllJavaTypes> it = collection.listIterator();
+        AllJavaTypes obj = it.next();
+        assertEquals("test data 0", obj.getFieldString());
+        realm.beginTransaction();
+        try {
+            it.remove();
+            if (collectionClass == CollectionClass.REALMRESULTS) {
+                fail();
+            }
+            assertTrue(obj.isValid());
+        } catch (UnsupportedOperationException e) {
+            assertEquals(CollectionClass.REALMRESULTS, collectionClass);
+        }
+    }
+

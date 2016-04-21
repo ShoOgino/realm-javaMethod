@@ -15,13 +15,12 @@
             throw new IllegalStateException("Cannot set auto-refresh in a Thread without a Looper");
         }
 
-        if (autoRefresh && !this.autoRefresh) { // Switch it on
-            handlerController = new HandlerController(this);
+        if (autoRefresh && !handlerController.isAutoRefreshEnabled()) { // Switch it on
             handler = new Handler(handlerController);
             handlers.put(handler, configuration.getPath());
-        } else if (!autoRefresh && this.autoRefresh && handler != null) { // Switch it off
+        } else if (!autoRefresh && handlerController.isAutoRefreshEnabled() && handler != null) { // Switch it off
             removeHandler();
         }
-        this.autoRefresh = autoRefresh;
+        handlerController.setAutoRefresh(autoRefresh);
     }
 

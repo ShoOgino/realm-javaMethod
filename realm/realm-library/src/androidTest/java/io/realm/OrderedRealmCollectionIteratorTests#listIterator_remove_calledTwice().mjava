@@ -1,0 +1,25 @@
+    @Test
+    public void listIterator_remove_calledTwice() {
+        Iterator<AllJavaTypes> it = collection.listIterator();
+        it.next();
+        realm.beginTransaction();
+
+        switch (collectionClass) {
+            case MANAGED_REALMLIST:
+            case UNMANAGED_REALMLIST:
+                it.remove();
+                thrown.expect(IllegalStateException.class);
+                it.remove();
+                break;
+            case REALMRESULTS:
+                try {
+                    it.remove(); // Method not supported
+                    fail();
+                } catch (UnsupportedOperationException ignored) {
+                }
+                break;
+            default:
+                fail("Unknown collection class: " + collectionClass);
+        }
+    }
+

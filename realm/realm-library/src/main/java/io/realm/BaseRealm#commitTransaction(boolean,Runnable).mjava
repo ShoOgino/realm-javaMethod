@@ -29,9 +29,9 @@
             // as the target thread consumes messages at the same time. In this case it is not a problem as worst
             // case we end up with two REALM_CHANGED messages in the queue.
             if (
-                    realmPath.equals(configuration.getPath())            // It's the right realm
-                            && !handler.hasMessages(HandlerController.REALM_CHANGED)       // The right message
-                            && handler.getLooper().getThread().isAlive() // The receiving thread is alive
+                    realmPath.equals(configuration.getPath())                           // It's the right realm
+                            && !handler.hasMessages(HandlerController.REALM_CHANGED)    // The right message
+                            && handler.getLooper().getThread().isAlive()                // The receiving thread is alive
                             && !handler.sendEmptyMessage(HandlerController.REALM_CHANGED)) {
                 RealmLog.w("Cannot update Looper threads when the Looper has quit. Use realm.setAutoRefresh(false) " +
                         "to prevent this.");

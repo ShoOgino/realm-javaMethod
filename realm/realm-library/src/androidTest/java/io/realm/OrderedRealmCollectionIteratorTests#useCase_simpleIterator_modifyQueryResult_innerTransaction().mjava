@@ -1,0 +1,19 @@
+    @Test
+    public void useCase_simpleIterator_modifyQueryResult_innerTransaction() {
+        if (skipTest(CollectionClass.MANAGED_REALMLIST, CollectionClass.UNMANAGED_REALMLIST)) {
+            return;
+        }
+
+        collection = realm.where(AllJavaTypes.class).lessThan(AllJavaTypes.FIELD_LONG, TEST_SIZE).findAll();
+        assertEquals(TEST_SIZE, collection.size());
+        for (int i = 0; i < collection.size(); i++) {
+            realm.beginTransaction();
+            AllJavaTypes obj = collection.get(i);
+            obj.setFieldLong(obj.getFieldLong() + TEST_SIZE);
+            realm.commitTransaction();
+        }
+
+        // Verify that all elements were modified
+        assertEquals(0, realm.where(AllJavaTypes.class).lessThan(AllJavaTypes.FIELD_LONG, TEST_SIZE).count());
+    }
+

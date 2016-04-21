@@ -1,0 +1,12 @@
+    private void createNewObject() {
+        Number currentMax = realm.where(AllJavaTypes.class).max(AllJavaTypes.FIELD_LONG);
+        long nextId = 0;
+        if (currentMax != null) {
+            nextId = currentMax.longValue() + 1;
+        }
+
+        realm.beginTransaction();
+        realm.createObject(AllJavaTypes.class, nextId);
+        realm.commitTransaction();
+    }
+

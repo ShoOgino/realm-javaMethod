@@ -1,0 +1,14 @@
+    @Test
+    public void listIterator_transactionBeforeNextItem() {
+        Iterator<AllJavaTypes> it = collection.listIterator();
+        int i = 0;
+        while (it.hasNext()) {
+            AllJavaTypes item = it.next();
+            assertEquals("Failed at index: " + i, i, item.getFieldLong());
+            i++;
+
+            // Committing transactions while iterating should not effect the current iterator if on a looper thread
+            createNewObject();
+        }
+    }
+

@@ -1,0 +1,14 @@
+    @Test
+    public void iterator_unrelatedTransactionBeforeNextItem() {
+        Iterator<AllJavaTypes> it = collection.iterator();
+        int i = 0;
+        while (it.hasNext()) {
+            AllJavaTypes item = it.next();
+            assertEquals("Failed at index: " + i, i, item.getFieldLong());
+            i++;
+
+            // Committing unrelated transactions while iterating should not effect the current iterator.
+            createNewObject();
+        }
+    }
+
