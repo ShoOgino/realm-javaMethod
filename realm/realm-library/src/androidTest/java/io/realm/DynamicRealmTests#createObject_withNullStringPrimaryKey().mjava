@@ -1,0 +1,9 @@
+    @Test
+    public void createObject_withNullStringPrimaryKey() {
+        realm.beginTransaction();
+        realm.createObject(PrimaryKeyAsString.CLASS_NAME, (String) null);
+        realm.commitTransaction();
+
+        assertEquals(1, realm.where(PrimaryKeyAsString.CLASS_NAME).equalTo(PrimaryKeyAsString.FIELD_PRIMARY_KEY, (String) null).count());
+    }
+

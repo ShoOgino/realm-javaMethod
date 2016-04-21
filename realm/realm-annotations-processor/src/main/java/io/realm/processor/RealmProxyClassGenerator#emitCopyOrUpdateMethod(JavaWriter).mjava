@@ -29,13 +29,27 @@
                     .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
 
             String primaryKeyGetter = metadata.getPrimaryKeyGetter();
-            if (Utils.isString(metadata.getPrimaryKey())) {
-                writer
-                    .beginControlFlow("if (((%s) object).%s() == null)", interfaceName, primaryKeyGetter)
-                        .emitStatement("throw new IllegalArgumentException(\"Primary key value must not be null.\")")
-                    .endControlFlow()
-                    .emitStatement("long rowIndex = table.findFirstString(pkColumnIndex, ((%s) object).%s())",
-                            interfaceName, primaryKeyGetter);
+            VariableElement primaryKeyElement = metadata.getPrimaryKey();
+            if (metadata.isNullable(primaryKeyElement)) {
+                if (Utils.isString(primaryKeyElement)) {
+                    writer
+                        .emitStatement("String value = ((%s) object).%s()", interfaceName, primaryKeyGetter)
+                        .emitStatement("long rowIndex = TableOrView.NO_MATCH")
+                        .beginControlFlow("if (value == null)")
+                            .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
+                        .nextControlFlow("else")
+                            .emitStatement("rowIndex = table.findFirstString(pkColumnIndex, value)")
+                        .endControlFlow();
+                } else {
+                    writer
+                        .emitStatement("Number value = ((%s) object).%s()", interfaceName, primaryKeyGetter)
+                        .emitStatement("long rowIndex = TableOrView.NO_MATCH")
+                        .beginControlFlow("if (value == null)")
+                            .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
+                        .nextControlFlow("else")
+                            .emitStatement("rowIndex = table.findFirstLong(pkColumnIndex, value.longValue())")
+                        .endControlFlow();
+                }
             } else {
                 writer.emitStatement("long rowIndex = table.findFirstLong(pkColumnIndex, ((%s) object).%s())",
                         interfaceName, primaryKeyGetter);

@@ -1,5 +1,12 @@
+    /**
+     * Set null to a row pointer.
+     *
+     * @param columnIndex 0 based index value of the cell column.
+     */
     @Override
     public void setNull(long columnIndex) {
+        parent.checkImmutable();
+        getTable().checkDuplicatedNullForPrimaryKeyValue(columnIndex, getIndex());
         nativeSetNull(nativePointer, columnIndex);
     }
 

@@ -1,0 +1,40 @@
+    @Test
+    public void copyToRealm_duplicatedNullPrimaryKeyThrows() {
+        final String[] PRIMARY_KEY_TYPES = {"String", "BoxedByte", "BoxedShort", "BoxedInteger", "BoxedLong"};
+
+        TestHelper.addStringPrimaryKeyObjectToTestRealm(realm,  (String) null,  0);
+        TestHelper.addBytePrimaryKeyObjectToTestRealm(realm,    (Byte) null,    (String) null);
+        TestHelper.addShortPrimaryKeyObjectToTestRealm(realm,   (Short) null,   (String) null);
+        TestHelper.addIntegerPrimaryKeyObjectToTestRealm(realm, (Integer) null, (String) null);
+        TestHelper.addLongPrimaryKeyObjectToTestRealm(realm,    (Long) null,    (String) null);
+
+        for (String className : PRIMARY_KEY_TYPES) {
+            try {
+                realm.beginTransaction();
+                switch (className) {
+                    case "String":
+                        realm.copyToRealm(new PrimaryKeyAsString());
+                        break;
+                    case "BoxedByte":
+                        realm.copyToRealm(new PrimaryKeyAsBoxedByte());
+                        break;
+                    case "BoxedShort":
+                        realm.copyToRealm(new PrimaryKeyAsBoxedShort());
+                        break;
+                    case "BoxedInteger":
+                        realm.copyToRealm(new PrimaryKeyAsBoxedInteger());
+                        break;
+                    case "BoxedLong":
+                        realm.copyToRealm(new PrimaryKeyAsBoxedLong());
+                        break;
+                    default:
+                }
+                fail("Null value as primary key already exists.");
+            } catch (RealmPrimaryKeyConstraintException expected) {
+                assertEquals("Value already exists: null", expected.getMessage());
+            } finally {
+                realm.cancelTransaction();
+            }
+        }
+    }
+

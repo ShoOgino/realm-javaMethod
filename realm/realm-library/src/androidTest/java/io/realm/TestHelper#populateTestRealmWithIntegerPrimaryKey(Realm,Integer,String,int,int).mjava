@@ -1,0 +1,20 @@
+    /**
+     * Populates a realm with Integer type Primarykey objects for a number of numberOfPopulation - 1,
+     * starting with iteratorBeginValue. One object is setup to have given values from parameters.
+     */
+    public static void populateTestRealmWithIntegerPrimaryKey(Realm testRealm, Integer primaryFieldValue, String secondaryFieldValue, int numberOfPopulation, int iteratorBeginValue) {
+        testRealm.beginTransaction();
+        PrimaryKeyAsBoxedInteger userObj = new PrimaryKeyAsBoxedInteger();
+        userObj.setId(primaryFieldValue);
+        userObj.setName(secondaryFieldValue);
+        testRealm.copyToRealm(userObj);
+        int idValue = iteratorBeginValue;
+        for (int i = 0; i < numberOfPopulation - 1; ++i, ++idValue) {
+            PrimaryKeyAsBoxedInteger obj = new PrimaryKeyAsBoxedInteger();
+            obj.setId(new Integer(idValue));
+            obj.setName(String.valueOf(idValue));
+            testRealm.copyToRealm(obj);
+        }
+        testRealm.commitTransaction();
+    }
+

@@ -1,0 +1,20 @@
+    /**
+     * Populates a realm with Long type Primarykey objects for a number of numberOfPopulation - 1,
+     * starting with iteratorBeginValue. One object is setup to have given values from parameters.
+     */
+    public static void populateTestRealmWithLongPrimaryKey(Realm testRealm, Long primaryFieldValue, String secondaryFieldValue, long numberOfPopulation, long iteratorBeginValue) {
+        testRealm.beginTransaction();
+        PrimaryKeyAsBoxedLong userObj = new PrimaryKeyAsBoxedLong();
+        userObj.setId(primaryFieldValue);
+        userObj.setName(secondaryFieldValue);
+        testRealm.copyToRealm(userObj);
+        long idValue = iteratorBeginValue;
+        for (long i = 0; i < numberOfPopulation - 1; ++i, ++idValue) {
+            PrimaryKeyAsBoxedLong obj = new PrimaryKeyAsBoxedLong();
+            obj.setId(new Long(idValue));
+            obj.setName(String.valueOf(idValue));
+            testRealm.copyToRealm(obj);
+        }
+        testRealm.commitTransaction();
+    }
+

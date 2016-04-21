@@ -1,0 +1,23 @@
+    @Test
+    public void isNull_nullPrimaryKeys() {
+        final long SECONDARY_FIELD_NUMBER = 49992417L;
+        final String SECONDARY_FIELD_STRING = "Realm is a mobile database hundreds of millions of people rely on.";
+        // fill up a realm with one user PrimaryKey value and 9 numeric values, starting from -5
+        TestHelper.populateTestRealmWithStringPrimaryKey(realm,  (String) null,  SECONDARY_FIELD_NUMBER, 10, -5);
+        TestHelper.populateTestRealmWithBytePrimaryKey(realm,    (Byte) null,    SECONDARY_FIELD_STRING, 10, -5);
+        TestHelper.populateTestRealmWithShortPrimaryKey(realm,   (Short) null,   SECONDARY_FIELD_STRING, 10, -5);
+        TestHelper.populateTestRealmWithIntegerPrimaryKey(realm, (Integer) null, SECONDARY_FIELD_STRING, 10, -5);
+        TestHelper.populateTestRealmWithLongPrimaryKey(realm,    (Long) null,    SECONDARY_FIELD_STRING, 10, -5);
+
+        // String
+        assertEquals(SECONDARY_FIELD_NUMBER, realm.where(PrimaryKeyAsString.class).isNull(PrimaryKeyAsString.FIELD_PRIMARY_KEY).findAll().first().getId());
+        // Boxed Byte
+        assertEquals(SECONDARY_FIELD_STRING, realm.where(PrimaryKeyAsBoxedByte.class).isNull(PrimaryKeyAsBoxedByte.FIELD_PRIMARY_KEY).findAll().first().getName());
+        // Boxed Short
+        assertEquals(SECONDARY_FIELD_STRING, realm.where(PrimaryKeyAsBoxedShort.class).isNull(PrimaryKeyAsBoxedShort.FIELD_PRIMARY_KEY).findAll().first().getName());
+        // Boxed Integer
+        assertEquals(SECONDARY_FIELD_STRING, realm.where(PrimaryKeyAsBoxedInteger.class).isNull(PrimaryKeyAsBoxedInteger.FIELD_PRIMARY_KEY).findAll().first().getName());
+        // Boxed Long
+        assertEquals(SECONDARY_FIELD_STRING, realm.where(PrimaryKeyAsBoxedLong.class).isNull(PrimaryKeyAsBoxedLong.FIELD_PRIMARY_KEY).findAll().first().getName());
+    }
+

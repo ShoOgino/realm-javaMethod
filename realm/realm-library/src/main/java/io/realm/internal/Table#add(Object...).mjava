@@ -44,9 +44,14 @@
                 nativeSetBoolean(nativePtr, columnIndex, rowIndex, (Boolean)value);
                 break;
             case INTEGER:
-                long intValue = ((Number) value).longValue();
-                checkIntValueIsLegal(columnIndex, rowIndex, intValue);
-                nativeSetLong(nativePtr, columnIndex, rowIndex, intValue);
+                if (value == null) {
+                    checkDuplicatedNullForPrimaryKeyValue(columnIndex, rowIndex);
+                    nativeSetNull(nativePtr, columnIndex, rowIndex);
+                } else {
+                    long intValue = ((Number) value).longValue();
+                    checkIntValueIsLegal(columnIndex, rowIndex, intValue);
+                    nativeSetLong(nativePtr, columnIndex, rowIndex, intValue);
+                }
                 break;
             case FLOAT:
                 nativeSetFloat(nativePtr, columnIndex, rowIndex, (Float) value);
@@ -55,9 +60,14 @@
                 nativeSetDouble(nativePtr, columnIndex, rowIndex, (Double) value);
                 break;
             case STRING:
-                String stringValue = (String) value;
-                checkStringValueIsLegal(columnIndex, rowIndex, stringValue);
-                nativeSetString(nativePtr, columnIndex, rowIndex, (String) value);
+                if (value == null) {
+                    checkDuplicatedNullForPrimaryKeyValue(columnIndex, rowIndex);
+                    nativeSetNull(nativePtr, columnIndex, rowIndex);
+                } else {
+                    String stringValue = (String) value;
+                    checkStringValueIsLegal(columnIndex, rowIndex, stringValue);
+                    nativeSetString(nativePtr, columnIndex, rowIndex, (String) value);
+                }
                 break;
             case DATE:
                 if (value == null)

@@ -10,10 +10,13 @@
         if (canUpdate) {
             Table table = realm.getTable(AllTypes.class);
             long pkColumnIndex = table.getPrimaryKey();
-            if (((AllTypesRealmProxyInterface) object).realmGet$columnString() == null) {
-                throw new IllegalArgumentException("Primary key value must not be null.");
+            String value = ((AllTypesRealmProxyInterface) object).realmGet$columnString();
+            long rowIndex = TableOrView.NO_MATCH;
+            if (value == null) {
+                rowIndex = table.findFirstNull(pkColumnIndex);
+            } else {
+                rowIndex = table.findFirstString(pkColumnIndex, value);
             }
-            long rowIndex = table.findFirstString(pkColumnIndex, ((AllTypesRealmProxyInterface) object).realmGet$columnString());
             if (rowIndex != TableOrView.NO_MATCH) {
                 realmObject = new AllTypesRealmProxy(realm.schema.getColumnInfo(AllTypes.class));
                 ((RealmObjectProxy)realmObject).realmGet$proxyState().setRealm$realm(realm);

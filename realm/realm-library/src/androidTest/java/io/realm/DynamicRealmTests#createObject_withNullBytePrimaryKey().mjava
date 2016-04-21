@@ -1,0 +1,9 @@
+    @Test
+    public void createObject_withNullBytePrimaryKey() {
+        realm.beginTransaction();
+        realm.createObject(PrimaryKeyAsBoxedByte.CLASS_NAME, (Byte) null);
+        realm.commitTransaction();
+
+        assertEquals(1, realm.where(PrimaryKeyAsBoxedByte.CLASS_NAME).equalTo(PrimaryKeyAsBoxedByte.FIELD_PRIMARY_KEY, (Byte) null).count());
+    }
+

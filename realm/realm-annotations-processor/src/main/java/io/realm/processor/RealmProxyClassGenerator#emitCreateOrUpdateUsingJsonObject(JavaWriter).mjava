@@ -16,16 +16,28 @@
                 .beginControlFlow("if (update)")
                     .emitStatement("Table table = realm.getTable(%s.class)", className)
                     .emitStatement("long pkColumnIndex = table.getPrimaryKey()")
+                    .emitStatement("long rowIndex = TableOrView.NO_MATCH");
+            if (metadata.isNullable(metadata.getPrimaryKey())) {
+                writer
+                    .beginControlFlow("if (json.isNull(\"%s\"))", metadata.getPrimaryKey().getSimpleName())
+                        .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
+                    .nextControlFlow("else")
+                        .emitStatement("rowIndex = table.findFirst%s(pkColumnIndex, json.get%s(\"%s\"))",
+                                pkType, pkType, metadata.getPrimaryKey().getSimpleName())
+                    .endControlFlow();
+            } else {
+                writer
                     .beginControlFlow("if (!json.isNull(\"%s\"))", metadata.getPrimaryKey().getSimpleName())
-                    .emitStatement("long rowIndex = table.findFirst%s(pkColumnIndex, json.get%s(\"%s\"))",
+                    .emitStatement("rowIndex = table.findFirst%s(pkColumnIndex, json.get%s(\"%s\"))",
                             pkType, pkType, metadata.getPrimaryKey().getSimpleName())
+                    .endControlFlow();
+            }
+            writer
                     .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
-                            .emitStatement("obj = new %s(realm.schema.getColumnInfo(%s.class))",
-                                    Utils.getProxyClassName(className),
-                                    className)
-                            .emitStatement("((RealmObjectProxy)obj).realmGet$proxyState().setRealm$realm(realm)")
-                            .emitStatement("((RealmObjectProxy)obj).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex))")
-                        .endControlFlow()
+                        .emitStatement("obj = new %s(realm.schema.getColumnInfo(%s.class))",
+                                Utils.getProxyClassName(className), className)
+                        .emitStatement("((RealmObjectProxy)obj).realmGet$proxyState().setRealm$realm(realm)")
+                        .emitStatement("((RealmObjectProxy)obj).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex))")
                     .endControlFlow()
                 .endControlFlow();
 

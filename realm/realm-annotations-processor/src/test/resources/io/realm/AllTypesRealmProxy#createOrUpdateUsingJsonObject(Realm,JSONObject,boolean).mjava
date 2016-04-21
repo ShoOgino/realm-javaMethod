@@ -5,13 +5,16 @@
         if (update) {
             Table table = realm.getTable(AllTypes.class);
             long pkColumnIndex = table.getPrimaryKey();
-            if (!json.isNull("columnString")) {
-                long rowIndex = table.findFirstString(pkColumnIndex, json.getString("columnString"));
-                if (rowIndex != TableOrView.NO_MATCH) {
-                    obj = new AllTypesRealmProxy(realm.schema.getColumnInfo(AllTypes.class));
-                    ((RealmObjectProxy)obj).realmGet$proxyState().setRealm$realm(realm);
-                    ((RealmObjectProxy)obj).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex));
-                }
+            long rowIndex = TableOrView.NO_MATCH;
+            if (json.isNull("columnString")) {
+                rowIndex = table.findFirstNull(pkColumnIndex);
+            } else {
+                rowIndex = table.findFirstString(pkColumnIndex, json.getString("columnString"));
+            }
+            if (rowIndex != TableOrView.NO_MATCH) {
+                obj = new AllTypesRealmProxy(realm.schema.getColumnInfo(AllTypes.class));
+                ((RealmObjectProxy)obj).realmGet$proxyState().setRealm$realm(realm);
+                ((RealmObjectProxy)obj).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex));
             }
         }
         if (obj == null) {

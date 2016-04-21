@@ -1,0 +1,20 @@
+    /**
+     * Populates a realm with String type Primarykey objects for a number of numberOfPopulation - 1,
+     * starting with iteratorBeginValue. One object is setup to have given values from parameters.
+     */
+    public static void populateTestRealmWithStringPrimaryKey(Realm testRealm, String primaryFieldValue, long secondaryFieldValue, int numberOfPopulation, int iteratorBeginValue) {
+        testRealm.beginTransaction();
+        PrimaryKeyAsString userObj = new PrimaryKeyAsString();
+        userObj.setName(primaryFieldValue);
+        userObj.setId(secondaryFieldValue);
+        testRealm.copyToRealm(userObj);
+        int idValue = iteratorBeginValue;
+        for (int i = 0; i < numberOfPopulation - 1; ++i, ++idValue) {
+            PrimaryKeyAsString obj = new PrimaryKeyAsString();
+            obj.setName(String.valueOf(idValue));
+            obj.setId(idValue);
+            testRealm.copyToRealm(obj);
+        }
+        testRealm.commitTransaction();
+    }
+

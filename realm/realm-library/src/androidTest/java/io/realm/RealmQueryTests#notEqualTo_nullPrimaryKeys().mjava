@@ -1,0 +1,23 @@
+    @Test
+    public void notEqualTo_nullPrimaryKeys() {
+        final long SECONDARY_FIELD_NUMBER = 49992417L;
+        final String SECONDARY_FIELD_STRING = "Realm is a mobile database hundreds of millions of people rely on.";
+        // fill up a realm with one user PrimaryKey value and one numeric values, starting from -1
+        TestHelper.populateTestRealmWithStringPrimaryKey(realm,  (String) null,  SECONDARY_FIELD_NUMBER, 2, -1);
+        TestHelper.populateTestRealmWithBytePrimaryKey(realm,    (Byte) null,    SECONDARY_FIELD_STRING, 2, -1);
+        TestHelper.populateTestRealmWithShortPrimaryKey(realm,   (Short) null,   SECONDARY_FIELD_STRING, 2, -1);
+        TestHelper.populateTestRealmWithIntegerPrimaryKey(realm, (Integer) null, SECONDARY_FIELD_STRING, 2, -1);
+        TestHelper.populateTestRealmWithLongPrimaryKey(realm,    (Long) null,    SECONDARY_FIELD_STRING, 2, -1);
+
+        // String
+        assertEquals(SECONDARY_FIELD_NUMBER, realm.where(PrimaryKeyAsString.class).notEqualTo(PrimaryKeyAsString.FIELD_PRIMARY_KEY,             "-1").findAll().first().getId());
+        // Boxed Byte
+        assertEquals(SECONDARY_FIELD_STRING, realm.where(PrimaryKeyAsBoxedByte.class).notEqualTo(PrimaryKeyAsBoxedByte.FIELD_PRIMARY_KEY,       Byte.valueOf((byte)-1)).findAll().first().getName());
+        // Boxed Short
+        assertEquals(SECONDARY_FIELD_STRING, realm.where(PrimaryKeyAsBoxedShort.class).notEqualTo(PrimaryKeyAsBoxedShort.FIELD_PRIMARY_KEY,     Short.valueOf((short)-1)).findAll().first().getName());
+        // Boxed Integer
+        assertEquals(SECONDARY_FIELD_STRING, realm.where(PrimaryKeyAsBoxedInteger.class).notEqualTo(PrimaryKeyAsBoxedInteger.FIELD_PRIMARY_KEY, Integer.valueOf(-1)).findAll().first().getName());
+        // Boxed Long
+        assertEquals(SECONDARY_FIELD_STRING, realm.where(PrimaryKeyAsBoxedLong.class).notEqualTo(PrimaryKeyAsBoxedLong.FIELD_PRIMARY_KEY,       Long.valueOf((long)-1)).findAll().first().getName());
+    }
+

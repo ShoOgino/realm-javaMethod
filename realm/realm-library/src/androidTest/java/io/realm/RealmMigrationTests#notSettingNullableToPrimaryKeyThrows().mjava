@@ -1,0 +1,32 @@
+    // Not-setting older boxed type PrimaryKey field nullable to see if migration fails in order to support Realm version 0.89+
+    @Test
+    public void notSettingNullableToPrimaryKeyThrows() throws IOException {
+        configFactory.copyRealmFromAssets(context, "default-notnullable-primarykey.realm", Realm.DEFAULT_REALM_NAME);
+        final Class[] classes = {PrimaryKeyAsString.class, PrimaryKeyAsBoxedByte.class, PrimaryKeyAsBoxedShort.class, PrimaryKeyAsBoxedInteger.class, PrimaryKeyAsBoxedLong.class};
+        for (final Class clazz : classes) {
+            try {
+                RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+                        .schemaVersion(0)
+                        .schema(clazz)
+                        .migration(new RealmMigration() {
+                            @Override
+                            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                                // intentionally left empty to preserve not-nullablility of PrimaryKey on old schema.
+                            }
+                        })
+                        .build();
+                Realm realm = Realm.getInstance(realmConfig);
+                realm.close();
+                fail();
+            } catch (RealmMigrationNeededException expected) {
+                if (clazz == PrimaryKeyAsString.class) {
+                    assertEquals("@PrimaryKey field 'name' does not support null values in the existing Realm file. Migrate using RealmObjectSchema.setNullable(), or mark the field as @Required.",
+                            expected.getMessage());
+                } else {
+                    assertEquals("@PrimaryKey field 'id' does not support null values in the existing Realm file. Migrate using RealmObjectSchema.setNullable(), or mark the field as @Required.",
+                            expected.getMessage());
+                }
+            }
+        }
+    }
+

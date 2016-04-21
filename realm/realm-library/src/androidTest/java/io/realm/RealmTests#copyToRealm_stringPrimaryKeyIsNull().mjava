@@ -1,0 +1,11 @@
+    @Test
+    public void copyToRealm_stringPrimaryKeyIsNull() {
+        final long SECONDARY_FIELD_VALUE = 34992142L;
+        TestHelper.addStringPrimaryKeyObjectToTestRealm(realm, (String) null, SECONDARY_FIELD_VALUE);
+
+        RealmResults<PrimaryKeyAsString> results = realm.allObjects(PrimaryKeyAsString.class);
+        assertEquals(1, results.size());
+        assertEquals(null, results.first().getName());
+        assertEquals(SECONDARY_FIELD_VALUE, results.first().getId());
+    }
+

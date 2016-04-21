@@ -1,0 +1,18 @@
+    @Test
+    public void greaterThanOrEqualTo_nullPrimaryKeysIsNotZero() {
+        // fill up a realm with one user PrimaryKey value and 9 numeric values, starting from -5
+        TestHelper.populateTestRealmWithBytePrimaryKey(realm,    (Byte) null,    (String) null, 10, -5);
+        TestHelper.populateTestRealmWithShortPrimaryKey(realm,   (Short) null,   (String) null, 10, -5);
+        TestHelper.populateTestRealmWithIntegerPrimaryKey(realm, (Integer) null, (String) null, 10, -5);
+        TestHelper.populateTestRealmWithLongPrimaryKey(realm,    (Long) null,    (String) null, 10, -5);
+
+        // Boxed Byte
+        assertEquals(5, realm.where(PrimaryKeyAsBoxedByte.class).greaterThanOrEqualTo(PrimaryKeyAsBoxedByte.FIELD_PRIMARY_KEY,       -1).count());
+        // Boxed Short
+        assertEquals(5, realm.where(PrimaryKeyAsBoxedShort.class).greaterThanOrEqualTo(PrimaryKeyAsBoxedShort.FIELD_PRIMARY_KEY,     -1).count());
+        // Boxed Integer
+        assertEquals(5, realm.where(PrimaryKeyAsBoxedInteger.class).greaterThanOrEqualTo(PrimaryKeyAsBoxedInteger.FIELD_PRIMARY_KEY, -1).count());
+        // Boxed Long
+        assertEquals(5, realm.where(PrimaryKeyAsBoxedLong.class).greaterThanOrEqualTo(PrimaryKeyAsBoxedLong.FIELD_PRIMARY_KEY,       -1).count());
+    }
+
