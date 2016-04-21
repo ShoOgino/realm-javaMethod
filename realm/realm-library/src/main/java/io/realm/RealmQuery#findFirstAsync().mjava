@@ -31,9 +31,10 @@
             result = realm.getConfiguration().getSchemaMediator().newInstance(clazz, realm.getSchema().getColumnInfo(clazz));
         }
 
-        final WeakReference<RealmObject> realmObjectWeakReference = realm.handlerController.addToAsyncRealmObject(result, this);
-        result.realm = realm;
-        result.row = Row.EMPTY_ROW;
+        RealmObjectProxy proxy = (RealmObjectProxy) result;
+        final WeakReference<RealmObjectProxy> realmObjectWeakReference = realm.handlerController.addToAsyncRealmObject(proxy, this);
+        proxy.realmGet$proxyState().setRealm$realm(realm);
+        proxy.realmGet$proxyState().setRow$realm(Row.EMPTY_ROW);
 
         final Future<Long> pendingQuery = Realm.asyncQueryExecutor.submit(new Callable<Long>() {
             @Override
@@ -80,7 +81,7 @@
                 return INVALID_NATIVE_POINTER;
             }
         });
-        result.setPendingQuery(pendingQuery);
+        proxy.realmGet$proxyState().setPendingQuery$realm(pendingQuery);
 
         return result;
     }

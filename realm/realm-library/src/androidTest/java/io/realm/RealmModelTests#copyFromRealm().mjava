@@ -1,0 +1,17 @@
+    @Test
+    public void copyFromRealm() {
+        populateTestRealm(realm, TEST_DATA_SIZE);
+
+        AllTypesRealmModel realmObject = realm.where(AllTypesRealmModel.class).findAllSorted(AllTypesRealmModel.FIELD_LONG).first();
+        AllTypesRealmModel standaloneObject = realm.copyFromRealm(realmObject);
+        assertArrayEquals(realmObject.columnBinary, standaloneObject.columnBinary);
+        assertEquals(realmObject.columnString, standaloneObject.columnString);
+        assertEquals(realmObject.columnLong, standaloneObject.columnLong);
+        assertEquals(realmObject.columnFloat, standaloneObject.columnFloat, 0.00000000001);
+        assertEquals(realmObject.columnDouble, standaloneObject.columnDouble, 0.00000000001);
+        assertEquals(realmObject.columnBoolean, standaloneObject.columnBoolean);
+        assertEquals(realmObject.columnDate, standaloneObject.columnDate);
+        assertEquals(realmObject.hashCode(), standaloneObject.hashCode());
+
+    }
+

@@ -1,0 +1,18 @@
+    private void populateTestRealm(Realm realm, int objects) {
+        realm.beginTransaction();
+        realm.delete(AllTypesRealmModel.class);
+        for (int i = 0; i < objects; ++i) {
+            AllTypesRealmModel allTypes = new AllTypesRealmModel();
+            allTypes.columnLong = i;
+            allTypes.columnBoolean = (i % 3) == 0;
+            allTypes.columnBinary = new byte[]{1, 2, 3};
+            allTypes.columnDate = new Date();
+            allTypes.columnDouble = 3.1415 + i;
+            allTypes.columnFloat = 1.234567f;
+            allTypes.columnString = "test data ";
+            allTypes.columnByte = 0b0010_1010;
+            realm.copyToRealm(allTypes);
+        }
+        realm.commitTransaction();
+    }
+

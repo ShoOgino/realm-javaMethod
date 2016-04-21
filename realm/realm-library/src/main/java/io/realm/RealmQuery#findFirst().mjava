@@ -10,8 +10,7 @@
         if (sourceRowIndex >= 0) {
             E realmObject = realm.get(clazz, className, sourceRowIndex);
             if (realm.handlerController != null) { // non Looper Thread doesn't have a handlerController
-                WeakReference<RealmObject> realmObjectWeakReference
-                        = new WeakReference<RealmObject>(realmObject, realm.handlerController.referenceQueueRealmObject);
+                WeakReference<RealmObjectProxy> realmObjectWeakReference = new WeakReference<RealmObjectProxy>((RealmObjectProxy) realmObject, realm.handlerController.referenceQueueRealmObject);
                 realm.handlerController.realmObjects.put(realmObjectWeakReference, this);
             }
             return realmObject;

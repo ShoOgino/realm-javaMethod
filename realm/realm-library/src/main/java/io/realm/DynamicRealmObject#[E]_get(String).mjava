@@ -7,16 +7,16 @@
      */
     @SuppressWarnings("unchecked")
     public <E> E get(String fieldName) {
-        long columnIndex = row.getColumnIndex(fieldName);
-        RealmFieldType type = row.getColumnType(columnIndex);
+        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        RealmFieldType type = proxyState.getRow$realm().getColumnType(columnIndex);
         switch (type) {
-            case BOOLEAN: return (E) Boolean.valueOf(row.getBoolean(columnIndex));
-            case INTEGER: return (E) Long.valueOf(row.getLong(columnIndex));
-            case FLOAT: return (E) Float.valueOf(row.getFloat(columnIndex));
-            case DOUBLE: return (E) Double.valueOf(row.getDouble(columnIndex));
-            case STRING: return (E) row.getString(columnIndex);
-            case BINARY: return (E) row.getBinaryByteArray(columnIndex);
-            case DATE: return (E) row.getDate(columnIndex);
+            case BOOLEAN: return (E) Boolean.valueOf(proxyState.getRow$realm().getBoolean(columnIndex));
+            case INTEGER: return (E) Long.valueOf(proxyState.getRow$realm().getLong(columnIndex));
+            case FLOAT: return (E) Float.valueOf(proxyState.getRow$realm().getFloat(columnIndex));
+            case DOUBLE: return (E) Double.valueOf(proxyState.getRow$realm().getDouble(columnIndex));
+            case STRING: return (E) proxyState.getRow$realm().getString(columnIndex);
+            case BINARY: return (E) proxyState.getRow$realm().getBinaryByteArray(columnIndex);
+            case DATE: return (E) proxyState.getRow$realm().getDate(columnIndex);
             case OBJECT: return (E) getObject(fieldName);
             case LIST: return (E) getList(fieldName);
             case UNSUPPORTED_TABLE:

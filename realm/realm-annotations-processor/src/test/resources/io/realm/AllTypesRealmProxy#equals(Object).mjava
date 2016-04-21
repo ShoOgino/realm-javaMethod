@@ -4,15 +4,15 @@
         if (o == null || getClass() != o.getClass()) return false;
         AllTypesRealmProxy aAllTypes = (AllTypesRealmProxy)o;
 
-        String path = ((RealmObject) this).realm.getPath();
-        String otherPath = ((RealmObject) aAllTypes).realm.getPath();
+        String path = proxyState.getRealm$realm().getPath();
+        String otherPath = aAllTypes.proxyState.getRealm$realm().getPath();
         if (path != null ? !path.equals(otherPath) : otherPath != null) return false;;
 
-        String tableName = ((RealmObject) this).row.getTable().getName();
-        String otherTableName = ((RealmObject) aAllTypes).row.getTable().getName();
+        String tableName = proxyState.getRow$realm().getTable().getName();
+        String otherTableName = aAllTypes.proxyState.getRow$realm().getTable().getName();
         if (tableName != null ? !tableName.equals(otherTableName) : otherTableName != null) return false;
 
-        if (((RealmObject) this).row.getIndex() != ((RealmObject) aAllTypes).row.getIndex()) return false;
+        if (proxyState.getRow$realm().getIndex() != aAllTypes.proxyState.getRow$realm().getIndex()) return false;
 
         return true;
     }

@@ -1,10 +1,10 @@
     private void completedAsyncRealmObject(QueryUpdateTask.Result result) {
-        Set<WeakReference<RealmObject>> updatedRowKey = result.updatedRow.keySet();
+        Set<WeakReference<RealmObjectProxy>> updatedRowKey = result.updatedRow.keySet();
         if (updatedRowKey.size() > 0) {
-            WeakReference<RealmObject> realmObjectWeakReference = updatedRowKey.iterator().next();
-            RealmObject realmObject = realmObjectWeakReference.get();
+            WeakReference<RealmObjectProxy> realmObjectWeakReference = updatedRowKey.iterator().next();
+            RealmObjectProxy proxy = realmObjectWeakReference.get();
 
-            if (realmObject != null) {
+            if (proxy != null) {
                 SharedGroup.VersionID callerVersionID = realm.sharedGroupManager.getVersion();
                 int compare = callerVersionID.compareTo(result.versionID);
                 // we always query on the same version
@@ -16,19 +16,19 @@
                         emptyAsyncRealmObject.remove(realmObjectWeakReference);
                         realmObjects.put(realmObjectWeakReference, null);
                     }
-                    realmObject.onCompleted(rowPointer);
-                    realmObject.notifyChangeListeners();
+                    proxy.realmGet$proxyState().onCompleted$realm(rowPointer);
+                    proxy.realmGet$proxyState().notifyChangeListeners$realm();
 
                 } else if (compare > 0) {
                     // the caller has advanced we need to
                     // retry against the current version of the caller if it's still empty
-                    if (realmObject.isValid()) { // already completed & has a valid pointer no need to re-run
-                        RealmLog.d("[COMPLETED_ASYNC_REALM_OBJECT "+ realmObject + "] , realm:" + HandlerController.this
+                    if (RealmObject.isValid(proxy)) { // already completed & has a valid pointer no need to re-run
+                        RealmLog.d("[COMPLETED_ASYNC_REALM_OBJECT "+ proxy + "] , realm:" + HandlerController.this
                                 + " RealmObject is already loaded, just notify it.");
-                        realmObject.notifyChangeListeners();
+                        proxy.realmGet$proxyState().notifyChangeListeners$realm();
 
                     } else {
-                        RealmLog.d("[COMPLETED_ASYNC_REALM_OBJECT "+ realmObject + "] , realm:" + HandlerController.this
+                        RealmLog.d("[COMPLETED_ASYNC_REALM_OBJECT "+ proxy + "] , realm:" + HandlerController.this
                                 + " RealmObject is not loaded yet. Rerun the query.");
                         RealmQuery<?> realmQuery = realmObjects.get(realmObjectWeakReference);
                         if (realmQuery == null) { // this is a retry of an empty RealmObject

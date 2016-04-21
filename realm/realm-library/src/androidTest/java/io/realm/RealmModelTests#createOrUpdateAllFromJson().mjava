@@ -1,0 +1,19 @@
+    @Test
+    public void createOrUpdateAllFromJson() throws IOException {
+        realm.beginTransaction();
+        realm.createOrUpdateAllFromJson(AllTypesRealmModel.class, TestHelper.loadJsonFromAssets(context, "list_alltypes_primarykey.json"));
+        realm.commitTransaction();
+
+        assertEquals(1, realm.allObjects(AllTypesRealmModel.class).size());
+        AllTypesRealmModel obj = realm.allObjects(AllTypesRealmModel.class).first();
+        assertEquals("Bar", obj.columnString);
+        assertEquals(2.23F, obj.columnFloat, 0.000000001);
+        assertEquals(2.234D, obj.columnDouble, 0.000000001);
+        assertEquals(true, obj.columnBoolean);
+        assertArrayEquals(new byte[]{1, 2, 3}, obj.columnBinary);
+        assertEquals(new Date(2000), obj.columnDate);
+        assertEquals("Dog4", obj.columnRealmObject.getName());
+        assertEquals(2, obj.columnRealmList.size());
+        assertEquals("Dog5", obj.columnRealmList.get(0).getName());
+    }
+

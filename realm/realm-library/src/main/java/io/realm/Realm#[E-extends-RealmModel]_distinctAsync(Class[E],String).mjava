@@ -1,0 +1,18 @@
+    /**
+     * Returns a distinct set of objects of a specific class. As a Realm is unordered, it is undefined which objects are
+     * returned in case of multiple occurrences.
+     * This method is only available from a Looper thread.
+     *
+     * @param clazz the Class to get objects of.
+     * @param fieldName the field name.
+     * @return immediately an empty {@link RealmResults}. Users need to register a listener
+     *         {@link io.realm.RealmResults#addChangeListener(RealmChangeListener)} to be notified when the
+     *         query completes.
+     * @throws IllegalArgumentException if a field is null, does not exist, is an unsupported type,
+     *         is not indexed, or points to linked fields.
+     */
+    public <E extends RealmModel> RealmResults<E> distinctAsync(Class<E> clazz, String fieldName) {
+        checkIfValid();
+        return where(clazz).distinctAsync(fieldName);
+    }
+

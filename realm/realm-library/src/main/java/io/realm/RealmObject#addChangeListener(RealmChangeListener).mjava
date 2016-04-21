@@ -2,21 +2,9 @@
      * Adds a change listener to this RealmObject.
      *
      * @param listener the change listener to be notified.
+     * @throws IllegalArgumentException if object is an un-managed RealmObject.
      */
     public final void addChangeListener(RealmChangeListener listener) {
-        if (listener == null) {
-            throw new IllegalArgumentException("Listener should not be null");
-        }
-        if (realm != null) {
-            realm.checkIfValid();
-        } else {
-            throw new IllegalArgumentException("Cannot add listener from this unmanaged RealmObject (created outside of Realm)");
-        }
-        if (realm.handler == null) {
-            throw new IllegalStateException("You can't register a listener from a non-Looper thread ");
-        }
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
+        RealmObject.addChangeListener(this, listener);
     }
 

@@ -1,0 +1,11 @@
+    @Override
+    public ColumnInfo validateTable(Class<? extends RealmModel> clazz, ImplicitTransaction transaction) {
+        checkClass(clazz);
+
+        if (clazz.equals(AllTypes.class)) {
+            return AllTypesRealmProxy.validateTable(transaction);
+        } else {
+            throw getMissingProxyClassException(clazz);
+        }
+    }
+

@@ -25,20 +25,6 @@
      * @see <a href="https://realm.io/docs/java/latest/#rxjava">RxJava and Realm</a>
      */
     public <E extends RealmObject> Observable<E> asObservable() {
-        if (realm instanceof Realm) {
-            @SuppressWarnings("unchecked")
-            E obj = (E) this;
-            return realm.configuration.getRxFactory().from((Realm) realm, obj);
-        } else if (realm instanceof DynamicRealm) {
-            DynamicRealm dynamicRealm = (DynamicRealm) realm;
-            DynamicRealmObject dynamicObject = (DynamicRealmObject) this;
-            @SuppressWarnings("unchecked")
-            Observable<E> observable = (Observable<E>) realm.configuration.getRxFactory().from(dynamicRealm,
-                    dynamicObject);
-            return observable;
-        } else {
-            throw new UnsupportedOperationException(realm.getClass() + " does not support RxJava." +
-                    " See https://realm.io/docs/java/latest/#rxjava for more details.");
-        }
+        return (Observable<E>) RealmObject.asObservable(this);
     }
 

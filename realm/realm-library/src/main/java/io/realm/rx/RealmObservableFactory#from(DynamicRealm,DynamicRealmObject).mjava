@@ -17,11 +17,11 @@
                         }
                     }
                 };
-                object.addChangeListener(listener);
+                RealmObject.addChangeListener(object, listener);
                 subscriber.add(Subscriptions.create(new Action0() {
                     @Override
                     public void call() {
-                        object.removeChangeListener(listener);
+                        RealmObject.removeChangeListener(object, listener);
                         observableRealm.close();
                         objectRefs.get().releaseReference(object);
                     }

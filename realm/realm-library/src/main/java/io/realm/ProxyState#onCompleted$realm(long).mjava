@@ -1,0 +1,14 @@
+    public void onCompleted$realm(long handoverRowPointer) {
+        if (handoverRowPointer == 0) {
+            // we'll retry later to update the row pointer, but we consider
+            // the query done
+            isCompleted = true;
+
+        } else if (!isCompleted || row == Row.EMPTY_ROW) {
+            isCompleted = true;
+            long nativeRowPointer = TableQuery.nativeImportHandoverRowIntoSharedGroup(handoverRowPointer, realm.sharedGroupManager.getNativePointer());
+            Table table = getTable();
+            this.row = table.getUncheckedRowByPointer(nativeRowPointer);
+        }// else: already loaded query no need to import again the pointer
+    }
+

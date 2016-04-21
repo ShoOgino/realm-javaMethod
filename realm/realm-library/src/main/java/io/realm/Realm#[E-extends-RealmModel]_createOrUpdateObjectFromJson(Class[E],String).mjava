@@ -1,0 +1,31 @@
+    /**
+     * Tries to update an existing object defined by its primary key with new JSON data. If no existing object could be
+     * found a new object will be saved in the Realm. This must happen within a transaction. If updating a
+     * {@link RealmObject} and a field is not found in the JSON object, that field will not be updated. If a new
+     * {@link RealmObject} is created and a field is not found in the JSON object, that field will be assigned the
+     * default value for the field type.
+     *
+     * @param clazz type of {@link io.realm.RealmObject} to create or update. It must have a primary key defined.
+     * @param json string with object data in JSON format.
+     * @return created or updated {@link io.realm.RealmObject}.
+     * @throws java.lang.IllegalArgumentException if trying to update a class without a
+     *         {@link io.realm.annotations.PrimaryKey}.
+     * @throws RealmException if JSON object cannot be mapped from the string parameter.
+     * @see #createObjectFromJson(Class, String)
+     */
+    public <E extends RealmModel> E createOrUpdateObjectFromJson(Class<E> clazz, String json) {
+        if (clazz == null || json == null || json.length() == 0) {
+            return null;
+        }
+        checkHasPrimaryKey(clazz);
+
+        JSONObject obj;
+        try {
+            obj = new JSONObject(json);
+        } catch (Exception e) {
+            throw new RealmException("Could not create Json object from string", e);
+        }
+
+        return createOrUpdateObjectFromJson(clazz, obj);
+    }
+

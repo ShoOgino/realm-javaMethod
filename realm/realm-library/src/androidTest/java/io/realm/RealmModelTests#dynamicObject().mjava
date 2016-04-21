@@ -1,0 +1,18 @@
+    @Test
+    public void dynamicObject() {
+        populateTestRealm(realm, TEST_DATA_SIZE);
+
+        AllTypesRealmModel typedObj = realm.allObjects(AllTypesRealmModel.class).first();
+        DynamicRealmObject dObj = new DynamicRealmObject(typedObj);
+
+        realm.beginTransaction();
+        dObj.setLong(AllTypesRealmModel.FIELD_LONG, 42L);
+        assertEquals(42, dObj.getLong(AllTypesRealmModel.FIELD_LONG));
+        assertEquals(42, typedObj.columnLong);
+
+        dObj.setBlob(AllTypesRealmModel.FIELD_BINARY, new byte[]{1, 2, 3});
+        Assert.assertArrayEquals(new byte[]{1, 2, 3}, dObj.getBlob(AllTypesRealmModel.FIELD_BINARY));
+        Assert.assertArrayEquals(new byte[]{1, 2, 3}, typedObj.columnBinary);
+        realm.cancelTransaction();
+    }
+

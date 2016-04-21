@@ -6,13 +6,13 @@
      * @throws IllegalArgumentException if field name doesn't exists or it doesn't contain links to other objects.
      */
     public DynamicRealmObject getObject(String fieldName) {
-        long columnIndex = row.getColumnIndex(fieldName);
-        if (row.isNullLink(columnIndex)) {
+        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        if (proxyState.getRow$realm().isNullLink(columnIndex)) {
             return null;
         } else {
-            long linkRowIndex = row.getLink(columnIndex);
-            CheckedRow linkRow = row.getTable().getLinkTarget(columnIndex).getCheckedRow(linkRowIndex);
-            return new DynamicRealmObject(realm, linkRow);
+            long linkRowIndex = proxyState.getRow$realm().getLink(columnIndex);
+            CheckedRow linkRow = proxyState.getRow$realm().getTable().getLinkTarget(columnIndex).getCheckedRow(linkRowIndex);
+            return new DynamicRealmObject(proxyState.getRealm$realm(), linkRow);
         }
     }
 

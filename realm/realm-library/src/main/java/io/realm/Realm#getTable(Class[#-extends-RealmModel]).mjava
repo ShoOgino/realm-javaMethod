@@ -1,0 +1,10 @@
+    Table getTable(Class<? extends RealmModel> clazz) {
+        Table table = classToTable.get(clazz);
+        if (table == null) {
+            clazz = Util.getOriginalModelClass(clazz);
+            table = sharedGroupManager.getTable(configuration.getSchemaMediator().getTableName(clazz));
+            classToTable.put(clazz, table);
+        }
+        return table;
+    }
+

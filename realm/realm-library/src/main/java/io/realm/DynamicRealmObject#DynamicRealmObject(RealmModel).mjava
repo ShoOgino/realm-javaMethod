@@ -1,0 +1,25 @@
+    /**
+     * Creates a dynamic Realm object based on an existing object.
+     *
+     * @param obj the Realm object to convert to a dynamic object. Only objects managed by {@link Realm} can be used.
+     * @throws IllegalArgumentException if object isn't managed by Realm or is a {@link DynamicRealmObject} already.
+     */
+    public DynamicRealmObject(RealmModel obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException("A non-null object must be provided.");
+        }
+        if (obj instanceof DynamicRealmObject) {
+            throw new IllegalArgumentException("The object is already a DynamicRealmObject: " + obj);
+        }
+
+        if (!RealmObject.isValid(obj)) {
+            throw new IllegalArgumentException("An object managed by Realm must be provided. This " +
+                    "is a standalone object or it was deleted.");
+        }
+
+        RealmObjectProxy proxy = (RealmObjectProxy) obj;
+        Row row = proxy.realmGet$proxyState().getRow$realm();
+        proxyState.setRealm$realm(proxy.realmGet$proxyState().getRealm$realm());
+        proxyState.setRow$realm(((UncheckedRow) row).convertToChecked());
+    }
+

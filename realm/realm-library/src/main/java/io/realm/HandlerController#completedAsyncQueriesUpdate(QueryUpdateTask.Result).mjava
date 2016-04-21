@@ -29,11 +29,11 @@
                 }
             }
 
-            ArrayList<RealmResults<? extends RealmObject>> callbacksToNotify = new ArrayList<RealmResults<? extends RealmObject>>(result.updatedTableViews.size());
+            ArrayList<RealmResults<? extends RealmModel>> callbacksToNotify = new ArrayList<RealmResults<? extends RealmModel>>(result.updatedTableViews.size());
             // use updated TableViews pointers for the existing async RealmResults
-            for (Map.Entry<WeakReference<RealmResults<? extends RealmObject>>, Long> query : result.updatedTableViews.entrySet()) {
-                WeakReference<RealmResults<? extends RealmObject>> weakRealmResults = query.getKey();
-                RealmResults<? extends RealmObject> realmResults = weakRealmResults.get();
+            for (Map.Entry<WeakReference<RealmResults<? extends RealmModel>>, Long> query : result.updatedTableViews.entrySet()) {
+                WeakReference<RealmResults<? extends RealmModel>> weakRealmResults = query.getKey();
+                RealmResults<? extends RealmModel> realmResults = weakRealmResults.get();
                 if (realmResults == null) {
                     // don't update GC'd instance
                     asyncRealmResults.remove(weakRealmResults);
@@ -51,7 +51,7 @@
                 }
             }
 
-            for (RealmResults<? extends RealmObject> query : callbacksToNotify) {
+            for (RealmResults<? extends RealmModel> query : callbacksToNotify) {
                 query.notifyChangeListeners();
             }
 

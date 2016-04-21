@@ -3,11 +3,11 @@
      * <ol>
      * <li><b>Un-managed RealmLists:</b> It is possible to add both managed and un-managed objects. If adding managed
      * objects to a un-managed RealmList they will not be copied to the Realm again if using
-     * {@link Realm#copyToRealm(RealmObject)} afterwards.</li>
+     * {@link Realm#copyToRealm(RealmModel)} afterwards.</li>
      *
      * <li><b>Managed RealmLists:</b> It is possible to add un-managed objects to a RealmList that is already managed. In
-     * that case the object will transparently be copied to Realm using {@link Realm#copyToRealm(RealmObject)}
-     * or {@link Realm#copyToRealmOrUpdate(RealmObject)} if it has a primary key.</li>
+     * that case the object will transparently be copied to Realm using {@link Realm#copyToRealm(RealmModel)}
+     * or {@link Realm#copyToRealmOrUpdate(RealmModel)} if it has a primary key.</li>
      * </ol>
      *
      * @param object the object to add.
@@ -19,8 +19,8 @@
         checkValidObject(object);
         if (managedMode) {
             checkValidView();
-            object = copyToRealmIfNeeded(object);
-            view.add(object.row.getIndex());
+            RealmObjectProxy proxy = (RealmObjectProxy) copyToRealmIfNeeded(object);
+            view.add(proxy.realmGet$proxyState().getRow$realm().getIndex());
         } else {
             nonManagedList.add(object);
         }

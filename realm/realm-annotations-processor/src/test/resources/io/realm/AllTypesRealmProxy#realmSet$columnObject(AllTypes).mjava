@@ -1,15 +1,15 @@
     public void realmSet$columnObject(AllTypes value) {
-        ((RealmObject) this).realm.checkIfValid();
+        proxyState.getRealm$realm().checkIfValid();
         if (value == null) {
-            ((RealmObject) this).row.nullifyLink(columnInfo.columnObjectIndex);
+            proxyState.getRow$realm().nullifyLink(columnInfo.columnObjectIndex);
             return;
         }
         if (!value.isValid()) {
             throw new IllegalArgumentException("'value' is not a valid managed object.");
         }
-        if (value.realm != this.realm) {
+        if (((RealmObjectProxy)value).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm()) {
             throw new IllegalArgumentException("'value' belongs to a different Realm.");
         }
-        ((RealmObject) this).row.setLink(columnInfo.columnObjectIndex, ((RealmObject) value).row.getIndex());
+        proxyState.getRow$realm().setLink(columnInfo.columnObjectIndex, ((RealmObjectProxy)value).realmGet$proxyState().getRow$realm().getIndex());
     }
 

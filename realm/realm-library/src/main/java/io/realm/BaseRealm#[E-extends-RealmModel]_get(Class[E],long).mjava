@@ -1,0 +1,15 @@
+    <E extends RealmModel> E get(Class<E> clazz, long rowIndex) {
+        Table table = schema.getTable(clazz);
+        UncheckedRow row = table.getUncheckedRow(rowIndex);
+        E result = configuration.getSchemaMediator().newInstance(clazz, schema.getColumnInfo(clazz));
+        RealmObjectProxy proxy = (RealmObjectProxy) result;
+        proxy.realmGet$proxyState().setRow$realm(row);
+        proxy.realmGet$proxyState().setRealm$realm(this);
+        proxy.realmGet$proxyState().setTableVersion$realm();
+
+        if (handlerController != null) {
+            handlerController.addToRealmObjects(result);
+        }
+        return result;
+    }
+

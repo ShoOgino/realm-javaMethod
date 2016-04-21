@@ -1,0 +1,21 @@
+    /**
+     * Gets all objects of a specific Class sorted by multiple fields. If no objects exist, the returned
+     * {@link RealmResults} will not be null. The RealmResults.size() to check the number of objects instead.
+     *
+     * @param clazz the Class to get objects of.
+     * @param sortOrders sort ascending if Sort.ASCENDING, sort descending if Sort.DESCENDING.
+     * @param fieldNames an array of field names to sort objects by. The objects are first sorted by fieldNames[0], then
+     *                   by fieldNames[1] and so forth.
+     * @return a sorted RealmResults containing the objects.
+     * @throws java.lang.IllegalArgumentException if a field name does not exist.
+     */
+    @SuppressWarnings("unchecked")
+    public <E extends RealmModel> RealmResults<E> allObjectsSorted(Class<E> clazz, String fieldNames[],
+                                                                    Sort sortOrders[]) {
+        checkAllObjectsSortedParameters(fieldNames, sortOrders);
+        Table table = this.getTable(clazz);
+
+        TableView tableView = doMultiFieldSort(fieldNames, sortOrders, table);
+        return RealmResults.createFromTableOrView(this, tableView, clazz);
+    }
+

@@ -1,7 +1,7 @@
     private void emitFields(JavaWriter writer) throws IOException {
-        writer.emitField("Set<Class<? extends RealmObject>>", "MODEL_CLASSES", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL));
+        writer.emitField("Set<Class<? extends RealmModel>>", "MODEL_CLASSES", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL));
         writer.beginInitializer(true);
-        writer.emitStatement("Set<Class<? extends RealmObject>> modelClasses = new HashSet<Class<? extends RealmObject>>()");
+        writer.emitStatement("Set<Class<? extends RealmModel>> modelClasses = new HashSet<Class<? extends RealmModel>>()");
         for (String clazz : simpleModelClasses) {
             writer.emitStatement("modelClasses.add(%s.class)", clazz);
         }

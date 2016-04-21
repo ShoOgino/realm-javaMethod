@@ -1,0 +1,14 @@
+    /**
+     * Instantiates and adds a new object to the Realm.
+     *
+     * @param clazz the Class of the object to create
+     * @return the new object
+     * @throws RealmException if an object could not be created
+     */
+    public <E extends RealmModel> E createObject(Class<E> clazz) {
+        checkIfValid();
+        Table table = getTable(clazz);
+        long rowIndex = table.addEmptyRow();
+        return get(clazz, rowIndex);
+    }
+

@@ -1,0 +1,11 @@
+    RealmObjectSchema getSchemaForClass(Class<? extends RealmModel> clazz) {
+        RealmObjectSchema classSchema = classToSchema.get(clazz);
+        if (classSchema == null) {
+            clazz = Util.getOriginalModelClass(clazz);
+            Table table = transaction.getTable(realm.configuration.getSchemaMediator().getTableName(clazz));
+            classSchema = new RealmObjectSchema(realm, table, columnIndices.getColumnInfo(clazz).getIndicesMap());
+            classToSchema.put(clazz, classSchema);
+        }
+        return classSchema;
+    }
+

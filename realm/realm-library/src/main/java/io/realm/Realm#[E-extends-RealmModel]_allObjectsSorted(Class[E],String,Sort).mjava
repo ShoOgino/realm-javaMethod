@@ -1,0 +1,23 @@
+    /**
+     * Get all objects of a specific Class sorted by a field. If no objects exist, the returned {@link RealmResults}
+     * will not be {@code null}. The RealmResults.size() to check the number of objects instead.
+     *
+     * @param clazz the Class to get objects of.
+     * @param fieldName the field name to sort by.
+     * @param sortOrder how to sort the results.
+     * @return a sorted RealmResults containing the objects.
+     * @throws java.lang.IllegalArgumentException if field name does not exist.
+     */
+    public <E extends RealmModel> RealmResults<E> allObjectsSorted(Class<E> clazz, String fieldName,
+                                                                    Sort sortOrder) {
+        checkIfValid();
+        Table table = getTable(clazz);
+        long columnIndex = schema.columnIndices.getColumnIndex(clazz, fieldName);
+        if (columnIndex < 0) {
+            throw new IllegalArgumentException(String.format("Field name '%s' does not exist.", fieldName));
+        }
+
+        TableView tableView = table.getSortedView(columnIndex, sortOrder);
+        return RealmResults.createFromTableOrView(this, tableView, clazz);
+    }
+

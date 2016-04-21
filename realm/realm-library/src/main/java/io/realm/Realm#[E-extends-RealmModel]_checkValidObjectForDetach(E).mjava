@@ -1,0 +1,12 @@
+    private <E extends RealmModel> void checkValidObjectForDetach(E realmObject) {
+        if (realmObject == null) {
+            throw new IllegalArgumentException("Null objects cannot be copied from Realm.");
+        }
+        if (!RealmObject.isValid(realmObject)) {
+            throw new IllegalArgumentException("RealmObject is not valid, so it cannot be copied.");
+        }
+        if (realmObject instanceof DynamicRealmObject) {
+            throw new IllegalArgumentException("DynamicRealmObject cannot be copied from Realm.");
+        }
+    }
+

@@ -1,18 +1,18 @@
     public void realmSet$columnRealmList(RealmList<AllTypes> value) {
-        ((RealmObject) this).realm.checkIfValid();
-        LinkView links = ((RealmObject) this).row.getLinkList(columnInfo.columnRealmListIndex);
+        proxyState.getRealm$realm().checkIfValid();
+        LinkView links = proxyState.getRow$realm().getLinkList(columnInfo.columnRealmListIndex);
         links.clear();
         if (value == null) {
             return;
         }
-        for (RealmObject linkedObject : (RealmList<? extends RealmObject>) value) {
-            if (!linkedObject.isValid()) {
+        for (RealmModel linkedObject : (RealmList<? extends RealmModel>) value) {
+            if (!RealmObject.isValid(linkedObject)) {
                 throw new IllegalArgumentException("Each element of 'value' must be a valid managed object.");
             }
-            if (linkedObject.realm != this.realm) {
+            if (((RealmObjectProxy)linkedObject).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm()) {
                 throw new IllegalArgumentException("Each element of 'value' must belong to the same Realm.");
             }
-            links.add(((RealmObject) linkedObject).row.getIndex());
+            links.add(((RealmObjectProxy)linkedObject).realmGet$proxyState().getRow$realm().getIndex());
         }
     }
 

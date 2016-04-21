@@ -1,0 +1,16 @@
+    /**
+     * Creates a new object inside the Realm with the Primary key value initially set.
+     * If the value violates the primary key constraint, no object will be added and a {@link RealmException} will be
+     * thrown.
+     *
+     * @param clazz the Class of the object to create.
+     * @param primaryKeyValue value for the primary key field.
+     * @return the new object.
+     * @throws RealmException if object could not be created.
+     */
+    <E extends RealmModel> E createObject(Class<E> clazz, Object primaryKeyValue) {
+        Table table = getTable(clazz);
+        long rowIndex = table.addEmptyRowWithPrimaryKey(primaryKeyValue);
+        return get(clazz, rowIndex);
+    }
+

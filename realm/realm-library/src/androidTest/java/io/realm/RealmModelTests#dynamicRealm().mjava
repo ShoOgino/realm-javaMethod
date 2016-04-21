@@ -1,0 +1,30 @@
+    @Test
+    @RunTestInLooperThread
+    public void dynamicRealm() {
+        populateTestRealm(looperThread.realm, TEST_DATA_SIZE);
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.realmConfiguration);
+
+        dynamicRealm.beginTransaction();
+        DynamicRealmObject dog = dynamicRealm.createObject(AllTypesRealmModel.CLASS_NAME, 42);
+        assertEquals(42, dog.getLong(AllTypesRealmModel.FIELD_LONG));
+        dynamicRealm.commitTransaction();
+
+        RealmResults<DynamicRealmObject> allAsync = dynamicRealm.where(AllTypesRealmModel.CLASS_NAME).equalTo(AllTypesRealmModel.FIELD_LONG, 42).findAll();
+        allAsync.load();
+        assertTrue(allAsync.isLoaded());
+        assertEquals(1, allAsync.size());
+
+        dynamicRealm.beginTransaction();
+        allAsync.deleteAllFromRealm();
+        dynamicRealm.commitTransaction();
+
+        RealmResults<DynamicRealmObject> results = dynamicRealm.where(AllTypesRealmModel.CLASS_NAME).findAll();
+        assertEquals(TEST_DATA_SIZE, results.size());
+        for (int i = 0; i < TEST_DATA_SIZE; i++) {
+            assertEquals(3.1415 + i, results.get(i).getDouble(AllTypesRealmModel.FIELD_DOUBLE), 0.0000001);
+            assertEquals((i % 3) == 0, results.get(i).getBoolean(AllTypesRealmModel.FIELD_BOOLEAN));
+        }
+        dynamicRealm.close();
+        looperThread.testComplete();
+    }
+

@@ -1,0 +1,24 @@
+    /**
+     * Creates a Realm object for each object in a JSON array. This must be done within a transaction.
+     * JSON properties with a null value will map to the default value for the data type in Realm and unknown properties
+     * will be ignored. If a {@link RealmObject} field is not present in the JSON object the RealmObject
+     * field will be set to the default value for that type.
+     *
+     * @param clazz type of Realm objects to create.
+     * @param json an array where each JSONObject must map to the specified class.
+     * @throws RealmException if mapping from JSON fails.
+     */
+    public <E extends RealmModel> void createAllFromJson(Class<E> clazz, JSONArray json) {
+        if (clazz == null || json == null) {
+            return;
+        }
+
+        for (int i = 0; i < json.length(); i++) {
+            try {
+                configuration.getSchemaMediator().createOrUpdateUsingJsonObject(clazz, this, json.getJSONObject(i), false);
+            } catch (Exception e) {
+                throw new RealmException("Could not map Json", e);
+            }
+        }
+    }
+

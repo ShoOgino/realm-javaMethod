@@ -1,0 +1,19 @@
+    /**
+     * Removes a previously registered listener on the given RealmObject.
+     *
+     * @param object RealmObject to remove listener from.
+     * @param listener the instance to be removed.
+     */
+    public static <E extends RealmModel> void removeChangeListener(E object, RealmChangeListener listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("Listener should not be null");
+        }
+        if (object instanceof RealmObjectProxy) {
+            RealmObjectProxy proxy = (RealmObjectProxy) object;
+            proxy.realmGet$proxyState().getRealm$realm().checkIfValid();
+            proxy.realmGet$proxyState().getListeners$realm().remove(listener);
+        } else {
+            throw new IllegalArgumentException("Cannot remove listener from this unmanaged RealmObject (created outside of Realm)");
+        }
+    }
+

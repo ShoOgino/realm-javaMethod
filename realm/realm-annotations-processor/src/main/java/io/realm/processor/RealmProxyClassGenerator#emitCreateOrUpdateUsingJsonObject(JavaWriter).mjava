@@ -23,8 +23,8 @@
                             .emitStatement("obj = new %s(realm.schema.getColumnInfo(%s.class))",
                                     Utils.getProxyClassName(className),
                                     className)
-                            .emitStatement("((RealmObject) obj).realm = realm")
-                            .emitStatement("((RealmObject) obj).row = table.getUncheckedRow(rowIndex)")
+                            .emitStatement("((RealmObjectProxy)obj).realmGet$proxyState().setRealm$realm(realm)")
+                            .emitStatement("((RealmObjectProxy)obj).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex))")
                         .endControlFlow()
                     .endControlFlow()
                 .endControlFlow();

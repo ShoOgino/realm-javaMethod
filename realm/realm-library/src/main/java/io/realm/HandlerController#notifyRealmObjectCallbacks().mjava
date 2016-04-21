@@ -1,25 +1,25 @@
     private void notifyRealmObjectCallbacks() {
-        List<RealmObject> objectsToBeNotified = new ArrayList<RealmObject>();
-        Iterator<WeakReference<RealmObject>> iterator = realmObjects.keySet().iterator();
+        List<RealmObjectProxy> objectsToBeNotified = new ArrayList<RealmObjectProxy>();
+        Iterator<WeakReference<RealmObjectProxy>> iterator = realmObjects.keySet().iterator();
         while (iterator.hasNext()) {
-            WeakReference<? extends RealmObject> weakRealmObject = iterator.next();
-            RealmObject realmObject = weakRealmObject.get();
+            WeakReference<RealmObjectProxy> weakRealmObject = iterator.next();
+            RealmObjectProxy realmObject = weakRealmObject.get();
             if (realmObject == null) {
                 iterator.remove();
 
             } else {
-                if (realmObject.row.isAttached()) {
+                if (realmObject.realmGet$proxyState().getRow$realm().isAttached()) {
                     // It should be legal to modify realmObjects in the listener
                     objectsToBeNotified.add(realmObject);
-                } else if (realmObject.row != Row.EMPTY_ROW) {
+                } else if (realmObject.realmGet$proxyState().getRow$realm() != Row.EMPTY_ROW) {
                     iterator.remove();
                 }
             }
         }
 
-        for (Iterator<RealmObject> it = objectsToBeNotified.iterator(); it.hasNext() && !realm.isClosed(); ) {
-            RealmObject realmObject = it.next();
-            realmObject.notifyChangeListeners();
+        for (Iterator<RealmObjectProxy> it = objectsToBeNotified.iterator(); it.hasNext() && !realm.isClosed(); ) {
+            RealmObjectProxy realmObject = it.next();
+            realmObject.realmGet$proxyState().notifyChangeListeners$realm();
         }
     }
 

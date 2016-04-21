@@ -1,0 +1,47 @@
+    /**
+     * Sets the reference to a {@link RealmList} on the given field.
+     *
+     * @param fieldName field name.
+     * @param list list of references.
+     * @throws IllegalArgumentException if field name doesn't exist, it is not a list field, the type
+     * of the object represented by the DynamicRealmObject doesn't match or any element in the list belongs to a
+     * different Realm.
+     */
+    public void setList(String fieldName, RealmList<? extends RealmModel> list) {
+        if (list == null) {
+            throw new IllegalArgumentException("Null values not allowed for lists");
+        }
+
+        String tableName = proxyState.getRow$realm().getTable().getName();
+        boolean typeValidated;
+        if (list.className == null && list.clazz == null) {
+            // Standalone lists don't know anything about the types they contain. They might even hold objects of
+            // multiple types :(, so we have to check each item in the list.
+            typeValidated = false;
+        } else {
+            String listType = list.className != null ? list.className : proxyState.getRealm$realm().schema.getTable(list.clazz).getName();
+            if (!tableName.equals(listType)) {
+                throw new IllegalArgumentException(String.format("The elements in the list is not the proper type. " +
+                        "Was %s expected %s.", listType, tableName));
+            }
+            typeValidated = true;
+        }
+
+        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        LinkView links = proxyState.getRow$realm().getLinkList(columnIndex);
+        links.clear();
+        Table linkTargetTable = links.getTargetTable();
+        for (int i = 0; i < list.size(); i++) {
+            RealmObjectProxy obj = (RealmObjectProxy) list.get(i);
+            if (obj.realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm()) {
+                throw new IllegalArgumentException("Each element in 'list' must belong to the same Realm instance.");
+            }
+            if (!typeValidated && !linkTargetTable.hasSameSchema(obj.realmGet$proxyState().getRow$realm().getTable())) {
+                throw new IllegalArgumentException(String.format(Locale.ENGLISH,
+                        "Element at index %d is not the proper type. " +
+                                "Was '%s' expected '%s'.", i, obj.realmGet$proxyState().getRow$realm().getTable().getName(), linkTargetTable.getName()));
+            }
+            links.add(obj.realmGet$proxyState().getRow$realm().getIndex());
+        }
+    }
+

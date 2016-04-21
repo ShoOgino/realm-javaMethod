@@ -1,48 +1,48 @@
     @Override
     public String toString() {
-        if (row == null || !row.isAttached()) {
+        if (proxyState.getRealm$realm() == null || !proxyState.getRow$realm().isAttached()) {
             return "Invalid object";
         }
 
-        final String className = Table.tableNameToClassName(row.getTable().getName());
+        final String className = Table.tableNameToClassName(proxyState.getRow$realm().getTable().getName());
         StringBuilder sb = new StringBuilder(className + " = [");
         String[] fields = getFieldNames();
         for (String field : fields) {
-            long columnIndex = row.getColumnIndex(field);
-            RealmFieldType type = row.getColumnType(columnIndex);
+            long columnIndex = proxyState.getRow$realm().getColumnIndex(field);
+            RealmFieldType type = proxyState.getRow$realm().getColumnType(columnIndex);
             sb.append("{");
             sb.append(field).append(":");
             switch (type) {
                 case BOOLEAN:
-                    sb.append(row.isNull(columnIndex) ? "null" : row.getBoolean(columnIndex));
+                    sb.append(proxyState.getRow$realm().isNull(columnIndex) ? "null" : proxyState.getRow$realm().getBoolean(columnIndex));
                     break;
                 case INTEGER:
-                    sb.append(row.isNull(columnIndex) ? "null" : row.getLong(columnIndex));
+                    sb.append(proxyState.getRow$realm().isNull(columnIndex) ? "null" : proxyState.getRow$realm().getLong(columnIndex));
                     break;
                 case FLOAT:
-                    sb.append(row.isNull(columnIndex) ? "null" : row.getFloat(columnIndex));
+                    sb.append(proxyState.getRow$realm().isNull(columnIndex) ? "null" : proxyState.getRow$realm().getFloat(columnIndex));
                     break;
                 case DOUBLE:
-                    sb.append(row.isNull(columnIndex) ? "null" : row.getDouble(columnIndex));
+                    sb.append(proxyState.getRow$realm().isNull(columnIndex) ? "null" : proxyState.getRow$realm().getDouble(columnIndex));
                     break;
                 case STRING:
-                    sb.append(row.getString(columnIndex));
+                    sb.append(proxyState.getRow$realm().getString(columnIndex));
                     break;
                 case BINARY:
-                    sb.append(Arrays.toString(row.getBinaryByteArray(columnIndex)));
+                    sb.append(Arrays.toString(proxyState.getRow$realm().getBinaryByteArray(columnIndex)));
                     break;
                 case DATE:
-                    sb.append(row.isNull(columnIndex) ? "null" : row.getDate(columnIndex));
+                    sb.append(proxyState.getRow$realm().isNull(columnIndex) ? "null" : proxyState.getRow$realm().getDate(columnIndex));
                     break;
                 case OBJECT:
-                    sb.append(row.isNullLink(columnIndex)
+                    sb.append(proxyState.getRow$realm().isNullLink(columnIndex)
                             ? "null"
-                            : Table.tableNameToClassName(row.getTable().getLinkTarget(columnIndex).getName()));
+                            : Table.tableNameToClassName(proxyState.getRow$realm().getTable().getLinkTarget(columnIndex).getName()));
                     break;
                 case LIST:
-                    final String tableName = row.getTable().getLinkTarget(columnIndex).getName();
+                    final String tableName = proxyState.getRow$realm().getTable().getLinkTarget(columnIndex).getName();
                     String targetType = Table.tableNameToClassName(tableName);
-                    sb.append(String.format("RealmList<%s>[%s]", targetType, row.getLinkList(columnIndex).size()));
+                    sb.append(String.format("RealmList<%s>[%s]", targetType, proxyState.getRow$realm().getLinkList(columnIndex).size()));
                     break;
                 case UNSUPPORTED_TABLE:
                 case UNSUPPORTED_MIXED:

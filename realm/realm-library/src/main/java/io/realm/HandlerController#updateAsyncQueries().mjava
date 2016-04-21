@@ -12,11 +12,11 @@
         QueryUpdateTask.Builder.RealmResultsQueryStep realmResultsQueryStep = null;
 
         // we iterate over non GC'd async RealmResults then add them to the list to be updated (in a batch)
-        Iterator<Map.Entry<WeakReference<RealmResults<? extends RealmObject>>, RealmQuery<?>>> iterator = asyncRealmResults.entrySet().iterator();
+        Iterator<Map.Entry<WeakReference<RealmResults<? extends RealmModel>>, RealmQuery<?>>> iterator = asyncRealmResults.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<WeakReference<RealmResults<? extends RealmObject>>, RealmQuery<?>> entry = iterator.next();
-            WeakReference<RealmResults<? extends RealmObject>> weakReference = entry.getKey();
-            RealmResults<? extends RealmObject> realmResults = weakReference.get();
+            Map.Entry<WeakReference<RealmResults<? extends RealmModel>>, RealmQuery<?>> entry = iterator.next();
+            WeakReference<RealmResults<? extends RealmModel>> weakReference = entry.getKey();
+            RealmResults<? extends RealmModel> realmResults = weakReference.get();
             if (realmResults == null) {
                 // GC'd instance remove from the list
                 iterator.remove();

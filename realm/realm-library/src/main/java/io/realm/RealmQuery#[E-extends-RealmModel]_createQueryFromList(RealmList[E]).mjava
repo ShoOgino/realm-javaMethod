@@ -1,0 +1,16 @@
+    /**
+     * Creates a query from a existing {@link RealmList}.
+     *
+     * @param list   a existing @{link io.realm.RealmList} to query against.
+     * @return {@link RealmQuery} object. After building the query call one of the {@code find*} methods
+     * to run it.
+     */
+    @SuppressWarnings("unchecked")
+    public static <E extends RealmModel> RealmQuery<E> createQueryFromList(RealmList<E> list) {
+        if (list.clazz != null) {
+            return new RealmQuery(list.realm, list.view, list.clazz);
+        } else {
+            return new RealmQuery(list.realm, list.view, list.className);
+        }
+    }
+

@@ -6,11 +6,11 @@
      * @throws IllegalArgumentException if field name doesn't exists.
      */
     public boolean isNull(String fieldName) {
-        long columnIndex = row.getColumnIndex(fieldName);
-        RealmFieldType type = row.getColumnType(columnIndex);
+        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        RealmFieldType type = proxyState.getRow$realm().getColumnType(columnIndex);
         switch (type) {
             case OBJECT:
-                return row.isNullLink(columnIndex);
+                return proxyState.getRow$realm().isNullLink(columnIndex);
             case BOOLEAN:
             case INTEGER:
             case FLOAT:
@@ -18,7 +18,7 @@
             case STRING:
             case BINARY:
             case DATE:
-                return row.isNull(columnIndex);
+                return proxyState.getRow$realm().isNull(columnIndex);
             case LIST:
             case UNSUPPORTED_TABLE:
             case UNSUPPORTED_MIXED:

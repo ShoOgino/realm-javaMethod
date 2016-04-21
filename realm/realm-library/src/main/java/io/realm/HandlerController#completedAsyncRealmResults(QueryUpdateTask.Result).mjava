@@ -1,9 +1,9 @@
     private void completedAsyncRealmResults(QueryUpdateTask.Result result) {
-        Set<WeakReference<RealmResults<? extends RealmObject>>> updatedTableViewsKeys = result.updatedTableViews.keySet();
+        Set<WeakReference<RealmResults<? extends RealmModel>>> updatedTableViewsKeys = result.updatedTableViews.keySet();
         if (updatedTableViewsKeys.size() > 0) {
-            WeakReference<RealmResults<? extends RealmObject>> weakRealmResults = updatedTableViewsKeys.iterator().next();
+            WeakReference<RealmResults<? extends RealmModel>> weakRealmResults = updatedTableViewsKeys.iterator().next();
 
-            RealmResults<? extends RealmObject> realmResults = weakRealmResults.get();
+            RealmResults<? extends RealmModel> realmResults = weakRealmResults.get();
             if (realmResults == null) {
                 asyncRealmResults.remove(weakRealmResults);
                 RealmLog.d("[COMPLETED_ASYNC_REALM_RESULTS "+ weakRealmResults + "] realm:"+ HandlerController.this + " RealmResults GC'd ignore results");

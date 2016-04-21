@@ -1,0 +1,22 @@
+    @Test
+    public void copyToRealmOrUpdate() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                AllTypesRealmModel obj = new AllTypesRealmModel();
+                obj.columnLong = 1;
+                realm.copyToRealm(obj);
+
+                AllTypesRealmModel obj2 = new AllTypesRealmModel();
+                obj2.columnLong = 1;
+                obj2.columnString = "Foo";
+                realm.copyToRealmOrUpdate(obj2);
+            }
+        });
+
+        assertEquals(1, realm.allObjects(AllTypesRealmModel.class).size());
+
+        AllTypesRealmModel obj = realm.allObjects(AllTypesRealmModel.class).first();
+        assertEquals("Foo", obj.columnString);
+    }
+

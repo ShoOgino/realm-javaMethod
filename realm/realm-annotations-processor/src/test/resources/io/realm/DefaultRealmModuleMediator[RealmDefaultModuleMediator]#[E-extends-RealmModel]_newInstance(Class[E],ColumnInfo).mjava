@@ -1,0 +1,11 @@
+    @Override
+    public <E extends RealmModel> E newInstance(Class<E> clazz, ColumnInfo columnInfo) {
+        checkClass(clazz);
+
+        if (clazz.equals(AllTypes.class)) {
+            return clazz.cast(new AllTypesRealmProxy(columnInfo));
+        } else {
+            throw getMissingProxyClassException(clazz);
+        }
+    }
+

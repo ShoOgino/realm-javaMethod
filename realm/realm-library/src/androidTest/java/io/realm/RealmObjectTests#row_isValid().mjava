@@ -2,8 +2,8 @@
     @Test
     public void row_isValid() {
         realm.beginTransaction();
-        RealmObject realmObject = realm.createObject(AllTypes.class);
-        Row row = realmObject.row;
+        RealmObjectProxy realmObject = (RealmObjectProxy) realm.createObject(AllTypes.class);
+        Row row = realmObject.realmGet$proxyState().getRow$realm();
         realm.commitTransaction();
 
         assertNotNull("RealmObject.realmGetRow returns zero ", row);

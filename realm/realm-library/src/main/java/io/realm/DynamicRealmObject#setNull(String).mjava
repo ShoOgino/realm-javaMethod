@@ -5,12 +5,12 @@
      * @throws IllegalArgumentException if field name doesn't exists, or the field isn't nullable.
      */
     public void setNull(String fieldName) {
-        long columnIndex = row.getColumnIndex(fieldName);
-        RealmFieldType type = row.getColumnType(columnIndex);
+        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        RealmFieldType type = proxyState.getRow$realm().getColumnType(columnIndex);
         if (type == RealmFieldType.OBJECT) {
-            row.nullifyLink(columnIndex);
+            proxyState.getRow$realm().nullifyLink(columnIndex);
         } else {
-            row.setNull(columnIndex);
+            proxyState.getRow$realm().setNull(columnIndex);
         }
     }
 

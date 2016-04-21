@@ -3,12 +3,12 @@
                 className, // Return type
                 "createDetachedCopy", // Method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
-                className, "realmObject", "int", "currentDepth", "int", "maxDepth", "Map<RealmObject, CacheData<RealmObject>>", "cache");
+                className, "realmObject", "int", "currentDepth", "int", "maxDepth", "Map<RealmModel, CacheData<RealmModel>>", "cache");
         writer
             .beginControlFlow("if (currentDepth > maxDepth || realmObject == null)")
                 .emitStatement("return null")
             .endControlFlow()
-            .emitStatement("CacheData<RealmObject> cachedObject = cache.get(realmObject)")
+            .emitStatement("CacheData<RealmModel> cachedObject = cache.get(realmObject)")
             .emitStatement("%s standaloneObject", className)
             .beginControlFlow("if (cachedObject != null)")
                 .emitSingleLineComment("Reuse cached object or recreate it because it was encountered at a lower depth.")
@@ -20,7 +20,7 @@
                 .endControlFlow()
             .nextControlFlow("else")
                 .emitStatement("standaloneObject = new %s()", className)
-                .emitStatement("cache.put(realmObject, new RealmObjectProxy.CacheData<RealmObject>(currentDepth, standaloneObject))")
+                .emitStatement("cache.put(realmObject, new RealmObjectProxy.CacheData(currentDepth, standaloneObject))")
             .endControlFlow();
 
         for (VariableElement field : metadata.getFields()) {

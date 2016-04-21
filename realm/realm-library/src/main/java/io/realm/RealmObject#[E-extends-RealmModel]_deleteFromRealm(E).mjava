@@ -1,0 +1,29 @@
+    /**
+     * Deletes the object from the Realm it is currently associated with.
+     * <p>
+     * After this method is called the object will be invalid and any operation (read or write) performed on it will
+     * fail with an IllegalStateException.
+     *
+     * @throws IllegalStateException if the corresponding Realm is closed or in an incorrect thread.
+     * @see #isValid()
+     */
+    public static <E extends RealmModel> void deleteFromRealm(E object) {
+        if (!(object instanceof RealmObjectProxy)) {
+            // TODO What type of exception IllegalArgument/IllegalState?
+            throw new IllegalArgumentException("Object not managed by Realm, so it cannot be removed.");
+        }
+
+        RealmObjectProxy proxy = (RealmObjectProxy) object;
+        if (proxy.realmGet$proxyState().getRow$realm() == null) {
+            throw new IllegalStateException("Object malformed: missing object in Realm. Make sure to instantiate RealmObjects with Realm.createObject()");
+        }
+        if (proxy.realmGet$proxyState().getRealm$realm() == null) {
+            throw new IllegalStateException("Object malformed: missing Realm. Make sure to instantiate RealmObjects with Realm.createObject()");
+        }
+
+        proxy.realmGet$proxyState().getRealm$realm().checkIfValid();
+        Row row = proxy.realmGet$proxyState().getRow$realm();
+        row.getTable().moveLastOver(row.getIndex());
+        proxy.realmGet$proxyState().setRow$realm(InvalidRow.INSTANCE);
+    }
+

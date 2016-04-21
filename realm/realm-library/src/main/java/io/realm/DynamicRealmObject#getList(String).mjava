@@ -6,9 +6,9 @@
      * @throws IllegalArgumentException if field name doesn't exists or it doesn't contain a list of links.
      */
     public RealmList<DynamicRealmObject> getList(String fieldName) {
-        long columnIndex = row.getColumnIndex(fieldName);
-        LinkView linkView = row.getLinkList(columnIndex);
+        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        LinkView linkView = proxyState.getRow$realm().getLinkList(columnIndex);
         String className = RealmSchema.getSchemaForTable(linkView.getTargetTable());
-        return new RealmList<DynamicRealmObject>(className, linkView, realm);
+        return new RealmList<DynamicRealmObject>(className, linkView, proxyState.getRealm$realm());
     }
 

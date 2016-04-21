@@ -1,0 +1,29 @@
+    // Test the behaviour of a RealmObject, containing a RealmList
+    // of RealmModel, in managed and un-managed mode
+    @Test
+    public void realmObjectWithRealmListOfRealmModel() {
+        RealmList<AllTypesRealmModel> allTypesRealmModel = new RealmList<AllTypesRealmModel>();
+        AllTypesRealmModel allTypePojo;
+        for (int i = 0; i < 10; i++) {
+            allTypePojo = new AllTypesRealmModel();
+            allTypePojo.columnLong = i;
+            allTypesRealmModel.add(allTypePojo);
+        }
+        AllTypesRealmModel pojo1 = allTypesRealmModel.get(1);
+        assertEquals(1, pojo1.columnLong);
+        allTypesRealmModel.move(1, 0);
+        assertEquals(0, allTypesRealmModel.indexOf(pojo1));
+
+        RealmObjectWithRealmListOfRealmModel model = new RealmObjectWithRealmListOfRealmModel();
+        model.setColumnRealmList(allTypesRealmModel);
+
+        realm.beginTransaction();
+        realm.copyToRealm(model);
+        realm.commitTransaction();
+
+        RealmResults<RealmObjectWithRealmListOfRealmModel> all = realm.where(RealmObjectWithRealmListOfRealmModel.class).findAll();
+        assertEquals(1, all.size());
+        assertEquals(10, all.first().getColumnRealmList().size());
+        assertEquals(1, all.first().getColumnRealmList().first().columnLong);
+    }
+

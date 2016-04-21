@@ -9,15 +9,15 @@
         writer.emitStatement("if (o == null || getClass() != o.getClass()) return false");
         writer.emitStatement("%s a%s = (%s)o", proxyClassName, className, proxyClassName);  // FooRealmProxy aFoo = (FooRealmProxy)o
         writer.emitEmptyLine();
-        writer.emitStatement("String path = ((RealmObject) this).realm.getPath()");
-        writer.emitStatement("String otherPath = ((RealmObject) a%s).realm.getPath()", className);
+        writer.emitStatement("String path = proxyState.getRealm$realm().getPath()");
+        writer.emitStatement("String otherPath = a%s.proxyState.getRealm$realm().getPath()", className);
         writer.emitStatement("if (path != null ? !path.equals(otherPath) : otherPath != null) return false;");
         writer.emitEmptyLine();
-        writer.emitStatement("String tableName = ((RealmObject) this).row.getTable().getName()");
-        writer.emitStatement("String otherTableName = ((RealmObject) a%s).row.getTable().getName()", className);
+        writer.emitStatement("String tableName = proxyState.getRow$realm().getTable().getName()");
+        writer.emitStatement("String otherTableName = a%s.proxyState.getRow$realm().getTable().getName()", className);
         writer.emitStatement("if (tableName != null ? !tableName.equals(otherTableName) : otherTableName != null) return false");
         writer.emitEmptyLine();
-        writer.emitStatement("if (((RealmObject) this).row.getIndex() != ((RealmObject) a%s).row.getIndex()) return false", className);
+        writer.emitStatement("if (proxyState.getRow$realm().getIndex() != a%s.proxyState.getRow$realm().getIndex()) return false", className);
         writer.emitEmptyLine();
         writer.emitStatement("return true");
         writer.endMethod();

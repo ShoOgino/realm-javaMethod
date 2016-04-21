@@ -10,10 +10,10 @@
             }
 
             RealmProxyMediator mediator = realm.configuration.getSchemaMediator();
-            final Set<Class<? extends RealmObject>> modelClasses = mediator.getModelClasses();
-            final Map<Class<? extends RealmObject>, ColumnInfo> columnInfoMap;
-            columnInfoMap = new HashMap<Class<? extends RealmObject>, ColumnInfo>(modelClasses.size());
-            for (Class<? extends RealmObject> modelClass : modelClasses) {
+            final Set<Class<? extends RealmModel>> modelClasses = mediator.getModelClasses();
+            final Map<Class<? extends RealmModel>, ColumnInfo> columnInfoMap;
+            columnInfoMap = new HashMap<Class<? extends RealmModel>, ColumnInfo>(modelClasses.size());
+            for (Class<? extends RealmModel> modelClass : modelClasses) {
                 // Create and validate table
                 if (version == UNVERSIONED) {
                     mediator.createTable(modelClass, realm.sharedGroupManager.getTransaction());

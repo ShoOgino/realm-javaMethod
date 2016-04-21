@@ -1,0 +1,16 @@
+    // async where with filed selection
+    @Test
+    @RunTestInLooperThread
+    public void async_query() {
+        populateTestRealm(looperThread.realm, TEST_DATA_SIZE);
+
+        final RealmResults<AllTypesRealmModel> allTypesRealmModels = looperThread.realm.distinctAsync(AllTypesRealmModel.class, AllTypesRealmModel.FIELD_STRING);
+        allTypesRealmModels.addChangeListener(new RealmChangeListener() {
+            @Override
+            public void onChange() {
+                assertEquals(1, allTypesRealmModels.size());
+                looperThread.testComplete();
+            }
+        });
+    }
+
