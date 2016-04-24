@@ -1,0 +1,14 @@
+    // @PrimaryKey + @Required annotation accept not-null value properly as a primary key value for Realm version 0.89.1+
+    @Test
+    public void copyToRealmOrUpdate_requiredPrimaryKey() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        RealmObject obj = (RealmObject)testClazz.getConstructor(primaryKeyFieldType, secondaryFieldType).newInstance(primaryKeyFieldValue, secondaryFieldValue);
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(obj);
+        realm.commitTransaction();
+
+        RealmResults results = realm.where(testClazz).findAll();
+        assertEquals(1, results.size());
+        assertEquals(primaryKeyFieldValue, ((NullPrimaryKey)results.first()).getId());
+        assertEquals(secondaryFieldValue, ((NullPrimaryKey)results.first()).getName());
+    }
+
