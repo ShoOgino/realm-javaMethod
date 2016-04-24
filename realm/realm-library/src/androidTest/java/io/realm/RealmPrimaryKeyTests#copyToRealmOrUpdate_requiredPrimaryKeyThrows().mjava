@@ -1,0 +1,20 @@
+    // @PrimaryKey + @Required annotation does accept null as a primary key value for Realm version 0.89.1+
+    @Test
+    public void copyToRealmOrUpdate_requiredPrimaryKeyThrows() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        try {
+            RealmObject obj = (RealmObject)testClazz.getConstructor(primaryKeyFieldType, secondaryFieldType).newInstance(null, null);
+            realm.beginTransaction();
+            realm.copyToRealmOrUpdate(obj);
+            fail("@PrimaryKey + @Required field cannot be null");
+        } catch (RuntimeException expected) {
+            if (testClazz.equals(PrimaryKeyRequiredAsString.class)) {
+                assertTrue(expected instanceof IllegalArgumentException);
+            } else {
+                assertTrue(expected instanceof NullPointerException);
+            }
+
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+
