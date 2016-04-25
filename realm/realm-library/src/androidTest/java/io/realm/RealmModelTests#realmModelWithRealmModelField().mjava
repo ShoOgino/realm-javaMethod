@@ -1,0 +1,17 @@
+    // Test the behaviour of a RealmModel, containing a RealmModel field
+    @Test
+    public void realmModelWithRealmModelField() {
+        RealmModelWithRealmModelField realmModelWithRealmModelField = new RealmModelWithRealmModelField();
+        AllTypesRealmModel allTypePojo = new AllTypesRealmModel();
+        allTypePojo.columnLong = 42;
+        realmModelWithRealmModelField.setAllTypesRealmModel(allTypePojo);
+
+        realm.beginTransaction();
+        realm.copyToRealm(realmModelWithRealmModelField);
+        realm.commitTransaction();
+
+        RealmResults<RealmModelWithRealmModelField> all = realm.where(RealmModelWithRealmModelField.class).findAll();
+        assertEquals(1, all.size());
+        assertEquals(42, all.first().getAllTypesRealmModel().columnLong);
+    }
+
