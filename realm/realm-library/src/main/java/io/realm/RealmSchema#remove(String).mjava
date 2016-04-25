@@ -8,6 +8,10 @@
         checkEmpty(className, EMPTY_STRING_MSG);
         String internalTableName = TABLE_PREFIX + className;
         checkHasTable(className, "Cannot remove class because it is not in this Realm: " + className);
+        Table table = getTable(className);
+        if (table.hasPrimaryKey()) {
+            table.setPrimaryKey(null);
+        }
         transaction.removeTable(internalTableName);
     }
 
