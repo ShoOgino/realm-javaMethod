@@ -1,0 +1,11 @@
+    @Test
+    public void createObjectWithPrimaryKey_valueAlreadyExists() {
+        realm.beginTransaction();
+        realm.createObject(AllJavaTypes.class, 42);
+        try {
+            realm.createObject(AllJavaTypes.class, 42);
+            fail();
+        } catch (RealmPrimaryKeyConstraintException ignored) {
+        }
+    }
+

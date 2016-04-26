@@ -1,0 +1,47 @@
+    @Test
+    public void createObjectWithPrimaryKey_nullDuplicated() {
+        realm.beginTransaction();
+
+        // Byte
+        realm.createObject(PrimaryKeyAsBoxedByte.class, null);
+        try {
+            realm.createObject(PrimaryKeyAsBoxedByte.class, null);
+            fail();
+        } catch (RealmPrimaryKeyConstraintException ignored) {
+        }
+
+        // Short
+        realm.createObject(PrimaryKeyAsBoxedShort.class, null);
+        try {
+            realm.createObject(PrimaryKeyAsBoxedShort.class, null);
+            fail();
+        } catch (RealmPrimaryKeyConstraintException ignored) {
+        }
+
+        // Integer
+        realm.createObject(PrimaryKeyAsBoxedInteger.class, null);
+        try {
+            realm.createObject(PrimaryKeyAsBoxedInteger.class, null);
+            fail();
+        } catch (RealmPrimaryKeyConstraintException ignored) {
+        }
+
+        // Long
+        realm.createObject(PrimaryKeyAsBoxedLong.class, null);
+        try {
+            realm.createObject(PrimaryKeyAsBoxedLong.class, null);
+            fail();
+        } catch (RealmPrimaryKeyConstraintException ignored) {
+        }
+
+        // String
+        realm.createObject(PrimaryKeyAsString.class, null);
+        try {
+            realm.createObject(PrimaryKeyAsString.class, null);
+            fail();
+        } catch (RealmPrimaryKeyConstraintException ignored) {
+        }
+
+        realm.cancelTransaction();
+    }
+
