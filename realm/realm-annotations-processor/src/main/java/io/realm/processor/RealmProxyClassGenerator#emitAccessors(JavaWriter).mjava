@@ -56,7 +56,7 @@
                         "proxyState.getRow$realm().set%s(%s, value)",
                         realmType, fieldIndexVariableReference(field));
                 writer.endMethod();
-            } else if (Utils.isRealmObject(field)) {
+            } else if (Utils.isRealmModel(field)) {
                 /**
                  * Links
                  */
@@ -79,7 +79,7 @@
                     writer.emitStatement("proxyState.getRow$realm().nullifyLink(%s)", fieldIndexVariableReference(field));
                     writer.emitStatement("return");
                 writer.endControlFlow();
-                writer.beginControlFlow("if (!value.isValid())");
+                writer.beginControlFlow("if (!RealmObject.isValid(value))");
                     writer.emitStatement("throw new IllegalArgumentException(\"'value' is not a valid managed object.\")");
                 writer.endControlFlow();
                 writer.beginControlFlow("if (((RealmObjectProxy)value).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm())");

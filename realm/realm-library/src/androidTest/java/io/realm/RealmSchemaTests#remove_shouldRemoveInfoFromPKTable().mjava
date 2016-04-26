@@ -1,0 +1,20 @@
+    @Test
+    public void remove_shouldRemoveInfoFromPKTable() {
+        assertTrue(realmSchema.contains(PrimaryKeyAsString.CLASS_NAME));
+        realmSchema.remove(PrimaryKeyAsString.CLASS_NAME);
+        assertFalse(realmSchema.contains(PrimaryKeyAsString.CLASS_NAME));
+
+        RealmObjectSchema objectSchema = realmSchema.create(PrimaryKeyAsString.CLASS_NAME);
+        objectSchema.addField(PrimaryKeyAsString.FIELD_PRIMARY_KEY, String.class);
+
+        try {
+            // It should not have primary key anymore at this point
+            objectSchema.getPrimaryKey();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        objectSchema.addPrimaryKey(PrimaryKeyAsString.FIELD_PRIMARY_KEY);
+        assertEquals(PrimaryKeyAsString.FIELD_PRIMARY_KEY, objectSchema.getPrimaryKey());
+    }
+
