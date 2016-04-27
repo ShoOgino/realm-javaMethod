@@ -5,7 +5,7 @@
         realm = Realm.getInstance(configFactory.createConfiguration());
         realm.beginTransaction();
         AllTypes allTypes = realm.createObject(AllTypes.class);
-        RealmResults<AllTypes> queryResult = realm.allObjects(AllTypes.class);
+        RealmResults<AllTypes> queryResult = realm.where(AllTypes.class).findAll();
         assertEquals(allTypes, queryResult.get(0));
         realm.commitTransaction();
         realm.close(); // This might not close the Realm if the reference count is wrong

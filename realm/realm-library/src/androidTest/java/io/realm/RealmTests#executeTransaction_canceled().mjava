@@ -2,7 +2,7 @@
     public void executeTransaction_canceled() {
         final AtomicReference<RuntimeException> thrownException = new AtomicReference<>(null);
 
-        assertEquals(0, realm.allObjects(Owner.class).size());
+        assertEquals(0, realm.where(Owner.class).count());
         try {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
@@ -17,6 +17,6 @@
             //noinspection ThrowableResultOfMethodCallIgnored
             assertTrue(e == thrownException.get());
         }
-        assertEquals(0, realm.allObjects(Owner.class).size());
+        assertEquals(0, realm.where(Owner.class).count());
     }
 

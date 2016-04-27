@@ -1,6 +1,6 @@
     @Test
     public void executeTransaction_warningIfManuallyCancelled() {
-        assertEquals(0, realm.allObjects("Owner").size());
+        assertEquals(0, realm.where("Owner").count());
         TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
         try {
             RealmLog.add(testLogger);
@@ -19,6 +19,6 @@
         } finally {
             RealmLog.remove(testLogger);
         }
-        assertEquals(0, realm.allObjects("Owner").size());
+        assertEquals(0, realm.where("Owner").count());
     }
 

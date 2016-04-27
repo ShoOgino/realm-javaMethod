@@ -1,6 +1,6 @@
     @Test
     public void executeTransaction() {
-        assertEquals(0, realm.allObjects(Owner.CLASS_NAME).size());
+        assertEquals(0, realm.where(Owner.CLASS_NAME).count());
         realm.executeTransaction(new DynamicRealm.Transaction() {
             @Override
             public void execute(DynamicRealm realm) {
@@ -9,7 +9,7 @@
             }
         });
 
-        RealmResults<DynamicRealmObject> allObjects = realm.allObjects(Owner.CLASS_NAME);
+        RealmResults<DynamicRealmObject> allObjects = realm.where(Owner.CLASS_NAME).findAll();
         assertEquals(1, allObjects.size());
         assertEquals("Owner", allObjects.get(0).getString("name"));
     }
