@@ -1,0 +1,21 @@
+    private static String getLinuxMacAddress() throws FileNotFoundException, NoSuchAlgorithmException {
+        File machineId = new File("/var/lib/dbus/machine-id");
+        if (!machineId.exists()) {
+            machineId = new File("/etc/machine-id");
+        }
+        if (!machineId.exists()) {
+            return UNKNOWN;
+        }
+
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(machineId);
+            String id = scanner.useDelimiter("\\A").next();
+            return Utils.hexStringify(Utils.sha256Hash(id.getBytes()));
+        } finally {
+            if (scanner != null) {
+                scanner.close();
+            }
+        }
+    }
+
