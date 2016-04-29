@@ -2,9 +2,9 @@
     @RunTestInLooperThread
     public void addChangeListener_duplicatedListener() {
         final AtomicInteger counter = new AtomicInteger(0);
-        RealmChangeListener listener = new RealmChangeListener() {
+        RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 counter.incrementAndGet();
             }
         };
@@ -12,9 +12,9 @@
         Realm realm = looperThread.realm;
         realm.addChangeListener(listener);
         realm.addChangeListener(listener);
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 assertEquals(1, counter.get());
                 looperThread.testComplete();
             }

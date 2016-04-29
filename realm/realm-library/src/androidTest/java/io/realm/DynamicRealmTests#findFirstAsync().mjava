@@ -6,10 +6,9 @@
                 .between(AllTypes.FIELD_LONG, 4, 9)
                 .findFirstAsync();
         assertFalse(allTypes.isLoaded());
-
-        allTypes.addChangeListener(new RealmChangeListener() {
+        allTypes.addChangeListener(new RealmChangeListener<DynamicRealmObject>() {
             @Override
-            public void onChange() {
+            public void onChange(DynamicRealmObject object) {
                 assertEquals("test data 4", allTypes.getString(AllTypes.FIELD_STRING));
                 dynamicRealm.close();
                 looperThread.testComplete();

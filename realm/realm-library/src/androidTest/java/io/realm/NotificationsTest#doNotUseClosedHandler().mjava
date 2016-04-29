@@ -13,9 +13,9 @@
             public void run() {
                 Looper.prepare();
                 final Realm realm = Realm.getInstance(realmConfig);
-                RealmChangeListener listener = new RealmChangeListener() {
+                RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
                     @Override
-                    public void onChange() {
+                    public void onChange(Realm object) {
                         realm.close();
                         handlerNotified.countDown();
                     }
@@ -31,9 +31,9 @@
             public void run() {
                 Looper.prepare();
                 Realm realm = Realm.getInstance(realmConfig);
-                RealmChangeListener listener = new RealmChangeListener() {
+                RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
                     @Override
-                    public void onChange() {
+                    public void onChange(Realm object) {
                         try {
                             fail("This handler should not be notified");
                         } catch (AssertionFailedError e) {

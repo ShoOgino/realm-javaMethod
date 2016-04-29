@@ -16,9 +16,9 @@
         Realm.asyncQueryExecutor.pause();
 
         final AllTypes firstAsync = looperThread.realm.where(AllTypes.class).findFirstAsync();
-        firstAsync.addChangeListener(new RealmChangeListener() {
+        firstAsync.addChangeListener(new RealmChangeListener<AllTypes>() {
             @Override
-            public void onChange() {
+            public void onChange(AllTypes object) {
                 assertNotNull(firstAsync);
                 assertEquals("test data 0", firstAsync.getColumnString());
                 looperThread.testComplete(signalClosedRealm);

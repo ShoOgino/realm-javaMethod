@@ -9,9 +9,9 @@
                 final DynamicRealm observableRealm = DynamicRealm.getInstance(realmConfig);
                 resultsRefs.get().acquireReference(results);
 
-                final RealmChangeListener listener = new RealmChangeListener() {
+                final RealmChangeListener<RealmResults<DynamicRealmObject>> listener = new RealmChangeListener<RealmResults<DynamicRealmObject>>() {
                     @Override
-                    public void onChange() {
+                    public void onChange(RealmResults<DynamicRealmObject> result) {
                         if (!subscriber.isUnsubscribed()) {
                             subscriber.onNext(results);
                         }

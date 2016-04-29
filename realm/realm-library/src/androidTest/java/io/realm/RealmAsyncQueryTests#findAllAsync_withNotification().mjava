@@ -9,9 +9,9 @@
                 .between("columnLong", 0, 4)
                 .findAllAsync();
 
-        results.addChangeListener(new RealmChangeListener() {
+        results.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 assertTrue(results.isLoaded());
                 assertEquals(5, results.size());
                 assertTrue(results.get(4).isValid());

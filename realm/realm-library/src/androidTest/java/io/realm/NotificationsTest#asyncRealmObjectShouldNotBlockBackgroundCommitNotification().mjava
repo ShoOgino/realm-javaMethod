@@ -6,17 +6,17 @@
     public void asyncRealmObjectShouldNotBlockBackgroundCommitNotification() {
         final AtomicInteger numberOfRealmCallbackInvocation = new AtomicInteger(0);
         final CountDownLatch signalClosedRealm = new CountDownLatch(1);
-        looperThread.realm.addChangeListener(new RealmChangeListener() {
+        looperThread.realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 switch (numberOfRealmCallbackInvocation.incrementAndGet()) {
                     case 1: {
                         // first commit
                         Dog dog = looperThread.realm.where(Dog.class).findFirstAsync();
                         assertTrue(dog.load());
-                        dog.addChangeListener(new RealmChangeListener() {
+                        dog.addChangeListener(new RealmChangeListener<Dog>() {
                             @Override
-                            public void onChange() {
+                            public void onChange(Dog dog) {
                             }
                         });
                         looperThread.keepStrongReference.add(dog);

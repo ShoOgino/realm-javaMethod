@@ -12,9 +12,9 @@
 
         final RealmResults<Dog> dogs = realm.where(Dog.class).findAllAsync();
         assertTrue(dogs.load());
-        dogs.addChangeListener(new RealmChangeListener() {
+        dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<Dog> object) {
                 // Step 4: Respond to relevant change
                 int commits = typebasedCommitInvocations.incrementAndGet();
                 switch (commits) {
@@ -28,9 +28,9 @@
             }
         });
 
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 int commits = globalCommitInvocations.incrementAndGet();
                 switch (commits) {
                     case 1:

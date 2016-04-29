@@ -15,9 +15,9 @@
 
         final RealmResults<Dog> dogs =
                 allTypes.getColumnRealmList().where().equalTo(Dog.FIELD_NAME, "name_0").findAll();
-        dogs.addChangeListener(new RealmChangeListener() {
+        dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<Dog> object) {
                 if (typebasedCommitInvocations.getAndIncrement() == 0) {
                     assertTrue(dogs.isValid());
                     assertEquals(0, dogs.size());

@@ -7,10 +7,10 @@
         final AtomicInteger listenerBCalled = new AtomicInteger(0);
         final Realm realm = looperThread.realm;
 
-        final RealmChangeListener listenerA = new RealmChangeListener() {
+        final RealmChangeListener<Realm> listenerA = new RealmChangeListener<Realm>() {
 
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 int called = listenerACalled.incrementAndGet();
                 if (called == 2) {
                     assertEquals(2, listenerBCalled.get());
@@ -18,9 +18,9 @@
                 }
             }
         };
-        final RealmChangeListener listenerB = new RealmChangeListener() {
+        final RealmChangeListener<Realm> listenerB = new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 listenerBCalled.incrementAndGet();
                 if (listenerACalled.get() == 1) {
                     // 2. Reverse order

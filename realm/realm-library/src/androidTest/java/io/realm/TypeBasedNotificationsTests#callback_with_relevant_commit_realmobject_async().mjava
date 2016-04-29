@@ -13,9 +13,9 @@
         final Dog dog = realm.where(Dog.class).findFirstAsync();
         assertTrue(dog.load());
 
-        dog.addChangeListener(new RealmChangeListener() {
+        dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
-            public void onChange() {
+            public void onChange(Dog object) {
                 switch (typebasedCommitInvocations.incrementAndGet()) {
                     case 1:
                         assertEquals("Akamaru", dog.getName());
@@ -30,9 +30,9 @@
             }
         });
 
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 int commits = globalCommitInvocations.incrementAndGet();
                 switch (commits) {
                     case 1:

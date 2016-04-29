@@ -6,9 +6,9 @@
     @RunTestInLooperThread
     public void non_looper_thread_commit_realmobject_sync() {
         final Realm realm = looperThread.realm;
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 if (realm.where(Dog.class).count() == 2) {
                     realm.handler.post(new Runnable() {
                         @Override
@@ -26,9 +26,9 @@
         realm.commitTransaction();
 
         Dog dog = realm.where(Dog.class).findFirst();
-        dog.addChangeListener(new RealmChangeListener() {
+        dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
-            public void onChange() {
+            public void onChange(Dog object) {
                 typebasedCommitInvocations.incrementAndGet();
             }
         });

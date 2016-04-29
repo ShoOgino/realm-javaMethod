@@ -11,9 +11,9 @@
         realm.commitTransaction();
 
         final RealmResults<Dog> dogs = realm.where(Dog.class).findAll();
-        dogs.addChangeListener(new RealmChangeListener() {
+        dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<Dog> object) {
                 // Step 4: Respond to relevant change
                 typebasedCommitInvocations.incrementAndGet();
                 assertEquals(1, dogs.size());
@@ -22,9 +22,9 @@
             }
         });
 
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 int commits = globalCommitInvocations.incrementAndGet();
                 switch (commits) {
                     case 1:

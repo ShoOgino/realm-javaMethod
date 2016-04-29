@@ -11,9 +11,9 @@
                 owner.setName("Owner");
             }
         });
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 assertEquals("Owner", realm.where(Owner.class).findFirst().getName());
                 looperThread.testComplete();
             }

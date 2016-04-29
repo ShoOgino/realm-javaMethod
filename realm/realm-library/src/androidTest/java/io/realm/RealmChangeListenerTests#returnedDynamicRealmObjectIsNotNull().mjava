@@ -1,0 +1,24 @@
+    @Test
+    @RunTestInLooperThread
+    public void returnedDynamicRealmObjectIsNotNull() {
+        Realm realm = Realm.getInstance(looperThread.realmConfiguration);
+        realm.close();
+
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.realmConfiguration);
+        dynamicRealm.beginTransaction();
+        DynamicRealmObject allTypes = dynamicRealm.createObject(AllTypes.CLASS_NAME);
+        dynamicRealm.commitTransaction();
+
+        allTypes.addChangeListener(new RealmChangeListener<DynamicRealmObject>() {
+            @Override
+            public void onChange(DynamicRealmObject object) {
+                assertEquals("test data 1", object.getString(AllTypes.FIELD_STRING));
+                dynamicRealm.close();
+                looperThread.testComplete();
+            }
+        });
+        dynamicRealm.beginTransaction();
+        allTypes.setString(AllTypes.FIELD_STRING, "test data 1");
+        dynamicRealm.commitTransaction();
+    }
+

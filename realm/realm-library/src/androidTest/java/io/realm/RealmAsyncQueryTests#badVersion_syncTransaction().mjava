@@ -8,9 +8,9 @@
 
         // 1. Make sure that async query is not started
         final RealmResults<AllTypes> result = realm.where(AllTypes.class).findAllSortedAsync(AllTypes.FIELD_STRING);
-        result.addChangeListener(new RealmChangeListener() {
+        result.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 // 4. The commit in #2, should result in a refresh being triggered, which means this callback will
                 // be notified once the updated async queries has run.
                 // with the correct

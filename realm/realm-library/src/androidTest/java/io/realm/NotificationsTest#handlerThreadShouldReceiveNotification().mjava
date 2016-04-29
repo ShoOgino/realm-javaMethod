@@ -16,9 +16,9 @@
                     assertionFailedErrors[0] = e;
                 }
                 final Realm backgroundRealm = Realm.getInstance(realmConfig);
-                backgroundRealm.addChangeListener(new RealmChangeListener() {
+                backgroundRealm.addChangeListener(new RealmChangeListener<Realm>() {
                     @Override
-                    public void onChange() {
+                    public void onChange(Realm object) {
                         backgroundRealm.close();
                         numberOfInvocation.countDown();
                     }

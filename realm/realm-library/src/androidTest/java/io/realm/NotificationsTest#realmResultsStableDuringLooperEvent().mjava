@@ -7,7 +7,7 @@
         final AtomicBoolean isRealmOpen = new AtomicBoolean(true);
         final Map<Integer, Integer> results = new ConcurrentHashMap<Integer, Integer>();
         final Looper[] looper = new Looper[1];
-        final RealmChangeListener listener[] = new RealmChangeListener[1];
+        final RealmChangeListener<Realm> listener[] = new RealmChangeListener[1];
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
@@ -21,9 +21,9 @@
                     realm = Realm.getInstance(realmConfig);
                     final RealmResults<Dog> dogs = realm.allObjects(Dog.class);
                     assertEquals(0, dogs.size());
-                    listener[0] = new RealmChangeListener() {
+                    listener[0] = new RealmChangeListener<Realm>() {
                         @Override
-                        public void onChange() {
+                        public void onChange(Realm object) {
                             int c = counter.incrementAndGet();
                             results.put(c, dogs.size());
                         }

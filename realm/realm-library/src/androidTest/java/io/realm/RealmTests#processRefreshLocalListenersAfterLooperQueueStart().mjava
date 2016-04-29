@@ -29,16 +29,16 @@
                 Realm bgRealm = Realm.getInstance(realmConfig);
                 RealmResults<Dog> dogs = bgRealm.where(Dog.class).findAll();
                 try {
-                    bgRealm.addChangeListener(new RealmChangeListener() {
+                    bgRealm.addChangeListener(new RealmChangeListener<Realm>() {
                         @Override
-                        public void onChange() {
+                        public void onChange(Realm object) {
                             listenerWasCalled.set(true);
                             bgClosedLatch.countDown();
                         }
                     });
-                    dogs.addChangeListener(new RealmChangeListener() {
+                    dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
                         @Override
-                        public void onChange() {
+                        public void onChange(RealmResults<Dog> object) {
                             typeListenerWasCalled.set(true);
                             bgClosedLatch.countDown();
                         }

@@ -3,16 +3,16 @@
     @RunTestInLooperThread
     public void closeRealmInChangeListenerWhenThereIsListenerOnEmptyObject() {
         final Realm realm = Realm.getInstance(looperThread.createConfiguration());
-        final RealmChangeListener dummyListener = new RealmChangeListener() {
+        final RealmChangeListener<AllTypes> dummyListener = new RealmChangeListener<AllTypes>() {
             @Override
-            public void onChange() {
+            public void onChange(AllTypes object) {
             }
         };
 
         // Change listener on Realm
-        final RealmChangeListener listener = new RealmChangeListener() {
+        final RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 if (realm.where(AllTypes.class).count() == 1) {
                     realm.removeChangeListener(this);
                     realm.close();

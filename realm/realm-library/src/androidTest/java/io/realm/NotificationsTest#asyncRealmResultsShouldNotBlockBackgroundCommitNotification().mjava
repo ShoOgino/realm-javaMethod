@@ -19,18 +19,18 @@
 
                 try {
                     realm[0] = Realm.getInstance(realmConfig);
-                    realm[0].addChangeListener(new RealmChangeListener() {
+                    realm[0].addChangeListener(new RealmChangeListener<Realm>() {
                         @Override
-                        public void onChange() {
+                        public void onChange(Realm object) {
                             RealmResults<Dog> dogs; // to keep it as a strong reference
                             switch (numberOfRealmCallbackInvocation.incrementAndGet()) {
                                 case 1: {
                                     // first commit
                                     dogs = realm[0].where(Dog.class).findAllAsync();
                                     assertTrue(dogs.load());
-                                    dogs.addChangeListener(new RealmChangeListener() {
+                                    dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
                                         @Override
-                                        public void onChange() {
+                                        public void onChange(RealmResults<Dog> object) {
                                             numberOfAsyncRealmResultsCallbackInvocation.incrementAndGet();
                                         }
                                     });

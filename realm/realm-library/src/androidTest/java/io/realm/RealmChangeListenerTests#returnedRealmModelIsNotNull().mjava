@@ -1,0 +1,21 @@
+    @Test
+    @RunTestInLooperThread
+    public void returnedRealmModelIsNotNull() {
+        Realm realm = looperThread.realm;
+        realm.beginTransaction();
+        AllTypesRealmModel model = realm.createObject(AllTypesRealmModel.class);
+        realm.commitTransaction();
+
+        RealmObject.addChangeListener(model, new RealmChangeListener<AllTypesRealmModel>() {
+            @Override
+            public void onChange(AllTypesRealmModel object) {
+                assertEquals("model1", object.columnString);
+                looperThread.testComplete();
+            }
+        });
+
+        realm.beginTransaction();
+        model.columnString = "model1";
+        realm.commitTransaction();
+    }
+

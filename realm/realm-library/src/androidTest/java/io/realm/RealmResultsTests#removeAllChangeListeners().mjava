@@ -5,15 +5,15 @@
         final Realm realm = looperThread.realm;
         RealmResults<AllTypes> collection = realm.allObjects(AllTypes.class);
 
-        RealmChangeListener listenerA = new RealmChangeListener() {
+        RealmChangeListener<RealmResults<AllTypes>> listenerA = new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 listenersTriggered.incrementAndGet();
             }
         };
-        RealmChangeListener listenerB = new RealmChangeListener() {
+        RealmChangeListener<RealmResults<AllTypes>> listenerB = new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 listenersTriggered.incrementAndGet();
             }
         };

@@ -35,9 +35,9 @@
         final AtomicInteger findAllSortedMultiInvocation = new AtomicInteger(0);
         final AtomicInteger findDistinctInvocation = new AtomicInteger(0);
 
-        findAllAsync.addChangeListener(new RealmChangeListener() {
+        findAllAsync.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 switch (findAllAsyncInvocation.incrementAndGet()) {
                     case 1: {
                         queriesCompleted.countDown();
@@ -53,9 +53,9 @@
             }
         });
 
-        findAllSorted.addChangeListener(new RealmChangeListener() {
+        findAllSorted.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 switch (findAllSortedInvocation.incrementAndGet()) {
                     case 1: {
                         queriesCompleted.countDown();
@@ -71,9 +71,9 @@
             }
         });
 
-        findAllSortedMulti.addChangeListener(new RealmChangeListener() {
+        findAllSortedMulti.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 switch (findAllSortedMultiInvocation.incrementAndGet()) {
                     case 1: {
                         queriesCompleted.countDown();
@@ -89,9 +89,9 @@
             }
         });
 
-        findDistinct.addChangeListener(new RealmChangeListener() {
+        findDistinct.addChangeListener(new RealmChangeListener<RealmResults<AnnotationIndexTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AnnotationIndexTypes> object) {
                 switch (findDistinctInvocation.incrementAndGet()) {
                     case 1: {
                         queriesCompleted.countDown();

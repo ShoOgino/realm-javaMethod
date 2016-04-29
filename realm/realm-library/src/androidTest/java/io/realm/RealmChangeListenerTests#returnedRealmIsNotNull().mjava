@@ -1,0 +1,15 @@
+    @Test
+    @RunTestInLooperThread
+    public void returnedRealmIsNotNull() {
+        looperThread.realm.addChangeListener(new RealmChangeListener<Realm>() {
+            @Override
+            public void onChange(Realm realm) {
+                assertNotNull(realm);
+                assertFalse(realm.isClosed());
+                looperThread.testComplete();
+            }
+        });
+        looperThread.realm.beginTransaction();
+        looperThread.realm.commitTransaction();
+    }
+

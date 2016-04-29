@@ -10,9 +10,9 @@
             @Override
             public void run() {
                 final Realm realm = Realm.getInstance(realmConfig);
-                final RealmChangeListener listener = new RealmChangeListener() {
+                final RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
                     @Override
-                    public void onChange() {
+                    public void onChange(Realm object) {
                         if (realm.where(AllTypes.class).count() == 1) {
                             realm.removeChangeListener(this);
                             realm.close();

@@ -7,9 +7,9 @@
                 // Get instance to make sure that the Realm is open for as long as the
                 // Observable is subscribed to it.
                 final DynamicRealm observableRealm = DynamicRealm.getInstance(realmConfig);
-                final RealmChangeListener listener = new RealmChangeListener() {
+                final RealmChangeListener<DynamicRealm> listener = new RealmChangeListener<DynamicRealm>() {
                     @Override
-                    public void onChange() {
+                    public void onChange(DynamicRealm realm) {
                         if (!subscriber.isUnsubscribed()) {
                             subscriber.onNext(observableRealm);
                         }

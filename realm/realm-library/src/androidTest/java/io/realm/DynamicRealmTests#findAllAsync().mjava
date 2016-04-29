@@ -9,9 +9,9 @@
         assertFalse(allTypes.isLoaded());
         assertEquals(0, allTypes.size());
 
-        allTypes.addChangeListener(new RealmChangeListener() {
+        allTypes.addChangeListener(new RealmChangeListener<RealmResults<DynamicRealmObject>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<DynamicRealmObject> object) {
                 assertEquals(6, allTypes.size());
                 for (int i = 0; i < allTypes.size(); i++) {
                     assertEquals("test data " + (4 + i), allTypes.get(i).getString(AllTypes.FIELD_STRING));

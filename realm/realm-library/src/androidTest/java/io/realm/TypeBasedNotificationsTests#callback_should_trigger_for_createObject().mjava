@@ -3,9 +3,9 @@
     @RunTestInLooperThread
     public void callback_should_trigger_for_createObject() {
         final Realm realm = looperThread.realm;
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 if (globalCommitInvocations.incrementAndGet() == 1) {
                     realm.handler.post(new Runnable() {
                         @Override
@@ -22,9 +22,9 @@
         final Dog dog = realm.createObject(Dog.class);
         realm.commitTransaction();
 
-        dog.addChangeListener(new RealmChangeListener() {
+        dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
-            public void onChange() {
+            public void onChange(Dog object) {
                 assertEquals("Akamaru", dog.getName());
                 typebasedCommitInvocations.incrementAndGet();
             }

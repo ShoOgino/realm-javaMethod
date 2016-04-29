@@ -83,9 +83,9 @@
             }
         };
 
-        realmResults1.addChangeListener(new RealmChangeListener() {
+        realmResults1.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 assertTrue(maxNumberOfNotificationsQuery1.getAndDecrement() > 0);
                 assertTrue(realmResults1.isLoaded());
                 assertEquals(12, realmResults1.size());
@@ -94,9 +94,9 @@
             }
         });
 
-        realmResults2.addChangeListener(new RealmChangeListener() {
+        realmResults2.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 assertTrue(maxNumberOfNotificationsQuery2.getAndDecrement() > 0);
                 assertTrue(realmResults2.isLoaded());
                 assertEquals(7, realmResults2.size());// the 2 add rows has columnLong == 0

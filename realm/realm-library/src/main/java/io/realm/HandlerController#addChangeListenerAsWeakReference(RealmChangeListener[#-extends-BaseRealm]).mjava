@@ -5,18 +5,18 @@
      *
      * @param listener the change listener.
      */
-    void addChangeListenerAsWeakReference(RealmChangeListener listener) {
-        Iterator<WeakReference<RealmChangeListener>> iterator = weakChangeListeners.iterator();
-        List<WeakReference<RealmChangeListener>> toRemoveList = null;
+    void addChangeListenerAsWeakReference(RealmChangeListener<? extends BaseRealm> listener) {
+        Iterator<WeakReference<RealmChangeListener<? extends BaseRealm>>> iterator = weakChangeListeners.iterator();
+        List<WeakReference<RealmChangeListener<? extends BaseRealm>>> toRemoveList = null;
         boolean addListener = true;
         while (iterator.hasNext()) {
-            WeakReference<RealmChangeListener> weakRef = iterator.next();
-            RealmChangeListener weakListener = weakRef.get();
+            WeakReference<RealmChangeListener<? extends BaseRealm>> weakRef = iterator.next();
+            RealmChangeListener<? extends BaseRealm> weakListener = weakRef.get();
 
             // Collect all listeners that are GC'ed
             if (weakListener == null) {
                 if (toRemoveList == null) {
-                    toRemoveList = new ArrayList<WeakReference<RealmChangeListener>>(weakChangeListeners.size());
+                    toRemoveList = new ArrayList<WeakReference<RealmChangeListener<? extends BaseRealm>>>(weakChangeListeners.size());
                 }
                 toRemoveList.add(weakRef);
             }
@@ -30,7 +30,7 @@
             weakChangeListeners.removeAll(toRemoveList);
         }
         if (addListener) {
-            weakChangeListeners.add(new WeakReference<RealmChangeListener>(listener));
+            weakChangeListeners.add(new WeakReference<RealmChangeListener<? extends BaseRealm>>(listener));
         }
     }
 

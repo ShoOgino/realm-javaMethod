@@ -4,18 +4,18 @@
     public void callback_with_relevant_commit_from_different_non_looper_realmobject_async() throws Throwable {
         final CountDownLatch nonLooperThread3CloseLatch = new CountDownLatch(1);
         final Realm realm = looperThread.realm;
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 globalCommitInvocations.incrementAndGet();
             }
         });
 
         final Dog dog = realm.where(Dog.class).findFirstAsync();
         assertTrue(dog.load());
-        dog.addChangeListener(new RealmChangeListener() {
+        dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
-            public void onChange() {
+            public void onChange(Dog object) {
                 switch (typebasedCommitInvocations.incrementAndGet()) {
                     case 1:  // triggered by COMPLETED_ASYNC_REALM_OBJECT
                         new RealmBackgroundTask(realm.configuration) {

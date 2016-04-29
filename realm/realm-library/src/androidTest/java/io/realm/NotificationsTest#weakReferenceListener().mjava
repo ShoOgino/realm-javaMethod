@@ -7,9 +7,9 @@
         final Realm realm = looperThread.realm;
 
         // Setup weak listener
-        RealmChangeListener weakListener = new RealmChangeListener() {
+        RealmChangeListener<Realm> weakListener = new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 weakCounter.incrementAndGet();
             }
         };
@@ -18,9 +18,9 @@
 
         // This is not a weak listener so will be called. When this is triggered the weak references have not been
         // removed yet. So make another change to ensure that they really are removed before validating.
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 int count = strongCounter.incrementAndGet();
                 if (count == 1) {
                     realm.beginTransaction();
@@ -35,7 +35,7 @@
         });
 
         // Hack: There is no guaranteed way to release the WeakReference, just clear it.
-        for (WeakReference<RealmChangeListener> weakRef : realm.handlerController.weakChangeListeners) {
+        for (WeakReference<RealmChangeListener<? extends BaseRealm>> weakRef : realm.handlerController.weakChangeListeners) {
             weakRef.clear();
         }
 

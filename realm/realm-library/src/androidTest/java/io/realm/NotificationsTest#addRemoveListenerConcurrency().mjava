@@ -10,9 +10,9 @@
         // the iterator.next get called
 
         // This one will be added when listener2's onChange called
-        final RealmChangeListener listener1 = new RealmChangeListener() {
+        final RealmChangeListener<Realm> listener1 = new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 // Step 7: Last listener called. Should only be called once
                 counter1.incrementAndGet();
 
@@ -27,9 +27,9 @@
         };
 
         // This one will be existing in the list all the time
-        final RealmChangeListener listener2 = new RealmChangeListener() {
+        final RealmChangeListener<Realm> listener2 = new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 // Step 3: Listener2 called
                 // Listener state [listener2, listener3, listener1]
                 // Listener 1 will not be called this time around
@@ -39,9 +39,9 @@
         };
 
         // This one will be removed after first transaction
-        RealmChangeListener listener3 = new RealmChangeListener() {
+        RealmChangeListener<Realm> listener3 = new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 // Step 4: Listener3 called
                 // Listener state [listener2, listener1]
                 counter3.incrementAndGet();

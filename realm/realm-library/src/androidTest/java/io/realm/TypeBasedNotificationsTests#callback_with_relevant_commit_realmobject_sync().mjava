@@ -16,9 +16,9 @@
         realm.commitTransaction();
 
         final Dog dog = realm.where(Dog.class).findFirst();
-        dog.addChangeListener(new RealmChangeListener() {
+        dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
-            public void onChange() {
+            public void onChange(Dog object) {
                 // Step 4: Respond to relevant change
                 typebasedCommitInvocations.incrementAndGet();
                 assertEquals("Akamaru", dog.getName());
@@ -26,9 +26,9 @@
             }
         });
 
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 int commits = globalCommitInvocations.incrementAndGet();
                 switch (commits) {
                     case 1:

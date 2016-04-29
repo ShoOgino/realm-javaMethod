@@ -4,9 +4,9 @@
     public void multiple_callbacks_should_be_invoked_realmobject_async() {
         final int NUMBER_OF_LISTENERS = 7;
         final Realm realm = looperThread.realm;
-        RealmChangeListener listener = new RealmChangeListener() {
+        RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
             @Override
-            public void onChange() {
+            public void onChange(Realm object) {
                 realm.handler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -26,9 +26,9 @@
         Dog dog = realm.where(Dog.class).findFirstAsync();
         assertTrue(dog.load());
         for (int i = 0; i < NUMBER_OF_LISTENERS; i++) {
-            dog.addChangeListener(new RealmChangeListener() {
+            dog.addChangeListener(new RealmChangeListener<Dog>() {
                 @Override
-                public void onChange() {
+                public void onChange(Dog object) {
                     typebasedCommitInvocations.incrementAndGet();
                 }
             });

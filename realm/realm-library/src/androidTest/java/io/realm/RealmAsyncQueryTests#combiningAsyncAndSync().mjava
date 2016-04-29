@@ -9,9 +9,9 @@
 
         assertEquals(0, allTypesAsync.size());
         assertEquals(6, allTypesSync.size());
-        allTypesAsync.addChangeListener(new RealmChangeListener() {
+        allTypesAsync.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 assertEquals(4, allTypesAsync.size());
                 assertEquals(6, allTypesSync.size());
                 looperThread.testComplete();

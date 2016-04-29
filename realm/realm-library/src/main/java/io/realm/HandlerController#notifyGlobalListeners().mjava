@@ -1,23 +1,23 @@
     private void notifyGlobalListeners() {
         // notify strong reference listener
-        Iterator<RealmChangeListener> iteratorStrongListeners = changeListeners.iterator();
+        Iterator<RealmChangeListener<? extends BaseRealm>> iteratorStrongListeners = changeListeners.iterator();
         while (iteratorStrongListeners.hasNext() && !realm.isClosed()) { // every callback could close the realm
             RealmChangeListener listener = iteratorStrongListeners.next();
-            listener.onChange();
+            listener.onChange(realm);
         }
         // notify weak reference listener (internals)
-        Iterator<WeakReference<RealmChangeListener>> iteratorWeakListeners = weakChangeListeners.iterator();
-        List<WeakReference<RealmChangeListener>> toRemoveList = null;
+        Iterator<WeakReference<RealmChangeListener<? extends BaseRealm>>> iteratorWeakListeners = weakChangeListeners.iterator();
+        List<WeakReference<RealmChangeListener<? extends BaseRealm>>> toRemoveList = null;
         while (iteratorWeakListeners.hasNext() && !realm.isClosed()) {
-            WeakReference<RealmChangeListener> weakRef = iteratorWeakListeners.next();
+            WeakReference<RealmChangeListener<? extends BaseRealm>> weakRef = iteratorWeakListeners.next();
             RealmChangeListener listener = weakRef.get();
             if (listener == null) {
                 if (toRemoveList == null) {
-                    toRemoveList = new ArrayList<WeakReference<RealmChangeListener>>(weakChangeListeners.size());
+                    toRemoveList = new ArrayList<WeakReference<RealmChangeListener<? extends BaseRealm>>>(weakChangeListeners.size());
                 }
                 toRemoveList.add(weakRef);
             } else {
-                listener.onChange();
+                listener.onChange(realm);
             }
         }
         if (toRemoveList != null) {

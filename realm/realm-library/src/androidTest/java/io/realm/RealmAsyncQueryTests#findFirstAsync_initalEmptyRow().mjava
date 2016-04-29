@@ -3,9 +3,9 @@
     public void findFirstAsync_initalEmptyRow() throws Throwable {
         Realm realm = looperThread.realm;
         final AllTypes firstAsync = realm.where(AllTypes.class).findFirstAsync();
-        firstAsync.addChangeListener(new RealmChangeListener() {
+        firstAsync.addChangeListener(new RealmChangeListener<AllTypes>() {
             @Override
-            public void onChange() {
+            public void onChange(AllTypes object) {
                 assertTrue(firstAsync.load());
                 assertTrue(firstAsync.isLoaded());
                 assertTrue(firstAsync.isValid());

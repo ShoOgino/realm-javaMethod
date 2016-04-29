@@ -12,9 +12,9 @@
                     bgRealm.commitTransaction();
 
                     RealmResults<Dog> dogs = bgRealm.where(Dog.class).findAll();
-                    dogs.addChangeListener(new RealmChangeListener() {
+                    dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
                         @Override
-                        public void onChange() {
+                        public void onChange(RealmResults<Dog> object) {
                             fail("Callback should not be registered and invoked on a non-Looper thread");
                         }
                     });

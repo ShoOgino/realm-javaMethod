@@ -6,9 +6,9 @@
         final Realm realm = looperThread.realm;
 
         final RealmResults<Dog> allAsync = realm.where(Dog.class).equalTo("owner.name", "kiba").findAllAsync();
-        allAsync.addChangeListener(new RealmChangeListener() {
+        allAsync.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<Dog> object) {
                 switch (numberOfInvocations.incrementAndGet()) {
                     case 1:
                         assertEquals(0, allAsync.size());

@@ -2,9 +2,9 @@
     @RunTestInLooperThread
     public void callback_should_trigger_for_createObject_dynamic_realm() {
         final DynamicRealm realm = DynamicRealm.getInstance(looperThread.realmConfiguration);
-        realm.addChangeListener(new RealmChangeListener() {
+        realm.addChangeListener(new RealmChangeListener<DynamicRealm>() {
             @Override
-            public void onChange() {
+            public void onChange(DynamicRealm object) {
                 if (globalCommitInvocations.incrementAndGet() == 1) {
                     realm.handler.post(new Runnable() {
                         @Override
@@ -22,9 +22,9 @@
         final DynamicRealmObject dog = realm.createObject("Dog");
         realm.commitTransaction();
 
-        dog.addChangeListener(new RealmChangeListener() {
+        dog.addChangeListener(new RealmChangeListener<DynamicRealmObject>() {
             @Override
-            public void onChange() {
+            public void onChange(DynamicRealmObject object) {
                 assertEquals("Akamaru", dog.getString("name"));
                 typebasedCommitInvocations.incrementAndGet();
             }

@@ -11,9 +11,9 @@
                     bgRealm.createObject(Dog.class);
                     bgRealm.commitTransaction();
 
-                    bgRealm.addChangeListener(new RealmChangeListener() {
+                    bgRealm.addChangeListener(new RealmChangeListener<Realm>() {
                         @Override
-                        public void onChange() {
+                        public void onChange(Realm object) {
                             fail("Callback should not be registered and invoked on a non-Looper thread");
                         }
                     });

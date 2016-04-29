@@ -1,0 +1,17 @@
+    @Test
+    @RunTestInLooperThread
+    public void returnedDynamicRealmIsNotNull() {
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.realmConfiguration);
+        dynamicRealm.addChangeListener(new RealmChangeListener<DynamicRealm>() {
+            @Override
+            public void onChange(DynamicRealm dynRealm) {
+                assertNotNull(dynRealm);
+                assertFalse(dynRealm.isClosed());
+                dynRealm.close();
+                looperThread.testComplete();
+            }
+        });
+        dynamicRealm.beginTransaction();
+        dynamicRealm.commitTransaction();
+    }
+

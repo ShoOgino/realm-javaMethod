@@ -32,9 +32,9 @@
         };
 
         final RealmResults<AllTypes> allAsync = looperThread.realm.where(AllTypes.class).findAllAsync();
-        allAsync.addChangeListener(new RealmChangeListener() {
+        allAsync.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 assertTrue(allAsync.isLoaded());
                 if (allAsync.size() == NUMBER_OF_COMMITS) {
                     AllTypes lastInserted = looperThread.realm.where(AllTypes.class)

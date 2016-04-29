@@ -24,9 +24,9 @@
             @Override
             public void run() {
                 final Realm mainRealm = Realm.getInstance(realmConfig);
-                mainRealm.addChangeListener(new RealmChangeListener() {
+                mainRealm.addChangeListener(new RealmChangeListener<Realm>() {
                     @Override
-                    public void onChange() {
+                    public void onChange(Realm object) {
                         mainRealm.close();
                         numberOfInvocation.countDown();
                     }

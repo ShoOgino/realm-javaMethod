@@ -4,9 +4,9 @@
         Realm realm = looperThread.realm;
         RealmResults<AllTypes> collection = realm.allObjects(AllTypes.class);
 
-        collection.addChangeListener(new RealmChangeListener() {
+        collection.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 looperThread.testComplete();
             }
         });

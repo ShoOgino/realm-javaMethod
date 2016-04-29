@@ -52,9 +52,9 @@
         assertEquals(0, realmResults.size());
 
         // 6. Callback triggered after retry has completed
-        realmResults.addChangeListener(new RealmChangeListener() {
+        realmResults.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
-            public void onChange() {
+            public void onChange(RealmResults<AllTypes> object) {
                 assertEquals(3, numberOfIntercept.get());
                 assertEquals(1, numberOfInvocation.incrementAndGet());
                 assertTrue(realmResults.isLoaded());
