@@ -1,0 +1,22 @@
+    static private boolean deletes(String canonicalPath, File rootFolder, String realmFileName) {
+        final AtomicBoolean realmDeleted = new AtomicBoolean(true);
+
+        List<File> filesToDelete = Arrays.asList(
+                new File(rootFolder, realmFileName),
+                new File(rootFolder, realmFileName + ".lock"),
+                new File(rootFolder, realmFileName + ".log_a"),
+                new File(rootFolder, realmFileName + ".log_b"),
+                new File(rootFolder, realmFileName + ".log"),
+                new File(canonicalPath));
+        for (File fileToDelete : filesToDelete) {
+            if (fileToDelete.exists()) {
+                boolean deleteResult = fileToDelete.delete();
+                if (!deleteResult) {
+                    realmDeleted.set(false);
+                    RealmLog.w("Could not delete the file " + fileToDelete);
+                }
+            }
+        }
+        return realmDeleted.get();
+    }
+
