@@ -1,0 +1,24 @@
+    // The object should be added to HandlerController.realmObjects only when the first time addListener called.
+    @Test
+    @UiThreadTest
+    public void addChangeListener_shouldAddTheObjectToHandlerRealmObjects() {
+        realm.beginTransaction();
+        AllTypesPrimaryKey allTypesPrimaryKey = realm.createObject(AllTypesPrimaryKey.class, 1);
+        realm.commitTransaction();
+        final Map<WeakReference<RealmObjectProxy>, RealmQuery<? extends RealmModel>> realmObjects =
+                realm.handlerController.realmObjects;
+
+        assertTrue(realmObjects.isEmpty());
+
+        allTypesPrimaryKey.addChangeListener(new RealmChangeListener<AllTypesPrimaryKey>() {
+            @Override
+            public void onChange(AllTypesPrimaryKey element) {
+            }
+        });
+
+        assertEquals(1, realmObjects.size());
+        for (WeakReference<RealmObjectProxy> ref : realmObjects.keySet()) {
+            assertTrue(ref.get() == allTypesPrimaryKey);
+        }
+    }
+
