@@ -1,0 +1,33 @@
+    // Test if waitForChange doesn't blocks once stopWaitForChange has been called before.
+    @Test
+    public void waitForChange_stopWaitForChangeDisablesWaiting() throws InterruptedException {
+        final CountDownLatch bgRealmOpened = new CountDownLatch(1);
+        final CountDownLatch bgRealmStopped = new CountDownLatch(1);
+        final CountDownLatch bgRealmClosed = new CountDownLatch(1);
+        final AtomicBoolean bgRealmFirstWaitResult = new AtomicBoolean(true);
+        final AtomicBoolean bgRealmSecondWaitResult = new AtomicBoolean(false);
+        final AtomicReference<Realm> bgRealm = new AtomicReference<Realm>();
+
+        // wait in background
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(realmConfig);
+                bgRealm.set(realm);
+                bgRealmOpened.countDown();
+                bgRealmFirstWaitResult.set(realm.waitForChange());
+                bgRealmStopped.countDown();
+                bgRealmSecondWaitResult.set(realm.waitForChange());
+                realm.close();
+                bgRealmClosed.countDown();
+            }
+        }).start();
+
+        TestHelper.awaitOrFail(bgRealmOpened);
+        bgRealm.get().stopWaitForChange();
+        TestHelper.awaitOrFail(bgRealmStopped);
+        assertFalse(bgRealmFirstWaitResult.get());
+        TestHelper.awaitOrFail(bgRealmClosed);
+        assertFalse(bgRealmSecondWaitResult.get());
+    }
+

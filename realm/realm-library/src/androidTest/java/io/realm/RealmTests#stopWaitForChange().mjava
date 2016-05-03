@@ -1,0 +1,27 @@
+    @Test
+    public void stopWaitForChange() throws InterruptedException {
+        final CountDownLatch bgRealmOpened = new CountDownLatch(1);
+        final CountDownLatch bgRealmClosed = new CountDownLatch(1);
+        final AtomicBoolean bgRealmChangeResult = new AtomicBoolean(true);
+        final AtomicReference<Realm> bgRealm = new AtomicReference<Realm>();
+
+        // wait in background
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(realmConfig);
+                bgRealm.set(realm);
+                bgRealmOpened.countDown();
+                bgRealmChangeResult.set(realm.waitForChange());
+                realm.close();
+                bgRealmClosed.countDown();
+            }
+        }).start();
+
+        TestHelper.awaitOrFail(bgRealmOpened);
+        Thread.sleep(200);
+        bgRealm.get().stopWaitForChange();
+        TestHelper.awaitOrFail(bgRealmClosed);
+        assertFalse(bgRealmChangeResult.get());
+    }
+

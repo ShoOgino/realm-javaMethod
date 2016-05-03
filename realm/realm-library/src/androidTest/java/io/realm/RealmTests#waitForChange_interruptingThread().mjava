@@ -1,0 +1,36 @@
+    // Check if waitForChange() does not respond to Thread.interrupt().
+    @Test
+    public void waitForChange_interruptingThread() throws InterruptedException {
+        final CountDownLatch bgRealmOpened = new CountDownLatch(1);
+        final CountDownLatch bgRealmClosed = new CountDownLatch(1);
+        final AtomicReference<Boolean> bgRealmWaitResult = new AtomicReference<Boolean>();
+        final AtomicReference<Realm> bgRealm = new AtomicReference<Realm>();
+
+        // wait in background
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(realmConfig);
+                bgRealm.set(realm);
+                bgRealmOpened.countDown();
+                bgRealmWaitResult.set(new Boolean(realm.waitForChange()));
+                realm.close();
+                bgRealmClosed.countDown();
+            }
+        });
+        thread.start();
+
+        TestHelper.awaitOrFail(bgRealmOpened);
+        // make sure background thread goes to wait
+        Thread.sleep(500);
+        // interrupting a thread should neither cause any side effect nor terminate the Background Realm from waiting.
+        thread.interrupt();
+        assertTrue(thread.isInterrupted());
+        assertEquals(null, bgRealmWaitResult.get());
+
+        // now we'll stop realm from waiting
+        bgRealm.get().stopWaitForChange();
+        TestHelper.awaitOrFail(bgRealmClosed);
+        assertFalse(bgRealmWaitResult.get().booleanValue());
+    }
+
