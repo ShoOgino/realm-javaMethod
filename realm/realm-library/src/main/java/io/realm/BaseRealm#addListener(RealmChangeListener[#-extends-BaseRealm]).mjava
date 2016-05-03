@@ -1,0 +1,8 @@
+    protected void addListener(RealmChangeListener<? extends BaseRealm> listener) {
+        checkIfValid();
+        if (!handlerController.isAutoRefreshEnabled()) {
+            throw new IllegalStateException("You can't register a listener from a non-Looper thread ");
+        }
+        handlerController.addChangeListener(listener);
+    }
+
