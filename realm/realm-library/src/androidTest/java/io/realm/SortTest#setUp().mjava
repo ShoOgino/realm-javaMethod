@@ -1,31 +1,17 @@
-    @Override
+    @Before
     public void setUp() {
         // Creates a Realm with the following objects:
         // 0: (5, "Adam")
         // 1: (4, "Brian")
         // 2: (4, "Adam")
         // 3: (5, "Adam")
-        RealmConfiguration config = TestHelper.createConfiguration(getContext());
-        Realm.deleteRealm(config);
-        testRealm = Realm.getInstance(config);
 
-        testRealm.beginTransaction();
-        testRealm.delete(AllTypes.class);
-        AllTypes object1 = testRealm.createObject(AllTypes.class);
-        object1.setColumnLong(5);
-        object1.setColumnString("Adam");
+        // Injecting the Instrumentation instance is required
+        // for your test to run with AndroidJUnitRunner.
+        context = InstrumentationRegistry.getInstrumentation().getContext();
+        realmConfig = configFactory.createConfiguration();
+        realm = Realm.getInstance(realmConfig);
 
-        AllTypes object2 = testRealm.createObject(AllTypes.class);
-        object2.setColumnLong(4);
-        object2.setColumnString("Brian");
-
-        AllTypes object3 = testRealm.createObject(AllTypes.class);
-        object3.setColumnLong(4);
-        object3.setColumnString("Adam");
-
-        AllTypes object4 = testRealm.createObject(AllTypes.class);
-        object4.setColumnLong(5);
-        object4.setColumnString("Adam");
-        testRealm.commitTransaction();
+        populateRealm(realm);
     }
 

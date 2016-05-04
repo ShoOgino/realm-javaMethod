@@ -1,0 +1,85 @@
+    @Test
+    @RunTestInLooperThread
+    public void resorting() throws InterruptedException {
+        final AtomicInteger changeListenerCalled = new AtomicInteger(4);
+
+        final Realm realm = Realm.getInstance(looperThread.createConfiguration());
+        realm.setAutoRefresh(true);
+
+        final Runnable endTest = new Runnable() {
+            @Override
+            public void run() {
+                if (changeListenerCalled.decrementAndGet() == 0) {
+                    realm.close();
+                    looperThread.testComplete();
+                }
+            }
+        };
+
+        // 0: (5, "Adam")
+        // 1: (4, "Brian")
+        // 2: (4, "Adam")
+        // 3: (5, "Adam")
+        populateRealm(realm);
+
+        // rr0: [0, 1, 2, 3]
+        final RealmResults<AllTypes> rr0 = realm.where(AllTypes.class).findAll();
+        rr0.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> element) {
+                // After commit: [0, 1, 2, 3, 4] - most likely as order isn't guaranteed
+                assertEquals(5, element.size());
+                endTest.run();
+            }
+        });
+
+        // rr1: [1, 2, 0, 3]
+        final RealmResults<AllTypes> rr1 = realm.where(AllTypes.class).findAll().sort(FIELD_LONG, Sort.ASCENDING);
+        rr1.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> element) {
+                // After commit: [1, 2, 0, 3, 4]
+                assertEquals(4, element.first().getColumnLong());
+                assertEquals(6, element.last().getColumnLong());
+                assertEquals(5, element.size());
+                endTest.run();
+            }
+        });
+        assertEquals(4, rr1.first().getColumnLong());
+        assertEquals(5, rr1.last().getColumnLong());
+
+        // rr2: [0, 3, 1, 2]
+        final RealmResults<AllTypes> rr2 = realm.where(AllTypes.class).findAll().sort(FIELD_LONG, Sort.DESCENDING);
+        rr2.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> element) {
+                // After commit: [4, 0, 3, 1, 2]
+                assertEquals(6, element.first().getColumnLong());
+                assertEquals(4, element.last().getColumnLong());
+                assertEquals(5, element.size());
+                endTest.run();
+            }
+        });
+        assertEquals(5, rr2.first().getColumnLong());
+        assertEquals(4, rr2.last().getColumnLong());
+
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
+            @Override
+            public void onChange(Realm element) {
+                assertEquals(5, element.where(AllTypes.class).findAll().size());
+                endTest.run();
+            }
+        });
+
+        // After commit:
+        // 0: (5, "Adam")
+        // 1: (4, "Brian")
+        // 2: (4, "Adam")
+        // 3: (5, "Adam")
+        // 4: (6, "")
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnLong(6);
+        realm.commitTransaction();
+    }
+
