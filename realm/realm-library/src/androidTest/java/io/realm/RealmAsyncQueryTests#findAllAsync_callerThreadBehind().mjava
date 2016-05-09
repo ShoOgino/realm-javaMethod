@@ -44,7 +44,7 @@
             }
         };
         realm.setHandler(handler);
-        Realm.asyncQueryExecutor.pause();
+        Realm.asyncTaskExecutor.pause();
 
         // Create async queries and check they haven't completed
         final RealmResults<AllTypes> realmResults1 = realm.where(AllTypes.class)
@@ -68,7 +68,7 @@
                 realm.commitTransaction();
             }
         }.awaitOrFail();
-        Realm.asyncQueryExecutor.resume();
+        Realm.asyncTaskExecutor.resume();
 
         // Setup change listeners
         final Runnable signalCallbackDone = new Runnable() {
