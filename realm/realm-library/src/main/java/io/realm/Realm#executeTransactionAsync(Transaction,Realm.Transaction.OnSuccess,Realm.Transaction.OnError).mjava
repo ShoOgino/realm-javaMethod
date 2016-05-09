@@ -26,7 +26,7 @@
         // to perform the transaction
         final RealmConfiguration realmConfiguration = getConfiguration();
 
-        final Future<?> pendingQuery = asyncQueryExecutor.submit(new Runnable() {
+        final Future<?> pendingTransaction= asyncTaskExecutor.submit(new Runnable() {
             @Override
             public void run() {
                 if (Thread.currentThread().isInterrupted()) {
@@ -120,6 +120,6 @@
             }
         });
 
-        return new RealmAsyncTask(pendingQuery);
+        return new RealmAsyncTask(pendingTransaction);
     }
 

@@ -13,7 +13,7 @@
         final CountDownLatch signalClosedRealm = new CountDownLatch(1);
 
         populateTestRealm(looperThread.realm, 10);
-        Realm.asyncQueryExecutor.pause();
+        Realm.asyncTaskExecutor.pause();
 
         final AllTypes firstAsync = looperThread.realm.where(AllTypes.class).findFirstAsync();
         firstAsync.addChangeListener(new RealmChangeListener<AllTypes>() {
@@ -33,7 +33,7 @@
                 // Advancing the Realm without generating notifications
                 bgRealm.sharedGroupManager.promoteToWrite();
                 bgRealm.sharedGroupManager.commitAndContinueAsRead();
-                Realm.asyncQueryExecutor.resume();
+                Realm.asyncTaskExecutor.resume();
                 bgRealm.close();
                 signalClosedRealm.countDown();
             }
