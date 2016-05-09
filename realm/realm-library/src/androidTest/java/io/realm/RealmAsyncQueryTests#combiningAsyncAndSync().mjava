@@ -3,7 +3,7 @@
     public void combiningAsyncAndSync() {
         populateTestRealm(looperThread.realm, 10);
 
-        Realm.asyncQueryExecutor.pause();
+        Realm.asyncTaskExecutor.pause();
         final RealmResults<AllTypes> allTypesAsync = looperThread.realm.where(AllTypes.class).greaterThan("columnLong", 5).findAllAsync();
         final RealmResults<AllTypes> allTypesSync = allTypesAsync.where().greaterThan("columnLong", 3).findAll();
 
@@ -17,7 +17,7 @@
                 looperThread.testComplete();
             }
         });
-        Realm.asyncQueryExecutor.resume();
+        Realm.asyncTaskExecutor.resume();
         looperThread.keepStrongReference.add(allTypesAsync);
     }
 
