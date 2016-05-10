@@ -1,0 +1,56 @@
+    @Test
+    @RunTestInLooperThread
+    public void resortingDates() {
+        final int TEST_SIZE = 10;
+        final AtomicInteger changeListenerCalled = new AtomicInteger(2);
+
+        final Realm realm = Realm.getInstance(looperThread.createConfiguration());
+        realm.setAutoRefresh(true);
+        populateDates(realm, TEST_SIZE);
+
+        final Runnable endTest = new Runnable() {
+            @Override
+            public void run() {
+                if (changeListenerCalled.decrementAndGet() == 0) {
+                    realm.close();
+                    looperThread.testComplete();
+                }
+            }
+        };
+
+        RealmResults<AllTypes> objectsAscending = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_DATE, Sort.ASCENDING);
+        assertEquals(TEST_SIZE, objectsAscending.size());
+        objectsAscending.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> element) {
+                assertEquals(TEST_SIZE + 1, element.size());
+                int i = 0;
+                for (AllTypes allTypes : element) {
+                    assertEquals(new Date(i), allTypes.getColumnDate());
+                    i++;
+                }
+                endTest.run();
+            }
+        });
+
+        RealmResults<AllTypes> objectsDescending = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_DATE, Sort.DESCENDING);
+        assertEquals(TEST_SIZE, objectsDescending.size());
+        objectsDescending.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> element) {
+                assertEquals(TEST_SIZE + 1, element.size());
+                int i = element.size() - 1;
+                for (AllTypes allTypes : element) {
+                    assertEquals(new Date(i), allTypes.getColumnDate());
+                    i--;
+                }
+                endTest.run();
+            }
+        });
+
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnDate(new Date(TEST_SIZE));
+        realm.commitTransaction();
+    }
+
