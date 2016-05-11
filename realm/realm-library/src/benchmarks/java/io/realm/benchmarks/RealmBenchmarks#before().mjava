@@ -1,0 +1,18 @@
+    @BeforeExperiment
+    public void before() {
+        coldConfig = new RealmConfiguration.Builder(InstrumentationRegistry.getTargetContext()).name("cold").build();
+        RealmConfiguration config = new RealmConfiguration.Builder(InstrumentationRegistry.getTargetContext()).build();
+        Realm.deleteRealm(coldConfig);
+        Realm.deleteRealm(config);
+        realm = Realm.getInstance(config);
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                readObject = realm.createObject(AllTypes.class);
+                readObject.setColumnString("Foo");
+                readObject.setColumnLong(42);
+                readObject.setColumnDouble(1.234D);
+            }
+        });
+    }
+

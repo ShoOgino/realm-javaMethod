@@ -1,0 +1,17 @@
+    @BeforeExperiment
+    public void before() {
+        RealmConfiguration config = new RealmConfiguration.Builder(InstrumentationRegistry.getTargetContext()).build();
+        Realm.deleteRealm(config);
+        realm = Realm.getInstance(config);
+        realm.beginTransaction();
+        for (int i = 0; i < DATA_SIZE; i++) {
+            AllTypes obj = realm.createObject(AllTypes.class);
+            obj.setColumnLong(i);
+            obj.setColumnBoolean(i % 2 == 0);
+            obj.setColumnString("Foo " + i);
+            obj.setColumnDouble(i + 1.234D);
+        }
+        realm.commitTransaction();
+        results = realm.where(AllTypes.class).findAll();
+    }
+

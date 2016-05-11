@@ -1,0 +1,9 @@
+    @BeforeExperiment
+    public void before() {
+        RealmConfiguration config = new RealmConfiguration.Builder(InstrumentationRegistry.getTargetContext()).build();
+        Realm.deleteRealm(config);
+        realm = Realm.getInstance(config);
+        realm.beginTransaction();
+        writeObject = realm.createObject(AllTypes.class);
+    }
+
