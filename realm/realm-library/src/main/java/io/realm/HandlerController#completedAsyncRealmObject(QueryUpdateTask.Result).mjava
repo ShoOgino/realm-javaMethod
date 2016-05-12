@@ -14,7 +14,7 @@
                     if (rowPointer != 0 && emptyAsyncRealmObject.containsKey(realmObjectWeakReference)) {
                         // cleanup a previously empty async RealmObject
                         emptyAsyncRealmObject.remove(realmObjectWeakReference);
-                        realmObjects.put(realmObjectWeakReference, null);
+                        realmObjects.put(realmObjectWeakReference, NO_REALM_QUERY);
                     }
                     proxy.realmGet$proxyState().onCompleted$realm(rowPointer);
                     proxy.realmGet$proxyState().notifyChangeListeners$realm();
@@ -28,11 +28,15 @@
                         proxy.realmGet$proxyState().notifyChangeListeners$realm();
 
                     } else {
-                        RealmLog.d("[COMPLETED_ASYNC_REALM_OBJECT "+ proxy + "] , realm:" + HandlerController.this
+                        RealmLog.d("[COMPLETED_ASYNC_REALM_OBJECT " + proxy + "] , realm:" + HandlerController.this
                                 + " RealmObject is not loaded yet. Rerun the query.");
-                        RealmQuery<?> realmQuery = realmObjects.get(realmObjectWeakReference);
-                        if (realmQuery == null) { // this is a retry of an empty RealmObject
+                        Object value = realmObjects.get(realmObjectWeakReference);
+                        RealmQuery<? extends RealmModel> realmQuery;
+                        if (value == null || value == NO_REALM_QUERY) { // this is a retry of an empty RealmObject
                             realmQuery = emptyAsyncRealmObject.get(realmObjectWeakReference);
+
+                        } else {
+                            realmQuery = (RealmQuery<? extends RealmModel>) value;
                         }
 
                         QueryUpdateTask queryUpdateTask = QueryUpdateTask.newBuilder()
