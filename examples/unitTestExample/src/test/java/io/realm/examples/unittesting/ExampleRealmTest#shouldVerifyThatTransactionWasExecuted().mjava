@@ -1,0 +1,17 @@
+    /**
+     * Have to verify the {@link Realm#executeTransaction(Realm.Transaction)} call in a different
+     * test because of a problem with Powermock: https://github.com/jayway/powermock/issues/649
+     */
+    @Test
+    public void shouldVerifyThatTransactionWasExecuted() {
+
+        DogRepository dogRepo = new DogRepositoryImpl();
+        dogRepo.createDog("Spot");
+
+        // Verify that the begin transaction was called only once
+        verify(mockRealm, times(1)).executeTransaction(Mockito.any(Realm.Transaction.class));
+
+        // Verify that the Realm was closed only once.
+        verify(mockRealm, times(1)).close();
+    }
+

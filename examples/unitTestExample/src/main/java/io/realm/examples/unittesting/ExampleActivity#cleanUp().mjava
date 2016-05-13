@@ -1,7 +1,10 @@
     private void cleanUp() {
         // Delete all persons
-        realm.beginTransaction();
-        realm.allObjects(Person.class).deleteAllFromRealm();
-        realm.commitTransaction();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.allObjects(Person.class).deleteAllFromRealm();
+            }
+        });
     }
 
