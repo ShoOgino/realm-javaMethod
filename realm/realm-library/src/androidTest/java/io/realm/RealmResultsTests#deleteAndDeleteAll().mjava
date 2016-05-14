@@ -1,0 +1,24 @@
+    @Test
+    public void deleteAndDeleteAll() {
+        realm.beginTransaction();
+        for (int i = 0; i < 10; i++) {
+            StringOnly stringOnly = realm.createObject(StringOnly.class);
+            stringOnly.setChars("String " + i);
+        }
+        realm.commitTransaction();
+
+        RealmResults<StringOnly> stringOnlies = realm.where(StringOnly.class).findAll();
+
+        realm.beginTransaction();
+        // remove one object
+        stringOnlies.get(0).deleteFromRealm();
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        // remove the rest
+        stringOnlies.deleteAllFromRealm();
+        realm.commitTransaction();
+
+        assertEquals(0, realm.where(StringOnly.class).findAll().size());
+    }
+
