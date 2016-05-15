@@ -7,7 +7,7 @@
         dogToAdd.setName("Rex");
         realm.commitTransaction();
 
-        assertEquals(1, realm.allObjects(Dog.class).size());
+        assertEquals(1, realm.where(Dog.class).count());
 
         Dog dogToRemove = realm.where(Dog.class).findFirst();
         assertNotNull(dogToRemove);
@@ -15,7 +15,7 @@
         dogToRemove.deleteFromRealm();
         realm.commitTransaction();
 
-        assertEquals(0, realm.allObjects(Dog.class).size());
+        assertEquals(0, realm.where(Dog.class).count());
         try {
             dogToAdd.getName();
             realm.close();

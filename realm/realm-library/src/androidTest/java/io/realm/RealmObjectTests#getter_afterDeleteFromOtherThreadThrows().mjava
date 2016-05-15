@@ -1,27 +1,32 @@
     @Test
     public void getter_afterDeleteFromOtherThreadThrows() {
+        realm = Realm.getInstance(configFactory.createConfiguration());
+        final CountDownLatch bgRealmDone = new CountDownLatch(1);
+
         realm.beginTransaction();
-        AllTypes obj = realm.createObject(AllTypes.class);
+        final AllTypes obj = realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
-        final CountDownLatch objectDeletedInBackground = new CountDownLatch(1);
-        new java.lang.Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                Realm realm = Realm.getInstance(realmConfig);
-                realm.beginTransaction();
-                realm.delete(AllTypes.class);
-                realm.commitTransaction();
-                realm.close();
-                objectDeletedInBackground.countDown();
+                Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+                bgRealm.beginTransaction();
+                bgRealm.delete(AllTypes.class);
+                bgRealm.commitTransaction();
+                bgRealm.close();
+                bgRealmDone.countDown();
             }
         }).start();
-        TestHelper.awaitOrFail(objectDeletedInBackground);
-        realm.refresh(); // Move to version where underlying object is deleted.
+        TestHelper.awaitOrFail(bgRealmDone);
+        realm.waitForChange();
 
         // Object should no longer be available
         assertFalse(obj.isValid());
-        thrown.expect(IllegalStateException.class);
-        obj.getColumnLong();
+        try {
+            obj.getColumnLong();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
     }
 

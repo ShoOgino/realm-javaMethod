@@ -7,7 +7,7 @@
         switch (collectionClass) {
             case MANAGED_REALMLIST:
                 realm.beginTransaction();
-                RealmResults<NullTypes> objects = realm.allObjects(NullTypes.class);
+                RealmResults<NullTypes> objects = realm.where(NullTypes.class).findAll();
                 NullTypes parent = realm.createObject(NullTypes.class, 0);
                 for (int i = 0; i < objects.size(); i++) {
                     NullTypes object = objects.get(i);
@@ -21,8 +21,8 @@
                 break;
 
             case REALMRESULTS:
-                original = realm.allObjects(NullTypes.class);
-                copy = realm.allObjects(NullTypes.class);
+                original = realm.where(NullTypes.class).findAll();
+                copy = realm.where(NullTypes.class).findAll();
                 break;
 
             default:

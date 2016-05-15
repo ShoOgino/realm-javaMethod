@@ -4,7 +4,7 @@
         final long SECONDARY_FIELD_UPDATED = 44887612L;
         PrimaryKeyAsString nullPrimaryKeyObj = TestHelper.addStringPrimaryKeyObjectToTestRealm(realm, (String) null, SECONDARY_FIELD_VALUE);
 
-        RealmResults<PrimaryKeyAsString> result = realm.allObjects(PrimaryKeyAsString.class);
+        RealmResults<PrimaryKeyAsString> result = realm.where(PrimaryKeyAsString.class).findAll();
         assertEquals(1, result.size());
         assertEquals(null, result.first().getName());
         assertEquals(SECONDARY_FIELD_VALUE, result.first().getId());
@@ -15,6 +15,6 @@
         realm.copyToRealmOrUpdate(nullPrimaryKeyObj);
         realm.commitTransaction();
 
-        assertEquals(SECONDARY_FIELD_UPDATED, realm.allObjects(PrimaryKeyAsString.class).first().getId());
+        assertEquals(SECONDARY_FIELD_UPDATED, realm.where(PrimaryKeyAsString.class).findFirst().getId());
     }
 

@@ -9,7 +9,7 @@
         TestHelper.addLongPrimaryKeyObjectToTestRealm(realm,    (Long) null,    SECONDARY_FIELD_VALUE);
 
         for (Class clazz : CLASSES) {
-            RealmResults results = realm.allObjects(clazz);
+            RealmResults results = realm.where(clazz).findAll();
             assertEquals(1, results.size());
             assertEquals(null, ((NullPrimaryKey)results.first()).getId());
             assertEquals(SECONDARY_FIELD_VALUE, ((NullPrimaryKey)results.first()).getName());

@@ -13,7 +13,7 @@
                 backgroundLooperStarted.countDown();
 
                 // Random operation in the client code
-                final RealmResults<Dog> dogs = realm.allObjects(Dog.class);
+                final RealmResults<Dog> dogs = realm.where(Dog.class).findAll();
                 if (dogs.size() != 0) {
                     return false;
                 }
@@ -56,7 +56,7 @@
             dog.setName("Rex " + i);
         }
         realm.commitTransaction();
-        assertEquals(TEST_SIZE, realm.allObjects(Dog.class).size());
+        assertEquals(TEST_SIZE, realm.where(Dog.class).count());
         realm.close();
         addHandlerMessages.countDown();
 

@@ -22,13 +22,13 @@
         // Test a normal Realm file
         testRealm.writeCopyTo(new File(getContext().getFilesDir(), fileName));
         Realm onDiskRealm = Realm.getInstance(conf);
-        assertEquals(onDiskRealm.allObjects(Dog.class).size(), 1);
+        assertEquals(onDiskRealm.where(Dog.class).count(), 1);
         onDiskRealm.close();
 
         // Test a encrypted Realm file
         testRealm.writeEncryptedCopyTo(new File(getContext().getFilesDir(), encFileName), key);
         onDiskRealm = Realm.getInstance(encConf);
-        assertEquals(onDiskRealm.allObjects(Dog.class).size(), 1);
+        assertEquals(onDiskRealm.where(Dog.class).count(), 1);
         onDiskRealm.close();
         // Test with a wrong key to see if it fails as expected.
         try {

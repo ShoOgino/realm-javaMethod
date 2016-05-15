@@ -4,7 +4,7 @@
 
             case MANAGED_REALMLIST:
                 realm.beginTransaction();
-                RealmResults<NonLatinFieldNames> results = realm.allObjects(NonLatinFieldNames.class);
+                RealmResults<NonLatinFieldNames> results = realm.where(NonLatinFieldNames.class).findAll();
                 RealmList<NonLatinFieldNames> list = results.get(0).getChildren();
                 for (int i = 0; i < results.size(); i++) {
                     list.add(results.get(i));
@@ -13,7 +13,7 @@
                 return list;
 
             case REALMRESULTS:
-                return realm.allObjects(NonLatinFieldNames.class);
+                return realm.where(NonLatinFieldNames.class).findAll();
 
             default:
                 throw new AssertionError("Unknown collection: " + collectionClass);
