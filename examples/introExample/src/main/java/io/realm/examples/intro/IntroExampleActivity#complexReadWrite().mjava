@@ -34,10 +34,10 @@
         });
 
         // Implicit read transactions allow you to access your objects
-        status += "\nNumber of persons: " + realm.allObjects(Person.class).size();
+        status += "\nNumber of persons: " + realm.where(Person.class).count();
 
         // Iterate over all objects
-        for (Person pers : realm.allObjects(Person.class)) {
+        for (Person pers : realm.where(Person.class).findAll()) {
             String dogName;
             if (pers.getDog() == null) {
                 dogName = "None";
@@ -48,9 +48,8 @@
         }
 
         // Sorting
-        RealmResults<Person> sortedPersons = realm.allObjects(Person.class);
-        sortedPersons.sort("age", Sort.DESCENDING);
-        status += "\nSorting " + sortedPersons.last().getName() + " == " + realm.allObjects(Person.class).first()
+        RealmResults<Person> sortedPersons = realm.where(Person.class).findAllSorted("age", Sort.DESCENDING);
+        status += "\nSorting " + sortedPersons.last().getName() + " == " + realm.where(Person.class).findFirst()
                 .getName();
 
         realm.close();
