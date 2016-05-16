@@ -1,0 +1,20 @@
+    @Test
+    public void addChangeListener_throwOnAddingNullListenerFromNonLooperThread() throws Throwable {
+        TestHelper.executeOnNonLooperThread(new TestHelper.Task() {
+            @Override
+            public void run() throws Exception {
+                final Realm realm = Realm.getInstance(realmConfig);
+                final Dog dog = createManagedDogObjectFromRealmInstance(realm);
+
+                //noinspection TryFinallyCanBeTryWithResources
+                try {
+                    dog.addChangeListener(null);
+                    fail("adding null change listener must throw an exception.");
+                } catch (IllegalArgumentException ignore) {
+                } finally {
+                    realm.close();
+                }
+            }
+        });
+    }
+

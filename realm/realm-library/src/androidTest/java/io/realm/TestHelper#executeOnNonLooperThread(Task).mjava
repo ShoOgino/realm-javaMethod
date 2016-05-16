@@ -1,0 +1,24 @@
+    public static void executeOnNonLooperThread(final Task task) throws Throwable {
+        final AtomicReference<Throwable> thrown = new AtomicReference<Throwable>();
+        final Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    task.run();
+                } catch (Throwable e) {
+                    thrown.set(e);
+                    if (e instanceof Error) {
+                        throw (Error) e;
+                    }
+                }
+            }
+        };
+        thread.start();
+        thread.join();
+
+        final Throwable throwable = thrown.get();
+        if (throwable != null) {
+            throw throwable;
+        }
+    }
+
