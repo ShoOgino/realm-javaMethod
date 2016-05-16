@@ -10,10 +10,11 @@
      * @param sortOrder2 sort order for second field
      * @return a {@link io.realm.RealmResults} containing objects. If no objects match the condition, a list with zero
      * objects is returned.
-     * @throws java.lang.IllegalArgumentException if a field name does not exist.
+     * @throws java.lang.IllegalArgumentException if a field name does not exist or it belongs to a child
+     * {@link RealmObject} or a child {@link RealmList}.
      */
     public RealmResults<E> findAllSorted(String fieldName1, Sort sortOrder1,
-                                   String fieldName2, Sort sortOrder2) {
+                                         String fieldName2, Sort sortOrder2) {
         return findAllSorted(new String[]{fieldName1, fieldName2}, new Sort[]{sortOrder1, sortOrder2});
     }
 
