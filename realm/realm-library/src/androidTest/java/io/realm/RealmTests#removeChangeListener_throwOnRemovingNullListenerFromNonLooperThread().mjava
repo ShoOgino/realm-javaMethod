@@ -1,0 +1,19 @@
+    @Test
+    public void removeChangeListener_throwOnRemovingNullListenerFromNonLooperThread() throws Throwable {
+        TestHelper.executeOnNonLooperThread(new TestHelper.Task() {
+            @Override
+            public void run() throws Exception {
+                final Realm realm = Realm.getInstance(realmConfig);
+
+                //noinspection TryFinallyCanBeTryWithResources
+                try {
+                    realm.removeChangeListener(null);
+                    fail("removing null change listener must throw an exception.");
+                } catch (IllegalArgumentException ignore) {
+                } finally {
+                    realm.close();
+                }
+            }
+        });
+    }
+

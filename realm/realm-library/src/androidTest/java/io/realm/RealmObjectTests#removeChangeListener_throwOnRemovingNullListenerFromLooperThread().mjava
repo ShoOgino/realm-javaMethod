@@ -1,13 +1,14 @@
     @Test
     @RunTestInLooperThread
-    public void removeChangeListener_throwOnRemovingNullListener() {
+    public void removeChangeListener_throwOnRemovingNullListenerFromLooperThread() {
         final Realm realm = looperThread.realm;
         Dog dog = createManagedDogObjectFromRealmInstance(realm);
 
         try {
-            dog.removeChangeListener((RealmChangeListener) null);
-            fail("Failed on adding null change listener.");
+            dog.removeChangeListener(null);
+            fail("removing null change listener must throw an exception.");
         } catch (IllegalArgumentException ignore) {
+        } finally {
             looperThread.testComplete();
         }
     }

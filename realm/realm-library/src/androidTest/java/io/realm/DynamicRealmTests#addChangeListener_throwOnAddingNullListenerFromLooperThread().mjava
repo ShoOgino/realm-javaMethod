@@ -1,0 +1,16 @@
+    @Test
+    @RunTestInLooperThread
+    public void addChangeListener_throwOnAddingNullListenerFromLooperThread() {
+        final DynamicRealm dynamicRealm = initializeDynamicRealm();
+
+        //noinspection TryFinallyCanBeTryWithResources
+        try {
+            dynamicRealm.addChangeListener(null);
+            fail("adding null change listener must throw an exception.");
+        } catch (IllegalArgumentException ignore) {
+        } finally {
+            dynamicRealm.close();
+            looperThread.testComplete();
+        }
+    }
+

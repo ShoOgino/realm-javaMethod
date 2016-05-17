@@ -1,0 +1,14 @@
+    @Test
+    @RunTestInLooperThread
+    public void removeChangeListener_throwOnRemovingNullListenerFromLooperThread() {
+        final Realm realm = looperThread.realm;
+
+        try {
+            realm.removeChangeListener(null);
+            fail("removing null change listener must throw an exception.");
+        } catch (IllegalArgumentException ignore) {
+        } finally {
+            looperThread.testComplete();
+        }
+    }
+
