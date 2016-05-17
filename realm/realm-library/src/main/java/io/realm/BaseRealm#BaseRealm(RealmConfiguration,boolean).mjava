@@ -4,6 +4,12 @@
         this.sharedGroupManager = new SharedGroupManager(configuration);
         this.schema = new RealmSchema(this, sharedGroupManager.getTransaction());
         this.handlerController = new HandlerController(this);
-        setAutoRefresh(autoRefresh);
+        if (Looper.myLooper() == null) {
+            if (autoRefresh) {
+                throw new IllegalStateException("Cannot set auto-refresh in a Thread without a Looper");
+            }
+        } else {
+            setAutoRefresh(autoRefresh);
+        }
     }
 
