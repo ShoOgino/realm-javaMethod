@@ -1,0 +1,14 @@
+    // create a RealmObject with null primarykey
+    private void createNullPrimaryKeyObjectFromTestRealm(Realm testRealm) {
+        testRealm.beginTransaction();
+
+        RealmObject obj = testRealm.createObject(testClazz, null);
+        if (testClazz.equals(PrimaryKeyAsString.class)) {
+            ((PrimaryKeyAsString)obj).setId((long) secondaryFieldValue);
+        } else {
+            ((NullPrimaryKey)obj).setName(secondaryFieldValue);
+        }
+
+        testRealm.commitTransaction();
+    }
+

@@ -1,0 +1,9 @@
+    // Adds a PrimaryKey object to a realm with values for its PrimaryKey field and secondary field.
+    private RealmObject addPrimaryKeyObjectToTestRealm(Realm testRealm) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        RealmObject obj = (RealmObject) testClazz.getConstructor(primaryKeyFieldType, secondaryFieldType).newInstance(null, secondaryFieldValue);
+        testRealm.beginTransaction();
+        testRealm.copyToRealm(obj);
+        testRealm.commitTransaction();
+        return obj;
+    }
+

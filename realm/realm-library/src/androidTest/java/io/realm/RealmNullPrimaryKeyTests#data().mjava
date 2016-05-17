@@ -1,0 +1,17 @@
+    /**
+     * Base parameters for testing null-primary key value. The parameters are aligned in an order of
+     * 1) a test target class, 2) a primary key field class, 3) a secondary field class, 4) a secondary
+     * field value, and 5) an update value, accommodating {@interface NullPrimaryKey} to condense unit tests.
+     */
+    @Parameterized.Parameters
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+            // 1) Test target class          2) PK Class    3) 2nd Class  4) 2nd field value   5) 2nd field value for update
+            {PrimaryKeyAsString.class,       String.class,  long.class,   Long.valueOf(492412), Long.valueOf(991241)},
+            {PrimaryKeyAsBoxedByte.class,    Byte.class,    String.class, "This-Is-Second-One", "Gosh Didnt KnowIt"},
+            {PrimaryKeyAsBoxedShort.class,   Short.class,   String.class, "AnyValueIsAccepted", "?YOUNOWKNOWRIGHT?"},
+            {PrimaryKeyAsBoxedInteger.class, Integer.class, String.class, "PlayWithSeondFied!", "HaHaHaHaHaHaHaHaH"},
+            {PrimaryKeyAsBoxedLong.class,    Long.class,    String.class, "Let's name a value", "KeyValueTestIsFun"}
+        });
+    }
+

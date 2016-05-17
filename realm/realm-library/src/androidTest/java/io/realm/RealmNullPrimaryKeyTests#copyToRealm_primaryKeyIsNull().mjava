@@ -1,0 +1,19 @@
+    // @PrimaryKey annotation accept null value properly as a primary key value for Realm version 0.89.1+
+    @Test
+    public void copyToRealm_primaryKeyIsNull() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        addPrimaryKeyObjectToTestRealm(realm);
+
+        if (testClazz.equals(PrimaryKeyAsString.class)) {
+            RealmResults<PrimaryKeyAsString> results = realm.where(PrimaryKeyAsString.class).findAll();
+            assertEquals(1, results.size());
+            assertEquals(null, results.first().getName());
+            assertEquals(secondaryFieldValue, results.first().getId());
+
+        } else {
+            RealmResults results = realm.where(testClazz).findAll();
+            assertEquals(1, results.size());
+            assertEquals(null, ((NullPrimaryKey) results.first()).getId());
+            assertEquals(secondaryFieldValue, ((NullPrimaryKey) results.first()).getName());
+        }
+    }
+
