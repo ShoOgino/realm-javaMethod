@@ -6,12 +6,12 @@
 
         final Realm realm = looperThread.realm;
         // Two results needed to make sure list modification happen while iterating
-        RealmResults<Owner> results1 = realm.allObjects(Owner.class);
-        RealmResults<Cat> results2 = realm.allObjects(Cat.class);
+        RealmResults<Owner> results1 = realm.where(Owner.class).findAll();
+        RealmResults<Cat> results2 = realm.where(Cat.class).findAll();
         RealmChangeListener listener = new RealmChangeListener() {
             @Override
             public void onChange(Object object) {
-                RealmResults<Owner> results = realm.allObjects(Owner.class);
+                RealmResults<Owner> results = realm.where(Owner.class).findAll();
                 boolean foundKey = false;
                 // Check if the results has been added to the syncRealmResults in case of the behaviour of
                 // allObjects changes

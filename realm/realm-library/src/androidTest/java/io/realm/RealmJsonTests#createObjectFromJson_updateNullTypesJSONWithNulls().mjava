@@ -15,7 +15,7 @@
         realm.createObjectFromJson(NullTypes.class, jsonObject);
         realm.commitTransaction();
 
-        RealmResults<NullTypes> nullTypesRealmResults = realm.allObjects(NullTypes.class);
+        RealmResults<NullTypes> nullTypesRealmResults = realm.where(NullTypes.class).findAll();
         assertEquals(2, nullTypesRealmResults.size());
         checkNullableValuesAreNotNull(nullTypesRealmResults.first());
 
@@ -25,7 +25,7 @@
         realm.createOrUpdateAllFromJson(NullTypes.class, array);
         realm.commitTransaction();
 
-        nullTypesRealmResults = realm.allObjects(NullTypes.class);
+        nullTypesRealmResults = realm.where(NullTypes.class).findAll();
         assertEquals(3, nullTypesRealmResults.size());
 
         NullTypes nullTypes1 = nullTypesRealmResults.where().equalTo("id", 1).findFirst();

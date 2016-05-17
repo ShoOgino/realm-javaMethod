@@ -6,11 +6,20 @@
 
         // Verify that ConcurrentModification is correctly detected on non-looper threads
         Iterator<AllJavaTypes> it = collection.iterator();
-        realm.beginTransaction();
-        realm.createObject(AllJavaTypes.class, TEST_SIZE);
-        realm.commitTransaction();
-        realm.refresh();
-
+        final CountDownLatch bgDone = new CountDownLatch(1);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+                bgRealm.beginTransaction();
+                bgRealm.createObject(AllJavaTypes.class, TEST_SIZE);
+                bgRealm.commitTransaction();
+                bgRealm.close();
+                bgDone.countDown();
+            }
+        }).start();
+        TestHelper.awaitOrFail(bgDone);
+        realm.waitForChange();
         try {
             it.next();
             fail();

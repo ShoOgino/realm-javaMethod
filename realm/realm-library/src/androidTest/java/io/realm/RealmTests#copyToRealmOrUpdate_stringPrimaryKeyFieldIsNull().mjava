@@ -1,0 +1,20 @@
+    @Test
+    public void copyToRealmOrUpdate_stringPrimaryKeyFieldIsNull() {
+        final long SECONDARY_FIELD_VALUE = 2192841L;
+        final long SECONDARY_FIELD_UPDATED = 44887612L;
+        PrimaryKeyAsString nullPrimaryKeyObj = TestHelper.addStringPrimaryKeyObjectToTestRealm(realm, (String) null, SECONDARY_FIELD_VALUE);
+
+        RealmResults<PrimaryKeyAsString> result = realm.where(PrimaryKeyAsString.class).findAll();
+        assertEquals(1, result.size());
+        assertEquals(null, result.first().getName());
+        assertEquals(SECONDARY_FIELD_VALUE, result.first().getId());
+
+        // update objects
+        realm.beginTransaction();
+        nullPrimaryKeyObj.setId(SECONDARY_FIELD_UPDATED);
+        realm.copyToRealmOrUpdate(nullPrimaryKeyObj);
+        realm.commitTransaction();
+
+        assertEquals(SECONDARY_FIELD_UPDATED, realm.where(PrimaryKeyAsString.class).findFirst().getId());
+    }
+

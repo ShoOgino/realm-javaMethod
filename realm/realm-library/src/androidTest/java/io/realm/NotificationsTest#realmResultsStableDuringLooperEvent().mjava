@@ -19,7 +19,7 @@
                 Realm realm = null;
                 try {
                     realm = Realm.getInstance(realmConfig);
-                    final RealmResults<Dog> dogs = realm.allObjects(Dog.class);
+                    final RealmResults<Dog> dogs = realm.where(Dog.class).findAll();
                     assertEquals(0, dogs.size());
                     listener[0] = new RealmChangeListener<Realm>() {
                         @Override
@@ -54,7 +54,7 @@
             dog.setName("Rex " + i);
         }
         realm.commitTransaction();
-        assertEquals(TEST_SIZE, realm.allObjects(Dog.class).size());
+        assertEquals(TEST_SIZE, realm.where(Dog.class).count());
         realm.close();
 
         try {

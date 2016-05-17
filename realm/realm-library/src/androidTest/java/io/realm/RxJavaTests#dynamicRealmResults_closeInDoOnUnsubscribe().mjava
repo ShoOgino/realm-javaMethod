@@ -3,7 +3,7 @@
     public void dynamicRealmResults_closeInDoOnUnsubscribe() {
         final DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
 
-        Observable<RealmResults<DynamicRealmObject>> observable = dynamicRealm.allObjects(AllTypes.CLASS_NAME).asObservable()
+        Observable<RealmResults<DynamicRealmObject>> observable = dynamicRealm.where(AllTypes.CLASS_NAME).findAll().asObservable()
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {

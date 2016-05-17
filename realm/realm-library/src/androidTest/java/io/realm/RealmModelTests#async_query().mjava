@@ -2,9 +2,10 @@
     @Test
     @RunTestInLooperThread
     public void async_query() {
-        populateTestRealm(looperThread.realm, TEST_DATA_SIZE);
+        Realm realm = looperThread.realm;
+        populateTestRealm(realm, TEST_DATA_SIZE);
 
-        final RealmResults<AllTypesRealmModel> allTypesRealmModels = looperThread.realm.distinctAsync(AllTypesRealmModel.class, AllTypesRealmModel.FIELD_STRING);
+        final RealmResults<AllTypesRealmModel> allTypesRealmModels = realm.where(AllTypesRealmModel.class).distinctAsync(AllTypesRealmModel.FIELD_STRING);
         allTypesRealmModels.addChangeListener(new RealmChangeListener<RealmResults<AllTypesRealmModel>>() {
             @Override
             public void onChange(RealmResults<AllTypesRealmModel> object) {

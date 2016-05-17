@@ -6,7 +6,7 @@
         realm.commitTransaction();
         final DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
 
-        Observable<DynamicRealmObject> observable = dynamicRealm.allObjects(AllTypes.CLASS_NAME).first().<DynamicRealmObject>asObservable()
+        Observable<DynamicRealmObject> observable = dynamicRealm.where(AllTypes.CLASS_NAME).findFirst().<DynamicRealmObject>asObservable()
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {

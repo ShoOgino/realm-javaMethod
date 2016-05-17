@@ -5,7 +5,7 @@
         realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
-        Observable<AllTypes> observable = realm.allObjects(AllTypes.class).first().<AllTypes>asObservable()
+        Observable<AllTypes> observable = realm.where(AllTypes.class).findFirst().<AllTypes>asObservable()
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {

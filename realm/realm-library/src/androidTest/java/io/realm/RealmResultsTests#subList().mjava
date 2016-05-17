@@ -1,6 +1,6 @@
     @Test
     public void subList() {
-        RealmResults<AllTypes> list = realm.allObjects(AllTypes.class);
+        RealmResults<AllTypes> list = realm.where(AllTypes.class).findAll();
         list.sort("columnLong");
         List<AllTypes> sublist = list.subList(Math.max(list.size() - 20, 0), list.size());
         assertEquals(TEST_DATA_SIZE - 1, sublist.get(sublist.size() - 1).getColumnLong());

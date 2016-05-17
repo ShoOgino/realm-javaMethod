@@ -11,14 +11,14 @@
 
             case UNMANAGED_REALMLIST:
                 populateRealm(realm, sampleSize);
-                RealmResults<AllJavaTypes> objects = realm.allObjectsSorted(AllJavaTypes.class, AllJavaTypes.FIELD_LONG, Sort.ASCENDING);
+                RealmResults<AllJavaTypes> objects = realm.where(AllJavaTypes.class).findAllSorted(AllJavaTypes.FIELD_LONG, Sort.ASCENDING);
                 RealmList<AllJavaTypes> inMemoryList = new RealmList<AllJavaTypes>();
                 inMemoryList.addAll(objects);
                 return inMemoryList;
 
             case REALMRESULTS:
                 populateRealm(realm, sampleSize);
-                return realm.allObjectsSorted(AllJavaTypes.class, AllJavaTypes.FIELD_LONG, Sort.ASCENDING);
+                return realm.where(AllJavaTypes.class).findAllSorted(AllJavaTypes.FIELD_LONG, Sort.ASCENDING);
 
             default:
                 throw new AssertionError("Unsupported class: " + collectionClass);

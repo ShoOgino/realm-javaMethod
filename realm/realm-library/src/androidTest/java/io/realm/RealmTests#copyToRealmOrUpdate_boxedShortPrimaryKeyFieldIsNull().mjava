@@ -1,0 +1,20 @@
+    @Test
+    public void copyToRealmOrUpdate_boxedShortPrimaryKeyFieldIsNull() {
+        final String SECONDARY_FIELD_VALUE = "nullShortPrimaryKeyObj";
+        final String SECONDARY_FIELD_UPDATED = "nullShortPrimaryKeyObjUpdated";
+        PrimaryKeyAsBoxedShort nullPrimaryKeyObj = TestHelper.addShortPrimaryKeyObjectToTestRealm(realm, (Short) null, SECONDARY_FIELD_VALUE);
+
+        RealmResults<PrimaryKeyAsBoxedShort> result = realm.where(PrimaryKeyAsBoxedShort.class).findAll();
+        assertEquals(1, result.size());
+        assertEquals(SECONDARY_FIELD_VALUE, result.first().getName());
+        assertEquals(null, result.first().getId());
+
+        // update objects
+        realm.beginTransaction();
+        nullPrimaryKeyObj.setName(SECONDARY_FIELD_UPDATED);
+        realm.copyToRealmOrUpdate(nullPrimaryKeyObj);
+        realm.commitTransaction();
+
+        assertEquals(SECONDARY_FIELD_UPDATED, realm.where(PrimaryKeyAsBoxedShort.class).findFirst().getName());
+    }
+

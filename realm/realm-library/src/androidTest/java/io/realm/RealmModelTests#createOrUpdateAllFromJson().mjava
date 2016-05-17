@@ -4,8 +4,8 @@
         realm.createOrUpdateAllFromJson(AllTypesRealmModel.class, TestHelper.loadJsonFromAssets(context, "list_alltypes_primarykey.json"));
         realm.commitTransaction();
 
-        assertEquals(1, realm.allObjects(AllTypesRealmModel.class).size());
-        AllTypesRealmModel obj = realm.allObjects(AllTypesRealmModel.class).first();
+        assertEquals(1, realm.where(AllTypesRealmModel.class).count());
+        AllTypesRealmModel obj = realm.where(AllTypesRealmModel.class).findFirst();
         assertEquals("Bar", obj.columnString);
         assertEquals(2.23F, obj.columnFloat, 0.000000001);
         assertEquals(2.234D, obj.columnDouble, 0.000000001);
