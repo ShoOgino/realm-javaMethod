@@ -7,7 +7,12 @@
          * reference to the in-memory Realm object with the specific name as long as you want the data to last.
          */
         public Builder inMemory() {
+            if (!TextUtils.isEmpty(assetFilePath)) {
+                throw new RealmException("Realm can not use in-memory configuration if asset file is present.");
+            }
+
             this.durability = SharedGroup.Durability.MEM_ONLY;
+
             return this;
         }
 

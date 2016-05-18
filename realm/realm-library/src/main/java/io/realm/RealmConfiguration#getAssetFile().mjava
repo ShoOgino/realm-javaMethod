@@ -1,0 +1,15 @@
+    /**
+     * Returns input stream object to the Realm asset file.
+     *
+     * @return input stream to the asset file.
+     * @throws IOException if copying the file fails.
+     */
+    InputStream getAssetFile() throws IOException {
+        Context context = contextWeakRef.get();
+        if (context != null) {
+            return context.getAssets().open(assetFilePath);
+        } else {
+            throw new IllegalArgumentException("Context should not be null. Use Application Context instead of Activity Context.");
+        }
+    }
+

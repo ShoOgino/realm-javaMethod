@@ -14,6 +14,8 @@
             cache = new RealmCache(configuration);
             // The new cache should be added to the map later.
             isCacheInMap = false;
+
+            copyAssetFileIfNeeded(configuration);
         } else {
             // Throw the exception if validation failed.
             cache.validateConfiguration(configuration);
@@ -24,6 +26,7 @@
         if (refAndCount.localRealm.get() == null) {
             // Create a new local Realm instance
             BaseRealm realm;
+
 
             if (realmClass == Realm.class) {
                 // RealmMigrationNeededException might be thrown here.
