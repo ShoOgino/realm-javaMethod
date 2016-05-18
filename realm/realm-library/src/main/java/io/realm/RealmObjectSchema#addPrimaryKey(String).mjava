@@ -1,6 +1,6 @@
     /**
      * Adds a primary key to a given field. This is the same as adding the {@link io.realm.annotations.PrimaryKey}
-     * annotation on the field.
+     * annotation on the field. Further, this implicitly adds {@link io.realm.annotations.Index} annotation to the field as well.
      *
      * @param fieldName field to set as primary key.
      * @return the updated schema.
@@ -14,6 +14,11 @@
             throw new IllegalStateException("A primary key is already defined");
         }
         table.setPrimaryKey(fieldName);
+        long columnIndex = getColumnIndex(fieldName);
+        if (!table.hasSearchIndex(columnIndex)) {
+            // No exception will be thrown since adding PrimaryKey implies the column has an index.
+            table.addSearchIndex(columnIndex);
+        }
         return this;
     }
 
