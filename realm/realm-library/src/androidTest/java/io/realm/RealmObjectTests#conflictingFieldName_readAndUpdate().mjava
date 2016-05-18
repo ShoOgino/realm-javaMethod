@@ -1,17 +1,17 @@
     @Test
     public void conflictingFieldName_readAndUpdate() {
-        final ConflictingFieldName standalone = new ConflictingFieldName();
-        standalone.setRealm("realm");
-        standalone.setRow("row");
-        standalone.setIsCompleted("isCompleted");
-        standalone.setListeners("listeners");
-        standalone.setPendingQuery("pendingQuery");
-        standalone.setCurrentTableVersion("currentTableVersion");
+        final ConflictingFieldName unmanaged = new ConflictingFieldName();
+        unmanaged.setRealm("realm");
+        unmanaged.setRow("row");
+        unmanaged.setIsCompleted("isCompleted");
+        unmanaged.setListeners("listeners");
+        unmanaged.setPendingQuery("pendingQuery");
+        unmanaged.setCurrentTableVersion("currentTableVersion");
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                realm.copyToRealm(standalone);
+                realm.copyToRealm(unmanaged);
             }
         });
 

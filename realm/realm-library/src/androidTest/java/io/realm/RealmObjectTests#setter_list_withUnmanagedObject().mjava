@@ -1,6 +1,6 @@
     @Test
-    public void setter_list_withStandaloneObject() {
-        CyclicType standalone = new CyclicType();
+    public void setter_list_withUnmanagedObject() {
+        CyclicType unmanaged = new CyclicType();
 
         realm.beginTransaction();
         try {
@@ -8,7 +8,7 @@
 
             RealmList<CyclicType> list = new RealmList<>();
             list.add(realm.createObject(CyclicType.class));
-            list.add(standalone); // List contains a standalone object
+            list.add(unmanaged); // List contains an unmanaged object
             list.add(realm.createObject(CyclicType.class));
 
             try {
