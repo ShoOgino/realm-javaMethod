@@ -1,0 +1,16 @@
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        realmConfiguration = new RealmConfiguration.Builder(this.getContext()).build();
+
+        realm = Realm.getInstance(realmConfiguration);
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.createObject(Dog.class);
+            }
+        });
+        // Open the dynamic Realm after transaction.
+        dynamicRealm = DynamicRealm.getInstance(realmConfiguration);
+    }
+
