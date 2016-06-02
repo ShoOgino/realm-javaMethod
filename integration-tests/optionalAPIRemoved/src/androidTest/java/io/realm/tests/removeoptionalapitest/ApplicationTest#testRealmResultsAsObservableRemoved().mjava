@@ -1,0 +1,11 @@
+    public void testRealmResultsAsObservableRemoved() {
+        RealmResults<Dog> results = realm.where(Dog.class).findAll();
+
+        try {
+            @SuppressWarnings("unused")
+            Observable<RealmResults<Dog>> observable = results.asObservable();
+            fail();
+        } catch (NoSuchMethodError ignored) {
+        }
+    }
+
