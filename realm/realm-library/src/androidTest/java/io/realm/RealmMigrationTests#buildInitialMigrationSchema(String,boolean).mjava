@@ -1,0 +1,30 @@
+    /**
+     * Builds a temporary schema to be modified later in a migration. {@link MigrationPrimaryKey} is
+     * the base class when specified.
+     *
+     * <p>MigrationPrimaryKey is supposed to be a RealmObject, but that would hamper our steps toward
+     * testing migrations as Realm looks for it in migration. It is thus set to be an interface.
+     *
+     * @param className a class whose schema is to be re-created
+     * @param createBase create a schema named "MigrationPrimaryKey" instead of {@code className} if {@code true}
+     */
+    private void buildInitialMigrationSchema(final String className, final boolean createBase) {
+        Realm realm = Realm.getInstance(configFactory.createConfigurationBuilder().build());
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                // first, remove an existing schema
+                realm.getSchema().remove(className);
+                // then recreate the deleted schema or build a base schema
+                realm.getSchema()
+                        .create(createBase ? MigrationPrimaryKey.CLASS_NAME : className)
+                        .addField(MigrationPrimaryKey.FIELD_FIRST,   Byte.class)
+                        .addField(MigrationPrimaryKey.FIELD_SECOND,  Short.class)
+                        .addField(MigrationPrimaryKey.FIELD_PRIMARY, String.class, FieldAttribute.PRIMARY_KEY)
+                        .addField(MigrationPrimaryKey.FIELD_FOURTH,  Integer.class)
+                        .addField(MigrationPrimaryKey.FIELD_FIFTH,   Long.class);
+            }
+        });
+        realm.close();
+    }
+
