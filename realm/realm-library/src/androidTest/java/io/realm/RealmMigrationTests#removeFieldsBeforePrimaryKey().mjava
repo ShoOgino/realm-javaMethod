@@ -1,0 +1,27 @@
+    // Removing fields before a pk field does not affect the pk
+    @Test
+    public void removeFieldsBeforePrimaryKey() {
+        buildInitialMigrationSchema(MigrationPosteriorIndexOnly.CLASS_NAME, false);
+
+        RealmMigration migration = new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                realm.getSchema().get(MigrationPosteriorIndexOnly.CLASS_NAME)
+                        .removeField(MigrationPrimaryKey.FIELD_FIRST)
+                        .removeField(MigrationPrimaryKey.FIELD_SECOND);
+            }
+        };
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+                .schemaVersion(1)
+                .schema(MigrationPosteriorIndexOnly.class)
+                .migration(migration)
+                .build();
+        Realm realm = Realm.getInstance(realmConfig);
+        Table table = realm.getSchema().getTable(MigrationPosteriorIndexOnly.class);
+
+        assertTrue(table.hasPrimaryKey());
+        assertEquals(MigrationPosteriorIndexOnly.DEFAULT_FIELDS_COUNT, table.getColumnCount());
+        assertEquals(MigrationPosteriorIndexOnly.DEFAULT_PRIMARY_INDEX, table.getPrimaryKey());
+        assertEquals(MigrationPosteriorIndexOnly.FIELD_PRIMARY, table.getColumnName(table.getPrimaryKey()));
+    }
+
