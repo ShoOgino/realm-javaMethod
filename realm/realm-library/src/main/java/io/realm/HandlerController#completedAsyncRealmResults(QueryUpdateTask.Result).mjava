@@ -19,7 +19,8 @@
                         // swap pointer
                         realmResults.swapTableViewPointer(result.updatedTableViews.get(weakRealmResults));
                         // notify callbacks
-                        realmResults.notifyChangeListeners();
+                        realmResults.syncIfNeeded();
+                        realmResults.notifyChangeListeners(false);
                     } else {
                         RealmLog.d("[COMPLETED_ASYNC_REALM_RESULTS "+ weakRealmResults + "] , realm:"+ HandlerController.this + " ignoring result the RealmResults (is already loaded)");
                     }
