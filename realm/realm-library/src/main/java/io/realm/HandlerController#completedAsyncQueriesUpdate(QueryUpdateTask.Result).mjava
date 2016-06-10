@@ -2,7 +2,9 @@
         SharedGroup.VersionID callerVersionID = realm.sharedGroupManager.getVersion();
         int compare = callerVersionID.compareTo(result.versionID);
         if (compare > 0) {
-            // if the caller thread is advanced i.e it already sent a REALM_CHANGE that will update the queries
+            // if the caller thread is more advanced than the worker thread, it means it did a local commit.
+            // This should also have put a REALM_CHANGED event on the Looper queue, so ignoring this result should
+            // be safe as all async queries will be rerun when processing the REALM_CHANGED event.
             RealmLog.d("COMPLETED_UPDATE_ASYNC_QUERIES realm:" + HandlerController.this + " caller is more advanced, Looper will updates queries");
 
         } else {
@@ -27,8 +29,10 @@
                 }
             }
 
-            ArrayList<RealmResults<? extends RealmModel>> callbacksToNotify = new ArrayList<RealmResults<? extends RealmModel>>(result.updatedTableViews.size());
-            // use updated TableViews pointers for the existing async RealmResults
+            // It's dangerous to notify the callback about new results before updating
+            // the pointers, because the callback may use another RealmResults not updated yet
+            // this is why we defer the notification until we're done updating all pointers.
+            ArrayList<RealmResults<? extends RealmModel>> resultsToBeNotified = new ArrayList<RealmResults<? extends RealmModel>>(result.updatedTableViews.size());
             for (Map.Entry<WeakReference<RealmResults<? extends RealmModel>>, Long> query : result.updatedTableViews.entrySet()) {
                 WeakReference<RealmResults<? extends RealmModel>> weakRealmResults = query.getKey();
                 RealmResults<? extends RealmModel> realmResults = weakRealmResults.get();
@@ -39,25 +43,17 @@
                 } else {
                     // update the instance with the new pointer
                     realmResults.swapTableViewPointer(query.getValue());
-
-                    // it's dangerous to notify the callback about new results before updating
-                    // the pointers, because the callback may use another RealmResults not updated yet
-                    // this is why we defer the notification until we're done updating all pointers
-                    callbacksToNotify.add(realmResults);
+                    realmResults.syncIfNeeded();
+                    resultsToBeNotified.add(realmResults);
 
                     RealmLog.d("COMPLETED_UPDATE_ASYNC_QUERIES realm:"+ HandlerController.this + " updating RealmResults " + weakRealmResults);
                 }
             }
+            collectSyncRealmResultsCallbacks(resultsToBeNotified);
 
-            for (RealmResults<? extends RealmModel> query : callbacksToNotify) {
-                query.notifyChangeListeners();
-            }
-
-            // We need to notify the rest of listeners, since the original REALM_CHANGE
-            // was delayed/swallowed in order to be able to update async queries
-            notifyGlobalListeners();
-            notifySyncRealmResultsCallbacks();
-            notifyRealmObjectCallbacks();
+            // We need to notify all listeners, since the original REALM_CHANGE
+            // was delayed/swallowed in order to be able to update the async queries.
+            notifyAllListeners(resultsToBeNotified);
 
             updateAsyncQueriesTask = null;
         }

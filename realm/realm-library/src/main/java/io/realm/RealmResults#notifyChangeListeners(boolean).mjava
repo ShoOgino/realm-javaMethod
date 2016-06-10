@@ -1,7 +1,9 @@
-    private void notifyChangeListeners(boolean syncBeforeNotifying, boolean forceNotify) {
-        if (syncBeforeNotifying) {
-            syncIfNeeded();
-        }
+    /**
+     * Notifies all registered listeners.
+     *
+     * NOTE: Remember to call `syncIfNeeded` before calling this method.
+     */
+    void notifyChangeListeners(boolean forceNotify) {
         if (!listeners.isEmpty()) {
             // table might be null (if the async query didn't complete
             // but we have already registered listeners for it)

@@ -1,3 +1,11 @@
+    /**
+     * Syncs this RealmResults, so it is up to date after `advance_read` has been called.
+     * Not doing so can leave detached accessors in the table view.
+     *
+     * By design, we should only call this on looper events.
+     *
+     * NOTE: Calling this is a prerequisite to calling {@link #notifyChangeListeners(boolean)}.
+     */
     void syncIfNeeded() {
         long newVersion = table.syncIfNeeded();
         viewUpdated = newVersion != currentTableViewVersion;

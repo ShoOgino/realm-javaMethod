@@ -1,0 +1,17 @@
+    private void collectRealmResultsCallbacks(Iterator<WeakReference<RealmResults<? extends RealmModel>>> iterator,
+                                              List<RealmResults<? extends RealmModel>> resultsToBeNotified) {
+        while (iterator.hasNext()) {
+            WeakReference<RealmResults<? extends RealmModel>> weakRealmResults = iterator.next();
+            RealmResults<? extends RealmModel> realmResults = weakRealmResults.get();
+            if (realmResults == null) {
+                iterator.remove();
+            } else {
+                // Sync the RealmResult so it is completely up to date.
+                // This is a prerequisite to calling the listener, so when the listener is finally triggered, all
+                // RealmResults will be up to date.
+                realmResults.syncIfNeeded();
+                resultsToBeNotified.add(realmResults);
+            }
+        }
+    }
+
