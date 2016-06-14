@@ -1,3 +1,6 @@
+    /**
+     * NOTE: Should only be called from {@link #notifyAllListeners(List)}.
+     */
     private void notifyRealmObjectCallbacks() {
         List<RealmObjectProxy> objectsToBeNotified = new ArrayList<RealmObjectProxy>();
         Iterator<WeakReference<RealmObjectProxy>> iterator = realmObjects.keySet().iterator();
@@ -17,7 +20,7 @@
             }
         }
 
-        for (Iterator<RealmObjectProxy> it = objectsToBeNotified.iterator(); it.hasNext() && !realm.isClosed(); ) {
+        for (Iterator<RealmObjectProxy> it = objectsToBeNotified.iterator(); !realm.isClosed() && it.hasNext(); ) {
             RealmObjectProxy realmObject = it.next();
             realmObject.realmGet$proxyState().notifyChangeListeners$realm();
         }

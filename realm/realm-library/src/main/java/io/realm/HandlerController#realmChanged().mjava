@@ -2,11 +2,14 @@
         deleteWeakReferences();
         if (threadContainsAsyncQueries()) {
             updateAsyncQueries();
-
         } else {
             RealmLog.d("REALM_CHANGED realm:" + HandlerController.this + " no async queries, advance_read");
             realm.sharedGroupManager.advanceRead();
-            notifyAllListeners();
+
+            List<RealmResults<? extends RealmModel>> resultsToBeNotified = new ArrayList<RealmResults<? extends RealmModel>>();
+            collectAsyncRealmResultsCallbacks(resultsToBeNotified);
+            collectSyncRealmResultsCallbacks(resultsToBeNotified);
+            notifyAllListeners(resultsToBeNotified);
         }
     }
 

@@ -1,14 +1,17 @@
+    /**
+     * NOTE: Should only be called from {@link #notifyAllListeners(List)}.
+     */
     private void notifyGlobalListeners() {
         // notify strong reference listener
         Iterator<RealmChangeListener<? extends BaseRealm>> iteratorStrongListeners = changeListeners.iterator();
-        while (iteratorStrongListeners.hasNext() && !realm.isClosed()) { // every callback could close the realm
+        while (!realm.isClosed() && iteratorStrongListeners.hasNext()) { // every callback could close the realm
             RealmChangeListener listener = iteratorStrongListeners.next();
             listener.onChange(realm);
         }
         // notify weak reference listener (internals)
         Iterator<WeakReference<RealmChangeListener<? extends BaseRealm>>> iteratorWeakListeners = weakChangeListeners.iterator();
         List<WeakReference<RealmChangeListener<? extends BaseRealm>>> toRemoveList = null;
-        while (iteratorWeakListeners.hasNext() && !realm.isClosed()) {
+        while (!realm.isClosed() && iteratorWeakListeners.hasNext()) {
             WeakReference<RealmChangeListener<? extends BaseRealm>> weakRef = iteratorWeakListeners.next();
             RealmChangeListener listener = weakRef.get();
             if (listener == null) {
