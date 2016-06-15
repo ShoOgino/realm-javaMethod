@@ -1,6 +1,7 @@
-    // The presence of async RealmResults block any `REALM_CHANGE` notification causing historically the Realm
-    // to advance to the latest version. We make sure in this test that all Realm listeners will be notified
-    // regardless of the presence of an async RealmObject that will delay the `REALM_CHANGE` sometimes
+    // The presence of async RealmResults blocks any `REALM_CHANGE` notification . We make sure in this test that all
+    // Realm listeners will be notified regardless of the presence of an async RealmObject. RealmObjects are special
+    // in the sense that once you got a row accessor to that object, it is automatically up to date as soon as you
+    // call advance_read().
     @Test
     @RunTestInLooperThread
     public void asyncRealmObjectShouldNotBlockBackgroundCommitNotification() {
@@ -9,7 +10,7 @@
         final Realm realm = looperThread.realm;
         realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
-            public void onChange(Realm realm) {
+            public void onChange(final Realm realm) {
                 switch (numberOfRealmCallbackInvocation.incrementAndGet()) {
                     case 1: {
                         // first commit
@@ -24,11 +25,11 @@
                         new Thread() {
                             @Override
                             public void run() {
-                                Realm realm = Realm.getInstance(looperThread.realmConfiguration);
-                                realm.beginTransaction();
-                                realm.createObject(Dog.class);
-                                realm.commitTransaction();
-                                realm.close();
+                                Realm threadRealm = Realm.getInstance(realm.getConfiguration());
+                                threadRealm.beginTransaction();
+                                threadRealm.createObject(Dog.class);
+                                threadRealm.commitTransaction();
+                                threadRealm.close();
                                 signalClosedRealm.countDown();
                             }
                         }.start();
