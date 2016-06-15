@@ -1,6 +1,7 @@
     @Override
     public Statement apply(final Statement base, Description description) {
-        if (description.getAnnotation(RunTestInLooperThread.class) == null) {
+        final RunTestInLooperThread annotation = description.getAnnotation(RunTestInLooperThread.class);
+        if (annotation == null) {
             return base;
         }
         return new Statement() {
@@ -9,6 +10,10 @@
             @Override
             public void evaluate() throws Throwable {
                 before();
+                Class<? extends RunnableBefore> runnableBefore = annotation.value();
+                if (!runnableBefore.isInterface()) {
+                    runnableBefore.newInstance().run(realmConfiguration);
+                }
                 try {
                     final CountDownLatch signalClosedRealm = new CountDownLatch(1);
                     final Throwable[] threadAssertionError = new Throwable[1];

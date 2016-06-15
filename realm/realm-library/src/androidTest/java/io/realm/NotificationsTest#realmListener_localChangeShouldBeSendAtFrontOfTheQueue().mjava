@@ -1,0 +1,40 @@
+    // See https://github.com/realm/realm-android-adapters/issues/48
+    // Step 1: Populate the db
+    // Step 2: Post a runnable to caller thread.
+    //         Event Queue: |Posted Runnable| <- TOP
+    // Step 3: Delete object which will make the results contain an invalid object at this moment
+    //         Right Event Queue: |LOCAL_COMMIT   |   Wrong Event Queue: |Posted Runnable           |  <- TOP
+    //                            |Posted Runnable|                      |REALM_CHANGED/LOCAL_COMMIT|
+    // Step 4: Posted runnable called.
+    @Test
+    @RunTestInLooperThread(/*step1*/PopulateOneAllTypes.class)
+    public void realmListener_localChangeShouldBeSendAtFrontOfTheQueue() {
+        final Realm realm = looperThread.realm;
+        final RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
+        assertEquals(1, results.size());
+
+        // Step 2
+        // The transaction later will trigger the results sync, and it should be run before this runnable.
+        looperThread.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                // Step 4
+                assertEquals(0, results.size());
+                realm.close();
+                looperThread.testComplete();
+            }
+        });
+
+        // Step 3
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+                assertNotNull(allTypes);
+                allTypes.deleteFromRealm();
+                assertEquals(0, realm.where(AllTypes.class).count());
+                assertFalse(results.get(0).isValid());
+            }
+        });
+    }
+
