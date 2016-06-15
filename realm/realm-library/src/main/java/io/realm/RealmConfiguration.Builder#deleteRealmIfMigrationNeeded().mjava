@@ -3,9 +3,18 @@
          * {@link io.realm.exceptions.RealmMigrationNeededException} the on-disc Realm will be cleared and recreated
          * with the new Realm schema.
          *
-         * <b>WARNING!</b> This will result in loss of data.
+         * <p>This cannot be configured to have an asset file at the same time by calling
+         * {@link #assetFile(Context, String)} as the provided asset file will be deleted in migrations.
+         *
+         * <p><b>WARNING!</b> This will result in loss of data.
+         *
+         * @throws IllegalStateException if configured to use an asset file by calling {@link #assetFile(Context, String)} previously.
          */
         public Builder deleteRealmIfMigrationNeeded() {
+            if (this.assetFilePath != null && this.assetFilePath.length() != 0) {
+                throw new IllegalStateException("Realm cannot clear its schema when previously configured to use an asset file by calling assetFile().");
+            }
+
             this.deleteRealmIfMigrationNeeded = true;
             return this;
         }
