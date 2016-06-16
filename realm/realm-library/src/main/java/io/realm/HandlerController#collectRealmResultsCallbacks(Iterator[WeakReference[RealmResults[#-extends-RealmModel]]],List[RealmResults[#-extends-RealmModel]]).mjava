@@ -9,8 +9,12 @@
                 // Sync the RealmResult so it is completely up to date.
                 // This is a prerequisite to calling the listener, so when the listener is finally triggered, all
                 // RealmResults will be up to date.
-                realmResults.syncIfNeeded();
-                resultsToBeNotified.add(realmResults);
+                // Local commits can accidentially cause async RealmResults to be notified, so we only want to
+                // include those that are actually done loading.
+                if (realmResults.isLoaded()) {
+                    realmResults.syncIfNeeded();
+                    resultsToBeNotified.add(realmResults);
+                }
             }
         }
     }
