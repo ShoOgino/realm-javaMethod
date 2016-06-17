@@ -1,8 +1,7 @@
     public SharedGroup(String canonicalPath, boolean enableImplicitTransactions, Durability durability, byte[] key) {
         if (enableImplicitTransactions) {
             nativeReplicationPtr = nativeCreateReplication(canonicalPath, key);
-            nativePtr = createNativeWithImplicitTransactions(nativeReplicationPtr,
-                    durability.value, key);
+            nativePtr = openSharedGroupOrFail(durability, key);
             implicitTransactionsEnabled = true;
         } else {
             nativePtr = nativeCreate(canonicalPath, Durability.FULL.value, CREATE_FILE_YES, DISABLE_REPLICATION, key);
