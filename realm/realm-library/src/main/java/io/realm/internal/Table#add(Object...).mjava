@@ -74,16 +74,12 @@
                     throw new IllegalArgumentException("Null Date is not allowed.");
                 nativeSetTimestamp(nativePtr, columnIndex, rowIndex, ((Date) value).getTime());
                 break;
-            case UNSUPPORTED_MIXED:
-                if (value == null)
-                    throw new IllegalArgumentException("Null Mixed data is not allowed");
-                nativeSetMixed(nativePtr, columnIndex, rowIndex, Mixed.mixedValue(value));
-                break;
             case BINARY:
                 if (value == null)
                     throw new IllegalArgumentException("Null Array is not allowed");
                 nativeSetByteArray(nativePtr, columnIndex, rowIndex, (byte[])value);
                 break;
+            case UNSUPPORTED_MIXED:
             case UNSUPPORTED_TABLE:
             default:
                 throw new RuntimeException("Unexpected columnType: " + String.valueOf(colTypes[(int)columnIndex]));
