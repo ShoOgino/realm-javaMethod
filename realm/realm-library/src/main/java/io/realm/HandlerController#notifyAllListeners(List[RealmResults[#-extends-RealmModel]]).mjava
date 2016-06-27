@@ -1,5 +1,6 @@
     /**
-     * This method calls all registered listeners on Realm, RealmResults and RealmObjects.
+     * This method calls all registered listeners for Realm, RealmResults and RealmObjects, and callbacks for async
+     * transactions.
      *
      * PREREQUISITE: Only call this method after all objects are up to date. This means:
      * - `advance_read` was called on the Realm.
@@ -23,6 +24,9 @@
         if (!realm.isClosed() && threadContainsAsyncEmptyRealmObject()) {
             updateAsyncEmptyRealmObject();
         }
+
+        // Notify any completed async transactions
+        notifyAsyncTransactionCallbacks();
 
         // Trigger global listeners last.
         // Note that NotificationTest.callingOrdersOfListeners will fail if orders change.
