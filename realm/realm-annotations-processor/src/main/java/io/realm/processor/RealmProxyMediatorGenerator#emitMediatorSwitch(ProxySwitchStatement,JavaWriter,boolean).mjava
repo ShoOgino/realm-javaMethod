@@ -4,13 +4,13 @@
             writer.emitStatement("checkClass(clazz)");
             writer.emitEmptyLine();
         }
-        if (simpleModelClasses.size() == 0) {
+        if (qualifiedModelClasses.size() == 0) {
             writer.emitStatement("throw getMissingProxyClassException(clazz)");
         } else {
-            writer.beginControlFlow("if (clazz.equals(%s.class))", simpleModelClasses.get(0));
+            writer.beginControlFlow("if (clazz.equals(%s.class))", qualifiedModelClasses.get(0));
             statement.emitStatement(0, writer);
-            for (int i = 1; i < simpleModelClasses.size(); i++) {
-                writer.nextControlFlow("else if (clazz.equals(%s.class))", simpleModelClasses.get(i));
+            for (int i = 1; i < qualifiedModelClasses.size(); i++) {
+                writer.nextControlFlow("else if (clazz.equals(%s.class))", qualifiedModelClasses.get(i));
                 statement.emitStatement(i, writer);
             }
             writer.nextControlFlow("else");

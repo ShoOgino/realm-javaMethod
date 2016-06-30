@@ -21,7 +21,7 @@
                 emitMediatorSwitch(new ProxySwitchStatement() {
                     @Override
                     public void emitStatement(int i, JavaWriter writer) throws IOException {
-                        writer.emitStatement("%s.insert(realm, (%s) object, cache)", proxyClasses.get(i), simpleModelClasses.get(i));
+                        writer.emitStatement("%s.insert(realm, (%s) object, cache)", qualifiedProxyClasses.get(i), qualifiedModelClasses.get(i));
                     }
                 }, writer, false);
 
@@ -29,7 +29,7 @@
             emitMediatorSwitch(new ProxySwitchStatement() {
                 @Override
                 public void emitStatement(int i, JavaWriter writer) throws IOException {
-                    writer.emitStatement("%s.insert(realm, iterator, cache)", proxyClasses.get(i));
+                    writer.emitStatement("%s.insert(realm, iterator, cache)", qualifiedProxyClasses.get(i));
                 }
             }, writer, false);
             writer.endControlFlow();

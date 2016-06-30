@@ -1,0 +1,21 @@
+        @Override
+        public void emitGetObjectWithPrimaryKeyValue(String qualifiedRealmObjectClass,
+                                                     String qualifiedRealmObjectProxyClass,
+                                                     String fieldName, JavaWriter writer) throws IOException {
+            // No error checking is done here for valid primary key types. This should be done by the annotation
+            // processor
+            writer
+                .beginControlFlow("if (json.has(\"%s\"))", fieldName)
+                    .beginControlFlow("if (json.isNull(\"%s\"))", fieldName)
+                        .emitStatement("obj = (%1$s) realm.createObject(%2$s.class, null)",
+                                qualifiedRealmObjectProxyClass, qualifiedRealmObjectClass)
+                    .nextControlFlow("else")
+                        .emitStatement("obj = (%1$s) realm.createObject(%2$s.class, json.get%3$s(\"%4$s\"))",
+                                qualifiedRealmObjectProxyClass, qualifiedRealmObjectClass, jsonType, fieldName)
+                    .endControlFlow()
+                .nextControlFlow("else")
+                    .emitStatement("obj = (%1$s) realm.createObject(%2$s.class)",
+                            qualifiedRealmObjectProxyClass, qualifiedRealmObjectClass)
+                    .endControlFlow();
+        }
+

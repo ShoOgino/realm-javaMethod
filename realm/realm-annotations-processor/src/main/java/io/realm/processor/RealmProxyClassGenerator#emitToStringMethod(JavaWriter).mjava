@@ -7,7 +7,7 @@
         writer.beginControlFlow("if (!RealmObject.isValid(this))");
         writer.emitStatement("return \"Invalid object\"");
         writer.endControlFlow();
-        writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = [\")", className);
+        writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = [\")", simpleClassName);
         List<VariableElement> fields = metadata.getFields();
         for (int i = 0; i < fields.size(); i++) {
             VariableElement field = fields.get(i);
@@ -22,9 +22,9 @@
                         fieldTypeSimpleName
                 );
             } else if (Utils.isRealmList(field)) {
-                String genericType = Utils.getGenericType(field);
+                String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
                 writer.emitStatement("stringBuilder.append(\"RealmList<%s>[\").append(%s().size()).append(\"]\")",
-                        genericType,
+                        genericTypeSimpleName,
                         metadata.getGetter(fieldName));
             } else {
                 if (metadata.isNullable(field)) {
