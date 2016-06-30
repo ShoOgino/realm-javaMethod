@@ -4,10 +4,10 @@
         }
 
         writer.beginMethod(
-                className, // Return type
+                qualifiedClassName, // Return type
                 "update", // Method name
                 EnumSet.of(Modifier.STATIC), // Modifiers
-                "Realm", "realm", className, "realmObject", className, "newObject", "Map<RealmModel, RealmObjectProxy>", "cache"); // Argument type & argument name
+                "Realm", "realm", qualifiedClassName, "realmObject", qualifiedClassName, "newObject", "Map<RealmModel, RealmObjectProxy>", "cache"); // Argument type & argument name
 
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
@@ -16,9 +16,9 @@
             if (Utils.isRealmModel(field)) {
                 writer
                     .emitStatement("%s %sObj = ((%s) newObject).%s()",
-                            Utils.getFieldTypeSimpleName(field), fieldName, interfaceName, getter)
+                            Utils.getFieldTypeQualifiedName(field), fieldName, interfaceName, getter)
                     .beginControlFlow("if (%sObj != null)", fieldName)
-                        .emitStatement("%s cache%s = (%s) cache.get(%sObj)", Utils.getFieldTypeSimpleName(field), fieldName, Utils.getFieldTypeSimpleName(field), fieldName)
+                        .emitStatement("%s cache%s = (%s) cache.get(%sObj)", Utils.getFieldTypeQualifiedName(field), fieldName, Utils.getFieldTypeQualifiedName(field), fieldName)
                         .beginControlFlow("if (cache%s != null)", fieldName)
                             .emitStatement("((%s) realmObject).%s(cache%s)", interfaceName, setter, fieldName)
                         .nextControlFlow("else")
@@ -26,8 +26,7 @@
                                     interfaceName,
                                     setter,
                                     Utils.getProxyClassSimpleName(field),
-                                    fieldName,
-                                    Utils.getFieldTypeSimpleName(field)
+                                    fieldName
                             )
                         .endControlFlow()
                     .nextControlFlow("else")
@@ -35,16 +34,17 @@
                         .emitStatement("((%s) realmObject).%s(null)", interfaceName, setter)
                     .endControlFlow();
             } else if (Utils.isRealmList(field)) {
+                final String genericType = Utils.getGenericTypeQualifiedName(field);
                 writer
                     .emitStatement("RealmList<%s> %sList = ((%s) newObject).%s()",
-                            Utils.getGenericType(field), fieldName, interfaceName, getter)
+                            genericType, fieldName, interfaceName, getter)
                     .emitStatement("RealmList<%s> %sRealmList = ((%s) realmObject).%s()",
-                            Utils.getGenericType(field), fieldName, interfaceName, getter)
+                            genericType, fieldName, interfaceName, getter)
                     .emitStatement("%sRealmList.clear()", fieldName)
                     .beginControlFlow("if (%sList != null)", fieldName)
                         .beginControlFlow("for (int i = 0; i < %sList.size(); i++)", fieldName)
-                            .emitStatement("%s %sItem = %sList.get(i)", Utils.getGenericType(field), fieldName, fieldName)
-                            .emitStatement("%s cache%s = (%s) cache.get(%sItem)", Utils.getGenericType(field), fieldName, Utils.getGenericType(field), fieldName)
+                            .emitStatement("%s %sItem = %sList.get(i)", genericType, fieldName, fieldName)
+                            .emitStatement("%s cache%s = (%s) cache.get(%sItem)", genericType, fieldName, genericType, fieldName)
                             .beginControlFlow("if (cache%s != null)", fieldName)
                                 .emitStatement("%sRealmList.add(cache%s)", fieldName, fieldName)
                             .nextControlFlow("else")

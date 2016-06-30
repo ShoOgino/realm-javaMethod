@@ -1,9 +1,9 @@
     private void emitCopyOrUpdateMethod(JavaWriter writer) throws IOException {
         writer.beginMethod(
-                className, // Return type
+                qualifiedClassName, // Return type
                 "copyOrUpdate", // Method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
-                "Realm", "realm", className, "object", "boolean", "update", "Map<RealmModel,RealmObjectProxy>", "cache" // Argument type & argument name
+                "Realm", "realm", qualifiedClassName, "object", "boolean", "update", "Map<RealmModel,RealmObjectProxy>", "cache" // Argument type & argument name
         );
 
         writer
@@ -20,17 +20,17 @@
 
         writer.emitStatement("RealmObjectProxy cachedRealmObject = cache.get(object)");
         writer.beginControlFlow("if (cachedRealmObject != null)")
-                .emitStatement("return (%s) cachedRealmObject", className)
+                .emitStatement("return (%s) cachedRealmObject", qualifiedClassName)
                 .nextControlFlow("else");
 
             if (!metadata.hasPrimaryKey()) {
                 writer.emitStatement("return copy(realm, object, update, cache)");
             } else {
                 writer
-                    .emitStatement("%s realmObject = null", className)
+                    .emitStatement("%s realmObject = null", qualifiedClassName)
                     .emitStatement("boolean canUpdate = update")
                     .beginControlFlow("if (canUpdate)")
-                        .emitStatement("Table table = realm.getTable(%s.class)", className)
+                        .emitStatement("Table table = realm.getTable(%s.class)", qualifiedClassName)
                         .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
 
                 String primaryKeyGetter = metadata.getPrimaryKeyGetter();
@@ -64,8 +64,8 @@
                 writer
                     .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
                         .emitStatement("realmObject = new %s(realm.schema.getColumnInfo(%s.class))",
-                                Utils.getProxyClassName(className),
-                                className)
+                                qualifiedGeneratedClassName,
+                                qualifiedClassName)
                         .emitStatement("((RealmObjectProxy)realmObject).realmGet$proxyState().setRealm$realm(realm)")
                         .emitStatement("((RealmObjectProxy)realmObject).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex))")
                         .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")

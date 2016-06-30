@@ -5,8 +5,8 @@
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
                 "ImplicitTransaction", "transaction"); // Argument type & argument name
 
-        writer.beginControlFlow("if (transaction.hasTable(\"" + Constants.TABLE_PREFIX + this.className + "\"))");
-        writer.emitStatement("Table table = transaction.getTable(\"%s%s\")", Constants.TABLE_PREFIX, this.className);
+        writer.beginControlFlow("if (transaction.hasTable(\"" + Constants.TABLE_PREFIX + this.simpleClassName + "\"))");
+        writer.emitStatement("Table table = transaction.getTable(\"%s%s\")", Constants.TABLE_PREFIX, this.simpleClassName);
 
         // verify number of columns
         writer.beginControlFlow("if (table.getColumnCount() != " + metadata.getFields().size() + ")");
@@ -29,10 +29,10 @@
         long fieldIndex = 0;
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
-            String fieldTypeCanonicalName = field.asType().toString();
+            String fieldTypeQualifiedName = Utils.getFieldTypeQualifiedName(field);
             String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
 
-            if (Constants.JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
+            if (Constants.JAVA_TO_REALM_TYPES.containsKey(fieldTypeQualifiedName)) {
                 // make sure types align
                 writer.beginControlFlow("if (!columnTypes.containsKey(\"%s\"))", fieldName);
                 writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath(), \"Missing field '%s' in existing Realm file. " +
@@ -40,7 +40,7 @@
                         "\")", fieldName);
                 writer.endControlFlow();
                 writer.beginControlFlow("if (columnTypes.get(\"%s\") != %s)",
-                        fieldName, Constants.JAVA_TO_COLUMN_TYPES.get(fieldTypeCanonicalName));
+                        fieldName, Constants.JAVA_TO_COLUMN_TYPES.get(fieldTypeQualifiedName));
                 writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath(), \"Invalid type '%s' for field '%s' in existing Realm file.\")",
                         fieldTypeSimpleName, fieldName);
                 writer.endControlFlow();
@@ -55,7 +55,7 @@
                                 "Migrate using RealmObjectSchema.setNullable(), or mark the field as @Required.\")",
                                 fieldName);
                     // nullability check for boxed types
-                    } else if (Utils.isBoxedType(fieldTypeCanonicalName)) {
+                    } else if (Utils.isBoxedType(fieldTypeQualifiedName)) {
                         writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath()," +
                                 "\"Field '%s' does not support null values in the existing Realm file. " +
                                 "Either set @Required, use the primitive type for field '%s' " +
@@ -80,7 +80,7 @@
                             .endControlFlow();
                     } else {
                         writer.beginControlFlow("if (table.isColumnNullable(%s))", fieldIndexVariableReference(field));
-                        if (Utils.isPrimitiveType(fieldTypeCanonicalName)) {
+                        if (Utils.isPrimitiveType(fieldTypeQualifiedName)) {
                             writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath()," +
                                     " \"Field '%s' does support null values in the existing Realm file. " +
                                     "Use corresponding boxed type for field '%s' or migrate using RealmObjectSchema.setNullable().\")",
@@ -131,20 +131,20 @@
                         fieldName, fieldIndexVariableReference(field), fieldIndex);
                 writer.endControlFlow();
             } else if (Utils.isRealmList(field)) { // Link Lists
-                String genericType = Utils.getGenericType(field);
+                String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
                 writer.beginControlFlow("if (!columnTypes.containsKey(\"%s\"))", fieldName);
                 writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath(), \"Missing field '%s'\")", fieldName);
                 writer.endControlFlow();
                 writer.beginControlFlow("if (columnTypes.get(\"%s\") != RealmFieldType.LIST)", fieldName);
                 writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath(), \"Invalid type '%s' for field '%s'\")",
-                        genericType, fieldName);
+                        genericTypeSimpleName, fieldName);
                 writer.endControlFlow();
-                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericType);
+                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericTypeSimpleName);
                 writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath(), \"Missing class '%s%s' for field '%s'\")",
-                        Constants.TABLE_PREFIX, genericType, fieldName);
+                        Constants.TABLE_PREFIX, genericTypeSimpleName, fieldName);
                 writer.endControlFlow();
 
-                writer.emitStatement("Table table_%d = transaction.getTable(\"%s%s\")", fieldIndex, Constants.TABLE_PREFIX, genericType);
+                writer.emitStatement("Table table_%d = transaction.getTable(\"%s%s\")", fieldIndex, Constants.TABLE_PREFIX, genericTypeSimpleName);
                 writer.beginControlFlow("if (!table.getLinkTarget(%s).hasSameSchema(table_%d))",
                         fieldIndexVariableReference(field), fieldIndex);
                 writer.emitStatement("throw new RealmMigrationNeededException(transaction.getPath(), \"Invalid RealmList type for field '%s': '\" + table.getLinkTarget(%s).getName() + \"' expected - was '\" + table_%d.getName() + \"'\")",

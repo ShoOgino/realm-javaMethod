@@ -2,7 +2,7 @@
         writer.emitField("Set<Class<? extends RealmModel>>", "MODEL_CLASSES", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL));
         writer.beginInitializer(true);
         writer.emitStatement("Set<Class<? extends RealmModel>> modelClasses = new HashSet<Class<? extends RealmModel>>()");
-        for (String clazz : simpleModelClasses) {
+        for (String clazz : qualifiedModelClasses) {
             writer.emitStatement("modelClasses.add(%s.class)", clazz);
         }
         writer.emitStatement("MODEL_CLASSES = Collections.unmodifiableSet(modelClasses)");

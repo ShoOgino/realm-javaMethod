@@ -1,7 +1,10 @@
     public RealmProxyClassGenerator(ProcessingEnvironment processingEnvironment, ClassMetaData metadata) {
         this.processingEnvironment = processingEnvironment;
         this.metadata = metadata;
-        this.className = metadata.getSimpleClassName();
-        this.interfaceName = Utils.getProxyInterfaceName(className);
+        this.simpleClassName = metadata.getSimpleClassName();
+        this.qualifiedClassName = metadata.getFullyQualifiedClassName();
+        this.interfaceName = Utils.getProxyInterfaceName(simpleClassName);
+        this.qualifiedGeneratedClassName = String.format("%s.%s",
+                Constants.REALM_PACKAGE_NAME, Utils.getProxyClassName(simpleClassName));
     }
 
