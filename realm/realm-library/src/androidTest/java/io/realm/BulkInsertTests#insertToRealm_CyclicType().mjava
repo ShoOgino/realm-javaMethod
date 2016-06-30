@@ -1,0 +1,20 @@
+    @Test
+    public void insertToRealm_CyclicType() {
+        CyclicType oneCyclicType = new CyclicType();
+        oneCyclicType.setName("One");
+        CyclicType anotherCyclicType = new CyclicType();
+        anotherCyclicType.setName("Two");
+        oneCyclicType.setObject(anotherCyclicType);
+        anotherCyclicType.setObject(oneCyclicType);
+
+        realm.beginTransaction();
+        realm.insert(Arrays.asList(oneCyclicType, anotherCyclicType));
+        realm.commitTransaction();
+
+        RealmResults<CyclicType> realmObjects = realm.where(CyclicType.class).findAllSorted(CyclicType.FIELD_NAME);
+        assertNotNull(realmObjects);
+        assertEquals(2, realmObjects.size());
+        assertEquals("One", realmObjects.get(0).getName());
+        assertEquals("Two", realmObjects.get(0).getObject().getName());
+    }
+

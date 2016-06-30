@@ -1,0 +1,15 @@
+    @Test
+    public void testListNull() {
+        List<AllTypes> nullObjects = null;
+
+        realm.beginTransaction();
+        try {
+            realm.insert(nullObjects);
+            fail("Should trigger IllegalArgumentException");
+        } catch (IllegalArgumentException ignore) {
+
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

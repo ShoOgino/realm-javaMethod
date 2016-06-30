@@ -18,67 +18,73 @@
                 .emitStatement("return object")
             .endControlFlow();
 
-        if (!metadata.hasPrimaryKey()) {
-            writer.emitStatement("return copy(realm, object, update, cache)");
-        } else {
-            writer
-                .emitStatement("%s realmObject = null", className)
-                .emitStatement("boolean canUpdate = update")
-                .beginControlFlow("if (canUpdate)")
-                    .emitStatement("Table table = realm.getTable(%s.class)", className)
-                    .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
+        writer.emitStatement("RealmObjectProxy cachedRealmObject = cache.get(object)");
+        writer.beginControlFlow("if (cachedRealmObject != null)")
+                .emitStatement("return (%s) cachedRealmObject", className)
+                .nextControlFlow("else");
 
-            String primaryKeyGetter = metadata.getPrimaryKeyGetter();
-            VariableElement primaryKeyElement = metadata.getPrimaryKey();
-            if (metadata.isNullable(primaryKeyElement)) {
-                if (Utils.isString(primaryKeyElement)) {
-                    writer
-                        .emitStatement("String value = ((%s) object).%s()", interfaceName, primaryKeyGetter)
-                        .emitStatement("long rowIndex = TableOrView.NO_MATCH")
-                        .beginControlFlow("if (value == null)")
-                            .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
-                        .nextControlFlow("else")
-                            .emitStatement("rowIndex = table.findFirstString(pkColumnIndex, value)")
-                        .endControlFlow();
-                } else {
-                    writer
-                        .emitStatement("Number value = ((%s) object).%s()", interfaceName, primaryKeyGetter)
-                        .emitStatement("long rowIndex = TableOrView.NO_MATCH")
-                        .beginControlFlow("if (value == null)")
-                            .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
-                        .nextControlFlow("else")
-                            .emitStatement("rowIndex = table.findFirstLong(pkColumnIndex, value.longValue())")
-                        .endControlFlow();
-                }
+            if (!metadata.hasPrimaryKey()) {
+                writer.emitStatement("return copy(realm, object, update, cache)");
             } else {
-                String pkType = Utils.isString(metadata.getPrimaryKey()) ? "String" : "Long";
-                writer.emitStatement("long rowIndex = table.findFirst%s(pkColumnIndex, ((%s) object).%s())",
-                        pkType, interfaceName, primaryKeyGetter);
+                writer
+                    .emitStatement("%s realmObject = null", className)
+                    .emitStatement("boolean canUpdate = update")
+                    .beginControlFlow("if (canUpdate)")
+                        .emitStatement("Table table = realm.getTable(%s.class)", className)
+                        .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
+
+                String primaryKeyGetter = metadata.getPrimaryKeyGetter();
+                VariableElement primaryKeyElement = metadata.getPrimaryKey();
+                if (metadata.isNullable(primaryKeyElement)) {
+                    if (Utils.isString(primaryKeyElement)) {
+                        writer
+                            .emitStatement("String value = ((%s) object).%s()", interfaceName, primaryKeyGetter)
+                            .emitStatement("long rowIndex = TableOrView.NO_MATCH")
+                            .beginControlFlow("if (value == null)")
+                                .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
+                            .nextControlFlow("else")
+                                .emitStatement("rowIndex = table.findFirstString(pkColumnIndex, value)")
+                            .endControlFlow();
+                    } else {
+                        writer
+                            .emitStatement("Number value = ((%s) object).%s()", interfaceName, primaryKeyGetter)
+                            .emitStatement("long rowIndex = TableOrView.NO_MATCH")
+                            .beginControlFlow("if (value == null)")
+                                .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
+                            .nextControlFlow("else")
+                                .emitStatement("rowIndex = table.findFirstLong(pkColumnIndex, value.longValue())")
+                            .endControlFlow();
+                    }
+                } else {
+                    String pkType = Utils.isString(metadata.getPrimaryKey()) ? "String" : "Long";
+                    writer.emitStatement("long rowIndex = table.findFirst%s(pkColumnIndex, ((%s) object).%s())",
+                            pkType, interfaceName, primaryKeyGetter);
+                }
+
+                writer
+                    .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
+                        .emitStatement("realmObject = new %s(realm.schema.getColumnInfo(%s.class))",
+                                Utils.getProxyClassName(className),
+                                className)
+                        .emitStatement("((RealmObjectProxy)realmObject).realmGet$proxyState().setRealm$realm(realm)")
+                        .emitStatement("((RealmObjectProxy)realmObject).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex))")
+                        .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
+                    .nextControlFlow("else")
+                        .emitStatement("canUpdate = false")
+                    .endControlFlow();
+
+                writer.endControlFlow();
+
+                writer
+                    .emitEmptyLine()
+                    .beginControlFlow("if (canUpdate)")
+                        .emitStatement("return update(realm, realmObject, object, cache)")
+                    .nextControlFlow("else")
+                        .emitStatement("return copy(realm, object, update, cache)")
+                    .endControlFlow();
             }
 
-            writer
-                .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
-                    .emitStatement("realmObject = new %s(realm.schema.getColumnInfo(%s.class))",
-                            Utils.getProxyClassName(className),
-                            className)
-                    .emitStatement("((RealmObjectProxy)realmObject).realmGet$proxyState().setRealm$realm(realm)")
-                    .emitStatement("((RealmObjectProxy)realmObject).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex))")
-                    .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
-                .nextControlFlow("else")
-                    .emitStatement("canUpdate = false")
-                .endControlFlow();
-
-            writer.endControlFlow();
-
-            writer
-                .emitEmptyLine()
-                .beginControlFlow("if (canUpdate)")
-                    .emitStatement("return update(realm, realmObject, object, cache)")
-                .nextControlFlow("else")
-                    .emitStatement("return copy(realm, object, update, cache)")
-                .endControlFlow();
-        }
-
+        writer.endControlFlow();
         writer.endMethod();
         writer.emitEmptyLine();
     }

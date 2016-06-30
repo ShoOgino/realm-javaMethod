@@ -1,0 +1,19 @@
+    public static void insert(Realm realm, Iterator<? extends RealmModel> objects, Map<RealmModel,Long> cache) {
+        Table table = realm.getTable(Simple.class);
+        long tableNativePtr = table.getNativeTablePointer();
+        SimpleColumnInfo columnInfo = (SimpleColumnInfo) realm.schema.getColumnInfo(Simple.class);
+        Simple object = null;
+        while (objects.hasNext()) {
+            object = (Simple) objects.next();
+            if(!cache.containsKey(object)) {
+                long rowIndex = Table.nativeAddEmptyRow(tableNativePtr, 1);
+                cache.put(object, rowIndex);
+                String realmGet$name = ((SimpleRealmProxyInterface)object).realmGet$name();
+                if (realmGet$name != null) {
+                    Table.nativeSetString(tableNativePtr, columnInfo.nameIndex, rowIndex, realmGet$name);
+                }
+                Table.nativeSetLong(tableNativePtr, columnInfo.ageIndex, rowIndex, ((SimpleRealmProxyInterface)object).realmGet$age());
+            }
+        }
+    }
+

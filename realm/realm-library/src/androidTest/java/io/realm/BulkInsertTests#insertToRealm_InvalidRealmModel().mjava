@@ -1,0 +1,14 @@
+    @Test
+    public void insertToRealm_InvalidRealmModel() {
+        InvalidRealmModel invalidRealmModel = new InvalidRealmModel();
+
+        realm.beginTransaction();
+        try {
+            realm.insert(invalidRealmModel);
+            fail("Expected Missing Proxy Class Exception");
+        } catch (RealmException ignored) {
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

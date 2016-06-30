@@ -1,0 +1,38 @@
+    @Test
+    public void insertOrUpdate_mixingPrimaryKeyAndNoPrimaryKeyModels() {
+        AllTypes objB_no_pk = new AllTypes();
+        objB_no_pk.setColumnString("B");
+
+        PrimaryKeyWithNoPrimaryKeyObjectRelation objA_pk = new PrimaryKeyWithNoPrimaryKeyObjectRelation();
+        objA_pk.setColumnString("A");
+        objA_pk.setColumnRealmObjectNoPK(objB_no_pk);
+
+        realm.beginTransaction();
+        realm.insert(objA_pk);
+        realm.commitTransaction();
+
+        RealmResults<PrimaryKeyWithNoPrimaryKeyObjectRelation> all = realm.where(PrimaryKeyWithNoPrimaryKeyObjectRelation.class).findAll();
+        assertEquals(1, all.size());
+        assertEquals("A", all.get(0).getColumnString());
+        assertEquals(8, all.get(0).getColumnInt());
+        assertNotNull(all.get(0).getColumnRealmObjectNoPK());
+        assertEquals("B", all.get(0).getColumnRealmObjectNoPK().getColumnString());
+        assertEquals(1, realm.where(AllTypes.class).findAll().size());
+
+        objA_pk.setColumnInt(42);
+        objB_no_pk.setColumnString("updated B");
+
+        realm.beginTransaction();
+        realm.insertOrUpdate(objA_pk);
+        realm.commitTransaction();
+
+        all = realm.where(PrimaryKeyWithNoPrimaryKeyObjectRelation.class).findAll();
+        assertEquals(1, all.size());
+        assertEquals("A", all.get(0).getColumnString());
+        assertEquals(42, all.get(0).getColumnInt());
+        assertNotNull(all.get(0).getColumnRealmObjectNoPK());
+        assertEquals("updated B", all.get(0).getColumnRealmObjectNoPK().getColumnString());
+        // since AllTypes doesn't have a PK we now have two instances
+        assertEquals(2, realm.where(AllTypes.class).findAll().size());
+    }
+

@@ -1,0 +1,27 @@
+    @Test
+    public void insertToRealm_RealmModel() {
+        AllTypesRealmModel allTypes = new AllTypesRealmModel();
+        allTypes.columnLong = 10;
+        allTypes.columnBoolean = false;
+        allTypes.columnBinary = new byte[]{1, 2, 3};
+        allTypes.columnDate = new Date();
+        allTypes.columnDouble = 3.1415;
+        allTypes.columnFloat = 1.234567f;
+        allTypes.columnString = "test data";
+        allTypes.columnByte = 0b0010_1010;
+
+        realm.beginTransaction();
+        realm.insert(allTypes);
+        realm.commitTransaction();
+
+        AllTypesRealmModel first = realm.where(AllTypesRealmModel.class).findFirst();
+        assertEquals(allTypes.columnString, first.columnString);
+        assertEquals(allTypes.columnLong, first.columnLong);
+        assertEquals(allTypes.columnBoolean, first.columnBoolean);
+        assertArrayEquals(allTypes.columnBinary, first.columnBinary);
+        assertEquals(allTypes.columnDate, first.columnDate);
+        assertEquals(allTypes.columnDouble, first.columnDouble, 0.0000001);
+        assertEquals(allTypes.columnFloat, first.columnFloat, 0.0000001);
+        assertEquals(allTypes.columnByte, first.columnByte);
+    }
+

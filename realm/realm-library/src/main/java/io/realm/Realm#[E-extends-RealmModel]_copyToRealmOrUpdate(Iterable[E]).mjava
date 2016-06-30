@@ -16,9 +16,11 @@
             return new ArrayList<E>(0);
         }
 
+        Map<RealmModel, RealmObjectProxy> cache = new HashMap<RealmModel, RealmObjectProxy>();
         ArrayList<E> realmObjects = new ArrayList<E>();
         for (E object : objects) {
-            realmObjects.add(copyToRealmOrUpdate(object));
+            checkNotNullObject(object);
+            realmObjects.add(copyOrUpdate(object, true, cache));
         }
 
         return realmObjects;

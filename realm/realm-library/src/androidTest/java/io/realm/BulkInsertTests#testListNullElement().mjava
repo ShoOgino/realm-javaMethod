@@ -1,0 +1,20 @@
+    @Test
+    public void testListNullElement() {
+        Dog dog1 = new Dog();
+        dog1.setName("Dog 1");
+        Dog dog2 = new Dog();
+        dog2.setName("Dog 2");
+        ArrayList<Dog> list = new ArrayList<Dog>();
+        list.addAll(Arrays.asList(dog1, null, dog2));
+
+        realm.beginTransaction();
+        try {
+            realm.insert(list);
+            fail("Should trigger IllegalArgumentException");
+        } catch (NullPointerException ignore) {
+
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

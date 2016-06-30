@@ -1,0 +1,38 @@
+    @Test
+    public void insertOrUpdate_mixingPrimaryAndNoPrimaryKeyList() {
+        NoPrimaryKeyWithPrimaryKeyObjectRelation objA_no_pk = new NoPrimaryKeyWithPrimaryKeyObjectRelation();
+        objA_no_pk.setColumnString("A");
+        NoPrimaryKeyWithPrimaryKeyObjectRelation objB_no_pk = new NoPrimaryKeyWithPrimaryKeyObjectRelation();
+        objB_no_pk.setColumnString("B");
+        AllTypesPrimaryKey objC_pk = new AllTypesPrimaryKey();
+        objC_pk.setColumnLong(7);
+        objC_pk.setColumnString("C");
+        AllTypesPrimaryKey objD_pk = new AllTypesPrimaryKey();
+        objD_pk.setColumnLong(7);
+        objD_pk.setColumnString("D");
+
+        objA_no_pk.setColumnRealmObjectPK(objC_pk);
+        objB_no_pk.setColumnRealmObjectPK(objD_pk);
+
+        ArrayList<NoPrimaryKeyWithPrimaryKeyObjectRelation> objects = new ArrayList<NoPrimaryKeyWithPrimaryKeyObjectRelation>(2);
+        objects.add(objA_no_pk);
+        objects.add(objB_no_pk);
+
+        realm.beginTransaction();
+        realm.insertOrUpdate(objects);
+        realm.commitTransaction();
+
+        RealmResults<NoPrimaryKeyWithPrimaryKeyObjectRelation> all = realm.where(NoPrimaryKeyWithPrimaryKeyObjectRelation.class).findAllSorted("columnString", Sort.DESCENDING);
+        assertEquals(2, all.size());
+        assertEquals("B", all.get(0).getColumnString());
+        assertEquals("A", all.get(1).getColumnString());
+
+        assertNotNull(all.get(0).getColumnRealmObjectPK());
+        assertNotNull(all.get(1).getColumnRealmObjectPK());
+
+        assertEquals("D", all.get(0).getColumnRealmObjectPK().getColumnString());
+        assertEquals("D", all.get(1).getColumnRealmObjectPK().getColumnString());
+
+        assertEquals(1, realm.where(AllTypesPrimaryKey.class).findAll().size());
+    }
+

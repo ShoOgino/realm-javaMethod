@@ -15,10 +15,11 @@
         if (objects == null) {
             return new ArrayList<E>();
         }
-
+        Map<RealmModel, RealmObjectProxy> cache = new HashMap<RealmModel, RealmObjectProxy>();
         ArrayList<E> realmObjects = new ArrayList<E>();
         for (E object : objects) {
-            realmObjects.add(copyToRealm(object));
+            checkNotNullObject(object);
+            realmObjects.add(copyOrUpdate(object, false, cache));
         }
 
         return realmObjects;

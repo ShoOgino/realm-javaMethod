@@ -1,0 +1,48 @@
+    @Test
+    public void insertToRealm() {
+        AllJavaTypes obj = new AllJavaTypes();
+        obj.setFieldIgnored("cookie");
+        obj.setFieldLong(42);
+        obj.setFieldString("obj1");
+
+        RealmList<AllJavaTypes> list = new RealmList<AllJavaTypes>();
+        list.add(obj);
+
+        Date date = new Date();
+
+        AllJavaTypes allTypes = new AllJavaTypes();
+        allTypes.setFieldString("String");
+        allTypes.setFieldLong(1l);
+        allTypes.setFieldFloat(1f);
+        allTypes.setFieldDouble(1d);
+        allTypes.setFieldBoolean(true);
+        allTypes.setFieldDate(date);
+        allTypes.setFieldBinary(new byte[]{1, 2, 3});
+        allTypes.setFieldObject(obj);
+        allTypes.setFieldList(list);
+
+        realm.beginTransaction();
+        realm.insert(allTypes);
+        realm.commitTransaction();
+
+        AllJavaTypes realmTypes = realm.where(AllJavaTypes.class).findFirst();
+
+        assertNotSame(allTypes, realmTypes); // Objects should not be considered equal
+        assertEquals(allTypes.getFieldString(), realmTypes.getFieldString()); // But they contain the same data
+        assertEquals(allTypes.getFieldLong(), realmTypes.getFieldLong());
+        assertEquals(allTypes.getFieldFloat(), realmTypes.getFieldFloat(), 0);
+        assertEquals(allTypes.getFieldDouble(), realmTypes.getFieldDouble(), 0);
+        assertEquals(allTypes.isFieldBoolean(), realmTypes.isFieldBoolean());
+        assertEquals(allTypes.getFieldDate(), realmTypes.getFieldDate());
+        assertArrayEquals(allTypes.getFieldBinary(), realmTypes.getFieldBinary());
+        assertEquals(allTypes.getFieldObject().getFieldString(), obj.getFieldString());
+        assertEquals(list.size(), realmTypes.getFieldList().size());
+        assertEquals(list.get(0).getFieldString(), realmTypes.getFieldList().get(0).getFieldString());
+        assertEquals(list.get(0).getFieldLong(), realmTypes.getFieldList().get(0).getFieldLong());
+        assertNull(realmTypes.getFieldList().get(0).getFieldIgnored());
+
+
+        // make sure Dog was not inserted twice in the recursive process
+        assertEquals(2, realm.where(AllJavaTypes.class).findAll().size());
+    }
+

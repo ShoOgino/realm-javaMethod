@@ -1,0 +1,49 @@
+    @Test
+    public void insertOrUpdate_mixingNoPrimaryKeyAndPrimaryKeyModels() {
+        AllTypesPrimaryKey objB_pk = new AllTypesPrimaryKey();
+        objB_pk.setColumnLong(7);
+        objB_pk.setColumnString("B");
+
+        NoPrimaryKeyWithPrimaryKeyObjectRelation objA_no_pk = new NoPrimaryKeyWithPrimaryKeyObjectRelation();
+        objA_no_pk.setColumnRealmObjectPK(objB_pk);
+        objA_no_pk.setColumnString("A");
+
+        realm.beginTransaction();
+        realm.insert(objA_no_pk);
+        realm.commitTransaction();
+
+        RealmResults<NoPrimaryKeyWithPrimaryKeyObjectRelation> all = realm.where(NoPrimaryKeyWithPrimaryKeyObjectRelation.class).findAll();
+        assertEquals(1, all.size());
+        assertEquals("A", all.get(0).getColumnString());
+        assertEquals(8, all.get(0).getColumnInt());
+        assertNotNull(all.get(0).getColumnRealmObjectPK());
+        assertEquals(7, all.get(0).getColumnRealmObjectPK().getColumnLong());
+        assertEquals("B", all.get(0).getColumnRealmObjectPK().getColumnString());
+        assertEquals(1, realm.where(AllTypesPrimaryKey.class).findAll().size());
+
+        objA_no_pk.setColumnString("different A");
+        objA_no_pk.setColumnInt(42);//should insert a new instance
+        // update (since it has a PK) now both AllTypesPrimaryKey points to the same objB_pk instance
+        objB_pk.setColumnString("updated B");
+
+        realm.beginTransaction();
+        realm.insertOrUpdate(objA_no_pk);
+        realm.commitTransaction();
+
+        all = realm.where(NoPrimaryKeyWithPrimaryKeyObjectRelation.class).findAllSorted("columnString");
+        assertEquals(2, all.size());
+        assertEquals("A", all.get(0).getColumnString());
+        assertEquals(8, all.get(0).getColumnInt());
+        assertEquals("different A", all.get(1).getColumnString());
+        assertEquals(42, all.get(1).getColumnInt());
+
+        assertNotNull(all.get(0).getColumnRealmObjectPK());
+        assertNotNull(all.get(1).getColumnRealmObjectPK());
+
+        assertEquals(7, all.get(0).getColumnRealmObjectPK().getColumnLong());
+        assertEquals(7, all.get(1).getColumnRealmObjectPK().getColumnLong());
+        assertEquals("updated B", all.get(0).getColumnRealmObjectPK().getColumnString());
+        assertEquals("updated B", all.get(1).getColumnRealmObjectPK().getColumnString());
+        assertEquals(1, realm.where(AllTypesPrimaryKey.class).findAll().size());
+    }
+

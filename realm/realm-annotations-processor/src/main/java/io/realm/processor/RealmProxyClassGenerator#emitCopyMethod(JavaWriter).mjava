@@ -5,65 +5,71 @@
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
                 "Realm", "realm", className, "newObject", "boolean", "update", "Map<RealmModel,RealmObjectProxy>", "cache"); // Argument type & argument name
 
-        if (metadata.hasPrimaryKey()) {
-            writer.emitStatement("%s realmObject = realm.createObject(%s.class, ((%s) newObject).%s())",
-                    className, className, interfaceName, metadata.getPrimaryKeyGetter());
-        } else {
-            writer.emitStatement("%s realmObject = realm.createObject(%s.class)", className, className);
-        }
-        writer.emitStatement("cache.put(newObject, (RealmObjectProxy) realmObject)");
-        for (VariableElement field : metadata.getFields()) {
-            String fieldName = field.getSimpleName().toString();
-            String fieldType = field.asType().toString();
-            String setter = metadata.getSetter(fieldName);
-            String getter = metadata.getGetter(fieldName);
+        writer.emitStatement("RealmObjectProxy cachedRealmObject = cache.get(newObject)");
+        writer.beginControlFlow("if (cachedRealmObject != null)")
+              .emitStatement("return (%s) cachedRealmObject", className)
+              .nextControlFlow("else");
 
-            if (Utils.isRealmModel(field)) {
-                writer
-                    .emitEmptyLine()
-                    .emitStatement("%s %sObj = ((%s) newObject).%s()", fieldType, fieldName, interfaceName, getter)
-                    .beginControlFlow("if (%sObj != null)", fieldName)
-                        .emitStatement("%s cache%s = (%s) cache.get(%sObj)", fieldType, fieldName, fieldType, fieldName)
-                        .beginControlFlow("if (cache%s != null)", fieldName)
-                            .emitStatement("((%s) realmObject).%s(cache%s)", interfaceName, setter, fieldName)
-                        .nextControlFlow("else")
-                            .emitStatement("((%s) realmObject).%s(%s.copyOrUpdate(realm, %sObj, update, cache))",
-                                    interfaceName,
-                                    setter,
-                                    Utils.getProxyClassSimpleName(field),
-                                    fieldName)
-                        .endControlFlow()
-                    .nextControlFlow("else")
-                        // No need to throw exception here if the field is not nullable. A exception will be thrown in setter.
-                        .emitStatement("((%s) realmObject).%s(null)", interfaceName, setter)
-                    .endControlFlow();
-            } else if (Utils.isRealmList(field)) {
-                writer
-                    .emitEmptyLine()
-                    .emitStatement("RealmList<%s> %sList = ((%s) newObject).%s()",
-                            Utils.getGenericType(field), fieldName, interfaceName, getter)
-                    .beginControlFlow("if (%sList != null)", fieldName)
-                        .emitStatement("RealmList<%s> %sRealmList = ((%s) realmObject).%s()",
-                                Utils.getGenericType(field), fieldName, interfaceName, getter)
-                        .beginControlFlow("for (int i = 0; i < %sList.size(); i++)", fieldName)
-                                .emitStatement("%s %sItem = %sList.get(i)", Utils.getGenericType(field), fieldName, fieldName)
-                                .emitStatement("%s cache%s = (%s) cache.get(%sItem)", Utils.getGenericType(field), fieldName, Utils.getGenericType(field), fieldName)
-                                .beginControlFlow("if (cache%s != null)", fieldName)
-                                        .emitStatement("%sRealmList.add(cache%s)", fieldName, fieldName)
-                                .nextControlFlow("else")
-                                        .emitStatement("%sRealmList.add(%s.copyOrUpdate(realm, %sList.get(i), update, cache))", fieldName, Utils.getProxyClassSimpleName(field), fieldName)
-                                .endControlFlow()
-                        .endControlFlow()
-                    .endControlFlow()
-                    .emitEmptyLine();
-
+            if (metadata.hasPrimaryKey()) {
+                writer.emitStatement("%s realmObject = realm.createObject(%s.class, ((%s) newObject).%s())",
+                        className, className, interfaceName, metadata.getPrimaryKeyGetter());
             } else {
-                writer.emitStatement("((%s) realmObject).%s(((%s) newObject).%s())",
-                        interfaceName, setter, interfaceName, getter);
+                writer.emitStatement("%s realmObject = realm.createObject(%s.class)", className, className);
             }
-        }
+            writer.emitStatement("cache.put(newObject, (RealmObjectProxy) realmObject)");
+            for (VariableElement field : metadata.getFields()) {
+                String fieldName = field.getSimpleName().toString();
+                String fieldType = field.asType().toString();
+                String setter = metadata.getSetter(fieldName);
+                String getter = metadata.getGetter(fieldName);
 
-        writer.emitStatement("return realmObject");
+                if (Utils.isRealmModel(field)) {
+                    writer
+                        .emitEmptyLine()
+                        .emitStatement("%s %sObj = ((%s) newObject).%s()", fieldType, fieldName, interfaceName, getter)
+                        .beginControlFlow("if (%sObj != null)", fieldName)
+                            .emitStatement("%s cache%s = (%s) cache.get(%sObj)", fieldType, fieldName, fieldType, fieldName)
+                            .beginControlFlow("if (cache%s != null)", fieldName)
+                                .emitStatement("((%s) realmObject).%s(cache%s)", interfaceName, setter, fieldName)
+                            .nextControlFlow("else")
+                                .emitStatement("((%s) realmObject).%s(%s.copyOrUpdate(realm, %sObj, update, cache))",
+                                        interfaceName,
+                                        setter,
+                                        Utils.getProxyClassSimpleName(field),
+                                        fieldName)
+                            .endControlFlow()
+                        .nextControlFlow("else")
+                            // No need to throw exception here if the field is not nullable. A exception will be thrown in setter.
+                            .emitStatement("((%s) realmObject).%s(null)", interfaceName, setter)
+                        .endControlFlow();
+                } else if (Utils.isRealmList(field)) {
+                    writer
+                        .emitEmptyLine()
+                        .emitStatement("RealmList<%s> %sList = ((%s) newObject).%s()",
+                                Utils.getGenericType(field), fieldName, interfaceName, getter)
+                        .beginControlFlow("if (%sList != null)", fieldName)
+                            .emitStatement("RealmList<%s> %sRealmList = ((%s) realmObject).%s()",
+                                    Utils.getGenericType(field), fieldName, interfaceName, getter)
+                            .beginControlFlow("for (int i = 0; i < %sList.size(); i++)", fieldName)
+                                    .emitStatement("%s %sItem = %sList.get(i)", Utils.getGenericType(field), fieldName, fieldName)
+                                    .emitStatement("%s cache%s = (%s) cache.get(%sItem)", Utils.getGenericType(field), fieldName, Utils.getGenericType(field), fieldName)
+                                    .beginControlFlow("if (cache%s != null)", fieldName)
+                                            .emitStatement("%sRealmList.add(cache%s)", fieldName, fieldName)
+                                    .nextControlFlow("else")
+                                            .emitStatement("%sRealmList.add(%s.copyOrUpdate(realm, %sList.get(i), update, cache))", fieldName, Utils.getProxyClassSimpleName(field), fieldName)
+                                    .endControlFlow()
+                            .endControlFlow()
+                        .endControlFlow()
+                        .emitEmptyLine();
+
+                } else {
+                    writer.emitStatement("((%s) realmObject).%s(((%s) newObject).%s())",
+                            interfaceName, setter, interfaceName, getter);
+                }
+            }
+
+            writer.emitStatement("return realmObject");
+          writer.endControlFlow();
         writer.endMethod();
         writer.emitEmptyLine();
     }

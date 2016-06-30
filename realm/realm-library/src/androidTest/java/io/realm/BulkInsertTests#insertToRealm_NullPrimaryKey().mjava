@@ -1,0 +1,25 @@
+    @Test
+    public void insertToRealm_NullPrimaryKey() {
+        PrimaryKeyAsString primaryKeyAsString = new PrimaryKeyAsString();
+        primaryKeyAsString.setId(19);
+
+        realm.beginTransaction();
+        realm.insertOrUpdate(primaryKeyAsString);
+        realm.commitTransaction();
+
+        primaryKeyAsString = realm.where(PrimaryKeyAsString.class).isNull("name").findFirst();
+        assertNull(primaryKeyAsString.getName());
+        assertEquals(19, primaryKeyAsString.getId());
+
+        PrimaryKeyAsBoxedShort primaryKeyAsShort = new PrimaryKeyAsBoxedShort();
+        primaryKeyAsShort.setName("42");
+
+        realm.beginTransaction();
+        realm.insertOrUpdate(primaryKeyAsShort);
+        realm.commitTransaction();
+
+        primaryKeyAsShort = realm.where(PrimaryKeyAsBoxedShort.class).isNull("id").findFirst();
+        assertNull(primaryKeyAsShort.getId());
+        assertEquals("42", primaryKeyAsShort.getName());
+    }
+

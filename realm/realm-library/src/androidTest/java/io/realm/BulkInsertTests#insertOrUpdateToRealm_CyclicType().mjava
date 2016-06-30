@@ -1,0 +1,28 @@
+    @Test
+    public void insertOrUpdateToRealm_CyclicType() {
+        CyclicTypePrimaryKey oneCyclicType = new CyclicTypePrimaryKey(1, "One");
+        CyclicTypePrimaryKey anotherCyclicType = new CyclicTypePrimaryKey(2, "Two");
+        oneCyclicType.setObject(anotherCyclicType);
+        anotherCyclicType.setObject(oneCyclicType);
+
+        realm.beginTransaction();
+        realm.insertOrUpdate(Arrays.asList(oneCyclicType, anotherCyclicType));
+        realm.commitTransaction();
+
+        RealmResults<CyclicTypePrimaryKey> realmObjects = realm.where(CyclicTypePrimaryKey.class).findAllSorted("name");
+        assertNotNull(realmObjects);
+        assertEquals(2, realmObjects.size());
+        assertEquals("One", realmObjects.get(0).getName());
+        assertEquals("Two", realmObjects.get(0).getObject().getName());
+
+        CyclicTypePrimaryKey updatedCyclicType = new CyclicTypePrimaryKey(2, "updated");
+
+        realm.beginTransaction();
+        realm.insertOrUpdate(updatedCyclicType);
+        realm.commitTransaction();
+
+        assertEquals("One", realmObjects.get(0).getName());
+        assertEquals("updated", realmObjects.get(0).getObject().getName());
+        assertEquals(2, realm.where(CyclicTypePrimaryKey.class).count());
+    }
+

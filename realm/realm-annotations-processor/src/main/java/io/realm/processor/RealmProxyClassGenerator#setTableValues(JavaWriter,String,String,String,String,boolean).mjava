@@ -1,0 +1,101 @@
+    private void setTableValues(JavaWriter writer, String fieldType, String fieldName, String interfaceName, String getter, boolean isUpdate) throws IOException {
+        if ("long".equals(fieldType)
+                || "int".equals(fieldType)
+                || "short".equals(fieldType)
+                || "byte".equals(fieldType)) {
+            writer.emitStatement("Table.nativeSetLong(tableNativePtr, columnInfo.%sIndex, rowIndex, ((%s)object).%s())", fieldName, interfaceName, getter);
+
+        } else if ("java.lang.Long".equals(fieldType)
+                || "java.lang.Integer".equals(fieldType)
+                || "java.lang.Short".equals(fieldType)
+                || "java.lang.Byte".equals(fieldType)) {
+            writer
+                    .emitStatement("Number %s = ((%s)object).%s()", getter, interfaceName, getter)
+                    .beginControlFlow("if (%s != null)", getter)
+                        .emitStatement("Table.nativeSetLong(tableNativePtr, columnInfo.%sIndex, rowIndex, %s.longValue())", fieldName, getter);
+                    if (isUpdate) {
+                        writer.nextControlFlow("else")
+                                .emitStatement("Table.nativeSetNull(tableNativePtr, columnInfo.%sIndex, rowIndex)", fieldName);
+                    }
+                    writer.endControlFlow();
+
+        } else if ("double".equals(fieldType)) {
+            writer.emitStatement("Table.nativeSetDouble(tableNativePtr, columnInfo.%sIndex, rowIndex, ((%s)object).%s())", fieldName, interfaceName, getter);
+
+        } else if("java.lang.Double".equals(fieldType)) {
+            writer
+                    .emitStatement("Double %s = ((%s)object).%s()", getter, interfaceName, getter)
+                    .beginControlFlow("if (%s != null)", getter)
+                        .emitStatement("Table.nativeSetDouble(tableNativePtr, columnInfo.%sIndex, rowIndex, %s)", fieldName, getter);
+                    if (isUpdate) {
+                        writer.nextControlFlow("else")
+                                .emitStatement("Table.nativeSetNull(tableNativePtr, columnInfo.%sIndex, rowIndex)", fieldName);
+                    }
+                    writer.endControlFlow();
+
+        } else if ("float".equals(fieldType)) {
+            writer.emitStatement("Table.nativeSetFloat(tableNativePtr, columnInfo.%sIndex, rowIndex, ((%s)object).%s())", fieldName, interfaceName, getter);
+
+        } else if ("java.lang.Float".equals(fieldType)) {
+            writer
+                    .emitStatement("Float %s = ((%s)object).%s()", getter, interfaceName, getter)
+                    .beginControlFlow("if (%s != null)", getter)
+                        .emitStatement("Table.nativeSetFloat(tableNativePtr, columnInfo.%sIndex, rowIndex, %s)", fieldName, getter);
+                    if (isUpdate) {
+                        writer.nextControlFlow("else")
+                                .emitStatement("Table.nativeSetNull(tableNativePtr, columnInfo.%sIndex, rowIndex)", fieldName);
+                    }
+                    writer.endControlFlow();
+
+        } else if ("boolean".equals(fieldType)) {
+            writer.emitStatement("Table.nativeSetBoolean(tableNativePtr, columnInfo.%sIndex, rowIndex, ((%s)object).%s())", fieldName, interfaceName, getter);
+
+        } else if ("java.lang.Boolean".equals(fieldType)) {
+            writer
+                    .emitStatement("Boolean %s = ((%s)object).%s()", getter, interfaceName, getter)
+                    .beginControlFlow("if (%s != null)", getter)
+                        .emitStatement("Table.nativeSetBoolean(tableNativePtr, columnInfo.%sIndex, rowIndex, %s)", fieldName, getter);
+                    if (isUpdate) {
+                        writer.nextControlFlow("else")
+                                .emitStatement("Table.nativeSetNull(tableNativePtr, columnInfo.%sIndex, rowIndex)", fieldName);
+                    }
+                    writer.endControlFlow();
+
+        } else if ("byte[]".equals(fieldType)) {
+            writer
+                    .emitStatement("byte[] %s = ((%s)object).%s()", getter, interfaceName, getter)
+                    .beginControlFlow("if (%s != null)", getter)
+                        .emitStatement("Table.nativeSetByteArray(tableNativePtr, columnInfo.%sIndex, rowIndex, %s)", fieldName, getter);
+                    if (isUpdate) {
+                        writer.nextControlFlow("else")
+                                .emitStatement("Table.nativeSetNull(tableNativePtr, columnInfo.%sIndex, rowIndex)", fieldName);
+                    }
+                    writer.endControlFlow();
+
+
+        } else if ("java.util.Date".equals(fieldType)) {
+            writer
+                    .emitStatement("java.util.Date %s = ((%s)object).%s()", getter, interfaceName, getter)
+                    .beginControlFlow("if (%s != null)", getter)
+                        .emitStatement("Table.nativeSetTimestamp(tableNativePtr, columnInfo.%sIndex, rowIndex, %s.getTime())", fieldName, getter);
+                    if (isUpdate) {
+                        writer.nextControlFlow("else")
+                                .emitStatement("Table.nativeSetNull(tableNativePtr, columnInfo.%sIndex, rowIndex)", fieldName);
+                    }
+                    writer.endControlFlow();
+
+        } else if ("java.lang.String".equals(fieldType)) {
+            writer
+                    .emitStatement("String %s = ((%s)object).%s()", getter, interfaceName, getter)
+                    .beginControlFlow("if (%s != null)", getter)
+                        .emitStatement("Table.nativeSetString(tableNativePtr, columnInfo.%sIndex, rowIndex, %s)", fieldName, getter);
+                    if (isUpdate) {
+                        writer.nextControlFlow("else")
+                                .emitStatement("Table.nativeSetNull(tableNativePtr, columnInfo.%sIndex, rowIndex)", fieldName);
+                    }
+                    writer.endControlFlow();
+        } else {
+            throw new IllegalStateException("Unsupported type " + fieldType);
+        }
+    }
+

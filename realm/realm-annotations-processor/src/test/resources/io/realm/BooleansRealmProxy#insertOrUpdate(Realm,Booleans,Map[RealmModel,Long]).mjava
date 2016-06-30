@@ -1,0 +1,13 @@
+    public static long insertOrUpdate(Realm realm, Booleans object, Map<RealmModel,Long> cache) {
+        Table table = realm.getTable(Booleans.class);
+        long tableNativePtr = table.getNativeTablePointer();
+        BooleansColumnInfo columnInfo = (BooleansColumnInfo) realm.schema.getColumnInfo(Booleans.class);
+        long rowIndex = Table.nativeAddEmptyRow(tableNativePtr, 1);
+        cache.put(object, rowIndex);
+        Table.nativeSetBoolean(tableNativePtr, columnInfo.doneIndex, rowIndex, ((BooleansRealmProxyInterface)object).realmGet$done());
+        Table.nativeSetBoolean(tableNativePtr, columnInfo.isReadyIndex, rowIndex, ((BooleansRealmProxyInterface)object).realmGet$isReady());
+        Table.nativeSetBoolean(tableNativePtr, columnInfo.mCompletedIndex, rowIndex, ((BooleansRealmProxyInterface)object).realmGet$mCompleted());
+        Table.nativeSetBoolean(tableNativePtr, columnInfo.anotherBooleanIndex, rowIndex, ((BooleansRealmProxyInterface)object).realmGet$anotherBoolean());
+        return rowIndex;
+    }
+

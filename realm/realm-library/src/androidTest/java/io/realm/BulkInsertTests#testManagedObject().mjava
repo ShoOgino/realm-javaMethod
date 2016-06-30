@@ -1,0 +1,34 @@
+    //Inserting a managed object will result in it being copied or updated again
+    @Test
+    public void testManagedObject() {
+        AllJavaTypes obj = new AllJavaTypes();
+        obj.setFieldIgnored("cookie");
+        obj.setFieldLong(42);
+        obj.setFieldString("obj1");
+
+        realm.beginTransaction();
+        AllJavaTypes managedAllJavaTypes = realm.copyToRealm(obj);
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+
+        AllJavaTypes filedObject = new AllJavaTypes();
+        filedObject.setFieldLong(8);
+        filedObject = realm.copyToRealm(filedObject);
+        managedAllJavaTypes.setFieldObject(filedObject);
+        managedAllJavaTypes.setFieldString("updated");
+
+        realm.insertOrUpdate(managedAllJavaTypes);
+        realm.commitTransaction();
+
+        AllJavaTypes first = realm.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_LONG, 42).findFirst();
+        assertNotNull(first);
+        assertEquals(42, first.getFieldLong(), 0);
+        assertEquals("updated", first.getFieldString());
+        assertNull(first.getFieldIgnored());
+        assertNotNull(first.getFieldObject());
+        assertEquals(8, first.getFieldObject().getFieldLong());
+
+        assertEquals(2, realm.where(AllJavaTypes.class).findAll().size());
+    }
+

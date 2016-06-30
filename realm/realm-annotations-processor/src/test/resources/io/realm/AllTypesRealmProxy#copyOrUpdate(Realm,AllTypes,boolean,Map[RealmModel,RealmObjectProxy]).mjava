@@ -5,32 +5,37 @@
         if (object instanceof RealmObjectProxy && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm().getPath().equals(realm.getPath())) {
             return object;
         }
-        AllTypes realmObject = null;
-        boolean canUpdate = update;
-        if (canUpdate) {
-            Table table = realm.getTable(AllTypes.class);
-            long pkColumnIndex = table.getPrimaryKey();
-            String value = ((AllTypesRealmProxyInterface) object).realmGet$columnString();
-            long rowIndex = TableOrView.NO_MATCH;
-            if (value == null) {
-                rowIndex = table.findFirstNull(pkColumnIndex);
-            } else {
-                rowIndex = table.findFirstString(pkColumnIndex, value);
-            }
-            if (rowIndex != TableOrView.NO_MATCH) {
-                realmObject = new AllTypesRealmProxy(realm.schema.getColumnInfo(AllTypes.class));
-                ((RealmObjectProxy)realmObject).realmGet$proxyState().setRealm$realm(realm);
-                ((RealmObjectProxy)realmObject).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex));
-                cache.put(object, (RealmObjectProxy) realmObject);
-            } else {
-                canUpdate = false;
-            }
-        }
-
-        if (canUpdate) {
-            return update(realm, realmObject, object, cache);
+        RealmObjectProxy cachedRealmObject = cache.get(object);
+        if (cachedRealmObject != null) {
+            return (AllTypes) cachedRealmObject;
         } else {
-            return copy(realm, object, update, cache);
+            AllTypes realmObject = null;
+            boolean canUpdate = update;
+            if (canUpdate) {
+                Table table = realm.getTable(AllTypes.class);
+                long pkColumnIndex = table.getPrimaryKey();
+                String value = ((AllTypesRealmProxyInterface) object).realmGet$columnString();
+                long rowIndex = TableOrView.NO_MATCH;
+                if (value == null) {
+                    rowIndex = table.findFirstNull(pkColumnIndex);
+                } else {
+                    rowIndex = table.findFirstString(pkColumnIndex, value);
+                }
+                if (rowIndex != TableOrView.NO_MATCH) {
+                    realmObject = new AllTypesRealmProxy(realm.schema.getColumnInfo(AllTypes.class));
+                    ((RealmObjectProxy)realmObject).realmGet$proxyState().setRealm$realm(realm);
+                    ((RealmObjectProxy)realmObject).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex));
+                    cache.put(object, (RealmObjectProxy) realmObject);
+                } else {
+                    canUpdate = false;
+                }
+            }
+
+            if (canUpdate) {
+                return update(realm, realmObject, object, cache);
+            } else {
+                return copy(realm, object, update, cache);
+            }
         }
     }
 

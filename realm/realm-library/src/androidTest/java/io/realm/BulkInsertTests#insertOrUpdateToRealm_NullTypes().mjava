@@ -1,0 +1,66 @@
+    @Test
+    public void insertOrUpdateToRealm_NullTypes() {
+        NullTypes nullTypes1 = new NullTypes();
+        nullTypes1.setId(1);
+        nullTypes1.setFieldIntegerNull(1);
+        nullTypes1.setFieldFloatNull(2F);
+        nullTypes1.setFieldDoubleNull(3D);
+        nullTypes1.setFieldBooleanNull(true);
+        nullTypes1.setFieldStringNull("4");
+        nullTypes1.setFieldDateNull(new Date(12345));
+
+        realm.beginTransaction();
+        realm.insert(nullTypes1);
+        realm.commitTransaction();
+
+        NullTypes first = realm.where(NullTypes.class).findFirst();
+
+        assertEquals(nullTypes1.getId(), first.getId());
+        assertEquals(nullTypes1.getFieldIntegerNull(), first.getFieldIntegerNull());
+        assertEquals(nullTypes1.getFieldFloatNull(), first.getFieldFloatNull());
+        assertEquals(nullTypes1.getFieldDoubleNull(), first.getFieldDoubleNull());
+        assertEquals(nullTypes1.getFieldBooleanNull(), first.getFieldBooleanNull());
+        assertEquals(nullTypes1.getFieldStringNull(), first.getFieldStringNull());
+        assertEquals(nullTypes1.getFieldDateNull(), first.getFieldDateNull());
+
+        NullTypes nullTypes2 = new NullTypes();
+        nullTypes2.setId(2);
+
+        NullTypes nullTypes3 = new NullTypes();
+        nullTypes3.setId(3);
+
+        nullTypes1 = new NullTypes();
+        nullTypes1.setId(1);
+        nullTypes1.setFieldIntegerNull(null);
+        nullTypes1.setFieldFloatNull(null);
+        nullTypes1.setFieldDoubleNull(null);
+        nullTypes1.setFieldBooleanNull(null);
+        nullTypes1.setFieldStringNull(null);
+        nullTypes1.setFieldDateNull(null);
+        nullTypes1.setFieldListNull(new RealmList<NullTypes>());
+        nullTypes1.getFieldListNull().add(nullTypes2);
+        nullTypes1.getFieldListNull().add(nullTypes3);
+
+        OrderedRealmCollection<NullTypes> collection = new RealmList<NullTypes>();
+        collection.add(nullTypes2);
+        collection.add(nullTypes1);
+        collection.add(nullTypes3);
+
+        realm.beginTransaction();
+        realm.insertOrUpdate(collection);
+        realm.commitTransaction();
+
+        first = realm.where(NullTypes.class).equalTo("id", 1).findFirst();
+
+        assertEquals(nullTypes1.getId(), first.getId());
+        assertNull(first.getFieldIntegerNull());
+        assertNull(first.getFieldFloatNull());
+        assertNull(first.getFieldDoubleNull());
+        assertNull(first.getFieldBooleanNull());
+        assertNull(first.getFieldStringNull());
+        assertNull(first.getFieldDateNull());
+        assertEquals(2, first.getFieldListNull().size());
+        assertEquals(2, first.getFieldListNull().get(0).getId());
+        assertEquals(3, first.getFieldListNull().get(1).getId());
+    }
+
