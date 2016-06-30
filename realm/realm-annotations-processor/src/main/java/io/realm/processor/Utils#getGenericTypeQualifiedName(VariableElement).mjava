@@ -1,0 +1,12 @@
+    /**
+     * @return the generic type for Lists of the form {@code List<type>}
+     */
+    public static String getGenericTypeQualifiedName(VariableElement field) {
+        TypeMirror fieldType = field.asType();
+        List<? extends TypeMirror> typeArguments = ((DeclaredType) fieldType).getTypeArguments();
+        if (typeArguments.size() == 0) {
+            return null;
+        }
+        return typeArguments.get(0).toString();
+    }
+

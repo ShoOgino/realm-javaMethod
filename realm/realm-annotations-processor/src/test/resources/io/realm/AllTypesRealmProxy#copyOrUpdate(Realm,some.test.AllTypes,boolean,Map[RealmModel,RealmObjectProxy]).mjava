@@ -1,14 +1,14 @@
-    public static AllTypes copyOrUpdate(Realm realm, AllTypes object, boolean update, Map<RealmModel,RealmObjectProxy> cache) {
+    public static some.test.AllTypes copyOrUpdate(Realm realm, some.test.AllTypes object, boolean update, Map<RealmModel,RealmObjectProxy> cache) {
         if (object instanceof RealmObjectProxy && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm().threadId != realm.threadId) {
             throw new IllegalArgumentException("Objects which belong to Realm instances in other threads cannot be copied into this Realm instance.");
         }
         if (object instanceof RealmObjectProxy && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm().getPath().equals(realm.getPath())) {
             return object;
         }
-        AllTypes realmObject = null;
+        some.test.AllTypes realmObject = null;
         boolean canUpdate = update;
         if (canUpdate) {
-            Table table = realm.getTable(AllTypes.class);
+            Table table = realm.getTable(some.test.AllTypes.class);
             long pkColumnIndex = table.getPrimaryKey();
             String value = ((AllTypesRealmProxyInterface) object).realmGet$columnString();
             long rowIndex = TableOrView.NO_MATCH;
@@ -18,7 +18,7 @@
                 rowIndex = table.findFirstString(pkColumnIndex, value);
             }
             if (rowIndex != TableOrView.NO_MATCH) {
-                realmObject = new AllTypesRealmProxy(realm.schema.getColumnInfo(AllTypes.class));
+                realmObject = new io.realm.AllTypesRealmProxy(realm.schema.getColumnInfo(some.test.AllTypes.class));
                 ((RealmObjectProxy)realmObject).realmGet$proxyState().setRealm$realm(realm);
                 ((RealmObjectProxy)realmObject).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex));
                 cache.put(object, (RealmObjectProxy) realmObject);

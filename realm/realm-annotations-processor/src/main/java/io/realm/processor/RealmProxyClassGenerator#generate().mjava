@@ -1,5 +1,4 @@
     public void generate() throws IOException, UnsupportedOperationException {
-        String qualifiedGeneratedClassName = String.format("%s.%s", Constants.REALM_PACKAGE_NAME, Utils.getProxyClassName(className));
         JavaFileObject sourceFile = processingEnvironment.getFiler().createSourceFile(qualifiedGeneratedClassName);
         JavaWriter writer = new JavaWriter(new BufferedWriter(sourceFile.openWriter()));
 
@@ -34,19 +33,6 @@
         imports.add("org.json.JSONArray");
         imports.add("java.util.concurrent.Future");
 
-        imports.add(metadata.getFullyQualifiedClassName());
-
-        for (VariableElement field : metadata.getFields()) {
-            String fieldTypeName = "";
-            if (Utils.isRealmModel(field)) { // Links
-                fieldTypeName = field.asType().toString();
-            } else if (Utils.isRealmList(field)) { // LinkLists
-                fieldTypeName = ((DeclaredType) field.asType()).getTypeArguments().get(0).toString();
-            }
-            if (!fieldTypeName.isEmpty() && !imports.contains(fieldTypeName)) {
-                imports.add(fieldTypeName);
-            }
-        }
         Collections.sort(imports);
         writer.emitImports(imports);
         writer.emitEmptyLine();
@@ -56,7 +42,7 @@
                 qualifiedGeneratedClassName, // full qualified name of the item to generate
                 "class",                     // the type of the item
                 EnumSet.of(Modifier.PUBLIC), // modifiers to apply
-                className,                   // class to extend
+                qualifiedClassName,          // class to extend
                 "RealmObjectProxy",          // interfaces to implement
                 interfaceName)
                 .emitEmptyLine();

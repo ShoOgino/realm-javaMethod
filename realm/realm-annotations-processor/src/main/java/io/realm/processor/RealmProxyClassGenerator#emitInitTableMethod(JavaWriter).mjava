@@ -5,8 +5,8 @@
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
                 "ImplicitTransaction", "transaction"); // Argument type & argument name
 
-        writer.beginControlFlow("if (!transaction.hasTable(\"" + Constants.TABLE_PREFIX + this.className + "\"))");
-        writer.emitStatement("Table table = transaction.getTable(\"%s%s\")", Constants.TABLE_PREFIX, this.className);
+        writer.beginControlFlow("if (!transaction.hasTable(\"" + Constants.TABLE_PREFIX + this.simpleClassName + "\"))");
+        writer.emitStatement("Table table = transaction.getTable(\"%s%s\")", Constants.TABLE_PREFIX, this.simpleClassName);
 
         // For each field generate corresponding table index constant
         for (VariableElement field : metadata.getFields()) {
@@ -31,12 +31,13 @@
                 writer.emitStatement("table.addColumnLink(RealmFieldType.OBJECT, \"%s\", transaction.getTable(\"%s%s\"))",
                         fieldName, Constants.TABLE_PREFIX, fieldTypeSimpleName);
             } else if (Utils.isRealmList(field)) {
-                String genericType = Utils.getGenericType(field);
-                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericType);
-                writer.emitStatement("%s%s.initTable(transaction)", genericType, Constants.PROXY_SUFFIX);
+                String genericType = Utils.getGenericTypeQualifiedName(field);
+                String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
+                writer.beginControlFlow("if (!transaction.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericTypeSimpleName);
+                writer.emitStatement("%s.initTable(transaction)", Utils.getProxyClassName(genericTypeSimpleName));
                 writer.endControlFlow();
                 writer.emitStatement("table.addColumnLink(RealmFieldType.LIST, \"%s\", transaction.getTable(\"%s%s\"))",
-                        fieldName, Constants.TABLE_PREFIX, genericType);
+                        fieldName, Constants.TABLE_PREFIX, genericTypeSimpleName);
             }
         }
 
@@ -54,7 +55,7 @@
 
         writer.emitStatement("return table");
         writer.endControlFlow();
-        writer.emitStatement("return transaction.getTable(\"%s%s\")", Constants.TABLE_PREFIX, this.className);
+        writer.emitStatement("return transaction.getTable(\"%s%s\")", Constants.TABLE_PREFIX, this.simpleClassName);
         writer.endMethod();
         writer.emitEmptyLine();
     }

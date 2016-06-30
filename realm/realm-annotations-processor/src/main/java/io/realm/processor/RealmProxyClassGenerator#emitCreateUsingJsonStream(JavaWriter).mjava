@@ -1,13 +1,13 @@
     private void emitCreateUsingJsonStream(JavaWriter writer) throws IOException {
         writer.emitAnnotation("SuppressWarnings", "\"cast\"");
         writer.beginMethod(
-                className,
+                qualifiedClassName,
                 "createUsingJsonStream",
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
                 Arrays.asList("Realm", "realm", "JsonReader", "reader"),
                 Collections.singletonList("IOException"));
 
-        writer.emitStatement("%s obj = realm.createObject(%s.class)",className, className);
+        writer.emitStatement("%s obj = realm.createObject(%s.class)",qualifiedClassName, qualifiedClassName);
         writer.emitStatement("reader.beginObject()");
         writer.beginControlFlow("while (reader.hasNext())");
         writer.emitStatement("String name = reader.nextName()");

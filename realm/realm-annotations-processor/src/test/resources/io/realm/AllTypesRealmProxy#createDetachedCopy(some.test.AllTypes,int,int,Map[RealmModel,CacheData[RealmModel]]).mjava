@@ -1,19 +1,19 @@
-    public static AllTypes createDetachedCopy(AllTypes realmObject, int currentDepth, int maxDepth, Map<RealmModel, CacheData<RealmModel>> cache) {
+    public static some.test.AllTypes createDetachedCopy(some.test.AllTypes realmObject, int currentDepth, int maxDepth, Map<RealmModel, CacheData<RealmModel>> cache) {
         if (currentDepth > maxDepth || realmObject == null) {
             return null;
         }
         CacheData<RealmModel> cachedObject = cache.get(realmObject);
-        AllTypes unmanagedObject;
+        some.test.AllTypes unmanagedObject;
         if (cachedObject != null) {
             // Reuse cached object or recreate it because it was encountered at a lower depth.
             if (currentDepth >= cachedObject.minDepth) {
-                return (AllTypes)cachedObject.object;
+                return (some.test.AllTypes)cachedObject.object;
             } else {
-                unmanagedObject = (AllTypes)cachedObject.object;
+                unmanagedObject = (some.test.AllTypes)cachedObject.object;
                 cachedObject.minDepth = currentDepth;
             }
         } else {
-            unmanagedObject = new AllTypes();
+            unmanagedObject = new some.test.AllTypes();
             cache.put(realmObject, new RealmObjectProxy.CacheData(currentDepth, unmanagedObject));
         }
         ((AllTypesRealmProxyInterface) unmanagedObject).realmSet$columnString(((AllTypesRealmProxyInterface) realmObject).realmGet$columnString());
@@ -31,13 +31,13 @@
         if (currentDepth == maxDepth) {
             ((AllTypesRealmProxyInterface) unmanagedObject).realmSet$columnRealmList(null);
         } else {
-            RealmList<AllTypes> managedcolumnRealmListList = ((AllTypesRealmProxyInterface) realmObject).realmGet$columnRealmList();
-            RealmList<AllTypes> unmanagedcolumnRealmListList = new RealmList<AllTypes>();
+            RealmList<some.test.AllTypes> managedcolumnRealmListList = ((AllTypesRealmProxyInterface) realmObject).realmGet$columnRealmList();
+            RealmList<some.test.AllTypes> unmanagedcolumnRealmListList = new RealmList<some.test.AllTypes>();
             ((AllTypesRealmProxyInterface) unmanagedObject).realmSet$columnRealmList(unmanagedcolumnRealmListList);
             int nextDepth = currentDepth + 1;
             int size = managedcolumnRealmListList.size();
             for (int i = 0; i < size; i++) {
-                AllTypes item = AllTypesRealmProxy.createDetachedCopy(managedcolumnRealmListList.get(i), nextDepth, maxDepth, cache);
+                some.test.AllTypes item = AllTypesRealmProxy.createDetachedCopy(managedcolumnRealmListList.get(i), nextDepth, maxDepth, cache);
                 unmanagedcolumnRealmListList.add(item);
             }
         }
