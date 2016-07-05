@@ -1,0 +1,51 @@
+    // This is to test how PK type can change to non-nullable int in migration
+    @Test
+    public void modifyPrimaryKeyFieldTypeToIntInMigration() {
+        final String TEMP_FIELD_ID = "temp_id";
+        buildInitialMigrationSchema(MigrationFieldTypeToInt.CLASS_NAME, false);
+        // create objects with the schema provided
+        createObjectsWithOldPrimaryKey(MigrationFieldTypeToInt.CLASS_NAME, true);
+
+        RealmMigration migration = new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                realm.getSchema().get(MigrationFieldTypeToInt.CLASS_NAME)
+                        .addField("temp_id", int.class)
+                        .transform(new RealmObjectSchema.Function() {
+                            @Override
+                            public void apply(DynamicRealmObject obj) {
+                                String fieldValue = obj.getString(MigrationPrimaryKey.FIELD_PRIMARY);
+                                if (fieldValue != null && fieldValue.length() != 0) {
+                                    obj.setInt(TEMP_FIELD_ID, Integer.valueOf(fieldValue).intValue());
+                                } else {
+                                    // Since this cannot be accepted as proper pk value, we'll delete it.
+                                    // *You can modify with some other value such as 0, but that's not
+                                    // counted in this scenario.
+                                    obj.deleteFromRealm();
+                                }
+                            }
+                        })
+                        .removeField(MigrationPrimaryKey.FIELD_PRIMARY)
+                        .renameField(TEMP_FIELD_ID, MigrationFieldTypeToInt.FIELD_PRIMARY)
+                        .addPrimaryKey(MigrationFieldTypeToInt.FIELD_PRIMARY);
+            }
+        };
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+                .schemaVersion(1)
+                .schema(MigrationFieldTypeToInt.class)
+                .migration(migration)
+                .build();
+        Realm realm = Realm.getInstance(realmConfig);
+
+        Table table = realm.getSchema().getTable(MigrationFieldTypeToInt.class);
+        assertTrue(table.hasPrimaryKey());
+        assertEquals(MigrationFieldTypeToInt.DEFAULT_FIELDS_COUNT, table.getColumnCount());
+        assertEquals(MigrationFieldTypeToInt.DEFAULT_PRIMARY_INDEX, table.getPrimaryKey());
+
+        RealmObjectSchema objectSchema = realm.getSchema().getSchemaForClass(MigrationFieldTypeToInt.class);
+        assertFalse(objectSchema.hasField(MigrationPrimaryKey.FIELD_PRIMARY));
+        assertEquals(MigrationFieldTypeToInt.FIELD_PRIMARY, objectSchema.getPrimaryKey());
+        assertEquals(1, realm.where(MigrationFieldTypeToInt.class).count());
+        assertEquals(12, realm.where(MigrationFieldTypeToInt.class).findFirst().fieldIntPrimary);
+    }
+

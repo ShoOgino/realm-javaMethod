@@ -1,0 +1,17 @@
+    private void createObjectsWithOldPrimaryKey(final String className, final boolean insertNullValue) {
+        DynamicRealm realm = DynamicRealm.getInstance(configFactory.createConfigurationBuilder().build());
+        try {
+            realm.executeTransaction(new DynamicRealm.Transaction() {
+                @Override
+                public void execute(DynamicRealm realm) {
+                    realm.createObject(className).setString(MigrationPrimaryKey.FIELD_PRIMARY, "12");
+                    if (insertNullValue) {
+                        realm.createObject(className).setString(MigrationPrimaryKey.FIELD_PRIMARY, null);
+                    }
+                }
+            });
+        } finally {
+            realm.close();
+        }
+    }
+
