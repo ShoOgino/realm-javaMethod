@@ -1,0 +1,28 @@
+    /**
+     * added to reproduce https://github.com/realm/realm-java/issues/3103
+     */
+    @Test
+    public void insertToRealm_emptyListWithCompositeMediator() {
+        final RealmConfiguration config = configFactory.createConfigurationBuilder()
+                .modules(new HumanModule(), new AnimalModule())
+                .name("composite.realm")
+                .build();
+        Realm.deleteRealm(config);
+
+        assertEquals(config.getSchemaMediator().getClass(), CompositeMediator.class);
+
+        final Realm realm = Realm.getInstance(config);
+        //noinspection TryFinallyCanBeTryWithResources
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.insert(Collections.<Cat>emptyList());
+                }
+            });
+            assertEquals(0, realm.where(Cat.class).count());
+        } finally {
+            realm.close();
+        }
+    }
+

@@ -1,0 +1,11 @@
+    @Test
+    public void insertToRealm_emptyList() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.insert(Collections.<PrimaryKeyAsLong>emptyList());
+            }
+        });
+        assertEquals(0, realm.where(PrimaryKeyAsLong.class).count());
+    }
+
