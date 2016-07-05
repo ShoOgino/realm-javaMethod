@@ -53,7 +53,7 @@
                         result.updatedTableViews.put(weakRealmResults, handoverTableViewPointer);
                         result.versionID = sharedGroup.getVersion();
                         closeSharedGroupAndSendMessageToHandler(sharedGroup,
-                                weakHandler, HandlerController.COMPLETED_ASYNC_REALM_RESULTS, result);
+                                weakHandler, HandlerControllerConstants.COMPLETED_ASYNC_REALM_RESULTS, result);
 
                         return handoverTableViewPointer;
 
@@ -62,10 +62,10 @@
                         RealmLog.d("findAllAsync handover could not complete due to a BadVersionException. " +
                                 "Retry is scheduled by a REALM_CHANGED event.");
 
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         RealmLog.e(e.getMessage(), e);
                         closeSharedGroupAndSendMessageToHandler(sharedGroup,
-                                weakHandler, HandlerController.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
+                                weakHandler, HandlerControllerConstants.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
 
                     } finally {
                         if (sharedGroup != null && !sharedGroup.isClosed()) {
