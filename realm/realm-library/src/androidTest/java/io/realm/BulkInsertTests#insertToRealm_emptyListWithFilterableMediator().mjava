@@ -1,0 +1,29 @@
+    /**
+     * added to reproduce https://github.com/realm/realm-java/issues/3103
+     */
+    @Test
+    public void insertToRealm_emptyListWithFilterableMediator() {
+        //noinspection unchecked
+        final RealmConfiguration config = configFactory.createConfigurationBuilder()
+                .schema(CatOwner.class, Cat.class)
+                .name("filterable.realm")
+                .build();
+        Realm.deleteRealm(config);
+
+        assertEquals(config.getSchemaMediator().getClass(), FilterableMediator.class);
+
+        final Realm realm = Realm.getInstance(config);
+        //noinspection TryFinallyCanBeTryWithResources
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.insert(Collections.<Cat>emptyList());
+                }
+            });
+            assertEquals(0, realm.where(Cat.class).count());
+        } finally {
+            realm.close();
+        }
+    }
+
