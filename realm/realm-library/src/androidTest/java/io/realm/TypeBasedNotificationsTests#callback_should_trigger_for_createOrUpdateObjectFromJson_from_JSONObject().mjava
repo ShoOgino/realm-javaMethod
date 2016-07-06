@@ -33,6 +33,7 @@
         final AllTypesPrimaryKey newObj = realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, json);
         realm.commitTransaction();
 
+        looperThread.keepStrongReference.add(newObj);
         newObj.addChangeListener(new RealmChangeListener<AllTypesPrimaryKey>() {
             @Override
             public void onChange(AllTypesPrimaryKey object) {

@@ -24,6 +24,7 @@
         RealmResults<Dog> dogs = realm.where(Dog.class).findAllAsync();
         assertTrue(dogs.load());
 
+        looperThread.keepStrongReference.add(dogs);
         for (int i = 0; i < NUMBER_OF_LISTENERS; i++) {
             dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
                 @Override

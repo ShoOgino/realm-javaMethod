@@ -1,7 +1,7 @@
     @Test
     @RunTestInLooperThread
     public void changeListener_syncIfNeeded_updatedFromOtherThread() {
-        final Realm realm = Realm.getInstance(looperThread.createConfiguration("Foo"));
+        final Realm realm = looperThread.realm;
         populateTestRealm(realm, 10);
 
         final RealmResults<AllTypes> results = realm.where(AllTypes.class).lessThan(AllTypes.FIELD_LONG, 10).findAll();

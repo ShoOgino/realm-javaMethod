@@ -6,6 +6,7 @@
         final Realm realm = looperThread.realm;
 
         final RealmResults<Dog> allAsync = realm.where(Dog.class).equalTo("owner.name", "kiba").findAllAsync();
+        looperThread.keepStrongReference.add(allAsync);
         allAsync.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
             public void onChange(RealmResults<Dog> object) {
