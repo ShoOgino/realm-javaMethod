@@ -17,6 +17,7 @@
         realm.commitTransaction();
 
         RealmResults<AllTypes> results = realm.where(AllTypes.class).findAllAsync();
+        looperThread.keepStrongReference.add(results);
         results.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> element) {

@@ -6,6 +6,7 @@
 
         final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.realmConfiguration);
         RealmResults<DynamicRealmObject> all = dynamicRealm.where(AllTypes.CLASS_NAME).findAll();
+        looperThread.keepStrongReference.add(all);
         all.addChangeListener(new RealmChangeListener<RealmResults<DynamicRealmObject>>() {
             @Override
             public void onChange(RealmResults<DynamicRealmObject> result) {

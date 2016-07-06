@@ -45,6 +45,7 @@
         // 4. Intercepting the query completed event the first time will
         // cause a commit that should cause the findAllSortedAsync to be re-run.
         // This change listener should only be called with the final result.
+        looperThread.keepStrongReference.add(realmResults);
         realmResults.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> object) {

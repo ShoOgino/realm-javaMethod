@@ -26,6 +26,7 @@
         final PrimaryKeyAsLong primaryKeyAsLong = realm.copyToRealmOrUpdate(obj);
         realm.commitTransaction();
 
+        looperThread.keepStrongReference.add(primaryKeyAsLong);
         primaryKeyAsLong.addChangeListener(new RealmChangeListener<PrimaryKeyAsLong>() {
             @Override
             public void onChange(PrimaryKeyAsLong object) {

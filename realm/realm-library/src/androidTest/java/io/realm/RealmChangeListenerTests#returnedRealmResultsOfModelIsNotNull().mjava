@@ -3,6 +3,7 @@
     public void returnedRealmResultsOfModelIsNotNull() {
         Realm realm = looperThread.realm;
         RealmResults<AllTypesRealmModel> alltypes = realm.where(AllTypesRealmModel.class).findAll();
+        looperThread.keepStrongReference.add(alltypes);
         alltypes.addChangeListener(new RealmChangeListener<RealmResults<AllTypesRealmModel>>() {
             @Override
             public void onChange(RealmResults<AllTypesRealmModel> result) {

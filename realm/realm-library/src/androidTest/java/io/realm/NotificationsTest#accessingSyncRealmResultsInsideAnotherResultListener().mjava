@@ -7,6 +7,8 @@
         final Realm realm = looperThread.realm;
         final RealmResults<AllTypes> syncResults1 = realm.where(AllTypes.class).findAll();
         final RealmResults<AllTypes> syncResults2 = realm.where(AllTypes.class).findAll();
+
+        looperThread.keepStrongReference.add(syncResults1);
         syncResults1.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> element) {

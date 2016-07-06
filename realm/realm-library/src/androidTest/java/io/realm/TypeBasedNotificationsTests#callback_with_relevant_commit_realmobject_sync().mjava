@@ -16,6 +16,7 @@
         realm.commitTransaction();
 
         final Dog dog = realm.where(Dog.class).findFirst();
+        looperThread.keepStrongReference.add(dog);
         dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
             public void onChange(Dog object) {

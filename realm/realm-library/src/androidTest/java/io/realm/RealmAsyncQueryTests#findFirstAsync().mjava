@@ -8,7 +8,7 @@
         final AllTypes asyncObj = realm.where(AllTypes.class).findFirstAsync();
         assertFalse(asyncObj.isValid());
         assertFalse(asyncObj.isLoaded());
-
+        looperThread.keepStrongReference.add(asyncObj);
         asyncObj.addChangeListener(new RealmChangeListener<AllTypes>() {
             @Override
             public void onChange(AllTypes object) {

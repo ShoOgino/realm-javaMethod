@@ -16,6 +16,7 @@
         Realm.asyncTaskExecutor.pause();
 
         final AllTypes firstAsync = looperThread.realm.where(AllTypes.class).findFirstAsync();
+        looperThread.keepStrongReference.add(firstAsync);
         firstAsync.addChangeListener(new RealmChangeListener<AllTypes>() {
             @Override
             public void onChange(AllTypes object) {
