@@ -1,7 +1,8 @@
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        // Don't run this processor in subsequent runs. We created everything in the first one.
         if (hasProcessedModules) {
-            return true;
+            return CONSUME_ANNOTATIONS;
         }
         RealmVersionChecker updateChecker = RealmVersionChecker.getInstance(processingEnv);
         updateChecker.executeRealmVersionUpdate();
@@ -54,6 +55,8 @@
         }
 
         hasProcessedModules = true;
-        return processModules(roundEnv);
+        processModules(roundEnv);
+
+        return CONSUME_ANNOTATIONS;
     }
 
