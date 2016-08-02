@@ -8,6 +8,7 @@
         realm.commitTransaction();
 
         primaryKeyAsString = realm.where(PrimaryKeyAsString.class).isNull("name").findFirst();
+        assertNotNull(primaryKeyAsString);
         assertNull(primaryKeyAsString.getName());
         assertEquals(19, primaryKeyAsString.getId());
 
@@ -19,6 +20,7 @@
         realm.commitTransaction();
 
         primaryKeyAsShort = realm.where(PrimaryKeyAsBoxedShort.class).isNull("id").findFirst();
+        assertNotNull(primaryKeyAsShort);
         assertNull(primaryKeyAsShort.getId());
         assertEquals("42", primaryKeyAsShort.getName());
     }

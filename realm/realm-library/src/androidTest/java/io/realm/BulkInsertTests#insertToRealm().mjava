@@ -12,9 +12,9 @@
 
         AllJavaTypes allTypes = new AllJavaTypes();
         allTypes.setFieldString("String");
-        allTypes.setFieldLong(1l);
-        allTypes.setFieldFloat(1f);
-        allTypes.setFieldDouble(1d);
+        allTypes.setFieldLong(1L);
+        allTypes.setFieldFloat(1F);
+        allTypes.setFieldDouble(1D);
         allTypes.setFieldBoolean(true);
         allTypes.setFieldDate(date);
         allTypes.setFieldBinary(new byte[]{1, 2, 3});
@@ -27,6 +27,7 @@
 
         AllJavaTypes realmTypes = realm.where(AllJavaTypes.class).findFirst();
 
+        assertNotNull(realmTypes);
         assertNotSame(allTypes, realmTypes); // Objects should not be considered equal
         assertEquals(allTypes.getFieldString(), realmTypes.getFieldString()); // But they contain the same data
         assertEquals(allTypes.getFieldLong(), realmTypes.getFieldLong());

@@ -1,0 +1,48 @@
+    @Test
+    @RunTestInLooperThread(threadName = "IntentService[1]")
+    public void listenersNotAllowedOnIntentServiceThreads() {
+        final Realm realm = looperThread.realm;
+        realm.beginTransaction();
+        AllTypes obj = realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+        RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
+
+        // Global listener
+        try {
+            realm.addChangeListener(new RealmChangeListener<Realm>() {
+                @Override
+                public void onChange(Realm element) {
+
+                }
+            });
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        // RealmResults listener
+        try {
+            results.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
+                @Override
+                public void onChange(RealmResults<AllTypes> element) {
+
+                }
+            });
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        // Object listener
+        try {
+            obj.addChangeListener(new RealmChangeListener<RealmModel>() {
+                @Override
+                public void onChange(RealmModel element) {
+
+                }
+            });
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        looperThread.testComplete();
+    }
+

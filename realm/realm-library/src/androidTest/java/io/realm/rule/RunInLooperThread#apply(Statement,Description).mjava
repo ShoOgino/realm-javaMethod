@@ -10,7 +10,8 @@
             @Override
             public void evaluate() throws Throwable {
                 before();
-                Class<? extends RunnableBefore> runnableBefore = annotation.value();
+                final String threadName = annotation.threadName();
+                Class<? extends RunnableBefore> runnableBefore = annotation.before();
                 if (!runnableBefore.isInterface()) {
                     runnableBefore.newInstance().run(realmConfiguration);
                 }
@@ -18,7 +19,12 @@
                     final CountDownLatch signalClosedRealm = new CountDownLatch(1);
                     final Throwable[] threadAssertionError = new Throwable[1];
                     final Looper[] backgroundLooper = new Looper[1];
-                    final ExecutorService executorService = Executors.newSingleThreadExecutor();
+                    final ExecutorService executorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+                        @Override
+                        public Thread newThread(Runnable runnable) {
+                            return new Thread(runnable, threadName);
+                        }
+                    });
                     executorService.submit(new Runnable() {
                         @Override
                         public void run() {
