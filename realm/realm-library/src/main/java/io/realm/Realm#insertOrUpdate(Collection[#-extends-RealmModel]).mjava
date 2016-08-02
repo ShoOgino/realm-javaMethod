@@ -14,10 +14,12 @@
      * you have a large number of object this method is generally faster.
      *
      * @param objects RealmObjects to insert.
+     * @throws IllegalStateException if the corresponding Realm is closed, called from an incorrect thread or not in a
+     * transaction.
      * @see #copyToRealmOrUpdate(Iterable)
      */
     public void insertOrUpdate(Collection<? extends RealmModel> objects) {
-        checkIfValid();
+        checkIfValidAndInTransaction();
         if (objects == null) {
             throw new IllegalArgumentException("Null objects cannot be inserted into Realm.");
         }
