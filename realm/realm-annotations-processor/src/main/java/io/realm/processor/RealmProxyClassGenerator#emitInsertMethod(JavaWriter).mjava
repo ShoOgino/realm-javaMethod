@@ -10,8 +10,11 @@
         writer.emitStatement("long tableNativePtr = table.getNativeTablePointer()");
         writer.emitStatement("%s columnInfo = (%s) realm.schema.getColumnInfo(%s.class)",
                 columnInfoClassName(), columnInfoClassName(), qualifiedClassName);
-        writer.emitStatement("long rowIndex = Table.nativeAddEmptyRow(tableNativePtr, 1)");
-        writer.emitStatement("cache.put(object, rowIndex)");
+
+        if (metadata.hasPrimaryKey()) {
+            writer.emitStatement("long pkColumnIndex = table.getPrimaryKey()");
+        }
+        addPrimaryKeyCheckIfNeeeded(metadata, true, writer);
 
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
@@ -52,7 +55,9 @@
                         .emitEmptyLine();
 
             } else {
-                setTableValues(writer, fieldType, fieldName, interfaceName, getter, false);
+                if (metadata.getPrimaryKey() != field) {
+                    setTableValues(writer, fieldType, fieldName, interfaceName, getter, false);
+                }
             }
         }
 
