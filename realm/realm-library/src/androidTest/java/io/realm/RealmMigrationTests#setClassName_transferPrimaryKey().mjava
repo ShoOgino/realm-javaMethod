@@ -1,13 +1,14 @@
-    // Test to show renaming a class does not hinder its PK field's attribute
+    // Test to show that renaming a class does not effect the primary key
     @Test
-    public void renameClassTransferPrimaryKey() {
+    public void setClassName_transferPrimaryKey() {
         buildInitialMigrationSchema(MigrationClassRenamed.CLASS_NAME, true);
 
         RealmMigration migration = new RealmMigration() {
             @Override
             public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
                 realm.getSchema()
-                        .rename(MigrationPrimaryKey.CLASS_NAME, MigrationClassRenamed.CLASS_NAME);
+                        .get(MigrationPrimaryKey.CLASS_NAME)
+                        .setClassName(MigrationClassRenamed.CLASS_NAME);
             }
         };
         RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
