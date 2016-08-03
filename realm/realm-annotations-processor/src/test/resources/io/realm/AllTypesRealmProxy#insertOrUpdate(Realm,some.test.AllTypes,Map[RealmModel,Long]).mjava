@@ -6,7 +6,7 @@
         String primaryKeyValue = ((AllTypesRealmProxyInterface) object).realmGet$columnString();
         long rowIndex = TableOrView.NO_MATCH;
         if (primaryKeyValue == null) {
-            rowIndex = table.findFirstNull(pkColumnIndex);
+            rowIndex = Table.nativeFindFirstNull(tableNativePtr, pkColumnIndex);
         } else {
             rowIndex = Table.nativeFindFirstString(tableNativePtr, pkColumnIndex, primaryKeyValue);
         }
@@ -17,12 +17,6 @@
             }
         }
         cache.put(object, rowIndex);
-        String realmGet$columnString = ((AllTypesRealmProxyInterface)object).realmGet$columnString();
-        if (realmGet$columnString != null) {
-            Table.nativeSetString(tableNativePtr, columnInfo.columnStringIndex, rowIndex, realmGet$columnString);
-        } else {
-            Table.nativeSetNull(tableNativePtr, columnInfo.columnStringIndex, rowIndex);
-        }
         Table.nativeSetLong(tableNativePtr, columnInfo.columnLongIndex, rowIndex, ((AllTypesRealmProxyInterface)object).realmGet$columnLong());
         Table.nativeSetFloat(tableNativePtr, columnInfo.columnFloatIndex, rowIndex, ((AllTypesRealmProxyInterface)object).realmGet$columnFloat());
         Table.nativeSetDouble(tableNativePtr, columnInfo.columnDoubleIndex, rowIndex, ((AllTypesRealmProxyInterface)object).realmGet$columnDouble());
