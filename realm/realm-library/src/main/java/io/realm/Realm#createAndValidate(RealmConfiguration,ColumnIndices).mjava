@@ -1,6 +1,5 @@
     static Realm createAndValidate(RealmConfiguration configuration, ColumnIndices columnIndices) {
-        boolean autoRefresh = Looper.myLooper() != null;
-        Realm realm = new Realm(configuration, autoRefresh);
+        Realm realm = new Realm(configuration);
         long currentVersion = realm.getVersion();
         long requiredVersion = configuration.getSchemaVersion();
         if (currentVersion != UNVERSIONED && currentVersion < requiredVersion && columnIndices == null) {

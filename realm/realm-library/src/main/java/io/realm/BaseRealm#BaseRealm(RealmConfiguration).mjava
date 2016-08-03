@@ -1,15 +1,12 @@
-    protected BaseRealm(RealmConfiguration configuration, boolean autoRefresh) {
+    protected BaseRealm(RealmConfiguration configuration) {
         this.threadId = Thread.currentThread().getId();
         this.configuration = configuration;
         this.sharedGroupManager = new SharedGroupManager(configuration);
         this.schema = new RealmSchema(this, sharedGroupManager.getTransaction());
         this.handlerController = new HandlerController(this);
-        if (Looper.myLooper() == null) {
-            if (autoRefresh) {
-                throw new IllegalStateException("Cannot set auto-refresh in a Thread without a Looper");
-            }
-        } else {
-            setAutoRefresh(autoRefresh);
+
+        if (handlerController.isAutoRefreshAvailable()) {
+            setAutoRefresh(true);
         }
     }
 
