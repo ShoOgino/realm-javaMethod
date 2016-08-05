@@ -1,0 +1,21 @@
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        final RealmConfiguration syncConfig = new RealmConfiguration
+                .Builder(this)
+                .name(SendOneCommit.class.getSimpleName())
+                .withSync(Constants.SYNC_SERVER_URL)
+                .syncUserToken(Constants.USER_TOKEN)
+                .build();
+        Realm realm = Realm.getInstance(syncConfig);
+
+        realm.beginTransaction();
+        ProcessInfo processInfo = realm.createObject(ProcessInfo.class);
+        processInfo.setName("Background");
+        processInfo.setPid(android.os.Process.myPid());
+        processInfo.setThreadId(Thread.currentThread().getId());
+        realm.commitTransaction();
+
+        realm.close();//FIXME the close may not give a chance to the sync client to process/upload the changeset
+    }
+

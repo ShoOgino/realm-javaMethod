@@ -1,0 +1,22 @@
+    // TODO Remove this? Explicit transactions are not supported anyway?
+    public SharedGroup(String canonicalPath,
+                       boolean enableImplicitTransactions,
+                       boolean enableSync,
+                       Durability durability,
+                       byte[] key) {
+        if (enableImplicitTransactions) {
+            if (enableSync) {
+                nativeReplicationPtr = nativeCreateSyncReplication(canonicalPath);
+            } else {
+                nativeReplicationPtr = nativeCreateLocalReplication(canonicalPath, key);
+            }
+            nativePtr = openSharedGroupOrFail(nativeReplicationPtr, canonicalPath, durability, key);
+            implicitTransactionsEnabled = true;
+        } else {
+            nativePtr = nativeCreate(canonicalPath, Durability.FULL.value, CREATE_FILE_YES, DISABLE_REPLICATION, key);
+        }
+        context = new Context();
+        path = canonicalPath;
+        checkNativePtrNotZero();
+    }
+

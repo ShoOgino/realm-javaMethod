@@ -6,11 +6,8 @@
         SharedGroup sharedGroup = null;
         boolean result = false;
         try {
-            sharedGroup = new SharedGroup(
-                    configuration.getPath(),
-                    SharedGroup.IMPLICIT_TRANSACTION,
-                    SharedGroup.Durability.FULL,
-                    configuration.getEncryptionKey());
+            // TODO: Fail if in-memory only?
+            sharedGroup = new SharedGroup(configuration);
             result = sharedGroup.compact();
         } catch (Exception e) {
             RealmLog.i(e.getMessage());

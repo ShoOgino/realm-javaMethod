@@ -10,14 +10,6 @@
      * @throws IllegalStateException if called from a non-Looper thread.
      */
     public void setAutoRefresh(boolean autoRefresh) {
-        checkIfValid();
-        handlerController.checkCanBeAutoRefreshed();
-        if (autoRefresh && !handlerController.isAutoRefreshEnabled()) { // Switch it on
-            handler = new Handler(handlerController);
-            handlers.put(handler, configuration.getPath());
-        } else if (!autoRefresh && handlerController.isAutoRefreshEnabled() && handler != null) { // Switch it off
-            removeHandler();
-        }
-        handlerController.setAutoRefresh(autoRefresh);
+        setAutoRefresh(autoRefresh, true);
     }
 

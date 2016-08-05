@@ -1,0 +1,39 @@
+    @Test
+    public void expectServerCommit() throws Exception {
+        final CountDownLatch testFinished = new CountDownLatch(1);
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Looper.prepare();
+                    Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+                    final RealmConfiguration syncConfig = new RealmConfiguration
+                            .Builder(targetContext)
+                            .name("main_process")
+                            .withSync(Constants.SYNC_SERVER_URL)
+                            .syncUserToken(Constants.USER_TOKEN)
+                            .build();
+                    final Realm realm = Realm.getInstance(syncConfig);
+                    Intent intent = new Intent(targetContext, SendOneCommit.class);
+                    targetContext.startService(intent);
+
+                    final RealmResults<ProcessInfo> all = realm.where(ProcessInfo.class).findAll();
+                    all.addChangeListener(new RealmChangeListener<RealmResults<ProcessInfo>>() {
+                        @Override
+                        public void onChange(RealmResults<ProcessInfo> element) {
+                            assertNotEquals(0, all.size());
+                            testFinished.countDown();
+                        }
+                    });
+
+                    Looper.loop();
+
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        testFinished.await(10, TimeUnit.SECONDS);
+    }
+

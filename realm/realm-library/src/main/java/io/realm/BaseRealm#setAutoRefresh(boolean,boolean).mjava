@@ -1,0 +1,15 @@
+    private void setAutoRefresh(boolean autoRefresh, boolean performCheck) {
+        if (performCheck) {
+            checkIfValid();
+        }
+
+        handlerController.checkCanBeAutoRefreshed();
+        if (autoRefresh && !handlerController.isAutoRefreshEnabled()) { // Switch it on
+            handler = new Handler(handlerController);
+            handlers.put(handler, configuration.getPath());
+        } else if (!autoRefresh && handlerController.isAutoRefreshEnabled() && handler != null) { // Switch it off
+            removeHandler();
+        }
+        handlerController.setAutoRefresh(autoRefresh);
+    }
+
