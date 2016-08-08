@@ -1,11 +1,11 @@
-    private void populateTestRealm(Realm testRealm, int objects) {
+    private void populateTestRealm(Realm testRealm, int dataSize) {
         testRealm.beginTransaction();
         testRealm.deleteAll();
-        for (int i = 0; i < objects; ++i) {
+        for (int i = 0; i < dataSize; ++i) {
             AllTypes allTypes = testRealm.createObject(AllTypes.class);
             allTypes.setColumnBoolean((i % 3) == 0);
             allTypes.setColumnBinary(new byte[]{1, 2, 3});
-            allTypes.setColumnDate(new Date(DECADE_MILLIS * (i - (objects / 2))));
+            allTypes.setColumnDate(new Date(DECADE_MILLIS * (i - (dataSize / 2))));
             allTypes.setColumnDouble(3.1415);
             allTypes.setColumnFloat(1.234567f + i);
             allTypes.setColumnString("test data " + i);

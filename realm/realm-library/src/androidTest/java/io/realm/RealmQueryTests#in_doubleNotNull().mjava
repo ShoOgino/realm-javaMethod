@@ -1,0 +1,10 @@
+    @Test
+    public void in_doubleNotNull() {
+        doTestForInDouble(NoPrimaryKeyNullTypes.FIELD_DOUBLE_NOT_NULL);
+        try {
+            realm.where(NoPrimaryKeyNullTypes.class).not().in(NoPrimaryKeyNullTypes.FIELD_DOUBLE_NOT_NULL, new Double[]{3.1415d + 1, null, 3.1415d + 2}).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
