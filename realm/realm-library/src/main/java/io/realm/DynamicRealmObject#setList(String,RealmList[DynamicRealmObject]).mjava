@@ -7,7 +7,7 @@
      * of the object represented by the DynamicRealmObject doesn't match or any element in the list belongs to a
      * different Realm.
      */
-    public void setList(String fieldName, RealmList<? extends RealmModel> list) {
+    public void setList(String fieldName, RealmList<DynamicRealmObject> list) {
         if (list == null) {
             throw new IllegalArgumentException("Null values not allowed for lists");
         }
@@ -32,7 +32,7 @@
         links.clear();
         Table linkTargetTable = links.getTargetTable();
         for (int i = 0; i < list.size(); i++) {
-            RealmObjectProxy obj = (RealmObjectProxy) list.get(i);
+            RealmObjectProxy obj = list.get(i);
             if (obj.realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm()) {
                 throw new IllegalArgumentException("Each element in 'list' must belong to the same Realm instance.");
             }

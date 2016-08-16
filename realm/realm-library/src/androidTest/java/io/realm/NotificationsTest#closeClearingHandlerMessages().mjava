@@ -19,9 +19,9 @@
                 }
                 addHandlerMessages.await(1, TimeUnit.SECONDS); // Wait for main thread to add update messages
 
-                // Find the current Handler for the thread now. All message and references will be
+                // Create a Handler for the thread now. All message and references for the notification handler will be
                 // cleared once we call close().
-                Handler threadHandler = realm.handler;
+                Handler threadHandler = new Handler(Looper.myLooper());
                 realm.close(); // Close native resources + associated handlers.
 
                 // Looper now reads the update message from the main thread if the Handler was not
@@ -29,12 +29,13 @@
                 // If it works correctly. The looper will just block on an empty message queue.
                 // This is normal behavior but is bad for testing, so we add a custom quit message
                 // at the end so we can evaluate results faster.
-                threadHandler.post(new Runnable() {
+                // 500 ms delay is to make sure the notification daemon thread gets time to send notification.
+                threadHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         TestHelper.quitLooperOrFail();
                     }
-                });
+                }, 500);
 
                 try {
                     Looper.loop();
