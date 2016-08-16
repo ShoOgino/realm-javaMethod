@@ -1,0 +1,14 @@
+    @Test
+    public void equalTo_noFieldObjectShouldThrow() {
+        final String className = "NoField";
+        RealmConfiguration emptyConfig = configFactory.createConfiguration("empty");
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(emptyConfig);
+        dynamicRealm.beginTransaction();
+        dynamicRealm.getSchema().create(className);
+        dynamicRealm.commitTransaction();
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Field 'nonExisting' does not exist.");
+        dynamicRealm.where(className).equalTo("nonExisting", 1);
+    }
+
