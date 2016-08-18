@@ -1,9 +1,19 @@
     Table getTable(Class<? extends RealmModel> clazz) {
         Table table = classToTable.get(clazz);
         if (table == null) {
-            clazz = Util.getOriginalModelClass(clazz);
-            table = transaction.getTable(realm.configuration.getSchemaMediator().getTableName(clazz));
-            classToTable.put(clazz, table);
+            Class<? extends RealmModel> originalClass = Util.getOriginalModelClass(clazz);
+            if (isProxyClass(originalClass, clazz)) {
+                // if passed 'clazz' is the proxy, try again with model class
+                table = classToTable.get(originalClass);
+            }
+            if (table == null) {
+                table = transaction.getTable(realm.configuration.getSchemaMediator().getTableName(originalClass));
+                classToTable.put(originalClass, table);
+            }
+            if (isProxyClass(originalClass, clazz)) {
+                // 'clazz' is the proxy class for 'originalClass'
+                classToTable.put(clazz, table);
+            }
         }
         return table;
     }
