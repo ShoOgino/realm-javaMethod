@@ -1,0 +1,22 @@
+    private void doTestForInLong(String targetField) {
+        populateNoPrimaryKeyNullTypesRows();
+        try {
+            realm.where(NoPrimaryKeyNullTypes.class).in(targetField, (Long[]) null).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+        try {
+            realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Long[]{}).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+        RealmResults<NoPrimaryKeyNullTypes> resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Long[]{11l}).findAll();
+        assertEquals(1, resultList.size());
+        resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Long[]{13l}).findAll();
+        assertEquals(1, resultList.size());
+        resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Long[]{13l, 14l, 16l, 98l}).findAll();
+        assertEquals(4, resultList.size());
+        resultList = realm.where(NoPrimaryKeyNullTypes.class).not().in(targetField, new Long[]{13l, 14l, 16l, 98l}).findAll();
+        assertEquals(196, resultList.size());
+    }
+

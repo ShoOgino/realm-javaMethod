@@ -1,0 +1,10 @@
+    @Test
+    public void in_dateNotNull() {
+        doTestForInDate(NoPrimaryKeyNullTypes.FIELD_DATE_NOT_NULL);
+        try {
+            realm.where(NoPrimaryKeyNullTypes.class).not().in(NoPrimaryKeyNullTypes.FIELD_DATE_NOT_NULL, new Date[]{new Date(DECADE_MILLIS * -80), null, new Date(0)}).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

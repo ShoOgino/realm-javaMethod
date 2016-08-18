@@ -1,0 +1,22 @@
+    private void doTestForInDate(String targetField) {
+        populateNoPrimaryKeyNullTypesRows();
+        try {
+            realm.where(NoPrimaryKeyNullTypes.class).in(targetField, (Date[]) null).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+        try {
+            realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Date[]{}).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+        RealmResults<NoPrimaryKeyNullTypes> resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Date[]{new Date(DECADE_MILLIS * -80)}).findAll();
+        assertEquals(1, resultList.size());
+        resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Date[]{new Date(0)}).findAll();
+        assertEquals(1, resultList.size());
+        resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Date[]{new Date(DECADE_MILLIS * -80), new Date(0)}).findAll();
+        assertEquals(2, resultList.size());
+        resultList = realm.where(NoPrimaryKeyNullTypes.class).not().in(targetField, new Date[]{new Date(DECADE_MILLIS * -80), new Date(0)}).findAll();
+        assertEquals(198, resultList.size());
+    }
+

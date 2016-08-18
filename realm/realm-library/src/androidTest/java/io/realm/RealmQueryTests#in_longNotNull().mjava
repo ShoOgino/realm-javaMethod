@@ -1,0 +1,10 @@
+    @Test
+    public void in_longNotNull() {
+        doTestForInLong(NoPrimaryKeyNullTypes.FIELD_LONG_NOT_NULL);
+        try {
+            realm.where(NoPrimaryKeyNullTypes.class).not().in(NoPrimaryKeyNullTypes.FIELD_LONG_NOT_NULL, new Long[]{13l, null, 16l, 98l}).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

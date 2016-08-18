@@ -1,0 +1,10 @@
+    @Test
+    public void in_integerNotNull() {
+        doTestForInInteger(NoPrimaryKeyNullTypes.FIELD_INTEGER_NOT_NULL);
+        try {
+            realm.where(NoPrimaryKeyNullTypes.class).not().in(NoPrimaryKeyNullTypes.FIELD_INTEGER_NOT_NULL, new Integer[]{1, null, 4, 5}).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

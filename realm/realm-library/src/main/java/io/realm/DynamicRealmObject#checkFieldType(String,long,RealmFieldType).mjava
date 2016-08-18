@@ -1,0 +1,16 @@
+    private void checkFieldType(String fieldName, long columnIndex, RealmFieldType expectedType) {
+        RealmFieldType columnType = proxyState.getRow$realm().getColumnType(columnIndex);
+        if (columnType != expectedType) {
+            String expectedIndefiniteVowel = "";
+            if (expectedType == RealmFieldType.INTEGER || expectedType == RealmFieldType.OBJECT) {
+                expectedIndefiniteVowel = "n";
+            }
+            String columnTypeIndefiniteVowel = "";
+            if (expectedType == RealmFieldType.INTEGER || expectedType == RealmFieldType.OBJECT) {
+                columnTypeIndefiniteVowel = "n";
+            }
+            throw new IllegalArgumentException(String.format("'%s' is not a%s '%s', but a%s '%s'.",
+                    fieldName, expectedIndefiniteVowel, expectedType, columnTypeIndefiniteVowel, columnType));
+        }
+    }
+
