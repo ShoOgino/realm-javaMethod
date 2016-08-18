@@ -7,7 +7,7 @@
             @Override
             public void onChange(Realm object) {
                 if (globalCommitInvocations.incrementAndGet() == 1) {
-                    realm.handler.post(new Runnable() {
+                    looperThread.postRunnable(new Runnable() {
                         @Override
                         public void run() {
                             assertEquals(1, typebasedCommitInvocations.get());

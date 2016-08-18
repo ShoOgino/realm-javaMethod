@@ -11,7 +11,7 @@
             public void onChange(Realm object) {
                 // Check if the 2nd transaction is committed.
                 if (realm.where(Dog.class).count() == 2) {
-                    realm.handler.post(new Runnable() {
+                    looperThread.postRunnable(new Runnable() {
                         @Override
                         public void run() {
                             assertEquals(2, typebasedCommitInvocations.get());
