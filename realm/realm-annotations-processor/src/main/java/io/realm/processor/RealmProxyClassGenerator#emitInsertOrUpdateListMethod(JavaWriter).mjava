@@ -19,7 +19,11 @@
         writer.emitStatement("object = (%s) objects.next()", qualifiedClassName);
         writer.beginControlFlow("if(!cache.containsKey(object))");
 
-        addPrimaryKeyCheckIfNeeeded(metadata, false, writer);
+        writer.beginControlFlow("if (object instanceof RealmObjectProxy && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm().getPath().equals(realm.getPath()))");
+            writer.emitStatement("cache.put(object, ((RealmObjectProxy)object).realmGet$proxyState().getRow$realm().getIndex())")
+                  .emitStatement("continue");
+        writer.endControlFlow();
+        addPrimaryKeyCheckIfNeeded(metadata, false, writer);
 
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();

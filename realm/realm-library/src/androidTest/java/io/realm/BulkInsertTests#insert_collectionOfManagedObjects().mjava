@@ -1,0 +1,23 @@
+    @Test
+    public void insert_collectionOfManagedObjects() {
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.getColumnRealmList().add(realm.createObject(Dog.class));
+        realm.commitTransaction();
+        assertEquals(1, allTypes.getColumnRealmList().size());
+
+        List<AllTypes>  list = new ArrayList<AllTypes>();
+        // Although there are two same objects in the list, none of them should be saved to the db since they are managed
+        // already.
+        list.add(allTypes);
+        list.add(allTypes);
+
+        realm.beginTransaction();
+        realm.insert(list);
+        realm.commitTransaction();
+        assertEquals(1, realm.where(AllTypes.class).count());
+        allTypes = realm.where(AllTypes.class).findFirst();
+        assertNotNull(allTypes);
+        assertEquals(1, allTypes.getColumnRealmList().size());
+    }
+
