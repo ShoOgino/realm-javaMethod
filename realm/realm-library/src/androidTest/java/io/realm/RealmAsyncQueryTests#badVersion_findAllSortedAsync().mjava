@@ -3,7 +3,7 @@
     @Test
     @UiThreadTest
     public void badVersion_findAllSortedAsync() throws NoSuchFieldException, IllegalAccessException {
-        TestHelper.replaceRealmThreadExectutor(RealmThreadPoolExecutor.newSingleThreadExecutor());
+        TestHelper.replaceRealmThreadExecutor(RealmThreadPoolExecutor.newSingleThreadExecutor());
         RealmConfiguration config = configFactory.createConfiguration();
         Realm realm = Realm.getInstance(config);
         realm.executeTransactionAsync(new Realm.Transaction() {
@@ -28,5 +28,6 @@
                 .findAllSortedAsync(AllTypes.FIELD_STRING, Sort.ASCENDING, AllTypes.FIELD_LONG, Sort.DESCENDING)
                 .load();
         realm.close();
+        TestHelper.resetRealmThreadExecutor();
     }
 
