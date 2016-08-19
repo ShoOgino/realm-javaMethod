@@ -3,7 +3,7 @@
     @Test
     @RunTestInLooperThread
     public void badVersion_syncTransaction() throws NoSuchFieldException, IllegalAccessException {
-        TestHelper.replaceRealmThreadExectutor(RealmThreadPoolExecutor.newSingleThreadExecutor());
+        TestHelper.replaceRealmThreadExecutor(RealmThreadPoolExecutor.newSingleThreadExecutor());
         Realm realm = looperThread.realm;
 
         // 1. Make sure that async query is not started
@@ -29,5 +29,6 @@
 
         // 3. The async query should now (hopefully) fail with a BadVersion
         result.load();
+        TestHelper.resetRealmThreadExecutor();
     }
 

@@ -3,7 +3,7 @@
     @Test
     @UiThreadTest
     public void badVersion_distinct() throws NoSuchFieldException, IllegalAccessException {
-        TestHelper.replaceRealmThreadExectutor(RealmThreadPoolExecutor.newSingleThreadExecutor());
+        TestHelper.replaceRealmThreadExecutor(RealmThreadPoolExecutor.newSingleThreadExecutor());
         RealmConfiguration config = configFactory.createConfiguration();
         Realm realm = Realm.getInstance(config);
         realm.executeTransactionAsync(new Realm.Transaction() {
@@ -29,5 +29,6 @@
                 .load();
 
         realm.close();
+        TestHelper.resetRealmThreadExecutor();
     }
 
