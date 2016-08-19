@@ -10,7 +10,12 @@
             fail();
         } catch (IllegalArgumentException ignored) {
         }
-        // 2 Bytes skipped, doesn't support equalTo query
+        // 2 Bytes
+        try {
+            realm.where(NullTypes.class).equalTo(NullTypes.FIELD_BYTES_NOT_NULL, (byte[]) null).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
         // 3 Boolean
         try {
             realm.where(NullTypes.class).equalTo(NullTypes.FIELD_BOOLEAN_NOT_NULL, (Boolean) null).findAll();

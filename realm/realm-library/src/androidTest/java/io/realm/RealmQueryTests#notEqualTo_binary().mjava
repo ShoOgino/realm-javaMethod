@@ -1,0 +1,13 @@
+    @Test
+    public void notEqualTo_binary() {
+        createBinaryOnlyDataSet();
+
+        RealmResults<AllJavaTypes> resultList;
+        resultList = realm.where(AllJavaTypes.class).notEqualTo(AllJavaTypes.FIELD_BINARY, binaries[0]).findAll();
+        assertEquals(4, resultList.size());
+        resultList = realm.where(AllJavaTypes.class).notEqualTo(AllJavaTypes.FIELD_BINARY, binaries[1]).findAll();
+        assertEquals(5, resultList.size());
+        resultList = realm.where(AllJavaTypes.class).notEqualTo(AllJavaTypes.FIELD_BINARY, new byte[] {1}).findAll();
+        assertEquals(6, resultList.size());
+    }
+

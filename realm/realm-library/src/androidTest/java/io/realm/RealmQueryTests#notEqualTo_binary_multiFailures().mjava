@@ -1,0 +1,21 @@
+    @Test
+    public void notEqualTo_binary_multiFailures() {
+        createBinaryOnlyDataSet();
+
+        // Non-binary field.
+        try {
+            RealmResults<AllJavaTypes> resultList = realm.where(AllJavaTypes.class)
+                    .notEqualTo(AllJavaTypes.FIELD_INT, binaries[0]).findAll();
+            fail("Should throw exception.");
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // Non-existent field.
+        try {
+            RealmResults<AllJavaTypes> resultList = realm.where(AllJavaTypes.class)
+                    .notEqualTo("NotAField", binaries[0]).findAll();
+            fail("Should throw exception.");
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
