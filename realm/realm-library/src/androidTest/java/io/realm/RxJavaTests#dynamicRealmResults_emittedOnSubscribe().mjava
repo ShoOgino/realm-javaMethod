@@ -1,10 +1,10 @@
     @Test
     @UiThreadTest
     public void dynamicRealmResults_emittedOnSubscribe() {
-        final DynamicRealm dynamicRealm = DynamicRealm.createInstance(realm.getConfiguration());
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         final RealmResults<DynamicRealmObject> results = dynamicRealm.where(AllTypes.CLASS_NAME).findAll();
-        results.asObservable().subscribe(new Action1<RealmResults<DynamicRealmObject>>() {
+        subscription = results.asObservable().subscribe(new Action1<RealmResults<DynamicRealmObject>>() {
             @Override
             public void call(RealmResults<DynamicRealmObject> rxResults) {
                 assertTrue(rxResults == results);
@@ -13,5 +13,6 @@
         });
         assertTrue(subscribedNotified.get());
         dynamicRealm.close();
+        subscription.unsubscribe();
     }
 

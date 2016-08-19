@@ -2,12 +2,12 @@
     @RunTestInLooperThread
     public void dynamicRealmResults_emittedOnUpdate() {
         final AtomicInteger subscriberCalled = new AtomicInteger(0);
-        final DynamicRealm dynamicRealm = DynamicRealm.createInstance(looperThread.realmConfiguration);
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.realmConfiguration);
         dynamicRealm.beginTransaction();
         RealmResults<DynamicRealmObject> results = dynamicRealm.where(AllTypes.CLASS_NAME).findAll();
         dynamicRealm.commitTransaction();
 
-        results.asObservable().subscribe(new Action1<RealmResults<DynamicRealmObject>>() {
+        subscription = results.asObservable().subscribe(new Action1<RealmResults<DynamicRealmObject>>() {
             @Override
             public void call(RealmResults<DynamicRealmObject> allTypes) {
                 if (subscriberCalled.incrementAndGet() == 2) {
