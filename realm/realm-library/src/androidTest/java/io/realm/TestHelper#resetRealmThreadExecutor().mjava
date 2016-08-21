@@ -1,0 +1,12 @@
+    /**
+     * This will first wait for finishing all tasks in BaseRealm.asyncTaskExecutor, throws if time out.
+     * Then reset the BaseRealm.asyncTaskExecutor to the default value.
+     *
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
+    public static void resetRealmThreadExecutor() throws NoSuchFieldException, IllegalAccessException {
+        waitRealmThreadExecutorFinish();
+        replaceRealmThreadExecutor(RealmThreadPoolExecutor.newDefaultExecutor());
+    }
+

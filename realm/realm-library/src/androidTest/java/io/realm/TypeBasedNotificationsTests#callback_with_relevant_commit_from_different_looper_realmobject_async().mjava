@@ -65,7 +65,7 @@
 
                     case 3: // triggered by relevant commit from LooperThread2
                         assertEquals("Akamaru", dog.getName());
-                        realm.handler.post(new Runnable() {
+                        looperThread.postRunnable(new Runnable() {
                             @Override
                             public void run() {
                                 // trigger second callback invocation
@@ -89,7 +89,7 @@
                         // posting as an event will give the handler a chance
                         // to deliver the notification for globalCommitInvocations
                         // otherwise, test will exit before the callback get a chance to be invoked
-                        realm.handler.post(new Runnable() {
+                        looperThread.postRunnable(new Runnable() {
                             @Override
                             public void run() {
                                 assertEquals(3, globalCommitInvocations.get());

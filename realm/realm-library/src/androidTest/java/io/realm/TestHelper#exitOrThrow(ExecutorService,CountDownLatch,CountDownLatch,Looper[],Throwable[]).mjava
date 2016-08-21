@@ -12,8 +12,6 @@
             // used. Any exception in the `after()` code will mask the original error.
             TestHelper.awaitOrFail(signalTestFinished);
         } finally {
-            // close the executor
-            executorService.shutdownNow();
             if (looper[0] != null) {
                 // failing to quit the looper will not execute the finally block responsible
                 // of closing the Realm
@@ -22,6 +20,9 @@
 
             // wait for the finally block to execute & close the Realm
             TestHelper.awaitOrFail(signalClosedRealm);
+            // Close the executor.
+            // This needs to be called after waiting since it might interrupt waitRealmThreadExecutorFinish().
+            executorService.shutdownNow();
 
             if (throwable[0] != null) {
                 // throw any assertion errors happened in the background thread

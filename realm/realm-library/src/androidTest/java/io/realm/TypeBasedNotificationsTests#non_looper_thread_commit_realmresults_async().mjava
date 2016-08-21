@@ -10,7 +10,7 @@
             @Override
             public void onChange(Realm object) {
                 if (realm.where(Dog.class).count() == 2) {
-                    realm.handler.post(new Runnable() {
+                    looperThread.postRunnable(new Runnable() {
                         @Override
                         public void run() {
                             assertEquals(2, typebasedCommitInvocations.get());
