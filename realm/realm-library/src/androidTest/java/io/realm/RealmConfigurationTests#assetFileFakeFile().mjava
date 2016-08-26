@@ -9,7 +9,8 @@
         try {
             Realm.getInstance(configuration);
             fail();
-        } catch (RealmIOException ignored) {
+        } catch (RealmFileException expected) {
+            assertEquals(expected.getKind(), RealmFileException.Kind.ACCESS_ERROR);
         }
     }
 
