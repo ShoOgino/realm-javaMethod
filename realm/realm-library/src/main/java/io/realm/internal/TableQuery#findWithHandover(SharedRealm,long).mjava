@@ -1,0 +1,12 @@
+    /**
+     * Performs a find query then handover the resulted Row (ready to be imported by another thread/shared_group).
+     *
+     * @param sharedRealm current {@link SharedRealm }from which to operate the query.
+     * @param ptrQuery query to run the the find against.
+     * @return pointer to the handover result (table_view).
+     */
+    public static long findWithHandover(SharedRealm sharedRealm, long ptrQuery) {
+        // Execute the disposal of abandoned realm objects each time a new realm object is created
+        return nativeFindWithHandover(sharedRealm.getNativePtr(), ptrQuery, 0);
+    }
+

@@ -1,0 +1,9 @@
+    @Test
+    public void renameTable_tableNotExist() {
+        sharedRealm.beginTransaction();
+        assertFalse(sharedRealm.hasTable("TableToRemove"));
+        thrown.expect(RealmError.class);
+        sharedRealm.renameTable("TableToRemove", "newName");
+        sharedRealm.cancelTransaction();
+    }
+

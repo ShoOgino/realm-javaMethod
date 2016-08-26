@@ -1,0 +1,15 @@
+    @Test
+    public void rowOperationsOnZeroRow(){
+
+        Table t = new Table();
+        // Remove rows without columns
+        try { t.remove(0);  fail("No rows in table"); } catch (ArrayIndexOutOfBoundsException ignored) {}
+        try { t.remove(10); fail("No rows in table"); } catch (ArrayIndexOutOfBoundsException ignored) {}
+
+        // Column added, remove rows again
+        t.addColumn(RealmFieldType.STRING, "");
+        try { t.remove(0);  fail("No rows in table"); } catch (ArrayIndexOutOfBoundsException ignored) {}
+        try { t.remove(10); fail("No rows in table"); } catch (ArrayIndexOutOfBoundsException ignored) {}
+
+    }
+

@@ -1,8 +1,9 @@
     protected BaseRealm(RealmConfiguration configuration) {
         this.threadId = Thread.currentThread().getId();
         this.configuration = configuration;
-        this.sharedGroupManager = new SharedGroupManager(configuration);
-        this.schema = new RealmSchema(this, sharedGroupManager.getTransaction());
+
+        this.sharedRealm = SharedRealm.getInstance(configuration);
+        this.schema = new RealmSchema(this);
         this.handlerController = new HandlerController(this);
 
         if (handlerController.isAutoRefreshAvailable()) {

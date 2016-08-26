@@ -14,7 +14,7 @@
         final WeakReference<Handler> weakHandler = getWeakReferenceHandler();
 
         // handover the query (to be used by a worker thread)
-        final long handoverQueryPointer = query.handoverQuery(realm.sharedGroupManager.getNativePointer());
+        final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
 
         // save query arguments (for future update)
         argumentsHolder = new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_FIRST);
@@ -40,16 +40,12 @@
             @Override
             public Long call() throws Exception {
                 if (!Thread.currentThread().isInterrupted()) {
-                    SharedGroup sharedGroup = null;
+                    SharedRealm sharedRealm = null;
 
                     try {
-                        sharedGroup = new SharedGroup(realmConfiguration.getPath(),
-                                SharedGroup.IMPLICIT_TRANSACTION,
-                                realmConfiguration.getDurability(),
-                                realmConfiguration.getEncryptionKey());
+                        sharedRealm = SharedRealm.getInstance(realmConfiguration);
 
-                        long handoverRowPointer = query.findWithHandover(sharedGroup.getNativePointer(),
-                                sharedGroup.getNativeReplicationPointer(), handoverQueryPointer);
+                        long handoverRowPointer = TableQuery.findWithHandover(sharedRealm, handoverQueryPointer);
                         if (handoverRowPointer == 0) { // empty row
                             realm.handlerController.addToEmptyAsyncRealmObject(realmObjectWeakReference, RealmQuery.this);
                             realm.handlerController.removeFromAsyncRealmObject(realmObjectWeakReference);
@@ -57,8 +53,8 @@
 
                         QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmObjectResponse();
                         result.updatedRow.put(realmObjectWeakReference, handoverRowPointer);
-                        result.versionID = sharedGroup.getVersion();
-                        closeSharedGroupAndSendMessageToHandler(sharedGroup,
+                        result.versionID = sharedRealm.getVersionID();
+                        closeSharedRealmAndSendMessageToHandler(sharedRealm,
                                 weakHandler, HandlerControllerConstants.COMPLETED_ASYNC_REALM_OBJECT, result);
 
                         return handoverRowPointer;
@@ -66,12 +62,12 @@
                     } catch (Throwable e) {
                         RealmLog.e(e.getMessage(), e);
                         // handler can't throw a checked exception need to wrap it into unchecked Exception
-                        closeSharedGroupAndSendMessageToHandler(sharedGroup,
+                        closeSharedRealmAndSendMessageToHandler(sharedRealm,
                                 weakHandler, HandlerControllerConstants.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
 
                     } finally {
-                        if (sharedGroup != null && !sharedGroup.isClosed()) {
-                            sharedGroup.close();
+                        if (sharedRealm != null && !sharedRealm.isClosed()) {
+                            sharedRealm.close();
                         }
                     }
                 } else {

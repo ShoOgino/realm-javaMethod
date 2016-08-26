@@ -1,15 +1,13 @@
+    @Test
     public void testLinkList() {
-
-        Group group = new Group();
-
-        Table table1 = group.getTable("table1");
+        Table table1 = sharedRealm.getTable("table1");
         table1.addColumn(RealmFieldType.INTEGER, "int");
         table1.addColumn(RealmFieldType.STRING, "string");
         table1.add(1, "c");
         table1.add(2, "b");
         table1.add(3, "a");
 
-        Table table2 = group.getTable("table2");
+        Table table2 = sharedRealm.getTable("table2");
 
         table2.addColumnLink(RealmFieldType.LIST, "LinkList", table1);
 
@@ -38,6 +36,5 @@
 
         assertEquals(links.getUncheckedRow(0).getString(1), "a");
         assertEquals(links.size(), 1);
-
     }
 

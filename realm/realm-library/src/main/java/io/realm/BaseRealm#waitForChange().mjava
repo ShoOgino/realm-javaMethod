@@ -15,10 +15,10 @@
         if (Looper.myLooper() != null) {
             throw new IllegalStateException("Cannot wait for changes inside a Looper thread. Use RealmChangeListeners instead.");
         }
-        boolean hasChanged = sharedGroupManager.getSharedGroup().waitForChange();
+        boolean hasChanged = sharedRealm.waitForChange();
         if (hasChanged) {
             // Since this Realm instance has been waiting for change, advance realm & refresh realm.
-            sharedGroupManager.advanceRead();
+            sharedRealm.refresh();
             handlerController.refreshSynchronousTableViews();
         }
         return hasChanged;
