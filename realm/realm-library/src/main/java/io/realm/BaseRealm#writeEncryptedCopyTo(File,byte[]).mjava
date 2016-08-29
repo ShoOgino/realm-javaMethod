@@ -9,14 +9,15 @@
      *
      * @param destination file to save the Realm to.
      * @param key a 64-byte encryption key.
-     * @throws java.io.IOException if any write operation fails.
      * @throws IllegalArgumentException if destination argument is null.
+     * @throws RealmFileException if an error happened when accessing the underlying Realm file or writing to the
+     * destination file.
      */
-    public void writeEncryptedCopyTo(File destination, byte[] key) throws java.io.IOException {
+    public void writeEncryptedCopyTo(File destination, byte[] key) {
         if (destination == null) {
             throw new IllegalArgumentException("The destination argument cannot be null");
         }
         checkIfValid();
-        sharedGroupManager.copyToFile(destination, key);
+        sharedRealm.writeCopy(destination, key);
     }
 

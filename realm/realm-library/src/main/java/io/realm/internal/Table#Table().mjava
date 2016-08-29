@@ -3,7 +3,6 @@
      * allowed only for empty tables. It creates a native reference of the object and keeps a reference to it.
      */
     public Table() {
-        this.parent = null; // No parent in free-standing table
         this.context = new Context();
         // Native methods work will be initialized here. Generated classes will
         // have nothing to do with the native functions. Generated Java Table
@@ -12,9 +11,6 @@
         if (nativePtr == 0) {
             throw new java.lang.OutOfMemoryError("Out of native memory.");
         }
-        if (DEBUG) {
-            tableNo = tableCount.incrementAndGet();
-            RealmLog.d("====== New Tablebase " + tableNo + " : ptr = " + nativePtr);
-        }
+        sharedRealm = null;
     }
 

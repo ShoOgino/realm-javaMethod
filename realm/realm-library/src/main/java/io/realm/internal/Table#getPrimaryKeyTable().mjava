@@ -1,15 +1,13 @@
     private Table getPrimaryKeyTable() {
-        Group group = getTableGroup();
-        if (group == null) {
+        if (sharedRealm == null) {
             return null;
         }
-
-        Table pkTable = group.getTable(PRIMARY_KEY_TABLE_NAME);
+        Table pkTable = sharedRealm.getTable(PRIMARY_KEY_TABLE_NAME);
         if (pkTable.getColumnCount() == 0) {
             pkTable.addColumn(RealmFieldType.STRING, PRIMARY_KEY_CLASS_COLUMN_NAME);
             pkTable.addColumn(RealmFieldType.STRING, PRIMARY_KEY_FIELD_COLUMN_NAME);
         } else {
-            migratePrimaryKeyTableIfNeeded(group, pkTable);
+            migratePrimaryKeyTableIfNeeded(sharedRealm.getGroupNative(), pkTable);
         }
 
         return pkTable;

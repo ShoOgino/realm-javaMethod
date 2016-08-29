@@ -1,0 +1,9 @@
+    @Test
+    public void removeTable_notInTransactionThrows() {
+        sharedRealm.beginTransaction();
+        sharedRealm.getTable("TableToRemove");
+        sharedRealm.commitTransaction();
+        thrown.expect(IllegalStateException.class);
+        sharedRealm.removeTable("TableToRemove");
+    }
+

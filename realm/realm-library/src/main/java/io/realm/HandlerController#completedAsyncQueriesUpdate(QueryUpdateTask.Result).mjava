@@ -1,5 +1,5 @@
     private void completedAsyncQueriesUpdate(QueryUpdateTask.Result result) {
-        SharedGroup.VersionID callerVersionID = realm.sharedGroupManager.getVersion();
+        SharedRealm.VersionID callerVersionID = realm.sharedRealm.getVersionID();
         int compare = callerVersionID.compareTo(result.versionID);
         if (compare > 0) {
             // if the caller thread is more advanced than the worker thread, it means it did a local commit.
@@ -21,7 +21,7 @@
                 // (advanceRead to the latest version may cause a version mismatch error) preventing us
                 // from importing correctly the handover table view
                 try {
-                    realm.sharedGroupManager.advanceRead(result.versionID);
+                    realm.sharedRealm.refresh(result.versionID);
                 } catch (BadVersionException e) {
                     // The version comparison above should have ensured that that the Caller version is less than the
                     // Worker version. In that case it should always be safe to advance_read.
