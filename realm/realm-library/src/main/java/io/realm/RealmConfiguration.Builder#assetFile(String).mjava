@@ -10,14 +10,10 @@
          * <p>
          * WARNING: This could potentially be a lengthy operation and should ideally be done on a background thread.
          *
-         * @param context Android application context.
          * @param assetFile path to the asset database file.
          * @throws IllegalStateException if this is configured to clear its schema by calling {@link #deleteRealmIfMigrationNeeded()}.
          */
-        public Builder assetFile(Context context, final String assetFile) {
-            if (context == null) {
-                throw new IllegalArgumentException("A non-null Context must be provided");
-            }
+        public Builder assetFile(final String assetFile) {
             if (TextUtils.isEmpty(assetFile)) {
                 throw new IllegalArgumentException("A non-empty asset file path must be provided");
             }
@@ -28,7 +24,6 @@
                 throw new IllegalStateException("Realm cannot use an asset file when previously configured to clear its schema in migration by calling deleteRealmIfMigrationNeeded().");
             }
 
-            this.contextWeakRef = new WeakReference<>(context);
             this.assetFilePath = assetFile;
 
             return this;

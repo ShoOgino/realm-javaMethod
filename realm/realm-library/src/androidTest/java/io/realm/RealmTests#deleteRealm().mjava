@@ -4,7 +4,9 @@
         File tempDirRenamed = new File(configFactory.getRoot(), "delete_test_dir_2");
         assertTrue(tempDir.mkdir());
 
-        final RealmConfiguration configuration = new RealmConfiguration.Builder(tempDir).build();
+        final RealmConfiguration configuration = new RealmConfiguration.Builder(InstrumentationRegistry.getTargetContext())
+                .directory(tempDir)
+                .build();
 
         final CountDownLatch bgThreadReadyLatch = new CountDownLatch(1);
         final CountDownLatch readyToCloseLatch = new CountDownLatch(1);

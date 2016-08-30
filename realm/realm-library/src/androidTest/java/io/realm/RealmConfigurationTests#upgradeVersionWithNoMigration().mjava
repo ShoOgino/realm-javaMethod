@@ -6,8 +6,10 @@
 
         // Version upgrades should always require a migration.
         try {
-            realm = Realm.getInstance(new RealmConfiguration.Builder(configFactory.getRoot())
-                    .schemaVersion(42).build());
+            realm = Realm.getInstance(new RealmConfiguration.Builder(context)
+                    .directory(configFactory.getRoot())
+                    .schemaVersion(42)
+                    .build());
             fail();
         } catch (RealmMigrationNeededException ignored) {
         }

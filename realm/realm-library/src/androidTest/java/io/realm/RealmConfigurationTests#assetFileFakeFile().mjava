@@ -1,11 +1,9 @@
     @Test
     public void assetFileFakeFile() {
-        Context context = InstrumentationRegistry.getInstrumentation().getContext();
-
         // Ensure that there is no data
         Realm.deleteRealm(new RealmConfiguration.Builder(context).build());
 
-        RealmConfiguration configuration = new RealmConfiguration.Builder(context).assetFile(context, "no_file").build();
+        RealmConfiguration configuration = new RealmConfiguration.Builder(context).assetFile("no_file").build();
         try {
             Realm.getInstance(configuration);
             fail();
