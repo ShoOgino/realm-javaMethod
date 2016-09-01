@@ -4,8 +4,8 @@
      *
      * @param columnIndex the column index to be renamed.
      * @param newName a new name replacing the old column name.
-     * @throws {@link IllegalArgumentException} if {@code newFieldName} is an empty string, or exceeds field name length limit.
-     * @throws {@link IllegalStateException} if a PrimaryKey column name could not be found in the meta table, but {@link #getPrimaryKey()} returns an index.
+     * @throws IllegalArgumentException if {@code newFieldName} is an empty string, or exceeds field name length limit.
+     * @throws IllegalStateException if a PrimaryKey column name could not be found in the meta table, but {@link #getPrimaryKey()} returns an index.
      */
     @Override
     public void renameColumn(long columnIndex, String newName) {
@@ -24,6 +24,10 @@
             try {
                 String className = tableNameToClassName(getName());
                 Table pkTable = getPrimaryKeyTable();
+                if (pkTable == null) {
+                    throw new IllegalStateException(
+                            "Table is not created from a SharedRealm, primary key is not available");
+                }
                 long pkRowIndex = pkTable.findFirstString(PRIMARY_KEY_CLASS_COLUMN_INDEX, className);
                 if (pkRowIndex != NO_MATCH) {
                     pkTable.setString(PRIMARY_KEY_FIELD_COLUMN_INDEX, pkRowIndex, newName);

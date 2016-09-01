@@ -1,0 +1,11 @@
+    @Test
+    public void renameTable() {
+        sharedRealm.beginTransaction();
+        sharedRealm.getTable("OldTable");
+        assertTrue(sharedRealm.hasTable("OldTable"));
+        sharedRealm.renameTable("OldTable", "NewTable");
+        assertFalse(sharedRealm.hasTable("OldTable"));
+        assertTrue(sharedRealm.hasTable("NewTable"));
+        sharedRealm.commitTransaction();
+    }
+

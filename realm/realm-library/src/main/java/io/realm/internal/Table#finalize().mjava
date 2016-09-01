@@ -1,14 +1,12 @@
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
         synchronized (context) {
             if (nativePtr != 0) {
-                boolean isRoot = (parent == null);
-                context.asyncDisposeTable(nativePtr, isRoot);
+                // Don't dispose the table immediately if it is created from a SharedRealm to avoid long run finalizer.
+                context.asyncDisposeTable(nativePtr, sharedRealm == null);
                 nativePtr = 0; // Set to 0 if finalize is called before close() for some reason
             }
         }
-        if (DEBUG) {
-            RealmLog.d("==== FINALIZE " + tableNo + "...");
-        }
+        super.finalize();
     }
 

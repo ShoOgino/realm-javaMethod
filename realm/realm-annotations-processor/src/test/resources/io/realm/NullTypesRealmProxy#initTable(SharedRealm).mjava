@@ -1,0 +1,33 @@
+    public static Table initTable(SharedRealm sharedRealm) {
+        if (!sharedRealm.hasTable("class_NullTypes")) {
+            Table table = sharedRealm.getTable("class_NullTypes");
+            table.addColumn(RealmFieldType.STRING, "fieldStringNotNull", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.STRING, "fieldStringNull", Table.NULLABLE);
+            table.addColumn(RealmFieldType.BOOLEAN, "fieldBooleanNotNull", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.BOOLEAN, "fieldBooleanNull", Table.NULLABLE);
+            table.addColumn(RealmFieldType.BINARY, "fieldBytesNotNull", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.BINARY, "fieldBytesNull", Table.NULLABLE);
+            table.addColumn(RealmFieldType.INTEGER, "fieldByteNotNull", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.INTEGER, "fieldByteNull", Table.NULLABLE);
+            table.addColumn(RealmFieldType.INTEGER, "fieldShortNotNull", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.INTEGER, "fieldShortNull", Table.NULLABLE);
+            table.addColumn(RealmFieldType.INTEGER, "fieldIntegerNotNull", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.INTEGER, "fieldIntegerNull", Table.NULLABLE);
+            table.addColumn(RealmFieldType.INTEGER, "fieldLongNotNull", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.INTEGER, "fieldLongNull", Table.NULLABLE);
+            table.addColumn(RealmFieldType.FLOAT, "fieldFloatNotNull", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.FLOAT, "fieldFloatNull", Table.NULLABLE);
+            table.addColumn(RealmFieldType.DOUBLE, "fieldDoubleNotNull", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.DOUBLE, "fieldDoubleNull", Table.NULLABLE);
+            table.addColumn(RealmFieldType.DATE, "fieldDateNotNull", Table.NOT_NULLABLE);
+            table.addColumn(RealmFieldType.DATE, "fieldDateNull", Table.NULLABLE);
+            if (!sharedRealm.hasTable("class_NullTypes")) {
+                NullTypesRealmProxy.initTable(sharedRealm);
+            }
+            table.addColumnLink(RealmFieldType.OBJECT, "fieldObjectNull", sharedRealm.getTable("class_NullTypes"));
+            table.setPrimaryKey("");
+            return table;
+        }
+        return sharedRealm.getTable("class_NullTypes");
+    }
+

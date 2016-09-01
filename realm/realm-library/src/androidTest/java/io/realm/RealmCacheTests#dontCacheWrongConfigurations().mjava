@@ -24,7 +24,8 @@
         try {
             Realm.getInstance(wrongConfig);
             fail();
-        } catch (IllegalArgumentException ignored) {
+        } catch (RealmFileException expected) {
+            assertEquals(expected.getKind(), RealmFileException.Kind.ACCESS_ERROR);
         }
 
         // Try again with proper key

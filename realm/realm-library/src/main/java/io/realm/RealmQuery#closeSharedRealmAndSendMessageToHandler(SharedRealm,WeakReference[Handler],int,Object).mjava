@@ -1,0 +1,13 @@
+    // The shared group needs to be closed before sending the message to other threads to avoid timing problems.
+    // eg.: The other thread wants to delete Realm when getting notified.
+    private void closeSharedRealmAndSendMessageToHandler(SharedRealm sharedRealm, WeakReference<Handler> weakHandler,
+                                                         int what, Object obj) {
+        if (sharedRealm != null) {
+            sharedRealm.close();
+        }
+        Handler handler = weakHandler.get();
+        if (handler != null && handler.getLooper().getThread().isAlive()) {
+            handler.obtainMessage(what, obj).sendToTarget();
+        }
+    }
+
