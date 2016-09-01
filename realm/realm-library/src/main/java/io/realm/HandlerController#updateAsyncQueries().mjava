@@ -37,7 +37,8 @@
         }
         if (realmResultsQueryStep != null) {
             QueryUpdateTask queryUpdateTask = realmResultsQueryStep
-                    .sendToHandler(realm.handler, HandlerControllerConstants.COMPLETED_UPDATE_ASYNC_QUERIES)
+                    .sendToNotifier(realm.sharedRealm.realmNotifier,
+                            QueryUpdateTask.NotifyEvent.COMPLETE_UPDATE_ASYNC_QUERIES)
                     .build();
             updateAsyncQueriesTask = Realm.asyncTaskExecutor.submitQueryUpdate(queryUpdateTask);
         }

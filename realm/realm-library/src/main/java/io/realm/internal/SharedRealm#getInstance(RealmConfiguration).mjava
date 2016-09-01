@@ -1,16 +1,4 @@
     public static SharedRealm getInstance(RealmConfiguration config) {
-        long nativeConfigPtr = nativeCreateConfig(
-                config.getPath(),
-                config.getEncryptionKey(),
-                SchemaMode.SCHEMA_MODE_MANUAL.value,
-                config.getDurability() == Durability.MEM_ONLY,
-                false,
-                false,
-                false);
-        try {
-            return new SharedRealm(nativeGetSharedRealm(nativeConfigPtr), config);
-        } finally {
-            nativeCloseConfig(nativeConfigPtr);
-        }
+        return getInstance(config, null);
     }
 

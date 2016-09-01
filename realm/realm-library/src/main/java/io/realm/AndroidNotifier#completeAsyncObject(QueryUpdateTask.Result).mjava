@@ -1,0 +1,8 @@
+    @Override
+    public void completeAsyncObject(QueryUpdateTask.Result result) {
+        Looper looper = handler.getLooper();
+        if (looper.getThread().isAlive()) {     // The receiving thread is alive
+            handler.obtainMessage(HandlerControllerConstants.COMPLETED_ASYNC_REALM_OBJECT, result).sendToTarget();
+        }
+    }
+

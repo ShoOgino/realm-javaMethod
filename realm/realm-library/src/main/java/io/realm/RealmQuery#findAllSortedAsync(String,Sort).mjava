@@ -16,7 +16,7 @@
         argumentsHolder.sortOrder = sortOrder;
         argumentsHolder.columnIndex = columnIndex;
 
-        final WeakReference<Handler> weakHandler = getWeakReferenceHandler();
+        final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();
 
         // handover the query (to be used by a worker thread)
         final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
@@ -53,8 +53,8 @@
                         QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResultsResponse();
                         result.updatedTableViews.put(weakRealmResults, handoverTableViewPointer);
                         result.versionID = sharedRealm.getVersionID();
-                        closeSharedRealmAndSendMessageToHandler(sharedRealm,
-                                weakHandler, HandlerControllerConstants.COMPLETED_ASYNC_REALM_RESULTS, result);
+                        closeSharedRealmAndSendEventToNotifier(sharedRealm,
+                                weakNotifier, QueryUpdateTask.NotifyEvent.COMPLETE_ASYNC_RESULTS, result);
 
                         return handoverTableViewPointer;
                     } catch (BadVersionException e) {
@@ -64,8 +64,8 @@
 
                     } catch (Throwable e) {
                         RealmLog.e(e.getMessage(), e);
-                        closeSharedRealmAndSendMessageToHandler(sharedRealm,
-                                weakHandler, HandlerControllerConstants.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
+                        closeSharedRealmAndSendEventToNotifier(sharedRealm,
+                                weakNotifier, QueryUpdateTask.NotifyEvent.THROW_BACKGROUND_EXCEPTION, e);
 
                     } finally {
                         if (sharedRealm!= null && !sharedRealm.isClosed()) {

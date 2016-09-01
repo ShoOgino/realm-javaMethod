@@ -45,7 +45,8 @@
                                 .add(weakRealmResults,
                                         query.handoverQueryPointer(),
                                         query.getArgument())
-                                .sendToHandler(realm.handler, HandlerControllerConstants.COMPLETED_ASYNC_REALM_RESULTS)
+                                .sendToNotifier(realm.sharedRealm.realmNotifier,
+                                        QueryUpdateTask.NotifyEvent.COMPLETE_ASYNC_RESULTS)
                                 .build();
 
                         Realm.asyncTaskExecutor.submitQueryUpdate(queryUpdateTask);

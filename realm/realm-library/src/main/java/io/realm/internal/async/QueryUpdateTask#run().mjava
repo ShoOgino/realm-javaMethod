@@ -24,9 +24,21 @@
                 result.versionID = sharedRealm.getVersionID();
             }
 
-            Handler handler = callerHandler.get();
-            if (updateSuccessful && !isTaskCancelled() && isAliveHandler(handler)) {
-                handler.obtainMessage(message, result).sendToTarget();
+            RealmNotifier notifier = callerNotifier.get();
+            if (updateSuccessful && !isTaskCancelled() && notifier != null) {
+                switch (event) {
+                    case COMPLETE_ASYNC_RESULTS:
+                        notifier.completeAsyncResults(result);
+                        break;
+                    case COMPLETE_ASYNC_OBJECT:
+                        notifier.completeAsyncObject(result);
+                        break;
+                    case COMPLETE_UPDATE_ASYNC_QUERIES:
+                        notifier.completeUpdateAsyncQueries(result);
+                        break;
+                    default:
+                        throw new IllegalStateException(String.format("%s is not handled here.", event));
+                }
             }
 
         } catch (BadVersionException e) {
@@ -36,9 +48,9 @@
 
         } catch (Throwable e) {
             RealmLog.e(e.getMessage(), e);
-            Handler handler = callerHandler.get();
-            if (handler != null && handler.getLooper().getThread().isAlive()) {
-                handler.obtainMessage(HandlerControllerConstants.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e)).sendToTarget();
+            RealmNotifier notifier = callerNotifier.get();
+            if (notifier!= null) {
+                notifier.throwBackgroundException(e);
             }
 
         } finally {

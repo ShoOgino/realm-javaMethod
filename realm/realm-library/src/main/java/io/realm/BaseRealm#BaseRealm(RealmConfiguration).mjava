@@ -2,9 +2,9 @@
         this.threadId = Thread.currentThread().getId();
         this.configuration = configuration;
 
-        this.sharedRealm = SharedRealm.getInstance(configuration);
-        this.schema = new RealmSchema(this);
         this.handlerController = new HandlerController(this);
+        this.sharedRealm = SharedRealm.getInstance(configuration, new AndroidNotifier(this.handlerController));
+        this.schema = new RealmSchema(this);
 
         if (handlerController.isAutoRefreshAvailable()) {
             setAutoRefresh(true);
