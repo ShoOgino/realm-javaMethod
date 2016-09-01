@@ -23,13 +23,15 @@
                     // the caller has advanced we need to
                     // retry against the current version of the caller if it's still empty
                     if (RealmObject.isValid(proxy)) { // already completed & has a valid pointer no need to re-run
-                        RealmLog.d("[COMPLETED_ASYNC_REALM_OBJECT "+ proxy + "] , realm:" + HandlerController.this
-                                + " RealmObject is already loaded, just notify it.");
+                        RealmLog.trace("[COMPLETED_ASYNC_REALM_OBJECT %s], realm: %s. " +
+                                "RealmObject is already loaded, just notify it",
+                                realm, HandlerController.this);
                         proxy.realmGet$proxyState().notifyChangeListeners$realm();
 
                     } else {
-                        RealmLog.d("[COMPLETED_ASYNC_REALM_OBJECT " + proxy + "] , realm:" + HandlerController.this
-                                + " RealmObject is not loaded yet. Rerun the query.");
+                        RealmLog.trace("[COMPLETED_ASYNC_REALM_OBJECT %s, realm: %s. " +
+                                "RealmObject is not loaded yet. Rerun the query.",
+                                proxy, HandlerController.this);
                         Object value = realmObjects.get(realmObjectWeakReference);
                         RealmQuery<? extends RealmModel> realmQuery;
                         if (value == null || value == NO_REALM_QUERY) { // this is a retry of an empty RealmObject

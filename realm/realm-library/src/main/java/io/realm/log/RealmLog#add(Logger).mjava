@@ -1,0 +1,19 @@
+    /**
+     * Adds a logger implementation that will be notified on log events.
+     *
+     * @param logger the reference to a {@link Logger} implementation.
+     */
+    public static void add(Logger logger) {
+        if (logger == null) {
+            throw new IllegalArgumentException("A non-null logger has to be provided");
+        }
+        synchronized (LOGGERS) {
+            LOGGERS.add(logger);
+            int minimumLogLevel = logger.getMinimumNativeDebugLevel();
+            if (minimumLogLevel < minimumNativeLogLevel) {
+                setMinimumNativeDebugLevel(minimumLogLevel);
+            }
+            loggersAsArray = LOGGERS.toArray(new Logger[LOGGERS.size()]);
+        }
+    }
+
