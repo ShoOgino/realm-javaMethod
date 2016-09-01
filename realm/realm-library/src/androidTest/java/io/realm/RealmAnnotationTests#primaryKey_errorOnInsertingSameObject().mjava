@@ -2,10 +2,8 @@
     public void primaryKey_errorOnInsertingSameObject() {
         try {
             realm.beginTransaction();
-            AnnotationTypes obj1 = realm.createObject(AnnotationTypes.class);
-            obj1.setId(1);
-            AnnotationTypes obj2 = realm.createObject(AnnotationTypes.class);
-            obj2.setId(1);
+            realm.createObject(AnnotationTypes.class, 1);
+            realm.createObject(AnnotationTypes.class, 1);
             fail("Inserting two objects with same primary key should fail");
         } catch (RealmPrimaryKeyConstraintException ignored) {
         } finally {
