@@ -1,14 +1,20 @@
     @Test
     public void constructBuilder_versionEqualWhenSchemaChangesThrows() {
         // Create initial Realm
-        RealmConfiguration config = new RealmConfiguration.Builder(configFactory.getRoot())
-                .schemaVersion(42).schema(Dog.class).build();
+        RealmConfiguration config = new RealmConfiguration.Builder(context)
+                .directory(configFactory.getRoot())
+                .schemaVersion(42)
+                .schema(Dog.class)
+                .build();
         Realm.getInstance(config).close();
 
         // Create new instance with a configuration containing another schema
         try {
-            config = new RealmConfiguration.Builder(configFactory.getRoot())
-                    .schemaVersion(42).schema(AllTypesPrimaryKey.class).build();
+            config = new RealmConfiguration.Builder(context)
+                    .directory(configFactory.getRoot())
+                    .schemaVersion(42)
+                    .schema(AllTypesPrimaryKey.class)
+                    .build();
             realm = Realm.getInstance(config);
             fail("A migration should be required");
         } catch (RealmMigrationNeededException ignored) {

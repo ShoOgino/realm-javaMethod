@@ -1,6 +1,9 @@
     @Test
     public void customSchemaDontIncludeLinkedClasses() {
-        RealmConfiguration config = new RealmConfiguration.Builder(configFactory.getRoot()).schema(Dog.class).build();
+        RealmConfiguration config = new RealmConfiguration.Builder(context)
+                .directory(configFactory.getRoot())
+                .schema(Dog.class)
+                .build();
         realm = Realm.getInstance(config);
         try {
             assertEquals(3, realm.getTable(Owner.class).getColumnCount());

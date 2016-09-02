@@ -11,7 +11,7 @@
      */
     public E findFirstAsync() {
         checkQueryIsNotReused();
-        final WeakReference<Handler> weakHandler = getWeakReferenceHandler();
+        final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();
 
         // handover the query (to be used by a worker thread)
         final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
@@ -54,17 +54,16 @@
                         QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmObjectResponse();
                         result.updatedRow.put(realmObjectWeakReference, handoverRowPointer);
                         result.versionID = sharedRealm.getVersionID();
-                        closeSharedRealmAndSendMessageToHandler(sharedRealm,
-                                weakHandler, HandlerControllerConstants.COMPLETED_ASYNC_REALM_OBJECT, result);
+                        closeSharedRealmAndSendEventToNotifier(sharedRealm,
+                                weakNotifier, QueryUpdateTask.NotifyEvent.COMPLETE_ASYNC_OBJECT, result);
 
                         return handoverRowPointer;
 
                     } catch (Throwable e) {
-                        RealmLog.e(e.getMessage(), e);
+                        RealmLog.error(e);
                         // handler can't throw a checked exception need to wrap it into unchecked Exception
-                        closeSharedRealmAndSendMessageToHandler(sharedRealm,
-                                weakHandler, HandlerControllerConstants.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
-
+                        closeSharedRealmAndSendEventToNotifier(sharedRealm,
+                                weakNotifier, QueryUpdateTask.NotifyEvent.THROW_BACKGROUND_EXCEPTION, e);
                     } finally {
                         if (sharedRealm != null && !sharedRealm.isClosed()) {
                             sharedRealm.close();

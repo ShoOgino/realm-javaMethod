@@ -1,11 +1,11 @@
     private void realmChanged(boolean localCommit) {
-        RealmLog.d((localCommit ? "LOCAL_COMMIT" : "REALM_CHANGED") + " : realm:" + HandlerController.this);
+        RealmLog.debug("%s : %s", (localCommit ? "LOCAL_COMMIT" : "REALM_CHANGED"), HandlerController.this);
         deleteWeakReferences();
         boolean threadContainsAsyncQueries = threadContainsAsyncQueries();
 
         // Mixing local transactions and async queries has unavoidable race conditions
         if (localCommit && threadContainsAsyncQueries) {
-            RealmLog.w("Mixing asynchronous queries with local writes should be avoided. " +
+            RealmLog.warn("Mixing asynchronous queries with local writes should be avoided. " +
                     "Realm will convert any async queries to synchronous in order to remain consistent. Use " +
                     "asynchronous writes instead. You can read more here: " +
                     "https://realm.io/docs/java/latest/#asynchronous-transactions");

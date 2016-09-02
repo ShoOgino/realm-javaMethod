@@ -5,7 +5,7 @@
             // if the caller thread is more advanced than the worker thread, it means it did a local commit.
             // This should also have put a REALM_CHANGED event on the Looper queue, so ignoring this result should
             // be safe as all async queries will be rerun when processing the REALM_CHANGED event.
-            RealmLog.d("COMPLETED_UPDATE_ASYNC_QUERIES realm:" + HandlerController.this + " caller is more advanced, Looper will updates queries");
+            RealmLog.trace("COMPLETED_UPDATE_ASYNC_QUERIES %s caller is more advanced, Looper will updates queries", HandlerController.this);
 
         } else {
             // We're behind or on the same version as the worker thread
@@ -16,7 +16,7 @@
                 // imperative TV, they will not rerun if the SharedGroup advance
 
                 // UC covered by this test: RealmAsyncQueryTests#testFindAllCallerThreadBehind
-                RealmLog.d("COMPLETED_UPDATE_ASYNC_QUERIES realm:"+ HandlerController.this + " caller is behind  advance_read");
+                RealmLog.trace("COMPLETED_UPDATE_ASYNC_QUERIES %s caller is behind advance_read", HandlerController.this);
                 // refresh the Realm to the version provided by the worker thread
                 // (advanceRead to the latest version may cause a version mismatch error) preventing us
                 // from importing correctly the handover table view
@@ -46,7 +46,7 @@
                     realmResults.syncIfNeeded();
                     resultsToBeNotified.add(realmResults);
 
-                    RealmLog.d("COMPLETED_UPDATE_ASYNC_QUERIES realm:"+ HandlerController.this + " updating RealmResults " + weakRealmResults);
+                    RealmLog.trace("COMPLETED_UPDATE_ASYNC_QUERIES updating RealmResults %s", HandlerController.this, weakRealmResults);
                 }
             }
             collectSyncRealmResultsCallbacks(resultsToBeNotified);

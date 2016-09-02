@@ -1,8 +1,11 @@
     @Test
     public void schema_differentSchemasThrows() {
-        RealmConfiguration config1 = new RealmConfiguration.Builder(configFactory.getRoot())
-                .schema(AllTypes.class).build();
-        RealmConfiguration config2 = new RealmConfiguration.Builder(configFactory.getRoot())
+        RealmConfiguration config1 = new RealmConfiguration.Builder(context)
+                .directory(configFactory.getRoot())
+                .schema(AllTypes.class)
+                .build();
+        RealmConfiguration config2 = new RealmConfiguration.Builder(context)
+                .directory(configFactory.getRoot())
                 .schema(CyclicType.class).build();
 
         Realm realm1 = Realm.getInstance(config1);

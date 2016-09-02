@@ -8,7 +8,10 @@
         assertTrue(realmFile.setWritable(false));
 
         try {
-            Realm.getInstance(new RealmConfiguration.Builder(folder).name(REALM_FILE).build());
+            Realm.getInstance(new RealmConfiguration.Builder(InstrumentationRegistry.getTargetContext())
+                    .directory(folder)
+                    .name(REALM_FILE)
+                    .build());
         } catch (RealmFileException expected) {
             assertEquals(expected.getKind(), RealmFileException.Kind.PERMISSION_DENIED);
         }

@@ -1,7 +1,9 @@
     @Test
     public void modelClasses_forCompositeMediator() throws Exception {
-        final RealmConfiguration config = new RealmConfiguration.Builder(configFactory.getRoot())
-                .modules(new HumanModule(), new AnimalModule()).build();
+        final RealmConfiguration config = new RealmConfiguration.Builder(context)
+                .directory(configFactory.getRoot())
+                .modules(new HumanModule(), new AnimalModule())
+                .build();
         assertTrue(config.getSchemaMediator() instanceof CompositeMediator);
 
         final Set<Class<? extends RealmModel>> realmClasses = config.getRealmObjectClasses();
