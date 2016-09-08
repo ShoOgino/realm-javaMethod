@@ -1,0 +1,25 @@
+    @Test
+    public void userAndServerUrlRequired() {
+        SyncConfiguration.Builder builder;
+
+        // Both missing
+        builder = new SyncConfiguration.Builder(context);
+        try {
+            builder.build();
+        } catch (IllegalStateException ignore) {
+        }
+
+        builder = new SyncConfiguration.Builder(context);
+        try {
+            builder.user(createTestUser(Long.MAX_VALUE)).build();
+        } catch (IllegalStateException ignore) {
+        }
+
+        // user missing
+        builder = new SyncConfiguration.Builder(context);
+        try {
+            builder.serverUrl("realm://foo.bar/~/default").build();
+        } catch (IllegalStateException ignore) {
+        }
+    }
+

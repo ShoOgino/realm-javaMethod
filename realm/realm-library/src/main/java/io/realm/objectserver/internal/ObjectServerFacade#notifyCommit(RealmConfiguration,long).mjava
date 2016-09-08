@@ -1,0 +1,10 @@
+    /**
+     * Notify the session for this configuration that a local commit was made.
+     */
+    public static void notifyCommit(RealmConfiguration configuration, long lastSnapshotVersion) {
+        if (SYNC_AVAILABLE && configuration instanceof SyncConfiguration) {
+            Session session = SessionStore.getSession((SyncConfiguration) configuration);
+            session.notifyCommit(lastSnapshotVersion);
+        }
+    }
+

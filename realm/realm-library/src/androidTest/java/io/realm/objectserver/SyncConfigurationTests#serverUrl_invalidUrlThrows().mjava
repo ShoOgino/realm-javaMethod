@@ -1,0 +1,22 @@
+    @Test
+    public void serverUrl_invalidUrlThrows() {
+        String[] invalidUrls = {
+            null,
+// TODO Should these two fail?
+//            "objectserver.realm.io/~/default", // Missing protocol. TODO Should we just default to one?
+//            "/~/default", // Missing server
+            "realm://objectserver.realm.io/~/default.realm", // Ending with .realm
+            "realm://objectserver.realm.io/<~>/default.realm", // Invalid chars <>
+            "realm://objectserver.realm.io/~/default.realm/", // Ending with /
+        };
+
+        SyncConfiguration.Builder builder = new SyncConfiguration.Builder(context);
+        for (String invalidUrl : invalidUrls) {
+            try {
+                builder.serverUrl(invalidUrl);
+                fail(invalidUrl + " should have failed.");
+            } catch (IllegalArgumentException ignore) {
+            }
+        }
+    }
+

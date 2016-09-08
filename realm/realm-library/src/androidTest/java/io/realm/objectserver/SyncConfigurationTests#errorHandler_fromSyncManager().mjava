@@ -1,0 +1,20 @@
+    @Test
+    public void errorHandler_fromSyncManager() {
+        // Set default error handler
+        Session.ErrorHandler errorHandler = new Session.ErrorHandler() {
+            @Override
+            public void onError(Session session, ObjectServerError error) {
+
+            }
+        };
+        SyncManager.setDefaultSessionErrorHandler(errorHandler);
+
+        // Create configuration using the default handler
+        SyncConfiguration config = new SyncConfiguration.Builder(context)
+                .user(User.createLocal())
+                .serverUrl("realm://objectserver.realm.io/default")
+                .build();
+        assertEquals(errorHandler, config.getErrorHandler());
+        SyncManager.setDefaultSessionErrorHandler(null);
+    }
+

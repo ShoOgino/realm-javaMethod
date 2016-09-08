@@ -1,0 +1,15 @@
+    @Override
+    public boolean onError(Session session, ObjectServerError error) {
+        switch(error.category()) {
+            case FATAL:
+                return false;   // Report all fatal errors to the user
+            case INFO:
+                return true;     // Ignore all INFO errors
+            case RECOVERABLE:
+                rebind(session);
+                return true;
+            default:
+                return false;
+        }
+    }
+

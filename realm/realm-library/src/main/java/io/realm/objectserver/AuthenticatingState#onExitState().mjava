@@ -1,0 +1,15 @@
+    @Override
+    public void onExitState() {
+        // Abort any current network request.
+        if (session.networkRequest != null) {
+            session.networkRequest.cancel();
+            session.networkRequest = null;
+        }
+
+        // Release listener if we were waiting for network to become available.
+        if (session.networkListener != null) {
+            NetworkStateReceiver.removeListener(session.networkListener);
+            session.networkListener = null;
+        }
+    }
+

@@ -1,0 +1,10 @@
+    @Override
+    public AuthenticateResponse authenticateRealm(Token refreshToken, URI path, URL authenticationUrl) {
+        try {
+            String requestBody = AuthenticateRequest.fromRefreshToken(refreshToken, path).toJson();
+            return authenticate(authenticationUrl, requestBody);
+        } catch (Exception e) {
+            return new AuthenticateResponse(new ObjectServerError(ErrorCode.UNKNOWN, e));
+        }
+    }
+

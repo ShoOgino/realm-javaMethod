@@ -1,0 +1,43 @@
+        /**
+         * Enable server side synchronization for this Realm. The name should be a unique URL that identifies the Realm.
+         * {@code /~/} can be used as a placeholder for a user ID in case the Realm should only be available to one
+         * user, e.g. {@code "realm://objectserver.realm.io/~/default"}
+         *
+         * The `/~/` will automatically be replaced with the user ID when creating the {@link SyncConfiguration}.
+         *
+         * The URL also defines the local location on the device. The default location of a synchronized Realm file is
+         * {@code /data/data/<packageName>/files/realm-object-server/<user-id>/<last-path-segment>}.
+         *
+         * This behaviour can be overwritten using {@link #name(String)} and {@link #directory(File)}.
+         *
+         * @param url URL identifying the Realm.
+         * @throws IllegalArgumentException if the URL is not valid.
+         */
+        public Builder serverUrl(String url) {
+            if (url == null) {
+                throw new IllegalArgumentException("Non-null 'url' required.");
+            }
+            try {
+                this.serverUrl = new URI(url);
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Invalid url: " + url, e);
+            }
+
+            // Detect last path segment as it is the default file name
+            String path = serverUrl.getPath();
+            if (path == null) {
+                throw new IllegalArgumentException("Invalid url: " + url);
+            }
+
+            String[] pathSegments = path.split("/");
+            this.defaultLocalFileName = pathSegments[pathSegments.length - 1];
+
+            // Validate filename
+            // TODO Lift this restriction on the Object Server
+            if (defaultLocalFileName.endsWith(".realm")) {
+                throw new IllegalArgumentException("The URL must not end with '.realm': " + url);
+            }
+
+            return this;
+        }
+

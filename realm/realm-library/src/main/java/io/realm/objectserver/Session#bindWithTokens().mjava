@@ -1,0 +1,11 @@
+    // Bind with proper access tokens
+    // Access tokens are presumed to be present and valid at this point
+    void bindWithTokens() {
+        Token accessToken = user.getAccessToken(configuration.getServerUrl());
+        if (accessToken == null) {
+            throw new IllegalStateException("User '" + user.toString() + "' does not have an access token for "
+                    + configuration.getServerUrl());
+        }
+        nativeBind(nativeSessionPointer, configuration.getServerUrl().toString(), accessToken.value());
+    }
+

@@ -1,14 +1,20 @@
     public static SharedRealm getInstance(RealmConfiguration config, RealmNotifier realmNotifier) {
+        String[] userAndServer = ObjectServerFacade.getUserAndServerUrl(config);
+        String rosServerUrl = userAndServer[0];
+        String rosUserToken = userAndServer[1];
+        boolean enable_caching = false; // Handled in Java currently
+        boolean disableFormatUpgrade = false; // TODO Double negatives :/
+        boolean autoChangeNotifications = true;
         long nativeConfigPtr = nativeCreateConfig(
                 config.getPath(),
                 config.getEncryptionKey(),
-                SchemaMode.SCHEMA_MODE_MANUAL.value,
+                rosServerUrl != null ? SchemaMode.SCHEMA_MODE_ADDITIVE.getNativeValue() : SchemaMode.SCHEMA_MODE_MANUAL.getNativeValue(),
                 config.getDurability() == Durability.MEM_ONLY,
-                false,
-                false,
-                true,
-                null,
-                null);
+                enable_caching,
+                disableFormatUpgrade,
+                autoChangeNotifications,
+                rosServerUrl,
+                rosUserToken);
         try {
             return new SharedRealm(nativeGetSharedRealm(nativeConfigPtr, realmNotifier), config, realmNotifier);
         } finally {

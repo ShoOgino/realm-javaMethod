@@ -1,0 +1,14 @@
+    // Goto the next state. The FsmState classes are responsible for calling this method as a reaction to a FsmAction
+    // being called or an internal action triggering a state transition.
+    void nextState(SessionState nextStateDescription) {
+        currentState.exit();
+        FsmState nextState = FSM.get(nextStateDescription);
+        if (nextState == null) {
+            throw new IllegalStateException("No state was configured to handle: " + nextStateDescription);
+        }
+        RealmLog.debug("Session[%s]: %s -> %s", configuration.getServerUrl(), currentStateDescription, nextStateDescription);
+        currentStateDescription = nextStateDescription;
+        currentState = nextState;
+        nextState.entry(this);
+    }
+

@@ -1,0 +1,31 @@
+    /**
+     * Helper method for creating the proper Authenticate response. This method will set the appropriate error
+     * depending on any HTTP response codes or IO errors.
+     */
+    public static AuthenticateResponse createFrom(Response response) {
+        String serverResponse;
+        try {
+            serverResponse = response.body().string();
+        } catch (IOException e) {
+            ObjectServerError error = new ObjectServerError(ErrorCode.IO_EXCEPTION, e);
+            return new AuthenticateResponse(error);
+        }
+        RealmLog.debug("Authenticate response: " + serverResponse);
+        if (response.code() != 200) {
+            try {
+                JSONObject obj = new JSONObject(serverResponse);
+                String type = obj.getString("type");
+                String hint = obj.optString("hint", null);
+                ErrorCode errorCode = ErrorCode.fromAuthError(type);
+                ObjectServerError error = new ObjectServerError(errorCode, hint);
+                return new AuthenticateResponse(error);
+            } catch (JSONException e) {
+                ObjectServerError error = new ObjectServerError(ErrorCode.JSON_EXCEPTION, "Server failed with " +
+                        response.code() + ", but could not parse error.", e);
+                return new AuthenticateResponse(error);
+            }
+        } else {
+            return new AuthenticateResponse(serverResponse);
+        }
+    }
+

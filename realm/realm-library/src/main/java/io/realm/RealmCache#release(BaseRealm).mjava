@@ -50,13 +50,16 @@
             for (RealmCacheType type : RealmCacheType.values()) {
                 totalRefCount += cache.refAndCountMap.get(type).globalCount;
             }
-            // No more instance of typed Realm and dynamic Realm. Remove the configuration from cache.
-            if (totalRefCount == 0) {
-                cachesMap.remove(canonicalPath);
-            }
 
             // No more local reference to this Realm in current thread, close the instance.
             realm.doClose();
+
+            // No more instance of typed Realm and dynamic Realm. Remove the configuration from cache.
+            if (totalRefCount == 0) {
+                cachesMap.remove(canonicalPath);
+                ObjectServerFacade.realmClosed(realm.getConfiguration());
+            }
+
         } else {
             refAndCount.localCount.set(refCount);
         }

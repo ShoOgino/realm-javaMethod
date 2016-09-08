@@ -1,0 +1,16 @@
+    public String toJson() {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("token", value);
+            obj.put("expires", expires);
+            JSONArray perms = new JSONArray();
+            for (int i = 0; i < permissions.length; i++) {
+                perms.put(permissions[i].toString().toLowerCase(Locale.US));
+            }
+            obj.put("access", perms);
+            return obj.toString();
+        } catch (JSONException e) {
+            throw new RuntimeException("Could not convert Token to JSON.", e);
+        }
+    }
+

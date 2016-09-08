@@ -1,0 +1,24 @@
+    /**
+     * Returns a JSON token representing this user.
+     *
+     * Possession of this JSON token can potentially grant access to data stored on the Realm Object Server, so it
+     * should be treated as sensitive data.
+     *
+     * @return JSON string representing this user. It can be converted back into a real user object using
+     *         {@link #fromJson(String)}.
+     *
+     * @see #fromJson(String)
+     */
+    public String toJson() {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("identifier", identifier);
+            obj.put("refreshToken", refreshToken.toJson());
+            obj.put("authUrl", authentificationUrl);
+            // FIXME: Add support for  storing access tokens as well
+           return obj.toString();
+        } catch (JSONException e) {
+            throw new RuntimeException("Could not convert User to JSON", e);
+        }
+    }
+

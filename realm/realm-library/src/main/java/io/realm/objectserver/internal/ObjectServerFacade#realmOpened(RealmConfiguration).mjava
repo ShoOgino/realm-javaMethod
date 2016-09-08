@@ -1,0 +1,9 @@
+    public static void realmOpened(RealmConfiguration configuration) {
+        if (SYNC_AVAILABLE && configuration instanceof SyncConfiguration) {
+            SyncConfiguration syncConfig = (SyncConfiguration) configuration;
+            Session session = SessionStore.getSession(syncConfig);
+            session.getSyncPolicy().onRealmOpened(session);
+        }
+
+    }
+

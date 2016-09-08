@@ -1,0 +1,17 @@
+    /**
+     /**
+     * Creates a new Object Server Session
+     *
+     * @param syncConfiguration Sync configuration defining this session
+     * @param authServer Authentication server used to refresh credentials if needed
+     * @param policy Sync Policy to use by this Session.
+     */
+    public Session(SyncConfiguration syncConfiguration, AuthenticationServer authServer, SyncPolicy policy) {
+        this.configuration = syncConfiguration;
+        this.user = configuration.getUser();
+        this.authServer = authServer;
+        this.errorHandler = configuration.getErrorHandler();
+        this.syncPolicy = policy;
+        setupStateMachine();
+    }
+

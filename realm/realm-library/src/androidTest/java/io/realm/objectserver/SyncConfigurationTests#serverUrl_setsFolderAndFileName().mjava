@@ -1,0 +1,24 @@
+    @Test
+    public void serverUrl_setsFolderAndFileName() {
+        User user = User.createLocal();
+        String[][] validUrls = {
+                // <URL>, <Folder>, <FileName>
+                { "realm://objectserver.realm.io/~/default", "realm-object-server/" + user.getIdentifier(), "default" },
+                { "realm://objectserver.realm.io/~/sub/default", "realm-object-server/" + user.getIdentifier() + "/sub", "default" }
+        };
+
+        for (String[] validUrl : validUrls) {
+            String serverUrl  = validUrl[0];
+            String expectedFolder = validUrl[1];
+            String expectedFileName = validUrl[2];
+
+            SyncConfiguration config = new SyncConfiguration.Builder(context)
+                    .serverUrl(serverUrl)
+                    .user(user)
+                    .build();
+
+            assertEquals(new File(context.getFilesDir(), expectedFolder), config.getRealmDirectory());
+            assertEquals(expectedFileName, config.getRealmFileName());
+        }
+    }
+

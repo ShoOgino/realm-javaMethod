@@ -1,0 +1,12 @@
+    private void setupStateMachine() {
+        FSM.put(SessionState.INITIAL, new InitialState());
+        FSM.put(SessionState.UNBOUND, new UnboundState());
+        FSM.put(SessionState.BINDING, new BindingState());
+        FSM.put(SessionState.AUTHENTICATING, new AuthenticatingState());
+        FSM.put(SessionState.BOUND, new BoundState());
+        FSM.put(SessionState.STOPPED, new StoppedState());
+        RealmLog.debug("Session started: " + configuration.getServerUrl());
+        currentState = FSM.get(SessionState.INITIAL);
+        currentState.entry(this);
+    }
+

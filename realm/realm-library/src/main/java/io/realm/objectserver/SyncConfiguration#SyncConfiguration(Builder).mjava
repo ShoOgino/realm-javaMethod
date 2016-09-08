@@ -1,0 +1,32 @@
+    private SyncConfiguration(Builder builder) {
+        super(builder);
+        if (builder.serverUrl == null || builder.user == null) {
+            throw new IllegalStateException("serverUrl() and user() are both required.");
+        }
+
+        // Check if the user has an identifier, if not, it cannot use /~/.
+        if (builder.serverUrl.toString().contains("/~/") && builder.user.getIdentifier() == null) {
+            throw new IllegalStateException("The serverUrl contained a /~/, but the user does not have an identifier," +
+                    " most likely because it hasn't been authenticated yet or have been created directly from an" +
+                    " access token. Use a path without /~/.");
+        }
+
+        this.user = builder.user;
+        this.serverUrl = getFullServerUrl(builder.serverUrl, user.getIdentifier());
+        this.syncPolicy = builder.syncPolicy;
+        this.errorHandler = builder.errorHandler;
+
+        // Determine location on disk
+        // Use the serverUrl + user to create a unique filepath unless it has been explicitly overridden.
+        // <rootDir>/<serverPath>/<serverFileNameOrOverriddenFileName>
+        File rootDir = builder.overrideDefaultFolder ? super.getRealmDirectory() : builder.defaultFolder;
+        String realmPath = getServerPath(serverUrl);
+        this.realmDirectory = new File(rootDir, realmPath);
+        // Create the folder on disk (if needed)
+        if (!realmDirectory.exists() && !realmDirectory.mkdirs()) {
+            throw new IllegalStateException("Could not create directory for saving the Realm: " + realmDirectory);
+        }
+        this.realmFileName = builder.overrideDefaultLocalFileName ? super.getRealmFileName() : builder.defaultLocalFileName;
+        this.canonicalPath = getCanonicalPath(new File(realmDirectory, realmFileName));
+    }
+

@@ -1,0 +1,18 @@
+    /**
+     * Removes a session. Should only be once it has been closed.
+     */
+    static synchronized void removeSession(Session session) {
+        if (session == null) {
+            return;
+        }
+
+        Iterator<Map.Entry<String, Session>> it = sessions.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Session> entry = it.next();
+            if (entry.getValue().equals(session)) {
+                it.remove();
+                break;
+            }
+        }
+    }
+

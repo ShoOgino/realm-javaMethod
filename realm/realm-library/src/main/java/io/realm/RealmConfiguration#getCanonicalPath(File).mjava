@@ -1,0 +1,11 @@
+    // Get the canonical path for a given file
+    protected static String getCanonicalPath(File realmFile) {
+        try {
+            return realmFile.getCanonicalPath();
+        } catch (IOException e) {
+            throw new RealmFileException(RealmFileException.Kind.ACCESS_ERROR,
+                    "Could not resolve the canonical path to the Realm file: " + realmFile.getAbsolutePath(),
+                    e);
+        }
+    }
+
