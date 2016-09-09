@@ -1,13 +1,24 @@
-    /**
-     * Add an empty row to the table which doesn't have a primary key defined.
-     * <p>
-     * NOTE: To add a table with a primary key defined, use {@link #addEmptyRowWithPrimaryKey(Object)} instead. This
-     * won't check if this table has a primary key.
-     *
-     * @return row index.
-     */
     public long addEmptyRow() {
         checkImmutable();
+        if (hasPrimaryKey()) {
+            long primaryKeyColumnIndex = getPrimaryKey();
+            RealmFieldType type = getColumnType(primaryKeyColumnIndex);
+            switch (type) {
+                case STRING:
+                    if (findFirstString(primaryKeyColumnIndex, STRING_DEFAULT_VALUE) != NO_MATCH) {
+                        throwDuplicatePrimaryKeyException(STRING_DEFAULT_VALUE);
+                    }
+                    break;
+                case INTEGER:
+                    if (findFirstLong(primaryKeyColumnIndex, INTEGER_DEFAULT_VALUE) != NO_MATCH) {
+                        throwDuplicatePrimaryKeyException(INTEGER_DEFAULT_VALUE);
+                    }
+                    break;
+                default:
+                    throw new RealmException("Cannot check for duplicate rows for unsupported primary key type: " + type);
+            }
+        }
+
         return nativeAddEmptyRow(nativePtr, 1);
     }
 

@@ -1,14 +1,13 @@
     /**
      * Creates a Realm object pre-filled with data from a JSON object. This must be done inside a transaction. JSON
-     * properties with unknown properties will be ignored. If a {@link RealmObject} field is not present in the JSON
-     * object the {@link RealmObject} field will be set to the default value for that type.
+     * properties with {@code null} values will map to the default value for the data type in Realm and unknown properties will
+     * be ignored. If a {@link RealmObject} field is not present in the JSON object the {@link RealmObject} field will
+     * be set to the default value for that type.
      *
      * @param clazz type of Realm object to create.
      * @param json the JSON string with object data.
      * @return created object or {@code null} if JSON string was empty or null.
      * @throws RealmException if mapping to json failed.
-     * @throws IllegalArgumentException if the JSON object doesn't have a primary key property but the corresponding
-     * {@link RealmObjectSchema} has a {@link io.realm.annotations.PrimaryKey} defined.
      */
     public <E extends RealmModel> E createObjectFromJson(Class<E> clazz, String json) {
         if (clazz == null || json == null || json.length() == 0) {

@@ -2,8 +2,7 @@
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static some.test.AllTypes createUsingJsonStream(Realm realm, JsonReader reader)
             throws IOException {
-        boolean jsonHasPrimaryKey = false;
-        some.test.AllTypes obj = new some.test.AllTypes();
+        some.test.AllTypes obj = realm.createObject(some.test.AllTypes.class);
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
@@ -14,7 +13,6 @@
                 } else {
                     ((AllTypesRealmProxyInterface) obj).realmSet$columnString((String) reader.nextString());
                 }
-                jsonHasPrimaryKey = true;
             } else if (name.equals("columnLong")) {
                 if (reader.peek() == JsonToken.NULL) {
                     reader.skipValue();
@@ -75,7 +73,6 @@
                     reader.skipValue();
                     ((AllTypesRealmProxyInterface) obj).realmSet$columnRealmList(null);
                 } else {
-                    ((AllTypesRealmProxyInterface) obj).realmSet$columnRealmList(new RealmList<some.test.AllTypes>());
                     reader.beginArray();
                     while (reader.hasNext()) {
                         some.test.AllTypes item = AllTypesRealmProxy.createUsingJsonStream(realm, reader);
@@ -88,10 +85,6 @@
             }
         }
         reader.endObject();
-        if (!jsonHasPrimaryKey) {
-            throw new IllegalArgumentException("JSON object doesn't have the primary key field 'columnString'.");
-        }
-        obj = realm.copyToRealm(obj);
         return obj;
     }
 

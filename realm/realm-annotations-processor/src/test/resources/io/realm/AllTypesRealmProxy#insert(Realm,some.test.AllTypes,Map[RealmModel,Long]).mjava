@@ -14,7 +14,10 @@
             rowIndex = Table.nativeFindFirstString(tableNativePtr, pkColumnIndex, primaryKeyValue);
         }
         if (rowIndex == TableOrView.NO_MATCH) {
-            rowIndex = table.addEmptyRowWithPrimaryKey(primaryKeyValue, false);
+            rowIndex = Table.nativeAddEmptyRow(tableNativePtr, 1);
+            if (primaryKeyValue != null) {
+                Table.nativeSetString(tableNativePtr, pkColumnIndex, rowIndex, (String)primaryKeyValue);
+            }
         } else {
             Table.throwDuplicatePrimaryKeyException(primaryKeyValue);
         }

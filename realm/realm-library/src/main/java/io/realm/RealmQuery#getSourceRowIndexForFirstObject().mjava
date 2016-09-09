@@ -1,5 +1,14 @@
     private long getSourceRowIndexForFirstObject() {
-        long tableRowIndex = this.query.find();
-        return tableRowIndex;
+        long rowIndex = this.query.find();
+        if (rowIndex < 0) {
+            return rowIndex;
+        }
+        if (this.view != null) {
+            return view.getTargetRowIndex(rowIndex);
+        } else if (table instanceof TableView){
+            return ((TableView) table).getSourceRowIndex(rowIndex);
+        } else {
+            return rowIndex;
+        }
     }
 

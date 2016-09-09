@@ -1,11 +1,62 @@
-    /**
-     * Add an empty row to the table and set the primary key with the given value. Equivalent to call
-     * {@link #addEmptyRowWithPrimaryKey(Object, boolean)} with {@code validation = true}.
-     *
-     * @param primaryKeyValue the primary key value
-     * @return the row index.
-     */
     public long addEmptyRowWithPrimaryKey(Object primaryKeyValue) {
-        return addEmptyRowWithPrimaryKey(primaryKeyValue, true);
+        checkImmutable();
+        checkHasPrimaryKey();
+
+        long primaryKeyColumnIndex = getPrimaryKey();
+        RealmFieldType type = getColumnType(primaryKeyColumnIndex);
+        long rowIndex;
+        UncheckedRow row;
+
+        // Add with primary key initially set
+        if (primaryKeyValue == null) {
+            switch (type) {
+                case STRING:
+                case INTEGER:
+                    if (findFirstNull(primaryKeyColumnIndex) != NO_MATCH) {
+                        throwDuplicatePrimaryKeyException("null");
+                    }
+                    rowIndex = nativeAddEmptyRow(nativePtr, 1);
+                    row = getUncheckedRow(rowIndex);
+                    row.setNull(primaryKeyColumnIndex);
+                    break;
+
+                default:
+                    throw new RealmException("Cannot check for duplicate rows for unsupported primary key type: " + type);
+            }
+
+        } else {
+            switch (type) {
+                case STRING:
+                    if (!(primaryKeyValue instanceof String)) {
+                        throw new IllegalArgumentException("Primary key value is not a String: " + primaryKeyValue);
+                    }
+                    if (findFirstString(primaryKeyColumnIndex, (String) primaryKeyValue) != NO_MATCH) {
+                        throwDuplicatePrimaryKeyException(primaryKeyValue);
+                    }
+                    rowIndex = nativeAddEmptyRow(nativePtr, 1);
+                    row = getUncheckedRow(rowIndex);
+                    row.setString(primaryKeyColumnIndex, (String) primaryKeyValue);
+                    break;
+
+                case INTEGER:
+                    long pkValue;
+                    try {
+                        pkValue = Long.parseLong(primaryKeyValue.toString());
+                    } catch (RuntimeException e) {
+                        throw new IllegalArgumentException("Primary key value is not a long: " + primaryKeyValue);
+                    }
+                    if (findFirstLong(primaryKeyColumnIndex, pkValue) != NO_MATCH) {
+                        throwDuplicatePrimaryKeyException(pkValue);
+                    }
+                    rowIndex = nativeAddEmptyRow(nativePtr, 1);
+                    row = getUncheckedRow(rowIndex);
+                    row.setLong(primaryKeyColumnIndex, pkValue);
+                    break;
+
+                default:
+                    throw new RealmException("Cannot check for duplicate rows for unsupported primary key type: " + type);
+            }
+        }
+        return rowIndex;
     }
 

@@ -1,6 +1,6 @@
         @Override
         public void emitStreamTypeConversion(String interfaceName, String setter, String fieldName, String fieldType,
-                                             JavaWriter writer, boolean isPrimaryKey)
+                                             JavaWriter writer)
                 throws IOException {
             String statementSetNullOrThrow;
             if (Utils.isPrimitiveType(fieldType)) {
@@ -17,8 +17,5 @@
                 .nextControlFlow("else")
                     .emitStatement("((%s) obj).%s((%s) reader.next%s())", interfaceName, setter, castType, jsonType)
                 .endControlFlow();
-            if (isPrimaryKey) {
-                writer.emitStatement("jsonHasPrimaryKey = true");
-            }
         }
 
