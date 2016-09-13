@@ -1,4 +1,5 @@
-    public static SharedRealm getInstance(RealmConfiguration config, RealmNotifier realmNotifier) {
+    public static SharedRealm getInstance(RealmConfiguration config, RealmNotifier realmNotifier,
+                                          SchemaVersionListener schemaVersionListener) {
         long nativeConfigPtr = nativeCreateConfig(
                 config.getPath(),
                 config.getEncryptionKey(),
@@ -8,7 +9,11 @@
                 false,
                 true);
         try {
-            return new SharedRealm(nativeGetSharedRealm(nativeConfigPtr, realmNotifier), config, realmNotifier);
+            return new SharedRealm(
+                    nativeGetSharedRealm(nativeConfigPtr, realmNotifier),
+                    config,
+                    realmNotifier,
+                    schemaVersionListener);
         } finally {
             nativeCloseConfig(nativeConfigPtr);
         }

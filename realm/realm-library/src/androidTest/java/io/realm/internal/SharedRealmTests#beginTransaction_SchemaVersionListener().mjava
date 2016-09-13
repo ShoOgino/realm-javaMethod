@@ -1,0 +1,39 @@
+    @Test
+    public void beginTransaction_SchemaVersionListener() {
+        final AtomicBoolean listenerCalled = new AtomicBoolean(false);
+        final AtomicLong schemaVersionFromListener = new AtomicLong(-1L);
+
+        sharedRealm.close();
+        sharedRealm = SharedRealm.getInstance(config, null, new SharedRealm.SchemaVersionListener() {
+            @Override
+            public void onSchemaVersionChanged(long currentVersion) {
+                listenerCalled.set(true);
+                schemaVersionFromListener.set(currentVersion);
+            }
+        });
+
+        final long before = sharedRealm.getSchemaVersion();
+
+        sharedRealm.beginTransaction();
+        try {
+            // listener is not called if there was no schema change
+            assertFalse(listenerCalled.get());
+
+            // change the schema version
+            sharedRealm.setSchemaVersion(before + 1);
+        } finally {
+            sharedRealm.commitTransaction();
+        }
+
+        // listener is not yet called
+        assertFalse(listenerCalled.get());
+
+        sharedRealm.beginTransaction();
+        try {
+            assertTrue(listenerCalled.get());
+            assertEquals(before + 1, schemaVersionFromListener.get());
+        } finally {
+            sharedRealm.cancelTransaction();
+        }
+    }
+

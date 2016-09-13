@@ -18,9 +18,11 @@
                 if (version == UNVERSIONED) {
                     mediator.createTable(modelClass, realm.sharedRealm);
                 }
-                columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm));
+                columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm, false));
             }
-            realm.schema.columnIndices = new ColumnIndices(columnInfoMap);
+            realm.schema.columnIndices = new ColumnIndices(
+                    (version == UNVERSIONED) ? realm.configuration.getSchemaVersion() : version,
+                    columnInfoMap);
 
             if (version == UNVERSIONED) {
                 final Transaction transaction = realm.getConfiguration().getInitialDataTransaction();

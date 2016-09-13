@@ -1,0 +1,44 @@
+    @Test
+    public void copyColumnInfoFrom_checkIndex() {
+        final RealmProxyMediator mediator = realm.getConfiguration().getSchemaMediator();
+        final CatRealmProxy.CatColumnInfo sourceColumnInfo, targetColumnInfo;
+        sourceColumnInfo = (CatRealmProxy.CatColumnInfo) mediator.validateTable(Cat.class, realm.sharedRealm, false);
+        targetColumnInfo = (CatRealmProxy.CatColumnInfo) mediator.validateTable(Cat.class, realm.sharedRealm, false);
+
+        // check precondition
+        assertNotSame(sourceColumnInfo, targetColumnInfo);
+        assertNotSame(sourceColumnInfo.getIndicesMap(), targetColumnInfo.getIndicesMap());
+
+        sourceColumnInfo.nameIndex = 1;
+        sourceColumnInfo.ageIndex = 2;
+        sourceColumnInfo.heightIndex = 3;
+        sourceColumnInfo.weightIndex = 4;
+        sourceColumnInfo.hasTailIndex = 5;
+        sourceColumnInfo.birthdayIndex = 6;
+        sourceColumnInfo.ownerIndex = 7;
+        sourceColumnInfo.scaredOfDogIndex = 8;
+
+        targetColumnInfo.nameIndex = 0;
+        targetColumnInfo.ageIndex = 0;
+        targetColumnInfo.heightIndex = 0;
+        targetColumnInfo.weightIndex = 0;
+        targetColumnInfo.hasTailIndex = 0;
+        targetColumnInfo.birthdayIndex = 0;
+        targetColumnInfo.ownerIndex = 0;
+        targetColumnInfo.scaredOfDogIndex = 0;
+
+        targetColumnInfo.copyColumnInfoFrom(sourceColumnInfo);
+
+        assertEquals(1, targetColumnInfo.nameIndex);
+        assertEquals(2, targetColumnInfo.ageIndex);
+        assertEquals(3, targetColumnInfo.heightIndex);
+        assertEquals(4, targetColumnInfo.weightIndex);
+        assertEquals(5, targetColumnInfo.hasTailIndex);
+        assertEquals(6, targetColumnInfo.birthdayIndex);
+        assertEquals(7, targetColumnInfo.ownerIndex);
+        assertEquals(8, targetColumnInfo.scaredOfDogIndex);
+
+        // current implementation shares the indices map.
+        assertSame(sourceColumnInfo.getIndicesMap(), targetColumnInfo.getIndicesMap());
+    }
+

@@ -1,0 +1,24 @@
+    @Test
+    public void copyFrom() {
+        final long sourceSchemaVersion = 101;
+        final long targetSchemaVersion = 100;
+
+        final ColumnIndices source = create(sourceSchemaVersion);
+        final ColumnIndices target = create(targetSchemaVersion);
+
+        final CatRealmProxy.CatColumnInfo catColumnInfoInSource = (CatRealmProxy.CatColumnInfo) source.getColumnInfo(Cat.class);
+        final CatRealmProxy.CatColumnInfo catColumnInfoInTarget = (CatRealmProxy.CatColumnInfo) target.getColumnInfo(Cat.class);
+
+        catColumnInfoInSource.nameIndex++;
+
+        // check preconditions
+        assertNotEquals(catColumnInfoInSource.nameIndex, catColumnInfoInTarget.nameIndex);
+        assertNotSame(catColumnInfoInSource.getIndicesMap(), catColumnInfoInTarget.getIndicesMap());
+
+        target.copyFrom(source,  mediator);
+
+        assertEquals(sourceSchemaVersion, target.getSchemaVersion());
+        assertEquals(catColumnInfoInSource.nameIndex, catColumnInfoInTarget.nameIndex);
+        assertSame(catColumnInfoInSource.getIndicesMap(), catColumnInfoInTarget.getIndicesMap());
+    }
+

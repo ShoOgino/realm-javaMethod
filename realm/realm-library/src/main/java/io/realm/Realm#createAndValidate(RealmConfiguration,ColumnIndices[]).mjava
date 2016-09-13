@@ -1,7 +1,8 @@
-    static Realm createAndValidate(RealmConfiguration configuration, ColumnIndices columnIndices) {
+    static Realm createAndValidate(RealmConfiguration configuration, ColumnIndices[] globalCacheArray) {
         Realm realm = new Realm(configuration);
         long currentVersion = realm.getVersion();
         long requiredVersion = configuration.getSchemaVersion();
+        final ColumnIndices columnIndices = RealmCache.findColumnIndices(globalCacheArray, requiredVersion);
         if (currentVersion != UNVERSIONED && currentVersion < requiredVersion && columnIndices == null) {
             realm.doClose();
             throw new RealmMigrationNeededException(configuration.getPath(), String.format("Realm on disk need to migrate from v%s to v%s", currentVersion, requiredVersion));
@@ -20,7 +21,8 @@
                 throw e;
             }
         } else {
-            realm.schema.columnIndices = columnIndices;
+            // copy global cache as a Realm local indices cache
+            realm.schema.columnIndices = columnIndices.clone();
         }
 
         return realm;

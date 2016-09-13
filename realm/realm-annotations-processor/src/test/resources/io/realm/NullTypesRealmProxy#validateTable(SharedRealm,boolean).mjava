@@ -1,8 +1,16 @@
-    public static NullTypesColumnInfo validateTable(SharedRealm sharedRealm) {
+    public static NullTypesColumnInfo validateTable(SharedRealm sharedRealm, boolean allowExtraColumns) {
         if (sharedRealm.hasTable("class_NullTypes")) {
             Table table = sharedRealm.getTable("class_NullTypes");
-            if (table.getColumnCount() != 21) {
-                throw new RealmMigrationNeededException(sharedRealm.getPath(), "Field count does not match - expected 21 but was " + table.getColumnCount());
+            final long columnCount = table.getColumnCount();
+            if (columnCount != 21) {
+                if (columnCount < 21) {
+                    throw new RealmMigrationNeededException(sharedRealm.getPath(), "Field count is less than expected - expected 21 but was " + columnCount);
+                }
+                if (allowExtraColumns) {
+                    RealmLog.debug("Field count is more than expected - expected 21 but was %1$d", columnCount);
+                } else {
+                    throw new RealmMigrationNeededException(sharedRealm.getPath(), "Field count is more than expected - expected 21 but was " + columnCount);
+                }
             }
             Map<String, RealmFieldType> columnTypes = new HashMap<String, RealmFieldType>();
             for (long i = 0; i < 21; i++) {
