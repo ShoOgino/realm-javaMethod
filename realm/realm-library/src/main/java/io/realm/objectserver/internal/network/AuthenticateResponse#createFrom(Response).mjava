@@ -16,8 +16,9 @@
                 JSONObject obj = new JSONObject(serverResponse);
                 String type = obj.getString("type");
                 String hint = obj.optString("hint", null);
-                ErrorCode errorCode = ErrorCode.fromAuthError(type);
-                ObjectServerError error = new ObjectServerError(errorCode, hint);
+                String title = obj.optString("title", null);
+                ErrorCode errorCode = ErrorCode.fromInt(obj.optInt("code", -1));
+                ObjectServerError error = new ObjectServerError(errorCode, title, hint, type);
                 return new AuthenticateResponse(error);
             } catch (JSONException e) {
                 ObjectServerError error = new ObjectServerError(ErrorCode.JSON_EXCEPTION, "Server failed with " +

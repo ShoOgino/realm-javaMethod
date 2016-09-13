@@ -1,15 +1,18 @@
     private User createTestUser(long expires) {
         JSONObject obj = new JSONObject();
         try {
-            obj.put("identifier", UUID.randomUUID().toString());
             JSONObject token = new JSONObject();
+            token.put("token", UUID.randomUUID().toString());
+            JSONObject tokenData = new JSONObject();
             JSONArray perms = new JSONArray(); // Grant all permissions
             for (int i = 0; i < Token.Permission.values().length; i++) {
                 perms.put(Token.Permission.values()[i].toString().toLowerCase(Locale.US));
             }
-            token.put("access", perms);
-            token.put("token", UUID.randomUUID().toString());
-            token.put("expires", expires);
+            tokenData.put("identity", UUID.randomUUID().toString());
+            tokenData.put("path", null);
+            tokenData.put("expires", expires);
+            tokenData.put("access", perms);
+            token.put("token_data", tokenData);
             obj.put("refreshToken", token);
             obj.put("authUrl", "http://dummy.org/auth");
             return User.fromJson(obj.toString());

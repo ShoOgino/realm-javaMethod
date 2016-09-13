@@ -11,23 +11,15 @@
         Token refreshToken;
         try {
             JSONObject obj = new JSONObject(serverResponse);
-            identifier = obj.getString("identity");
-            path = obj.optString("path");
-            appId = obj.optString("app_id"); // FIXME No longer sent?
-            accessToken = obj.has("token") ? Token.from(obj) : null;
-            refreshToken = obj.has("refresh") ? Token.from(obj.getJSONObject("refresh")) : null;
+            accessToken = obj.has("accessToken") ? Token.from(obj.getJSONObject("accessToken")) : null;
+            refreshToken = obj.has("refreshToken") ? Token.from(obj.getJSONObject("refreshToken")) : null;
             error = null;
         } catch (JSONException ex) {
-            identifier = null;
-            path =  null;
-            appId = null;
             accessToken = null;
             refreshToken = null;
             error = new ObjectServerError(ErrorCode.JSON_EXCEPTION, ex);
         }
-        this.identifier = identifier;
-        this.path = path;
-        this.appId = appId;
+
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.error = error;

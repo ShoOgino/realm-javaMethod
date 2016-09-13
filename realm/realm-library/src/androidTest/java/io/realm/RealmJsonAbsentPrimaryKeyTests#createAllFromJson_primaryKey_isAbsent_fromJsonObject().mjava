@@ -1,0 +1,11 @@
+    // Testing absent primary key value for createAllFromJson()
+    @Test
+    public void createAllFromJson_primaryKey_isAbsent_fromJsonObject() throws JSONException {
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put(new JSONObject(jsonString));
+        realm.beginTransaction();
+        thrown.expect(IllegalArgumentException.class);
+        realm.createAllFromJson(clazz, jsonArray);
+        realm.commitTransaction();
+    }
+
