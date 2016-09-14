@@ -23,6 +23,11 @@
                 String setter = metadata.getSetter(fieldName);
                 String getter = metadata.getGetter(fieldName);
 
+                if (field.equals(metadata.getPrimaryKey())) {
+                    // PK has been set when creating object.
+                    continue;
+                }
+
                 if (Utils.isRealmModel(field)) {
                     writer
                         .emitEmptyLine()

@@ -3,12 +3,13 @@
         populateTestRealm(realm, TEST_DATA_SIZE);
 
         AllTypesRealmModel typedObj = realm.where(AllTypesRealmModel.class).findFirst();
+        assertNotNull(typedObj);
         DynamicRealmObject dObj = new DynamicRealmObject(typedObj);
 
         realm.beginTransaction();
-        dObj.setLong(AllTypesRealmModel.FIELD_LONG, 42L);
-        assertEquals(42, dObj.getLong(AllTypesRealmModel.FIELD_LONG));
-        assertEquals(42, typedObj.columnLong);
+        dObj.setByte(AllTypesRealmModel.FIELD_BYTE, (byte) 42);
+        assertEquals(42, dObj.getLong(AllTypesRealmModel.FIELD_BYTE));
+        assertEquals(42, typedObj.columnByte);
 
         dObj.setBlob(AllTypesRealmModel.FIELD_BINARY, new byte[]{1, 2, 3});
         Assert.assertArrayEquals(new byte[]{1, 2, 3}, dObj.getBlob(AllTypesRealmModel.FIELD_BINARY));

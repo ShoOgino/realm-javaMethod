@@ -3,6 +3,7 @@
      *
      * @param fieldName field name.
      * @throws IllegalArgumentException if field name doesn't exist, or the field isn't nullable.
+     * @throws RealmException if the field is a {@link io.realm.annotations.PrimaryKey} field.
      */
     public void setNull(String fieldName) {
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
@@ -10,6 +11,7 @@
         if (type == RealmFieldType.OBJECT) {
             proxyState.getRow$realm().nullifyLink(columnIndex);
         } else {
+            checkIsPrimaryKey(fieldName);
             proxyState.getRow$realm().setNull(columnIndex);
         }
     }
