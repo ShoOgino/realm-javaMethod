@@ -1,22 +1,22 @@
     /**
-     * Parse a valid (200) server response. It might still result in a unsuccessful authentication attempt, if the
+     * Parses a valid (200) server response. It might still result in a unsuccessful authentication attempt, if the
      * JSON response could not be parsed correctly.
      */
-    public AuthenticateResponse(String serverResponse) {
+    private AuthenticateResponse(String serverResponse) {
         ObjectServerError error;
-        String identifier;
-        String path;
-        String appId;
         Token accessToken;
         Token refreshToken;
         try {
             JSONObject obj = new JSONObject(serverResponse);
-            accessToken = obj.has("accessToken") ? Token.from(obj.getJSONObject("accessToken")) : null;
-            refreshToken = obj.has("refreshToken") ? Token.from(obj.getJSONObject("refreshToken")) : null;
+            accessToken = obj.has(JSON_FIELD_ACCESS_TOKEN) ?
+                    Token.from(obj.getJSONObject(JSON_FIELD_ACCESS_TOKEN)) : null;
+            refreshToken = obj.has(JSON_FIELD_REFRESH_TOKEN) ?
+                    Token.from(obj.getJSONObject(JSON_FIELD_REFRESH_TOKEN)) : null;
             error = null;
         } catch (JSONException ex) {
             accessToken = null;
             refreshToken = null;
+            //noinspection ThrowableInstanceNeverThrown
             error = new ObjectServerError(ErrorCode.JSON_EXCEPTION, ex);
         }
 
