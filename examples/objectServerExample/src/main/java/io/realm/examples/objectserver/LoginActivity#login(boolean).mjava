@@ -1,0 +1,49 @@
+    public void login(boolean createUser) {
+        if (!validate()) {
+            onLoginFailed("Invalid username or password");
+            return;
+        }
+
+        createUserButton.setEnabled(false);
+        loginButton.setEnabled(false);
+
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Authenticating...");
+        progressDialog.show();
+
+        String username = this.username.getText().toString();
+        String password = this.password.getText().toString();
+
+        Credentials creds = Credentials.fromUsernamePassword(username, password, createUser);
+        String authUrl = "http://" + MyApplication.OBJECT_SERVER_IP + ":8080/auth";
+        User.Callback callback = new User.Callback() {
+            @Override
+            public void onSuccess(User user) {
+                progressDialog.dismiss();
+                userStore.saveAsync(MyApplication.APP_USER_KEY, user); // TODO Use Async
+                MyApplication.CURRENT_USER = user;
+                onLoginSuccess();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                progressDialog.dismiss();
+                String errorMsg;
+                switch (error.errorCode()) {
+                    case UNKNOWN_ACCOUNT:
+                        errorMsg = "Account does not exists.";
+                        break;
+                    case INVALID_CREDENTIALS:
+                        errorMsg = "User name and password does not match";
+                        break;
+                    default:
+                        errorMsg = error.toString();
+                }
+                onLoginFailed(errorMsg);
+            }
+        };
+
+        User.loginAsync(creds, authUrl, callback);
+    }
+
