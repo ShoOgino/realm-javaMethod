@@ -7,6 +7,20 @@
             if (rxFactory == null && isRxJavaAvailable()) {
                 rxFactory = new RealmObservableFactory();
             }
-            return new RealmConfiguration(this);
+
+            return new RealmConfiguration(directory,
+                    fileName,
+                    getCanonicalPath(new File(directory, fileName)),
+                    assetFilePath,
+                    key,
+                    schemaVersion,
+                    migration,
+                    deleteRealmIfMigrationNeeded,
+                    durability,
+                    createSchemaMediator(modules, debugSchema),
+                    rxFactory,
+                    initialDataTransaction,
+                    contextWeakRef
+            );
         }
 

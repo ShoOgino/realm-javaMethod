@@ -2,11 +2,13 @@
          * Sets the local filename for the Realm.
          * This will override the default name defined by the {@link #serverUrl(String)}
          *
-         * @param name name of the local file on disk.
+         * @param filename name of the local file on disk.
          */
-        @Override
-        public Builder name(String name) {
-            super.name(name);
+        public Builder name(String filename) {
+            if (filename == null || filename.isEmpty()) {
+                throw new IllegalArgumentException("A non-empty filename must be provided");
+            }
+            this.fileName = filename;
             this.overrideDefaultLocalFileName = true;
             return this;
         }
