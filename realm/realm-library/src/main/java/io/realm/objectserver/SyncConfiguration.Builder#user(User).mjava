@@ -8,9 +8,8 @@
             if (user == null) {
                 throw new IllegalArgumentException("Non-null `user` required.");
             }
-            if (!user.isAuthenticated()) {
-                throw new IllegalArgumentException("User not authenticated or authentication expired. User ID: "
-                        + user.getIdentifier());
+            if (!user.getSyncUser().isAuthenticated()) {
+                throw new IllegalArgumentException("User not authenticated or authentication expired. User ID: " + user.getIdentity());
             }
             this.user = user;
             return this;

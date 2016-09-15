@@ -7,10 +7,14 @@
      * {@link UserStore}.
      *
      * @param token token to represent user.
+     * @see #getAccessToken()
+     *
      */
     // FIXME Align with Cocoa on naming
     public static User fromToken(String token) {
         // Define a user with unlimited access. Object Server will reject any invalid access anyway.
-        return new User(null, new Token(token, null, null, Long.MAX_VALUE, Token.Permission.values()), null);
+        Token refreshToken = new Token(token, null, null, Long.MAX_VALUE, Token.Permission.values());
+        SyncUser internalUser = new SyncUser(null, refreshToken, null);
+        return new User(internalUser);
     }
 

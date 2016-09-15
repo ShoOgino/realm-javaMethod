@@ -1,0 +1,11 @@
+    /**
+     * Checks if the user has access to the given Realm. Being authenticated means that the
+     * user is know by the Realm Object Server and have been granted access to the given Realm.
+     *
+     * Authenticating will happen automatically as part of opening a Realm.
+     */
+    public boolean isAuthenticated(SyncConfiguration configuration) {
+        Token token = getAccessToken(configuration.getServerUrl());
+        return token != null && token.expiresMs() > System.currentTimeMillis();
+    }
+

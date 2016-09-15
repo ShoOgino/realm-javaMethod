@@ -1,0 +1,55 @@
+    // Authenticate by getting access tokens for the specific Realm
+    void authenticateRealm(final Runnable onSuccess, final Session.ErrorHandler errorHandler) {
+        if (networkRequest != null) {
+            networkRequest.cancel();
+        }
+        // Authenticate in a background thread. This allows incremental backoff and retries in a safe manner.
+        Future<?> task = SyncManager.NETWORK_POOL_EXECUTOR.submit(new Runnable() {
+            @Override
+            public void run() {
+                int attempt = 0;
+                boolean success;
+                ObjectServerError error = null;
+                while (true) {
+                    attempt++;
+                    long sleep = Util.calculateExponentialDelay(attempt - 1, TimeUnit.MINUTES.toMillis(5));
+                    if (sleep > 0) {
+                        try {
+                            Thread.sleep(sleep);
+                        } catch (InterruptedException e) {
+                            return; // Abort authentication if interrupted.
+                        }
+                    }
+
+                    AuthenticateResponse response = authServer.authenticateRealm(
+                            user.getRefreshToken(),
+                            configuration.getServerUrl(),
+                            user.getAuthenticationUrl()
+                    );
+                    if (response.isValid()) {
+                        user.addAccessToken(configuration.getServerUrl(), response.getAccessToken());
+                        success = true;
+                        break;
+                    } else {
+                        // Only retry in case of IO exceptions, since that might be network timeouts etc.
+                        // All other errors indicate a bigger problem, so stop trying to authenticate and
+                        // unbind
+                        ObjectServerError responseError = response.getError();
+                        if (responseError.errorCode() != ErrorCode.IO_EXCEPTION) {
+                            success = false;
+                            error = responseError;
+                            break;
+                        }
+                    }
+                }
+
+                if (success) {
+                    onSuccess.run();
+                } else {
+                    errorHandler.onError(getUserSession(), error);
+                }
+            }
+        });
+        networkRequest = new RealmAsyncTask(task, SyncManager.NETWORK_POOL_EXECUTOR);
+    }
+

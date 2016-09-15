@@ -6,6 +6,23 @@
      * @return the {@link Session} for the specified Realm.
      */
     public static synchronized Session getSession(SyncConfiguration syncConfiguration) {
-        return SessionStore.getSession(syncConfiguration);
+        if (syncConfiguration == null) {
+            throw new IllegalArgumentException("A non-empty 'syncConfiguration' is required.");
+        }
+
+        if (SessionStore.hasSession(syncConfiguration)) {
+            return SessionStore.getPublicSession(syncConfiguration);
+        } else {
+            SyncSession internalSession = new SyncSession(
+                    syncConfiguration,
+                    authServer,
+                    syncConfiguration.getUser().getSyncUser(),
+                    syncConfiguration.getSyncPolicy(),
+                    syncConfiguration.getErrorHandler()
+            );
+            Session publicSession = new Session(internalSession);
+            SessionStore.addSession(publicSession, internalSession);
+            return publicSession;
+        }
     }
 

@@ -12,7 +12,7 @@
             Token refreshToken = Token.from(obj.getJSONObject("refreshToken"));
             URL authUrl = new URL(obj.getString("authUrl"));
             // FIXME: Add support for  storing access tokens as well
-            return new User(refreshToken.identity(), refreshToken, authUrl);
+            return new User(new SyncUser(refreshToken.identity(), refreshToken, authUrl));
         } catch (JSONException e) {
             throw new IllegalArgumentException("Could not parse user json: " + user, e);
         } catch (MalformedURLException e) {
