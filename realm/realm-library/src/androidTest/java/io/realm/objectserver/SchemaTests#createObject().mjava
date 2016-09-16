@@ -1,0 +1,12 @@
+    @Test
+    public void createObject() {
+        Realm realm = Realm.getInstance(config);
+        realm.beginTransaction();
+        assertTrue(realm.getSchema().contains("StringOnly"));
+        StringOnly stringOnly= realm.createObject(StringOnly.class);
+        stringOnly.setChars("TEST");
+        realm.commitTransaction();
+        assertEquals(1, realm.where(StringOnly.class).count());
+        realm.close();
+    }
+

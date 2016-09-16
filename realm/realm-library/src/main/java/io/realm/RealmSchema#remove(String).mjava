@@ -5,6 +5,7 @@
      * @param className name of the class to remove.
      */
     public void remove(String className) {
+        checkNotInSync(); // destructive modifications are not permitted
         checkEmpty(className, EMPTY_STRING_MSG);
         String internalTableName = TABLE_PREFIX + className;
         checkHasTable(className, "Cannot remove class because it is not in this Realm: " + className);

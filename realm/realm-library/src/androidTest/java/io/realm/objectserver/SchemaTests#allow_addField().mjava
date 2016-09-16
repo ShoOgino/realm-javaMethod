@@ -1,0 +1,14 @@
+    @Test
+    public void allow_addField() {
+        String className = "StringOnly";
+        Realm realm = Realm.getInstance(config);
+
+        realm.beginTransaction();
+        realm.getSchema().get(className).addField("foo", String.class);
+        realm.commitTransaction();
+
+        assertTrue(realm.getSchema().get(className).hasField("foo"));
+
+        realm.close();
+    }
+

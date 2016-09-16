@@ -1,0 +1,14 @@
+    /**
+     * Closes/frees native resource. Even though the method is public, there is never a purpose which justifies calling
+     * it!
+     */
+    public void close() {
+        if (nativePtr != 0) {
+            Set<Property> properties = getProperties();
+            for (Property property : properties) {
+                property.close();
+            }
+            nativeClose(nativePtr);
+        }
+    }
+

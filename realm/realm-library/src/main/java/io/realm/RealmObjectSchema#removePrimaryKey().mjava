@@ -6,6 +6,7 @@
      * @throws IllegalArgumentException if the class doesn't have a primary key defined.
      */
     public RealmObjectSchema removePrimaryKey() {
+        checkNotInSync(); // destructive modifications are not permitted
         if (!table.hasPrimaryKey()) {
             throw new IllegalStateException(getClassName() + " doesn't have a primary key.");
         }

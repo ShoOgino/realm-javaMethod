@@ -9,6 +9,10 @@
      * @return the name of the RealmObject class represented by this schema.
      */
     public String getClassName() {
-        return table.getName().substring(Table.TABLE_PREFIX.length());
+        if (realm == null) {
+            return nativeGetClassName(nativePtr);
+        } else {
+            return table.getName().substring(Table.TABLE_PREFIX.length());
+        }
     }
 

@@ -2,37 +2,58 @@
     private static void initializeRealm(Realm realm) {
         long version = realm.getVersion();
         boolean commitNeeded = false;
+        boolean syncAvailable = ObjectServerFacade.SYNC_AVAILABLE && realm.configuration instanceof SyncConfiguration;
+
         try {
-            realm.beginTransaction();
-            if (version == UNVERSIONED) {
-                commitNeeded = true;
-                realm.setVersion(realm.configuration.getSchemaVersion());
+            if (!syncAvailable) {
+                realm.beginTransaction();
+                if (version == UNVERSIONED) {
+                    commitNeeded = true;
+                    realm.setVersion(realm.configuration.getSchemaVersion());
+                }
             }
 
             RealmProxyMediator mediator = realm.configuration.getSchemaMediator();
             final Set<Class<? extends RealmModel>> modelClasses = mediator.getModelClasses();
             final Map<Class<? extends RealmModel>, ColumnInfo> columnInfoMap;
             columnInfoMap = new HashMap<Class<? extends RealmModel>, ColumnInfo>(modelClasses.size());
+            ArrayList<RealmObjectSchema> realmObjectSchemas = new ArrayList<>();
+            RealmSchema realmSchemaCache = new RealmSchema();
             for (Class<? extends RealmModel> modelClass : modelClasses) {
                 // Create and validate table
-                if (version == UNVERSIONED) {
+                if (version == UNVERSIONED && !syncAvailable) {
                     mediator.createTable(modelClass, realm.sharedRealm);
                 }
-                columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm));
+                if (syncAvailable) {
+                    RealmObjectSchema realmObjectSchema = mediator.createRealmObjectSchema(modelClass, realmSchemaCache);
+                    realmObjectSchemas.add(realmObjectSchema);
+                } else {
+                    columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm));
+                }
+            }
+            if (syncAvailable) {
+                RealmSchema schema = new RealmSchema(realmObjectSchemas);
+                // Assumption: when SyncConfiguration then additive schema update mode
+                realm.sharedRealm.updateSchema(schema, version);
+                for (Class<? extends RealmModel> modelClass : modelClasses) {
+                    columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm));
+                }
             }
             realm.schema.columnIndices = new ColumnIndices(columnInfoMap);
 
-            if (version == UNVERSIONED) {
+            if (version == UNVERSIONED && !syncAvailable) {
                 final Transaction transaction = realm.getConfiguration().getInitialDataTransaction();
                 if (transaction != null) {
                     transaction.execute(realm);
                 }
             }
         } finally {
-            if (commitNeeded) {
-                realm.commitTransaction(false);
-            } else {
-                realm.cancelTransaction();
+            if (!syncAvailable) {
+                if (commitNeeded) {
+                    realm.commitTransaction(false);
+                } else {
+                    realm.cancelTransaction();
+                }
             }
         }
     }

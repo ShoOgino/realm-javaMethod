@@ -1,0 +1,12 @@
+    @Test
+    public void disallow_renameClass() {
+        Realm realm = Realm.getInstance(config);
+        String className = "StringOnly";
+        realm.beginTransaction();
+        thrown.expect(IllegalArgumentException.class);
+        realm.getSchema().rename(className, "Dogplace");
+        realm.cancelTransaction();
+        assertTrue(realm.getSchema().contains(className));
+        realm.close();
+    }
+

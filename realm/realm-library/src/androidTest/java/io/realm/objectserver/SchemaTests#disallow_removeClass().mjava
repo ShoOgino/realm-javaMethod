@@ -1,0 +1,12 @@
+    @Test
+    public void disallow_removeClass() {
+        Realm realm = Realm.getInstance(config);
+        String className = "StringOnly";
+        realm.beginTransaction();
+        assertTrue(realm.getSchema().contains(className));
+        thrown.expect(IllegalArgumentException.class);
+        realm.getSchema().remove(className);
+        realm.cancelTransaction();
+        realm.close();
+    }
+

@@ -6,6 +6,7 @@
      * @return a schema object for renamed class.
      */
     public RealmObjectSchema rename(String oldClassName, String newClassName) {
+        checkNotInSync(); // destructive modifications are not permitted
         checkEmpty(oldClassName, "Class names cannot be empty or null");
         checkEmpty(newClassName, "Class names cannot be empty or null");
         String oldInternalName = TABLE_PREFIX + oldClassName;

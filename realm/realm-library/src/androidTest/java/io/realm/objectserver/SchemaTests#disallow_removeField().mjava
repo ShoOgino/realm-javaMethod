@@ -1,0 +1,13 @@
+    @Test
+    public void disallow_removeField() {
+        Realm realm = Realm.getInstance(config);
+        String className = "StringOnly";
+        String fieldName = "chars";
+        realm.beginTransaction();
+        assertTrue(realm.getSchema().get(className).hasField(fieldName));
+        thrown.expect(IllegalArgumentException.class);
+        realm.getSchema().get(className).removeField(fieldName);
+        realm.cancelTransaction();
+        realm.close();
+    }
+

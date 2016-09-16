@@ -5,6 +5,10 @@
      * @return {@code true} if the class already exists. {@code false} otherwise.
      */
     public boolean contains(String className) {
-        return realm.sharedRealm.hasTable(Table.TABLE_PREFIX + className);
+        if (realm == null) {
+            return dynamicClassToSchema.containsKey(className);
+        } else {
+            return realm.sharedRealm.hasTable(Table.TABLE_PREFIX + className);
+        }
     }
 
