@@ -1,13 +1,10 @@
     @Override
     public boolean onError(SyncSession session, ObjectServerError error) {
-        switch(error.category()) {
+        switch(error.getCategory()) {
             case FATAL:
                 return false;   // Report all fatal errors to the user
-            case INFO:
-                return true;     // Ignore all INFO errors
             case RECOVERABLE:
-                rebind(session);
-                return true;
+                return rebind(session);
             default:
                 return false;
         }

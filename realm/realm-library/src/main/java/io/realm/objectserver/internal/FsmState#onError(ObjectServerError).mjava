@@ -1,5 +1,12 @@
     @Override
     public void onError(ObjectServerError error) {
-        gotoNextState(SessionState.STOPPED);
+        switch(error.getCategory()) {
+            case FATAL:
+                gotoNextState(SessionState.STOPPED);
+                break;
+            case RECOVERABLE:
+                gotoNextState(SessionState.UNBOUND);
+                break;
+        }
     }
 

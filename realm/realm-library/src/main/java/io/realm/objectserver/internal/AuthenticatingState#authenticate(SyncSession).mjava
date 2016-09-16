@@ -4,11 +4,10 @@
             public void run() {
                 gotoNextState(SessionState.BINDING);
             }
-        }, new io.realm.objectserver.Session.ErrorHandler() {
+        }, new Session.ErrorHandler() {
             @Override
-            public void onError(io.realm.objectserver.Session session, ObjectServerError error) {
-                // FIXME For critical errors, got directly to STOPPED
-                gotoNextState(SessionState.UNBOUND);
+            public void onError(Session s, ObjectServerError error) {
+                session.onError(error);
             }
         });
     }
