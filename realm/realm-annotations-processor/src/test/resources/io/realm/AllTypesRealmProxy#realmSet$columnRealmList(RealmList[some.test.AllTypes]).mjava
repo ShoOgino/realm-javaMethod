@@ -1,5 +1,31 @@
     public void realmSet$columnRealmList(RealmList<some.test.AllTypes> value) {
         proxyState.getRealm$realm().checkIfValid();
+        if (proxyState == null) {
+            // Called from model's constructor. Inject context.
+            injectObjectContext();
+        }
+
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+            if (proxyState.getExcludeFields$realm().contains("columnRealmList")) {
+                return;
+            }
+            if (value != null && !value.isManaged()) {
+                final Realm realm = (Realm) proxyState.getRealm$realm();
+                final RealmList<some.test.AllTypes> original = value;
+                value = new RealmList<some.test.AllTypes>();
+                for (some.test.AllTypes item : original) {
+                    if (item == null || RealmObject.isManaged(item)) {
+                        value.add(item);
+                    } else {
+                        value.add(realm.copyToRealm(item));
+                    }
+                }
+            }
+        }
+
         LinkView links = proxyState.getRow$realm().getLinkList(columnInfo.columnRealmListIndex);
         links.clear();
         if (value == null) {

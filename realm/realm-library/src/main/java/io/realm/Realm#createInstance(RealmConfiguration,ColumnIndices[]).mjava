@@ -1,0 +1,30 @@
+    /**
+     * Creates a {@link Realm} instance without checking the existence in the {@link RealmCache}.
+     *
+     * @param configuration {@link RealmConfiguration} used to create the Realm.
+     * @param globalCacheArray if this is not {@code null} and contains an entry for current schema version,
+     *                         the {@link BaseRealm#schema#columnIndices} will be initialized with the copy of
+     *                         the entry. Otherwise, {@link BaseRealm#schema#columnIndices} will be populated
+     *                         from the Realm file.
+     * @return a {@link Realm} instance.
+     */
+    static Realm createInstance(RealmConfiguration configuration, ColumnIndices[] globalCacheArray) {
+        try {
+            return createAndValidate(configuration, globalCacheArray);
+
+        } catch (RealmMigrationNeededException e) {
+            if (configuration.shouldDeleteRealmIfMigrationNeeded()) {
+                deleteRealm(configuration);
+            } else {
+                try {
+                    migrateRealm(configuration);
+                } catch (FileNotFoundException fileNotFoundException) {
+                    // Should never happen
+                    throw new RealmFileException(RealmFileException.Kind.NOT_FOUND, fileNotFoundException);
+                }
+            }
+
+            return createAndValidate(configuration, globalCacheArray);
+        }
+    }
+

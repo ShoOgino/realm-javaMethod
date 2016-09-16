@@ -1,25 +1,24 @@
     // Used by RealmList/RealmResults
     // Invariant: if dynamicClassName != null -> clazz == DynamicRealmObject
     <E extends RealmModel> E get(Class<E> clazz, String dynamicClassName, long rowIndex) {
-        Table table;
+        final Table table = (dynamicClassName != null) ? schema.getTable(dynamicClassName) : schema.getTable(clazz);
+
         E result;
         if (dynamicClassName != null) {
-            table = schema.getTable(dynamicClassName);
             @SuppressWarnings("unchecked")
-            E dynamicObj = (E) new DynamicRealmObject();
+            E dynamicObj = (E) new DynamicRealmObject(this,
+                    (rowIndex != Table.NO_MATCH) ? table.getUncheckedRow(rowIndex) : InvalidRow.INSTANCE,
+                    false);
             result = dynamicObj;
         } else {
-            table = schema.getTable(clazz);
-            result = configuration.getSchemaMediator().newInstance(clazz, schema.getColumnInfo(clazz));
+            result = configuration.getSchemaMediator().newInstance(clazz, this,
+                    (rowIndex != Table.NO_MATCH) ? table.getUncheckedRow(rowIndex) : InvalidRow.INSTANCE,
+                    schema.getColumnInfo(clazz), false, Collections.<String> emptyList());
         }
 
         RealmObjectProxy proxy = (RealmObjectProxy) result;
-        proxy.realmGet$proxyState().setRealm$realm(this);
         if (rowIndex != Table.NO_MATCH) {
-            proxy.realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex));
             proxy.realmGet$proxyState().setTableVersion$realm();
-        } else {
-            proxy.realmGet$proxyState().setRow$realm(InvalidRow.INSTANCE);
         }
 
         return result;

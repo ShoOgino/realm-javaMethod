@@ -5,6 +5,7 @@
         if (object instanceof RealmObjectProxy && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm().getPath().equals(realm.getPath())) {
             return object;
         }
+        final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get();
         RealmObjectProxy cachedRealmObject = cache.get(object);
         if (cachedRealmObject != null) {
             return (some.test.AllTypes) cachedRealmObject;
@@ -22,10 +23,13 @@
                     rowIndex = table.findFirstString(pkColumnIndex, value);
                 }
                 if (rowIndex != TableOrView.NO_MATCH) {
-                    realmObject = new io.realm.AllTypesRealmProxy(realm.schema.getColumnInfo(some.test.AllTypes.class));
-                    ((RealmObjectProxy)realmObject).realmGet$proxyState().setRealm$realm(realm);
-                    ((RealmObjectProxy)realmObject).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex));
-                    cache.put(object, (RealmObjectProxy) realmObject);
+                    try {
+                        objectContext.set(realm, table.getUncheckedRow(rowIndex), realm.schema.getColumnInfo(some.test.AllTypes.class), false, Collections.<String> emptyList());
+                        realmObject = new io.realm.AllTypesRealmProxy();
+                        cache.put(object, (RealmObjectProxy) realmObject);
+                    } finally {
+                        objectContext.clear();
+                    }
                 } else {
                     canUpdate = false;
                 }

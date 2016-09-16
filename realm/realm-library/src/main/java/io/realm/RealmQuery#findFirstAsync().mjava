@@ -26,15 +26,15 @@
         final E result;
         if (isDynamicQuery()) {
             //noinspection unchecked
-            result = (E) new DynamicRealmObject(className);
+            result = (E) new DynamicRealmObject(className, realm, Row.EMPTY_ROW, false);
         } else {
-            result = realm.getConfiguration().getSchemaMediator().newInstance(clazz, realm.getSchema().getColumnInfo(clazz));
+            result = realm.getConfiguration().getSchemaMediator().newInstance(
+                    clazz, realm, Row.EMPTY_ROW, realm.getSchema().getColumnInfo(clazz),
+                    false, Collections.<String>emptyList());
         }
 
-        RealmObjectProxy proxy = (RealmObjectProxy) result;
+        final RealmObjectProxy proxy = (RealmObjectProxy) result;
         final WeakReference<RealmObjectProxy> realmObjectWeakReference = realm.handlerController.addToAsyncRealmObject(proxy, this);
-        proxy.realmGet$proxyState().setRealm$realm(realm);
-        proxy.realmGet$proxyState().setRow$realm(Row.EMPTY_ROW);
 
         final Future<Long> pendingQuery = Realm.asyncTaskExecutor.submitQuery(new Callable<Long>() {
             @Override

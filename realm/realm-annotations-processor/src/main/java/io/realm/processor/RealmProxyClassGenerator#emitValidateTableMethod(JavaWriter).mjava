@@ -1,17 +1,28 @@
     private void emitValidateTableMethod(JavaWriter writer) throws IOException {
         writer.beginMethod(
-                columnInfoClassName(), // Return type
-                "validateTable", // Method name
+                columnInfoClassName(),        // Return type
+                "validateTable",              // Method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
-                "SharedRealm", "sharedRealm"); // Argument type & argument name
+                "SharedRealm", "sharedRealm", // Argument type & argument name
+                "boolean", "allowExtraColumns");
 
         writer.beginControlFlow("if (sharedRealm.hasTable(\"" + Constants.TABLE_PREFIX + this.simpleClassName + "\"))");
         writer.emitStatement("Table table = sharedRealm.getTable(\"%s%s\")", Constants.TABLE_PREFIX, this.simpleClassName);
 
         // verify number of columns
-        writer.beginControlFlow("if (table.getColumnCount() != " + metadata.getFields().size() + ")");
-        writer.emitStatement("throw new RealmMigrationNeededException(sharedRealm.getPath(), \"Field count does not match - expected %d but was \" + table.getColumnCount())",
-                metadata.getFields().size());
+        writer.emitStatement("final long columnCount = table.getColumnCount()");
+        writer.beginControlFlow("if (columnCount != %d)", metadata.getFields().size());
+            writer.beginControlFlow("if (columnCount < %d)", metadata.getFields().size());
+                writer.emitStatement("throw new RealmMigrationNeededException(sharedRealm.getPath(), \"Field count is less than expected - expected %d but was \" + columnCount)",
+                        metadata.getFields().size());
+            writer.endControlFlow();
+            writer.beginControlFlow("if (allowExtraColumns)");
+                writer.emitStatement("RealmLog.debug(\"Field count is more than expected - expected %d but was %%1$d\", columnCount)",
+                        metadata.getFields().size());
+            writer.nextControlFlow("else");
+                writer.emitStatement("throw new RealmMigrationNeededException(sharedRealm.getPath(), \"Field count is more than expected - expected %d but was \" + columnCount)",
+                        metadata.getFields().size());
+            writer.endControlFlow();
         writer.endControlFlow();
 
         // create type dictionary for lookup
@@ -49,7 +60,7 @@
                 if (metadata.isNullable(field)) {
                     writer.beginControlFlow("if (!table.isColumnNullable(%s))", fieldIndexVariableReference(field));
                     // Check if the existing PrimaryKey does support null value for String, Byte, Short, Integer, & Long
-                    if (field.equals(metadata.getPrimaryKey())) {
+                    if (metadata.isPrimaryKey(field)) {
                         writer.emitStatement("throw new RealmMigrationNeededException(sharedRealm.getPath()," +
                                 "\"@PrimaryKey field '%s' does not support null values in the existing Realm file. " +
                                 "Migrate using RealmObjectSchema.setNullable(), or mark the field as @Required.\")",
@@ -70,7 +81,7 @@
                     writer.endControlFlow();
                 } else {
                     // check before migrating a nullable field containing null value to not-nullable PrimaryKey field for Realm version 0.89+
-                    if (field.equals(metadata.getPrimaryKey())) {
+                    if (metadata.isPrimaryKey(field)) {
                         writer
                             .beginControlFlow("if (table.isColumnNullable(%s) && table.findFirstNull(%s) != TableOrView.NO_MATCH)",
                                     fieldIndexVariableReference(field), fieldIndexVariableReference(field))
@@ -96,7 +107,7 @@
                 }
 
                 // Validate @PrimaryKey
-                if (field.equals(metadata.getPrimaryKey())) {
+                if (metadata.isPrimaryKey(field)) {
                     writer.beginControlFlow("if (table.getPrimaryKey() != table.getColumnIndex(\"%s\"))", fieldName);
                     writer.emitStatement("throw new RealmMigrationNeededException(sharedRealm.getPath(), \"Primary key not defined for field '%s' in existing Realm file. Add @PrimaryKey.\")", fieldName);
                     writer.endControlFlow();

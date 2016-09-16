@@ -30,7 +30,7 @@
 
             if (realmClass == Realm.class) {
                 // RealmMigrationNeededException might be thrown here.
-                realm = Realm.createInstance(configuration, cache.typedColumnIndices);
+                realm = Realm.createInstance(configuration, cache.typedColumnIndicesArray);
             } else if (realmClass == DynamicRealm.class) {
                 realm = DynamicRealm.createInstance(configuration);
             } else {
@@ -50,7 +50,9 @@
         Integer refCount = refAndCount.localCount.get();
         if (refCount == 0) {
             if (realmClass == Realm.class && refAndCount.globalCount == 0) {
-                cache.typedColumnIndices = refAndCount.localRealm.get().schema.columnIndices;
+                final BaseRealm realm = refAndCount.localRealm.get();
+                // store a copy of local ColumnIndices as a global cache.
+                RealmCache.storeColumnIndices(cache.typedColumnIndicesArray, realm.schema.columnIndices.clone());
             }
             // This is the first instance in current thread, increase the global count.
             refAndCount.globalCount++;

@@ -1,4 +1,21 @@
     public void realmSet$fieldObjectNull(some.test.NullTypes value) {
+        if (proxyState == null) {
+            // Called from model's constructor. Inject context.
+            injectObjectContext();
+        }
+
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+            if (proxyState.getExcludeFields$realm().contains("fieldObjectNull")) {
+                return;
+            }
+            if (value != null && !RealmObject.isManaged(value)) {
+                value = ((Realm) proxyState.getRealm$realm()).copyToRealm(value);
+            }
+        }
+
         proxyState.getRealm$realm().checkIfValid();
         if (value == null) {
             proxyState.getRow$realm().nullifyLink(columnInfo.fieldObjectNullIndex);

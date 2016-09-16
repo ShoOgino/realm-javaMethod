@@ -28,7 +28,7 @@
                     RealmObjectSchema realmObjectSchema = mediator.createRealmObjectSchema(modelClass, realmSchemaCache);
                     realmObjectSchemas.add(realmObjectSchema);
                 } else {
-                    columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm));
+                    columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm), false);
                 }
             }
             if (syncAvailable) {
@@ -36,10 +36,12 @@
                 // Assumption: when SyncConfiguration then additive schema update mode
                 realm.sharedRealm.updateSchema(schema, version);
                 for (Class<? extends RealmModel> modelClass : modelClasses) {
-                    columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm));
+                    columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm),false);
                 }
             }
-            realm.schema.columnIndices = new ColumnIndices(columnInfoMap);
+            realm.schema.columnIndices = new ColumnIndices(
+                    (version == UNVERSIONED) ? realm.configuration.getSchemaVersion() : version,
+                    columnInfoMap);
 
             if (version == UNVERSIONED && !syncAvailable) {
                 final Transaction transaction = realm.getConfiguration().getInitialDataTransaction();

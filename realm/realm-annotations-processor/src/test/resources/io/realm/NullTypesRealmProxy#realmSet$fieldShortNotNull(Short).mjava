@@ -1,4 +1,15 @@
     public void realmSet$fieldShortNotNull(Short value) {
+        if (proxyState == null) {
+            // Called from model's constructor. Inject context.
+            injectObjectContext();
+        }
+
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+        }
+
         proxyState.getRealm$realm().checkIfValid();
         if (value == null) {
             throw new IllegalArgumentException("Trying to set non-nullable field 'fieldShortNotNull' to null.");
