@@ -1,51 +1,28 @@
     public void setRefreshToken(final Token refreshToken) {
-        if (refreshTask != null) {
-            refreshTask.cancel();
-            refreshTask = null;
-        }
-        this.refreshToken = refreshToken;
+        this.refreshToken = refreshToken; // Replace any existing token. TODO re-save the user with latest token.
 
-        if (authentificationUrl == null) {
-            return;
-        }
         // Schedule a refresh. This method cannot fail, but will continue retrying until either the app is killed
         // or the attempt was successful.
-        // TODO Consider combining refresh across all users?
         final long expire = refreshToken.expiresMs();
         final AuthenticationServer server = SyncManager.getAuthServer();
-        Future<?> task = SyncManager.NETWORK_POOL_EXECUTOR.submit(new Runnable() {
+        Future<?> task = SyncManager.NETWORK_POOL_EXECUTOR.submit(new ExponentialBackoffTask<RefreshResponse>() {
             @Override
-            public void run() {
+            protected RefreshResponse execute() {
                 long timeToExpiration = System.currentTimeMillis() - expire;
-                if (timeToExpiration > 0) {
+                if (timeToExpiration - REFRESH_WINDOW_MS > 0) {
                     SystemClock.sleep(timeToExpiration);
                 }
+                return server.refresh(refreshToken.value(), authenticationUrl);
+            }
 
-                int attempt = 0;
-                while (!Thread.interrupted()) {
-                    attempt++;
-                    long sleep = Util.calculateExponentialDelay(attempt - 1, TimeUnit.MINUTES.toMillis(5));
-                    if (sleep > 0) {
-                        try {
-                            Thread.sleep(sleep);
-                        } catch (InterruptedException e) {
-                            return; // Abort authentication if interrupted.
-                        }
-                    }
-                    try {
-                        RefreshResponse result = server.refresh(refreshToken.value(), authentificationUrl);
-                        if (result.isValid()) {
-                            setRefreshToken(result.getRefreshToken());
-                            break;
-                        } else {
-                            // FIXME: Log to session events instead
-                            RealmLog.warn("Refreshing login failed: " + result.getErrorCode() + " : " + result.getErrorMessage());
-                        }
-                    } catch (IOException e) {
-                        // FIXME: Log to session events instead.
-                        RealmLog.info("Refreshing login failed: " + e.toString());
-                    }
-                }
+            @Override
+            protected void onSuccess(RefreshResponse response) {
+                setRefreshToken(response.getRefreshToken());
+            }
+
+            @Override
+            protected void onError(RefreshResponse response) {
+
             }
         });
         refreshTask = new RealmAsyncTask(task, SyncManager.NETWORK_POOL_EXECUTOR);

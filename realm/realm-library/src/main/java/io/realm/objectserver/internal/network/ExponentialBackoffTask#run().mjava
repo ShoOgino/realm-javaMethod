@@ -1,0 +1,27 @@
+    @Override
+    public void run() {
+        int attempt = 0;
+        while (true) {
+            attempt++;
+            long sleep = calculateExponentialDelay(attempt - 1, TimeUnit.MINUTES.toMillis(5));
+            if (sleep > 0) {
+                try {
+                    Thread.sleep(sleep);
+                } catch (InterruptedException e) {
+                    return; // Abort if interrupted
+                }
+            }
+            T response = execute();
+
+            if (isSuccess(response)) {
+                onSuccess(response);
+                break;
+            } else {
+                if (shouldAbortTask(response)) {
+                    onError(response);
+                    break;
+                }
+            }
+        }
+    }
+

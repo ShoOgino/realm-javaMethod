@@ -1,0 +1,21 @@
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public User remove(String key) {
+        String currentUser = sp.getString(key, null);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(key, null);
+        editor.apply();
+
+        if (UserStore.CURRENT_USER_KEY.equals(key) && cachedCurrentUser != null) {
+            cachedCurrentUser = null;
+        }
+
+        if (currentUser != null) {
+            return User.fromJson(currentUser);
+        } else {
+            return null;
+        }
+    }
+

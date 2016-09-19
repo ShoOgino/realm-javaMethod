@@ -5,9 +5,13 @@
         String fieldName = "chars";
         realm.beginTransaction();
         assertTrue(realm.getSchema().get(className).hasField(fieldName));
-        thrown.expect(IllegalArgumentException.class);
-        realm.getSchema().get(className).removeField(fieldName);
-        realm.cancelTransaction();
-        realm.close();
+        try {
+            realm.getSchema().get(className).removeField(fieldName);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+            realm.close();
+        }
     }
 

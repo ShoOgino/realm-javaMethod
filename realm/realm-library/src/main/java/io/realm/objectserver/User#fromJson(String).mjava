@@ -9,14 +9,23 @@
     public static User fromJson(String user) {
         try {
             JSONObject obj = new JSONObject(user);
-            Token refreshToken = Token.from(obj.getJSONObject("refreshToken"));
             URL authUrl = new URL(obj.getString("authUrl"));
-            // FIXME: Add support for  storing access tokens as well
-            return new User(new SyncUser(refreshToken.identity(), refreshToken, authUrl));
+            Token refreshToken = Token.from(obj.getJSONObject("userToken"));
+            SyncUser syncUser = new SyncUser(refreshToken, authUrl);
+            JSONArray realmTokens = obj.getJSONArray("realms");
+            for (int i = 0; i < realmTokens.length(); i++) {
+                JSONObject token = realmTokens.getJSONObject(i);
+                URI uri = new URI(token.getString("uri"));
+                SyncUser.AccessDescription realmDesc = SyncUser.AccessDescription.fromJson(token.getJSONObject("description"));
+                syncUser.addRealm(uri, realmDesc);
+            }
+            return new User(syncUser);
         } catch (JSONException e) {
             throw new IllegalArgumentException("Could not parse user json: " + user, e);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("URL in JSON not valid: " + user, e);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("URI is not valid: " + user, e);
         }
     }
 
