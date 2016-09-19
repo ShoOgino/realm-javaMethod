@@ -1,0 +1,9 @@
+    @Test
+    public void renameTable_notInTransactionThrows() {
+        sharedRealm.beginTransaction();
+        sharedRealm.getTable("OldTable");
+        sharedRealm.commitTransaction();
+        thrown.expect(IllegalStateException.class);
+        sharedRealm.renameTable("OldTable", "NewTable");
+    }
+

@@ -12,10 +12,10 @@
             @Override
             public void onCall() {
                 // Check if the Realm instance has been closed
-                if (sharedGroupManager == null || !sharedGroupManager.isOpen() || sharedGroupManager.getSharedGroup().isClosed()) {
+                if (sharedRealm == null || sharedRealm.isClosed()) {
                     throw new IllegalStateException(BaseRealm.CLOSED_REALM_MESSAGE);
                 }
-                sharedGroupManager.getSharedGroup().stopWaitForChange();
+                sharedRealm.stopWaitForChange();
             }
         });
     }

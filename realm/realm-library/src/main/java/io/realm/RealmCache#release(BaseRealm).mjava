@@ -19,7 +19,7 @@
         }
 
         if (refCount <= 0) {
-            RealmLog.w("Realm " + canonicalPath + " has been closed already.");
+            RealmLog.warn("%s has been closed already.", canonicalPath);
             return;
         }
 
@@ -43,7 +43,7 @@
             // Clear the column indices cache if needed
             if (realm instanceof Realm && refAndCount.globalCount == 0) {
                 // All typed Realm instances of this file are cleared from cache
-                cache.typedColumnIndices = null;
+                Arrays.fill(cache.typedColumnIndicesArray, null);
             }
 
             int totalRefCount = 0;

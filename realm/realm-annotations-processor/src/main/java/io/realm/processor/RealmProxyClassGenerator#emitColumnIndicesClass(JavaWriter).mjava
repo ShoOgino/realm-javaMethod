@@ -3,13 +3,14 @@
                 columnInfoClassName(),                       // full qualified name of the item to generate
                 "class",                                     // the type of the item
                 EnumSet.of(Modifier.STATIC, Modifier.FINAL), // modifiers to apply
-                "ColumnInfo")                                // base class
+                "ColumnInfo",                                // base class
+                "Cloneable")                                 // interfaces
                 .emitEmptyLine();
 
         // fields
         for (VariableElement variableElement : metadata.getFields()) {
             writer.emitField("long", columnIndexVarName(variableElement),
-                    EnumSet.of(Modifier.PUBLIC, Modifier.FINAL));
+                    EnumSet.of(Modifier.PUBLIC));
         }
         writer.emitEmptyLine();
 
@@ -25,12 +26,43 @@
             writer.emitStatement("this.%s = getValidColumnIndex(path, table, \"%s\", \"%s\")",
                     columnIndexVarName, simpleClassName, columnName);
             writer.emitStatement("indicesMap.put(\"%s\", this.%s)", columnName, columnIndexVarName);
-            writer.emitEmptyLine();
         }
+        writer.emitEmptyLine();
         writer.emitStatement("setIndicesMap(indicesMap)");
         writer.endConstructor();
+        writer.emitEmptyLine();
+
+        // copyColumnInfoFrom method
+        writer.emitAnnotation("Override");
+        writer.beginMethod(
+                "void",                      // return type
+                "copyColumnInfoFrom",        // method name
+                EnumSet.of(Modifier.PUBLIC, Modifier.FINAL), // modifiers
+                "ColumnInfo", "other");      // parameters
+        {
+            writer.emitStatement("final %1$s otherInfo = (%1$s) other", columnInfoClassName());
+
+            // copy field values
+            for (VariableElement variableElement : metadata.getFields()) {
+                writer.emitStatement("this.%1$s = otherInfo.%1$s", columnIndexVarName(variableElement));
+            }
+            writer.emitEmptyLine();
+            writer.emitStatement("setIndicesMap(otherInfo.getIndicesMap())");
+        }
+        writer.endMethod();
+        writer.emitEmptyLine();
+
+        // clone method
+        writer.emitAnnotation("Override");
+        writer.beginMethod(
+                columnInfoClassName(),       // return type
+                "clone",                     // method name
+                EnumSet.of(Modifier.PUBLIC, Modifier.FINAL)) // modifiers
+                // method body
+                .emitStatement("return (%1$s) super.clone()", columnInfoClassName())
+                .endMethod()
+                .emitEmptyLine();
 
         writer.endType();
-        writer.emitEmptyLine();
     }
 

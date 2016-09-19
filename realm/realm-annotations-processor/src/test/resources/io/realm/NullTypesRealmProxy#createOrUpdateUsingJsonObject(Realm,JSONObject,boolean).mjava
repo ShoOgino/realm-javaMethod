@@ -1,7 +1,11 @@
     @SuppressWarnings("cast")
     public static some.test.NullTypes createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
             throws JSONException {
-        some.test.NullTypes obj = realm.createObject(some.test.NullTypes.class);
+        final List<String> excludeFields = new ArrayList<String>(1);
+        if (json.has("fieldObjectNull")) {
+            excludeFields.add("fieldObjectNull");
+        }
+        some.test.NullTypes obj = realm.createObjectInternal(some.test.NullTypes.class, true, excludeFields);
         if (json.has("fieldStringNotNull")) {
             if (json.isNull("fieldStringNotNull")) {
                 ((NullTypesRealmProxyInterface) obj).realmSet$fieldStringNotNull(null);

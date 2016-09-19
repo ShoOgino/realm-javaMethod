@@ -1,5 +1,10 @@
     @SuppressWarnings("cast")
     public Boolean realmGet$fieldBooleanNotNull() {
+        if (proxyState == null) {
+            // Called from model's constructor. Inject context.
+            injectObjectContext();
+        }
+
         proxyState.getRealm$realm().checkIfValid();
         return (boolean) proxyState.getRow$realm().getBoolean(columnInfo.fieldBooleanNotNullIndex);
     }

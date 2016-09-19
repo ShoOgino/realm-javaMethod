@@ -13,16 +13,16 @@
     public RealmResults<E> distinctAsync(String fieldName) {
         checkQueryIsNotReused();
         final long columnIndex = getAndValidateDistinctColumnIndex(fieldName, this.table.getTable());
-        final WeakReference<Handler> weakHandler = getWeakReferenceHandler();
+        final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();
 
         // handover the query (to be used by a worker thread)
-        final long handoverQueryPointer = query.handoverQuery(realm.sharedGroupManager.getNativePointer());
+        final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
 
         // save query arguments (for future update)
         argumentsHolder = new ArgumentsHolder(ArgumentsHolder.TYPE_DISTINCT);
         argumentsHolder.columnIndex = columnIndex;
 
-        // we need to use the same configuration to open a background SharedGroup (i.e Realm)
+        // we need to use the same configuration to open a background SharedRealm (i.e Realm)
         // to perform the query
         final RealmConfiguration realmConfiguration = realm.getConfiguration();
 
@@ -42,35 +42,30 @@
             @Override
             public Long call() throws Exception {
                 if (!Thread.currentThread().isInterrupted()) {
-                    SharedGroup sharedGroup = null;
+                    SharedRealm sharedRealm = null;
 
                     try {
-                        sharedGroup = new SharedGroup(realmConfiguration.getPath(),
-                                SharedGroup.IMPLICIT_TRANSACTION,
-                                realmConfiguration.getDurability(),
-                                realmConfiguration.getEncryptionKey());
+                        sharedRealm = SharedRealm.getInstance(realmConfiguration);
 
-                        long handoverTableViewPointer = query.
-                                findDistinctWithHandover(sharedGroup.getNativePointer(),
-                                        sharedGroup.getNativeReplicationPointer(),
+                        long handoverTableViewPointer = TableQuery.
+                                findDistinctWithHandover(sharedRealm,
                                         handoverQueryPointer,
                                         columnIndex);
 
                         QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResultsResponse();
                         result.updatedTableViews.put(weakRealmResults, handoverTableViewPointer);
-                        result.versionID = sharedGroup.getVersion();
-                        closeSharedGroupAndSendMessageToHandler(sharedGroup,
-                                weakHandler, HandlerControllerConstants.COMPLETED_ASYNC_REALM_RESULTS, result);
+                        result.versionID = sharedRealm.getVersionID();
+                        closeSharedRealmAndSendEventToNotifier(sharedRealm,
+                                weakNotifier, QueryUpdateTask.NotifyEvent.COMPLETE_ASYNC_RESULTS, result);
 
                         return handoverTableViewPointer;
                     } catch (Throwable e) {
-                        RealmLog.e(e.getMessage(), e);
-                        closeSharedGroupAndSendMessageToHandler(sharedGroup,
-                                weakHandler, HandlerControllerConstants.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
-
+                        RealmLog.error(e);
+                        closeSharedRealmAndSendEventToNotifier(sharedRealm,
+                                weakNotifier, QueryUpdateTask.NotifyEvent.THROW_BACKGROUND_EXCEPTION, e);
                     } finally {
-                        if (sharedGroup != null && !sharedGroup.isClosed()) {
-                            sharedGroup.close();
+                        if (sharedRealm != null && !sharedRealm.isClosed()) {
+                            sharedRealm.close();
                         }
                     }
                 } else {

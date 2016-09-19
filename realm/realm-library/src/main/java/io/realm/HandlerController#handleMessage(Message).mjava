@@ -4,14 +4,14 @@
         // aware when this threads handler is removed before they send messages to it. We don't wish to synchronize
         // access to the handlers as they are the prime mean of notifying about updates. Instead we make sure
         // that if a message does slip though (however unlikely), it will not try to update a SharedGroup that no
-        // longer exists. `sharedGroupManager` will only be null if a Realm is really closed.
-        if (realm.sharedGroupManager != null) {
+        // longer exists. `sharedRealm` will only be null if a Realm is really closed.
+        if (realm.sharedRealm != null) {
             QueryUpdateTask.Result result;
             switch (message.what) {
 
-                case HandlerControllerConstants.LOCAL_COMMIT:
-                case HandlerControllerConstants.REALM_CHANGED:
-                    realmChanged(message.what == HandlerControllerConstants.LOCAL_COMMIT);
+                case LOCAL_COMMIT:
+                case REALM_CHANGED:
+                    realmChanged(message.what == LOCAL_COMMIT);
                     break;
 
                 case HandlerControllerConstants.COMPLETED_ASYNC_REALM_RESULTS:

@@ -4,10 +4,6 @@
      * @return the schema version for the Realm file backing this Realm.
      */
     public long getVersion() {
-        if (!sharedGroupManager.hasTable(Table.METADATA_TABLE_NAME)) {
-            return UNVERSIONED;
-        }
-        Table metadataTable = sharedGroupManager.getTable(Table.METADATA_TABLE_NAME);
-        return metadataTable.getLong(0, 0);
+        return sharedRealm.getSchemaVersion();
     }
 

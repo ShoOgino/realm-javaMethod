@@ -3,7 +3,8 @@
         if (cachedRealmObject != null) {
             return (some.test.Booleans) cachedRealmObject;
         } else {
-            some.test.Booleans realmObject = realm.createObject(some.test.Booleans.class);
+            // rejecting default values to avoid creating unexpected objects from RealmModel/RealmList fields.
+            some.test.Booleans realmObject = realm.createObjectInternal(some.test.Booleans.class, false, Collections.<String>emptyList());
             cache.put(newObject, (RealmObjectProxy) realmObject);
             ((BooleansRealmProxyInterface) realmObject).realmSet$done(((BooleansRealmProxyInterface) newObject).realmGet$done());
             ((BooleansRealmProxyInterface) realmObject).realmSet$isReady(((BooleansRealmProxyInterface) newObject).realmGet$isReady());

@@ -1,0 +1,19 @@
+    @Test
+    public void copyDeeply() {
+        final long schemaVersion = 100;
+
+        final ColumnIndices columnIndices = create(schemaVersion);
+        final ColumnIndices deepCopy = columnIndices.clone();
+
+        assertEquals(schemaVersion, deepCopy.getSchemaVersion());
+        assertEquals(columnIndices.getColumnIndex(Cat.class, Cat.FIELD_NAME),
+                deepCopy.getColumnIndex(Cat.class, Cat.FIELD_NAME));
+        assertEquals(columnIndices.getColumnIndex(Dog.class, Dog.FIELD_AGE),
+                deepCopy.getColumnIndex(Dog.class, Dog.FIELD_AGE));
+
+        // check if those are different instance.
+        assertNotSame(columnIndices, deepCopy);
+        assertNotSame(columnIndices.getColumnInfo(Cat.class), deepCopy.getColumnInfo(Cat.class));
+        assertNotSame(columnIndices.getColumnInfo(Dog.class), deepCopy.getColumnInfo(Dog.class));
+    }
+

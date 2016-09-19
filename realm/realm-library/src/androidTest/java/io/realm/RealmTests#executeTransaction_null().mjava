@@ -1,11 +1,12 @@
     @Test
     public void executeTransaction_null() {
+        SharedRealm.VersionID oldVersion = realm.sharedRealm.getVersionID();
         try {
             realm.executeTransaction(null);
             fail("null transaction should throw");
         } catch (IllegalArgumentException ignored) {
-
         }
-        assertFalse(realm.hasChanged());
+        SharedRealm.VersionID newVersion = realm.sharedRealm.getVersionID();
+        assertEquals(oldVersion, newVersion);
     }
 

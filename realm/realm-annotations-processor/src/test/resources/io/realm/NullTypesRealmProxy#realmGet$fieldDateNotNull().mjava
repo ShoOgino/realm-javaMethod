@@ -1,5 +1,10 @@
     @SuppressWarnings("cast")
     public Date realmGet$fieldDateNotNull() {
+        if (proxyState == null) {
+            // Called from model's constructor. Inject context.
+            injectObjectContext();
+        }
+
         proxyState.getRealm$realm().checkIfValid();
         return (java.util.Date) proxyState.getRow$realm().getDate(columnInfo.fieldDateNotNullIndex);
     }

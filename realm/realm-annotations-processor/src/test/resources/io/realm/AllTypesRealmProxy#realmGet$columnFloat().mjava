@@ -1,5 +1,10 @@
     @SuppressWarnings("cast")
     public float realmGet$columnFloat() {
+        if (proxyState == null) {
+            // Called from model's constructor. Inject context.
+            injectObjectContext();
+        }
+
         proxyState.getRealm$realm().checkIfValid();
         return (float) proxyState.getRow$realm().getFloat(columnInfo.columnFloatIndex);
     }

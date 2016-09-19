@@ -3,7 +3,10 @@
         // Generate a key and use it in a RealmConfiguration
         byte[] oldKey = TestHelper.getRandomKey(12345);
         byte[] key = oldKey;
-        RealmConfiguration config = new RealmConfiguration.Builder(configFactory.getRoot()).encryptionKey(key).build();
+        RealmConfiguration config = new RealmConfiguration.Builder(context)
+                .directory(configFactory.getRoot())
+                .encryptionKey(key)
+                .build();
 
         // Generate a different key and assign it to the same variable
         byte[] newKey = TestHelper.getRandomKey(67890);

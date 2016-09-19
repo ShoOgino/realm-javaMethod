@@ -5,6 +5,7 @@
                 .emitStatement("reader.skipValue()")
                 .emitStatement("((%s) obj).%s(null)", interfaceName, setter)
             .nextControlFlow("else")
+                .emitStatement("((%s) obj).%s(new RealmList<%s>())", interfaceName, setter, fieldTypeCanonicalName)
                 .emitStatement("reader.beginArray()")
                 .beginControlFlow("while (reader.hasNext())")
                     .emitStatement("%s item = %s.createUsingJsonStream(realm, reader)", fieldTypeCanonicalName, proxyClass)

@@ -1,14 +1,17 @@
     /**
      * Instantiates and adds a new object to the Realm.
+     * <p>
+     * This method is only available for model classes with no @PrimaryKey annotation.
+     * If you like to create an object that has a primary key, use {@link #createObject(Class, Object)}
+     * or {@link #copyToRealm(RealmModel)} instead.
      *
      * @param clazz the Class of the object to create.
      * @return the new object.
-     * @throws RealmException if an object cannot be created.
+     * @throws RealmException if the primary key is defined in the model class or an object cannot be created.
+     * @see #createObject(Class, Object)
      */
     public <E extends RealmModel> E createObject(Class<E> clazz) {
         checkIfValid();
-        Table table = schema.getTable(clazz);
-        long rowIndex = table.addEmptyRow();
-        return get(clazz, rowIndex);
+        return createObjectInternal(clazz, true, Collections.<String> emptyList());
     }
 

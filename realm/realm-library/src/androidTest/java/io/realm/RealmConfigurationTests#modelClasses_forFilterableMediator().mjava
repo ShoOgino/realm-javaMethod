@@ -1,8 +1,10 @@
     @Test
     public void modelClasses_forFilterableMediator() throws Exception {
         //noinspection unchecked
-        final RealmConfiguration config = new RealmConfiguration.Builder(configFactory.getRoot())
-                .schema(AllTypes.class, CatOwner.class).build();
+        final RealmConfiguration config = new RealmConfiguration.Builder(context)
+                .directory(configFactory.getRoot())
+                .schema(AllTypes.class, CatOwner.class)
+                .build();
         assertTrue(config.getSchemaMediator() instanceof FilterableMediator);
 
         final Set<Class<? extends RealmModel>> realmClasses = config.getRealmObjectClasses();

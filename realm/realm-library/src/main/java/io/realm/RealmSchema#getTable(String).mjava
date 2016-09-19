@@ -2,10 +2,10 @@
         className = Table.TABLE_PREFIX + className;
         Table table = dynamicClassToTable.get(className);
         if (table == null) {
-            if (!transaction.hasTable(className)) {
+            if (!realm.sharedRealm.hasTable(className)) {
                 throw new IllegalArgumentException("The class " + className + " doesn't exist in this Realm.");
             }
-            table = transaction.getTable(className);
+            table = realm.sharedRealm.getTable(className);
             dynamicClassToTable.put(className, table);
         }
         return table;

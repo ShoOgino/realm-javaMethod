@@ -1,4 +1,15 @@
     public void realmSet$columnLong(long value) {
+        if (proxyState == null) {
+            // Called from model's constructor. Inject context.
+            injectObjectContext();
+        }
+
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+        }
+
         proxyState.getRealm$realm().checkIfValid();
         proxyState.getRow$realm().setLong(columnInfo.columnLongIndex, value);
     }

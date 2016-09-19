@@ -10,7 +10,8 @@
         realm.close();
         try {
             Realm.getInstance(configB); // Try to open with key 2
-        } catch (IllegalArgumentException ignored) {
+        } catch (RealmFileException expected) {
+            assertEquals(expected.getKind(), RealmFileException.Kind.ACCESS_ERROR);
             // Delete Realm so key 2 works. This should work as a Realm shouldn't be cached
             // if initialization failed.
             assertTrue(Realm.deleteRealm(configA));
