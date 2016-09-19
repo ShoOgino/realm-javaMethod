@@ -1,0 +1,9 @@
+    @Test
+    public void serverUrl_invalidChars() {
+        SyncConfiguration.Builder builder = new SyncConfiguration.Builder(context)
+                .serverUrl("realm://objectserver.realm.io/~/?")
+                .user(createTestUser());
+        SyncConfiguration config = builder.build();
+        assertFalse(config.getRealmFileName().contains("?"));
+    }
+
