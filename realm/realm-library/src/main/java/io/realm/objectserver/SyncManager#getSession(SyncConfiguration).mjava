@@ -22,6 +22,8 @@
             );
             Session publicSession = new Session(internalSession);
             SessionStore.addSession(publicSession, internalSession);
+            syncConfiguration.getUser().getSyncUser().addSession(publicSession);
+            syncConfiguration.getSyncPolicy().onSessionCreated(internalSession);
             return publicSession;
         }
     }

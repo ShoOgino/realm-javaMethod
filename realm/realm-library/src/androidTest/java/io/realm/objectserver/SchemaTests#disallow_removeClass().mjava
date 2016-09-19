@@ -4,9 +4,13 @@
         String className = "StringOnly";
         realm.beginTransaction();
         assertTrue(realm.getSchema().contains(className));
-        thrown.expect(IllegalArgumentException.class);
-        realm.getSchema().remove(className);
-        realm.cancelTransaction();
-        realm.close();
+        try {
+            realm.getSchema().remove(className);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        } finally {
+            realm.cancelTransaction();
+            realm.close();
+        }
     }
 

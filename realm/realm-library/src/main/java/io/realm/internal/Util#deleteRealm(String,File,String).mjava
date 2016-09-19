@@ -1,0 +1,19 @@
+    public static boolean deleteRealm(String canonicalPath, File realmFolder, String realmFileName) {
+        boolean realmDeleted = true;
+        final String management = ".management";
+        File managementFolder = new File(realmFolder, realmFileName + management);
+
+        // delete files in management directory and the directory
+        // there is no subfolders in the management directory
+        File[] files = managementFolder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                realmDeleted = realmDeleted && file.delete();
+            }
+        }
+        realmDeleted = realmDeleted && managementFolder.delete();
+
+        // delete specific files in root directory
+        return realmDeleted && deletes(canonicalPath, realmFolder, realmFileName);
+    }
+

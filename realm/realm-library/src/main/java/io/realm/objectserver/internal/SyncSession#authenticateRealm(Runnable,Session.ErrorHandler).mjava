@@ -4,50 +4,30 @@
             networkRequest.cancel();
         }
         // Authenticate in a background thread. This allows incremental backoff and retries in a safe manner.
-        Future<?> task = SyncManager.NETWORK_POOL_EXECUTOR.submit(new Runnable() {
+        Future<?> task = SyncManager.NETWORK_POOL_EXECUTOR.submit(new ExponentialBackoffTask<AuthenticateResponse>() {
             @Override
-            public void run() {
-                int attempt = 0;
-                boolean success;
-                ObjectServerError error = null;
-                while (true) {
-                    attempt++;
-                    long sleep = Util.calculateExponentialDelay(attempt - 1, MAX_DELAY_MS);
-                    if (sleep > 0) {
-                        try {
-                            Thread.sleep(sleep);
-                        } catch (InterruptedException e) {
-                            return; // Abort authentication if interrupted.
-                        }
-                    }
+            protected AuthenticateResponse execute() {
+                return authServer.authenticateRealm(
+                        user.getUserToken(),
+                        configuration.getServerUrl(),
+                        user.getAuthenticationUrl()
+                );
+            }
 
-                    AuthenticateResponse response = authServer.authenticateRealm(
-                            user.getRefreshToken(),
-                            configuration.getServerUrl(),
-                            user.getAuthenticationUrl()
-                    );
-                    if (response.isValid()) {
-                        user.addAccessToken(configuration.getServerUrl(), response.getAccessToken());
-                        success = true;
-                        break;
-                    } else {
-                        // Only retry in case of IO exceptions, since that might be network timeouts etc.
-                        // All other errors indicate a bigger problem, so stop trying to authenticate and
-                        // unbind
-                        ObjectServerError responseError = response.getError();
-                        if (responseError.getErrorCode() != ErrorCode.IO_EXCEPTION) {
-                            success = false;
-                            error = responseError;
-                            break;
-                        }
-                    }
-                }
+            @Override
+            protected void onSuccess(AuthenticateResponse response) {
+                SyncUser.AccessDescription desc = new SyncUser.AccessDescription(
+                        response.getAccessToken(),
+                        configuration.getPath(),
+                        configuration.shouldDeleteRealmOnLogout()
+                );
+                user.addRealm(configuration.getServerUrl(), desc);
+                onSuccess.run();
+            }
 
-                if (success) {
-                    onSuccess.run();
-                } else {
-                    errorHandler.onError(getUserSession(), error);
-                }
+            @Override
+            protected void onError(AuthenticateResponse response) {
+                errorHandler.onError(getUserSession(), response.getError());
             }
         });
         networkRequest = new RealmAsyncTask(task, SyncManager.NETWORK_POOL_EXECUTOR);

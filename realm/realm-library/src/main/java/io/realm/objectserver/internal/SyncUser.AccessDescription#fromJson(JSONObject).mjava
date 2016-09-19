@@ -1,0 +1,11 @@
+        public static AccessDescription fromJson(JSONObject json) {
+            try {
+                Token token = Token.from(json.getJSONObject("accessToken"));
+                String localPath = json.getString("localPath");
+                boolean deleteOnLogout = json.getBoolean("deleteOnLogout");
+                return new AccessDescription(token, localPath, deleteOnLogout);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+

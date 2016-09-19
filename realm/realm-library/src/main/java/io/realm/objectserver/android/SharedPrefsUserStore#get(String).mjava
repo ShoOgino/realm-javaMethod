@@ -1,0 +1,21 @@
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public User get(String key) {
+        if (key == UserStore.CURRENT_USER_KEY && cachedCurrentUser != null) {
+            return cachedCurrentUser;
+        }
+
+        String userData = sp.getString(key, "");
+        if (userData.equals("")) {
+            return null;
+        }
+
+        User user = User.fromJson(userData);
+        if (UserStore.CURRENT_USER_KEY.equals(key)) {
+            cachedCurrentUser = user;
+        }
+        return user;
+    }
+

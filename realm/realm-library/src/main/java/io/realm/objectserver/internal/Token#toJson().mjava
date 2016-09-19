@@ -1,14 +1,18 @@
-    public String toJson() {
+    public JSONObject toJson() {
         JSONObject obj = new JSONObject();
         try {
             obj.put("token", value);
-            obj.put("expires", expiresSec);
+            JSONObject tokenData = new JSONObject();
+            tokenData.put("identity", identity);
+            tokenData.put("path", path);
+            tokenData.put("expires", expiresSec);
             JSONArray perms = new JSONArray();
             for (int i = 0; i < permissions.length; i++) {
                 perms.put(permissions[i].toString().toLowerCase(Locale.US));
             }
-            obj.put("access", perms);
-            return obj.toString();
+            tokenData.put("access", perms);
+            obj.put("token_data", tokenData);
+            return obj;
         } catch (JSONException e) {
             throw new RuntimeException("Could not convert Token to JSON.", e);
         }

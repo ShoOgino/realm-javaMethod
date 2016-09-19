@@ -1,7 +1,8 @@
     @Override
     protected void onStart() {
         super.onStart();
-        if (MyApplication.CURRENT_USER != null) {
+        if (User.currentUser() != null) {
+            user = User.currentUser();
             // Create a RealmConfiguration for our user
             SyncConfiguration config = new SyncConfiguration.Builder(this)
                     .initialData(new Realm.Transaction() {
@@ -10,7 +11,7 @@
                             realm.createObject(CRDTCounter.class, 1);
                         }
                     })
-                    .user(MyApplication.CURRENT_USER)
+                    .user(user)
                     .serverUrl("realm://" + MyApplication.OBJECT_SERVER_IP + "/~/default")
                     .build();
 
@@ -18,6 +19,7 @@
             realm = Realm.getInstance(config);
 
             // FIXME Looks like PrimaryKey and lists are not working correctly yet
+            // FIXME Also need support for the `setDefault` instruction for this to make sense.
 //            counter = realm.where(CRDTCounter.class).findFirstAsync();
 //            counter.addChangeListener(new RealmChangeListener<CRDTCounter>() {
 //                @Override
