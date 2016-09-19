@@ -7,15 +7,14 @@
     public void shouldBeAbleToVerifyTransactionCalls() {
 
         // Create activity
-        ActivityController<ExampleActivity> controller =
-                Robolectric.buildActivity(ExampleActivity.class).setup();
+        ActivityController<ExampleActivity> controller = Robolectric.buildActivity(ExampleActivity.class).setup();
         ExampleActivity activity = controller.get();
 
         assertThat(activity.getTitle().toString(), is("Unit Test Example"));
 
         // Verify that two Realm.getInstance() calls took place.
         verifyStatic(times(2));
-        Realm.getInstance(any(RealmConfiguration.class));
+        Realm.getDefaultInstance();
 
         // verify that we have four begin and commit transaction calls
         // Do not verify partial mock invocation count: https://github.com/jayway/powermock/issues/649

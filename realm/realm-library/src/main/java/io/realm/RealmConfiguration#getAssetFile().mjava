@@ -5,11 +5,6 @@
      * @throws IOException if copying the file fails.
      */
     InputStream getAssetFile() throws IOException {
-        Context context = contextWeakRef.get();
-        if (context != null) {
-            return context.getAssets().open(assetFilePath);
-        } else {
-            throw new IllegalArgumentException("Context should not be null. Use Application Context instead of Activity Context.");
-        }
+        return BaseRealm.applicationContext.getAssets().open(assetFilePath);
     }
 

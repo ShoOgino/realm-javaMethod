@@ -1,14 +1,7 @@
-        /**
-         * Creates an instance of the Builder for the SyncConfiguration.
-         * <p>
-         * This will use the app's own internal directory for storing the Realm file. This does not require any
-         * additional permissions. The default location is {@code /data/data/<packagename>/files/realm-object-server},
-         * but can change depending on vendor implementations of Android.
-         *
-         * @param context the Android application context.
-         */
-        public Builder(Context context) {
-            this.context = context;
+        Builder(Context context) {
+            if (context == null) {
+                throw new IllegalStateException("Call `Realm.init(Context)` before creating a SyncConfiguration");
+            }
             this.defaultFolder = new File(context.getFilesDir(), "realm-object-server");
             if (Realm.getDefaultModule() != null) {
                 this.modules.add(Realm.getDefaultModule());
