@@ -10,10 +10,10 @@
         if (internalTableName.length() > Table.TABLE_MAX_LENGTH) {
             throw new IllegalArgumentException("Class name is to long. Limit is 57 characters: " + className.length());
         }
-        if (transaction.hasTable(internalTableName)) {
+        if (realm.sharedRealm.hasTable(internalTableName)) {
             throw new IllegalArgumentException("Class already exists: " + className);
         }
-        Table table = transaction.getTable(internalTableName);
+        Table table = realm.sharedRealm.getTable(internalTableName);
         RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
         return new RealmObjectSchema(realm, table, columnIndices);
     }

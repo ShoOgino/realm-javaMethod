@@ -10,11 +10,13 @@
               .emitStatement("return (%s) cachedRealmObject", qualifiedClassName)
               .nextControlFlow("else");
 
+            writer.emitSingleLineComment("rejecting default values to avoid creating unexpected objects from RealmModel/RealmList fields.");
             if (metadata.hasPrimaryKey()) {
-                writer.emitStatement("%s realmObject = realm.createObject(%s.class, ((%s) newObject).%s())",
+                writer.emitStatement("%s realmObject = realm.createObjectInternal(%s.class, ((%s) newObject).%s(), false, Collections.<String>emptyList())",
                         qualifiedClassName, qualifiedClassName, interfaceName, metadata.getPrimaryKeyGetter());
             } else {
-                writer.emitStatement("%s realmObject = realm.createObject(%s.class)", qualifiedClassName, qualifiedClassName);
+                writer.emitStatement("%s realmObject = realm.createObjectInternal(%s.class, false, Collections.<String>emptyList())",
+                        qualifiedClassName, qualifiedClassName);
             }
             writer.emitStatement("cache.put(newObject, (RealmObjectProxy) realmObject)");
             for (VariableElement field : metadata.getFields()) {
@@ -22,6 +24,11 @@
                 String fieldType = field.asType().toString();
                 String setter = metadata.getSetter(fieldName);
                 String getter = metadata.getGetter(fieldName);
+
+                if (metadata.isPrimaryKey(field)) {
+                    // PK has been set when creating object.
+                    continue;
+                }
 
                 if (Utils.isRealmModel(field)) {
                     writer

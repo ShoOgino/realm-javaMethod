@@ -1,10 +1,11 @@
     @Before
     public void setup() throws Exception {
 
-        // Setup Realm to be mocked
+        // Setup Realm to be mocked. The order of these matters
+        mockStatic(RealmCore.class);
+        mockStatic(RealmLog.class);
         mockStatic(Realm.class);
         mockStatic(RealmConfiguration.class);
-        mockStatic(RealmCore.class);
 
         // Create the mock
         final Realm mockRealm = mock(Realm.class);
@@ -15,6 +16,7 @@
         // will be called by RealmConfiguration.Builder's constructor.
         doNothing().when(RealmCore.class);
         RealmCore.loadLibrary(any(Context.class));
+
 
         // TODO: Mock the RealmConfiguration's constructor. If the RealmConfiguration.Builder.build can be mocked, this
         // is not necessary anymore.

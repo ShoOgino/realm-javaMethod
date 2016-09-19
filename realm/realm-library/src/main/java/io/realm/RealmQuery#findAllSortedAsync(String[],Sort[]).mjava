@@ -17,12 +17,12 @@
             return findAllSortedAsync(fieldNames[0], sortOrders[0]);
 
         } else {
-            final WeakReference<Handler> weakHandler = getWeakReferenceHandler();
+            final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();
 
             // Handover the query (to be used by a worker thread)
-            final long handoverQueryPointer = query.handoverQuery(realm.sharedGroupManager.getNativePointer());
+            final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
 
-            // We need to use the same configuration to open a background SharedGroup to perform the query
+            // We need to use the same configuration to open a background SharedRealm to perform the query
             final RealmConfiguration realmConfiguration = realm.getConfiguration();
 
             final long indices[] = new long[fieldNames.length];
@@ -52,38 +52,34 @@
                 @Override
                 public Long call() throws Exception {
                     if (!Thread.currentThread().isInterrupted()) {
-                        SharedGroup sharedGroup = null;
+                        SharedRealm sharedRealm = null;
 
                         try {
-                            sharedGroup = new SharedGroup(realmConfiguration.getPath(),
-                                    SharedGroup.IMPLICIT_TRANSACTION,
-                                    realmConfiguration.getDurability(),
-                                    realmConfiguration.getEncryptionKey());
+                            sharedRealm = SharedRealm.getInstance(realmConfiguration);
 
                             // run the query & handover the table view for the caller thread
-                            long handoverTableViewPointer = query.findAllMultiSortedWithHandover(sharedGroup.getNativePointer(),
-                                    sharedGroup.getNativeReplicationPointer(), handoverQueryPointer, indices, sortOrders);
+                            long handoverTableViewPointer = TableQuery.findAllMultiSortedWithHandover(sharedRealm,
+                                    handoverQueryPointer, indices, sortOrders);
 
                             QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResultsResponse();
                             result.updatedTableViews.put(weakRealmResults, handoverTableViewPointer);
-                            result.versionID = sharedGroup.getVersion();
-                            closeSharedGroupAndSendMessageToHandler(sharedGroup,
-                                    weakHandler, HandlerControllerConstants.COMPLETED_ASYNC_REALM_RESULTS, result);
+                            result.versionID = sharedRealm.getVersionID();
+                            closeSharedRealmAndSendEventToNotifier(sharedRealm,
+                                    weakNotifier, QueryUpdateTask.NotifyEvent.COMPLETE_ASYNC_RESULTS, result);
 
                             return handoverTableViewPointer;
                         } catch (BadVersionException e) {
                             // In some rare race conditions, this can happen. In that case, just ignore the error.
-                            RealmLog.d("findAllSortedAsync handover could not complete due to a BadVersionException. " +
+                            RealmLog.debug("findAllSortedAsync handover could not complete due to a BadVersionException. " +
                                     "Retry is scheduled by a REALM_CHANGED event.");
 
                         } catch (Throwable e) {
-                            RealmLog.e(e.getMessage(), e);
-                            closeSharedGroupAndSendMessageToHandler(sharedGroup,
-                                    weakHandler, HandlerControllerConstants.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
-
+                            RealmLog.error(e);
+                            closeSharedRealmAndSendEventToNotifier(sharedRealm,
+                                    weakNotifier, QueryUpdateTask.NotifyEvent.THROW_BACKGROUND_EXCEPTION, e);
                         } finally {
-                            if (sharedGroup != null && !sharedGroup.isClosed()) {
-                                sharedGroup.close();
+                            if (sharedRealm != null && !sharedRealm.isClosed()) {
+                                sharedRealm.close();
                             }
                         }
                     } else {

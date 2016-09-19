@@ -5,7 +5,7 @@
             realm.beginTransaction();
             fail();
         } catch (IllegalStateException e) {
-            assertEquals("Nested transactions are not allowed. Use commitTransaction() after each beginTransaction().", e.getMessage());
+            assertTrue(e.getMessage().startsWith("The Realm is already in a write transaction"));
         }
         realm.commitTransaction();
     }

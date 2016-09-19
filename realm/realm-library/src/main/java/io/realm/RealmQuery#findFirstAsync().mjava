@@ -11,10 +11,10 @@
      */
     public E findFirstAsync() {
         checkQueryIsNotReused();
-        final WeakReference<Handler> weakHandler = getWeakReferenceHandler();
+        final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();
 
         // handover the query (to be used by a worker thread)
-        final long handoverQueryPointer = query.handoverQuery(realm.sharedGroupManager.getNativePointer());
+        final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
 
         // save query arguments (for future update)
         argumentsHolder = new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_FIRST);
@@ -26,30 +26,26 @@
         final E result;
         if (isDynamicQuery()) {
             //noinspection unchecked
-            result = (E) new DynamicRealmObject(className);
+            result = (E) new DynamicRealmObject(className, realm, Row.EMPTY_ROW, false);
         } else {
-            result = realm.getConfiguration().getSchemaMediator().newInstance(clazz, realm.getSchema().getColumnInfo(clazz));
+            result = realm.getConfiguration().getSchemaMediator().newInstance(
+                    clazz, realm, Row.EMPTY_ROW, realm.getSchema().getColumnInfo(clazz),
+                    false, Collections.<String>emptyList());
         }
 
-        RealmObjectProxy proxy = (RealmObjectProxy) result;
+        final RealmObjectProxy proxy = (RealmObjectProxy) result;
         final WeakReference<RealmObjectProxy> realmObjectWeakReference = realm.handlerController.addToAsyncRealmObject(proxy, this);
-        proxy.realmGet$proxyState().setRealm$realm(realm);
-        proxy.realmGet$proxyState().setRow$realm(Row.EMPTY_ROW);
 
         final Future<Long> pendingQuery = Realm.asyncTaskExecutor.submitQuery(new Callable<Long>() {
             @Override
             public Long call() throws Exception {
                 if (!Thread.currentThread().isInterrupted()) {
-                    SharedGroup sharedGroup = null;
+                    SharedRealm sharedRealm = null;
 
                     try {
-                        sharedGroup = new SharedGroup(realmConfiguration.getPath(),
-                                SharedGroup.IMPLICIT_TRANSACTION,
-                                realmConfiguration.getDurability(),
-                                realmConfiguration.getEncryptionKey());
+                        sharedRealm = SharedRealm.getInstance(realmConfiguration);
 
-                        long handoverRowPointer = query.findWithHandover(sharedGroup.getNativePointer(),
-                                sharedGroup.getNativeReplicationPointer(), handoverQueryPointer);
+                        long handoverRowPointer = TableQuery.findWithHandover(sharedRealm, handoverQueryPointer);
                         if (handoverRowPointer == 0) { // empty row
                             realm.handlerController.addToEmptyAsyncRealmObject(realmObjectWeakReference, RealmQuery.this);
                             realm.handlerController.removeFromAsyncRealmObject(realmObjectWeakReference);
@@ -57,21 +53,20 @@
 
                         QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmObjectResponse();
                         result.updatedRow.put(realmObjectWeakReference, handoverRowPointer);
-                        result.versionID = sharedGroup.getVersion();
-                        closeSharedGroupAndSendMessageToHandler(sharedGroup,
-                                weakHandler, HandlerControllerConstants.COMPLETED_ASYNC_REALM_OBJECT, result);
+                        result.versionID = sharedRealm.getVersionID();
+                        closeSharedRealmAndSendEventToNotifier(sharedRealm,
+                                weakNotifier, QueryUpdateTask.NotifyEvent.COMPLETE_ASYNC_OBJECT, result);
 
                         return handoverRowPointer;
 
                     } catch (Throwable e) {
-                        RealmLog.e(e.getMessage(), e);
+                        RealmLog.error(e);
                         // handler can't throw a checked exception need to wrap it into unchecked Exception
-                        closeSharedGroupAndSendMessageToHandler(sharedGroup,
-                                weakHandler, HandlerControllerConstants.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(e));
-
+                        closeSharedRealmAndSendEventToNotifier(sharedRealm,
+                                weakNotifier, QueryUpdateTask.NotifyEvent.THROW_BACKGROUND_EXCEPTION, e);
                     } finally {
-                        if (sharedGroup != null && !sharedGroup.isClosed()) {
-                            sharedGroup.close();
+                        if (sharedRealm != null && !sharedRealm.isClosed()) {
+                            sharedRealm.close();
                         }
                     }
                 } else {

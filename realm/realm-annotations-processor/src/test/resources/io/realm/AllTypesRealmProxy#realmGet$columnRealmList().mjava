@@ -1,4 +1,9 @@
     public RealmList<some.test.AllTypes> realmGet$columnRealmList() {
+        if (proxyState == null) {
+            // Called from model's constructor. Inject context.
+            injectObjectContext();
+        }
+
         proxyState.getRealm$realm().checkIfValid();
         // use the cached value if available
         if (columnRealmListRealmList != null) {

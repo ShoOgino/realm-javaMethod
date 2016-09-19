@@ -4,7 +4,9 @@
         File tempDirRenamed = new File(configFactory.getRoot(), "delete_test_dir_2");
         assertTrue(tempDir.mkdir());
 
-        final RealmConfiguration configuration = new RealmConfiguration.Builder(tempDir).build();
+        final RealmConfiguration configuration = new RealmConfiguration.Builder(InstrumentationRegistry.getTargetContext())
+                .directory(tempDir)
+                .build();
 
         final CountDownLatch bgThreadReadyLatch = new CountDownLatch(1);
         final CountDownLatch readyToCloseLatch = new CountDownLatch(1);
@@ -45,6 +47,8 @@
         assertTrue(Realm.deleteRealm(configuration));
 
         // Directory should be empty now
-        assertEquals(0, tempDir.listFiles().length);
+        // FIXME: .note file is the named pipe for OS android notification. Just don't delete it until we figure out
+        // one single daemon thread for notification.
+        assertEquals(/*0*/1, tempDir.listFiles().length);
     }
 

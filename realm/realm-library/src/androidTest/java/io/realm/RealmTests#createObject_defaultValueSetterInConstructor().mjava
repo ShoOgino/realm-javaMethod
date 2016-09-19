@@ -1,0 +1,63 @@
+    @Test
+    public void createObject_defaultValueSetterInConstructor() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                // create a DefaultValueSetter with non-default primary key value
+                realm.createObject(DefaultValueSetter.class,
+                        DefaultValueSetter.FIELD_LONG_PRIMARY_KEY_DEFAULT_VALUE * 3);
+            }
+        });
+        final String createdRandomString = DefaultValueSetter.lastRandomStringValue;
+
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_STRING,
+                DefaultValueSetter.FIELD_STRING_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_RANDOM_STRING,
+                createdRandomString);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_SHORT,
+                DefaultValueSetter.FIELD_SHORT_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_INT,
+                DefaultValueSetter.FIELD_INT_DEFAULT_VALUE);
+        // default value for pk must be ignored
+        testNoObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_LONG_PRIMARY_KEY,
+                        DefaultValueSetter.FIELD_LONG_PRIMARY_KEY_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_LONG_PRIMARY_KEY,
+                        DefaultValueSetter.FIELD_LONG_PRIMARY_KEY_DEFAULT_VALUE * 3);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_LONG,
+                DefaultValueSetter.FIELD_LONG_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_BYTE,
+                DefaultValueSetter.FIELD_BYTE_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_FLOAT,
+                DefaultValueSetter.FIELD_FLOAT_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_DOUBLE,
+                DefaultValueSetter.FIELD_DOUBLE_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_BOOLEAN,
+                DefaultValueSetter.FIELD_BOOLEAN_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_DATE,
+                DefaultValueSetter.FIELD_DATE_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_BINARY,
+                DefaultValueSetter.FIELD_BINARY_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_OBJECT + "." + RandomPrimaryKey.FIELD_INT,
+                        RandomPrimaryKey.FIELD_INT_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_LIST + "." + RandomPrimaryKey.FIELD_INT,
+                        RandomPrimaryKey.FIELD_INT_DEFAULT_VALUE);
+        testOneObjectFound(realm, DefaultValueSetter.class,
+                DefaultValueSetter.FIELD_LIST+ "." + RandomPrimaryKey.FIELD_INT,
+                        RandomPrimaryKey.FIELD_INT_DEFAULT_VALUE + 1);
+    }
+

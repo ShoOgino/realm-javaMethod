@@ -1,0 +1,24 @@
+    /**
+     * Removes the given logger if it is currently added.
+     *
+     * @return {@code true} if the logger was removed, {@code false} otherwise.
+     */
+    public static boolean remove(Logger logger) {
+        if (logger == null) {
+            throw new IllegalArgumentException("A non-null logger has to be provided");
+        }
+        synchronized (LOGGERS) {
+            LOGGERS.remove(logger);
+            int newMinLevel = Integer.MAX_VALUE;
+            for (int i = 0; i < LOGGERS.size(); i++) {
+                int logMin = LOGGERS.get(i).getMinimumNativeDebugLevel();
+                if (logMin < newMinLevel) {
+                    newMinLevel = logMin;
+                }
+            }
+            setMinimumNativeDebugLevel(newMinLevel);
+            loggersAsArray = LOGGERS.toArray(new Logger[LOGGERS.size()]);
+        }
+        return true;
+    }
+

@@ -1,0 +1,39 @@
+    // Inspired by https://github.com/JakeWharton/timber/blob/master/timber/src/main/java/timber/log/Timber.java
+    private void log(int androidLogLevel, Throwable t, String message, Object... args) {
+        if (androidLogLevel < minimumLogLevel) {
+            return;
+        }
+        if (message == null) {
+            if (t == null) {
+                return; // Ignore event if message is null and there's no throwable.
+            }
+            message = getStackTraceString(t);
+        } else {
+            if (args != null && args.length > 0) {
+                message = String.format(message, args);
+            }
+            if (t != null) {
+                message += "\n" + getStackTraceString(t);
+            }
+        }
+
+        // Message fit one line. Just print and exit
+        if (message.length() < LOG_ENTRY_MAX_LENGTH) {
+            Log.println(androidLogLevel, logTag, message);
+            return;
+        }
+
+        // Message does not fit one line.
+        // Split by line, then ensure each line can fit into Log's maximum length.
+        for (int i = 0, length = message.length(); i < length; i++) {
+            int newline = message.indexOf('\n', i);
+            newline = newline != -1 ? newline : length;
+            do {
+                int end = Math.min(newline, i + LOG_ENTRY_MAX_LENGTH);
+                String part = message.substring(i, end);
+                Log.println(androidLogLevel, logTag, part);
+                i = end;
+            } while (i < newline);
+        }
+    }
+

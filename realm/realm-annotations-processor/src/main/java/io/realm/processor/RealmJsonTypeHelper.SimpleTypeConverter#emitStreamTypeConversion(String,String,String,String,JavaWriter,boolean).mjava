@@ -1,0 +1,24 @@
+        @Override
+        public void emitStreamTypeConversion(String interfaceName, String setter, String fieldName, String fieldType,
+                                             JavaWriter writer, boolean isPrimaryKey)
+                throws IOException {
+            String statementSetNullOrThrow;
+            if (Utils.isPrimitiveType(fieldType)) {
+                // Only throw exception for primitive types. For boxed types and String, exception will be thrown in
+                // the setter.
+                statementSetNullOrThrow = String.format(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName);
+            } else {
+                statementSetNullOrThrow = String.format("((%s) obj).%s(null)", interfaceName, setter);
+            }
+            writer
+                .beginControlFlow("if (reader.peek() == JsonToken.NULL)")
+                    .emitStatement("reader.skipValue()")
+                    .emitStatement(statementSetNullOrThrow)
+                .nextControlFlow("else")
+                    .emitStatement("((%s) obj).%s((%s) reader.next%s())", interfaceName, setter, castType, jsonType)
+                .endControlFlow();
+            if (isPrimaryKey) {
+                writer.emitStatement("jsonHasPrimaryKey = true");
+            }
+        }
+
