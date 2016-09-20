@@ -10,10 +10,9 @@
         SyncManager.setDefaultSessionErrorHandler(errorHandler);
 
         // Create configuration using the default handler
-        SyncConfiguration config = new SyncConfiguration.Builder(context)
-                .user(createTestUser())
-                .serverUrl("realm://objectserver.realm.io/default")
-                .build();
+        User user = createTestUser();
+        String url = "realm://objectserver.realm.io/default";
+        SyncConfiguration config = new SyncConfiguration.Builder(user, url).build();
         assertEquals(errorHandler, config.getErrorHandler());
         SyncManager.setDefaultSessionErrorHandler(null);
     }

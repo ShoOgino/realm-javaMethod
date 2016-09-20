@@ -1,17 +1,12 @@
     @Test
     public void errorHandler() {
-        SyncConfiguration.Builder builder;
-        builder = new SyncConfiguration.Builder(context)
-                .user(createTestUser())
-                .serverUrl("realm://objectserver.realm.io/default");
-
+        SyncConfiguration.Builder builder = new SyncConfiguration.Builder(createTestUser(), "realm://objectserver.realm.io/default");
         Session.ErrorHandler errorHandler = new Session.ErrorHandler() {
             @Override
             public void onError(Session session, ObjectServerError error) {
 
             }
         };
-
         SyncConfiguration config = builder.errorHandler(errorHandler).build();
         assertEquals(errorHandler, config.getErrorHandler());
     }

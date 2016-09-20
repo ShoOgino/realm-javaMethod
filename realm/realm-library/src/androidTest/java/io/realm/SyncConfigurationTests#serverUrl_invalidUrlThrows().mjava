@@ -16,10 +16,9 @@
             "http://objectserver.realm.io/~/default", // wrong scheme
         };
 
-        SyncConfiguration.Builder builder = new SyncConfiguration.Builder(context);
         for (String invalidUrl : invalidUrls) {
             try {
-                builder.serverUrl(invalidUrl);
+                new SyncConfiguration.Builder(createTestUser(), invalidUrl);
                 fail(invalidUrl + " should have failed.");
             } catch (IllegalArgumentException ignore) {
             }

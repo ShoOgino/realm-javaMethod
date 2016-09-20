@@ -1,4 +1,4 @@
-        Builder(Context context) {
+        Builder(Context context, User user, String url) {
             if (context == null) {
                 throw new IllegalStateException("Call `Realm.init(Context)` before creating a SyncConfiguration");
             }
@@ -6,5 +6,8 @@
             if (Realm.getDefaultModule() != null) {
                 this.modules.add(Realm.getDefaultModule());
             }
+
+            validateAndSet(user);
+            validateAndSet(url);
         }
 

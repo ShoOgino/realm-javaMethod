@@ -1,15 +1,13 @@
     @Test
     public void user_invalidUserThrows() {
-        SyncConfiguration.Builder builder = new SyncConfiguration.Builder(context);
-
         try {
-            builder.user(null);
+            new SyncConfiguration.Builder(null, "realm://ros.realm.io/default");
         } catch (IllegalArgumentException ignore) {
         }
 
         User user = createTestUser(0); // Create user that has expired credentials
         try {
-            builder.user(user);
+            new SyncConfiguration.Builder(user, "realm://ros.realm.io/default");
         } catch (IllegalArgumentException ignore) {
         }
     }

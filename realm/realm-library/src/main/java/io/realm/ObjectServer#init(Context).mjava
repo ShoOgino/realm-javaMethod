@@ -1,0 +1,15 @@
+    public static void init(Context context) {
+        // Setup AppID
+        String appId = "unknown";
+        try {
+            PackageInfo pi = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            appId = pi.packageName;
+        } catch (Exception ignore) {
+        }
+
+        // Configure default UserStore
+        UserStore userStore = new SharedPrefsUserStore(context);
+
+        SyncManager.init(appId, userStore);
+    }
+

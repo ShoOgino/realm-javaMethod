@@ -1,0 +1,18 @@
+    // Called from SyncObjectServerFacade using reflection
+    @SuppressWarnings("unused")
+    static void init(String appId, UserStore userStore) {
+
+        // Initialize underlying Sync Network Client
+        nativeInitializeSyncClient();
+
+        // Create the client thread in java to avoid problems when exceptions are being thrown. We need to attach
+        // any thread to the JVM anyway in order to send back log events.
+        clientThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                nativeRunClient();
+            }
+        }, "RealmSyncClient");
+        clientThread.start();
+    }
+
