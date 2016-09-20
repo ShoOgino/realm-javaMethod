@@ -1,7 +1,12 @@
     @Override
     public void onCreate() {
         super.onCreate();
-        RealmLog.add(new AndroidLogger(Log.VERBOSE));
-        SyncManager.setUserStore(new SharedPrefsUserStore(this)); // Temporary until we can find a way to inject Context.
+        Realm.init(this);
+
+        // Enable full log output when debugging
+        if (BuildConfig.DEBUG) {
+            RealmLog.clear();
+            RealmLog.add(new AndroidLogger(Log.VERBOSE));
+        }
     }
 
