@@ -1,8 +1,11 @@
-    public static void realmClosed(RealmConfiguration configuration) {
-        if (SYNC_AVAILABLE && configuration instanceof SyncConfiguration) {
+    @Override
+    public void realmClosed(RealmConfiguration configuration) {
+        if (configuration instanceof SyncConfiguration) {
             Session publicSession = SyncManager.getSession((SyncConfiguration) configuration);
             SyncSession session = SessionStore.getPrivateSession(publicSession);
             session.getSyncPolicy().onRealmClosed(session);
+        } else {
+            throw new IllegalArgumentException(WRONG_TYPE_OF_CONFIGURATION);
         }
     }
 

@@ -57,7 +57,8 @@
             // No more instance of typed Realm and dynamic Realm. Remove the configuration from cache.
             if (totalRefCount == 0) {
                 cachesMap.remove(canonicalPath);
-                ObjectServerFacade.realmClosed(realm.getConfiguration());
+                ObjectServerFacade.getFacade(realm.getConfiguration().isSyncConfiguration())
+                        .realmClosed(realm.getConfiguration());
             }
 
         } else {

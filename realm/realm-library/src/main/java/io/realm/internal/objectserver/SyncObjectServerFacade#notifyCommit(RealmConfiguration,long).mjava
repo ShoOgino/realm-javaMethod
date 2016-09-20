@@ -1,0 +1,11 @@
+    @Override
+    public void notifyCommit(RealmConfiguration configuration, long lastSnapshotVersion) {
+        if (configuration instanceof SyncConfiguration) {
+            Session publicSession = SyncManager.getSession((SyncConfiguration) configuration);
+            SyncSession session = SessionStore.getPrivateSession(publicSession);
+            session.notifyCommit(lastSnapshotVersion);
+        } else {
+            throw new IllegalArgumentException(WRONG_TYPE_OF_CONFIGURATION);
+        }
+    }
+
