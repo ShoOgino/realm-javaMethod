@@ -10,8 +10,8 @@
         try {
             JSONObject obj = new JSONObject(user);
             URL authUrl = new URL(obj.getString("authUrl"));
-            Token refreshToken = Token.from(obj.getJSONObject("userToken"));
-            SyncUser syncUser = new SyncUser(refreshToken, authUrl);
+            Token userToken = Token.from(obj.getJSONObject("userToken"));
+            SyncUser syncUser = new SyncUser(userToken, authUrl);
             JSONArray realmTokens = obj.getJSONArray("realms");
             for (int i = 0; i < realmTokens.length(); i++) {
                 JSONObject token = realmTokens.getJSONObject(i);

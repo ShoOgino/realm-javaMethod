@@ -1,0 +1,11 @@
+    public static AuthenticateResponse createRefreshResponse() {
+        try {
+            Token userToken = new Token(USER_TOKEN, "JohnDoe", null, Long.MAX_VALUE, null);
+            JSONObject response = new JSONObject();
+            response.put("refresh_token", userToken.toJson());
+            return AuthenticateResponse.from(response.toString());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+

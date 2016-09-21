@@ -1,30 +1,5 @@
     public void setRefreshToken(final Token refreshToken) {
         this.refreshToken = refreshToken; // Replace any existing token. TODO re-save the user with latest token.
-
-        // Schedule a refresh. This method cannot fail, but will continue retrying until either the app is killed
-        // or the attempt was successful.
-        final long expire = refreshToken.expiresMs();
-        final AuthenticationServer server = SyncManager.getAuthServer();
-        Future<?> task = SyncManager.NETWORK_POOL_EXECUTOR.submit(new ExponentialBackoffTask<RefreshResponse>() {
-            @Override
-            protected RefreshResponse execute() {
-                long timeToExpiration = System.currentTimeMillis() - expire;
-                if (timeToExpiration - REFRESH_WINDOW_MS > 0) {
-                    SystemClock.sleep(timeToExpiration);
-                }
-                return server.refresh(refreshToken.value(), authenticationUrl);
-            }
-
-            @Override
-            protected void onSuccess(RefreshResponse response) {
-                setRefreshToken(response.getRefreshToken());
-            }
-
-            @Override
-            protected void onError(RefreshResponse response) {
-
-            }
-        });
-        refreshTask = new RealmAsyncTaskImpl(task, SyncManager.NETWORK_POOL_EXECUTOR);
+        scheduleRefresh();
     }
 
