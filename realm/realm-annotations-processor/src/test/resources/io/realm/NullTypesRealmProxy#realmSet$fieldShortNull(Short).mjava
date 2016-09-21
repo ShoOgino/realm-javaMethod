@@ -8,6 +8,13 @@
             if (!proxyState.getAcceptDefaultValue$realm()) {
                 return;
             }
+            final Row row = proxyState.getRow$realm();
+            if (value == null) {
+                row.getTable().setNull(columnInfo.fieldShortNullIndex, row.getIndex(), true);
+                return;
+            }
+            row.getTable().setLong(columnInfo.fieldShortNullIndex, row.getIndex(), value, true);
+            return;
         }
 
         proxyState.getRealm$realm().checkIfValid();
