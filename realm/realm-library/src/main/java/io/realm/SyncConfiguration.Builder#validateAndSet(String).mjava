@@ -1,12 +1,12 @@
-        private void validateAndSet(String url) {
-            if (url == null) {
-                throw new IllegalArgumentException("Non-null 'url' required.");
+        private void validateAndSet(String uri) {
+            if (uri == null) {
+                throw new IllegalArgumentException("Non-null 'uri' required.");
             }
 
             try {
-                serverUrl = new URI(url);
+                serverUrl = new URI(uri);
             } catch (URISyntaxException e) {
-                throw new IllegalArgumentException("Invalid url: " + url, e);
+                throw new IllegalArgumentException("Invalid URI: " + uri, e);
             }
 
             // scheme must be realm or realms
@@ -27,7 +27,7 @@
             // Detect last path segment as it is the default file name
             String path = serverUrl.getPath();
             if (path == null) {
-                throw new IllegalArgumentException("Invalid url: " + url);
+                throw new IllegalArgumentException("Invalid URI: " + uri);
             }
 
             String[] pathSegments = path.split("/");
@@ -37,11 +37,11 @@
                     continue;
                 }
                 if (segment.equals("..") || segment.equals(".")) {
-                    throw new IllegalArgumentException("The URL has an invalid segment: " + segment);
+                    throw new IllegalArgumentException("The URI has an invalid segment: " + segment);
                 }
                 Matcher m = pattern.matcher(segment);
                 if (!m.matches()) {
-                    throw new IllegalArgumentException("The URL must only contain characters 0-9, a-z, A-Z, ., _, and -: " + segment);
+                    throw new IllegalArgumentException("The URI must only contain characters 0-9, a-z, A-Z, ., _, and -: " + segment);
                 }
             }
 
@@ -52,14 +52,14 @@
             if (defaultLocalFileName.endsWith(".realm")
                     || defaultLocalFileName.endsWith(".realm.lock")
                     || defaultLocalFileName.endsWith(".realm.management")) {
-                throw new IllegalArgumentException("The URL must not end with '.realm', '.realm.lock' or '.realm.management: " + url);
+                throw new IllegalArgumentException("The URI must not end with '.realm', '.realm.lock' or '.realm.management: " + uri);
             }
 
             try {
                 this.serverUrl = new URI(scheme, serverUrl.getUserInfo(), serverUrl.getHost(),
                         port, serverUrl.getPath(), serverUrl.getQuery(), serverUrl.getFragment());
             } catch (URISyntaxException e) {
-                throw new IllegalArgumentException("Cannot reconstruct url: " + url, e);
+                throw new IllegalArgumentException("Cannot reconstruct URI: " + uri, e);
             }
         }
 

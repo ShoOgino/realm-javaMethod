@@ -1,30 +1,30 @@
         /**
          * Creates an instance of the Builder for the SyncConfiguration.
          * <p>
-         * Opening a synchronized Realm requires a valid user and an unique URL that identifies that Realm. In URL's,
+         * Opening a synchronized Realm requires a valid user and an unique URI that identifies that Realm. In URIs,
          * {@code /~/} can be used as a placeholder for a user ID in case the Realm should only be available to one
-         * user, e.g. {@code "realm://objectserver.realm.io/~/default"}
+         * user e.g., {@code "realm://objectserver.realm.io/~/default"}.
          * <p>
-         * The URL cannot end with {@code .realm}.
+         * The URL cannot end with {@code .realm}, {@code .realm.lock} or {@code .realm.management}.
          * <p>
-         * The `/~/` will automatically be replaced with the user ID when creating the {@link SyncConfiguration}.
+         * The {@code /~/} will automatically be replaced with the user ID when creating the {@link SyncConfiguration}.
          * <p>
-         * The URL also defines the local location on disk. The default location of a synchronized Realm file is
-         * {@code /data/data/<packageName>/files/realm-object-server/<user-id>/<last-path-segment>}, but this behaviour
+         * Moreover, the URI defines the local location on disk. The default location of a synchronized Realm file is
+         * {@code /data/data/<packageName>/files/realm-object-server/<user-id>/<last-path-segment>}, but this behavior
          * can be overwritten using {@link #name(String)} and {@link #directory(File)}.
          * <p>
          * Many Android devices are using FAT32 file systems. FAT32 file systems have a limitation that
-         * file name cannot be longer than 255 characters. Moreover, the entire URL should not exceed 256 characters.
+         * file names cannot be longer than 255 characters. Moreover, the entire URI should not exceed 256 characters.
          * If file name and underlying path are too long to handle for FAT32, a shorter unique name will be generated.
          * See also @{link https://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx}.
          *
-         * @param user Set the user for this Realm. An authenticated {@link User} is required to open any Realm managed
+         * @param user the user for this Realm. An authenticated {@link User} is required to open any Realm managed
          *             by a Realm Object Server.
-         * @param url URL identifying the Realm.
+         * @param uri URI identifying the Realm.
          *
          * @see User#isValid()
          */
-        public Builder(User user, String url) {
-            this(BaseRealm.applicationContext, user, url);
+        public Builder(User user, String uri) {
+            this(BaseRealm.applicationContext, user, uri);
         }
 
