@@ -1,0 +1,34 @@
+    @Test
+    public void isNull() {
+
+        sharedRealm.beginTransaction();
+        for (int i = 0; i < table.size(); i++) {
+            if (isOdd(i)) {
+                table.setNull(STRING_COLUMN_INDEX, i, false);
+            }
+        }
+        sharedRealm.commitTransaction();
+
+        TableQuery query = table.where();
+        for (int i = 0; i < ROW_COUNT; i++) {
+            if (isOdd(i)) {
+                query = query.or().equalTo(new long[]{INTEGER_COLUMN_INDEX}, (long) i);
+            }
+        }
+        final TableView oddRows = query.findAll();
+        for (int i = 0; i < oddRows.size(); i++) {
+            assertEquals("index: " + i, true, oddRows.isNull(STRING_COLUMN_INDEX, i));
+        }
+
+        query = table.where();
+        for (int i = 0; i < ROW_COUNT; i++) {
+            if (isEven(i)) {
+                query = query.or().equalTo(new long[]{INTEGER_COLUMN_INDEX}, (long) i);
+            }
+        }
+        final TableView evenRows = query.findAll();
+        for (int i = 0; i < evenRows.size(); i++) {
+            assertEquals("index: " + i, false, evenRows.isNull(STRING_COLUMN_INDEX, i));
+        }
+    }
+

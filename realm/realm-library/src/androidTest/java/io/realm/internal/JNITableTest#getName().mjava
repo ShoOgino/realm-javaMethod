@@ -5,13 +5,18 @@
         Realm.deleteRealm(configuration);
 
         SharedRealm sharedRealm = SharedRealm.getInstance(configuration);
+        //noinspection TryFinallyCanBeTryWithResources
+        try {
 
-        // Write transaction must be run so we are sure a db exists with the correct table
-        sharedRealm.beginTransaction();
-        sharedRealm.getTable(TABLE_NAME);
-        sharedRealm.commitTransaction();
+            // Write transaction must be run so we are sure a db exists with the correct table
+            sharedRealm.beginTransaction();
+            sharedRealm.getTable(TABLE_NAME);
+            sharedRealm.commitTransaction();
 
-        Table table = sharedRealm.getTable(TABLE_NAME);
-        assertEquals(TABLE_NAME, table.getName());
+            Table table = sharedRealm.getTable(TABLE_NAME);
+            assertEquals(TABLE_NAME, table.getName());
+        } finally {
+            sharedRealm.close();
+        }
     }
 

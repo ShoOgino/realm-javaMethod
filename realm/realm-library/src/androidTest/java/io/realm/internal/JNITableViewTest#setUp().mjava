@@ -1,0 +1,20 @@
+    @Before
+    public void setUp() {
+        sharedRealm = SharedRealm.getInstance(configFactory.createConfiguration());
+        sharedRealm.beginTransaction();
+        try {
+            table = sharedRealm.getTable(TABLE_NAME);
+
+            for (RealmFieldType field : FIELDS) {
+                final long index = table.addColumn(field, field.name().toLowerCase(Locale.ENGLISH) + "Column");
+                table.convertColumnToNullable(index);
+            }
+
+            for (int i = 0; i < ROW_COUNT; i++) {
+                table.add(i, true, "abcd", new byte[]{123, -123}, new Date(12345), 1.234f, 3.446d);
+            }
+        } finally {
+            sharedRealm.commitTransaction();
+        }
+    }
+
