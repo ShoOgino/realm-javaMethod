@@ -1,7 +1,9 @@
     @Test
     public void modelClasses_forGeneratedMediator() throws Exception {
-        final RealmConfiguration config = new RealmConfiguration.Builder(configFactory.getRoot())
-                .modules(new HumanModule()).build();
+        final RealmConfiguration config = new RealmConfiguration.Builder(context)
+                .directory(configFactory.getRoot())
+                .modules(new HumanModule())
+                .build();
         assertTrue(config.getSchemaMediator() instanceof HumanModuleMediator);
 
         final Set<Class<? extends RealmModel>> realmClasses = config.getRealmObjectClasses();

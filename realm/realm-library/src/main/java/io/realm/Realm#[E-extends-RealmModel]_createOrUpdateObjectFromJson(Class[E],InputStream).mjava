@@ -10,8 +10,9 @@
      * @param clazz type of {@link io.realm.RealmObject} to create or update. It must have a primary key defined.
      * @param in the {@link InputStream} with object data in JSON format.
      * @return created or updated {@link io.realm.RealmObject}.
-     * @throws java.lang.IllegalArgumentException if trying to update a class without a
-     *         {@link io.realm.annotations.PrimaryKey}.
+     * @throws IllegalArgumentException if trying to update a class without a {@link io.realm.annotations.PrimaryKey}.
+     * @throws IllegalArgumentException if the JSON object doesn't have a primary key property but the corresponding
+     * {@link RealmObjectSchema} has a {@link io.realm.annotations.PrimaryKey} defined.
      * @throws RealmException if failure to read JSON.
      * @see #createObjectFromJson(Class, java.io.InputStream)
      */
@@ -20,6 +21,7 @@
         if (clazz == null || in == null) {
             return null;
         }
+        checkIfValid();
         checkHasPrimaryKey(clazz);
 
         // As we need the primary key value we have to first parse the entire input stream as in the general

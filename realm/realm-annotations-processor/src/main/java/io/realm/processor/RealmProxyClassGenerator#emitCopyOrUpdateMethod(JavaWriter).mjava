@@ -18,6 +18,8 @@
                 .emitStatement("return object")
             .endControlFlow();
 
+        writer.emitStatement("final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get()");
+
         writer.emitStatement("RealmObjectProxy cachedRealmObject = cache.get(object)");
         writer.beginControlFlow("if (cachedRealmObject != null)")
                 .emitStatement("return (%s) cachedRealmObject", qualifiedClassName)
@@ -63,12 +65,16 @@
 
                 writer
                     .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
-                        .emitStatement("realmObject = new %s(realm.schema.getColumnInfo(%s.class))",
-                                qualifiedGeneratedClassName,
-                                qualifiedClassName)
-                        .emitStatement("((RealmObjectProxy)realmObject).realmGet$proxyState().setRealm$realm(realm)")
-                        .emitStatement("((RealmObjectProxy)realmObject).realmGet$proxyState().setRow$realm(table.getUncheckedRow(rowIndex))")
-                        .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
+                        .beginControlFlow("try")
+                            .emitStatement("objectContext.set(realm, table.getUncheckedRow(rowIndex)," +
+                                    " realm.schema.getColumnInfo(%s.class)," +
+                                    " false, Collections.<String> emptyList())", qualifiedClassName)
+                            .emitStatement("realmObject = new %s()", qualifiedGeneratedClassName)
+                            .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
+                        .nextControlFlow("finally")
+                            .emitStatement("objectContext.clear()")
+                        .endControlFlow()
+
                     .nextControlFlow("else")
                         .emitStatement("canUpdate = false")
                     .endControlFlow();

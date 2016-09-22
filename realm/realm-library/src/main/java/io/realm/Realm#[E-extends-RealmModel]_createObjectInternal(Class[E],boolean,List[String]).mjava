@@ -1,0 +1,23 @@
+    /**
+     * Same as {@link #createObject(Class)} but this does not check the thread.
+     *
+     * @param clazz the Class of the object to create.
+     * @param acceptDefaultValue if {@code true}, default value of the object will be applied and
+     *                           if {@code false}, it will be ignored.
+     * @return the new object.
+     * @throws RealmException if the primary key is defined in the model class or an object cannot be created.
+     */
+    // called from proxy classes
+    <E extends RealmModel> E createObjectInternal(Class<E> clazz,
+                                                            boolean acceptDefaultValue,
+                                                            List<String> excludeFields) {
+        Table table = schema.getTable(clazz);
+        // Check and throw the exception earlier for a better exception message.
+        if (table.hasPrimaryKey()) {
+            throw new RealmException(String.format("'%s' has a primary key, use" +
+                    " 'createObject(Class<E>, Object)' instead.", Table.tableNameToClassName(table.getName())));
+        }
+        long rowIndex = table.addEmptyRow();
+        return get(clazz, rowIndex, acceptDefaultValue, excludeFields);
+    }
+

@@ -1,0 +1,12 @@
+    @Test
+    public void setNulls() {
+        Table t = new Table();
+        t.addColumn(RealmFieldType.STRING, "");
+        t.addColumn(RealmFieldType.DATE, "");
+        t.addColumn(RealmFieldType.BINARY, "");
+        t.add("String val", new Date(), new byte[]{1, 2, 3});
+
+        try { t.setString(0, 0, null, false);  fail("null string not allowed"); } catch (IllegalArgumentException ignored) { }
+        try { t.setDate(1, 0, null, false);    fail("null Date not allowed"); } catch (IllegalArgumentException ignored) { }
+    }
+

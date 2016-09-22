@@ -4,14 +4,14 @@
      * @return the set of all classes in this Realm or no RealmObject classes can be saved in the Realm.
      */
     public Set<RealmObjectSchema> getAll() {
-        int tableCount = (int) transaction.size();
+        int tableCount = (int) realm.sharedRealm.size();
         Set<RealmObjectSchema> schemas = new LinkedHashSet<>(tableCount);
         for (int i = 0; i < tableCount; i++) {
-            String tableName = transaction.getTableName(i);
-            if (Table.isMetaTable(tableName)) {
+            String tableName = realm.sharedRealm.getTableName(i);
+            if (!Table.isModelTable(tableName)) {
                 continue;
             }
-            Table table = transaction.getTable(tableName);
+            Table table = realm.sharedRealm.getTable(tableName);
             RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
             schemas.add(new RealmObjectSchema(realm, table, columnIndices));
         }

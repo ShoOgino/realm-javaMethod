@@ -1,8 +1,4 @@
     boolean isImmutable() {
-        if (!(parent instanceof Table)) {
-            return parent != null && ((Group) parent).immutable;
-        } else {
-            return ((Table)parent).isImmutable();
-        }
+        return sharedRealm != null && !sharedRealm.isInTransaction();
     }
 

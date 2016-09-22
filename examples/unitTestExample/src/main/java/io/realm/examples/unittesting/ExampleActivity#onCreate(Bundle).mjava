@@ -1,14 +1,13 @@
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Realm.init(getApplicationContext());
         setContentView(R.layout.activity_example);
         rootLayout = ((LinearLayout) findViewById(R.id.container));
         rootLayout.removeAllViews();
 
-        // Create Realm configuration if it doesn't exist.
-        realmConfig = new RealmConfiguration.Builder(this).build();
         // Open the default Realm for the UI thread.
-        realm = Realm.getInstance(realmConfig);
+        realm = Realm.getDefaultInstance();
 
         // Clean up from previous run
         cleanUp();

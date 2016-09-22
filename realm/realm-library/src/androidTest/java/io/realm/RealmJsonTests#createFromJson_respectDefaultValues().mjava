@@ -1,0 +1,36 @@
+    @Test
+    public void createFromJson_respectDefaultValues() throws JSONException {
+        final long fieldLongPrimaryKeyValue = DefaultValueOfField.FIELD_LONG_PRIMARY_KEY_DEFAULT_VALUE + 1;
+
+        // Step 1: Prepare almost empty JSON
+        final JSONObject json = new JSONObject();
+        json.put(DefaultValueOfField.FIELD_LONG_PRIMARY_KEY, fieldLongPrimaryKeyValue);
+
+        // Step 2: Update with almost empty JSONObject
+        realm.beginTransaction();
+        final DefaultValueOfField managedObj = realm.createOrUpdateObjectFromJson(DefaultValueOfField.class, json);
+        realm.commitTransaction();
+
+        // Step 3: Check that default values are applied
+        assertEquals(DefaultValueOfField.FIELD_IGNORED_DEFAULT_VALUE,
+                managedObj.getFieldIgnored());
+        assertEquals(DefaultValueOfField.FIELD_STRING_DEFAULT_VALUE, managedObj.getFieldString());
+        assertFalse(TextUtils.isEmpty(managedObj.getFieldRandomString()));
+        assertEquals(DefaultValueOfField.FIELD_SHORT_DEFAULT_VALUE, managedObj.getFieldShort());
+        assertEquals(DefaultValueOfField.FIELD_INT_DEFAULT_VALUE, managedObj.getFieldInt());
+        assertEquals(fieldLongPrimaryKeyValue, managedObj.getFieldLongPrimaryKey());
+        assertEquals(DefaultValueOfField.FIELD_LONG_DEFAULT_VALUE, managedObj.getFieldLong());
+        assertEquals(DefaultValueOfField.FIELD_BYTE_DEFAULT_VALUE, managedObj.getFieldByte());
+        assertEquals(DefaultValueOfField.FIELD_FLOAT_DEFAULT_VALUE, managedObj.getFieldFloat(), 0f);
+        assertEquals(DefaultValueOfField.FIELD_DOUBLE_DEFAULT_VALUE, managedObj.getFieldDouble(), 0d);
+        assertEquals(DefaultValueOfField.FIELD_BOOLEAN_DEFAULT_VALUE, managedObj.isFieldBoolean());
+        assertEquals(DefaultValueOfField.FIELD_DATE_DEFAULT_VALUE, managedObj.getFieldDate());
+        assertTrue(Arrays.equals(DefaultValueOfField.FIELD_BINARY_DEFAULT_VALUE, managedObj.getFieldBinary()));
+        assertEquals(RandomPrimaryKey.FIELD_INT_DEFAULT_VALUE, managedObj.getFieldObject().getFieldInt());
+        assertEquals(1, managedObj.getFieldList().size());
+        assertEquals(RandomPrimaryKey.FIELD_INT_DEFAULT_VALUE, managedObj.getFieldList().first().getFieldInt());
+
+        // make sure that excess object by default value is not created.
+        assertEquals(2, realm.where(RandomPrimaryKey.class).count());
+    }
+

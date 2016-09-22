@@ -1,0 +1,26 @@
+    // Called by Java when transaction committed to send LOCAL_COMMIT to current thread's handler.
+    @Override
+    public void notifyCommitByLocalThread() {
+        if (handler == null) {
+            return;
+        }
+
+        // Force any updates on the current thread to the front the queue. Doing this is mostly
+        // relevant on the UI thread where it could otherwise process a motion event before the
+        // REALM_CHANGED event. This could in turn cause a UI component like ListView to crash. See
+        // https://github.com/realm/realm-android-adapters/issues/11 for such a case.
+        // Other Looper threads could process similar events. For that reason all looper threads will
+        // prioritize local commits.
+        //
+        // If a user is doing commits inside a RealmChangeListener this can cause the Looper thread to get
+        // event starved as it only starts handling Realm events instead. This is an acceptable risk as
+        // that behaviour indicate a user bug. Previously this would be hidden as the UI would still
+        // be responsive.
+        Message msg = Message.obtain();
+        msg.what = HandlerControllerConstants.LOCAL_COMMIT;
+        if (!handler.hasMessages(HandlerControllerConstants.LOCAL_COMMIT)) {
+            handler.removeMessages(HandlerControllerConstants.REALM_CHANGED);
+            handler.sendMessageAtFrontOfQueue(msg);
+        }
+    }
+

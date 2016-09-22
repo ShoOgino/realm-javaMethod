@@ -1,10 +1,12 @@
     @Before
     public void setup() throws Exception {
 
-        // Setup Realm to be mocked
+        // Setup Realm to be mocked. The order of these matters
+        mockStatic(RealmCore.class);
+        mockStatic(RealmLog.class);
         mockStatic(Realm.class);
         mockStatic(RealmConfiguration.class);
-        mockStatic(RealmCore.class);
+        Realm.init(RuntimeEnvironment.application);
 
         // Create the mock
         final Realm mockRealm = mock(Realm.class);
@@ -16,12 +18,13 @@
         doNothing().when(RealmCore.class);
         RealmCore.loadLibrary(any(Context.class));
 
+
         // TODO: Mock the RealmConfiguration's constructor. If the RealmConfiguration.Builder.build can be mocked, this
         // is not necessary anymore.
         whenNew(RealmConfiguration.class).withAnyArguments().thenReturn(mockRealmConfig);
 
         // Anytime getInstance is called with any configuration, then return the mockRealm
-        when(Realm.getInstance(any(RealmConfiguration.class))).thenReturn(mockRealm);
+        when(Realm.getDefaultInstance()).thenReturn(mockRealm);
 
         // Anytime we ask Realm to create a Person, return a new instance.
         when(mockRealm.createObject(Person.class)).thenReturn(new Person());

@@ -1,9 +1,17 @@
     protected BaseRealm(RealmConfiguration configuration) {
         this.threadId = Thread.currentThread().getId();
         this.configuration = configuration;
-        this.sharedGroupManager = new SharedGroupManager(configuration);
-        this.schema = new RealmSchema(this, sharedGroupManager.getTransaction());
+
         this.handlerController = new HandlerController(this);
+        this.sharedRealm = SharedRealm.getInstance(configuration, new AndroidNotifier(this.handlerController),
+                !(this instanceof Realm) ? null :
+                new SharedRealm.SchemaVersionListener() {
+                    @Override
+                    public void onSchemaVersionChanged(long currentVersion) {
+                        RealmCache.updateSchemaCache((Realm) BaseRealm.this);
+                    }
+                });
+        this.schema = new RealmSchema(this);
 
         if (handlerController.isAutoRefreshAvailable()) {
             setAutoRefresh(true);

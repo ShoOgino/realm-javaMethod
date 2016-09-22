@@ -1,7 +1,8 @@
     @SuppressWarnings("cast")
     public static some.test.Booleans createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
             throws JSONException {
-        some.test.Booleans obj = realm.createObject(some.test.Booleans.class);
+        final List<String> excludeFields = Collections.<String> emptyList();
+        some.test.Booleans obj = realm.createObjectInternal(some.test.Booleans.class, true, excludeFields);
         if (json.has("done")) {
             if (json.isNull("done")) {
                 throw new IllegalArgumentException("Trying to set non-nullable field 'done' to null.");

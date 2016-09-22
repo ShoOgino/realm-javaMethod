@@ -1,9 +1,13 @@
     @Test
     public void encryptionKey_differentEncryptionKeysThrows() {
-        RealmConfiguration config1 = new RealmConfiguration.Builder(configFactory.getRoot())
-                .encryptionKey(TestHelper.getRandomKey()).build();
-        RealmConfiguration config2 = new RealmConfiguration.Builder(configFactory.getRoot())
-                .encryptionKey(TestHelper.getRandomKey()).build();
+        RealmConfiguration config1 = new RealmConfiguration.Builder(context)
+                .directory(configFactory.getRoot())
+                .encryptionKey(TestHelper.getRandomKey())
+                .build();
+        RealmConfiguration config2 = new RealmConfiguration.Builder(context)
+                .directory(configFactory.getRoot())
+                .encryptionKey(TestHelper.getRandomKey())
+                .build();
 
         Realm realm1 = Realm.getInstance(config1);
         try {

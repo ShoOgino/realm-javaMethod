@@ -1,5 +1,10 @@
     @SuppressWarnings("cast")
     public int realmGet$age() {
+        if (proxyState == null) {
+            // Called from model's constructor. Inject context.
+            injectObjectContext();
+        }
+
         proxyState.getRealm$realm().checkIfValid();
         return (int) proxyState.getRow$realm().getLong(columnInfo.ageIndex);
     }

@@ -3,6 +3,9 @@
      *
      * @param values values.
      * @return the row index of the appended row.
+     * @deprecated Remove this functions since it doesn't seem to be useful. And this function does deal with tables
+     * withprimary key defined well. Primary key has to be set with `setXxxUnique` as the first thing to do after row
+     * added.
      */
     protected long add(Object... values) {
         long rowIndex = addEmptyRow();
@@ -41,43 +44,43 @@
             Object value = values[(int)columnIndex];
             switch (colTypes[(int)columnIndex]) {
             case BOOLEAN:
-                nativeSetBoolean(nativePtr, columnIndex, rowIndex, (Boolean)value);
+                nativeSetBoolean(nativePtr, columnIndex, rowIndex, (Boolean)value, false);
                 break;
             case INTEGER:
                 if (value == null) {
                     checkDuplicatedNullForPrimaryKeyValue(columnIndex, rowIndex);
-                    nativeSetNull(nativePtr, columnIndex, rowIndex);
+                    nativeSetNull(nativePtr, columnIndex, rowIndex, false);
                 } else {
                     long intValue = ((Number) value).longValue();
                     checkIntValueIsLegal(columnIndex, rowIndex, intValue);
-                    nativeSetLong(nativePtr, columnIndex, rowIndex, intValue);
+                    nativeSetLong(nativePtr, columnIndex, rowIndex, intValue, false);
                 }
                 break;
             case FLOAT:
-                nativeSetFloat(nativePtr, columnIndex, rowIndex, (Float) value);
+                nativeSetFloat(nativePtr, columnIndex, rowIndex, (Float) value, false);
                 break;
             case DOUBLE:
-                nativeSetDouble(nativePtr, columnIndex, rowIndex, (Double) value);
+                nativeSetDouble(nativePtr, columnIndex, rowIndex, (Double) value, false);
                 break;
             case STRING:
                 if (value == null) {
                     checkDuplicatedNullForPrimaryKeyValue(columnIndex, rowIndex);
-                    nativeSetNull(nativePtr, columnIndex, rowIndex);
+                    nativeSetNull(nativePtr, columnIndex, rowIndex, false);
                 } else {
                     String stringValue = (String) value;
                     checkStringValueIsLegal(columnIndex, rowIndex, stringValue);
-                    nativeSetString(nativePtr, columnIndex, rowIndex, (String) value);
+                    nativeSetString(nativePtr, columnIndex, rowIndex, (String) value, false);
                 }
                 break;
             case DATE:
                 if (value == null)
                     throw new IllegalArgumentException("Null Date is not allowed.");
-                nativeSetTimestamp(nativePtr, columnIndex, rowIndex, ((Date) value).getTime());
+                nativeSetTimestamp(nativePtr, columnIndex, rowIndex, ((Date) value).getTime(), false);
                 break;
             case BINARY:
                 if (value == null)
                     throw new IllegalArgumentException("Null Array is not allowed");
-                nativeSetByteArray(nativePtr, columnIndex, rowIndex, (byte[])value);
+                nativeSetByteArray(nativePtr, columnIndex, rowIndex, (byte[])value, false);
                 break;
             case UNSUPPORTED_MIXED:
             case UNSUPPORTED_TABLE:

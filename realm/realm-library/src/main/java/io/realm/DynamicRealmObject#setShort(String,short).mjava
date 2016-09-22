@@ -4,8 +4,10 @@
      * @param fieldName field name.
      * @param value value to insert.
      * @throws IllegalArgumentException if field name doesn't exist or field isn't an integer field.
+     * @throws RealmException if the field is a {@link io.realm.annotations.PrimaryKey} field.
      */
     public void setShort(String fieldName, short value) {
+        checkIsPrimaryKey(fieldName);
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
         proxyState.getRow$realm().setLong(columnIndex, value);
     }

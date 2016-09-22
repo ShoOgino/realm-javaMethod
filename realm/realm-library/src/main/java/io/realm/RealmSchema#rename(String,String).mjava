@@ -11,7 +11,7 @@
         String oldInternalName = TABLE_PREFIX + oldClassName;
         String newInternalName = TABLE_PREFIX + newClassName;
         checkHasTable(oldClassName, "Cannot rename class because it doesn't exist in this Realm: " + oldClassName);
-        if (transaction.hasTable(newInternalName)) {
+        if (realm.sharedRealm.hasTable(newInternalName)) {
             throw new IllegalArgumentException(oldClassName + " cannot be renamed because the new class already exists: " + newClassName);
         }
 
@@ -23,8 +23,8 @@
             oldTable.setPrimaryKey(null);
         }
 
-        transaction.renameTable(oldInternalName, newInternalName);
-        Table table = transaction.getTable(newInternalName);
+        realm.sharedRealm.renameTable(oldInternalName, newInternalName);
+        Table table = realm.sharedRealm.getTable(newInternalName);
 
         // Set the primary key for the new class if necessary
         if (pkField != null) {

@@ -1,0 +1,9 @@
+    @Override
+    public void throwBackgroundException(Throwable throwable) {
+        Looper looper = handler.getLooper();
+        if (looper.getThread().isAlive()) {     // The receiving thread is alive
+            handler.obtainMessage(
+                    HandlerControllerConstants.REALM_ASYNC_BACKGROUND_EXCEPTION, new Error(throwable)).sendToTarget();
+        }
+    }
+

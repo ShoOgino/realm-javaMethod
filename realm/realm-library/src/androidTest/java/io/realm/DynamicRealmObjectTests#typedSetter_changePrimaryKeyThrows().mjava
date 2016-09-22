@@ -1,0 +1,22 @@
+    @Test
+    public void typedSetter_changePrimaryKeyThrows() {
+        final String[] primaryKeyClasses = {PrimaryKeyAsByte.CLASS_NAME, PrimaryKeyAsShort.CLASS_NAME,
+                PrimaryKeyAsInteger.CLASS_NAME, PrimaryKeyAsLong.CLASS_NAME, PrimaryKeyAsString.CLASS_NAME};
+        for (String pkClass : primaryKeyClasses) {
+            dynamicRealm.beginTransaction();
+            DynamicRealmObject object;
+            if (pkClass.equals(PrimaryKeyAsString.CLASS_NAME)) {
+                object = dynamicRealm.createObject(pkClass, "");
+            } else {
+                object = dynamicRealm.createObject(pkClass, 0);
+            }
+
+            try {
+                callSetterOnPrimaryKey(pkClass, object);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+            dynamicRealm.cancelTransaction();
+        }
+    }
+

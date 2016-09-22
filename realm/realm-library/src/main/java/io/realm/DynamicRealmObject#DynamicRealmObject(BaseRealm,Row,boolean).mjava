@@ -1,0 +1,10 @@
+    DynamicRealmObject(BaseRealm realm, Row row, boolean convertTocheckedRow) {
+        proxyState.setRealm$realm(realm);
+        if (convertTocheckedRow) {
+            proxyState.setRow$realm((row instanceof CheckedRow) ? (CheckedRow) row : ((UncheckedRow) row).convertToChecked());
+        } else {
+            proxyState.setRow$realm(row);
+        }
+        proxyState.setConstructionFinished();
+    }
+

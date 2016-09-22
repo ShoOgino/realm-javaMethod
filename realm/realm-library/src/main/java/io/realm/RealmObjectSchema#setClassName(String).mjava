@@ -13,7 +13,7 @@
         if (internalTableName.length() > Table.TABLE_MAX_LENGTH) {
             throw new IllegalArgumentException("Class name is to long. Limit is 56 characters: \'" + className + "\' (" + Integer.toString(className.length()) + ")");
         }
-        if (transaction.hasTable(internalTableName)) {
+        if (realm.sharedRealm.hasTable(internalTableName)) {
             throw new IllegalArgumentException("Class already exists: " + className);
         }
         // in case this table has a primary key, we need to transfer it after renaming the table.
@@ -24,13 +24,13 @@
             pkField = getPrimaryKey();
             table.setPrimaryKey(null);
         }
-        transaction.renameTable(table.getName(), internalTableName);
+        realm.sharedRealm.renameTable(table.getName(), internalTableName);
         if (pkField != null && !pkField.isEmpty()) {
             try {
                 table.setPrimaryKey(pkField);
             } catch (Exception e) {
                 // revert the table name back when something goes wrong
-                transaction.renameTable(table.getName(), oldTableName);
+                realm.sharedRealm.renameTable(table.getName(), oldTableName);
                 throw e;
             }
         }

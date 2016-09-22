@@ -1,0 +1,11 @@
+    private void emitCodeForInjectingObjectContext(JavaWriter writer) throws IOException {
+        // if invoked from model's constructor, inject BaseRealm and Row
+        writer.beginControlFlow("if (proxyState == null)");
+        {
+            writer.emitSingleLineComment("Called from model's constructor. Inject context.");
+            writer.emitStatement("injectObjectContext()");
+        }
+        writer.endControlFlow();
+        writer.emitEmptyLine();
+    }
+

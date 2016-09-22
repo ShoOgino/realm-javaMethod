@@ -1,18 +1,20 @@
     /**
      * Creates a Realm object for each object in a JSON array. This must be done within a transaction.
      * <p>
-     * JSON properties with {@code null} values will map to the default value for the data type in Realm and unknown properties
-     * will be ignored. If a {@link RealmObject} field is not present in the JSON object the {@link RealmObject}
-     * field will be set to the default value for that type.
+     * JSON properties with unknown properties will be ignored. If a {@link RealmObject} field is not present in the
+     * JSON object the {@link RealmObject} field will be set to the default value for that type.
      *
      * @param clazz type of Realm objects to create.
      * @param json an array where each JSONObject must map to the specified class.
      * @throws RealmException if mapping from JSON fails.
+     * @throws IllegalArgumentException if the JSON object doesn't have a primary key property but the corresponding
+     * {@link RealmObjectSchema} has a {@link io.realm.annotations.PrimaryKey} defined.
      */
     public <E extends RealmModel> void createAllFromJson(Class<E> clazz, JSONArray json) {
         if (clazz == null || json == null) {
             return;
         }
+        checkIfValid();
 
         for (int i = 0; i < json.length(); i++) {
             try {

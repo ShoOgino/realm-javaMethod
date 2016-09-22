@@ -1,0 +1,11 @@
+    private void buildExcludeFieldsList(JavaWriter writer, List<VariableElement> fields) throws IOException {
+        for (VariableElement field : fields) {
+            if (Utils.isRealmModel(field) || Utils.isRealmList(field)) {
+                final String fieldName = field.getSimpleName().toString();
+                writer.beginControlFlow("if (json.has(\"%1$s\"))", fieldName)
+                        .emitStatement("excludeFields.add(\"%1$s\")", fieldName)
+                        .endControlFlow();
+            }
+        }
+    }
+

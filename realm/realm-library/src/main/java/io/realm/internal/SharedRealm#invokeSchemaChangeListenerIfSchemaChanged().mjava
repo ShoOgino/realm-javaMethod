@@ -1,0 +1,13 @@
+    public void invokeSchemaChangeListenerIfSchemaChanged() {
+        if (schemaChangeListener == null) {
+            return;
+        }
+
+        final long before = lastSchemaVersion;
+        final long current = getSchemaVersion();
+        if (current != before) {
+            lastSchemaVersion = current;
+            schemaChangeListener.onSchemaVersionChanged(current);
+        }
+    }
+
