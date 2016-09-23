@@ -15,7 +15,6 @@
         long primaryKeyColumnIndex = getPrimaryKey();
         RealmFieldType type = getColumnType(primaryKeyColumnIndex);
         long rowIndex;
-        UncheckedRow row;
 
         // Add with primary key initially set
         if (primaryKeyValue == null) {
@@ -26,9 +25,11 @@
                         throwDuplicatePrimaryKeyException("null");
                     }
                     rowIndex = nativeAddEmptyRow(nativePtr, 1);
-                    row = getUncheckedRow(rowIndex);
-                    // FIXME: Use core's set_null_unique when core supports it.
-                    row.setNull(primaryKeyColumnIndex);
+                    if (type == RealmFieldType.STRING) {
+                        nativeSetStringUnique(nativePtr, primaryKeyColumnIndex, rowIndex, null);
+                    } else {
+                        nativeSetNullUnique(nativePtr, primaryKeyColumnIndex, rowIndex);
+                    }
                     break;
 
                 default:
