@@ -1,0 +1,29 @@
+    @Test
+    public void authListener_remove() {
+        User user = createTestUser();
+        final int[] counter = {0, 0};
+
+        AuthenticationListener authenticationListener = new AuthenticationListener() {
+            @Override
+            public void loggedIn(User user) {
+                counter[0]++;
+            }
+
+            @Override
+            public void loggedOut(User user) {
+                counter[1]++;
+            }
+        };
+
+        SyncManager.addAuthenticationListener(authenticationListener);
+
+        SyncManager.removeAuthenticationListener(authenticationListener);
+
+        SyncManager.notifyUserLoggedIn(user);
+        SyncManager.notifyUserLoggedOut(user);
+
+        // no listener to update counters
+        assertEquals(0, counter[0]);
+        assertEquals(0, counter[1]);
+    }
+

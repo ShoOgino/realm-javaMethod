@@ -1,0 +1,14 @@
+    @Test
+    public void init() {
+        // Realm.init() calls SyncManager.init() wihich will start a thread for the sync client
+        boolean found = false;
+        Set<Thread> threads = Thread.getAllStackTraces().keySet();
+        for (Thread thread : threads) {
+            if (thread.getName().equals("RealmSyncClient")) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
+    }
+
