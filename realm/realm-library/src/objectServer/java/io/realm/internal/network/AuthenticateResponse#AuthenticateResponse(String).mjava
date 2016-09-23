@@ -8,6 +8,7 @@
         ObjectServerError error;
         Token accessToken;
         Token refreshToken;
+        String message;
         try {
             JSONObject obj = new JSONObject(serverResponse);
             accessToken = obj.has(JSON_FIELD_ACCESS_TOKEN) ?
@@ -15,13 +16,19 @@
             refreshToken = obj.has(JSON_FIELD_REFRESH_TOKEN) ?
                     Token.from(obj.getJSONObject(JSON_FIELD_REFRESH_TOKEN)) : null;
             error = null;
+            if (accessToken == null) {
+                message = "accessToken = null";
+            } else {
+                message = String.format("Identity %s; Path %s", accessToken.identity(), accessToken.path());
+            }
         } catch (JSONException ex) {
             accessToken = null;
             refreshToken = null;
             //noinspection ThrowableInstanceNeverThrown
             error = new ObjectServerError(ErrorCode.JSON_EXCEPTION, ex);
+            message = String.format("Error %s", error.getErrorMessage());
         }
-
+        RealmLog.debug("AuthenticateResponse. " + message);
         setError(error);
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
