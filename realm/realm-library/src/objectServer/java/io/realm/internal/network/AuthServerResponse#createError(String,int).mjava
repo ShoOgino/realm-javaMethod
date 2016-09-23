@@ -1,0 +1,21 @@
+    /**
+     * Parse an HTTP error from a Realm Authentication Server. The server returns errors following
+     * https://tools.ietf.org/html/rfc7807 with an extra "code" field for Realm specific error codes.
+     *
+     * @param response the server response.
+     * @param httpErrorCode the HTTP error code.
+     * @return an server error.
+     */
+    public static ObjectServerError createError(String response, int httpErrorCode) {
+        try {
+            JSONObject obj = new JSONObject(response);
+            String title = obj.optString("title", null);
+            String hint = obj.optString("hint", null);
+            ErrorCode errorCode = ErrorCode.fromInt(obj.optInt("code", -1));
+            return new ObjectServerError(errorCode, title, hint);
+        } catch (JSONException e) {
+            return new ObjectServerError(ErrorCode.JSON_EXCEPTION, "Server failed with " +
+                    httpErrorCode + ", but could not parse error.", e);
+        }
+    }
+

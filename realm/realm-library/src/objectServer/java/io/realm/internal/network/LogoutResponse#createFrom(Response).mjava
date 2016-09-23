@@ -1,0 +1,23 @@
+    /**
+     * Helper method for creating the proper Authenticate response. This method will set the appropriate error
+     * depending on any HTTP response codes or I/O errors.
+     *
+     * @param response the server response.
+     * @return the log out response.
+     */
+    static LogoutResponse createFrom(Response response) {
+        String serverResponse;
+        try {
+            serverResponse = response.body().string();
+        } catch (IOException e) {
+            ObjectServerError error = new ObjectServerError(ErrorCode.IO_EXCEPTION, e);
+            return new LogoutResponse(error);
+        }
+        RealmLog.debug("Authenticate response: " + serverResponse);
+        if (response.code() != 200) {
+            return new LogoutResponse(AuthServerResponse.createError(serverResponse, response.code()));
+        } else {
+            return new LogoutResponse(serverResponse);
+        }
+    }
+

@@ -1,0 +1,15 @@
+    /**
+     * Attempt to detect if a device is online and can transmit or receive data.
+     * This method is thread safe.
+     * <p>
+     * An emulator is always considered online, as `getActiveNetworkInfo()` does not report the correct value.
+     *
+     * @param context an Android context.
+     * @return {@code true} if device is online, otherwise {@code false}.
+     */
+    public static boolean isOnline(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        return ((networkInfo != null && networkInfo.isConnectedOrConnecting()) || Util.isEmulator());
+    }
+

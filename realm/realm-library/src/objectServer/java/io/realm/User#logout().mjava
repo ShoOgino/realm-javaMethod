@@ -1,0 +1,74 @@
+    /**
+     * Logs out the user from the Realm Object Server. Once the Object Server has confirmed the logout any registered
+     * {@link AuthenticationListener} will be notified and user credentials will be deleted from this device.
+     * <p>
+     * Any Realms owned by the user will be deleted if {@link SyncConfiguration.Builder#deleteRealmOnLogout()} is
+     * also set.
+     *
+     * @throws IllegalStateException if any Realms owned by this user is still open. They should be closed before
+     *         logging out.
+     */
+    public void logout() {
+        // Acquire lock to prevent users creating new instances
+        synchronized (Realm.class) {
+            if (!syncUser.isLoggedIn()) {
+                return; // Already logged out
+            }
+
+            // Ensure that we can log out. If any Realm file is still open we should abort before doing anything
+            // else.
+            Collection<Session> sessions = syncUser.getSessions();
+            for (Session session : sessions) {
+                SyncConfiguration config = session.getConfiguration();
+                if (Realm.getGlobalInstanceCount(config) > 0) {
+                    throw new IllegalStateException("A Realm controlled by this user is still open. Close all Realms " +
+                            "before logging out: " + config.getPath());
+                }
+            }
+
+            // Stop all active sessions immediately. If we waited until after talking to the server
+            // there is a high chance errors would be reported from the Sync Client first which would
+            // be confusing.
+            for (Session session : sessions) {
+                session.getSyncSession().stop();
+            }
+
+            final AuthenticationServer server = SyncManager.getAuthServer();
+            ThreadPoolExecutor networkPoolExecutor = SyncManager.NETWORK_POOL_EXECUTOR;
+            networkPoolExecutor.submit(new ExponentialBackoffTask<LogoutResponse>() {
+
+                @Override
+                protected LogoutResponse execute() {
+                    return server.logout(User.this, syncUser.getAuthenticationUrl());
+                }
+
+                @Override
+                protected void onSuccess(LogoutResponse response) {
+                    // Remove all local tokens, preventing further connections.
+                    syncUser.clearTokens();
+
+                    if (User.this.equals(User.currentUser())) {
+                        SyncManager.getUserStore().remove(UserStore.CURRENT_USER_KEY);
+                    }
+
+                    // Delete all Realms if needed.
+                    for (SyncUser.AccessDescription desc : syncUser.getRealms()) {
+                        if (desc.deleteOnLogout) {
+                            File realmFile = new File(desc.localPath);
+                            if (realmFile.exists() && !Util.deleteRealm(desc.localPath, realmFile.getParentFile(), realmFile.getName())) {
+                                RealmLog.error("Could not delete Realm when user logged out: " + desc.localPath);
+                            }
+                        }
+                    }
+
+                    SyncManager.notifyUserLoggedOut(User.this);
+                }
+
+                @Override
+                protected void onError(LogoutResponse response) {
+                    RealmLog.error("Failed to log user out.\n" + response.getError().toString());
+                }
+            });
+        }
+    }
+

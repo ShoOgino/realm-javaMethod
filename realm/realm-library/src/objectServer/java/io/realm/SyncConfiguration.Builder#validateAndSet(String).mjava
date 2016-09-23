@@ -1,0 +1,65 @@
+        private void validateAndSet(String uri) {
+            if (uri == null) {
+                throw new IllegalArgumentException("Non-null 'uri' required.");
+            }
+
+            try {
+                serverUrl = new URI(uri);
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Invalid URI: " + uri, e);
+            }
+
+            // scheme must be realm or realms
+            String scheme = serverUrl.getScheme();
+            if (!scheme.equals("realm") && !scheme.equals("realms")) {
+                throw new IllegalArgumentException("Invalid scheme: " + scheme);
+            }
+
+            // set port if not set by user
+            int port;
+            int currentPort = serverUrl.getPort();
+            if (currentPort == -1) {
+                port = scheme.equals("realm") ? PORT_REALM : PORT_REALMS;
+            } else {
+                port = currentPort;
+            }
+
+            // Detect last path segment as it is the default file name
+            String path = serverUrl.getPath();
+            if (path == null) {
+                throw new IllegalArgumentException("Invalid URI: " + uri);
+            }
+
+            String[] pathSegments = path.split("/");
+            for (int i = 1; i < pathSegments.length; i++) {
+                String segment = pathSegments[i];
+                if (segment.equals("~")) {
+                    continue;
+                }
+                if (segment.equals("..") || segment.equals(".")) {
+                    throw new IllegalArgumentException("The URI has an invalid segment: " + segment);
+                }
+                Matcher m = pattern.matcher(segment);
+                if (!m.matches()) {
+                    throw new IllegalArgumentException("The URI must only contain characters 0-9, a-z, A-Z, ., _, and -: " + segment);
+                }
+            }
+
+            this.defaultLocalFileName = pathSegments[pathSegments.length - 1];
+
+            // Validate filename
+            // TODO Lift this restriction on the Object Server
+            if (defaultLocalFileName.endsWith(".realm")
+                    || defaultLocalFileName.endsWith(".realm.lock")
+                    || defaultLocalFileName.endsWith(".realm.management")) {
+                throw new IllegalArgumentException("The URI must not end with '.realm', '.realm.lock' or '.realm.management: " + uri);
+            }
+
+            try {
+                this.serverUrl = new URI(scheme, serverUrl.getUserInfo(), serverUrl.getHost(),
+                        port, serverUrl.getPath(), serverUrl.getQuery(), serverUrl.getFragment());
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Cannot reconstruct URI: " + uri, e);
+            }
+        }
+

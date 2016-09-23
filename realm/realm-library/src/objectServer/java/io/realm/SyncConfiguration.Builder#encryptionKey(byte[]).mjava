@@ -1,0 +1,18 @@
+        /**
+         * Sets the {@value io.realm.RealmConfiguration#KEY_LENGTH} bytes key used to encrypt and decrypt the Realm file.
+         *
+         * @param key the encryption key.
+         * @throws IllegalArgumentException if key is invalid.
+         */
+        public Builder encryptionKey(byte[] key) {
+            if (key == null) {
+                throw new IllegalArgumentException("A non-null key must be provided");
+            }
+            if (key.length != KEY_LENGTH) {
+                throw new IllegalArgumentException(String.format("The provided key must be %s bytes. Yours was: %s",
+                        KEY_LENGTH, key.length));
+            }
+            this.key = Arrays.copyOf(key, key.length);
+            return this;
+        }
+
