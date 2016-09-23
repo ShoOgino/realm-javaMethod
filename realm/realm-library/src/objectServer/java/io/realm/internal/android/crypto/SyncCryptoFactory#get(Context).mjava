@@ -1,0 +1,10 @@
+    public static SyncCrypto get (Context context) throws KeyStoreException {
+        if (IS_JB43) {
+            return new SyncCryptoApi18Impl(context);
+        } else if (IS_GINGERBREAD) {
+            return new SyncCryptoLegacy(context);
+        } else {
+            throw new KeyStoreException("Unknown android version");
+        }
+    }
+

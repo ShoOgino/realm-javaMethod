@@ -1,0 +1,29 @@
+    /**
+     * Retrieves the {@link User} by decrypting first the serialised Json.
+     * @param key the {@link android.content.SharedPreferences} key.
+     * @return the {@link User} with the given key.
+     */
+    @Override
+    public User get(String key) {
+        if (key.equals(UserStore.CURRENT_USER_KEY) && cachedCurrentUser != null) {
+            return cachedCurrentUser;
+        }
+
+        String userData = sp.getString(key, "");
+        if (userData.equals("")) {
+            return null;
+        }
+
+        try {
+            String userSerialisedAndDecrypted = cipherClient.decrypt(userData);
+            User user = User.fromJson(userSerialisedAndDecrypted);
+            if (UserStore.CURRENT_USER_KEY.equals(key)) {
+                cachedCurrentUser = user;
+            }
+            return user;
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+

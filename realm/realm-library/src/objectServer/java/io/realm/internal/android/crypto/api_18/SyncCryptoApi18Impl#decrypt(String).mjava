@@ -1,0 +1,21 @@
+    @Override
+    public String decrypt(String cipherText) throws KeyStoreException {
+        try {
+            String[] fields = cipherText.split(DELIMITER);
+            if (fields.length != 2) {
+                throw new IllegalArgumentException("Invalid encrypted text format");
+            }
+
+            byte[] aesEncWithRSA = Base64.from(fields[0]);
+            byte[] encToken = Base64.from(fields[1]);
+
+            // decrypt AES using RSA
+            SecretKey key = decrypytAESKeyUsingRSA(aesEncWithRSA);
+
+            // decrypt Token using decrypted AES
+            return decryptedUsingAESKey(key, encToken);
+        } catch (Exception e) {
+            throw new KeyStoreException(e);
+        }
+    }
+

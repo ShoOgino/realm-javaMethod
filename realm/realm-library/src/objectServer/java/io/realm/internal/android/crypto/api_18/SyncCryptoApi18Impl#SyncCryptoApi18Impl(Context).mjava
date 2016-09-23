@@ -1,0 +1,21 @@
+    public SyncCryptoApi18Impl (Context context) throws KeyStoreException {
+        PRNGFixes.apply();
+        this.context = context;
+        try {
+            keyStore = java.security.KeyStore.getInstance(ANDROID_KEYSTORE);
+            keyStore.load(null);
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+            throw new KeyStoreException(e);
+        } catch (CertificateException e) {
+            e.printStackTrace();
+            throw new KeyStoreException(e);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new KeyStoreException(e);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new KeyStoreException(e);
+        }
+    }
+
