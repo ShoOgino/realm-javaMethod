@@ -1,0 +1,11 @@
+    @Test
+    public void realmLogin() throws URISyntaxException, JSONException {
+        Token t = SyncTestUtils.createTestUser().getSyncUser().getUserToken();
+        AuthenticateRequest request = AuthenticateRequest.realmLogin(t, new URI("realm://objectserver/" + t.value() + "/default"));
+
+        JSONObject obj = new JSONObject(request.toJson());
+        assertEquals("/" + t.value() + "/default", obj.get("path"));
+        assertEquals(t.value(), obj.get("data"));
+        assertEquals("realm", obj.get("provider"));
+    }
+

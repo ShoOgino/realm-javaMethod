@@ -1,0 +1,10 @@
+    @Test
+    public void userLogin() throws URISyntaxException, JSONException {
+        AuthenticateRequest request = AuthenticateRequest.userLogin(Credentials.facebook("foo"));
+
+        JSONObject obj = new JSONObject(request.toJson());
+        assertFalse(obj.has("path"));
+        assertEquals("foo", obj.get("data"));
+        assertEquals("facebook", obj.get("provider"));
+    }
+
