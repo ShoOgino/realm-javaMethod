@@ -1,0 +1,17 @@
+    @Override
+    public Collection<User> allUsers() {
+        Map<String, ?> all = sp.getAll();
+        ArrayList<User> users = new ArrayList<User>(all.size());
+        for (Object userJson : all.values()) {
+            String userSerialisedAndDecrypted = null;
+            try {
+                userSerialisedAndDecrypted = cipherClient.decrypt((String) userJson);
+            } catch (KeyStoreException e) {
+                e.printStackTrace();
+                // returning null will probably penalise the other Users
+            }
+            users.add(User.fromJson(userSerialisedAndDecrypted));
+        }
+        return users;
+    }
+

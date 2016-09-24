@@ -1,0 +1,14 @@
+    @Override
+    public String encrypt(String plainText) throws KeyStoreException {
+        try {
+            SecretKey key = generateAESKey();
+            byte[] encrypted = encryptedUsingAESKey(key, plainText);
+            byte[] encryptedKey = encryptAESKeyUsingRSA(key);
+            // append with AES enc with RSA
+            return String.format("%s%s%s", Base64.to(encryptedKey), DELIMITER,
+                    Base64.to(encrypted));
+        } catch (Exception e) {
+            throw new KeyStoreException(e);
+        }
+    }
+

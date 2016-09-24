@@ -1,0 +1,14 @@
+    private State state() throws KeyStoreException {
+        execute('t');
+        switch (mError) {
+            case NO_ERROR:
+                return State.UNLOCKED;
+            case LOCKED:
+                return State.LOCKED;
+            case UNINITIALIZED:
+                return State.UNINITIALIZED;
+            default:
+                throw new KeyStoreException("" + mError);
+        }
+    }
+
