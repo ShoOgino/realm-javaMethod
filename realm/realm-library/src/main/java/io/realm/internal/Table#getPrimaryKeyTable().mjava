@@ -4,10 +4,10 @@
         }
         Table pkTable = sharedRealm.getTable(PRIMARY_KEY_TABLE_NAME);
         if (pkTable.getColumnCount() == 0) {
-            pkTable.addColumn(RealmFieldType.STRING, PRIMARY_KEY_CLASS_COLUMN_NAME);
+            checkImmutable();
+            long columnIndex = pkTable.addColumn(RealmFieldType.STRING, PRIMARY_KEY_CLASS_COLUMN_NAME);
+            pkTable.addSearchIndex(columnIndex);
             pkTable.addColumn(RealmFieldType.STRING, PRIMARY_KEY_FIELD_COLUMN_NAME);
-        } else {
-            migratePrimaryKeyTableIfNeeded(sharedRealm.getGroupNative(), pkTable);
         }
 
         return pkTable;

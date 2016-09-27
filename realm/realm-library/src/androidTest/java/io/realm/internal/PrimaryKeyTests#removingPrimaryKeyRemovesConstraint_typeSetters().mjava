@@ -1,0 +1,32 @@
+    // Test that primary key constraints are actually removed
+    @Test
+    public void removingPrimaryKeyRemovesConstraint_typeSetters() {
+        RealmConfiguration config = configFactory.createConfigurationBuilder()
+                .name("removeConstraints").build();
+        SharedRealm sharedRealm = SharedRealm.getInstance(config);
+
+        sharedRealm.beginTransaction();
+        Table tbl = sharedRealm.getTable("EmployeeTable");
+        tbl.addColumn(RealmFieldType.STRING, "name");
+        tbl.setPrimaryKey("name");
+
+        // Create first entry with name "Foo"
+        tbl.setString(0, tbl.addEmptyRow(), "Foo", false);
+
+        long rowIndex = tbl.addEmptyRow();
+        try {
+            tbl.setString(0, rowIndex, "Foo", false); // Try to create 2nd entry with name Foo
+        } catch (RealmPrimaryKeyConstraintException e1) {
+            tbl.setPrimaryKey(""); // Primary key check worked, now remove it and try again.
+            try {
+                tbl.setString(0, rowIndex, "Foo", false);
+                return;
+            } catch (RealmException e2) {
+                fail("Primary key not removed");
+            }
+        }
+
+        fail("Primary key not enforced.");
+        sharedRealm.close();
+    }
+
