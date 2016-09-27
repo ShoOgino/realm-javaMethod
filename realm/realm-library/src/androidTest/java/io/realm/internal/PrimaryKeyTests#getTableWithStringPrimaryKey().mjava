@@ -1,0 +1,10 @@
+    private Table getTableWithStringPrimaryKey() {
+        sharedRealm = SharedRealm.getInstance(config);
+        sharedRealm.beginTransaction();
+        Table t = sharedRealm.getTable("TestTable");
+        long column = t.addColumn(RealmFieldType.STRING, "colName", true);
+        t.addSearchIndex(column);
+        t.setPrimaryKey("colName");
+        return t;
+    }
+

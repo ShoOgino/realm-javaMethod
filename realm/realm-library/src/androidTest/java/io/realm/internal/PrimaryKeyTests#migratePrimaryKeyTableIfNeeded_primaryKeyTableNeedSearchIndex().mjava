@@ -1,0 +1,39 @@
+    // PK table's column 'pk_table' needs search index in order to use set_string_unique.
+    // See https://github.com/realm/realm-java/pull/3488
+    @Test
+    public void migratePrimaryKeyTableIfNeeded_primaryKeyTableNeedSearchIndex() {
+        sharedRealm = SharedRealm.getInstance(config);
+        sharedRealm.beginTransaction();
+        Table table = sharedRealm.getTable("TestTable");
+        long column = table.addColumn(RealmFieldType.INTEGER, "PKColumn");
+        table.addSearchIndex(column);
+        table.setPrimaryKey(column);
+        sharedRealm.commitTransaction();
+
+        assertEquals(table.getPrimaryKey(), table.getColumnIndex("PKColumn"));
+        // Now we have a pk table with search index.
+
+        sharedRealm.beginTransaction();
+        Table pkTable = sharedRealm.getTable("pk");
+        long classColumn = pkTable.getColumnIndex("pk_table");
+        pkTable.removeSearchIndex(classColumn);
+
+        // Try to add a pk for another table
+        Table table2 = sharedRealm.getTable("TestTable2");
+        long column2 = table2.addColumn(RealmFieldType.INTEGER, "PKColumn");
+        table2.addSearchIndex(column2);
+        try {
+            table2.setPrimaryKey(column2);
+        } catch (RealmError ignored) {
+            // Column has no search index
+        }
+
+        assertFalse(pkTable.hasSearchIndex(classColumn));
+
+        Table.migratePrimaryKeyTableIfNeeded(sharedRealm);
+        assertTrue(pkTable.hasSearchIndex(classColumn));
+        // Now it works.
+        table2.addSearchIndex(column2);
+        sharedRealm.cancelTransaction();
+    }
+
