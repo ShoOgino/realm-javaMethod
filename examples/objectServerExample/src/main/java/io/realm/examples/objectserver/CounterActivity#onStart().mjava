@@ -8,10 +8,7 @@
                     .initialData(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
-                            // Workaround for initialData right now https://github.com/realm/realm-java-private/issues/164
-                            if (realm.isEmpty()) {
-                                realm.createObject(CRDTCounter.class, 1);
-                            }
+                            realm.createObject(CRDTCounter.class, 1);
                         }
                     })
                     .build();
@@ -19,30 +16,14 @@
             // This will automatically sync all changes in the background for as long as the Realm is open
             realm = Realm.getInstance(config);
 
-            // FIXME Looks like PrimaryKey and lists are not working correctly yet
-            // FIXME Also need support for the `setDefault` instruction for this to make sense.
-//            counter = realm.where(CRDTCounter.class).findFirstAsync();
-//            counter.addChangeListener(new RealmChangeListener<CRDTCounter>() {
-//                @Override
-//                public void onChange(CRDTCounter counter) {
-//                    if (counter.isValid()) {
-//                        counterView.setText(String.format(Locale.US, "%d", counter.getCount()));
-//                    } else {
-//                        counterView.setText("-");
-//                    }
-//                }
-//            });
-
-            counter = realm.where(CounterOperation.class).findAllAsync();
-            counter.addChangeListener(new RealmChangeListener<RealmResults<CounterOperation>>() {
+            counter = realm.where(CRDTCounter.class).findFirstAsync();
+            counter.addChangeListener(new RealmChangeListener<CRDTCounter>() {
                 @Override
-                public void onChange(RealmResults<CounterOperation> result) {
-                    // FIXME Why isn't this triggered when the DB is opened?
-                    Number sum = result.sum("adjustment");
-                    if (sum != null) {
-                        counterView.setText(Long.toString(sum.longValue()));
+                public void onChange(CRDTCounter counter) {
+                    if (counter.isValid()) {
+                        counterView.setText(String.format(Locale.US, "%d", counter.getCount()));
                     } else {
-                        counterView.setText("0");
+                        counterView.setText("-");
                     }
                 }
             });

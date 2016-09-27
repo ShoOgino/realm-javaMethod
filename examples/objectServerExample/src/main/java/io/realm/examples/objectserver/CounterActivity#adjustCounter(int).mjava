@@ -1,10 +1,11 @@
-    private void adjustCounter(final CounterOperation ops) {
+    private void adjustCounter(final int adjustment) {
         // A synchronized Realm can get written to at any point in time, so doing synchronous writes on the UI
         // thread is HIGHLY discouraged as it might block longer than intended. Only use async transactions.
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                realm.copyToRealm(ops);
+                CRDTCounter counter = realm.where(CRDTCounter.class).findFirst();
+                counter.add(adjustment);
             }
         });
     }
