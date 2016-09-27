@@ -23,6 +23,19 @@
 
         RefAndCount refAndCount = cache.refAndCountMap.get(RealmCacheType.valueOf(realmClass));
 
+        if (refAndCount.globalCount == 0) {
+            SharedRealm sharedRealm = SharedRealm.getInstance(configuration);
+            if (Table.primaryKeyTableNeedsMigration(sharedRealm)) {
+                sharedRealm.beginTransaction();
+                if (Table.migratePrimaryKeyTableIfNeeded(sharedRealm)) {
+                    sharedRealm.commitTransaction();
+                } else {
+                    sharedRealm.cancelTransaction();
+                }
+            }
+            sharedRealm.close();
+        }
+
         if (refAndCount.localRealm.get() == null) {
             // Create a new local Realm instance
             BaseRealm realm;
