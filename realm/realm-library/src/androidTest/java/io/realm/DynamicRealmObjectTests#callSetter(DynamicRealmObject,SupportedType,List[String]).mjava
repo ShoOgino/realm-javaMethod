@@ -1,0 +1,22 @@
+    // Helper method for calling setters with different field names
+    private static void callSetter(DynamicRealmObject target, SupportedType type, List<String> fieldNames) {
+        for (String fieldName : fieldNames) {
+            switch (type) {
+                case BOOLEAN: target.setBoolean(fieldName, false); break;
+                case SHORT: target.setShort(fieldName, (short) 1); break;
+                case INT: target.setInt(fieldName, 1); break;
+                case LONG: target.setLong(fieldName, 1L); break;
+                case BYTE: target.setByte(fieldName, (byte) 4); break;
+                case FLOAT: target.setFloat(fieldName, 1.23f); break;
+                case DOUBLE: target.setDouble(fieldName, 1.23d); break;
+                case STRING: target.setString(fieldName, "foo"); break;
+                case BINARY: target.setBlob(fieldName, new byte[]{}); break;
+                case DATE: target.getDate(fieldName); break;
+                case OBJECT: target.setObject(fieldName, null); target.setObject(fieldName, target); break;
+                case LIST: target.setList(fieldName, new RealmList<DynamicRealmObject>()); break;
+                default:
+                    fail();
+            }
+        }
+    }
+

@@ -11,7 +11,11 @@
      */
     public long getLong(String fieldName) {
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        checkFieldType(fieldName, columnIndex, RealmFieldType.INTEGER);
-        return proxyState.getRow$realm().getLong(columnIndex);
+        try {
+            return proxyState.getRow$realm().getLong(columnIndex);
+        } catch (IllegalArgumentException e) {
+            checkFieldType(fieldName, columnIndex, RealmFieldType.INTEGER);
+            throw e;
+        }
     }
 

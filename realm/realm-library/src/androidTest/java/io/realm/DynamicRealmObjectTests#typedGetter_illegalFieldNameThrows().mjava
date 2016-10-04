@@ -13,7 +13,12 @@
             // of failing values. Only difference is the wrong type column has to be different.
             List<String> args = (type == SupportedType.STRING) ? stringArguments : arguments;
             try {
-                callGetter(type, args);
+                callGetter(dObjTyped, type, args);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+            try {
+                callGetter(dObjDynamic, type, args);
                 fail();
             } catch (IllegalArgumentException ignored) {
             }

@@ -7,7 +7,11 @@
      */
     public byte[] getBlob(String fieldName) {
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        checkFieldType(fieldName, columnIndex, RealmFieldType.BINARY);
-        return proxyState.getRow$realm().getBinaryByteArray(columnIndex);
+        try {
+            return proxyState.getRow$realm().getBinaryByteArray(columnIndex);
+        } catch (IllegalArgumentException e) {
+            checkFieldType(fieldName, columnIndex, RealmFieldType.BINARY);
+            throw e;
+        }
     }
 

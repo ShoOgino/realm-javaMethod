@@ -11,7 +11,11 @@
      */
     public boolean getBoolean(String fieldName) {
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        checkFieldType(fieldName, columnIndex, RealmFieldType.BOOLEAN);
-        return proxyState.getRow$realm().getBoolean(columnIndex);
+        try {
+            return proxyState.getRow$realm().getBoolean(columnIndex);
+        } catch (IllegalArgumentException e) {
+            checkFieldType(fieldName, columnIndex, RealmFieldType.BOOLEAN);
+            throw e;
+        }
     }
 

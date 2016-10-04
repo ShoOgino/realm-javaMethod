@@ -4,9 +4,19 @@
             try {
                 // Make sure we hit the wrong underlying type for all types.
                 if (type == SupportedType.DOUBLE) {
-                    callGetter(type, Arrays.asList(AllJavaTypes.FIELD_STRING));
+                    callGetter(dObjTyped, type, Arrays.asList(AllJavaTypes.FIELD_STRING));
                 } else {
-                    callGetter(type, Arrays.asList(AllJavaTypes.FIELD_DOUBLE));
+                    callGetter(dObjTyped, type, Arrays.asList(AllJavaTypes.FIELD_DOUBLE));
+                }
+                fail(type + " failed to throw.");
+            } catch (IllegalArgumentException ignored) {
+            }
+            try {
+                // Make sure we hit the wrong underlying type for all types.
+                if (type == SupportedType.DOUBLE) {
+                    callGetter(dObjDynamic, type, Arrays.asList(AllJavaTypes.FIELD_STRING));
+                } else {
+                    callGetter(dObjDynamic, type, Arrays.asList(AllJavaTypes.FIELD_DOUBLE));
                 }
                 fail(type + " failed to throw.");
             } catch (IllegalArgumentException ignored) {

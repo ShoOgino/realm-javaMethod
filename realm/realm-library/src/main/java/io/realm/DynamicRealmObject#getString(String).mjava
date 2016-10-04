@@ -7,7 +7,11 @@
      */
     public String getString(String fieldName) {
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        checkFieldType(fieldName, columnIndex, RealmFieldType.STRING);
-        return proxyState.getRow$realm().getString(columnIndex);
+        try {
+            return proxyState.getRow$realm().getString(columnIndex);
+        } catch (IllegalArgumentException e) {
+            checkFieldType(fieldName, columnIndex, RealmFieldType.STRING);
+            throw e;
+        }
     }
 

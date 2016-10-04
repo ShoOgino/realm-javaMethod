@@ -11,7 +11,11 @@
      */
     public double getDouble(String fieldName) {
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        checkFieldType(fieldName, columnIndex, RealmFieldType.DOUBLE);
-        return proxyState.getRow$realm().getDouble(columnIndex);
+        try {
+            return proxyState.getRow$realm().getDouble(columnIndex);
+        } catch (IllegalArgumentException e) {
+            checkFieldType(fieldName, columnIndex, RealmFieldType.DOUBLE);
+            throw e;
+        }
     }
 
