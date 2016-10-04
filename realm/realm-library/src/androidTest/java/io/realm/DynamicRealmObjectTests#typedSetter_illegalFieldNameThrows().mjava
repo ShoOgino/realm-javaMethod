@@ -11,7 +11,12 @@
         for (SupportedType type : SupportedType.values()) {
             List<String> args = (type == SupportedType.STRING) ? stringArguments : arguments;
             try {
-                callSetter(type, args);
+                callSetter(dObjTyped, type, args);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+            try {
+                callSetter(dObjDynamic, type, args);
                 fail();
             } catch (IllegalArgumentException ignored) {
             }

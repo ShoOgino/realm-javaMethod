@@ -11,7 +11,11 @@
      */
     public float getFloat(String fieldName) {
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        checkFieldType(fieldName, columnIndex, RealmFieldType.FLOAT);
-        return proxyState.getRow$realm().getFloat(columnIndex);
+        try {
+            return proxyState.getRow$realm().getFloat(columnIndex);
+        } catch (IllegalArgumentException e) {
+            checkFieldType(fieldName, columnIndex, RealmFieldType.FLOAT);
+            throw e;
+        }
     }
 

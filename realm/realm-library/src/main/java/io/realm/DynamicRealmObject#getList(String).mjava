@@ -7,9 +7,13 @@
      */
     public RealmList<DynamicRealmObject> getList(String fieldName) {
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        checkFieldType(fieldName, columnIndex, RealmFieldType.LIST);
-        LinkView linkView = proxyState.getRow$realm().getLinkList(columnIndex);
-        String className = RealmSchema.getSchemaForTable(linkView.getTargetTable());
-        return new RealmList<DynamicRealmObject>(className, linkView, proxyState.getRealm$realm());
+        try {
+            LinkView linkView = proxyState.getRow$realm().getLinkList(columnIndex);
+            String className = RealmSchema.getSchemaForTable(linkView.getTargetTable());
+            return new RealmList<DynamicRealmObject>(className, linkView, proxyState.getRealm$realm());
+        } catch (IllegalArgumentException e) {
+            checkFieldType(fieldName, columnIndex, RealmFieldType.LIST);
+            throw e;
+        }
     }
 
