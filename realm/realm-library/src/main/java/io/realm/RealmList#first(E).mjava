@@ -1,0 +1,15 @@
+    /**
+    * {@inheritDoc}
+    */
+    public E first(E defaultValue) {
+        if (managedMode) {
+            checkValidView();
+            if (!view.isEmpty()) {
+                return get(0);
+            }
+        } else if (unmanagedList != null && unmanagedList.size() > 0) {
+            return unmanagedList.get(0);
+        }
+        return defaultValue;
+    }
+
