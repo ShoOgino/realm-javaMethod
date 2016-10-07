@@ -2,14 +2,6 @@
      * {@inheritDoc}
      */
     public E first() {
-        if (managedMode) {
-            checkValidView();
-            if (!view.isEmpty()) {
-                return get(0);
-            }
-        } else if (unmanagedList != null && unmanagedList.size() > 0) {
-            return unmanagedList.get(0);
-        }
-        throw new IndexOutOfBoundsException("The list is empty.");
+        return firstImpl(true, null);
     }
 

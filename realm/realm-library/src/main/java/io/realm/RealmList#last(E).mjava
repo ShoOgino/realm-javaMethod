@@ -2,14 +2,6 @@
      * {@inheritDoc}
      */
     public E last(E defaultValue) {
-        if (managedMode) {
-            checkValidView();
-            if (!view.isEmpty()) {
-                return get((int) view.size() - 1);
-            }
-        } else if (unmanagedList != null && unmanagedList.size() > 0) {
-            return unmanagedList.get(unmanagedList.size() - 1);
-        }
-        return defaultValue;
+        return lastImpl(false, defaultValue);
     }
 
