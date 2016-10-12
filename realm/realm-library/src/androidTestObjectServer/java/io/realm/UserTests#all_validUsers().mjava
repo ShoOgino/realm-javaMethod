@@ -1,0 +1,14 @@
+    // `all()` returns only valid users. Invalid users are filtered.
+    @Test
+    public void all_validUsers() {
+        // Add 1 expired user and 1 valid user to the user store
+        UserStore userStore = new SharedPrefsUserStore(InstrumentationRegistry.getContext());
+        SyncManager.setUserStore(userStore);
+        userStore.put(UserStore.CURRENT_USER_KEY, SyncTestUtils.createTestUser(Long.MIN_VALUE));
+        userStore.put(UserStore.CURRENT_USER_KEY, SyncTestUtils.createTestUser(Long.MAX_VALUE));
+
+        Collection<User> users = User.all();
+        assertEquals(1, users.size());
+        assertTrue(users.iterator().next().isValid());
+    }
+
