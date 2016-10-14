@@ -1,6 +1,6 @@
-    public void stopSyncServer() throws Exception {
+    public static void startSyncServer() throws Exception {
         Request request = new Request.Builder()
-                .url(STOP_SERVER)
+                .url(START_SERVER)
                 .build();
 
         Response response = client.newCall(request).execute();
@@ -12,5 +12,11 @@
         }
 
         System.out.println(response.body().string());
+
+        // FIXME: Server ready checking should be done in the control server side!
+        if (!waitAuthServerReady()) {
+            stopSyncServer();
+            throw new RuntimeException("Auth server cannot be started.");
+        }
     }
 

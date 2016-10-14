@@ -1,0 +1,18 @@
+    @Test
+    @RunTestInLooperThread
+    public void loginAsync_userNotExist() {
+        Credentials credentials = Credentials.usernamePassword("IWantToHackYou", "GeneralPassword", false);
+        User.loginAsync(credentials, Constants.AUTH_URL, new User.Callback() {
+            @Override
+            public void onSuccess(User user) {
+                fail();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                assertEquals(ErrorCode.UNKNOWN_ACCOUNT, error.getErrorCode());
+                looperThread.testComplete();
+            }
+        });
+    }
+
