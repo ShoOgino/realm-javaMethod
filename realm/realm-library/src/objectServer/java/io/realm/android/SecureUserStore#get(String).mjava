@@ -1,10 +1,10 @@
     /**
-     * Retrieves the {@link User} by decrypting first the serialised Json.
+     * Retrieves the {@link SyncUser} by decrypting first the serialised Json.
      * @param key the {@link android.content.SharedPreferences} key.
-     * @return the {@link User} with the given key.
+     * @return the {@link SyncUser} with the given key.
      */
     @Override
-    public User get(String key) {
+    public SyncUser get(String key) {
         if (key.equals(UserStore.CURRENT_USER_KEY) && cachedCurrentUser != null) {
             return cachedCurrentUser;
         }
@@ -16,7 +16,7 @@
 
         try {
             String userSerialisedAndDecrypted = cipherClient.decrypt(userData);
-            User user = User.fromJson(userSerialisedAndDecrypted);
+            SyncUser user = SyncUser.fromJson(userSerialisedAndDecrypted);
             if (UserStore.CURRENT_USER_KEY.equals(key)) {
                 cachedCurrentUser = user;
             }

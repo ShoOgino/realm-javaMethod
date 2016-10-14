@@ -1,0 +1,16 @@
+    private synchronized void authenticate(final ObjectServerSession session) {
+        session.authenticateRealm(new Runnable() {
+            @Override
+            public void run() {
+                RealmLog.debug("Session[%s]: Access token acquired", session.getConfiguration().getPath());
+                gotoNextState(SessionState.BINDING);
+            }
+        }, new SyncSession.ErrorHandler() {
+            @Override
+            public void onError(SyncSession s, ObjectServerError error) {
+                RealmLog.debug("Session[%s]: Failed to get access token (%d)", session.getConfiguration().getPath(), error.getErrorCode());
+                session.onError(error);
+            }
+        });
+    }
+

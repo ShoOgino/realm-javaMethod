@@ -15,11 +15,11 @@
         String username = this.username.getText().toString();
         String password = this.password.getText().toString();
 
-        Credentials creds = Credentials.usernamePassword(username, password, createUser);
+        SyncCredentials creds = SyncCredentials.usernamePassword(username, password, createUser);
         String authUrl = "http://" + BuildConfig.OBJECT_SERVER_IP + ":9080/auth";
-        User.Callback callback = new User.Callback() {
+        SyncUser.Callback callback = new SyncUser.Callback() {
             @Override
-            public void onSuccess(User user) {
+            public void onSuccess(SyncUser user) {
                 progressDialog.dismiss();
                 onLoginSuccess();
             }
@@ -42,6 +42,6 @@
             }
         };
 
-        User.loginAsync(creds, authUrl, callback);
+        SyncUser.loginAsync(creds, authUrl, callback);
     }
 

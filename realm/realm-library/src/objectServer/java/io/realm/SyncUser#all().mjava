@@ -1,0 +1,18 @@
+    /**
+     * Returns all valid users known by this device.
+     * A user is invalidated when he/she logs out or the user's access token expires.
+     *
+     * @return a list of all known valid users.
+     */
+    public static Collection<SyncUser> all() {
+        UserStore userStore = SyncManager.getUserStore();
+        Collection<SyncUser> storedUsers = userStore.allUsers();
+        List<SyncUser> result = new ArrayList<SyncUser>(storedUsers.size());
+        for (SyncUser user : storedUsers) {
+            if (user.isValid()) {
+                result.add(user);
+            }
+        }
+        return result;
+    }
+

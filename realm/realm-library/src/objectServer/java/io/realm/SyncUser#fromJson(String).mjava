@@ -1,0 +1,31 @@
+    /**
+     * Loads a user that has previously been serialized using {@link #toJson()}.
+     *
+     * @param user JSON string representing the user.
+     *
+     * @return the user object.
+     * @throws IllegalArgumentException if the JSON couldn't be converted to a valid {@link SyncUser} object.
+     */
+    public static SyncUser fromJson(String user) {
+        try {
+            JSONObject obj = new JSONObject(user);
+            URL authUrl = new URL(obj.getString("authUrl"));
+            Token userToken = Token.from(obj.getJSONObject("userToken"));
+            ObjectServerUser syncUser = new ObjectServerUser(userToken, authUrl);
+            JSONArray realmTokens = obj.getJSONArray("realms");
+            for (int i = 0; i < realmTokens.length(); i++) {
+                JSONObject token = realmTokens.getJSONObject(i);
+                URI uri = new URI(token.getString("uri"));
+                ObjectServerUser.AccessDescription realmDesc = ObjectServerUser.AccessDescription.fromJson(token.getJSONObject("description"));
+                syncUser.addRealm(uri, realmDesc);
+            }
+            return new SyncUser(syncUser);
+        } catch (JSONException e) {
+            throw new IllegalArgumentException("Could not parse user json: " + user, e);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("URL in JSON not valid: " + user, e);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("URI is not valid: " + user, e);
+        }
+    }
+

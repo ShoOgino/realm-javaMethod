@@ -1,0 +1,13 @@
+        Builder(Context context, SyncUser user, String url) {
+            if (context == null) {
+                throw new IllegalStateException("Call `Realm.init(Context)` before creating a SyncConfiguration");
+            }
+            this.defaultFolder = new File(context.getFilesDir(), "realm-object-server");
+            if (Realm.getDefaultModule() != null) {
+                this.modules.add(Realm.getDefaultModule());
+            }
+
+            validateAndSet(user);
+            validateAndSet(url);
+        }
+

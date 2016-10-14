@@ -1,12 +1,12 @@
     /**
-     * Gets any cached {@link Session} for the given {@link SyncConfiguration} or create a new one if
+     * Gets any cached {@link SyncSession} for the given {@link SyncConfiguration} or create a new one if
      * no one exists.
      *
      * @param syncConfiguration configuration object for the synchronized Realm.
-     * @return the {@link Session} for the specified Realm.
+     * @return the {@link SyncSession} for the specified Realm.
      * @throws IllegalArgumentException if syncConfiguration is {@code null}.
      */
-    public static synchronized Session getSession(SyncConfiguration syncConfiguration) {
+    public static synchronized SyncSession getSession(SyncConfiguration syncConfiguration) {
         if (syncConfiguration == null) {
             throw new IllegalArgumentException("A non-empty 'syncConfiguration' is required.");
         }
@@ -14,14 +14,14 @@
         if (SessionStore.hasSession(syncConfiguration)) {
             return SessionStore.getPublicSession(syncConfiguration);
         } else {
-            SyncSession internalSession = new SyncSession(
+            ObjectServerSession internalSession = new ObjectServerSession(
                     syncConfiguration,
                     authServer,
                     syncConfiguration.getUser().getSyncUser(),
                     syncConfiguration.getSyncPolicy(),
                     syncConfiguration.getErrorHandler()
             );
-            Session publicSession = new Session(internalSession);
+            SyncSession publicSession = new SyncSession(internalSession);
             SessionStore.addSession(publicSession, internalSession);
             syncConfiguration.getUser().getSyncUser().addSession(publicSession);
             syncConfiguration.getSyncPolicy().onSessionCreated(internalSession);

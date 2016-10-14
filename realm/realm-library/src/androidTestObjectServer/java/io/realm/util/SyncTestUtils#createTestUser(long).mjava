@@ -1,7 +1,7 @@
-    public static User createTestUser(long expires) {
+    public static SyncUser createTestUser(long expires) {
         Token userToken = new Token(USER_TOKEN, "JohnDoe", null, expires, null);
         Token accessToken = new Token(REALM_TOKEN, "JohnDoe", "/foo", expires, new Token.Permission[] {Token.Permission.DOWNLOAD });
-        SyncUser.AccessDescription desc = new SyncUser.AccessDescription(accessToken, "/data/data/myapp/files/default", false);
+        ObjectServerUser.AccessDescription desc = new ObjectServerUser.AccessDescription(accessToken, "/data/data/myapp/files/default", false);
 
         JSONObject obj = new JSONObject();
         try {
@@ -14,7 +14,7 @@
             obj.put("authUrl", "http://objectserver.realm.io/auth");
             obj.put("userToken", userToken.toJson());
             obj.put("realms", realmList);
-            return User.fromJson(obj.toString());
+            return SyncUser.fromJson(obj.toString());
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

@@ -1,7 +1,7 @@
     @Override
-    public Collection<User> allUsers() {
+    public Collection<SyncUser> allUsers() {
         Map<String, ?> all = sp.getAll();
-        ArrayList<User> users = new ArrayList<User>(all.size());
+        ArrayList<SyncUser> users = new ArrayList<SyncUser>(all.size());
         for (Object userJson : all.values()) {
             String userSerialisedAndDecrypted = null;
             try {
@@ -10,7 +10,7 @@
                 e.printStackTrace();
                 // returning null will probably penalise the other Users
             }
-            users.add(User.fromJson(userSerialisedAndDecrypted));
+            users.add(SyncUser.fromJson(userSerialisedAndDecrypted));
         }
         return users;
     }

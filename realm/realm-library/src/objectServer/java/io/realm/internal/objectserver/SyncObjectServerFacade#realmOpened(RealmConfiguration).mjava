@@ -1,8 +1,8 @@
     @Override
     public void realmOpened(RealmConfiguration configuration) {
         if (configuration instanceof SyncConfiguration) {
-            Session publicSession = SyncManager.getSession((SyncConfiguration) configuration);
-            SyncSession session = SessionStore.getPrivateSession(publicSession);
+            SyncSession publicSession = SyncManager.getSession((SyncConfiguration) configuration);
+            ObjectServerSession session = SessionStore.getPrivateSession(publicSession);
             session.getSyncPolicy().onRealmOpened(session);
         } else {
             throw new IllegalArgumentException(WRONG_TYPE_OF_CONFIGURATION);

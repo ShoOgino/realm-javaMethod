@@ -4,7 +4,7 @@
     @SuppressWarnings("unused")
     private static void notifyErrorHandler(int errorCode, String errorMessage) {
         ObjectServerError error = new ObjectServerError(ErrorCode.fromInt(errorCode), errorMessage);
-        for (SyncSession session : SessionStore.getAllSessions()) {
+        for (ObjectServerSession session : SessionStore.getAllSessions()) {
             session.onError(error);
         }
     }

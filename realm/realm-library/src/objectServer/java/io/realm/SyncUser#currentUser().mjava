@@ -1,0 +1,15 @@
+    /**
+     * Returns the last user that has logged in and who is still valid.
+     * A user is invalidated when he/she logs out or the user's access token expire.
+     *
+     * @return last {@link SyncUser} that has logged in and who is still valid. {@code null} if no current user or user has
+     *         been invalidated.
+     */
+    public static SyncUser currentUser() {
+        SyncUser user = SyncManager.getUserStore().get(UserStore.CURRENT_USER_KEY);
+        if (user != null && user.isValid()) {
+            return user;
+        }
+        return null;
+    }
+
