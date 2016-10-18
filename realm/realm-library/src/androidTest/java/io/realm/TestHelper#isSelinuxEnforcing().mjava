@@ -1,0 +1,30 @@
+    @SuppressWarnings("WeakerAccess")
+    public static boolean isSelinuxEnforcing() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            // SELinux is not enabled for these versions.
+            return false;
+        }
+        try {
+            final Process process = new ProcessBuilder("/system/bin/getenforce").start();
+            try {
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                //noinspection TryFinallyCanBeTryWithResources
+                try {
+                    return reader.readLine().toLowerCase(Locale.ENGLISH).equals("enforcing");
+                } finally {
+                    try {
+                        reader.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+            } finally {
+                try {
+                    process.waitFor();
+                } catch (InterruptedException ignored) {
+                }
+            }
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
