@@ -1,0 +1,17 @@
+    private E firstImpl(boolean shouldThrow, E defaultValue) {
+        if (managedMode) {
+            checkValidView();
+            if (!view.isEmpty()) {
+                return get(0);
+            }
+        } else if (unmanagedList != null && !unmanagedList.isEmpty()) {
+            return unmanagedList.get(0);
+        }
+        
+        if (shouldThrow) {
+            throw new IndexOutOfBoundsException("The list is empty.");
+        } else {
+            return defaultValue;
+        }
+    }
+
