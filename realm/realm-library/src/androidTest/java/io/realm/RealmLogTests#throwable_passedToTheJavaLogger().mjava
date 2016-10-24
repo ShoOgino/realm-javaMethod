@@ -1,0 +1,20 @@
+    @Test
+    public void throwable_passedToTheJavaLogger() {
+        TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
+        RealmLog.add(testLogger);
+        Throwable throwable;
+
+        try {
+            throw new RuntimeException("Test exception.");
+        } catch (RuntimeException e) {
+            throwable = e;
+            RealmLog.fatal(e);
+        }
+
+        // Throwable has been passed.
+        assertEquals(throwable, testLogger.throwable);
+        // Message is the stacktrace.
+        assertTrue(testLogger.message.contains("RealmLogTests.java"));
+        RealmLog.remove(testLogger);
+    }
+

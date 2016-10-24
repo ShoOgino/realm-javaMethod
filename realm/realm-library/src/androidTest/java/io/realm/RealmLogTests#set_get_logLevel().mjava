@@ -1,0 +1,19 @@
+    @Test
+    public void set_get_logLevel() {
+        TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
+        RealmLog.add(testLogger);
+
+        RealmLog.setLevel(LogLevel.FATAL);
+        assertEquals(LogLevel.FATAL, RealmLog.getLevel());
+        RealmLog.debug("TEST_DEBUG");
+        assertNull(testLogger.message);
+
+        RealmLog.setLevel(LogLevel.DEBUG);
+        RealmLog.debug("TEST_DEBUG");
+        assertEquals("TEST_DEBUG", testLogger.message);
+        RealmLog.fatal("TEST_FATAL");
+        assertEquals("TEST_FATAL", testLogger.message);
+
+        RealmLog.remove(testLogger);
+    }
+

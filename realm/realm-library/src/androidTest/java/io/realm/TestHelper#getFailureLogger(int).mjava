@@ -1,48 +1,21 @@
     /**
-     * Returns a Logger that will fail if it is asked to log a message above a certain level.
+     * Returns a RealmLogger that will fail if it is asked to log a message above a certain level.
      *
      * @param failureLevel {@link Log} level from which the unit test will fail.
-     * @return Logger implementation
+     * @return RealmLogger implementation
      */
-    public static Logger getFailureLogger(final int failureLevel) {
-        return new AndroidLogger(Log.VERBOSE) {
-
-            private void failIfEqualOrAbove(int logLevel, int failureLevel) {
+    public static RealmLogger getFailureLogger(final int failureLevel) {
+        return new RealmLogger() {
+            private void failIfEqualOrAbove(int logLevel) {
                 if (logLevel >= failureLevel) {
                     fail("Message logged that was above valid level: " + logLevel + " >= " + failureLevel);
                 }
             }
 
             @Override
-            public void trace(Throwable t, String message, Object... args) {
-                failIfEqualOrAbove(Log.VERBOSE, failureLevel);
+            public void log(int level, String tag, Throwable throwable, String message) {
+                failIfEqualOrAbove(level);
             }
-
-            @Override
-            public void debug(Throwable t, String message, Object... args) {
-                failIfEqualOrAbove(Log.DEBUG, failureLevel);
-            }
-
-            @Override
-            public void info(Throwable t, String message, Object... args) {
-                failIfEqualOrAbove(Log.INFO, failureLevel);
-            }
-
-            @Override
-            public void warn(Throwable t, String message, Object... args) {
-                failIfEqualOrAbove(Log.WARN, failureLevel);
-            }
-
-            @Override
-            public void error(Throwable t, String message, Object... args) {
-                failIfEqualOrAbove(Log.ERROR, failureLevel);
-            }
-
-            @Override
-            public void fatal(Throwable t, String message, Object... args) {
-                failIfEqualOrAbove(Log.ERROR, failureLevel);
-            }
-
         };
     }
 

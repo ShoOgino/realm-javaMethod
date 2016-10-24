@@ -1,11 +1,11 @@
     /**
-     * Remove all loggers.
+     * Removes all loggers. The default native logger will be removed as well. Use {@link #registerDefaultLogger()} to
+     * add it back.
      */
     public static void clear() {
-        synchronized (LOGGERS) {
-            LOGGERS.clear();
-            setMinimumNativeDebugLevel(Integer.MAX_VALUE);
-            loggersAsArray = NO_LOGGERS;
+        synchronized (LoggerAdapter.class) {
+            nativeClearLoggers();
+            LoggerAdapter.clear();
         }
     }
 
