@@ -4,15 +4,19 @@
     public Number min(String fieldName) {
         realm.checkIfValid();
         long columnIndex = getColumnIndexForSort(fieldName);
-        switch (table.getColumnType(columnIndex)) {
-            case INTEGER:
-                return table.minimumLong(columnIndex);
-            case FLOAT:
-                return table.minimumFloat(columnIndex);
-            case DOUBLE:
-                return table.minimumDouble(columnIndex);
-            default:
-                throw new IllegalArgumentException(String.format(TYPE_MISMATCH, fieldName, "int, float or double"));
+        if (nativePtr == 0) {
+            switch (table.getColumnType(columnIndex)) {
+                case INTEGER:
+                    return table.minimumLong(columnIndex);
+                case FLOAT:
+                    return table.minimumFloat(columnIndex);
+                case DOUBLE:
+                    return table.minimumDouble(columnIndex);
+                default:
+                    throw new IllegalArgumentException(String.format(TYPE_MISMATCH, fieldName, "int, float or double"));
+            }
+        } else {
+            return nativeAggregate(nativePtr, columnIndex, 1);
         }
     }
 
