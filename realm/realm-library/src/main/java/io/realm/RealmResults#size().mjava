@@ -1,0 +1,20 @@
+    /**
+     * Returns the number of elements in this query result.
+     *
+     * @return the number of elements in this query result.
+     */
+    @Override
+    public int size() {
+        if (!isLoaded()) {
+            return 0;
+        } else {
+            long size;
+            if (nativePtr == 0) {
+                size = getTableOrView().size();
+            } else {
+                size = nativeSize(nativePtr);
+            }
+            return (size > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) size;
+        }
+    }
+

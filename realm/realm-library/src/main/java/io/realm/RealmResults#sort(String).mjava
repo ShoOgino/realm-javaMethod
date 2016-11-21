@@ -1,0 +1,13 @@
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealmResults<E> sort(String fieldName) {
+        if (nativePtr == 0) {
+            return this.sort(fieldName, Sort.ASCENDING);
+        } else {
+            long ptr = nativeSort(nativePtr, new long[]{getColumnIndexForSort(fieldName)}, new boolean[]{Sort.ASCENDING.getValue()});
+            return new RealmResults<E>(realm, className, ptr);
+        }
+    }
+

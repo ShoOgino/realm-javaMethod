@@ -1,0 +1,16 @@
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public E previous() {
+            realm.checkIfValid();
+            checkRealmIsStable();
+            try {
+                E obj = get(pos);
+                pos--;
+                return obj;
+            } catch (IndexOutOfBoundsException e) {
+                throw new NoSuchElementException("Cannot access index less than zero. This was " + pos + ". Remember to check hasPrevious() before using previous().");
+            }
+        }
+
