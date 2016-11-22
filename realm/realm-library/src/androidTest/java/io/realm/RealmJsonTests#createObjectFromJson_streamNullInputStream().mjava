@@ -1,5 +1,7 @@
     @Test
     public void createObjectFromJson_streamNullInputStream() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         realm.beginTransaction();
         assertNull(realm.createObjectFromJson(AnnotationTypes.class, (InputStream) null));
         realm.commitTransaction();

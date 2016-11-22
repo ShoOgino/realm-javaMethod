@@ -1,5 +1,7 @@
     @Test
     public void createObjectFromJson_streamAllSimpleTypes() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         InputStream in = TestHelper.loadJsonFromAssets(context, "all_simple_types.json");
         realm.beginTransaction();
         realm.createObjectFromJson(AllTypes.class, in);

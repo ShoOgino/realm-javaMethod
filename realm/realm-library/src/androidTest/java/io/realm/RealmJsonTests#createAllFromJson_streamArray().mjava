@@ -1,5 +1,7 @@
     @Test
     public void createAllFromJson_streamArray() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         InputStream in = TestHelper.loadJsonFromAssets(context, "array.json");
         realm.beginTransaction();
         realm.createAllFromJson(Dog.class, in);

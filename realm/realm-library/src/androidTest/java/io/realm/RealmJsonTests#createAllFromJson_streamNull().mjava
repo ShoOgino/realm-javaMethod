@@ -1,5 +1,7 @@
     @Test
     public void createAllFromJson_streamNull() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         realm.createAllFromJson(AllTypes.class, (InputStream) null);
         assertEquals(0, realm.where(AllTypes.class).count());
     }

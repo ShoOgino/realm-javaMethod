@@ -1,5 +1,7 @@
     @Test
     public void createObjectFromJson_streamEmptyChildObjectList() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         InputStream in = TestHelper.loadJsonFromAssets(context, "realmlist_empty.json");
         realm.beginTransaction();
         realm.createObjectFromJson(AllTypes.class, in);

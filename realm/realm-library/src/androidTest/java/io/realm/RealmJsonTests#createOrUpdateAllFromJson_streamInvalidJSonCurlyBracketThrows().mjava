@@ -1,5 +1,7 @@
     @Test
     public void createOrUpdateAllFromJson_streamInvalidJSonCurlyBracketThrows() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         try {
             realm.createOrUpdateAllFromJson(AllTypesPrimaryKey.class, TestHelper.stringToStream("{"));
             fail();
