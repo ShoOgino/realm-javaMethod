@@ -1,5 +1,7 @@
     @Test
     public void createOrUpdateAllFromJson_streamNoPrimaryKeyThrows() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         try {
             realm.createOrUpdateAllFromJson(AllTypes.class, new TestHelper.StubInputStream());
             fail();

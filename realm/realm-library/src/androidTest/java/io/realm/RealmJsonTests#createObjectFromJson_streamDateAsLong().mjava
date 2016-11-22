@@ -1,5 +1,7 @@
     @Test
     public void createObjectFromJson_streamDateAsLong() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         InputStream in = TestHelper.loadJsonFromAssets(context, "date_as_long.json");
         realm.beginTransaction();
         realm.createObjectFromJson(AllTypes.class, in);

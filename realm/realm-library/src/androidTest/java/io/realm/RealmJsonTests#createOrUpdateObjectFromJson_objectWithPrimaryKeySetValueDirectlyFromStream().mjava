@@ -4,6 +4,8 @@
      */
     @Test
     public void createOrUpdateObjectFromJson_objectWithPrimaryKeySetValueDirectlyFromStream() throws JSONException, IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         InputStream stream = TestHelper.stringToStream("{\"id\": 1, \"name\": \"bar\"}");
         realm.beginTransaction();
         realm.createObject(OwnerPrimaryKey.class, 0); // id = 0
