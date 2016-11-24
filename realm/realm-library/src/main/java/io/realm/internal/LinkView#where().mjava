@@ -1,12 +1,5 @@
     public TableQuery where() {
-        // Execute the disposal of abandoned realm objects each time a new realm object is created
-        this.context.executeDelayedDisposal();
-        long nativeQueryPtr = nativeWhere(nativePointer);
-        try {
-            return new TableQuery(this.context, this.parent, nativeQueryPtr);
-        } catch (RuntimeException e) {
-            TableQuery.nativeClose(nativeQueryPtr);
-            throw e;
-        }
+        long nativeQueryPtr = nativeWhere(nativePtr);
+        return new TableQuery(this.context, this.parent, nativeQueryPtr);
     }
 

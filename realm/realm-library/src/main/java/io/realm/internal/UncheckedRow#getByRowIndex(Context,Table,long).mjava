@@ -6,10 +6,8 @@
      * @param index the index of the row.
      * @return an instance of Row for the table and index specified.
      */
-    public static UncheckedRow getByRowIndex(Context context, Table table, long index) {
+    static UncheckedRow getByRowIndex(Context context, Table table, long index) {
         long nativeRowPointer = table.nativeGetRowPtr(table.nativePtr, index);
-        UncheckedRow row = new UncheckedRow(context, table, nativeRowPointer);
-        context.addReference(NativeObjectReference.TYPE_ROW, row);
-        return row;
+        return new UncheckedRow(context, table, nativeRowPointer);
     }
 
