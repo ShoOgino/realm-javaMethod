@@ -1,14 +1,7 @@
     public TableView findAll(long start, long end, long limit) {
         validateQuery();
 
-        // Execute the disposal of abandoned realm objects each time a new realm object is created
-        context.executeDelayedDisposal();
         long nativeViewPtr = nativeFindAll(nativePtr, start, end, limit);
-        try {
-            return new TableView(this.context, this.table, nativeViewPtr, this);
-        } catch (RuntimeException e) {
-            TableView.nativeClose(nativeViewPtr);
-            throw e;
-        }
+        return new TableView(this.context, this.table, nativeViewPtr, this);
     }
 

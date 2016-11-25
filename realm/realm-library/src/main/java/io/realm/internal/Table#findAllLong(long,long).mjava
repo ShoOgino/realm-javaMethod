@@ -1,12 +1,6 @@
     @Override
     public TableView findAllLong(long columnIndex, long value) {
-        context.executeDelayedDisposal();
         long nativeViewPtr = nativeFindAllInt(nativePtr, columnIndex, value);
-        try {
-            return new TableView(this.context, this, nativeViewPtr);
-        } catch (RuntimeException e) {
-            TableView.nativeClose(nativeViewPtr);
-            throw e;
-        }
+        return new TableView(this.context, this, nativeViewPtr);
     }
 

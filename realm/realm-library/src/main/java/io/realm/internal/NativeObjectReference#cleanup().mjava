@@ -2,16 +2,10 @@
      * To dealloc native resources.
      */
     void cleanup() {
-        switch (type) {
-            case TYPE_LINK_VIEW:
-                LinkView.nativeClose(nativePointer);
-                break;
-            case TYPE_ROW:
-                UncheckedRow.nativeClose(nativePointer);
-                break;
-            default:
-                // Cannot get here.
-                throw new IllegalStateException("Unknown native reference type " + type + ".");
+        synchronized (context) {
+            nativeCleanUp(nativeFinalizerPtr, nativePtr);
         }
+        // Remove the PhantomReference from the pool to free it.
+        referencePool.remove(this);
     }
 

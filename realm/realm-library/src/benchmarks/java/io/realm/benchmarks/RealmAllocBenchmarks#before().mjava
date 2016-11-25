@@ -1,0 +1,11 @@
+    @BeforeExperiment
+    public void before() {
+        Realm.init(InstrumentationRegistry.getTargetContext());
+        RealmConfiguration config = new RealmConfiguration.Builder().build();
+        Realm.deleteRealm(config);
+        realm = Realm.getInstance(config);
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class).getColumnRealmList().add(realm.createObject(Dog.class));
+        realm.commitTransaction();
+    }
+

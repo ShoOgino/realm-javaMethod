@@ -1,13 +1,6 @@
     @Override
     public TableView findAllString(long columnIndex, String value){
-        // Execute the disposal of abandoned realm objects each time a new realm object is created
-        context.executeDelayedDisposal();
         long nativeViewPtr = nativeFindAllString(nativePtr, columnIndex, value);
-        try {
-            return new TableView(this.context, this.parent, nativeViewPtr);
-        } catch (RuntimeException e) {
-            TableView.nativeClose(nativeViewPtr);
-            throw e;
-        }
+        return new TableView(this.context, this.parent, nativeViewPtr);
     }
 
