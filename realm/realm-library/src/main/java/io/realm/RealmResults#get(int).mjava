@@ -7,17 +7,7 @@
      */
     @Override
     public E get(int location) {
-        E obj;
         realm.checkIfValid();
-        /*
-        TableOrView table = getTableOrView();
-        if (table instanceof TableView) {
-            obj = realm.get(classSpec, className, ((TableView) table).getSourceRowIndex(location));
-        } else {
-            obj = realm.get(classSpec, className, location);
-        }
-        */
-        long rowPtr = nativeGetRow(nativePtr, location);
-        return realm.get(classSpec, rowPtr);
+        return realm.get(classSpec, collection.getUncheckedRow(location));
     }
 

@@ -4,19 +4,6 @@
     public Number max(String fieldName) {
         realm.checkIfValid();
         long columnIndex = getColumnIndexForSort(fieldName);
-        if (nativePtr == 0) {
-            switch (table.getColumnType(columnIndex)) {
-                case INTEGER:
-                    return table.maximumLong(columnIndex);
-                case FLOAT:
-                    return table.maximumFloat(columnIndex);
-                case DOUBLE:
-                    return table.maximumDouble(columnIndex);
-                default:
-                    throw new IllegalArgumentException(String.format(TYPE_MISMATCH, fieldName, "int, float or double"));
-            }
-        } else {
-            return (Number) nativeAggregate(nativePtr, columnIndex, AGGREGATE_FUNCTION_MAXIMUM);
-        }
+        return (Number) collection.aggregate(Collection.Aggregate.MAXIMUM, columnIndex);
     }
 

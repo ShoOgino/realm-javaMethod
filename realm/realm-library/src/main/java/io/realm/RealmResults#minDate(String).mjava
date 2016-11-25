@@ -4,14 +4,6 @@
     public Date minDate(String fieldName) {
         realm.checkIfValid();
         long columnIndex = getColumnIndexForSort(fieldName);
-        if (nativePtr == 0) {
-            if (table.getColumnType(columnIndex) == RealmFieldType.DATE) {
-                return table.minimumDate(columnIndex);
-            } else {
-                throw new IllegalArgumentException(String.format(TYPE_MISMATCH, fieldName, "Date"));
-            }
-        } else {
-            return (Date) nativeAggregate(nativePtr, columnIndex, AGGREGATE_FUNCTION_MINIMUM);
-        }
+        return (Date) collection.aggregate(Collection.Aggregate.MINIMUM, columnIndex);
     }
 

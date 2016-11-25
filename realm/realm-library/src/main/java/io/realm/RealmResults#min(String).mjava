@@ -4,19 +4,6 @@
     public Number min(String fieldName) {
         realm.checkIfValid();
         long columnIndex = getColumnIndexForSort(fieldName);
-        if (nativePtr == 0) {
-            switch (table.getColumnType(columnIndex)) {
-                case INTEGER:
-                    return table.minimumLong(columnIndex);
-                case FLOAT:
-                    return table.minimumFloat(columnIndex);
-                case DOUBLE:
-                    return table.minimumDouble(columnIndex);
-                default:
-                    throw new IllegalArgumentException(String.format(TYPE_MISMATCH, fieldName, "int, float or double"));
-            }
-        } else {
-            return (Number) nativeAggregate(nativePtr, columnIndex, AGGREGATE_FUNCTION_MINIMUM);
-        }
+        return (Number)collection.aggregate(io.realm.internal.Collection.Aggregate.MINIMUM, columnIndex);
     }
 

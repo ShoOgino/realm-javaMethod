@@ -4,19 +4,6 @@
     public Number sum(String fieldName) {
         realm.checkIfValid();
         long columnIndex = getColumnIndexForSort(fieldName);
-        if (nativePtr == 0) {
-            switch (table.getColumnType(columnIndex)) {
-                case INTEGER:
-                    return table.sumLong(columnIndex);
-                case FLOAT:
-                    return table.sumFloat(columnIndex);
-                case DOUBLE:
-                    return table.sumDouble(columnIndex);
-                default:
-                    throw new IllegalArgumentException(String.format(TYPE_MISMATCH, fieldName, "int, float or double"));
-            }
-        } else {
-            return (Number) nativeAggregate(nativePtr, columnIndex, AGGREGATE_FUNCTION_SUM);
-        }
+        return (Number) collection.aggregate(Collection.Aggregate.SUM, columnIndex);
     }
 

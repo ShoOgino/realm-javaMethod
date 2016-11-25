@@ -6,19 +6,11 @@
      * @return if no objects exist or they all have {@code null} as the value for the given date field, {@code null}
      * will be returned. Otherwise the maximum date is returned. When determining the maximum date, objects with
      * {@code null} values are ignored.
-     * @throws java.lang.IllegalArgumentException if fieldName is not a Date field.
+     * @throws IllegalArgumentException if fieldName is not a Date field.
      */
     public Date maxDate(String fieldName) {
         realm.checkIfValid();
         long columnIndex = getColumnIndexForSort(fieldName);
-        if (nativePtr == 0) {
-            if (table.getColumnType(columnIndex) == RealmFieldType.DATE) {
-                return table.maximumDate(columnIndex);
-            } else {
-                throw new IllegalArgumentException(String.format(TYPE_MISMATCH, fieldName, "Date"));
-            }
-        } else {
-            return (Date) nativeAggregate(nativePtr, columnIndex, AGGREGATE_FUNCTION_MAXIMUM);
-        }
+        return (Date) collection.aggregate(Collection.Aggregate.MAXIMUM, columnIndex);
     }
 

@@ -4,21 +4,9 @@
     public double average(String fieldName) {
         realm.checkIfValid();
         long columnIndex = getColumnIndexForSort(fieldName);
-        if (nativePtr == 0) {
-            switch (table.getColumnType(columnIndex)) {
-                case INTEGER:
-                    return table.averageLong(columnIndex);
-                case DOUBLE:
-                    return table.averageDouble(columnIndex);
-                case FLOAT:
-                    return table.averageFloat(columnIndex);
-                default:
-                    throw new IllegalArgumentException(String.format(TYPE_MISMATCH, fieldName, "int, float or double"));
-            }
-        } else {
-            // FIXME: Should we change return type to Double?
-            Number sum = (Number) nativeAggregate(nativePtr, columnIndex, AGGREGATE_FUNCTION_AVERAGE);
-            return sum.doubleValue();
-        }
+
+        // FIXME: Should we change return type to Double?
+        Number sum = (Number) collection.aggregate(Collection.Aggregate.AVERAGE, columnIndex);
+        return sum.doubleValue();
     }
 
