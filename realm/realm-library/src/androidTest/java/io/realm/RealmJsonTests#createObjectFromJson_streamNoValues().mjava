@@ -1,6 +1,8 @@
     // Test if Json object doesn't have the field, then the field should have default value. Stream version.
     @Test
     public void createObjectFromJson_streamNoValues() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         InputStream in = TestHelper.loadJsonFromAssets(context, "other_json_object.json");
         realm.beginTransaction();
         realm.createObjectFromJson(AllTypes.class, in);

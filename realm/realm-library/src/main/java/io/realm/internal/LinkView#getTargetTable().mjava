@@ -1,13 +1,6 @@
     public Table getTargetTable() {
-        // Execute the disposal of abandoned realm objects each time a new realm object is created
-        context.executeDelayedDisposal();
-        long nativeTablePointer = nativeGetTargetTable(nativePointer);
-        try {
-            // Copy context reference from parent
-            return new Table(this.parent, nativeTablePointer);
-        } catch (RuntimeException e) {
-            Table.nativeClose(nativeTablePointer);
-            throw e;
-        }
+        long nativeTablePointer = nativeGetTargetTable(nativePtr);
+        Table table = new Table(this.parent, nativeTablePointer);
+        return table;
     }
 

@@ -1,0 +1,17 @@
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                NativeObjectReference reference = (NativeObjectReference) referenceQueue.remove();
+                reference.cleanup();
+            } catch (InterruptedException e) {
+                // Restore the interrupted status
+                Thread.currentThread().interrupt();
+
+                RealmLog.fatal("The FinalizerRunnable thread has been interrupted." +
+                        " Native resources cannot be freed anymore");
+                break;
+            }
+        }
+    }
+

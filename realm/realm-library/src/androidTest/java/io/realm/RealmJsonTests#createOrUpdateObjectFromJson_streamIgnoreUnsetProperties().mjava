@@ -1,5 +1,7 @@
     @Test
     public void createOrUpdateObjectFromJson_streamIgnoreUnsetProperties() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         realm.beginTransaction();
         realm.createOrUpdateAllFromJson(AllTypesPrimaryKey.class, TestHelper.loadJsonFromAssets(context, "list_alltypes_primarykey.json"));
         realm.commitTransaction();

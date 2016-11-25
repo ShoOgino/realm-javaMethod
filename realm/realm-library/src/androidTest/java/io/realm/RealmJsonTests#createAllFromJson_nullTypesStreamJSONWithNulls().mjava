@@ -1,6 +1,8 @@
     // Test creating objects form JSON stream, all nullable fields with null values or non-null values
     @Test
     public void createAllFromJson_nullTypesStreamJSONWithNulls() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         realm.beginTransaction();
         realm.createAllFromJson(NullTypes.class, TestHelper.loadJsonFromAssets(context, "nulltypes.json"));
         realm.commitTransaction();

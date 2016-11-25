@@ -1,14 +1,7 @@
     public Table getLinkTarget(long columnIndex) {
-        // Execute the disposal of abandoned realm objects each time a new realm object is created
-        context.executeDelayedDisposal();
         long nativeTablePointer = nativeGetLinkTarget(nativePtr, columnIndex);
-        try {
-            // Copy context reference from parent
-            return new Table(this.sharedRealm, nativeTablePointer);
-        }
-        catch (RuntimeException e) {
-            Table.nativeClose(nativeTablePointer);
-            throw e;
-        }
+        // Copy context reference from parent
+        Table table = new Table(this.sharedRealm, nativeTablePointer);
+        return table;
     }
 

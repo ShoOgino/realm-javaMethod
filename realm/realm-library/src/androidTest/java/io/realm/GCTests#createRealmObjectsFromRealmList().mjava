@@ -1,0 +1,13 @@
+    @Test
+    public void createRealmObjectsFromRealmList() {
+        for (int i = 0; i < 100; i++) {
+            Realm realm = Realm.getInstance(realmConfig);
+            for (int j = 0; j < 1000; j++) {
+                AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+                assertNotNull(allTypes);
+                assertNotNull(allTypes.getColumnRealmList().first());
+            }
+            realm.close();
+        }
+    }
+

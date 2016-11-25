@@ -1,14 +1,7 @@
     @Override
     public TableQuery where() {
-        // Execute the disposal of abandoned realm objects each time a new realm object is created
-        context.executeDelayedDisposal();
         long nativeQueryPtr = nativeWhere(nativePtr);
-        try {
-            // Copy context reference from parent
-            return new TableQuery(this.context, this, nativeQueryPtr);
-        } catch (RuntimeException e) {
-            TableQuery.nativeClose(nativeQueryPtr);
-            throw e;
-        }
+        // Copy context reference from parent
+        return new TableQuery(this.context, this, nativeQueryPtr);
     }
 

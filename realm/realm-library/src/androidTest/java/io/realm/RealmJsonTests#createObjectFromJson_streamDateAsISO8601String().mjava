@@ -1,5 +1,7 @@
     @Test
     public void createObjectFromJson_streamDateAsISO8601String() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
         InputStream in = TestHelper.loadJsonFromAssets(context, "date_as_iso8601_string.json");
         realm.beginTransaction();
         realm.createObjectFromJson(AllTypes.class, in);

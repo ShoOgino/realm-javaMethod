@@ -1,12 +1,5 @@
     public TableView getDistinctView(long columnIndex) {
-        // Execute the disposal of abandoned realm objects each time a new realm object is created
-        this.context.executeDelayedDisposal();
         long nativeViewPtr = nativeGetDistinctView(nativePtr, columnIndex);
-        try {
-            return new TableView(this.context, this, nativeViewPtr);
-        } catch (RuntimeException e) {
-            TableView.nativeClose(nativeViewPtr);
-            throw e;
-        }
+        return new TableView(this.context, this, nativeViewPtr);
     }
 

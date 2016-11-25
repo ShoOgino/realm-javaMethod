@@ -6,11 +6,8 @@
      * @param index the index of the row.
      * @return an instance of Row for the LinkView and index specified.
      */
-    public static UncheckedRow getByRowIndex(Context context, LinkView linkView, long index) {
-        long nativeRowPointer = linkView.nativeGetRow(linkView.nativePointer, index);
-        UncheckedRow row = new UncheckedRow(context, linkView.getTargetTable(),
-                nativeRowPointer);
-        context.addReference(NativeObjectReference.TYPE_ROW, row);
-        return row;
+    static UncheckedRow getByRowIndex(Context context, LinkView linkView, long index) {
+        long nativeRowPointer = linkView.nativeGetRow(linkView.getNativePtr(), index);
+        return new UncheckedRow(context, linkView.getTargetTable(), nativeRowPointer);
     }
 

@@ -1,0 +1,11 @@
+    @Before
+    public void setUp() {
+        realmConfig = configFactory.createConfiguration();
+        Realm realm = Realm.getInstance(realmConfig);
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class).getColumnRealmList().add(realm.createObject(Dog.class));
+        realm.commitTransaction();
+        realm.close();
+
+    }
+
