@@ -1,7 +1,8 @@
-    protected Collection(SharedRealm sharedRealm, TableQuery query, long indices[], boolean[] orders) {
+    public Collection(SharedRealm sharedRealm, TableQuery query, long indices[], boolean[] orders) {
         this.context = sharedRealm.context;
         this.query = query;
 
         this.nativePtr = nativeCreateResults(sharedRealm.getNativePtr(), query.getNativePtr(), indices, orders);
+        this.context.addReference(this);
     }
 

@@ -1,0 +1,16 @@
+    // Called by JNI
+    @SuppressWarnings("unused")
+    private void notifyChangeListeners() {
+        if (!listeners.isEmpty()) {
+            for (Listener listener : listeners) {
+                Object obj = listener.objectRef.get();
+                if (obj == null) {
+                    listeners.remove(listener);
+                    continue;
+                }
+                //noinspection unchecked
+                listener.realmChangeListener.onChange(obj);
+            }
+        }
+    }
+
