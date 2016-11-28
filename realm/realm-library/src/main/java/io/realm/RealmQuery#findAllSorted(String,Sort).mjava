@@ -14,15 +14,14 @@
     @SuppressWarnings("unchecked")
     public RealmResults<E> findAllSorted(String fieldName, Sort sortOrder) {
         checkQueryIsNotReused();
-        TableView tableView = query.findAll();
-        long columnIndex = getColumnIndexForSort(fieldName);
-        tableView.sort(columnIndex, sortOrder);
+        SortDescriptor sortDescriptor = SortDescriptor.getInstanceForSort(query.getTable(), fieldName, sortOrder);
 
+        Collection collection = new Collection(realm.sharedRealm, query, sortDescriptor);
         RealmResults<E> realmResults;
         if (isDynamicQuery()) {
-            realmResults = (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, tableView, className);
+            realmResults = new RealmResults<E>(realm, collection, className);
         } else {
-            realmResults = RealmResults.createFromTableOrView(realm, tableView, clazz);
+            realmResults = new RealmResults<E>(realm, collection, clazz);
         }
         return realmResults;
     }

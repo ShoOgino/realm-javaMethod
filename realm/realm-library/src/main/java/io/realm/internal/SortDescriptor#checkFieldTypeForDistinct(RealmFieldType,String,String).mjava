@@ -1,0 +1,11 @@
+    private static void checkFieldTypeForDistinct(RealmFieldType type, String fieldName, String fieldDescriptions) {
+        for (RealmFieldType aValidFieldTypesForSort : validFieldTypesForDistinct) {
+            if (aValidFieldTypesForSort == type) {
+                return;
+            }
+        }
+        throw new IllegalArgumentException(String.format(
+                "Distinct is not supported on '%s' field '%s' in '%s'.",
+                type.toString(), fieldName, fieldDescriptions));
+    }
+

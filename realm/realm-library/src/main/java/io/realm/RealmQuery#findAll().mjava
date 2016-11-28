@@ -9,11 +9,11 @@
     public RealmResults<E> findAll() {
         checkQueryIsNotReused();
         RealmResults<E> realmResults;
+        Collection collection = new Collection(realm.sharedRealm, query, null);
         if (isDynamicQuery()) {
-            realmResults =  (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, query.findAll(), className);
+            realmResults = new RealmResults<E>(realm, collection, className);
         } else {
-            //realmResults = RealmResults.createFromTableOrView(realm, query.findAll(), clazz);
-            realmResults = RealmResults.createFromQuery(realm, query, clazz, null, null);
+            realmResults = new RealmResults<E>(realm, collection, clazz);
         }
         return realmResults;
     }

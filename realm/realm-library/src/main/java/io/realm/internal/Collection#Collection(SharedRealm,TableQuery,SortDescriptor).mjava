@@ -1,0 +1,13 @@
+    public Collection(SharedRealm sharedRealm, TableQuery query, SortDescriptor sortDescriptor) {
+        this.context = sharedRealm.context;
+        this.query = query;
+
+        if (sortDescriptor == null) {
+            this.nativePtr = nativeCreateResults(sharedRealm.getNativePtr(), query.getNativePtr(), 0);
+        } else {
+            this.nativePtr = nativeCreateResults(sharedRealm.getNativePtr(), query.getNativePtr(),
+                    sortDescriptor.getNativePtr());
+        }
+        this.context.addReference(this);
+    }
+

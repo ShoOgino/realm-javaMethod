@@ -1,0 +1,14 @@
+    private SortDescriptor(Table table, long[][] columnIndices, Sort[] sortOrders) {
+        if (sortOrders != null) {
+            ascendings = new boolean[sortOrders.length];
+            for (int i = 0; i < sortOrders.length; i++) {
+                ascendings[i] = sortOrders[i].getValue();
+            }
+        } else {
+            ascendings = null;
+        }
+
+        this.columnIndices = columnIndices;
+        nativePtr = nativeCreate(table.getNativePtr(), columnIndices, ascendings);
+    }
+
