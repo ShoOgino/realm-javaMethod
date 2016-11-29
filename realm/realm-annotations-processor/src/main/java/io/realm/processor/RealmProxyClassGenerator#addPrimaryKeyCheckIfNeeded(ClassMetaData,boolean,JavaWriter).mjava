@@ -6,7 +6,7 @@
                 if (Utils.isString(primaryKeyElement)) {
                     writer
                         .emitStatement("String primaryKeyValue = ((%s) object).%s()", interfaceName, primaryKeyGetter)
-                        .emitStatement("long rowIndex = TableOrView.NO_MATCH")
+                        .emitStatement("long rowIndex = Table.NO_MATCH")
                         .beginControlFlow("if (primaryKeyValue == null)")
                         .emitStatement("rowIndex = Table.nativeFindFirstNull(tableNativePtr, pkColumnIndex)")
                         .nextControlFlow("else")
@@ -15,7 +15,7 @@
                 } else {
                     writer
                         .emitStatement("Object primaryKeyValue = ((%s) object).%s()", interfaceName, primaryKeyGetter)
-                        .emitStatement("long rowIndex = TableOrView.NO_MATCH")
+                        .emitStatement("long rowIndex = Table.NO_MATCH")
                         .beginControlFlow("if (primaryKeyValue == null)")
                         .emitStatement("rowIndex = Table.nativeFindFirstNull(tableNativePtr, pkColumnIndex)")
                         .nextControlFlow("else")
@@ -23,7 +23,7 @@
                         .endControlFlow();
                 }
             } else {
-                writer.emitStatement("long rowIndex = TableOrView.NO_MATCH");
+                writer.emitStatement("long rowIndex = Table.NO_MATCH");
                 writer.emitStatement("Object primaryKeyValue = ((%s) object).%s()", interfaceName, primaryKeyGetter);
                 writer.beginControlFlow("if (primaryKeyValue != null)");
 
@@ -35,7 +35,7 @@
                 writer.endControlFlow();
             }
 
-            writer.beginControlFlow("if (rowIndex == TableOrView.NO_MATCH)");
+            writer.beginControlFlow("if (rowIndex == Table.NO_MATCH)");
             if (Utils.isString(metadata.getPrimaryKey())) {
                 writer.emitStatement("rowIndex = table.addEmptyRowWithPrimaryKey(primaryKeyValue, false)");
             } else {
