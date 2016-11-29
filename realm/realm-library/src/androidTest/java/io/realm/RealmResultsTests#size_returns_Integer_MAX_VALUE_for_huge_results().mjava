@@ -1,13 +1,13 @@
     @Test
     public void size_returns_Integer_MAX_VALUE_for_huge_results() {
-        final Table table = Mockito.mock(Table.class);
-        final RealmResults<AllTypes> targetResult = TestHelper.newRealmResults(realm, table, AllTypes.class);
+        final Collection collection = Mockito.mock(Collection.class);
+        final RealmResults<AllTypes> targetResult = TestHelper.newRealmResults(realm, collection, AllTypes.class);
 
-        Mockito.when(table.size()).thenReturn(((long) Integer.MAX_VALUE) - 1);
+        Mockito.when(collection.size()).thenReturn(((long) Integer.MAX_VALUE) - 1);
         assertEquals(Integer.MAX_VALUE - 1, targetResult.size());
-        Mockito.when(table.size()).thenReturn(((long) Integer.MAX_VALUE));
+        Mockito.when(collection.size()).thenReturn(((long) Integer.MAX_VALUE));
         assertEquals(Integer.MAX_VALUE, targetResult.size());
-        Mockito.when(table.size()).thenReturn(((long) Integer.MAX_VALUE) + 1);
+        Mockito.when(collection.size()).thenReturn(((long) Integer.MAX_VALUE) + 1);
         assertEquals(Integer.MAX_VALUE, targetResult.size());
     }
 
