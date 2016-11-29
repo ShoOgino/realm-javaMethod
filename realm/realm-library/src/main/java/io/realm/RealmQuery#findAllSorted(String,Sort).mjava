@@ -17,12 +17,6 @@
         SortDescriptor sortDescriptor = SortDescriptor.getInstanceForSort(query.getTable(), fieldName, sortOrder);
 
         Collection collection = new Collection(realm.sharedRealm, query, sortDescriptor);
-        RealmResults<E> realmResults;
-        if (isDynamicQuery()) {
-            realmResults = new RealmResults<E>(realm, collection, className);
-        } else {
-            realmResults = new RealmResults<E>(realm, collection, clazz);
-        }
-        return realmResults;
+        return createRealmResults(collection);
     }
 

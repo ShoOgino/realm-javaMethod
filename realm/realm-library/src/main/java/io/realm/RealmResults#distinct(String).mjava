@@ -9,15 +9,6 @@
      * is not indexed, or points to linked fields.
      */
     public RealmResults<E> distinct(String fieldName) {
-        realm.checkIfValid();
-        long columnIndex = RealmQuery.getAndValidateDistinctColumnIndex(fieldName, this.table.getTable());
-
-        TableOrView tableOrView = getTableOrView();
-        if (tableOrView instanceof Table) {
-            this.table = ((Table) tableOrView).getDistinctView(columnIndex);
-        } else {
-            ((TableView) tableOrView).distinct(columnIndex);
-        }
-        return this;
+        return where().distinct(fieldName);
     }
 

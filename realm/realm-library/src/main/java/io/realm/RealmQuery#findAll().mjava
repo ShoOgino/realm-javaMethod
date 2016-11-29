@@ -8,13 +8,7 @@
     @SuppressWarnings("unchecked")
     public RealmResults<E> findAll() {
         checkQueryIsNotReused();
-        RealmResults<E> realmResults;
-        Collection collection = new Collection(realm.sharedRealm, query, null);
-        if (isDynamicQuery()) {
-            realmResults = new RealmResults<E>(realm, collection, className);
-        } else {
-            realmResults = new RealmResults<E>(realm, collection, clazz);
-        }
-        return realmResults;
+        Collection collection = new Collection(realm.sharedRealm, query);
+        return createRealmResults(collection);
     }
 
