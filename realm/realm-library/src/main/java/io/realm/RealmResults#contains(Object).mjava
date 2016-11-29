@@ -8,14 +8,10 @@
     @Override
     public boolean contains(Object object) {
         boolean contains = false;
-        if (isLoaded() && object instanceof RealmObjectProxy) {
+        if (object instanceof RealmObjectProxy) {
             RealmObjectProxy proxy = (RealmObjectProxy) object;
             Row row = proxy.realmGet$proxyState().getRow$realm();
-            if (row instanceof InvalidRow) {
-                contains = false;
-            } else {
-                contains = collection.contains((UncheckedRow) row);
-            }
+            contains = !(row instanceof InvalidRow) && collection.contains((UncheckedRow) row);
         }
         return contains;
     }
