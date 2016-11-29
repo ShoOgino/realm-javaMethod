@@ -1,0 +1,12 @@
+    @Test
+    public void indexOf() {
+        SortDescriptor sortDescriptor = new SortDescriptor(table, new long[] {2});
+        try {
+            Collection collection = new Collection(sharedRealm, table.where(), sortDescriptor);
+            UncheckedRow row = table.getUncheckedRow(0);
+            assertEquals(collection.indexOf(row), 3);
+        } finally {
+            sortDescriptor.close();
+        }
+    }
+
