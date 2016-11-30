@@ -3,27 +3,8 @@
      */
     void notifyChangeListeners$realm() {
         if (!listeners.isEmpty()) {
-            boolean notify = false;
-
-            Table table = row.getTable();
-            if (table == null) {
-                // Completed async queries might result in `table == null`, `isCompleted == true` and `row == Row.EMPTY_ROW`
-                // We still want to trigger change notifications for these cases.
-                // isLoaded / isValid should be considered properties on RealmObjects as well so any change to these
-                // should trigger a RealmChangeListener.
-                notify = true;
-            } else {
-                long version = table.getVersion();
-                if (currentTableVersion != version) {
-                    currentTableVersion = version;
-                    notify = true;
-                }
-            }
-
-            if (notify) {
-                for (RealmChangeListener listener : listeners) {
-                    listener.onChange(model);
-                }
+            for (RealmChangeListener listener : listeners) {
+                listener.onChange(model);
             }
         }
     }

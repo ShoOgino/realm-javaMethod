@@ -1,0 +1,18 @@
+    private Row executeQuery() {
+        if (pendingCollection == null) {
+            throw new IllegalStateException(QUERY_EXECUTED_MESSAGE);
+        }
+        if (frontEnd == null) {
+            throw new IllegalStateException(PROXY_NOT_SET_MESSAGE);
+        }
+        Row row = pendingCollection.getUncheckedRow(0);
+        if (row == null) {
+            throw new IllegalStateException(EMPTY_ROW_MESSAGE);
+        }
+        if (frontEnd.get() != null) {
+            frontEnd.get().onQueryFinished(pendingCollection.firstUncheckedRow(), false);
+        }
+        clearPendingCollection();
+        return row;
+    }
+

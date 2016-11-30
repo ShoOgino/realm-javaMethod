@@ -6,12 +6,26 @@
      */
     public E findFirst() {
         checkQueryIsNotReused();
-        long tableRowIndex = getSourceRowIndexForFirstObject();
-        if (tableRowIndex >= 0) {
-            E realmObject = realm.get(clazz, className, tableRowIndex);
-            return realmObject;
+
+        // TODO: The performance by the pending query will be a little bit worse than directly calling core's
+        // Query.find(). The overhead comes with core needs to add all the row indices to the vector. However this can
+        // be optimized by adding support of limit in OS's Results which is supported by core already.
+        PendingRow pendingRow = new PendingRow(realm.sharedRealm, query, null);
+        // prepare an empty reference of the RealmObject, so we can return it immediately (promise)
+        // then update it once the query complete in the background.
+        final E result;
+        if (isDynamicQuery()) {
+            //noinspection unchecked
+            result = (E) new DynamicRealmObject(className, realm, pendingRow);
         } else {
-            return null;
+            result = realm.getConfiguration().getSchemaMediator().newInstance(
+                    clazz, realm, pendingRow, realm.getSchema().getColumnInfo(clazz),
+                    false, Collections.<String>emptyList());
         }
+
+        final RealmObjectProxy proxy = (RealmObjectProxy) result;
+        pendingRow.setFrontEnd(proxy.realmGet$proxyState());
+
+        return result;
     }
 

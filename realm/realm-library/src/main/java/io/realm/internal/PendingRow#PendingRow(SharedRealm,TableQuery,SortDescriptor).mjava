@@ -1,0 +1,26 @@
+    public PendingRow(SharedRealm sharedRealm, TableQuery query, SortDescriptor sortDescriptor) {
+        pendingCollection = new Collection(sharedRealm, query, sortDescriptor);
+        listener = new Collection.Listener(new RealmChangeListener<PendingRow>() {
+            @Override
+            public void onChange(PendingRow pendingRow) {
+                if (frontEnd == null) {
+                    throw new IllegalStateException(PROXY_NOT_SET_MESSAGE);
+                }
+                // TODO: PendingRow will always get the first Row of the query since we only support findFirst.
+                Row row = pendingCollection.firstUncheckedRow();
+                if (frontEnd.get() == null) {
+                    // The front end is GCed.
+                    clearPendingCollection();
+                    return;
+                }
+                // If no rows returned by the query, just wait for the query updates until it returns a valid row.
+                if (row != null) {
+                    // Ask the front end to reset the row and stop async query.
+                    frontEnd.get().onQueryFinished(row, true);
+                    clearPendingCollection();
+                }
+            }
+        }, this);
+        pendingCollection.addListener(listener);
+    }
+
