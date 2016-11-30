@@ -1,6 +1,8 @@
     private E lastImpl(boolean shouldThrow, E defaultValue) {
-        if (!isEmpty()) {
-            return get(size() - 1);
+        Row row = collection.lastUncheckedRow();
+
+        if (row != null) {
+            return realm.get(classSpec, row);
         } else {
             if (shouldThrow) {
                 throw new IndexOutOfBoundsException("No results were found.");

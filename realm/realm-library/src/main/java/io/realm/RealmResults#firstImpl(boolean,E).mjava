@@ -1,6 +1,8 @@
     private E firstImpl(boolean shouldThrow, E defaultValue) {
-        if (!isEmpty()) {
-            return get(0);
+        Row row = collection.firstUncheckedRow();
+
+        if (row != null) {
+            return realm.get(classSpec, row);
         } else {
             if (shouldThrow) {
                 throw new IndexOutOfBoundsException("No results were found.");
