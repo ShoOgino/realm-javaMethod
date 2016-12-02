@@ -1,0 +1,12 @@
+    // Called by JNI
+    @SuppressWarnings("unused")
+    private Observer[] getObservers() {
+        Observer[] observers = new Observer[rowObserverMap.size()];
+        int i = 0;
+        for (Map.Entry<UncheckedRow, Observer> entry : rowObserverMap.entrySet()) {
+            observers[i]  = entry.getValue();
+            observers[i].row = entry.getKey();
+        }
+        return observers;
+    }
+

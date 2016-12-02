@@ -16,11 +16,13 @@
                 autoChangeNotifications,
                 rosServerUrl,
                 rosUserToken);
+        RowNotifier rowNotifier = new RowNotifier();
         try {
             return new SharedRealm(
-                    nativeGetSharedRealm(nativeConfigPtr, realmNotifier),
+                    nativeGetSharedRealm(nativeConfigPtr, realmNotifier, rowNotifier),
                     config,
                     realmNotifier,
+                    rowNotifier,
                     schemaVersionListener);
         } finally {
             nativeCloseConfig(nativeConfigPtr);

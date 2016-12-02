@@ -1,0 +1,15 @@
+    public void addChangeListener(RealmChangeListener<E> listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+        if (row instanceof UncheckedRow) {
+            RowNotifier rowNotifier = realm.sharedRealm.rowNotifier;
+            rowNotifier.registerListener((UncheckedRow) row, new RealmChangeListener<ProxyState<E>>() {
+                @Override
+                public void onChange(ProxyState<E> proxyState) {
+                    proxyState.notifyChangeListeners$realm();
+                }
+            }, this);
+        }
+    }
+
