@@ -10,11 +10,21 @@
         cat.addChangeListener(new RealmChangeListener<Cat>() {
             @Override
             public void onChange(Cat object) {
-                assertEquals("cat1", object.getName());
-                looperThread.testComplete();
+                //assertEquals("cat1", object.getName());
+                //looperThread.testComplete();
+                Cat cat = object;
             }
         });
+        cat.getAge();
 
+        /*
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.where(Cat.class).findFirst().setName("cat1");
+            }
+        });
+        */
         realm.beginTransaction();
         cat.setName("cat1");
         realm.commitTransaction();

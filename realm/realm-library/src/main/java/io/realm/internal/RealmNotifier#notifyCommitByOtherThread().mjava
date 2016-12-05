@@ -1,8 +1,28 @@
+    // This is called by OS when other thread/process changes the Realm.
+    // This is getting called on the same thread which created the Realm.
+    // |---------------------------------------------------------------+--------------+------------------------------------------------|
+    // | Thread A                                                      | Thread B     | Daemon Thread                                  |
+    // |---------------------------------------------------------------+--------------+------------------------------------------------|
+    // |                                                               | Make changes |                                                |
+    // |                                                               |              | Detect and notify thread A through JNI ALooper |
+    // | Call OS's Realm::notify() from OS's ALooper callback          |              |                                                |
+    // | Realm::notify() calls JavaBindingContext:change_available()   |              |                                                |
+    // | change_available calls into this method to send REALM_CHANGED |              |                                                |
+    // |---------------------------------------------------------------+--------------+------------------------------------------------|
     /**
      * This is called in Realm Object Store's JavaBindingContext::changes_available.
      * This is getting called on the same thread which created this Realm when the same Realm file has been changed by
      * other thread. The changes on the same thread should not trigger this call.
      */
     @SuppressWarnings("unused") // called from java_binding_context.cpp
-    void notifyCommitByOtherThread();
+    void notifyCommitByOtherThread() {
+        for (RealmObserverPair observerPair : realmObserverPairs) {
+            Object observer = observerPair.observerRef.get();
+            if (observer == null) {
+                realmObserverPairs.remove(observerPair);
+            } else {
+                observerPair.onChange();
+            }
+        }
+    }
 
