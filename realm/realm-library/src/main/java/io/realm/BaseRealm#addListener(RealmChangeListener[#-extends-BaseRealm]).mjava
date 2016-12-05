@@ -3,9 +3,7 @@
             throw new IllegalArgumentException("Listener should not be null");
         }
         checkIfValid();
-        if (!handlerController.isAutoRefreshEnabled()) {
-            throw new IllegalStateException("You can't register a listener from a non-Looper or IntentService thread.");
-        }
+        sharedRealm.getCapabilities().checkCanDeliverNotification("Listener cannot be registered.");
         sharedRealm.realmNotifier.addChangeListener(this, listener);
     }
 

@@ -6,9 +6,7 @@
      */
     public void removeAllChangeListeners() {
         checkIfValid();
-        if (!handlerController.isAutoRefreshEnabled()) {
-            throw new IllegalStateException("You can't remove listeners from a non-Looper thread ");
-        }
+        sharedRealm.getCapabilities().checkCanDeliverNotification("Listener cannot be removed.");
         sharedRealm.realmNotifier.removeAllChangeListeners();
     }
 

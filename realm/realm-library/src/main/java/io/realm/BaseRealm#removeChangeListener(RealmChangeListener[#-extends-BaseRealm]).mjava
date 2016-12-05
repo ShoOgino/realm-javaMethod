@@ -11,9 +11,7 @@
             throw new IllegalArgumentException("Listener should not be null");
         }
         checkIfValid();
-        if (!handlerController.isAutoRefreshEnabled()) {
-            throw new IllegalStateException("You can't remove a listener from a non-Looper thread ");
-        }
+        sharedRealm.getCapabilities().checkCanDeliverNotification("Listener cannot be removed.");
         sharedRealm.realmNotifier.removeChangeListener(this, listener);
     }
 

@@ -1,0 +1,12 @@
+    @Override
+    public void checkCanDeliverNotification(String exceptionMessage) {
+        if (Looper.myLooper() == null) {
+            throw new IllegalStateException( exceptionMessage == null ? "" : (exceptionMessage + " ") +
+                    "Realm cannot be automatically updated on a thread without a looper.");
+        }
+        if (isIntentServiceThread()) {
+            throw new IllegalStateException( exceptionMessage == null ? "" : (exceptionMessage + " ") +
+                    "Realm cannot be automatically updated on a IntentService thread.");
+        }
+    }
+
