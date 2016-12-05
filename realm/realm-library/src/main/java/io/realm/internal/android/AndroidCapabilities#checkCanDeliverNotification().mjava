@@ -1,0 +1,10 @@
+    @Override
+    public void checkCanDeliverNotification() {
+        if (Looper.myLooper() == null) {
+            throw new IllegalStateException("Cannot set auto-refresh in a Thread without a Looper");
+        }
+        if (isIntentServiceThread()) {
+            throw new IllegalStateException("Cannot set auto-refresh in an IntentService thread.");
+        }
+    }
+
