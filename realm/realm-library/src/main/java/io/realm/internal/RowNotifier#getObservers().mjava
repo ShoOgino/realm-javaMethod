@@ -1,12 +1,26 @@
+    // The calling orders in JNI:
+    // 1. getObservers() to get the array of current ObserverPair. (called in BindingContext::get_observed_rows)
+    // 2. getObservedRowPtrs() with return value from step 1. To get an array of Row pointers. (called in
+    //    BindingContext::get_observed_rows)
+    // 3. Every RowObserverPair.onChange() deliver the changes to java. (called in BindingContext::did_change())
+    // 4. clearRowRefs() to reset the strong reference we hold in the ObserverPair. (called in
+    //    BindingContext::did_change())
     // Called by JNI
     @SuppressWarnings("unused")
-    private Observer[] getObservers() {
-        Observer[] observers = new Observer[rowObserverMap.size()];
-        int i = 0;
-        for (Map.Entry<UncheckedRow, Observer> entry : rowObserverMap.entrySet()) {
-            observers[i]  = entry.getValue();
-            observers[i].row = entry.getKey();
+    private RowObserverPair[] getObservers() {
+        List<RowObserverPair> pairList = new ArrayList<RowObserverPair>(rowObserverPairs.size());
+        for (RowObserverPair pair : rowObserverPairs) {
+            // FIXME: Anyone could tell me why wo we have to cast it here?
+            UncheckedRow uncheckedRow = (UncheckedRow) pair.rowRef.get();
+            if (pair.observerRef.get() == null || uncheckedRow == null || !uncheckedRow.isAttached()) {
+                // The observer object or the row get GCed. Remove it.
+                rowObserverPairs.remove(pair);
+            } else {
+                // Keep a strong ref of the row! in case it gets GCed before clearRowRefs!
+                pair.row = uncheckedRow;
+                pairList.add(pair);
+            }
         }
-        return observers;
+        return pairList.toArray(new RowObserverPair[pairList.size()]);
     }
 
