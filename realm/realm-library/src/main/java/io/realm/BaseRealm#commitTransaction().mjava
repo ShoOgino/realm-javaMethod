@@ -5,6 +5,9 @@
      * changes from this commit.
      */
     public void commitTransaction() {
-        commitTransaction(true);
+        checkIfValid();
+        sharedRealm.commitTransaction();
+        ObjectServerFacade.getFacade(configuration.isSyncConfiguration())
+                .notifyCommit(configuration, sharedRealm.getLastSnapshotVersion());
     }
 
