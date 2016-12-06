@@ -5,12 +5,13 @@
         if (frontEnd == null) {
             throw new IllegalStateException(PROXY_NOT_SET_MESSAGE);
         }
-        Row row = pendingCollection.getUncheckedRow(0);
-        if (row == null) {
+        UncheckedRow uncheckedRow = pendingCollection.firstUncheckedRow();
+        if (uncheckedRow == null) {
             throw new IllegalStateException(EMPTY_ROW_MESSAGE);
         }
+        Row row = returnCheckedRow ? CheckedRow.getFromRow(uncheckedRow) : uncheckedRow;
         if (frontEnd.get() != null) {
-            frontEnd.get().onQueryFinished(pendingCollection.firstUncheckedRow(), false);
+            frontEnd.get().onQueryFinished(row, false);
         }
         clearPendingCollection();
         return row;
