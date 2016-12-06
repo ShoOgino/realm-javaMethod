@@ -1,18 +1,18 @@
     @Test
     @RunTestInLooperThread
-    public void commitTransaction_delayChangeListenerOnSameThread() {
+    public void globalListener_looperThread_triggeredByLocalCommit() {
         final AtomicInteger success = new AtomicInteger(0);
         Realm realm = looperThread.realm;
         realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm object) {
-                assertEquals(1, success.get());
+                assertEquals(0, success.getAndIncrement());
                 looperThread.testComplete();
             }
         });
         realm.beginTransaction();
         realm.createObject(AllTypes.class);
         realm.commitTransaction();
-        assertEquals(0, success.getAndIncrement());
+        assertEquals(1, success.get());
     }
 

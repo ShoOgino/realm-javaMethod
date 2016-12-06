@@ -1,0 +1,19 @@
+    @Test
+    public void globalListener_nonLooperThread_triggeredByWaitForChange() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
+            @Override
+            public void onChange(Realm element) {
+                latch.countDown();
+            }
+        });
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.createObject(AllTypes.class);
+            }
+        });
+        realm.waitForChange();
+        TestHelper.awaitOrFail(latch);
+    }
+
