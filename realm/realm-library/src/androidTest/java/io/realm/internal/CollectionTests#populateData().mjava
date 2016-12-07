@@ -1,4 +1,6 @@
-    private void populateData(Table table) {
+    private void populateData() {
+        sharedRealm.beginTransaction();
+        table = sharedRealm.getTable("test_table");
         // Specify the column types and names
         table.addColumn(RealmFieldType.STRING, "firstName");
         table.addColumn(RealmFieldType.STRING, "lastName");
@@ -24,5 +26,6 @@
         table.setString(0, row, "Henry", false);
         table.setString(1, row, "Anderson", false);
         table.setLong(2, row, 1, false);
+        sharedRealm.commitTransaction();
     }
 

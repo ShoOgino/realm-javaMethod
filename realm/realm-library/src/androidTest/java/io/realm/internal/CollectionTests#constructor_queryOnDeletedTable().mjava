@@ -1,7 +1,9 @@
     @Test
     public void constructor_queryOnDeletedTable() {
         TableQuery query = table.where();
+        sharedRealm.beginTransaction();
         sharedRealm.removeTable(table.getName());
+        sharedRealm.commitTransaction();
         // Query should be checked before creating OS Results.
         thrown.expect(IllegalStateException.class);
         new Collection(sharedRealm, query);

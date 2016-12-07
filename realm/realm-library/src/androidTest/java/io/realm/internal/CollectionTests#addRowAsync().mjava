@@ -1,0 +1,14 @@
+    private void addRowAsync() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SharedRealm sharedRealm = SharedRealm.getInstance(config);
+                addRow(sharedRealm);
+                sharedRealm.close();
+                latch.countDown();
+            }
+        }).start();
+        TestHelper.awaitOrFail(latch);
+    }
+
