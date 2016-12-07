@@ -1,4 +1,12 @@
     public void commitTransaction() {
         nativeCommitTransaction(nativePtr);
+        if (realmNotifier != null && !collections.isEmpty()) {
+            realmNotifier.postAtFrontOfQueue(new Runnable() {
+                @Override
+                public void run() {
+                    disableCollectionSnapshot();
+                }
+            });
+        }
     }
 

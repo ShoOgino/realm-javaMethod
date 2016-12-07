@@ -1,9 +1,12 @@
     @Test
-    public void size_doesNotChangeAfterLocalCommit() {
+    public void switchSnapshot_nonLooperThread() {
         final Collection collection = new Collection(sharedRealm, table.where());
         assertEquals(collection.size(), 4);
         addRow(sharedRealm);
+        // The results is backed by snapshot now.
         assertEquals(collection.size(), 4);
         sharedRealm.refresh();
+        // The results is switched back to the original Results.
+        assertEquals(collection.size(), 5);
     }
 

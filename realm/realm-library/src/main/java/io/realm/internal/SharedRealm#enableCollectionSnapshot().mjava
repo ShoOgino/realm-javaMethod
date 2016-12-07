@@ -1,0 +1,11 @@
+    private void enableCollectionSnapshot() {
+        for (WeakReference<Collection> collectionRef : collections) {
+            Collection collection = collectionRef.get();
+            if (collection == null) {
+                collections.remove(collectionRef);
+            } else {
+                collection.enableSnapshot();
+            }
+        }
+    }
+
