@@ -2,15 +2,12 @@
     @KeepMember
     @SuppressWarnings("unused")
     private void notifyChangeListeners() {
-        if (!listeners.isEmpty()) {
-            for (Listener listener : listeners) {
-                Object obj = listener.objectRef.get();
-                if (obj == null) {
-                    listeners.remove(listener);
-                    continue;
-                }
-                //noinspection unchecked
-                listener.realmChangeListener.onChange(obj);
+        for (CollectionObserverPair pair: observerPairs) {
+            Object object = pair.observerRef.get();
+            if (object != null) {
+                pair.onChange();
+            } else {
+                observerPairs.remove(pair);
             }
         }
     }

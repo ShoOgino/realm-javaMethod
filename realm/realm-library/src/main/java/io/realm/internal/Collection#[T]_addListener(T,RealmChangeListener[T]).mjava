@@ -1,0 +1,10 @@
+    public <T> void addListener(T observer, RealmChangeListener<T> listener) {
+        if (observerPairs.isEmpty()) {
+            nativeStartListening(nativePtr);
+        }
+        CollectionObserverPair<T> collectionObserverPair = new CollectionObserverPair<T>(observer, listener);
+        if (!observerPairs.contains(collectionObserverPair)) {
+            observerPairs.add(collectionObserverPair);
+        }
+    }
+

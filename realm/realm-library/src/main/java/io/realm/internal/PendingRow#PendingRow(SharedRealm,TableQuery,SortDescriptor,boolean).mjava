@@ -1,7 +1,8 @@
     public PendingRow(SharedRealm sharedRealm, TableQuery query, SortDescriptor sortDescriptor,
                       final boolean returnCheckedRow) {
         pendingCollection = new Collection(sharedRealm, query, sortDescriptor);
-        listener = new Collection.Listener(new RealmChangeListener<PendingRow>() {
+
+        listener = new RealmChangeListener<PendingRow>() {
             @Override
             public void onChange(PendingRow pendingRow) {
                 if (frontEnd == null) {
@@ -22,8 +23,8 @@
                     clearPendingCollection();
                 }
             }
-        }, this);
-        pendingCollection.addListener(listener);
+        };
+        pendingCollection.addListener(this, listener);
         this.returnCheckedRow = returnCheckedRow;
     }
 
