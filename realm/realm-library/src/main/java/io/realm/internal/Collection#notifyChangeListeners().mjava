@@ -2,6 +2,11 @@
     @KeepMember
     @SuppressWarnings("unused")
     private void notifyChangeListeners() {
+        // For the stable iteration.
+        // It is needed when the local commit triggered async query updates. And this is called in the next event loop
+        // by OS Realm::notify().
+        this.disableSnapshot();
+
         for (CollectionObserverPair pair: observerPairs) {
             Object object = pair.observerRef.get();
             if (object != null) {

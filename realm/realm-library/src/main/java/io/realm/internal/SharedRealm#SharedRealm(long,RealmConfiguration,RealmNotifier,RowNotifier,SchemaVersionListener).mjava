@@ -2,7 +2,12 @@
                         RowNotifier rowNotifier, SchemaVersionListener schemaVersionListener) {
         this.nativePtr = nativePtr;
         this.configuration = configuration;
+
+        if (notifier != null) {
+            notifier.setSharedRealm(this);
+        }
         this.realmNotifier = notifier;
+
         this.rowNotifier = rowNotifier;
         this.schemaChangeListener = schemaVersionListener;
         context = new Context();
