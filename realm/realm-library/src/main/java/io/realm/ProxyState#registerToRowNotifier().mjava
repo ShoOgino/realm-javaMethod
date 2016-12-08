@@ -1,0 +1,12 @@
+    private void registerToRowNotifier() {
+        RowNotifier rowNotifier = realm.sharedRealm.rowNotifier;
+        if (row.isAttached()) {
+            rowNotifier.registerListener((UncheckedRow) row, this, new RealmChangeListener<ProxyState<E>>() {
+                @Override
+                public void onChange(ProxyState<E> proxyState) {
+                    proxyState.notifyChangeListeners();
+                }
+            });
+        }
+    }
+
