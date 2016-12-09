@@ -1,4 +1,5 @@
-    private boolean runMethodOnWrongThread(final CollectionMethod method) throws ExecutionException, InterruptedException {
+    private boolean runMethodOnWrongThread(final CollectionMethod method, final AllJavaTypes tempObject)
+            throws ExecutionException, InterruptedException {
         realm.beginTransaction();
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
@@ -23,8 +24,9 @@
                     switch (method) {
                         case ADD_OBJECT: collection.add(new AllJavaTypes()); break;
                         case ADD_ALL_OBJECTS: collection.addAll(Collections.singletonList(new AllJavaTypes())); break;
-                        case CLEAR: collection.clear(); case CONTAINS:
-                        case CONTAINS_ALL: collection.containsAll(Collections.singletonList(new AllJavaTypes())); break;
+                        case CLEAR: collection.clear();
+                        case CONTAINS:
+                        case CONTAINS_ALL: collection.containsAll(Collections.singletonList(tempObject)); break;
                         case EQUALS: collection.equals(createCollection(collectionClass)); break;
                         case HASHCODE:
                             //noinspection ResultOfMethodCallIgnored
