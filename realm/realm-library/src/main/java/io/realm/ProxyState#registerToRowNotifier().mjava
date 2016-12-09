@@ -1,4 +1,8 @@
     private void registerToRowNotifier() {
+        if (realm.sharedRealm == null || realm.sharedRealm.isClosed()) {
+            return;
+        }
+
         RowNotifier rowNotifier = realm.sharedRealm.rowNotifier;
         if (row.isAttached()) {
             rowNotifier.registerListener((UncheckedRow) row, this, new RealmChangeListener<ProxyState<E>>() {
