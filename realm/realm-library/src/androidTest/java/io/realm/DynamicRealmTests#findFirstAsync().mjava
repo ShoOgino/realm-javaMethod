@@ -1,11 +1,10 @@
     @Test
     @RunTestInLooperThread
-    public void findFirst_async() {
+    public void findFirstAsync() {
         final DynamicRealm dynamicRealm = initializeDynamicRealm();
         final DynamicRealmObject allTypes = dynamicRealm.where(AllTypes.CLASS_NAME)
                 .between(AllTypes.FIELD_LONG, 4, 9)
-                .findFirst();
-        assertTrue(allTypes.realmGet$proxyState().getRow$realm() instanceof PendingRow);
+                .findFirstAsync();
         looperThread.keepStrongReference.add(allTypes);
         allTypes.addChangeListener(new RealmChangeListener<DynamicRealmObject>() {
             @Override

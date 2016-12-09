@@ -1,20 +1,17 @@
     @Test
     @RunTestInLooperThread
-    public void findAllSortedAsync() {
+    public void findAll_async() {
         final DynamicRealm dynamicRealm = initializeDynamicRealm();
         final RealmResults<DynamicRealmObject> allTypes = dynamicRealm.where(AllTypes.CLASS_NAME)
-                .between(AllTypes.FIELD_LONG, 0, 4)
-                .findAllSortedAsync(AllTypes.FIELD_STRING, Sort.DESCENDING);
-        assertFalse(allTypes.isLoaded());
-        assertEquals(0, allTypes.size());
+                .between(AllTypes.FIELD_LONG, 4, 9)
+                .findAll();
 
         allTypes.addChangeListener(new RealmChangeListener<RealmResults<DynamicRealmObject>>() {
             @Override
             public void onChange(RealmResults<DynamicRealmObject> object) {
-                assertEquals(5, allTypes.size());
-                for (int i = 0; i < 5; i++) {
-                    int iteration = (4 - i);
-                    assertEquals("test data " + iteration, allTypes.get(4 - iteration).getString(AllTypes.FIELD_STRING));
+                assertEquals(6, allTypes.size());
+                for (int i = 0; i < allTypes.size(); i++) {
+                    assertEquals("test data " + (4 + i), allTypes.get(i).getString(AllTypes.FIELD_STRING));
                 }
                 dynamicRealm.close();
                 looperThread.testComplete();
