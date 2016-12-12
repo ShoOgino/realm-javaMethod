@@ -7,13 +7,6 @@
         // by OS Realm::notify().
         this.disableSnapshot();
 
-        for (CollectionObserverPair pair: observerPairs) {
-            Object object = pair.observerRef.get();
-            if (object != null) {
-                pair.onChange();
-            } else {
-                observerPairs.remove(pair);
-            }
-        }
+        observerPairs.foreach(onChangeCallback);
     }
 

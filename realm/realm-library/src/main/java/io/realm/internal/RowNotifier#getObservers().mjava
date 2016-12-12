@@ -8,19 +8,16 @@
     // Called by JNI
     @SuppressWarnings("unused")
     private RowObserverPair[] getObservers() {
-        List<RowObserverPair> pairList = new ArrayList<RowObserverPair>(rowObserverPairs.size());
-        for (RowObserverPair pair : rowObserverPairs) {
-            // FIXME: Anyone could tell me why wo we have to cast it here?
-            UncheckedRow uncheckedRow = (UncheckedRow) pair.rowRef.get();
-            if (pair.observerRef.get() == null || uncheckedRow == null || !uncheckedRow.isAttached()) {
-                // The observer object or the row get GCed. Remove it.
-                rowObserverPairs.remove(pair);
-            } else {
+        final List<RowObserverPair> pairList = new ArrayList<RowObserverPair>(rowObserverPairs.size());
+        rowObserverPairs.foreach(new ObserverPairList.Callback<RowObserverPair>() {
+            @Override
+            public void onCalled(RowObserverPair pair, Object observer) {
+                // TODO: Anyone knows why do we need to cast it here?
                 // Keep a strong ref of the row! in case it gets GCed before clearRowRefs!
-                pair.row = uncheckedRow;
+                pair.row = (UncheckedRow) pair.rowRef.get();
                 pairList.add(pair);
             }
-        }
+        });
         return pairList.toArray(new RowObserverPair[pairList.size()]);
     }
 

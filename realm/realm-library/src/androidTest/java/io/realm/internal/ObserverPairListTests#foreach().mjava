@@ -1,0 +1,24 @@
+    @Test
+    public void foreach() {
+        final boolean[] onChangesCalled = {false, false};
+        TestListener<Integer> listener = new TestListener<Integer>() {
+            @Override
+            void onChange(Integer i) {
+                onChangesCalled[i-1] = true;
+            }
+        };
+
+        TestObserverPair pair = new TestObserverPair(ONE, listener);
+        observerPairs.add(pair);
+        pair = new TestObserverPair(TWO, listener);
+        observerPairs.add(pair);
+        observerPairs.foreach(new ObserverPairList.Callback<TestObserverPair>() {
+            @Override
+            public void onCalled(TestObserverPair pair, Object observer) {
+                //noinspection unchecked
+                pair.listener.onChange(observer);
+            }
+        });
+        assertTrue(onChangesCalled[0] && onChangesCalled[1]);
+    }
+

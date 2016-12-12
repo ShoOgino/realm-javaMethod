@@ -1,0 +1,23 @@
+    @Test
+    public void remove() {
+        TestObserverPair pair = new TestObserverPair(ONE, testListener);
+        observerPairs.add(pair);
+        assertEquals(1, observerPairs.size());
+
+        // Create a new Integer 1 to see if the equality is checked by the same object.
+        //noinspection UnnecessaryBoxing
+        pair = new TestObserverPair(new Integer(1), testListener);
+        observerPairs.remove(pair);
+        assertEquals(1, observerPairs.size());
+
+        // Different listener
+        pair = new TestObserverPair(ONE, new TestListener());
+        observerPairs.remove(pair);
+        assertEquals(1, observerPairs.size());
+
+        // Should remove now
+        pair = new TestObserverPair(ONE, testListener);
+        observerPairs.remove(pair);
+        assertEquals(0, observerPairs.size());
+    }
+

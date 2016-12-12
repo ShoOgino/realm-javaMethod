@@ -16,13 +16,6 @@
      */
     @SuppressWarnings("unused") // called from java_binding_context.cpp
     protected void didChange() {
-        for (RealmObserverPair observerPair : realmObserverPairs) {
-            Object observer = observerPair.observerRef.get();
-            if (observer == null) {
-                realmObserverPairs.remove(observerPair);
-            } else {
-                observerPair.onChange();
-            }
-        }
+        realmObserverPairs.foreach(onChangeCallBack);
     }
 
