@@ -1,13 +1,7 @@
     // Testing the in-memory Realm by Creating one instance, adding a record, then close the instance.
     // By the next time in-memory Realm instance with the same name created, it should be empty.
-    // Use StrictMode to check no disk IO would happen in VM to this thread.
-    public void testInMemoryRealm() {
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectDiskReads()
-                .detectDiskWrites()
-                .penaltyDeath()
-                .build());
-
+    @Test
+    public void inMemoryRealm() {
         testRealm.beginTransaction();
         Dog dog = testRealm.createObject(Dog.class);
         dog.setName("DinoDog");
@@ -21,7 +15,5 @@
         // in-mem-realm with same identifier should create a fresh new instance.
         testRealm = Realm.getInstance(inMemConf);
         assertEquals(testRealm.where(Dog.class).count(), 0);
-
-        StrictMode.enableDefaults();
     }
 

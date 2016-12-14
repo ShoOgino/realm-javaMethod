@@ -1,12 +1,13 @@
     // Test if an in-memory Realm can be written to disk with/without encryption
-    public void testWriteCopyTo() {
+    @Test
+    public void writeCopyTo() {
         byte[] key = TestHelper.getRandomKey();
         String fileName = IDENTIFIER + ".realm";
         String encFileName = IDENTIFIER + ".enc.realm";
-        RealmConfiguration conf = new RealmConfiguration.Builder(getContext())
+        RealmConfiguration conf = configFactory.createConfigurationBuilder()
                 .name(fileName)
                 .build();
-        RealmConfiguration encConf = new RealmConfiguration.Builder(getContext())
+        RealmConfiguration encConf = configFactory.createConfigurationBuilder()
                 .name(encFileName)
                 .encryptionKey(key)
                 .build();
@@ -20,19 +21,19 @@
         testRealm.commitTransaction();
 
         // Test a normal Realm file
-        testRealm.writeCopyTo(new File(getContext().getFilesDir(), fileName));
+        testRealm.writeCopyTo(new File(configFactory.getRoot(), fileName));
         Realm onDiskRealm = Realm.getInstance(conf);
         assertEquals(onDiskRealm.where(Dog.class).count(), 1);
         onDiskRealm.close();
 
         // Test a encrypted Realm file
-        testRealm.writeEncryptedCopyTo(new File(getContext().getFilesDir(), encFileName), key);
+        testRealm.writeEncryptedCopyTo(new File(configFactory.getRoot(), encFileName), key);
         onDiskRealm = Realm.getInstance(encConf);
         assertEquals(onDiskRealm.where(Dog.class).count(), 1);
         onDiskRealm.close();
         // Test with a wrong key to see if it fails as expected.
         try {
-            RealmConfiguration wrongKeyConf = new RealmConfiguration.Builder(getContext())
+            RealmConfiguration wrongKeyConf = configFactory.createConfigurationBuilder()
                     .name(encFileName)
                     .encryptionKey(TestHelper.getRandomKey(42))
                     .build();
