@@ -1,0 +1,16 @@
+    @Test
+    public void executeTransactionAsync_onErrorOnNonLooperThreadThrows() {
+        Realm realm = Realm.getInstance(configFactory.createConfiguration());
+        thrown.expect(IllegalStateException.class);
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+            }
+        });
+    }
+
