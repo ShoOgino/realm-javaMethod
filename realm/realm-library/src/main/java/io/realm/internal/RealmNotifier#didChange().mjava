@@ -17,5 +17,9 @@
     @SuppressWarnings("unused") // called from java_binding_context.cpp
     protected void didChange() {
         realmObserverPairs.foreach(onChangeCallBack);
+        for (Runnable runnable : transactionCallbacks) {
+            runnable.run();
+        }
+        transactionCallbacks.clear();
     }
 

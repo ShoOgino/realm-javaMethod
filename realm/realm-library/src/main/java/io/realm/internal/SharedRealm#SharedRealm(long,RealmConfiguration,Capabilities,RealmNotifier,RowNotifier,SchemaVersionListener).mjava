@@ -1,16 +1,17 @@
-    private SharedRealm(long nativePtr, RealmConfiguration configuration, RealmNotifier notifier,
-                        RowNotifier rowNotifier, SchemaVersionListener schemaVersionListener) {
+    private SharedRealm(long nativePtr, RealmConfiguration configuration, Capabilities capabilities,
+                        RealmNotifier notifier, RowNotifier rowNotifier, SchemaVersionListener schemaVersionListener) {
+        context = new Context();
+
         this.nativePtr = nativePtr;
         this.configuration = configuration;
 
-        if (notifier != null) {
-            notifier.setSharedRealm(this);
-        }
+        this.capabilities = capabilities;
         this.realmNotifier = notifier;
-
+        if (this.realmNotifier != null) {
+            this.realmNotifier.setSharedRealm(this);
+        }
         this.rowNotifier = rowNotifier;
         this.schemaChangeListener = schemaVersionListener;
-        context = new Context();
         this.lastSchemaVersion = schemaVersionListener == null ? -1L : getSchemaVersion();
         objectServerFacade = null;
         nativeSetAutoRefresh(nativePtr, capabilities.canDeliverNotification());

@@ -1,4 +1,4 @@
-    public static SharedRealm getInstance(RealmConfiguration config, RealmNotifier realmNotifier,
+    public static SharedRealm getInstance(RealmConfiguration config,
                                           SchemaVersionListener schemaVersionListener) {
         String[] userAndServer = ObjectServerFacade.getSyncFacadeIfPossible().getUserAndServerUrl(config);
         String rosServerUrl = userAndServer[0];
@@ -6,6 +6,7 @@
         boolean enable_caching = false; // Handled in Java currently
         boolean disableFormatUpgrade = false; // TODO Double negatives :/
         boolean autoChangeNotifications = true;
+
         long nativeConfigPtr = nativeCreateConfig(
                 config.getPath(),
                 config.getEncryptionKey(),
@@ -16,11 +17,15 @@
                 autoChangeNotifications,
                 rosServerUrl,
                 rosUserToken);
+
+        Capabilities capabilities = new AndroidCapabilities();
+        RealmNotifier realmNotifier = new AndroidRealmNotifier(capabilities);
         RowNotifier rowNotifier = new RowNotifier();
         try {
             return new SharedRealm(
                     nativeGetSharedRealm(nativeConfigPtr, realmNotifier, rowNotifier),
                     config,
+                    capabilities,
                     realmNotifier,
                     rowNotifier,
                     schemaVersionListener);
