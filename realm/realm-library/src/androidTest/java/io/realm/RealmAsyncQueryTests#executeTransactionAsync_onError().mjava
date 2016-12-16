@@ -1,0 +1,23 @@
+    @Test
+    @RunTestInLooperThread
+    public void executeTransactionAsync_onError() throws Throwable {
+        final Realm realm = looperThread.realm;
+        final RuntimeException runtimeException = new RuntimeException("Oh! What a Terrible Failure");
+        assertEquals(0, realm.where(Owner.class).count());
+
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                throw runtimeException;
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                assertEquals(0, realm.where(Owner.class).count());
+                assertNull(realm.where(Owner.class).findFirst());
+                assertEquals(runtimeException, error);
+                looperThread.testComplete();
+            }
+        });
+    }
+
