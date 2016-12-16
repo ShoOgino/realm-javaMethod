@@ -1,11 +1,10 @@
     // Test that current user is cleared if it is logged out
     @Test
     public void currentUser_clearedOnLogout() {
-        // Add an expired user to the user store
+        // Add 1 valid user to the user store
         SyncUser user = SyncTestUtils.createTestUser(Long.MAX_VALUE);
-        UserStore userStore = new SharedPrefsUserStore(InstrumentationRegistry.getContext());
-        SyncManager.setUserStore(userStore);
-        userStore.put(UserStore.CURRENT_USER_KEY, user);
+        UserStore userStore = SyncManager.getUserStore();
+        userStore.put(user);
 
         SyncUser savedUser = SyncUser.currentUser();
         assertEquals(user, savedUser);
