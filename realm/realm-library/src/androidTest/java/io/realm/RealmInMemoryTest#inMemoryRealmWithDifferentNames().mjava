@@ -1,12 +1,13 @@
     // Two in-memory Realms with different names should not affect each other.
-    public void testInMemoryRealmWithDifferentNames() {
+    @Test
+    public void inMemoryRealmWithDifferentNames() {
         testRealm.beginTransaction();
         Dog dog = testRealm.createObject(Dog.class);
         dog.setName("DinoDog");
         testRealm.commitTransaction();
 
         // Create the 2nd in-memory Realm with a different name. To make sure they are not affecting each other.
-        RealmConfiguration inMemConf2 = new RealmConfiguration.Builder(getContext())
+        RealmConfiguration inMemConf2 = configFactory.createConfigurationBuilder()
                 .name(IDENTIFIER + "2")
                 .inMemory()
                 .build();
@@ -17,8 +18,10 @@
         testRealm2.commitTransaction();
 
         assertEquals(testRealm.where(Dog.class).count(), 1);
+        //noinspection ConstantConditions
         assertEquals(testRealm.where(Dog.class).findFirst().getName(), "DinoDog");
         assertEquals(testRealm2.where(Dog.class).count(), 1);
+        //noinspection ConstantConditions
         assertEquals(testRealm2.where(Dog.class).findFirst().getName(), "UFODog");
 
         testRealm2.close();
