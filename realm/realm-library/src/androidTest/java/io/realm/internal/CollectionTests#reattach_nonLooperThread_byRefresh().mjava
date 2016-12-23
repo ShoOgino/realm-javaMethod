@@ -1,12 +1,14 @@
     @Test
-    public void switchSnapshot_nonLooperThread() {
+    public void reattach_nonLooperThread_byRefresh() {
         final Collection collection = new Collection(sharedRealm, table.where());
         assertEquals(collection.size(), 4);
         addRow(sharedRealm);
         // The results is backed by snapshot now.
+        assertTrue(collection.isDetached());
         assertEquals(collection.size(), 4);
         sharedRealm.refresh();
         // The results is switched back to the original Results.
+        assertFalse(collection.isDetached());
         assertEquals(collection.size(), 5);
     }
 

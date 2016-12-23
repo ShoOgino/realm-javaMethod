@@ -1,0 +1,9 @@
+    @Test
+    public void detach_commitTransactionWontReattach() {
+        final Collection collection = new Collection(sharedRealm, table.where());
+        sharedRealm.beginTransaction();
+        sharedRealm.commitTransaction();
+        assertTrue(collection.isDetached());
+        assertEquals(collection.size(), 4);
+    }
+

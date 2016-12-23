@@ -1,0 +1,25 @@
+    @Test
+    @RunTestInLooperThread
+    public void reattach_looperThread_shouldHappenBeforeAnyOtherLoopEventWithLocalTransactionCanceled() {
+        final SharedRealm sharedRealm = getSharedRealm();
+        Table table = sharedRealm.getTable("test_table");
+        final Collection collection = new Collection(sharedRealm, table.where());
+        looperThread.keepStrongReference.add(collection);
+        assertEquals(collection.size(), 4);
+        looperThread.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                // The results is switched back to the original Results.
+                assertFalse(collection.isDetached());
+                assertEquals(collection.size(), 4);
+                sharedRealm.close();
+                looperThread.testComplete();
+            }
+        });
+        sharedRealm.beginTransaction();
+        // The results is backed by snapshot now.
+        assertTrue(collection.isDetached());
+        assertEquals(collection.size(), 4);
+        sharedRealm.cancelTransaction();
+    }
+

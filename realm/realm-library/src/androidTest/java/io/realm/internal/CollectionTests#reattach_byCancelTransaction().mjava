@@ -1,0 +1,10 @@
+    @Test
+    public void reattach_byCancelTransaction() {
+        final Collection collection = new Collection(sharedRealm, table.where());
+        sharedRealm.beginTransaction();
+        assertTrue(collection.isDetached());
+        sharedRealm.cancelTransaction();
+        assertFalse(collection.isDetached());
+        assertEquals(collection.size(), 4);
+    }
+

@@ -1,0 +1,27 @@
+    @Test
+    @RunTestInLooperThread
+    public void reattach_looperThread_byRemoteTransaction() {
+        final SharedRealm sharedRealm = getSharedRealm();
+        Table table = sharedRealm.getTable("test_table");
+        final Collection collection = new Collection(sharedRealm, table.where());
+        looperThread.keepStrongReference.add(collection);
+        assertFalse(collection.isDetached());
+        assertEquals(collection.size(), 4);
+        collection.addListener(collection, new RealmChangeListener<Collection>() {
+            @Override
+            public void onChange(Collection element) {
+                assertFalse(collection.isDetached());
+                assertEquals(collection.size(), 5);
+                sharedRealm.close();
+                looperThread.testComplete();
+            }
+        });
+        sharedRealm.beginTransaction();
+        sharedRealm.commitTransaction();
+        // The results is backed by snapshot now.
+        assertTrue(collection.isDetached());
+        assertEquals(collection.size(), 4);
+
+        addRowAsync();
+    }
+
