@@ -1,0 +1,12 @@
+    @Test
+    public void getInstanceForDistinct_shouldThrowOnLinkField() {
+        RealmFieldType type = RealmFieldType.STRING;
+        RealmFieldType objectType = RealmFieldType.OBJECT;
+        table.addColumn(type, type.name());
+        table.addColumnLink(objectType, objectType.name(), table);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("is not a supported link field");
+        SortDescriptor.getInstanceForDistinct(table, String.format("%s.%s", objectType.name(), type.name()));
+    }
+
