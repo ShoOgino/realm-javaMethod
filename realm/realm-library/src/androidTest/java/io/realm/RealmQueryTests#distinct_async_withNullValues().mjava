@@ -1,0 +1,43 @@
+    @Test
+    @RunTestInLooperThread
+    public void distinct_async_withNullValues() throws Throwable {
+        final AtomicInteger changeListenerCalled = new AtomicInteger(2);
+        final Realm realm = looperThread.realm;
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, true);
+
+        final RealmResults<AnnotationIndexTypes> distinctDate = realm.where(AnnotationIndexTypes.class)
+                .distinct(AnnotationIndexTypes.FIELD_INDEX_DATE);
+        final RealmResults<AnnotationIndexTypes> distinctString = realm.where(AnnotationIndexTypes.class)
+                .distinct(AnnotationIndexTypes.FIELD_INDEX_STRING);
+
+        final Runnable endTest = new Runnable() {
+            @Override
+            public void run() {
+                if (changeListenerCalled.decrementAndGet() == 0) {
+                    looperThread.testComplete();
+                }
+            }
+        };
+
+        looperThread.keepStrongReference.add(distinctDate);
+        looperThread.keepStrongReference.add(distinctString);
+
+        distinctDate.addChangeListener(new RealmChangeListener<RealmResults<AnnotationIndexTypes>>() {
+            @Override
+            public void onChange(RealmResults<AnnotationIndexTypes> object) {
+                assertEquals(1, distinctDate.size());
+                endTest.run();
+            }
+        });
+
+        distinctString.addChangeListener(new RealmChangeListener<RealmResults<AnnotationIndexTypes>>() {
+            @Override
+            public void onChange(RealmResults<AnnotationIndexTypes> object) {
+                assertEquals(1, distinctString.size());
+                endTest.run();
+            }
+        });
+    }
+
