@@ -1,0 +1,14 @@
+    @Test
+    public void getInstanceForSort_numOfFeildsAndSortOrdersNotMatch() {
+        RealmFieldType stringType = RealmFieldType.STRING;
+        table.addColumn(stringType, stringType.name());
+        RealmFieldType intType = RealmFieldType.INTEGER;
+        table.addColumn(intType, intType.name());
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Number of fields and sort orders do not match.");
+        SortDescriptor.getInstanceForSort(table, new String[] {
+                stringType.name(), intType.name()}, new Sort[] {Sort.ASCENDING});
+
+    }
+

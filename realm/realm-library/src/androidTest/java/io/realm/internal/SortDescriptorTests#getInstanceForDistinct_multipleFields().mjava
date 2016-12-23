@@ -1,0 +1,20 @@
+    @Test
+    public void getInstanceForDistinct_multipleFields() {
+        RealmFieldType stringType = RealmFieldType.STRING;
+        long stringColumn = table.addColumn(stringType, stringType.name());
+        table.addSearchIndex(stringColumn);
+        RealmFieldType intType = RealmFieldType.INTEGER;
+        long intColumn = table.addColumn(intType, intType.name());
+        table.addSearchIndex(intColumn);
+
+        SortDescriptor sortDescriptor = SortDescriptor.getInstanceForDistinct(table, new String[] {
+               stringType.name(), intType.name()});
+        assertEquals(2, sortDescriptor.getColumnIndices().length);
+        assertNull(sortDescriptor.getAscendings());
+        assertEquals(1, sortDescriptor.getColumnIndices()[0].length);
+        assertEquals(stringColumn, sortDescriptor.getColumnIndices()[0][0]);
+        assertEquals(1, sortDescriptor.getColumnIndices()[1].length);
+        assertEquals(intColumn, sortDescriptor.getColumnIndices()[1][0]);
+
+    }
+

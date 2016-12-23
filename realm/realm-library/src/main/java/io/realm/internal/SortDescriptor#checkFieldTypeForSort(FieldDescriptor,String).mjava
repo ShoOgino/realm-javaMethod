@@ -1,0 +1,11 @@
+    private static void checkFieldTypeForSort(FieldDescriptor descriptor, String fieldDescriptions) {
+        for (RealmFieldType aValidFieldTypesForSort : validFieldTypesForSort) {
+            if (aValidFieldTypesForSort == descriptor.getFieldType()) {
+                return;
+            }
+        }
+        throw new IllegalArgumentException(String.format(
+                "Sort is not supported on '%s' field '%s' in '%s'.", descriptor.toString(), descriptor.getFieldName(),
+                fieldDescriptions));
+    }
+
