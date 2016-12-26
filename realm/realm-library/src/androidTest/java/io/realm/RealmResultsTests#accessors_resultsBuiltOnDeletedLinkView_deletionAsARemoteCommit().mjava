@@ -1,0 +1,62 @@
+    // If a RealmResults is built on a link view, when the link view is deleted on a remote thread, within the same
+    // event loop, the RealmResults stays without changes since the Realm version doesn't change. In the next
+    // event loop, the results will be empty because of the parent link view is deleted.
+    // 1. Create results from link view.
+    // 2. Delete the parent link view by a remote transaction.
+    // 3. Within the same event loop, the results stays the same.
+    // 4. The results change listener called, the results becomes empty.
+    @Test
+    @RunTestInLooperThread
+    public void accessors_resultsBuiltOnDeletedLinkView_deletionAsARemoteCommit() {
+        // Step 1
+        Realm realm = looperThread.realm;
+        RealmResults<Dog> dogs = populateRealmResultsOnLinkView(realm);
+        looperThread.keepStrongReference.add(dogs);
+        dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
+            @Override
+            public void onChange(RealmResults<Dog> dogs) {
+                // Step 4
+                // The results is still valid, but empty.
+                assertEquals(true, dogs.isValid());
+                assertEquals(true, dogs.isEmpty());
+                assertEquals(0, dogs.size());
+                try {
+                    dogs.first();
+                    fail();
+                } catch (IndexOutOfBoundsException ignored) {
+                }
+
+                assertEquals(0, dogs.sum(Dog.FIELD_AGE).intValue());
+                assertEquals(0f, dogs.sum(Dog.FIELD_HEIGHT).floatValue(), 0f);
+                assertEquals(0d, dogs.sum(Dog.FIELD_WEIGHT).doubleValue(), 0d);
+                assertEquals(0d, dogs.average(Dog.FIELD_AGE), 0d);
+                assertEquals(0d, dogs.average(Dog.FIELD_HEIGHT), 0d);
+                assertEquals(0d, dogs.average(Dog.FIELD_WEIGHT), 0d);
+                assertEquals(null, dogs.min(Dog.FIELD_AGE));
+                assertEquals(null, dogs.max(Dog.FIELD_AGE));
+                assertEquals(null, dogs.minDate(Dog.FIELD_BIRTHDAY));
+                assertEquals(null, dogs.maxDate(Dog.FIELD_BIRTHDAY));
+
+                // FIXME: Enable this when https://github.com/realm/realm-core/issues/2378 fixed.
+                // assertEquals(0, dogs.where().findAll().size());
+
+                looperThread.testComplete();
+            }
+        });
+
+
+        // Step 2
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.where(Owner.class).findAll().deleteAllFromRealm();
+            }
+        });
+
+        // Step 3
+        assertEquals(true, dogs.isValid());
+        assertEquals(5, dogs.size());
+        // The link view still exists
+        assertEquals(5, dogs.where().findAll().size());
+    }
+
