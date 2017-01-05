@@ -1,9 +1,9 @@
     @Test
-    public void notSettingPrimaryKeyThrows() {
+    public void addingPrimaryKeyThrows() {
 
         // Create v0 of the Realm
         RealmConfiguration originalConfig = configFactory.createConfigurationBuilder()
-                .schema(AllTypes.class)
+                .schema(Thread.class)
                 .build();
         Realm.getInstance(originalConfig).close();
 
@@ -21,14 +21,14 @@
         // Create v1 of the Realm
         RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                 .schemaVersion(1)
-                .schema(AllTypes.class, AnnotationTypes.class)
+                .schema(Thread.class, AnnotationTypes.class)
                 .migration(migration)
                 .build();
         try {
             realm = Realm.getInstance(realmConfig);
             fail();
         } catch (RealmMigrationNeededException e) {
-            if (!e.getMessage().equals("Primary key not defined for field 'id' in existing Realm file. Add @PrimaryKey.")) {
+            if (!e.getMessage().equals("Primary key not defined for field 'id' in existing Realm file. @PrimaryKey was added.")) {
                 fail(e.toString());
             }
         } finally {

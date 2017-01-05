@@ -1,0 +1,38 @@
+    @Test
+    public void removingPrimaryKeyThrows() {
+
+        // Create v0 of the Realm
+        RealmConfiguration originalConfig = configFactory.createConfigurationBuilder()
+                .schema(Thread.class)
+                .build();
+        Realm.getInstance(originalConfig).close();
+
+        RealmMigration migration = new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                RealmSchema schema = realm.getSchema();
+                schema.create("StringOnly")
+                        .addField("chars", String.class, FieldAttribute.PRIMARY_KEY);
+            }
+        };
+
+        // Create v1 of the Realm
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+                .schemaVersion(1)
+                .schema(Thread.class, StringOnly.class)
+                .migration(migration)
+                .build();
+        try {
+            realm = Realm.getInstance(realmConfig);
+            fail();
+        } catch (RealmMigrationNeededException e) {
+            if (!e.getMessage().equals("Primary Key defined for field chars was removed.")) {
+                fail(e.toString());
+            }
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+        }
+    }
+
