@@ -1,0 +1,21 @@
+    @Test
+    @RunTestInLooperThread
+    public void addChangeListener_byRemoteChanges() {
+        SharedRealm sharedRealm = getSharedRealm();
+        sharedRealm.realmNotifier.addChangeListener(sharedRealm, new RealmChangeListener<SharedRealm>() {
+            @Override
+            public void onChange(SharedRealm sharedRealm) {
+                looperThread.testComplete();
+            }
+        });
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SharedRealm sharedRealm = getSharedRealm();
+                sharedRealm.beginTransaction();
+                sharedRealm.commitTransaction();
+                sharedRealm.close();
+            }
+        }).start();
+    }
+
