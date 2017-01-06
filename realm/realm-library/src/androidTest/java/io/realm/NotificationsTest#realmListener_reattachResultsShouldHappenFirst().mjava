@@ -3,12 +3,12 @@
     // Step 2: Post a runnable to caller thread.
     //         Event Queue: |Posted Runnable| <- TOP
     // Step 3: Delete object which will make the results contain an invalid object at this moment
-    //         Right Event Queue: |LOCAL_COMMIT   |   Wrong Event Queue: |Posted Runnable           |  <- TOP
-    //                            |Posted Runnable|                      |REALM_CHANGED/LOCAL_COMMIT|
+    //         Right Event Queue: |Reattach       |   Wrong Event Queue: |Posted Runnable       |  <- TOP
+    //                            |Posted Runnable|                      |REALM_CHANGED/Reattach|
     // Step 4: Posted runnable called.
     @Test
     @RunTestInLooperThread(/*step1*/ before = PopulateOneAllTypes.class)
-    public void realmListener_localChangeShouldBeSendAtFrontOfTheQueue() {
+    public void realmListener_reattachResultsShouldHappenFirst() {
         final Realm realm = looperThread.realm;
         final RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
         assertEquals(1, results.size());
