@@ -1,4 +1,9 @@
     void disableCollectionSnapshot() {
+        if (isInTransaction()) {
+            // This should never happen.
+            throw new IllegalStateException( "Collection cannot be reattached if the Realm is in transaction." +
+                    " Please remember to commit or cancel transaction before finishing the current event loop.");
+        }
         for (WeakReference<Collection> collectionRef : collections) {
             Collection collection = collectionRef.get();
             if (collection == null) {
