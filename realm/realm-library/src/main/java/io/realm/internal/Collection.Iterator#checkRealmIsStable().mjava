@@ -1,0 +1,14 @@
+        protected void checkRealmIsStable() {
+            Collection collection = collectionWeakReference.get();
+            if (collection != null) {
+                for (WeakReference<Iterator> it : collection.stableIterators) {
+                    if (it.get() == this) {
+                        return;
+                    }
+                }
+            }
+            throw new ConcurrentModificationException(
+                    "No outside changes to a Realm is allowed while iterating a RealmResults." +
+                            " Don't call Realm.refresh() while iterating.");
+        }
+
