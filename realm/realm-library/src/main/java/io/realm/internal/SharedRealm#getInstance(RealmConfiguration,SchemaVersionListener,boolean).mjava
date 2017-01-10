@@ -19,14 +19,12 @@
 
         Capabilities capabilities = new AndroidCapabilities();
         RealmNotifier realmNotifier = new AndroidRealmNotifier(capabilities);
-        RowNotifier rowNotifier = new RowNotifier();
         try {
             return new SharedRealm(
-                    nativeGetSharedRealm(nativeConfigPtr, realmNotifier, rowNotifier),
+                    nativeGetSharedRealm(nativeConfigPtr, realmNotifier),
                     config,
                     capabilities,
                     realmNotifier,
-                    rowNotifier,
                     schemaVersionListener);
         } finally {
             nativeCloseConfig(nativeConfigPtr);
