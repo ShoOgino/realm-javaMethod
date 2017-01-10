@@ -9,7 +9,7 @@
     public void callback_with_relevant_commit_realmobject_sync() {
         final Realm realm = looperThread.realm;
 
-        // Step 1: Trigger global Realm change listener
+        // Step 1: Create object
         realm.beginTransaction();
         final Dog akamaru = realm.createObject(Dog.class);
         akamaru.setName("Akamaru");
@@ -24,38 +24,21 @@
                 typebasedCommitInvocations.incrementAndGet();
                 assertEquals("Akamaru", dog.getName());
                 assertEquals(17, dog.getAge());
+                looperThread.testComplete();
             }
         });
 
-        realm.addChangeListener(new RealmChangeListener<Realm>() {
+        // Step 2: Trigger non-related commit
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
-            public void onChange(Realm object) {
-                int commits = globalCommitInvocations.incrementAndGet();
-                switch (commits) {
-                    case 1:
-                        // Step 2: Trigger non-related commit
-                        realm.beginTransaction();
-                        realm.commitTransaction();
-                        break;
+            public void execute(Realm realm) {
+            }
+        });
 
-                    case 2:
-                        // Step 3: Trigger related commit
-                        realm.beginTransaction();
-                        akamaru.setAge(17);
-                        realm.commitTransaction();
-                        break;
-
-                    case 3:
-                        // Step 5: Complete test
-                        looperThread.postRunnable(new Runnable() {
-                            @Override
-                            public void run() {
-                                assertEquals(1, typebasedCommitInvocations.get());
-                                looperThread.testComplete();
-                            }
-                        });
-
-                }
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.where(Dog.class).findFirst().setAge(17);
             }
         });
     }
