@@ -5,19 +5,16 @@
         listener = new RealmChangeListener<PendingRow>() {
             @Override
             public void onChange(PendingRow pendingRow) {
-                if (frontEnd == null) {
+                if (frontEndRef == null) {
                     throw new IllegalStateException(PROXY_NOT_SET_MESSAGE);
                 }
-                if (frontEnd.get() == null) {
+                FrontEnd frontEnd = frontEndRef.get();
+                if (frontEnd == null) {
                     // The front end is GCed.
                     clearPendingCollection();
                     return;
                 }
 
-                if (pendingCollection == null) {
-                    // Should not happen, but make findbugs happy.
-                    return;
-                }
                 if (pendingCollection.isValid()) {
                     // PendingRow will always get the first Row of the query since we only support findFirst.
                     UncheckedRow uncheckedRow = pendingCollection.firstUncheckedRow();
@@ -25,7 +22,7 @@
                     if (uncheckedRow != null) {
                         Row row = returnCheckedRow ? CheckedRow.getFromRow(uncheckedRow) : uncheckedRow;
                         // Ask the front end to reset the row and stop async query.
-                        frontEnd.get().onQueryFinished(row);
+                        frontEnd.onQueryFinished(row);
                         clearPendingCollection();
                     }
                 } else {
