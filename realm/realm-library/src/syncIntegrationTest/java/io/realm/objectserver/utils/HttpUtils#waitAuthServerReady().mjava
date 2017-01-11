@@ -1,29 +1,20 @@
     // Checking the server
     private static boolean waitAuthServerReady() throws InterruptedException {
         int retryTimes = 50;
-
-        // Dummy invalid request, which will trigger a 400 (BAD REQUEST), but indicate the auth
-        // server is responsive
         Request request = new Request.Builder()
-                .post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ""))
-                .url(Constants.AUTH_URL)
+                .url(Constants.AUTH_SERVER_URL)
                 .build();
 
         while (retryTimes != 0) {
-            Response response = null;
             try {
-                response = client.newCall(request).execute();
-                if (response.code() == 400) {
+                Response response = client.newCall(request).execute();
+                if (response.isSuccessful()) {
                     return true;
                 }
                 RealmLog.error("Error response from auth server: %s", response.toString());
             } catch (IOException e) {
                 RealmLog.error(e);
                 Thread.sleep(100);
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
             }
             retryTimes--;
         }
