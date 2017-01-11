@@ -17,15 +17,8 @@
                 rosServerUrl,
                 rosUserToken);
 
-        Capabilities capabilities = new AndroidCapabilities();
-        RealmNotifier realmNotifier = new AndroidRealmNotifier(capabilities);
         try {
-            return new SharedRealm(
-                    nativeGetSharedRealm(nativeConfigPtr, realmNotifier),
-                    config,
-                    capabilities,
-                    realmNotifier,
-                    schemaVersionListener);
+            return new SharedRealm(nativeConfigPtr, config, schemaVersionListener);
         } finally {
             nativeCloseConfig(nativeConfigPtr);
         }
