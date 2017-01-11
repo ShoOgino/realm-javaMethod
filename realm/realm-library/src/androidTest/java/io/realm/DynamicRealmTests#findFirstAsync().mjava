@@ -5,6 +5,7 @@
         final DynamicRealmObject allTypes = dynamicRealm.where(AllTypes.CLASS_NAME)
                 .between(AllTypes.FIELD_LONG, 4, 9)
                 .findFirstAsync();
+        assertFalse(allTypes.isLoaded());
         looperThread.keepStrongReference.add(allTypes);
         allTypes.addChangeListener(new RealmChangeListener<DynamicRealmObject>() {
             @Override

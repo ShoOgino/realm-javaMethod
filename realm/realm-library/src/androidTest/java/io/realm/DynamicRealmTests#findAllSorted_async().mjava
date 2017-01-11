@@ -5,6 +5,7 @@
         final RealmResults<DynamicRealmObject> allTypes = dynamicRealm.where(AllTypes.CLASS_NAME)
                 .between(AllTypes.FIELD_LONG, 0, 4)
                 .findAllSorted(AllTypes.FIELD_STRING, Sort.DESCENDING);
+        assertFalse(allTypes.isLoaded());
 
         allTypes.addChangeListener(new RealmChangeListener<RealmResults<DynamicRealmObject>>() {
             @Override
