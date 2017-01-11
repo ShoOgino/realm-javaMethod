@@ -1,0 +1,56 @@
+    // FIXME: Ignore for now. They do still not work. It might be caused by two processes each creating
+    // a Sync Client, but it needs to be investigated.
+    @Test
+    @Ignore
+    public void expectServerCommit() throws Throwable {
+        final Throwable[] exception = new Throwable[1];
+        final CountDownLatch testFinished = new CountDownLatch(1);
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Looper.prepare();
+                    Context targetContext = InstrumentationRegistry.getTargetContext();
+
+                    SyncUser user = UserFactory.createDefaultUser(Constants.AUTH_URL, Constants.USER_TOKEN);
+                    String realmUrl = Constants.SYNC_SERVER_URL;
+                    final SyncConfiguration syncConfig = new SyncConfiguration.Builder(user, realmUrl)
+                            .name(SendOneCommit.class.getSimpleName())
+                            .errorHandler(new SyncSession.ErrorHandler() {
+                                @Override
+                                public void onError(SyncSession session, ObjectServerError error) {
+                                    fail("Sync failure: " + error);
+                                }
+                            })
+                            .build();
+                    Realm.deleteRealm(syncConfig);//TODO do this in Rule as async tests
+                    final Realm realm = Realm.getInstance(syncConfig);
+                    Intent intent = new Intent(targetContext, SendOneCommit.class);
+                    targetContext.startService(intent);
+                    final RealmResults<ProcessInfo> all = realm.where(ProcessInfo.class).findAll();
+                    all.addChangeListener(new RealmChangeListener<RealmResults<ProcessInfo>>() {
+                        @Override
+                        public void onChange(RealmResults<ProcessInfo> element) {
+                            assertEquals(1, all.size());
+                            assertEquals("Background_Process1", all.get(0).getName());
+                            testFinished.countDown();
+                        }
+                    });
+
+                    Looper.loop();
+
+                } catch (Throwable e) {
+                    exception[0] = e;
+                    testFinished.countDown();
+                }
+            }
+        });
+        boolean testTimedOut = testFinished.await(300, TimeUnit.SECONDS);
+        if (exception[0] != null) {
+            throw exception[0];
+        } else if (!testTimedOut) {
+            fail("Test timed out ");
+        }
+    }
+
