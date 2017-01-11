@@ -1,10 +1,11 @@
-    private void enableCollectionSnapshot() {
+    // The detaching should happen before transaction begins.
+    private void detachCollections() {
         for (WeakReference<Collection> collectionRef : collections) {
             Collection collection = collectionRef.get();
             if (collection == null) {
                 collections.remove(collectionRef);
             } else {
-                collection.enableSnapshot();
+                collection.detach();
             }
         }
     }
