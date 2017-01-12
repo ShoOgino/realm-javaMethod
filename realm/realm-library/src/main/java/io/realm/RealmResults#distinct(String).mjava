@@ -11,10 +11,6 @@
     public RealmResults<E> distinct(String fieldName) {
         SortDescriptor distinctDescriptor = SortDescriptor.getInstanceForDistinct(collection.getTable(), fieldName);
         Collection distinctCollection = collection.distinct(distinctDescriptor);
-        if (className != null) {
-            return new RealmResults<E>(realm, distinctCollection, className);
-        } else {
-            return new RealmResults<E>(realm, distinctCollection, classSpec);
-        }
+        return createLoadedResults(distinctCollection);
     }
 
