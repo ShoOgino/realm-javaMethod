@@ -10,6 +10,7 @@
      * {@code false}.
      */
     public E findFirstAsync() {
+        realm.sharedRealm.capabilities.checkCanDeliverNotification(ASYNC_QUERY_WRONG_THREAD_MESSAGE);
         Row row;
         if (realm.isInTransaction()) {
             // It is not possible to create async query inside a transaction. So immediately query the first object.
