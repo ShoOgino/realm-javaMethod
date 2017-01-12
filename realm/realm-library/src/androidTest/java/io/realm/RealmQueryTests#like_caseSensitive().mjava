@@ -1,0 +1,24 @@
+    @Test
+    public void like_caseSensitive() {
+        final int TEST_OBJECTS_COUNT = 200;
+        populateTestRealm(realm, TEST_OBJECTS_COUNT);
+
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).like("columnString", "*DaTa*").findAll();
+        assertEquals(0, resultList.size());
+
+        resultList = realm.where(AllTypes.class).like("columnString", "*DaTa*", Case.INSENSITIVE).findAll();
+        assertEquals(TEST_OBJECTS_COUNT, resultList.size());
+
+        resultList = realm.where(AllTypes.class).like("columnString", "*DaTa 2?").findAll();
+        assertEquals(0, resultList.size());
+
+        resultList = realm.where(AllTypes.class).like("columnString", "*DaTa 2?", Case.INSENSITIVE).findAll();
+        assertEquals(10, resultList.size());
+
+        resultList = realm.where(AllTypes.class).like("columnString", "TEST*0").findAll();
+        assertEquals(0, resultList.size());
+
+        resultList = realm.where(AllTypes.class).like("columnString", "TEST*0", Case.INSENSITIVE).findAll();
+        assertEquals(20, resultList.size());
+    }
+
