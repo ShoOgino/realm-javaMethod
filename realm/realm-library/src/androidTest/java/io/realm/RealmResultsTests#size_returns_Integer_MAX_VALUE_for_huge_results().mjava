@@ -2,6 +2,7 @@
     public void size_returns_Integer_MAX_VALUE_for_huge_results() {
         final Collection collection = Mockito.mock(Collection.class);
         final RealmResults<AllTypes> targetResult = TestHelper.newRealmResults(realm, collection, AllTypes.class);
+        targetResult.load();
 
         Mockito.when(collection.size()).thenReturn(((long) Integer.MAX_VALUE) - 1);
         assertEquals(Integer.MAX_VALUE - 1, targetResult.size());

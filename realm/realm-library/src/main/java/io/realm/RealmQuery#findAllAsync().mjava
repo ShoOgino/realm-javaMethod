@@ -1,7 +1,12 @@
     /**
-     * @deprecated use {@link #findAll()} instead.
+     * Finds all objects that fulfill the query conditions and sorted by specific field name.
+     * This method is only available from a Looper thread.
+     *
+     * @return immediately an empty {@link RealmResults}. Users need to register a listener
+     * {@link io.realm.RealmResults#addChangeListener(RealmChangeListener)} to be notified when the query completes.
+     * @see io.realm.RealmResults
      */
     public RealmResults<E> findAllAsync() {
-        return findAll();
+        return createRealmResults(query, null, null, false);
     }
 

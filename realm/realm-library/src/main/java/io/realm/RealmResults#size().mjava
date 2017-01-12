@@ -5,7 +5,10 @@
      */
     @Override
     public int size() {
-        long size = collection.size();
-        return (size > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) size;
+        if (isLoaded()) {
+            long size = collection.size();
+            return (size > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) size;
+        }
+        return 0;
     }
 

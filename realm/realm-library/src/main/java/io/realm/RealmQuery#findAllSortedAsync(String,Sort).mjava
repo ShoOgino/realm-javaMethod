@@ -1,7 +1,14 @@
     /**
-     * @deprecated use {@link #findAllSorted(String, Sort) instead.}
+     * Similar to {@link #findAllSorted(String, Sort)} but runs asynchronously on a worker thread
+     * (Need a Realm opened from a looper thread to work).
+     *
+     * @return immediately an empty {@link RealmResults}. Users need to register a listener
+     *         {@link io.realm.RealmResults#addChangeListener(RealmChangeListener)} to be notified when the query completes.
+     * @throws java.lang.IllegalArgumentException if field name does not exist or it belongs to a child
+     * {@link RealmObject} or a child {@link RealmList}.
      */
     public RealmResults<E> findAllSortedAsync(final String fieldName, final Sort sortOrder) {
-        return findAllSorted(fieldName, sortOrder);
+        SortDescriptor sortDescriptor = SortDescriptor.getInstanceForSort(query.getTable(), fieldName, sortOrder);
+        return createRealmResults(query, sortDescriptor, null, false);
     }
 

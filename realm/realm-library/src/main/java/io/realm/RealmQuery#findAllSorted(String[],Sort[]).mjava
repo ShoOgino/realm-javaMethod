@@ -6,15 +6,13 @@
      *
      * @param fieldNames an array of field names to sort by.
      * @param sortOrders how to sort the field names.
-     * @return a {@link io.realm.RealmResults} containing objects. If no objects match the condition, a list with zero
+     * @return a {@link io.realm.RealmResults} containing objects. If no objects match the condition, a list with zero 
      *         objects is returned.
      * @throws java.lang.IllegalArgumentException if one of the field names does not exist or it belongs to a child
      * {@link RealmObject} or a child {@link RealmList}.
      */
     public RealmResults<E> findAllSorted(String fieldNames[], Sort sortOrders[]) {
         SortDescriptor sortDescriptor = SortDescriptor.getInstanceForSort(query.getTable(), fieldNames, sortOrders);
-
-        Collection collection = new Collection(realm.sharedRealm, query, sortDescriptor);
-        return createRealmResults(collection);
+        return createRealmResults(query, sortDescriptor, null, true);
     }
 

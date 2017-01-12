@@ -14,8 +14,6 @@
     @SuppressWarnings("unchecked")
     public RealmResults<E> findAllSorted(String fieldName, Sort sortOrder) {
         SortDescriptor sortDescriptor = SortDescriptor.getInstanceForSort(query.getTable(), fieldName, sortOrder);
-
-        Collection collection = new Collection(realm.sharedRealm, query, sortDescriptor);
-        return createRealmResults(collection);
+        return createRealmResults(query, sortDescriptor, null, true);
     }
 

@@ -1,0 +1,20 @@
+    // neverDetach means the collection won't be detached when local transaction starts. This is useful for the
+    // PendingRow implementation.
+    public Collection(SharedRealm sharedRealm, TableQuery query,
+                      SortDescriptor sortDescriptor, SortDescriptor distinctDescriptor,
+                      boolean neverDetach) {
+        query.validateQuery();
+
+        this.nativePtr = nativeCreateResults(sharedRealm.getNativePtr(), query.getNativePtr(),
+                sortDescriptor,
+                distinctDescriptor);
+
+        this.sharedRealm = sharedRealm;
+        this.context = sharedRealm.context;
+        this.table = query.getTable();
+        this.context.addReference(this);
+        if (!neverDetach) {
+            sharedRealm.addCollection(this);
+        }
+    }
+
