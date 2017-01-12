@@ -1,10 +1,13 @@
     @Test
     @RunTestInLooperThread
-    public void findAll_async() {
+    public void findAllAsync() {
         final DynamicRealm dynamicRealm = initializeDynamicRealm();
         final RealmResults<DynamicRealmObject> allTypes = dynamicRealm.where(AllTypes.CLASS_NAME)
                 .between(AllTypes.FIELD_LONG, 4, 9)
-                .findAll();
+                .findAllAsync();
+
+        assertFalse(allTypes.isLoaded());
+        assertEquals(0, allTypes.size());
 
         allTypes.addChangeListener(new RealmChangeListener<RealmResults<DynamicRealmObject>>() {
             @Override

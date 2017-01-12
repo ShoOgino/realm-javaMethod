@@ -1,0 +1,20 @@
+    @Test
+    @RunTestInLooperThread
+    public void accessingDynamicRealmObjectBeforeAsyncQueryCompleted() {
+        final DynamicRealm dynamicRealm = initializeDynamicRealm();
+        final DynamicRealmObject dynamicRealmObject = dynamicRealm.where(AllTypes.CLASS_NAME)
+                .between(AllTypes.FIELD_LONG, 4, 9)
+                .findFirstAsync();
+        assertFalse(dynamicRealmObject.isLoaded());
+        assertFalse(dynamicRealmObject.isValid());
+        try {
+            dynamicRealmObject.getObject(AllTypes.FIELD_BINARY);
+            fail("trying to access a DynamicRealmObject property should throw");
+        } catch (IllegalStateException ignored) {
+
+        } finally {
+            dynamicRealm.close();
+            looperThread.testComplete();
+        }
+    }
+
