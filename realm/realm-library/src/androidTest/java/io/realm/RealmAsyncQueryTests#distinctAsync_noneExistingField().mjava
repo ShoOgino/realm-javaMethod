@@ -1,0 +1,16 @@
+    @Test
+    @RunTestInLooperThread
+    public void distinctAsync_noneExistingField() throws Throwable {
+        Realm realm = looperThread.realm;
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+
+        try {
+            realm.where(AnnotationIndexTypes.class).distinctAsync("doesNotExist");
+            fail();
+        } catch (IllegalArgumentException ignored) {
+            looperThread.testComplete();
+        }
+    }
+

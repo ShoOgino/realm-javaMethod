@@ -1,0 +1,19 @@
+    @Test
+    @RunTestInLooperThread
+    public void distinctAsync_notIndexedFields() throws Throwable {
+        Realm realm = looperThread.realm;
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+
+        for (String fieldName : new String[]{"Boolean", "Long", "Date", "String"}) {
+            try {
+                realm.where(AnnotationIndexTypes.class).distinctAsync("notIndex" + fieldName);
+                fail("notIndex" + fieldName);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        looperThread.testComplete();
+    }
+

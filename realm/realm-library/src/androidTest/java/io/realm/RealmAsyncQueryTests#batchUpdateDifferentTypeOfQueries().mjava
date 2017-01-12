@@ -1,0 +1,133 @@
+    @Test
+    @RunTestInLooperThread
+    public void batchUpdateDifferentTypeOfQueries() {
+        final Realm realm = looperThread.realm;
+        realm.beginTransaction();
+        for (int i = 0; i < 5; ) {
+            AllTypes allTypes = realm.createObject(AllTypes.class);
+            allTypes.setColumnLong(i);
+            allTypes.setColumnString("data " + i % 3);
+
+            allTypes = realm.createObject(AllTypes.class);
+            allTypes.setColumnLong(i);
+            allTypes.setColumnString("data " + (++i % 3));
+        }
+        final long numberOfBlocks = 25;
+        final long numberOfObjects = 10; // must be greater than 1
+        realm.commitTransaction();
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
+
+        RealmResults<AllTypes> findAllAsync = realm.where(AllTypes.class).findAllAsync();
+        RealmResults<AllTypes> findAllSorted = realm.where(AllTypes.class).findAllSortedAsync("columnString", Sort.ASCENDING);
+        RealmResults<AllTypes> findAllSortedMulti = realm.where(AllTypes.class).findAllSortedAsync(new String[]{"columnString", "columnLong"},
+                new Sort[]{Sort.ASCENDING, Sort.DESCENDING});
+        RealmResults<AnnotationIndexTypes> findDistinct = realm.where(AnnotationIndexTypes.class).distinctAsync("indexString");
+
+        looperThread.keepStrongReference.add(findAllAsync);
+        looperThread.keepStrongReference.add(findAllSorted);
+        looperThread.keepStrongReference.add(findAllSortedMulti);
+        looperThread.keepStrongReference.add(findDistinct);
+
+        final CountDownLatch queriesCompleted = new CountDownLatch(4);
+        final CountDownLatch bgRealmClosedLatch = new CountDownLatch(1);
+        final AtomicInteger batchUpdateCompleted = new AtomicInteger(0);
+        final AtomicInteger findAllAsyncInvocation = new AtomicInteger(0);
+        final AtomicInteger findAllSortedInvocation = new AtomicInteger(0);
+        final AtomicInteger findAllSortedMultiInvocation = new AtomicInteger(0);
+        final AtomicInteger findDistinctInvocation = new AtomicInteger(0);
+
+        findAllAsync.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> object) {
+                switch (findAllAsyncInvocation.incrementAndGet()) {
+                    case 1: {
+                        queriesCompleted.countDown();
+                        break;
+                    }
+                    case 2: {
+                        if (batchUpdateCompleted.incrementAndGet() == 4) {
+                            looperThread.testComplete(bgRealmClosedLatch);
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+
+        findAllSorted.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> object) {
+                switch (findAllSortedInvocation.incrementAndGet()) {
+                    case 1: {
+                        queriesCompleted.countDown();
+                        break;
+                    }
+                    case 2: {
+                        if (batchUpdateCompleted.incrementAndGet() == 4) {
+                            looperThread.testComplete(bgRealmClosedLatch);
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+
+        findAllSortedMulti.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> object) {
+                switch (findAllSortedMultiInvocation.incrementAndGet()) {
+                    case 1: {
+                        queriesCompleted.countDown();
+                        break;
+                    }
+                    case 2: {
+                        if (batchUpdateCompleted.incrementAndGet() == 4) {
+                            looperThread.testComplete(bgRealmClosedLatch);
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+
+        findDistinct.addChangeListener(new RealmChangeListener<RealmResults<AnnotationIndexTypes>>() {
+            @Override
+            public void onChange(RealmResults<AnnotationIndexTypes> object) {
+                switch (findDistinctInvocation.incrementAndGet()) {
+                    case 1: {
+                        queriesCompleted.countDown();
+                        break;
+                    }
+                    case 2: {
+                        if (batchUpdateCompleted.incrementAndGet() == 4) {
+                            looperThread.testComplete(bgRealmClosedLatch);
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+
+        // wait for the queries to completes then send a commit from
+        // another thread to trigger a batch update of the 4 queries
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    queriesCompleted.await();
+                    Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+
+                    bgRealm.beginTransaction();
+                    bgRealm.createObject(AllTypes.class);
+                    bgRealm.createObject(AnnotationIndexTypes.class);
+                    bgRealm.commitTransaction();
+
+                    bgRealm.close();
+                    bgRealmClosedLatch.countDown();
+                } catch (InterruptedException e) {
+                    fail(e.getMessage());
+                }
+            }
+        }.start();
+    }
+

@@ -16,7 +16,12 @@
             @Override
             public void onSuccess() {
                 assertEquals(1, realm.where(AllTypes.class).count());
-                assertEquals(1, results.size());
+                // We cannot guarantee the async results get delivered from OS.
+                if (results.isLoaded()) {
+                    assertEquals(1, results.size());
+                } else {
+                    assertEquals(0, results.size());
+                }
                 looperThread.testComplete();
             }
         }, new Realm.Transaction.OnError() {
