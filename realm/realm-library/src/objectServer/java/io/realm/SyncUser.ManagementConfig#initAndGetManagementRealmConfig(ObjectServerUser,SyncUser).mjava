@@ -1,0 +1,12 @@
+        synchronized SyncConfiguration initAndGetManagementRealmConfig(
+                ObjectServerUser syncUser, SyncUser user) {
+            if (managementRealmConfig == null) {
+                managementRealmConfig = new SyncConfiguration.Builder(
+                        user, getManagementRealmUrl(syncUser.getAuthenticationUrl()))
+                        .modules(new PermissionModule())
+                        .build();
+            }
+
+            return managementRealmConfig;
+        }
+

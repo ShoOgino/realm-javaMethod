@@ -7,15 +7,6 @@
      * @see <a href="https://realm.io/docs/realm-object-server/#permissions">How to control permissions</a>
      */
     public Realm getManagementRealm() {
-        synchronized (this) {
-            if (managementRealmConfig == null) {
-                String managementUrl = getManagementRealmUrl(syncUser.getAuthenticationUrl());
-                managementRealmConfig = new SyncConfiguration.Builder(this, managementUrl)
-                        .modules(new PermissionModule())
-                        .build();
-            }
-        }
-
-        return Realm.getInstance(managementRealmConfig);
+        return Realm.getInstance(managementConfig.initAndGetManagementRealmConfig(syncUser, this));
     }
 
