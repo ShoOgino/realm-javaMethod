@@ -1,0 +1,20 @@
+    /**
+     * @param dirPath A directory path
+     * @param pattern A regex
+     * @return the number of files, in the `dirPath` directory, whose names match `pattern`
+     */
+    private static int countFilesInDir(String dirPath, String pattern) {
+        final Pattern filePattern = Pattern.compile(pattern);
+        try {
+            File[] files = new File(dirPath).listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return filePattern.matcher(file.getName()).matches();
+                }
+            });
+            return (files == null) ? 0 : files.length;
+        } catch (SecurityException ignore) {
+        }
+        return 0;
+    }
+
