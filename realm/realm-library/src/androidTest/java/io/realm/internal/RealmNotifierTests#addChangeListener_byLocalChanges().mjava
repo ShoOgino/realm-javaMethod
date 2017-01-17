@@ -1,18 +1,20 @@
+    // Callback is immediately called when commitTransaction for local changes.
     @Test
     @RunTestInLooperThread
     public void addChangeListener_byLocalChanges() {
+        final AtomicBoolean commitReturns = new AtomicBoolean(false);
         SharedRealm sharedRealm = getSharedRealm(looperThread.realmConfiguration);
         sharedRealm.realmNotifier.addChangeListener(sharedRealm, new RealmChangeListener<SharedRealm>() {
             @Override
             public void onChange(SharedRealm sharedRealm) {
                 // Transaction has been committed in core, but commitTransaction hasn't returned in java.
-                // Need a flag in java.
-                //assertTrue(sharedRealm.isInTransaction());
+                assertFalse(commitReturns.get());
                 looperThread.testComplete();
                 sharedRealm.close();
             }
         });
         sharedRealm.beginTransaction();
         sharedRealm.commitTransaction();
+        commitReturns.set(true);
     }
 
