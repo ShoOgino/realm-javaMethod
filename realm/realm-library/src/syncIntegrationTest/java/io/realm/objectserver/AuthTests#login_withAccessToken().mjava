@@ -1,0 +1,38 @@
+    @Test
+    @RunTestInLooperThread
+    public void login_withAccessToken() {
+        SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
+        SyncCredentials credentials = SyncCredentials.accessToken(admin.getAccessToken(), "custom-admin-user");
+        SyncUser.loginAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback() {
+            @Override
+            public void onSuccess(SyncUser user) {
+                final SyncConfiguration config = new SyncConfiguration.Builder(user, Constants.SYNC_SERVER_URL)
+                        .errorHandler(new SyncSession.ErrorHandler() {
+                            @Override
+                            public void onError(SyncSession session, ObjectServerError error) {
+                                fail("Session failed: " + error);
+                            }
+                        })
+                        .build();
+
+                final Realm realm = Realm.getInstance(config);
+                looperThread.testRealm = realm;
+
+                // FIXME: Right now we have no Java API for detecting when a session is established
+                // So we optimistically assume it has been connected after 1 second.
+                looperThread.postRunnableDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        assertEquals(SessionState.BOUND, SyncManager.getSession(config).getState());
+                        looperThread.testComplete();
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail("Login failed: " + error);
+            }
+        });
+    }
+
