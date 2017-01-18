@@ -1,0 +1,19 @@
+    /**
+     * Condition that the value of field matches with the specified substring, with wildcards:
+     * <ul>
+     *   <li>'*' matches [0, n] unicode chars</li>
+     *   <li>'?' matches a single unicode char.</li>
+     * </ul>
+     *
+     * @param fieldName the field to compare.
+     * @param value the wildcard string.
+     * @param casing how to handle casing. Setting this to {@link Case#INSENSITIVE} only works for Latin-1 characters.
+     * @return the query object.
+     * @throws java.lang.IllegalArgumentException if one or more arguments do not match class or field type.
+     */
+    public RealmQuery<E> like(String fieldName, String value, Case casing) {
+        long columnIndices[] = schema.getColumnIndices(fieldName, RealmFieldType.STRING);
+        this.query.like(columnIndices, value, casing);
+        return this;
+    }
+
