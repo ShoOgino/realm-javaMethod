@@ -6,9 +6,12 @@
         ObjectServerUser syncUser = (ObjectServerUser) o;
 
         if (!identity.equals(syncUser.identity)) return false;
-        if (!refreshToken.equals(syncUser.refreshToken)) return false;
+        if (refreshToken == null) {
+            if (syncUser.refreshToken != null) return false;
+        } else {
+            if (!refreshToken.equals(syncUser.refreshToken)) return false;
+        }
         if (!authenticationUrl.toString().equals(syncUser.authenticationUrl.toString())) return false;
         return realms.equals(syncUser.realms);
-
     }
 
