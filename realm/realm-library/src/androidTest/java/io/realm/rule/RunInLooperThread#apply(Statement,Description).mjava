@@ -51,8 +51,10 @@
                                 if (realm != null) {
                                     realm.close();
                                 }
-                                if (testRealm != null) {
-                                    testRealm.close();
+                                if (!testRealms.isEmpty()) {
+                                    for (Realm testRealm : testRealms) {
+                                        testRealm.close();
+                                    }
                                 }
                                 signalClosedRealm.countDown();
                             }
