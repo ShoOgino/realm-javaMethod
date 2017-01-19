@@ -1,0 +1,27 @@
+    public void copyRealmFromAssets(Context context, String realmPath, RealmConfiguration config) throws IOException {
+        // Delete the existing file before copy
+        Realm.deleteRealm(config);
+
+        File outFile = new File(config.getRealmDirectory(), config.getRealmFileName());
+
+        InputStream is = null;
+        FileOutputStream os = null;
+        try {
+            is = context.getAssets().open(realmPath);
+            os = new FileOutputStream(outFile);
+
+            byte[] buf = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = is.read(buf)) > -1) {
+                os.write(buf, 0, bytesRead);
+            }
+        } finally {
+            if (is != null) {
+                try { is.close(); } catch (IOException ignore) {}
+            }
+            if (os != null) {
+                try { os.close(); } catch (IOException ignore) {}
+            }
+        }
+    }
+
