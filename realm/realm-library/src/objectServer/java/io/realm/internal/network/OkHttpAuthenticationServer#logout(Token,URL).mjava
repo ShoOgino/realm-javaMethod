@@ -1,0 +1,10 @@
+    @Override
+    public LogoutResponse logout(Token userToken, URL authenticationUrl) {
+        try {
+            String requestBody = LogoutRequest.revoke(userToken).toJson();
+            return logout(buildLogoutUrl(authenticationUrl), requestBody);
+        } catch (Exception e) {
+            return LogoutResponse.from(new ObjectServerError(ErrorCode.UNKNOWN, e));
+        }
+    }
+

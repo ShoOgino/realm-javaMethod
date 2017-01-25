@@ -1,0 +1,21 @@
+    /**
+     * Helper method for creating the proper Logout response. This method will set the appropriate error
+     * depending on any HTTP response codes or I/O errors.
+     *
+     * @param response the server response.
+     * @return the log out response.
+     */
+    static LogoutResponse from(Response response) {
+        if (response.isSuccessful()) {
+            // success
+            return new LogoutResponse();
+        }
+        try {
+            String serverResponse = response.body().string();
+            return new LogoutResponse(AuthServerResponse.createError(serverResponse, response.code()));
+        } catch (IOException e) {
+            ObjectServerError error = new ObjectServerError(ErrorCode.IO_EXCEPTION, e);
+            return new LogoutResponse(error);
+        }
+    }
+

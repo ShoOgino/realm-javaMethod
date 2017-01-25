@@ -1,0 +1,59 @@
+    private static void initializeSyncedRealm(Realm realm) {
+        // Everything in this method needs to be behind a transaction lock to prevent multi-process interaction while
+        // the Realm is initialized.
+        boolean commitChanges = false;
+        try {
+            realm.beginTransaction();
+            long currentVersion = realm.getVersion();
+            final boolean unversioned = (currentVersion == UNVERSIONED);
+
+            final RealmProxyMediator mediator = realm.configuration.getSchemaMediator();
+            final Set<Class<? extends RealmModel>> modelClasses = mediator.getModelClasses();
+
+            final ArrayList<RealmObjectSchema> realmObjectSchemas = new ArrayList<>();
+            final RealmSchema realmSchemaCache = new RealmSchema();
+            for (Class<? extends RealmModel> modelClass : modelClasses) {
+                RealmObjectSchema realmObjectSchema = mediator.createRealmObjectSchema(modelClass, realmSchemaCache);
+                realmObjectSchemas.add(realmObjectSchema);
+            }
+
+            // Assumption: when SyncConfiguration then additive schema update mode
+            final RealmSchema schema = new RealmSchema(realmObjectSchemas);
+            long newVersion = realm.configuration.getSchemaVersion();
+            if (realm.sharedRealm.requiresMigration(schema)) {
+                if (currentVersion >= newVersion) {
+                    throw new IllegalArgumentException(String.format("The schema was changed but the schema version " +
+                            "was not updated. The configured schema version (%d) must be higher than the one in the Realm " +
+                            "file (%d) in order to update the schema.", newVersion, currentVersion));
+                }
+                realm.sharedRealm.updateSchema(schema, newVersion);
+                // The OS currently does not handle setting the schema version. We have to do it manually.
+                realm.setVersion(newVersion);
+                commitChanges = true;
+            }
+
+            final Map<Class<? extends RealmModel>, ColumnInfo> columnInfoMap = new HashMap<>(modelClasses.size());
+            for (Class<? extends RealmModel> modelClass : modelClasses) {
+                columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm, false));
+            }
+
+            realm.schema.columnIndices = new ColumnIndices((unversioned) ? newVersion : currentVersion, columnInfoMap);
+
+            if (unversioned) {
+                final Transaction transaction = realm.configuration.getInitialDataTransaction();
+                if (transaction != null) {
+                    transaction.execute(realm);
+                }
+            }
+        } catch (Exception e) {
+            commitChanges = false;
+            throw e;
+        } finally {
+            if (commitChanges) {
+                realm.commitTransaction();
+            } else {
+                realm.cancelTransaction();
+            }
+        }
+    }
+

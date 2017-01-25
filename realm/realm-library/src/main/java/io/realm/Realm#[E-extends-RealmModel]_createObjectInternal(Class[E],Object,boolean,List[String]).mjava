@@ -11,9 +11,11 @@
      * @throws IllegalArgumentException if the {@code primaryKeyValue} doesn't have a value that can be converted to the
      */
     // called from proxy classes
-    <E extends RealmModel> E createObjectInternal(Class<E> clazz, Object primaryKeyValue,
-                                                            boolean acceptDefaultValue,
-                                                            List<String> excludeFields) {
+    <E extends RealmModel> E createObjectInternal(
+            Class<E> clazz,
+            Object primaryKeyValue,
+            boolean acceptDefaultValue,
+            List<String> excludeFields) {
         Table table = schema.getTable(clazz);
         long rowIndex = table.addEmptyRowWithPrimaryKey(primaryKeyValue);
         return get(clazz, rowIndex, acceptDefaultValue, excludeFields);
