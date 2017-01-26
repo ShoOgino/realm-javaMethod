@@ -7,13 +7,15 @@
      */
     public void foreach(Callback<T> callback) {
         for (T pair : pairs) {
-            Object observer = pair.observerRef.get();
-            if (observer == null) {
-                pairs.remove(pair);
-            } else if (cleared) {
+            if (cleared) {
                 break;
-            } else if (!pair.removed) {
-                callback.onCalled(pair, observer);
+            } else {
+                Object observer = pair.observerRef.get();
+                if (observer == null) {
+                    pairs.remove(pair);
+                } else if (!pair.removed) {
+                    callback.onCalled(pair, observer);
+                }
             }
         }
     }
