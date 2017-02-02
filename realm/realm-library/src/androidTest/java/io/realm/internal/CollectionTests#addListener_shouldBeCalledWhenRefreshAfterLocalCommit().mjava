@@ -2,7 +2,7 @@
     public void addListener_shouldBeCalledWhenRefreshAfterLocalCommit() {
         final CountDownLatch latch = new CountDownLatch(1);
         Collection collection = new Collection(sharedRealm, table.where());
-        collection.size();
+        assertEquals(4, collection.size()); // See `populateData()`
         collection.addListener(collection, new RealmChangeListener<Collection>() {
             @Override
             public void onChange(Collection element) {
