@@ -23,16 +23,16 @@
             return;
         }
 
-        // Decrease the local counter.
+        // Decreases the local counter.
         refCount -= 1;
 
         if (refCount == 0) {
             // The last instance in this thread.
-            // Clear local ref & counter
+            // Clears local ref & counter.
             refAndCount.localCount.set(null);
             refAndCount.localRealm.set(null);
 
-            // Clear global counter
+            // Clears global counter.
             refAndCount.globalCount--;
             if (refAndCount.globalCount < 0) {
                 // Should never happen.
@@ -40,9 +40,9 @@
                         " got corrupted.");
             }
 
-            // Clear the column indices cache if needed
+            // Clears the column indices cache if needed.
             if (realm instanceof Realm && refAndCount.globalCount == 0) {
-                // All typed Realm instances of this file are cleared from cache
+                // All typed Realm instances of this file are cleared from cache.
                 Arrays.fill(cache.typedColumnIndicesArray, null);
             }
 

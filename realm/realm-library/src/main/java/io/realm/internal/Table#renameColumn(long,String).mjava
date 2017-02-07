@@ -10,16 +10,16 @@
     @Override
     public void renameColumn(long columnIndex, String newName) {
         verifyColumnName(newName);
-        // get the old column name. We'll assume that the old column name is *NOT* an empty string.
+        // Gets the old column name. We'll assume that the old column name is *NOT* an empty string.
         final String oldName = nativeGetColumnName(nativePtr, columnIndex);
-        // also old pk index. Once a column name changes, there is no way you can find the column name
+        // Also old pk index. Once a column name changes, there is no way you can find the column name
         // by old name.
         final long oldPkColumnIndex = getPrimaryKey();
 
-        // then let's try to rename a column. If an error occurs for some reasons, we'll throw.
+        // Then let's try to rename a column. If an error occurs for some reasons, we'll throw.
         nativeRenameColumn(nativePtr, columnIndex, newName);
 
-        // Rename a primary key. At this point, renaming the column name should have been fine.
+        // Renames a primary key. At this point, renaming the column name should have been fine.
         if (oldPkColumnIndex == columnIndex) {
             try {
                 String className = tableNameToClassName(getName());
@@ -35,7 +35,7 @@
                     throw new IllegalStateException("Non-existent PrimaryKey column cannot be renamed");
                 }
             } catch (Exception e) {
-                // we failed to rename the pk meta table. roll back the column name, not pk meta table
+                // We failed to rename the pk meta table. roll back the column name, not pk meta table
                 // then rethrow.
                 nativeRenameColumn(nativePtr, columnIndex, oldName);
                 throw e;

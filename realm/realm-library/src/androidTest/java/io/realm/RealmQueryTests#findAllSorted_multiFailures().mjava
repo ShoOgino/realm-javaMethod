@@ -1,13 +1,13 @@
     @Test
     public void findAllSorted_multiFailures() {
-        // zero fields specified
+        // Zero fields specified.
         try {
             realm.where(AllTypes.class).findAllSorted(new String[]{}, new Sort[]{});
             fail();
         } catch (IllegalArgumentException ignored) {
         }
 
-        // number of fields and sorting orders don't match
+        // Number of fields and sorting orders don't match.
         try {
             realm.where(AllTypes.class).findAllSorted(new String[]{AllTypes.FIELD_STRING},
                     new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
@@ -15,7 +15,7 @@
         } catch (IllegalArgumentException ignored) {
         }
 
-        // null is not allowed
+        // Null is not allowed.
         try {
             realm.where(AllTypes.class).findAllSorted((String[]) null, null);
             fail();
@@ -27,7 +27,7 @@
         } catch (IllegalArgumentException ignored) {
         }
 
-        // non-existing field name
+        // Non-existing field name.
         try {
             realm.where(AllTypes.class)
                     .findAllSorted(new String[]{AllTypes.FIELD_STRING, "do-not-exist"},

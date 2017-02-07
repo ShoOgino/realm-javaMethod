@@ -2,14 +2,14 @@
     public void realmSortMultiFailures() {
         RealmResults<AllTypes> allTypes = realm.where(AllTypes.class).findAll();
 
-        // zero fields specified
+        // Zero fields specified.
         try {
             realm.where(AllTypes.class).findAll().sort(new String[]{}, new Sort[]{});
             fail();
         } catch (IllegalArgumentException ignored) {
         }
 
-        // number of fields and sorting orders don't match
+        // Number of fields and sorting orders don't match.
         try {
             realm.where(AllTypes.class).findAll().
                     sort(new String[]{FIELD_STRING}, ORDER_ASC_ASC);
@@ -17,7 +17,7 @@
         } catch (IllegalArgumentException ignored) {
         }
 
-        // null is not allowed
+        // Null is not allowed.
         try {
             realm.where(AllTypes.class).findAll().sort(null, (Sort[]) null);
             fail();
@@ -29,7 +29,7 @@
         } catch (IllegalArgumentException ignored) {
         }
 
-        // non-existing field name
+        // Non-existing field name.
         try {
             realm.where(AllTypes.class).findAll().
                     sort(new String[]{FIELD_STRING, "dont-exist"}, ORDER_ASC_ASC);

@@ -1,4 +1,4 @@
-    // Test if an in-memory Realm can be written to disk with/without encryption
+    // Tests if an in-memory Realm can be written to disk with/without encryption.
     @Test
     public void writeCopyTo() {
         byte[] key = TestHelper.getRandomKey();
@@ -20,18 +20,18 @@
         dog.setName("DinoDog");
         testRealm.commitTransaction();
 
-        // Test a normal Realm file
+        // Tests a normal Realm file.
         testRealm.writeCopyTo(new File(configFactory.getRoot(), fileName));
         Realm onDiskRealm = Realm.getInstance(conf);
         assertEquals(onDiskRealm.where(Dog.class).count(), 1);
         onDiskRealm.close();
 
-        // Test a encrypted Realm file
+        // Tests a encrypted Realm file.
         testRealm.writeEncryptedCopyTo(new File(configFactory.getRoot(), encFileName), key);
         onDiskRealm = Realm.getInstance(encConf);
         assertEquals(onDiskRealm.where(Dog.class).count(), 1);
         onDiskRealm.close();
-        // Test with a wrong key to see if it fails as expected.
+        // Tests with a wrong key to see if it fails as expected.
         try {
             RealmConfiguration wrongKeyConf = configFactory.createConfigurationBuilder()
                     .name(encFileName)

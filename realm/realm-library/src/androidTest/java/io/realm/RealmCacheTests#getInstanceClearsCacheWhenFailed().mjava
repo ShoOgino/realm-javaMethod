@@ -6,13 +6,13 @@
         RealmConfiguration configB = configFactory.createConfiguration(REALM_NAME,
                 TestHelper.getRandomKey(43));
 
-        Realm realm = Realm.getInstance(configA); // Create starting Realm with key1
+        Realm realm = Realm.getInstance(configA); // Creates starting Realm with key 1.
         realm.close();
         try {
-            Realm.getInstance(configB); // Try to open with key 2
+            Realm.getInstance(configB); // Tries to open with key 2.
         } catch (RealmFileException expected) {
             assertEquals(expected.getKind(), RealmFileException.Kind.ACCESS_ERROR);
-            // Delete Realm so key 2 works. This should work as a Realm shouldn't be cached
+            // Deletes Realm so key 2 works. This should work as a Realm shouldn't be cached
             // if initialization failed.
             assertTrue(Realm.deleteRealm(configA));
             realm = Realm.getInstance(configB);

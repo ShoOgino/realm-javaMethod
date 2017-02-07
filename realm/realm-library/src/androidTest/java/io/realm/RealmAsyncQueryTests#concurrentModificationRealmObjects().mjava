@@ -1,5 +1,5 @@
-    // handlerController#realmObjects is accessed from different threads
-    // make sure that we iterate over it safely without any race condition (ConcurrentModification)
+    // handlerController#realmObjects is accessed from different threads.
+    // Makes sure that we iterate over it safely without any race condition (ConcurrentModification).
     @Test
     @UiThreadTest
     public void concurrentModificationRealmObjects() {
@@ -26,7 +26,7 @@
         AtomicBoolean fireOnce = new AtomicBoolean(true);
         while (iterator.hasNext()) {
             Dog next = (Dog) iterator.next().getKey().get();
-            // add a new Dog from a background thread
+            // Adds a new Dog from a background thread.
             if (fireOnce.compareAndSet(true, false)) {
                 new Thread() {
                     @Override

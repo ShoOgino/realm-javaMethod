@@ -1,20 +1,20 @@
     @Test
     public void notSettingIndexThrows() {
 
-        // Create v0 of the Realm
+        // Creates v0 of the Realm.
         RealmConfiguration originalConfig = configFactory.createConfigurationBuilder()
                 .schema(AllTypes.class)
                 .build();
         Realm.getInstance(originalConfig).close();
 
-        // Create v1 of the Realm
+        // Creates v1 of the Realm.
         RealmMigration migration = new RealmMigration() {
             @Override
             public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
                 RealmSchema schema = realm.getSchema();
                 schema.create("AnnotationTypes")
                         .addField("id", long.class, FieldAttribute.PRIMARY_KEY)
-                        .addField("indexString", String.class) // Forget to set @Index
+                        .addField("indexString", String.class) // Forgets to set @Index.
                         .addField("notIndexString", String.class);
             }
         };

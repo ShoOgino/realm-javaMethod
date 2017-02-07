@@ -4,17 +4,17 @@
             return;
         }
 
-        // Test all RealmCollection methods
+        // Tests all RealmCollection methods.
         for (RealmCollectionMethod method : RealmCollectionMethod.values()) {
             collection = createCollection(realm, collectionClass, TEST_SIZE);
             realm.beginTransaction();
-            collection.remove(0); // Remove object creating circular dependency which will crash deleteAll.
+            collection.remove(0); // Removes object creating circular dependency which will crash deleteAll.
             Iterator<AllJavaTypes> it = collection.iterator();
             switch (method) {
                 case DELETE_ALL_FROM_REALM:
                     collection.deleteAllFromRealm(); break;
 
-                // Does not impact size, so does not trigger ConcurrentModificationException
+                // Does not impact size, so does not trigger ConcurrentModificationException.
                 case WHERE:
                 case MIN:
                 case MAX:
@@ -32,7 +32,7 @@
             checkIteratorThrowsConcurrentModification(realm, method.toString(), it);
         }
 
-        // Test all OrderedRealmCollection methods
+        // Tests all OrderedRealmCollection methods.
         for (OrderedRealmCollectionMethod method : OrderedRealmCollectionMethod.values()) {
             collection = createCollection(realm, collectionClass, TEST_SIZE);
             realm.beginTransaction();
@@ -42,7 +42,7 @@
                 case DELETE_FIRST: collection.deleteFirstFromRealm(); break;
                 case DELETE_LAST: collection.deleteLastFromRealm(); break;
 
-                // Does not impact size, so does not trigger ConcurrentModificationException
+                // Does not impact size, so does not trigger ConcurrentModificationException.
                 case SORT:
                 case SORT_FIELD:
                 case SORT_2FIELDS:

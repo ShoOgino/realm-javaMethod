@@ -5,47 +5,47 @@
         populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
 
         RealmResults<AnnotationIndexTypes> results = realm.where(AnnotationIndexTypes.class).findAll();
-        // an empty string field in the middle
+        // An empty string field in the middle.
         try {
             results.distinct(AnnotationIndexTypes.FIELD_INDEX_BOOL, "", AnnotationIndexTypes.FIELD_INDEX_INT);
         } catch (IllegalArgumentException ignored) {
         }
-        // an empty string field at the end
+        // An empty string field at the end.
         try {
             results.distinct(AnnotationIndexTypes.FIELD_INDEX_BOOL, AnnotationIndexTypes.FIELD_INDEX_INT, "");
         } catch (IllegalArgumentException ignored) {
         }
-        // a null string field in the middle
+        // A null string field in the middle.
         try {
             results.distinct(AnnotationIndexTypes.FIELD_INDEX_BOOL, null, AnnotationIndexTypes.FIELD_INDEX_INT);
         } catch (IllegalArgumentException ignored) {
         }
-        // a null string field at the end
+        // A null string field at the end.
         try {
             results.distinct(AnnotationIndexTypes.FIELD_INDEX_BOOL, AnnotationIndexTypes.FIELD_INDEX_INT, null);
         } catch (IllegalArgumentException ignored) {
         }
-        // (String)null makes varargs a null array.
+        // (String) Null makes varargs a null array.
         try {
             results.distinct(AnnotationIndexTypes.FIELD_INDEX_BOOL, (String)null);
         } catch (IllegalArgumentException ignored) {
         }
-        // Two (String)null for first and varargs fields
+        // Two (String) null for first and varargs fields.
         try {
             results.distinct(null, (String) null);
         } catch (IllegalArgumentException ignored) {
         }
-        // "" & (String)null combination
+        // "" & (String)null combination.
         try {
             results.distinct("", (String) null);
         } catch (IllegalArgumentException ignored) {
         }
-        // "" & (String)null combination
+        // "" & (String)null combination.
         try {
             results.distinct(null, "");
         } catch (IllegalArgumentException ignored) {
         }
-        // Two empty fields tests
+        // Two empty fields tests.
         try {
             results.distinct("", "");
         } catch (IllegalArgumentException ignored) {

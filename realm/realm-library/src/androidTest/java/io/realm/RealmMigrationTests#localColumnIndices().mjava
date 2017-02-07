@@ -5,7 +5,7 @@
         String MIGRATED_REALM = "migrated.realm";
         String NEW_REALM = "new.realm";
 
-        // Migrate old Realm to proper schema
+        // Migrates old Realm to proper schema.
 
         // V1 config
         RealmConfiguration v1Config = configFactory.createConfigurationBuilder()
@@ -35,8 +35,8 @@
                 .build();
         oldRealm = Realm.getInstance(v2Config);
 
-        // Create new Realm which will cause column indices to be recalculated based on the order in the java file
-        // instead of the migration
+        // Creates new Realm which will cause column indices to be recalculated based on the order in the java file
+        // instead of the migration.
         RealmConfiguration newConfig = configFactory.createConfigurationBuilder()
                 .name(NEW_REALM)
                 .schemaVersion(2)
@@ -45,7 +45,7 @@
         Realm newRealm = Realm.getInstance(newConfig);
         newRealm.close();
 
-        // Try to query migrated realm. With local column indices this will work. With global it will fail.
+        // Tries to query migrated realm. With local column indices this will work. With global it will fail.
         assertEquals(0, oldRealm.where(FieldOrder.class).equalTo("field1", true).findAll().size());
         oldRealm.close();
     }

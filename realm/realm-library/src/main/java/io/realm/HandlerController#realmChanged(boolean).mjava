@@ -3,7 +3,7 @@
         deleteWeakReferences();
         boolean threadContainsAsyncQueries = threadContainsAsyncQueries();
 
-        // Mixing local transactions and async queries has unavoidable race conditions
+        // Mixing local transactions and async queries has unavoidable race conditions.
         if (localCommit && threadContainsAsyncQueries) {
             RealmLog.warn("Mixing asynchronous queries with local writes should be avoided. " +
                     "Realm will convert any async queries to synchronous in order to remain consistent. Use " +
@@ -12,11 +12,11 @@
         }
 
         if (!localCommit && threadContainsAsyncQueries) {
-            // For changes from other threads, swallow the change and re-run async queries first.
+            // For changes from other threads, swallows the change and re-runs async queries first.
             updateAsyncQueries();
         } else {
             // Following cases handled by this:
-            // localCommit && threadContainsAsyncQueries (this is the case the warning above is about)
+            // localCommit && threadContainsAsyncQueries (This is the case the warning above is about.)
             // localCommit && !threadContainsAsyncQueries
             // !localCommit && !threadContainsAsyncQueries
             realm.sharedRealm.refresh();

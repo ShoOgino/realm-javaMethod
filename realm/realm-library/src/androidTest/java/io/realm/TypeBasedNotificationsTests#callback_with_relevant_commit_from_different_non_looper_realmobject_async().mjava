@@ -1,4 +1,4 @@
-    // UC 1 Async RealmObject
+    // UC 1 Async RealmObject.
     @Test
     @RunTestInLooperThread
     public void callback_with_relevant_commit_from_different_non_looper_realmobject_async() throws Throwable {
@@ -18,7 +18,7 @@
             @Override
             public void onChange(Dog object) {
                 switch (typebasedCommitInvocations.incrementAndGet()) {
-                    case 1:  // triggered by COMPLETED_ASYNC_REALM_OBJECT
+                    case 1:  // Triggered by COMPLETED_ASYNC_REALM_OBJECT.
                         new RealmBackgroundTask(realm.configuration) {
                             @Override
                             protected void doInBackground(Realm realm) {
@@ -28,7 +28,7 @@
                         }.awaitOrFail();
                         break;
 
-                    case 2: {// triggered by the irrelevant commit (not affecting Dog table)
+                    case 2: {// Triggered by the irrelevant commit (not affecting Dog table).
                         assertTrue(dog.isLoaded());
                         assertFalse(dog.isValid());
                         new RealmBackgroundTask(realm.configuration) {
@@ -47,7 +47,7 @@
                         looperThread.postRunnable(new Runnable() {
                             @Override
                             public void run() {
-                                // trigger second callback invocation
+                                // Triggers second callback invocation.
                                 new Thread() {
                                     @Override
                                     public void run() {
@@ -66,9 +66,9 @@
                     case 4: {
                         assertEquals("Akamaru", dog.getName());
                         assertEquals(17, dog.getAge());
-                        // posting as an event will give the handler a chance
-                        // to deliver the notification for globalCommitInvocations
-                        // otherwise, test will exit before the callback get a chance to be invoked
+                        // Posting as an event will give the handler a chance
+                        // to deliver the notification for globalCommitInvocations.
+                        // Otherwise, test will exit before the callback get a chance to be invoked.
                         looperThread.postRunnable(new Runnable() {
                             @Override
                             public void run() {

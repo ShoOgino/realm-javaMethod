@@ -1,18 +1,18 @@
-    // Creates the mediator that defines the current schema
+    // Creates the mediator that defines the current schema.
     protected static RealmProxyMediator createSchemaMediator(Set<Object> modules,
                                                              Set<Class<? extends RealmModel>> debugSchema) {
 
-        // If using debug schema, use special mediator
+        // If using debug schema, uses special mediator.
         if (debugSchema.size() > 0) {
             return new FilterableMediator(DEFAULT_MODULE_MEDIATOR, debugSchema);
         }
 
-        // If only one module, use that mediator directly
+        // If only one module, uses that mediator directly.
         if (modules.size() == 1) {
             return getModuleMediator(modules.iterator().next().getClass().getCanonicalName());
         }
 
-        // Otherwise combine all mediators
+        // Otherwise combines all mediators.
         RealmProxyMediator[] mediators = new RealmProxyMediator[modules.size()];
         int i = 0;
         for (Object module : modules) {

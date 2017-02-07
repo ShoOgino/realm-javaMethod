@@ -18,14 +18,14 @@
         dynamicRealm.commitTransaction();
         dynamicRealm.setAutoRefresh(true);
 
-        // Sort first set by using: String[ASC], Long[DESC]
+        // Sorts first set by using: String[ASC], Long[DESC].
         final RealmResults<DynamicRealmObject> realmResults1 = dynamicRealm.where(AllTypes.CLASS_NAME)
                 .findAllSortedAsync(
                         new String[]{AllTypes.FIELD_STRING, AllTypes.FIELD_LONG},
                         new Sort[]{Sort.ASCENDING, Sort.DESCENDING}
                 );
 
-        // Sort second set by using: String[DESC], Long[ASC]
+        // Sorts second set by using: String[DESC], Long[ASC].
         final RealmResults<DynamicRealmObject> realmResults2 = dynamicRealm.where(AllTypes.CLASS_NAME)
                 .between(AllTypes.FIELD_LONG, 0, 5)
                 .findAllSortedAsync(

@@ -19,10 +19,10 @@
         } else {
             final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();
 
-            // Handover the query (to be used by a worker thread)
+            // Handovers the query (to be used by a worker thread).
             final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
 
-            // We need to use the same configuration to open a background SharedRealm to perform the query
+            // We need to use the same configuration to open a background SharedRealm to perform the query.
             final RealmConfiguration realmConfiguration = realm.getConfiguration();
 
             final long indices[] = new long[fieldNames.length];
@@ -32,12 +32,12 @@
                 indices[i] = columnIndex;
             }
 
-            // capture the query arguments for future retries & update
+            // Captures the query arguments for future retries & update.
             argumentsHolder = new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_ALL_MULTI_SORTED);
             argumentsHolder.sortOrders = sortOrders;
             argumentsHolder.columnIndices = indices;
 
-            // prepare the promise result
+            // Prepares the promise result.
             RealmResults<E> realmResults;
             if (isDynamicQuery()) {
                 //noinspection unchecked
@@ -57,7 +57,7 @@
                         try {
                             sharedRealm = SharedRealm.getInstance(realmConfiguration);
 
-                            // run the query & handover the table view for the caller thread
+                            // Runs the query & handover the table view for the caller thread.
                             long handoverTableViewPointer = TableQuery.findAllMultiSortedWithHandover(sharedRealm,
                                     handoverQueryPointer, indices, sortOrders);
 
