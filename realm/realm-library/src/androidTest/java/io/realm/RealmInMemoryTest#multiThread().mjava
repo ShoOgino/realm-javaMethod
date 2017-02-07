@@ -1,9 +1,9 @@
     // Test below scenario:
-    // 1. Create a in-memory Realm instance in the main thread.
-    // 2. Create a in-memory Realm with same name in another thread.
-    // 3. Close the in-memory Realm instance in the main thread and the Realm data should not be released since
+    // 1. Creates a in-memory Realm instance in the main thread.
+    // 2. Creates a in-memory Realm with same name in another thread.
+    // 3. Closes the in-memory Realm instance in the main thread and the Realm data should not be released since
     //    another instance is still held by the other thread.
-    // 4. Close the in-memory Realm instance and the Realm data should be released since no more instance with the
+    // 4. Closes the in-memory Realm instance and the Realm data should be released since no more instance with the
     //    specific name exists.
     @Test
     public void multiThread() throws InterruptedException, ExecutionException {
@@ -31,7 +31,7 @@
                 }
                 workerCommittedLatch.countDown();
 
-                // Wait until Realm instance closed in main thread
+                // Waits until Realm instance closed in main thread.
                 try {
                     realmInMainClosedLatch.await(3, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
@@ -47,20 +47,20 @@
         workerThread.start();
 
 
-        // Wait until the worker thread started
+        // Waits until the worker thread started.
         workerCommittedLatch.await(3, TimeUnit.SECONDS);
         if (threadError[0] != null) { throw threadError[0]; }
 
-        // refresh will be ran in the next loop, manually refresh it here.
+        // Refreshes will be ran in the next loop, manually refreshes it here.
         testRealm.waitForChange();
         assertEquals(testRealm.where(Dog.class).count(), 1);
 
         // Step 3.
-        // Release the main thread Realm reference, and the worker thread hold the reference still
+        // Releases the main thread Realm reference, and the worker thread holds the reference still.
         testRealm.close();
 
         // Step 4.
-        // Create a new Realm reference in main thread and checking the data.
+        // Creates a new Realm reference in main thread and checks the data.
         testRealm = Realm.getInstance(inMemConf);
         assertEquals(testRealm.where(Dog.class).count(), 1);
         testRealm.close();
@@ -68,11 +68,11 @@
         // Let the worker thread continue.
         realmInMainClosedLatch.countDown();
 
-        // Wait until the worker thread finished
+        // Waits until the worker thread finished.
         workerClosedLatch.await(3, TimeUnit.SECONDS);
         if (threadError[0] != null) { throw threadError[0]; }
 
-        // Since all previous Realm instances has been closed before, below will create a fresh new in-mem-realm instance
+        // Since all previous Realm instances has been closed before, below will create a fresh new in-mem-realm instance.
         testRealm = Realm.getInstance(inMemConf);
         assertEquals(testRealm.where(Dog.class).count(), 0);
     }

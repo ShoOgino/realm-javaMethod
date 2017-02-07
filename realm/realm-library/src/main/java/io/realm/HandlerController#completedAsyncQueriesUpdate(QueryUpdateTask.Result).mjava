@@ -2,24 +2,24 @@
         SharedRealm.VersionID callerVersionID = realm.sharedRealm.getVersionID();
         int compare = callerVersionID.compareTo(result.versionID);
         if (compare > 0) {
-            // if the caller thread is more advanced than the worker thread, it means it did a local commit.
+            // If the caller thread is more advanced than the worker thread, it means it did a local commit.
             // This should also have put a REALM_CHANGED event on the Looper queue, so ignoring this result should
             // be safe as all async queries will be rerun when processing the REALM_CHANGED event.
             RealmLog.trace("COMPLETED_UPDATE_ASYNC_QUERIES %s caller is more advanced, Looper will updates queries", HandlerController.this);
 
         } else {
-            // We're behind or on the same version as the worker thread
+            // We're behind or on the same version as the worker thread.
 
-            // only advance if we're behind
+            // Only advances if we're behind.
             if (compare != 0) {
-                // no need to remove old pointers from TableView, since they're
-                // imperative TV, they will not rerun if the SharedGroup advance
+                // No need to remove old pointers from TableView, since they're
+                // imperative TV, they will not rerun if the SharedGroup advance.
 
                 // UC covered by this test: RealmAsyncQueryTests#testFindAllCallerThreadBehind
                 RealmLog.trace("COMPLETED_UPDATE_ASYNC_QUERIES %s caller is behind advance_read", HandlerController.this);
-                // refresh the Realm to the version provided by the worker thread
+                // Refreshes the Realm to the version provided by the worker thread
                 // (advanceRead to the latest version may cause a version mismatch error) preventing us
-                // from importing correctly the handover table view
+                // from importing correctly the handover table view.
                 try {
                     realm.sharedRealm.refresh(result.versionID);
                 } catch (BadVersionException e) {
@@ -37,11 +37,11 @@
                 WeakReference<RealmResults<? extends RealmModel>> weakRealmResults = query.getKey();
                 RealmResults<? extends RealmModel> realmResults = weakRealmResults.get();
                 if (realmResults == null) {
-                    // don't update GC'd instance
+                    // Doesn't update GC'd instance.
                     asyncRealmResults.remove(weakRealmResults);
 
                 } else {
-                    // update the instance with the new pointer
+                    // Updates the instance with the new pointer.
                     realmResults.swapTableViewPointer(query.getValue());
                     realmResults.syncIfNeeded();
                     resultsToBeNotified.add(realmResults);

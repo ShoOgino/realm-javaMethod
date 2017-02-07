@@ -15,18 +15,18 @@
         final long columnIndex = getAndValidateDistinctColumnIndex(fieldName, this.table.getTable());
         final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();
 
-        // handover the query (to be used by a worker thread)
+        // Handovers the query (to be used by a worker thread).
         final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
 
-        // save query arguments (for future update)
+        // Saves query arguments (for future update).
         argumentsHolder = new ArgumentsHolder(ArgumentsHolder.TYPE_DISTINCT);
         argumentsHolder.columnIndex = columnIndex;
 
-        // we need to use the same configuration to open a background SharedRealm (i.e Realm)
-        // to perform the query
+        // We need to use the same configuration to open a background SharedRealm (i.e Realm)
+        // to perform the query.
         final RealmConfiguration realmConfiguration = realm.getConfiguration();
 
-        // prepare an empty reference of the RealmResults, so we can return it immediately (promise)
+        // Prepares an empty reference of the RealmResults, so we can return it immediately (promise)
         // then update it once the query completes in the background.
         RealmResults<E> realmResults;
         if (isDynamicQuery()) {

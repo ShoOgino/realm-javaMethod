@@ -1,6 +1,6 @@
     @Test
     public void assetFileValidFile() throws IOException {
-        // Ensure that there is no data
+        // Ensures that there is no data.
         Realm.deleteRealm(new RealmConfiguration.Builder(context).build());
 
         RealmConfiguration configuration = new RealmConfiguration
@@ -16,13 +16,13 @@
         realm = Realm.getInstance(configuration);
         assertTrue(realmFile.exists());
 
-        // Asset file has 10 Owners and 10 Cats, check if data is present
+        // Asset file has 10 Owners and 10 Cats, checks if data is present.
         assertEquals(10, realm.where(Owner.class).count());
         assertEquals(10, realm.where(Cat.class).count());
 
         realm.close();
 
-        // Copy original file to another location
+        // Copies original file to another location.
         configFactory.copyRealmFromAssets(context, "asset_file.realm", "asset_file_copy.realm");
         File copyFromAsset = new File(configFactory.getRoot(), "asset_file_copy.realm");
         assertTrue(copyFromAsset.exists());

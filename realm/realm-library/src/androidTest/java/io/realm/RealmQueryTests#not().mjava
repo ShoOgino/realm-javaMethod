@@ -2,11 +2,11 @@
     public void not() {
         populateTestRealm(); // create TEST_DATA_SIZE objects
 
-        // only one object with value 5 -> TEST_DATA_SIZE-1 object with value "not 5"
+        // Only one object with value 5 -> TEST_DATA_SIZE-1 object with value "not 5".
         RealmResults<AllTypes> list1 = realm.where(AllTypes.class).not().equalTo(AllTypes.FIELD_LONG, 5).findAll();
         assertEquals(TEST_DATA_SIZE - 1, list1.size());
 
-        // not().greater() and lessThenOrEqual() must be the same
+        // not().greater() and lessThenOrEqual() must be the same.
         RealmResults<AllTypes> list2 = realm.where(AllTypes.class).not().greaterThan(AllTypes.FIELD_LONG, 5).findAll();
         RealmResults<AllTypes> list3 = realm.where(AllTypes.class).lessThanOrEqualTo(AllTypes.FIELD_LONG, 5).findAll();
         assertEquals(list2.size(), list3.size());

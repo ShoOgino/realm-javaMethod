@@ -1,4 +1,4 @@
-    // Test that depth restriction is calculated from the top-most encountered object, i.e. it is possible for some
+    // Tests that depth restriction is calculated from the top-most encountered object, i.e. it is possible for some
     // objects to exceed the depth limit.
     // A -> B -> C -> D -> E
     // A -> D -> E
@@ -23,8 +23,8 @@
         objA.setOtherObject(objD);
         realm.commitTransaction();
 
-        // object is filled before otherObject (because of field order - WARNING: Not guaranteed)
-        // this means that the object will be encountered first time at max depth, so E will not be copied.
+        // Object is filled before otherObject. (because of field order - WARNING: Not guaranteed)
+        // This means that the object will be encountered first time at max depth, so E will not be copied.
         // If the object cache does not handle this, otherObject will be wrong.
         CyclicType copyA = realm.copyFromRealm(objA, 3);
         assertEquals("E", copyA.getOtherObject().getObject().getName());

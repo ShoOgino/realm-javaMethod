@@ -1,5 +1,5 @@
-    // Build a RealmResults from a RealmList, and delete the RealmList. Test the behavior of ChangeListener on the
-// "invalid" RealmResults.
+    // Builds a RealmResults from a RealmList, and deletes the RealmList. Tests the behavior of ChangeListener on the
+    // "invalid" RealmResults.
     @Test
     @RunTestInLooperThread
     public void changeListener_onResultsBuiltOnDeletedLinkView() {
@@ -28,16 +28,16 @@
             }
         });
 
-        // Trigger the listener at the first time.
+        // Triggers the listener at the first time.
         realm.beginTransaction();
         allTypes.deleteFromRealm();
         realm.commitTransaction();
 
-        // Try to trigger the listener second time.
+        // Tries to trigger the listener second time.
         realm.beginTransaction();
         realm.commitTransaction();
 
-        // Close the realm and finish the test. This needs to follow the REALM_CHANGED in the queue.
+        // Closes the realm and finishes the test. This needs to follow the REALM_CHANGED in the queue.
         looperThread.postRunnable(new Runnable() {
             @Override
             public void run() {

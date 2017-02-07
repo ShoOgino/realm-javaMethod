@@ -1,5 +1,5 @@
     /**
-     * Removes a column in the table dynamically. if {@code columnIndex} is smaller than the primary
+     * Removes a column in the table dynamically. If {@code columnIndex} is smaller than the primary
      * key column index, {@link #invalidateCachedPrimaryKeyIndex()} will be called to recalculate the
      * primary key column index.
      *
@@ -10,15 +10,15 @@
      */
     @Override
     public void removeColumn(long columnIndex) {
-        // Check the PK column index before removing a column. We don't know if we're hitting a PK col,
+        // Checks the PK column index before removing a column. We don't know if we're hitting a PK col,
         // but it should be noted that once a column is removed, there is no way we can find whether
         // a PK exists or not.
         final long oldPkColumnIndex = getPrimaryKey();
 
-        // firstly remove a column. If there is no error, we can proceed. Otherwise, it will stop here.
+        // First removes a column. If there is no error, we can proceed. Otherwise, it will stop here.
         nativeRemoveColumn(nativePtr, columnIndex);
 
-        // Check if a PK exists and take actions if there is. This is same as hasPrimaryKey(), but
+        // Checks if a PK exists and takes actions if there is. This is same as hasPrimaryKey(), but
         // this relies on the local cache.
         if (oldPkColumnIndex >= 0) {
 

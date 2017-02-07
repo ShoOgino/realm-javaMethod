@@ -1,16 +1,16 @@
     @Test
     public void releaseCacheInOneThread() {
-        // Test release typed Realm instance
+        // Tests release typed Realm instance.
         Realm realmA = RealmCache.createRealmOrGetFromCache(defaultConfig, Realm.class);
         Realm realmB = RealmCache.createRealmOrGetFromCache(defaultConfig, Realm.class);
         RealmCache.release(realmA);
         assertNotNull(realmA.sharedRealm);
         RealmCache.release(realmB);
         assertNull(realmB.sharedRealm);
-        // No crash but warning in the log
+        // No crash but warning in the log.
         RealmCache.release(realmB);
 
-        // Test release dynamic Realm instance
+        // Tests release dynamic Realm instance.
         DynamicRealm dynamicRealmA = RealmCache.createRealmOrGetFromCache(defaultConfig,
                 DynamicRealm.class);
         DynamicRealm dynamicRealmB = RealmCache.createRealmOrGetFromCache(defaultConfig,
@@ -19,10 +19,10 @@
         assertNotNull(dynamicRealmA.sharedRealm);
         RealmCache.release(dynamicRealmB);
         assertNull(dynamicRealmB.sharedRealm);
-        // No crash but warning in the log
+        // No crash but warning in the log.
         RealmCache.release(dynamicRealmB);
 
-        // Test both typed Realm and dynamic Realm in same thread
+        // Tests both typed Realm and dynamic Realm in same thread.
         realmA = RealmCache.createRealmOrGetFromCache(defaultConfig, Realm.class);
         dynamicRealmA = RealmCache.createRealmOrGetFromCache(defaultConfig, DynamicRealm.class);
         RealmCache.release(realmA);

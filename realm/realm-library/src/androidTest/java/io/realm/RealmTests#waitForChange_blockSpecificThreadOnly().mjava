@@ -1,4 +1,4 @@
-    // Test if waitForChange still blocks if stopWaitForChange has been called for a realm in a different thread.
+    // Tests if waitForChange still blocks if stopWaitForChange has been called for a realm in a different thread.
     @Test
     public void waitForChange_blockSpecificThreadOnly() throws InterruptedException {
         final CountDownLatch bgRealmsOpened = new CountDownLatch(2);
@@ -8,7 +8,7 @@
         final AtomicLong bgRealmWaitForChangeResult = new AtomicLong(0);
         final AtomicReference<Realm> bgRealm = new AtomicReference<Realm>();
 
-        // wait in background
+        // Waits in background.
         Thread thread1 = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -37,7 +37,7 @@
 
         TestHelper.awaitOrFail(bgRealmsOpened);
         bgRealm.get().stopWaitForChange();
-        // wait for Thread 2 to wait
+        // Waits for Thread 2 to wait.
         Thread.sleep(500);
         populateTestRealm();
         TestHelper.awaitOrFail(bgRealmsClosed);

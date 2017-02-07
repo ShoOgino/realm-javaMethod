@@ -1,6 +1,6 @@
     // The presence of async RealmResults block any `REALM_CHANGE` notification causing historically the Realm
     // to advance to the latest version. We make sure in this test that all Realm listeners will be notified
-    // regardless of the presence of an async RealmResults that will delay the `REALM_CHANGE` sometimes
+    // regardless of the presence of an async RealmResults that will delay the `REALM_CHANGE` sometimes.
     @Test
     @RunTestInLooperThread
     public void asyncRealmResultsShouldNotBlockBackgroundCommitNotification() {
@@ -16,7 +16,7 @@
             @Override
             public void onChange(RealmResults<Dog> results) {
                 if (dogs.size() == 2) {
-                    // Results has the latest changes
+                    // Results has the latest changes.
                     resultsListenerDone.set(true);
                     if (realmListenerDone.get()) {
                         looperThread.testComplete();
@@ -29,7 +29,7 @@
             @Override
             public void onChange(Realm element) {
                 if (dogs.size() == 1) {
-                    // Step 2. Create the second dog
+                    // Step 2. Creates the second dog.
                     realm.executeTransactionAsync(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
@@ -37,7 +37,7 @@
                         }
                     });
                 } else if (dogs.size() == 2) {
-                    // Realm listener can see the latest changes
+                    // Realm listener can see the latest changes.
                     realmListenerDone.set(true);
                     if (resultsListenerDone.get()) {
                         looperThread.testComplete();
@@ -46,7 +46,7 @@
             }
         });
 
-        // Step 1. Create the first dog
+        // Step 1. Creates the first dog.
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

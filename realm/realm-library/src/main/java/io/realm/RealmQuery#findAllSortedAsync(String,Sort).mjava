@@ -11,17 +11,17 @@
         checkQueryIsNotReused();
         long columnIndex = getColumnIndexForSort(fieldName);
 
-        // capture the query arguments for future retries & update
+        // Captures the query arguments for future retries & updates.
         argumentsHolder = new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_ALL_SORTED);
         argumentsHolder.sortOrder = sortOrder;
         argumentsHolder.columnIndex = columnIndex;
 
         final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();
 
-        // handover the query (to be used by a worker thread)
+        // Handovers the query (to be used by a worker thread).
         final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
 
-        // we need to use the same configuration to open a background SharedRealm to perform the query
+        // We need to use the same configuration to open a background SharedRealm to perform the query.
         final RealmConfiguration realmConfiguration = realm.getConfiguration();
 
         RealmResults<E> realmResults;
@@ -46,7 +46,7 @@
 
                         long columnIndex = getColumnIndexForSort(fieldName);
 
-                        // run the query & handover the table view for the caller thread
+                        // Runs the query & handover the table view for the caller thread.
                         long handoverTableViewPointer = TableQuery.findAllSortedWithHandover(sharedRealm,
                                  handoverQueryPointer, columnIndex, sortOrder);
 

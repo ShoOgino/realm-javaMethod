@@ -1,4 +1,4 @@
-    // test for https://github.com/realm/realm-java/issues/1646
+    // Test for https://github.com/realm/realm-java/issues/1646
     @Test
     public void closingRealmWhileOtherThreadIsOpeningRealm() throws Exception {
         final CountDownLatch startLatch = new CountDownLatch(1);
@@ -28,11 +28,11 @@
             }
         }.start();
 
-        // prevent for another thread to enter Realm.createAndValidate().
+        // Prevents for another thread to enter Realm.createAndValidate().
         synchronized (BaseRealm.class) {
             startLatch.countDown();
 
-            // wait for another thread's entering Realm.createAndValidate().
+            // Waits for another thread's entering Realm.createAndValidate().
             SystemClock.sleep(100L);
 
             realm.close();

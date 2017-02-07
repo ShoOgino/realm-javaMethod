@@ -2,14 +2,14 @@
     public void shouldThrowWhenSetIndexOnWrongRealmFieldType() {
         for (long colIndex = 0; colIndex < t.getColumnCount(); colIndex++) {
 
-            // All types supported addSearchIndex and removeSearchIndex
+            // All types supported addSearchIndex and removeSearchIndex.
             boolean exceptionExpected = (
                             t.getColumnType(colIndex) != RealmFieldType.STRING &&
                             t.getColumnType(colIndex) != RealmFieldType.INTEGER &&
                             t.getColumnType(colIndex) != RealmFieldType.BOOLEAN &&
                             t.getColumnType(colIndex) != RealmFieldType.DATE);
 
-            // Try to addSearchIndex()
+            // Tries to addSearchIndex().
             try {
                 t.addSearchIndex(colIndex);
                 if (exceptionExpected) {
@@ -18,9 +18,9 @@
             } catch (IllegalArgumentException ignored) {
             }
 
-            // Try to removeSearchIndex()
+            // Tries to removeSearchIndex().
             try {
-                // Currently core will do nothing if the column doesn't have a search index
+                // Currently core will do nothing if the column doesn't have a search index.
                 t.removeSearchIndex(colIndex);
                 if (exceptionExpected) {
                     fail("Expected exception for colIndex " + colIndex);
@@ -29,7 +29,7 @@
             }
 
 
-            // Try to hasSearchIndex() for all columnTypes
+            // Tries to hasSearchIndex() for all columnTypes.
             t.hasSearchIndex(colIndex);
         }
     }

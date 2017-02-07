@@ -1,10 +1,10 @@
-    // UC 1 Async RealmResults
+    // UC 1 Async RealmResults.
     @Test
     @RunTestInLooperThread
     public void callback_with_relevant_commit_realmresults_async() {
         final Realm realm = looperThread.realm;
 
-        // Step 1: Trigger global Realm change listener
+        // Step 1: Triggers global Realm change listener.
         realm.beginTransaction();
         final Dog akamaru = realm.createObject(Dog.class);
         akamaru.setName("Akamaru");
@@ -16,7 +16,7 @@
         dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
             public void onChange(RealmResults<Dog> object) {
-                // Step 4: Respond to relevant change
+                // Step 4: Responds to relevant change.
                 int commits = typebasedCommitInvocations.incrementAndGet();
                 switch (commits) {
                     case 2:
@@ -35,20 +35,20 @@
                 int commits = globalCommitInvocations.incrementAndGet();
                 switch (commits) {
                     case 1:
-                        // Step 2: Trigger non-related commit
+                        // Step 2: Triggers non-related commit.
                         realm.beginTransaction();
                         realm.commitTransaction();
                         break;
 
                     case 2:
-                        // Step 3: Trigger related commit
+                        // Step 3: Triggers related commit.
                         realm.beginTransaction();
                         akamaru.setAge(17);
                         realm.commitTransaction();
                         break;
 
                     case 3:
-                        // Step 5: Complete test
+                        // Step 5: Completes test.
                         looperThread.postRunnable(new Runnable() {
                             @Override
                             public void run() {

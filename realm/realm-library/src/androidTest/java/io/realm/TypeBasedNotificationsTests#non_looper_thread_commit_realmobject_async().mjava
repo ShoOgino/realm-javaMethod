@@ -1,6 +1,6 @@
-    // UC 3 Async RealmObject
-    // 1. Create RealmObject async query
-    // 2. Wait COMPLETED_ASYNC_REALM_OBJECT then commit transaction in another non-looper thread
+    // UC 3 Async RealmObject.
+    // 1. Creates RealmObject async query.
+    // 2. Waits COMPLETED_ASYNC_REALM_OBJECT then commits transaction in another non-looper thread.
     // 3. Listener on the RealmObject gets triggered again.
     @Test
     @RunTestInLooperThread
@@ -9,7 +9,7 @@
         realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm object) {
-                // Check if the 2nd transaction is committed.
+                // Checks if the 2nd transaction is committed.
                 if (realm.where(Dog.class).count() == 2) {
                     looperThread.postRunnable(new Runnable() {
                         @Override

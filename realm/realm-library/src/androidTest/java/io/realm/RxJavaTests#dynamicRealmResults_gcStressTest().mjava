@@ -14,7 +14,7 @@
         realm.commitTransaction();
 
         for (int i = 0; i < TEST_SIZE; i++) {
-            // Don't keep a reference to the Observable
+            // Doesn't keep a reference to the Observable.
             realm.where(AllTypes.CLASS_NAME).equalTo(AllTypes.FIELD_LONG, i).findAllAsync().asObservable()
                     .filter(new Func1<RealmResults<DynamicRealmObject>, Boolean>() {
                         @Override
@@ -22,11 +22,11 @@
                             return results.isLoaded();
                         }
                     })
-                    .take(1) // Unsubscribes from Realm
+                    .take(1) // Unsubscribes from Realm.
                     .subscribe(new Action1<RealmResults<DynamicRealmObject>>() {
                         @Override
                         public void call(RealmResults<DynamicRealmObject> result) {
-                            // Not guaranteed, but can result in the GC of other RealmResults waiting for a result
+                            // Not guaranteed, but can result in the GC of other RealmResults waiting for a result.
                             Runtime.getRuntime().gc();
                             if (innerCounter.incrementAndGet() == TEST_SIZE) {
                                 realm.close();

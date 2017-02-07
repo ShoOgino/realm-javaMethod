@@ -1,12 +1,12 @@
-    // Make sure we don't get the run into the IllegalStateException
+    // Makes sure we don't get the run into the IllegalStateException.
     // (Caller thread behind the worker thread)
     // Scenario:
-    // - Caller thread is in version 1, start an asyncFindFirst
-    // - Another thread advance the Realm, now the latest version = 2
-    // - The worker thread should query against version 1 not version 2
-    // otherwise the caller thread wouldn't be able to import the result
+    // - Caller thread is in version 1, starts an asyncFindFirst.
+    // - Another thread advances the Realm, now the latest version = 2.
+    // - The worker thread should query against version 1 not version 2.
+    // Otherwise the caller thread wouldn't be able to import the result.
     // - The notification mechanism will guarantee that the REALM_CHANGE triggered by
-    // the background thread, will update the caller thread (advancing it to version 2)
+    // the background thread, will update the caller thread (advancing it to version 2).
     @Test
     @RunTestInLooperThread
     public void testFindFirstUsesCallerThreadVersion() throws Throwable {
@@ -26,12 +26,12 @@
             }
         });
 
-        // advance the background Realm
+        // Advances the background Realm.
         new Thread() {
             @Override
             public void run() {
                 Realm bgRealm = Realm.getInstance(looperThread.realmConfiguration);
-                // Advancing the Realm without generating notifications
+                // Advances the Realm without generating notifications.
                 bgRealm.sharedRealm.beginTransaction();
                 bgRealm.sharedRealm.commitTransaction();
                 Realm.asyncTaskExecutor.resume();

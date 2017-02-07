@@ -1,12 +1,12 @@
-    // similar UC as #testFindAllAsyncBatchUpdate using 'findAllSortedMulti'
+    // Similar UC as #testFindAllAsyncBatchUpdate using 'findAllSortedMulti'.
     // UC:
-    //   1- insert 10 objects
-    //   2- start 2 async queries to find all objects [0-9] & objects[0-4]
-    //   3- assert both RealmResults are empty (Worker Thread didn't complete)
-    //   4- the queries will complete with the same version as the caller thread
-    //   5- using a background thread update the Realm
-    //   6- now REALM_CHANGED will trigger a COMPLETED_UPDATE_ASYNC_QUERIES that should update all queries
-    //   7- callbacks are notified with the latest results (called twice overall)
+    //   1- Inserts 10 objects.
+    //   2- Starts 2 async queries to find all objects [0-9] & objects[0-4].
+    //   3- Asserts both RealmResults are empty (Worker Thread didn't complete).
+    //   4- The queries will complete with the same version as the caller thread.
+    //   5- Using a background thread updates the Realm.
+    //   6- Now REALM_CHANGED will trigger a COMPLETED_UPDATE_ASYNC_QUERIES that should update all queries.
+    //   7- Callbacks are notified with the latest results (called twice overall).
     @Test
     @RunTestInLooperThread
     public void findAllSortedAsync_multipleFields_batchUpdate() throws Throwable {
@@ -15,7 +15,7 @@
         final AtomicInteger numberOfIntercept = new AtomicInteger(0);
         Realm realm = looperThread.realm;
 
-        // 1. Add initial objects
+        // 1. Adds initial objects.
         realm.setAutoRefresh(false);
         realm.beginTransaction();
         for (int i = 0; i < 5; ) {
@@ -30,7 +30,7 @@
         realm.commitTransaction();
         realm.setAutoRefresh(true);
 
-        // 2. Configure interceptor
+        // 2. Configures interceptor.
         final Handler handler = new HandlerProxy(realm.handlerController) {
             @Override
             public boolean onInterceptInMessage(int what) {
@@ -63,14 +63,14 @@
         };
         realm.setHandler(handler);
 
-        // 3. Create 2 async queries
+        // 3. Creates 2 async queries.
         final RealmResults<AllTypes> realmResults1 = realm.where(AllTypes.class)
                 .findAllSortedAsync("columnString", Sort.ASCENDING, "columnLong", Sort.DESCENDING);
         final RealmResults<AllTypes> realmResults2 = realm.where(AllTypes.class)
                 .between("columnLong", 0, 5)
                 .findAllSortedAsync("columnString", Sort.DESCENDING, "columnLong", Sort.ASCENDING);
 
-        // 4. Assert that queries have not finished
+        // 4. Asserts that queries have not finished.
         assertFalse(realmResults1.isLoaded());
         assertFalse(realmResults2.isLoaded());
         assertEquals(0, realmResults1.size());
@@ -80,8 +80,8 @@
         assertEquals(0, realmResults1.size());
         assertEquals(0, realmResults2.size());
 
-        // 5. Change listeners will be called twice. Once when the first query completely and then
-        // when the background thread has completed, notifying this thread to rerun and then receive
+        // 5. Changes listeners will be called twice. Once when the first query has completed and then
+        // when the background thread has completed, notifies this thread to rerun and then receives
         // the updated results.
         final Runnable signalCallbackDone = new Runnable() {
             private AtomicInteger signalCallbackFinished = new AtomicInteger(2);
@@ -103,7 +103,7 @@
             @Override
             public void onChange(RealmResults<AllTypes> object) {
                 switch (numberOfNotificationsQuery1.incrementAndGet()) {
-                    case 1: // first callback invocation
+                    case 1: // First callback invocation
                         assertTrue(realmResults1.isLoaded());
                         assertEquals(10, realmResults1.size());
 
@@ -131,14 +131,14 @@
                         assertEquals(1, realmResults1.get(9).getColumnLong());
                         break;
 
-                    case 2: // second callback
+                    case 2: // Second callback
                         assertTrue(realmResults1.isLoaded());
                         assertEquals(12, realmResults1.size());
-                        //first
+                        // First
                         assertEquals("data 0", realmResults1.get(0).getColumnString());
                         assertEquals(3, realmResults1.get(0).getColumnLong());
 
-                        //last
+                        // Last
                         assertEquals("data 5", realmResults1.get(11).getColumnString());
                         assertEquals(0, realmResults1.get(11).getColumnLong());
 
@@ -152,7 +152,7 @@
             @Override
             public void onChange(RealmResults<AllTypes> object) {
                 switch (numberOfNotificationsQuery2.incrementAndGet()) {
-                    case 1: // first callback invocation
+                    case 1: // First callback invocation
                         assertTrue(realmResults2.isLoaded());
                         assertEquals(10, realmResults2.size());
 
@@ -180,7 +180,7 @@
                         assertEquals(3, realmResults2.get(9).getColumnLong());
                         break;
 
-                    case 2: // second callback
+                    case 2: // Second callback
                         assertTrue(realmResults2.isLoaded());
                         assertEquals(12, realmResults2.size());
 

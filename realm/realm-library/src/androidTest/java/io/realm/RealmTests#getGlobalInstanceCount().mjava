@@ -5,15 +5,15 @@
         final RealmConfiguration config = configFactory.createConfiguration("globalCountTest");
         assertEquals(0, Realm.getGlobalInstanceCount(config));
 
-        // Open thread local Realm
+        // Opens thread local Realm.
         Realm realm = Realm.getInstance(config);
         assertEquals(1, Realm.getGlobalInstanceCount(config));
 
-        // Open thread local DynamicRealm
+        // Opens thread local DynamicRealm.
         DynamicRealm dynRealm = DynamicRealm.getInstance(config);
         assertEquals(2, Realm.getGlobalInstanceCount(config));
 
-        // Open Realm in another thread
+        // Opens Realm in another thread.
         new Thread(new Runnable() {
             @Override
             public void run() {

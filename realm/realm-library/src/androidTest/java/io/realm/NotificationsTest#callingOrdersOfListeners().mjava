@@ -19,7 +19,7 @@
                 new RealmChangeListener<RealmResults<AllTypes>>() {
                     @Override
                     public void onChange(RealmResults<AllTypes> element) {
-                        // First called
+                        // First called.
                         assertEquals(0, count.getAndIncrement());
                     }
                 };
@@ -27,14 +27,14 @@
         final RealmChangeListener<AllTypes> syncedObjectListener = new RealmChangeListener<AllTypes>() {
             @Override
             public void onChange(AllTypes element) {
-                // Second called
+                // Second called.
                 assertEquals(1, count.getAndIncrement());
             }
         };
         final RealmChangeListener<Realm> globalListener = new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm element) {
-                // third called
+                // Third called.
                 assertEquals(2, count.getAndIncrement());
                 looperThread.testComplete();
             }
@@ -45,23 +45,23 @@
         final AllTypes allTypes = realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
-        // We need to create one objects first and let the pass the first change event
+        // We need to create one objects first and let the pass the first change event.
         final RealmChangeListener<Realm> initListener = new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm element) {
                 looperThread.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        // Clear the change listeners
+                        // Clears the change listeners.
                         realm.removeAllChangeListeners();
 
-                        // Now we can start testing
+                        // Now we can start testing.
                         allTypes.addChangeListener(syncedObjectListener);
                         RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
                         results.addChangeListener(syncedResultsListener);
                         realm.addChangeListener(globalListener);
 
-                        // Now we trigger those listeners
+                        // Now we trigger those listeners.
                         realm.executeTransactionAsync(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {

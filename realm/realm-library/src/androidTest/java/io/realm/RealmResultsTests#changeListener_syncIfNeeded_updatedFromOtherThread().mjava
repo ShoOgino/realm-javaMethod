@@ -7,7 +7,7 @@
         final RealmResults<AllTypes> results = realm.where(AllTypes.class).lessThan(AllTypes.FIELD_LONG, 10).findAll();
         assertEquals(10, results.size());
 
-        // 1. Delete first object from another thread.
+        // 1. Deletes first object from another thread.
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -16,7 +16,7 @@
         }, new Realm.Transaction.OnSuccess() {
             @Override
             public void onSuccess() {
-                // 2. RealmResults are refreshed before onSuccess is called
+                // 2. RealmResults are refreshed before onSuccess is called.
                 assertEquals(9, results.size());
                 realm.close();
                 looperThread.testComplete();

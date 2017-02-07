@@ -1,5 +1,5 @@
-    // handlerController#emptyAsyncRealmObject is accessed from different threads
-    // make sure that we iterate over it safely without any race condition (ConcurrentModification)
+    // handlerController#emptyAsyncRealmObject is accessed from different threads.
+    // Makes sure that we iterate over it safely without any race condition (ConcurrentModification).
     @Test
     @UiThreadTest
     public void concurrentModificationEmptyAsyncRealmObject() {
@@ -20,8 +20,8 @@
         final WeakReference<RealmObjectProxy> weakReference2 = new WeakReference<RealmObjectProxy>((RealmObjectProxy)dog2);
 
         final RealmQuery<Dog> dummyQuery = RealmQuery.createQuery(realm, Dog.class);
-        // Initialize the emptyAsyncRealmObject map, to make sure that iterating is safe
-        // even if we modify the map from a background thread (in case of an empty findFirstAsync)
+        // Initializes the emptyAsyncRealmObject map, to make sure that iterating is safe
+        // even if we modify the map from a background thread (in case of an empty findFirstAsync).
         realm.handlerController.emptyAsyncRealmObject.put(weakReference1, dummyQuery);
 
         final CountDownLatch dogAddFromBg = new CountDownLatch(1);
@@ -29,13 +29,13 @@
         AtomicBoolean fireOnce = new AtomicBoolean(true);
         while (iterator.hasNext()) {
             Dog next = (Dog) iterator.next().getKey().get();
-            // add a new Dog from a background thread
+            // Adds a new Dog from a background thread.
             if (fireOnce.compareAndSet(true, false)) {
                 new Thread() {
                     @Override
                     public void run() {
-                        // add a WeakReference to simulate an empty row using a findFirstAsync
-                        // this is added on an Executor thread, hence the dedicated thread
+                        // Adds a WeakReference to simulate an empty row using a findFirstAsync.
+                        // This is added on an Executor thread, hence the dedicated thread.
                         realm.handlerController.emptyAsyncRealmObject.put(weakReference2, dummyQuery);
                         dogAddFromBg.countDown();
                     }

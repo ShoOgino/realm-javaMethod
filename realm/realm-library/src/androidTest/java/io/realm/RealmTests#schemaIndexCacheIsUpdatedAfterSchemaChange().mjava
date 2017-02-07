@@ -6,7 +6,7 @@
         final long nameIndex = catColumnInfo.nameIndex;
         final AtomicLong nameIndexNew = new AtomicLong(-1L);
 
-        // change column index of "name"
+        // Changes column index of "name".
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -21,17 +21,17 @@
                 nameIndexNew.set(newIndex);
             }
         });
-        // we need ↓ to update index cache if the schema version was changed in the same thread.
+        // We need to update index cache if the schema version was changed in the same thread.
         realm.sharedRealm.invokeSchemaChangeListenerIfSchemaChanged();
 
-        // check if the index was changed
+        // Checks if the index was changed.
         assertNotEquals(nameIndex, nameIndexNew);
 
-        // check if index in the ColumnInfo is updated
+        // Checks if index in the ColumnInfo is updated.
         assertEquals(nameIndexNew.get(), catColumnInfo.nameIndex);
         assertEquals(nameIndexNew.get(), (long) catColumnInfo.getIndicesMap().get(Cat.FIELD_NAME));
 
-        // check by actual get and set
+        // Checks by actual get and set.
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {

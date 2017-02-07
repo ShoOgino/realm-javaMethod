@@ -1,5 +1,5 @@
-    // keep advancing the Realm by sending 1 commit for each frame (16ms)
-    // the async queries should keep up with the modification
+    // Keeps advancing the Realm by sending 1 commit for each frame (16ms).
+    // The async queries should keep up with the modification.
     @Test
     @RunTestInLooperThread
     public void stressTestBackgroundCommits() throws Throwable {
@@ -8,7 +8,7 @@
         final long[] latestLongValue = new long[1];
         final float[] latestFloatValue = new float[1];
 
-        // start a background thread that pushes a commit every 16ms
+        // Starts a background thread that pushes a commit every 16ms.
         final Thread backgroundThread = new Thread() {
             @Override
             public void run() {
@@ -23,7 +23,7 @@
                     object.setColumnLong(latestLongValue[0]);
                     backgroundThreadRealm.commitTransaction();
 
-                    // Wait 16ms. before adding the next commit.
+                    // Waits 16ms. Before adding the next commit.
                     SystemClock.sleep(16);
                 }
                 backgroundThreadRealm.close();

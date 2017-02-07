@@ -61,7 +61,7 @@
                     }
 
                     final Throwable backgroundException = exception[0];
-                    // Send response as the final step to ensure the bg thread quit before others get the response!
+                    // Sends response as the final step to ensure the bg thread quit before others get the response!
                     if (hasValidNotifier() && !Thread.currentThread().isInterrupted()) {
 
                         if (transactionCommitted) {
@@ -79,7 +79,7 @@
                             });
                         }
 
-                        // Send errors directly to the looper, so they don't get intercepted by the HandlerController.
+                        // Sends errors directly to the looper, so they don't get intercepted by the HandlerController.
                         if (backgroundException != null) {
                             if (onError != null) {
                                 sharedRealm.realmNotifier.post(new Runnable() {
@@ -105,7 +105,7 @@
                         }
 
                     } else {
-                        // Throw exception in the worker thread if the caller thread terminated
+                        // Throws exception in the worker thread if the caller thread terminated.
                         if (backgroundException != null) {
                             if (backgroundException instanceof RuntimeException) {
                                 //noinspection ThrowFromFinallyBlock

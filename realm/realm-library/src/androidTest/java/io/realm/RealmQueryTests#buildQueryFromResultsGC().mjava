@@ -3,7 +3,7 @@
     @Test
     public void buildQueryFromResultsGC() {
         // According to the testing, setting this to 10 can almost certainly trigger the GC.
-        // Use 30 here can ensure GC happen. (Tested with 4.3 1G Ram and 5.0 3G Ram)
+        // Uses 30 here can ensure GC happen. (Tested with 4.3 1G Ram and 5.0 3G Ram)
         final int count = 30;
         RealmResults<CatOwner> results = realm.where(CatOwner.class).findAll();
 
@@ -11,7 +11,7 @@
             @SuppressWarnings({"unused"})
             byte garbage[] = TestHelper.allocGarbage(0);
             results = results.where().findAll();
-            System.gc(); // if a native resource has a reference count = 0, doing GC here might lead to a crash
+            System.gc(); // If a native resource has a reference count = 0, doing GC here might lead to a crash.
         }
     }
 

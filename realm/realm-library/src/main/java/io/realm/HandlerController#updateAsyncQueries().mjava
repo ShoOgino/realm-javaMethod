@@ -1,24 +1,24 @@
     private void updateAsyncQueries() {
         if (updateAsyncQueriesTask != null && !updateAsyncQueriesTask.isDone()) {
-            // try to cancel any pending update since we're submitting a new one anyway
+            // Tries to cancel any pending update since we're submitting a new one anyway.
             updateAsyncQueriesTask.cancel(true);
             Realm.asyncTaskExecutor.getQueue().remove(updateAsyncQueriesTask);
             RealmLog.trace("REALM_CHANGED realm: %s cancelling pending COMPLETED_UPDATE_ASYNC_QUERIES updates", HandlerController.this);
         }
         RealmLog.trace("REALM_CHANGED realm: %s updating async queries, total: %d", HandlerController.this, asyncRealmResults.size());
-        // prepare a QueryUpdateTask to current async queries in this thread
+        // Prepares a QueryUpdateTask to current async queries in this thread.
         QueryUpdateTask.Builder.UpdateQueryStep updateQueryStep = QueryUpdateTask.newBuilder()
                 .realmConfiguration(realm.getConfiguration());
         QueryUpdateTask.Builder.RealmResultsQueryStep realmResultsQueryStep = null;
 
-        // we iterate over non GC'd async RealmResults then add them to the list to be updated (in a batch)
+        // We iterate over non GC'd async RealmResults then add them to the list to be updated (in a batch).
         Iterator<Map.Entry<WeakReference<RealmResults<? extends RealmModel>>, RealmQuery<?>>> iterator = asyncRealmResults.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<WeakReference<RealmResults<? extends RealmModel>>, RealmQuery<?>> entry = iterator.next();
             WeakReference<RealmResults<? extends RealmModel>> weakReference = entry.getKey();
             RealmResults<? extends RealmModel> realmResults = weakReference.get();
             if (realmResults == null) {
-                // GC'd instance remove from the list
+                // GC'd instance remove from the list.
                 iterator.remove();
 
             } else {
@@ -27,12 +27,12 @@
                         entry.getValue().getArgument());
             }
 
-            // Note: we're passing an WeakRef of a RealmResults to another thread
-            //       this is safe as long as we don't invoke any of the RealmResults methods.
-            //       we're just using it as a Key in an IdentityHashMap (i.e doesn't call
+            // Note: We're passing an WeakRef of a RealmResults to another thread.
+            //       This is safe as long as we don't invoke any of the RealmResults methods.
+            //       We're just using it as a Key in an IdentityHashMap (i.e doesn't call
             //       AbstractList's hashCode, that require accessing objects from another thread)
             //
-            //       watch out when you debug, as you're IDE try to evaluate RealmResults
+            //       Watch out when you debug, as you're IDE try to evaluate RealmResults
             //       which break the Thread confinement constraints.
         }
         if (realmResultsQueryStep != null) {

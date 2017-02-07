@@ -6,16 +6,16 @@
      */
     private void validateConfiguration(RealmConfiguration newConfiguration) {
         if (configuration.equals(newConfiguration)) {
-            // Same configuration objects
+            // Same configuration objects.
             return;
         }
 
-        // Check that encryption keys aren't different. key is not in RealmConfiguration's toString.
+        // Checks that encryption keys aren't different. key is not in RealmConfiguration's toString.
         if (!Arrays.equals(configuration.getEncryptionKey(), newConfiguration.getEncryptionKey())) {
             throw new IllegalArgumentException(DIFFERENT_KEY_MESSAGE);
         } else {
             // A common problem is that people are forgetting to override `equals` in their custom migration class.
-            // Try to detect this problem specifically so we can throw a better error message.
+            // Tries to detect this problem specifically so we can throw a better error message.
             RealmMigration newMigration = newConfiguration.getMigration();
             RealmMigration oldMigration = configuration.getMigration();
             if (oldMigration != null 

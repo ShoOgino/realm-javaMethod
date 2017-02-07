@@ -1,6 +1,6 @@
     // Realm validation & initialization is done once, still ColumnIndices
     // should be populated for the subsequent Realm sharing the same configuration
-    // even if we skip initialization & validation
+    // even if we skip initialization & validation.
     @Test
     public void columnIndicesIsPopulatedWhenSkippingInitialization() throws Throwable {
         final RealmConfiguration realmConfiguration = configFactory.createConfiguration("columnIndices");
@@ -12,7 +12,7 @@
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Realm realm = Realm.getInstance(realmConfiguration); // This will populate columnIndices
+                Realm realm = Realm.getInstance(realmConfiguration); // This will populate columnIndices.
                 try {
                     bgRealmOpened.countDown();
                     TestHelper.awaitOrFail(mainThreadRealmDone);
@@ -30,7 +30,7 @@
 
         TestHelper.awaitOrFail(bgRealmOpened);
         Realm realm = Realm.getInstance(realmConfiguration);
-        realm.where(AllTypes.class).equalTo("columnString", "Foo").findAll(); // This would crash if columnIndices == null
+        realm.where(AllTypes.class).equalTo("columnString", "Foo").findAll(); // This would crash if columnIndices == null.
         realm.close();
         mainThreadRealmDone.countDown();
         TestHelper.awaitOrFail(bgRealmClosed);
