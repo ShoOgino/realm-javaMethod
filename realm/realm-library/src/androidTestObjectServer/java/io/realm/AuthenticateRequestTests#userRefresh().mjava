@@ -1,10 +1,10 @@
     @Test
     public void userRefresh() throws URISyntaxException, JSONException {
         Token t = SyncTestUtils.createTestUser().getSyncUser().getUserToken();
-        AuthenticateRequest request = AuthenticateRequest.userRefresh(t);
+        AuthenticateRequest request = AuthenticateRequest.userRefresh(t, new URI("realm://objectserver/" + t.identity() + "/default"));
 
         JSONObject obj = new JSONObject(request.toJson());
-        assertFalse(obj.has("path"));
+        assertTrue(obj.has("path"));
         assertEquals(t.value(), obj.get("data"));
         assertEquals("realm", obj.get("provider"));
     }

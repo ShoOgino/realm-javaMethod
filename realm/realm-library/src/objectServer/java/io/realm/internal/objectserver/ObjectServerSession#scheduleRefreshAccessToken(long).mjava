@@ -1,0 +1,26 @@
+    private void scheduleRefreshAccessToken(long expireDateInMs) {
+        // calculate the delay time before which we should refresh the access_token,
+        // we adjust to 10 second to proactively refresh the access_token before the session
+        // hit the expire date on the token
+        long refreshAfter =  expireDateInMs - System.currentTimeMillis() - REFRESH_MARGIN_DELAY;
+        if (refreshAfter < 0) {
+            // Token already expired
+            RealmLog.debug("Expires time already reached for the access token, refreshing now");
+            refreshAccessToken();
+
+        } else {
+            RealmLog.debug("Scheduling an access_token refresh in " + (refreshAfter) + " milliseconds");
+            if (refreshTokenTask != null) {
+                refreshTokenTask.cancel();
+            }
+
+            ScheduledFuture<?> task = REFRESH_TOKENS_EXECUTOR.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    refreshAccessToken();
+                }
+            }, refreshAfter, TimeUnit.MILLISECONDS);
+            refreshTokenTask = new RealmAsyncTaskImpl(task, REFRESH_TOKENS_EXECUTOR);
+        }
+    }
+
