@@ -1,12 +1,20 @@
     @Test
     public void addListener_shouldBeCalledWhenRefreshAfterLocalCommit() {
-        final CountDownLatch latch = new CountDownLatch(1);
-        Collection collection = new Collection(sharedRealm, table.where());
+        final CountDownLatch latch = new CountDownLatch(2);
+        final Collection collection = new Collection(sharedRealm, table.where());
         assertEquals(4, collection.size()); // See `populateData()`
         collection.addListener(collection, new RealmChangeListener<Collection>() {
             @Override
             public void onChange(Collection element) {
-                assertEquals(latch.getCount(), 1);
+                if (latch.getCount() == 2) {
+                    // triggered by beginTransaction
+                    assertEquals(4, collection.size());
+                } else if (latch.getCount() == 1) {
+                    // triggered by refresh
+                    assertEquals(5, collection.size());
+                } else {
+                    fail();
+                }
                 latch.countDown();
             }
         });
