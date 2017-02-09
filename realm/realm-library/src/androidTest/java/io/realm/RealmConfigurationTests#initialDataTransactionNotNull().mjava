@@ -1,6 +1,6 @@
     @Test
     public void initialDataTransactionNotNull() {
-        // Remove default instance
+        // Removes default instance.
         Realm.deleteRealm(defaultConfig);
 
         RealmConfiguration configuration = configFactory.createConfigurationBuilder()
@@ -14,7 +14,7 @@
 
         realm = Realm.getInstance(configuration);
 
-        // First time check for initial data
+        // First time check for initial data.
         assertEquals(1, realm.where(AllTypes.class).count());
         assertEquals(1, realm.where(Owner.class).count());
         assertEquals(1, realm.where(Cat.class).count());
@@ -27,7 +27,7 @@
 
         realm.close();
         realm = Realm.getInstance(configuration);
-        // Check if there is still the same data
+        // Checks if there is still the same data.
         assertEquals(0, realm.where(AllTypes.class).count());
         assertEquals(1, realm.where(Owner.class).count());
         assertEquals(1, realm.where(Cat.class).count());

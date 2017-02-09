@@ -1,18 +1,18 @@
     @Test
     public void getInstance_referenceCounting() {
-        // At this point reference count should be one because of the setUp method
+        // At this point reference count should be one because of the setUp method.
         try {
             realm.where(AllTypes.class).count();
         } catch (IllegalStateException e) {
             fail();
         }
 
-        // Make sure the reference counter is per realm file
+        // Makes sure the reference counter is per realm file.
         RealmConfiguration anotherConfig = configFactory.createConfiguration("anotherRealm.realm");
         Realm.deleteRealm(anotherConfig);
         Realm otherRealm = Realm.getInstance(anotherConfig);
 
-        // Raise the reference
+        // Raises the reference.
         Realm realm = null;
         try {
             realm = Realm.getInstance(configFactory.createConfiguration());
@@ -21,7 +21,7 @@
         }
 
         try {
-            // This should not fail because the reference is now 1
+            // This should not fail because the reference is now 1.
             if (realm != null) {
                 realm.where(AllTypes.class).count();
             }

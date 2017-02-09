@@ -3,6 +3,10 @@
         if (networkRequest != null) {
             networkRequest.cancel();
         }
+        // clear any previously scheduled refresh access_token
+        // since we're going to obtain a new refresh_token
+        clearScheduledAccessTokenRefresh();
+
         // Authenticate in a background thread. This allows incremental backoff and retries in a safe manner.
         Future<?> task = SyncManager.NETWORK_POOL_EXECUTOR.submit(new ExponentialBackoffTask<AuthenticateResponse>() {
             @Override
@@ -22,6 +26,8 @@
                         configuration.shouldDeleteRealmOnLogout()
                 );
                 user.addRealm(configuration.getServerUrl(), desc);
+                // schedule a token refresh before it expires
+                scheduleRefreshAccessToken(response.getAccessToken().expiresMs());
                 onSuccess.run();
             }
 

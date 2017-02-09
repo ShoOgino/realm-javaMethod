@@ -6,7 +6,7 @@
         final CountDownLatch backgroundThread1Started = new CountDownLatch(1);
         final CountDownLatch backgroundThread2Closed = new CountDownLatch(1);
 
-        // Create Handler on Thread1 by opening a Realm instance
+        // Creates Handler on Thread1 by opening a Realm instance.
         new Thread("thread1") {
 
             @Override
@@ -26,7 +26,7 @@
             }
         }.start();
 
-        // Create Handler on Thread2 for the same Realm path and close the Realm instance again.
+        // Creates Handler on Thread2 for the same Realm path and closes the Realm instance again.
         new Thread("thread2") {
             @Override
             public void run() {
@@ -51,7 +51,7 @@
         Realm realm = Realm.getInstance(realmConfig);
         realm.beginTransaction();
         realm.commitTransaction();
-        // Any REALM_CHANGED message should now only reach the open Handler on Thread1
+        // Any REALM_CHANGED message should now only reach the open Handler on Thread1.
         try {
             // TODO: Waiting 5 seconds is not a reliable condition. Figure out a better way for this.
             if (!handlerNotified.await(5, TimeUnit.SECONDS)) {

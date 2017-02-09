@@ -1,7 +1,7 @@
     @Test
     public void namedPipeDirForExternalStorage() {
 
-        // test for https://github.com/realm/realm-java/issues/3140
+        // Test for https://github.com/realm/realm-java/issues/3140
         realm.close();
         realm = null;
 
@@ -18,7 +18,7 @@
                 .build();
         Realm.deleteRealm(config);
 
-        // test if it works when the namedPipeDir is empty.
+        // Test if it works when the namedPipeDir is empty.
         Realm realmOnExternalStorage = Realm.getInstance(config);
         realmOnExternalStorage.close();
 
@@ -26,7 +26,7 @@
 
         Assume.assumeTrue("SELinux is not enforced on this device.", TestHelper.isSelinuxEnforcing());
 
-        // Only check the fifo file created by call, since all Realm instances share the same fifo created by
+        // Only checks the fifo file created by call, since all Realm instances share the same fifo created by
         // external_commit_helper which might not be created in the newly created dir if there are Realm instances
         // are not deleted when TestHelper.deleteRecursively(namedPipeDir) called.
         File[] files = namedPipeDir.listFiles(new FilenameFilter() {
@@ -37,7 +37,7 @@
         });
         assertEquals(1, files.length);
 
-        // test if it works when the namedPipeDir and the named pipe files already exist.
+        // Tests if it works when the namedPipeDir and the named pipe files already exist.
         realmOnExternalStorage = Realm.getInstance(config);
         realmOnExternalStorage.close();
     }

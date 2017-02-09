@@ -5,12 +5,12 @@
         RealmMigration migration = new RealmMigration() {
             @Override
             public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
-                // Let us set a new class name
+                // Let us set a new class name.
                 realm.getSchema()
                         .get(MigrationPrimaryKey.CLASS_NAME)
                         .setClassName(MigrationClassRenamed.CLASS_NAME);
 
-                // Then recreate the original schema to see if Realm is going to get confused.
+                // Then recreates the original schema to see if Realm is going to get confused.
                 // Unlike the first time with buildInitialMigrationSchema(), we will not have a primary key.
                 realm.getSchema()
                         .create(MigrationPrimaryKey.CLASS_NAME)

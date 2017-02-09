@@ -18,14 +18,14 @@
         long classColumn = pkTable.getColumnIndex("pk_table");
         pkTable.removeSearchIndex(classColumn);
 
-        // Try to add a pk for another table
+        // Tries to add a pk for another table.
         Table table2 = sharedRealm.getTable("TestTable2");
         long column2 = table2.addColumn(RealmFieldType.INTEGER, "PKColumn");
         table2.addSearchIndex(column2);
         try {
             table2.setPrimaryKey(column2);
         } catch (RealmError ignored) {
-            // Column has no search index
+            // Column has no search index.
         }
 
         assertFalse(pkTable.hasSearchIndex(classColumn));

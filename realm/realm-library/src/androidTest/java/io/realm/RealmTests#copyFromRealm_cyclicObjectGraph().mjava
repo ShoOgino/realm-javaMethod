@@ -1,7 +1,7 @@
-    // Test that the object graph is copied as it is and no extra copies are made
+    // Tests that the object graph is copied as it is and no extra copies are made.
     // 1) (A -> B/[B,C])
     // 2) (C -> B/[B,A])
-    // A copy should result in only 3 distinct objects
+    // A copy should result in only 3 distinct objects.
     @Test
     public void copyFromRealm_cyclicObjectGraph() {
         realm.beginTransaction();
@@ -27,7 +27,7 @@
         assertEquals("B", copyB.getName());
         assertEquals("C", copyC.getName());
 
-        // Assert object equality on the object graph
+        // Asserts object equality on the object graph.
         assertTrue(copyA.getObject() == copyC.getObject());
         assertTrue(copyA.getObjects().get(0) == copyC.getObjects().get(0));
         assertTrue(copyA == copyC.getObjects().get(1));

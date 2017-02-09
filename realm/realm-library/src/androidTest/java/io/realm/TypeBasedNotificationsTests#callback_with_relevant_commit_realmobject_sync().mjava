@@ -1,7 +1,7 @@
     // ********************************************************************************* //
     // UC 1.
-    // Callback should be invoked after a relevant commit (one that should impact the
-    // query from which we obtained our RealmObject or RealmResults)
+    // Callback should be invoked after a relevant commit. (one that should impact the
+    // query from which we obtained our RealmObject or RealmResults.)
     // ********************************************************************************* //
     // UC 1 for Sync RealmObject
     @Test
@@ -9,7 +9,7 @@
     public void callback_with_relevant_commit_realmobject_sync() {
         final Realm realm = looperThread.realm;
 
-        // Step 1: Create object
+        // Step 1: Creates object
         realm.beginTransaction();
         final Dog akamaru = realm.createObject(Dog.class);
         akamaru.setName("Akamaru");
@@ -20,7 +20,7 @@
         dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
             public void onChange(Dog object) {
-                // Step 3: Respond to relevant change
+                // Step 3: Responds to relevant change.
                 typebasedCommitInvocations.incrementAndGet();
                 assertEquals("Akamaru", dog.getName());
                 assertEquals(17, dog.getAge());

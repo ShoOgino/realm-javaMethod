@@ -7,13 +7,13 @@
      * @return the new object.
      * @throws RealmException if the primary key is defined in the model class or an object cannot be created.
      */
-    // called from proxy classes
+    // Called from proxy classes.
     <E extends RealmModel> E createObjectInternal(
             Class<E> clazz,
             boolean acceptDefaultValue,
             List<String> excludeFields) {
         Table table = schema.getTable(clazz);
-        // Check and throw the exception earlier for a better exception message.
+        // Checks and throws the exception earlier for a better exception message.
         if (table.hasPrimaryKey()) {
             throw new RealmException(String.format("'%s' has a primary key, use" +
                     " 'createObject(Class<E>, Object)' instead.", Table.tableNameToClassName(table.getName())));

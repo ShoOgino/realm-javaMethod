@@ -1,10 +1,10 @@
-    // UC 1 Async RealmObject
+    // UC 1 Async RealmObject.
     @Test
     @RunTestInLooperThread
     public void callback_with_relevant_commit_realmobject_async() {
         final Realm realm = looperThread.realm;
 
-        // Step 1: Create object
+        // Step 1: Creates object.
         realm.beginTransaction();
         final Dog akamaru = realm.createObject(Dog.class);
         akamaru.setName("Akamaru");
@@ -22,14 +22,14 @@
                         assertEquals("Akamaru", dog.getName());
                         assertEquals(0, dog.getAge());
 
-                        // Step 2: Trigger non-related commit
+                        // Step 2: Triggers non-related commit.
                         realm.executeTransactionAsync(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
                             }
                         });
 
-                        // Step 3: Trigger related commit
+                        // Step 3: Triggers related commit.
                         realm.executeTransactionAsync(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
@@ -39,7 +39,7 @@
                         break;
 
                     case 2:
-                        // Step 4: Respond to relevant change
+                        // Step 4: Responds to relevant change.
                         assertEquals(17, dog.getAge());
                         looperThread.testComplete();
                         break;

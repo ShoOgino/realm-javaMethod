@@ -2,14 +2,14 @@
     public void updateFromJson_defaultValuesAreIgnored() throws JSONException {
         final long fieldLongPrimaryKeyValue = DefaultValueOfField.FIELD_LONG_PRIMARY_KEY_DEFAULT_VALUE + 1;
 
-        // Step 1: Create an object with default values
+        // Step 1: Creates an object with default values.
         final DefaultValueOfField original;
         realm.beginTransaction(); {
             original = realm.createObject(DefaultValueOfField.class, fieldLongPrimaryKeyValue);
         }
         realm.commitTransaction();
 
-        // Step 2: Prepare JSON
+        // Step 2: Prepares JSON.
         final String fieldIgnoredValue = DefaultValueOfField.FIELD_IGNORED_DEFAULT_VALUE + ".modified";
         final String fieldStringValue = DefaultValueOfField.FIELD_STRING_DEFAULT_VALUE + ".modified";
         final String fieldRandomStringValue = "non-random";
@@ -45,26 +45,26 @@
                 original.getFieldObject().getFieldRandomPrimaryKey());
         fieldObjectJson.put(RandomPrimaryKey.FIELD_INT, fieldObjectIntValue);
         json.put(DefaultValueOfField.FIELD_OBJECT, fieldObjectJson);
-        // value for 'fieldList'
+        // Value for 'fieldList'
         final JSONArray fieldListArrayJson = new JSONArray();
-        final JSONObject fieldListItem0Json = new JSONObject(); // to be added
+        final JSONObject fieldListItem0Json = new JSONObject(); // To be added.
         fieldListItem0Json.put(RandomPrimaryKey.FIELD_RANDOM_PRIMARY_KEY,  "unique value");
         fieldListItem0Json.put(RandomPrimaryKey.FIELD_INT, fieldListIntValue);
         fieldListArrayJson.put(fieldListItem0Json);
-        final JSONObject fieldListItem1Json = new JSONObject(); // to be updated
+        final JSONObject fieldListItem1Json = new JSONObject(); // To be updated.
         fieldListItem1Json.put(RandomPrimaryKey.FIELD_RANDOM_PRIMARY_KEY,
                 original.getFieldList().first().getFieldRandomPrimaryKey());
         fieldListItem1Json.put(RandomPrimaryKey.FIELD_INT, fieldListIntValue + 1);
         fieldListArrayJson.put(fieldListItem1Json);
         json.put(DefaultValueOfField.FIELD_LIST, fieldListArrayJson);
 
-        // Step 3: Update with JSONObject
+        // Step 3: Updates with JSONObject.
         realm.beginTransaction();
         final DefaultValueOfField managedObj = realm.createOrUpdateObjectFromJson(DefaultValueOfField.class, json);
         realm.commitTransaction();
 
-        // Step 4: Check that properly updated
-        assertEquals(DefaultValueOfField.FIELD_IGNORED_DEFAULT_VALUE/*not fieldIgnoredValue*/,
+        // Step 4: Checks that properly updated.
+        assertEquals(DefaultValueOfField.FIELD_IGNORED_DEFAULT_VALUE /* not fieldIgnoredValue */,
                 managedObj.getFieldIgnored());
         assertEquals(fieldStringValue, managedObj.getFieldString());
         assertEquals(fieldRandomStringValue, managedObj.getFieldRandomString());
@@ -86,7 +86,7 @@
                 managedObj.getFieldList().get(1).getFieldRandomPrimaryKey());
         assertEquals(fieldListIntValue + 1, managedObj.getFieldList().get(1).getFieldInt());
 
-        // make sure that excess object by default value is not created.
+        // Makes sure that excess object by default value is not created.
         assertEquals(3/* 2 updated + 1 added*/, realm.where(RandomPrimaryKey.class).count());
     }
 

@@ -1,14 +1,14 @@
     @Test
     public void getInstance_referenceCounting_doubleClose() {
         realm.close();
-        realm.close(); // Count down once too many. Counter is now potentially negative
+        realm.close(); // Counts down once too many. Counter is now potentially negative.
         realm = Realm.getInstance(configFactory.createConfiguration());
         realm.beginTransaction();
         AllTypes allTypes = realm.createObject(AllTypes.class);
         RealmResults<AllTypes> queryResult = realm.where(AllTypes.class).findAll();
         assertEquals(allTypes, queryResult.get(0));
         realm.commitTransaction();
-        realm.close(); // This might not close the Realm if the reference count is wrong
+        realm.close(); // This might not close the Realm if the reference count is wrong.
 
         // This should now fail due to the Realm being fully closed.
         thrown.expect(IllegalStateException.class);

@@ -4,13 +4,13 @@
         final long numberOfObjects = 10;
         populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
 
-        // all objects
+        // All objects
         RealmResults<AnnotationIndexTypes> allResults = realm.where(AnnotationIndexTypes.class).findAll();
         assertEquals("All Objects Count", numberOfBlocks * numberOfBlocks * numberOfObjects, allResults.size());
-        // distinctive dates
+        // Distinctive dates
         RealmResults<AnnotationIndexTypes> distinctDates = allResults.distinct(AnnotationIndexTypes.FIELD_INDEX_DATE);
         assertEquals("Distinctive Dates", numberOfBlocks, distinctDates.size());
-        // distinctive Booleans
+        // Distinctive Booleans
         RealmResults<AnnotationIndexTypes> distinctBooleans = distinctDates.distinct(AnnotationIndexTypes.FIELD_INDEX_BOOL);
         assertEquals("Distinctive Booleans", 2, distinctBooleans.size());
         // distinct results are not the same object

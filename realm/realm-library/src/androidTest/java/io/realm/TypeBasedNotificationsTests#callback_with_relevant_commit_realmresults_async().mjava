@@ -1,10 +1,10 @@
-    // UC 1 Async RealmResults
+    // UC 1 Async RealmResults.
     @Test
     @RunTestInLooperThread
     public void callback_with_relevant_commit_realmresults_async() {
         final Realm realm = looperThread.realm;
 
-        // Step 1: Create object
+        // Step 1: Creates object.
         realm.beginTransaction();
         final Dog akamaru = realm.createObject(Dog.class);
         akamaru.setName("Akamaru");
@@ -15,7 +15,7 @@
         dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
             public void onChange(RealmResults<Dog> object) {
-                // Step 4: Respond to relevant change
+                // Step 4: Responds to relevant change.
                 int commits = typebasedCommitInvocations.incrementAndGet();
                 switch (commits) {
                     case 1:
@@ -30,7 +30,7 @@
                             }
                         });
 
-                        // Step 3: Trigger related commit
+                        // Step 3: Triggers related commit.
                         realm.executeTransactionAsync(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {

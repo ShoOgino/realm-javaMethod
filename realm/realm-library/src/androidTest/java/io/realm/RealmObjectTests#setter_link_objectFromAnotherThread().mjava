@@ -10,7 +10,7 @@
             public void run() {
                 Realm realm = Realm.getInstance(realmConfig);
 
-                // 1. create an object
+                // 1. Creates an object.
                 realm.beginTransaction();
                 objFromAnotherThread.set(realm.createObject(CyclicType.class));
                 realm.commitTransaction();
@@ -21,14 +21,14 @@
                 } catch (InterruptedException ignored) {
                 }
 
-                // 3. close Realm in this thread and finish.
+                // 3. Closes Realm in this thread and finishes.
                 realm.close();
             }
         };
         thread.start();
 
         createLatch.await();
-        // 2. set created object to target
+        // 2. Sets created object to target.
         realm.beginTransaction();
         try {
             CyclicType target = realm.createObject(CyclicType.class);
@@ -42,7 +42,7 @@
             realm.cancelTransaction();
         }
 
-        // wait for finishing the thread
+        // Waits for finishing the thread.
         thread.join();
     }
 

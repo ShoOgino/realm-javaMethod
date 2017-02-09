@@ -6,7 +6,7 @@
      * @return a schema object for renamed class.
      */
     public RealmObjectSchema rename(String oldClassName, String newClassName) {
-        realm.checkNotInSync(); // destructive modifications are not permitted
+        realm.checkNotInSync(); // Destructive modifications are not permitted.
         checkEmpty(oldClassName, "Class names cannot be empty or null");
         checkEmpty(newClassName, "Class names cannot be empty or null");
         String oldInternalName = TABLE_PREFIX + oldClassName;
@@ -16,7 +16,7 @@
             throw new IllegalArgumentException(oldClassName + " cannot be renamed because the new class already exists: " + newClassName);
         }
 
-        // Check if there is a primary key defined for the old class.
+        // Checks if there is a primary key defined for the old class.
         Table oldTable = getTable(oldClassName);
         String pkField = null;
         if (oldTable.hasPrimaryKey()) {
@@ -27,7 +27,7 @@
         realm.sharedRealm.renameTable(oldInternalName, newInternalName);
         Table table = realm.sharedRealm.getTable(newInternalName);
 
-        // Set the primary key for the new class if necessary
+        // Sets the primary key for the new class if necessary.
         if (pkField != null) {
             table.setPrimaryKey(pkField);
         }
