@@ -10,25 +10,25 @@
      */
     void notifyAllListeners(List<RealmResults<? extends RealmModel>> realmResultsToBeNotified) {
 
-        // Notify all RealmResults (async and synchronous).
+        // Notifies all RealmResults (async and synchronous).
         for (Iterator<RealmResults<? extends RealmModel>> it = realmResultsToBeNotified.iterator(); !realm.isClosed() && it.hasNext(); ) {
             RealmResults<? extends RealmModel> realmResults = it.next();
             realmResults.notifyChangeListeners(false);
         }
 
-        // Notify all loaded RealmObjects
+        // Notifies all loaded RealmObjects.
         notifyRealmObjectCallbacks();
 
-        // Re-run any async single objects that are still not loaded.
+        // Re-runs any async single objects that are still not loaded.
         // TODO: Why is this here? This was not called in `completedAsyncQueriesUpdate()`. Problem?
         if (!realm.isClosed() && threadContainsAsyncEmptyRealmObject()) {
             updateAsyncEmptyRealmObject();
         }
 
-        // Notify any completed async transactions
+        // Notifies any completed async transactions.
         notifyAsyncTransactionCallbacks();
 
-        // Trigger global listeners last.
+        // Triggers global listeners last.
         // Note that NotificationTest.callingOrdersOfListeners will fail if orders change.
         notifyGlobalListeners();
     }

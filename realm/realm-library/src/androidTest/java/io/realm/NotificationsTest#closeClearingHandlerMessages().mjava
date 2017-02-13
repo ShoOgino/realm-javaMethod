@@ -8,18 +8,18 @@
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                Looper.prepare(); // Fake background thread with a looper, eg. a IntentService
+                Looper.prepare(); // Fake background thread with a looper, eg. a IntentService.
                 Realm realm = Realm.getInstance(realmConfig);
                 backgroundLooperStarted.countDown();
 
-                // Random operation in the client code
+                // Random operation in the client code.
                 final RealmResults<Dog> dogs = realm.where(Dog.class).findAll();
                 if (dogs.size() != 0) {
                     return false;
                 }
-                addHandlerMessages.await(1, TimeUnit.SECONDS); // Wait for main thread to add update messages
+                addHandlerMessages.await(1, TimeUnit.SECONDS); // Wait for main thread to add update messages.
 
-                // Create a Handler for the thread now. All message and references for the notification handler will be
+                // Creates a Handler for the thread now. All message and references for the notification handler will be
                 // cleared once we call close().
                 Handler threadHandler = new Handler(Looper.myLooper());
                 realm.close(); // Close native resources + associated handlers.
@@ -46,10 +46,10 @@
             }
         });
 
-        // Wait until the looper is started on a background thread
+        // Waits until the looper is started on a background thread.
         backgroundLooperStarted.await(1, TimeUnit.SECONDS);
 
-        // Execute a transaction that will trigger a Realm update
+        // Executes a transaction that will trigger a Realm update.
         Realm realm = Realm.getInstance(realmConfig);
         realm.beginTransaction();
         for (int i = 0; i < TEST_SIZE; i++) {
@@ -61,7 +61,7 @@
         realm.close();
         addHandlerMessages.countDown();
 
-        // Check that messages was properly cleared
+        // Checks that messages was properly cleared.
         // It looks like getting this future sometimes takes a while for some reason. Setting to
         // 10s. now.
         Boolean result = future.get(10, TimeUnit.SECONDS);

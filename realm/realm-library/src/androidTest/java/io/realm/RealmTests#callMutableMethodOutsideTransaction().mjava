@@ -1,12 +1,12 @@
-    // Test that all methods that require a transaction (ie. any function that mutates Realm data)
+    // Tests that all methods that require a transaction. (ie. any function that mutates Realm data)
     @Test
     public void callMutableMethodOutsideTransaction() throws JSONException, IOException {
 
-        // Prepare unmanaged object data
+        // Prepares unmanaged object data.
         AllTypesPrimaryKey t = new AllTypesPrimaryKey();
         List<AllTypesPrimaryKey> ts = Arrays.asList(t, t);
 
-        // Prepare JSON data
+        // Prepares JSON data.
         String jsonObjStr = "{ \"columnLong\" : 1 }";
         JSONObject jsonObj = new JSONObject(jsonObjStr);
         InputStream jsonObjStream = TestHelper.stringToStream(jsonObjStr);
@@ -17,7 +17,7 @@
         InputStream jsonArrStream = TestHelper.stringToStream(jsonArrStr);
         InputStream jsonArrStream2 = TestHelper.stringToStream(jsonArrStr);
 
-        // Test all methods that should require a transaction
+        // Tests all methods that should require a transaction.
         try { realm.createObject(AllTypes.class);   fail(); } catch (IllegalStateException expected) {}
         try { realm.copyToRealm(t);                 fail(); } catch (IllegalStateException expected) {}
         try { realm.copyToRealm(ts);                fail(); } catch (IllegalStateException expected) {}

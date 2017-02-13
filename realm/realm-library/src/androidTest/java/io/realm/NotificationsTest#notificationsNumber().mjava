@@ -33,13 +33,13 @@
             }
         });
 
-        // Wait until the looper in the background thread is started
+        // Waits until the looper in the background thread is started.
         while (!isReady.get()) {
             Thread.sleep(5);
         }
         Thread.sleep(100);
 
-        // Trigger OnRealmChanged on background thread
+        // Triggers OnRealmChanged on background thread.
         realm = Realm.getInstance(realmConfig);
         realm.beginTransaction();
         Dog dog = realm.createObject(Dog.class);
@@ -54,7 +54,7 @@
             looper[0].quit();
         }
 
-        // Wait until the Looper thread is actually closed
+        // Waits until the Looper thread is actually closed.
         while (isRealmOpen.get()) {
             Thread.sleep(5);
         }

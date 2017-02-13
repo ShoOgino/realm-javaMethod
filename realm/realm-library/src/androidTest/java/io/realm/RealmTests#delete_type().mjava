@@ -1,29 +1,29 @@
     @Test
     public void delete_type() {
-        // ** delete non existing table should succeed
+        // ** Deletes non existing table should succeed.
         realm.beginTransaction();
         realm.delete(AllTypes.class);
         realm.commitTransaction();
 
-        // ** delete existing class, but leave other classes classes
+        // ** Deletes existing class, but leaves other classes classes.
 
-        // Add two classes
+        // Adds two classes.
         populateTestRealm();
         realm.beginTransaction();
         Dog dog = realm.createObject(Dog.class);
         dog.setName("Castro");
         realm.commitTransaction();
-        // Clear
+        // Clears.
         realm.beginTransaction();
         realm.delete(Dog.class);
         realm.commitTransaction();
-        // Check one class is cleared but other class is still there
+        // Checks one class is cleared but other class is still there.
         RealmResults<AllTypes> resultListTypes = realm.where(AllTypes.class).findAll();
         assertEquals(TEST_DATA_SIZE, resultListTypes.size());
         RealmResults<Dog> resultListDogs = realm.where(Dog.class).findAll();
         assertEquals(0, resultListDogs.size());
 
-        // ** delete() must throw outside a transaction
+        // ** delete() must throw outside a transaction.
         try {
             realm.delete(AllTypes.class);
             fail("Expected exception");

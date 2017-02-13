@@ -1,4 +1,4 @@
-    // Test that an async transaction that throws an exception propagate it properly to the user.
+    // Tests that an async transaction that throws an exception propagate it properly to the user.
     @Test
     @RunTestInLooperThread
     public void executeTransactionAsync_exceptionHandling() throws Throwable {
@@ -14,7 +14,7 @@
             public void execute(Realm realm) {
                 Owner owner = realm.createObject(Owner.class);
                 owner.setName("Owner");
-                realm.cancelTransaction(); // Cancel the transaction then throw
+                realm.cancelTransaction(); // Cancels the transaction then throw.
                 throw new RuntimeException("Boom");
             }
         }, new Realm.Transaction.OnSuccess() {
@@ -25,7 +25,7 @@
         }, new Realm.Transaction.OnError() {
             @Override
             public void onError(Throwable error) {
-                // Ensure we are giving developers quality messages in the logs.
+                // Ensures we are giving developers quality messages in the logs.
                 assertEquals("Could not cancel transaction, not currently in a transaction.", testLogger.message);
                 RealmLog.remove(testLogger);
                 looperThread.testComplete();

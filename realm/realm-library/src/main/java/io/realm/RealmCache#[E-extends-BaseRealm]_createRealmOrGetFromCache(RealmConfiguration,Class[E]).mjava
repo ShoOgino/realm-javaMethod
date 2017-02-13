@@ -10,14 +10,14 @@
         boolean isCacheInMap = true;
         RealmCache cache = cachesMap.get(configuration.getPath());
         if (cache == null) {
-            // Create a new cache
+            // Creates a new cache.
             cache = new RealmCache(configuration);
             // The new cache should be added to the map later.
             isCacheInMap = false;
 
             copyAssetFileIfNeeded(configuration);
         } else {
-            // Throw the exception if validation failed.
+            // Throws the exception if validation failed.
             cache.validateConfiguration(configuration);
         }
 
@@ -37,7 +37,7 @@
         }
 
         if (refAndCount.localRealm.get() == null) {
-            // Create a new local Realm instance
+            // Creates a new local Realm instance
             BaseRealm realm;
 
 
@@ -64,7 +64,7 @@
         if (refCount == 0) {
             if (realmClass == Realm.class && refAndCount.globalCount == 0) {
                 final BaseRealm realm = refAndCount.localRealm.get();
-                // store a copy of local ColumnIndices as a global cache.
+                // Stores a copy of local ColumnIndices as a global cache.
                 RealmCache.storeColumnIndices(cache.typedColumnIndicesArray, realm.schema.columnIndices.clone());
             }
             // This is the first instance in current thread, increase the global count.
@@ -75,7 +75,7 @@
         @SuppressWarnings("unchecked")
         E realm = (E) refAndCount.localRealm.get();
 
-        // Notify SyncPolicy that the Realm has been opened for the first time
+        // Notifies SyncPolicy that the Realm has been opened for the first time
         if (refAndCount.globalCount == 1) {
             ObjectServerFacade.getFacade(configuration.isSyncConfiguration()).realmOpened(configuration);
         }

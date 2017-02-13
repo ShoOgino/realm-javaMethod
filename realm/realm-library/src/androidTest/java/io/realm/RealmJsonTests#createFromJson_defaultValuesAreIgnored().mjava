@@ -2,7 +2,7 @@
     public void createFromJson_defaultValuesAreIgnored() throws JSONException {
         final long fieldLongPrimaryKeyValue = DefaultValueOfField.FIELD_LONG_PRIMARY_KEY_DEFAULT_VALUE + 1;
 
-        // Step 1: Prepare JSON
+        // Step 1: Prepares JSON.
         final String fieldIgnoredValue = DefaultValueOfField.FIELD_IGNORED_DEFAULT_VALUE + ".modified";
         final String fieldStringValue = DefaultValueOfField.FIELD_STRING_DEFAULT_VALUE + ".modified";
         final String fieldRandomStringValue = "non-random";
@@ -32,12 +32,12 @@
         json.put(DefaultValueOfField.FIELD_BOOLEAN, fieldBooleanValue);
         json.put(DefaultValueOfField.FIELD_DATE, ISO8601Utils.format(fieldDateValue, true));
         json.put(DefaultValueOfField.FIELD_BINARY, Base64.encodeToString(fieldBinaryValue, Base64.DEFAULT));
-        // value for 'fieldObject'
+        // Value for 'fieldObject'
         final JSONObject fieldObjectJson = new JSONObject();
         fieldObjectJson.put(RandomPrimaryKey.FIELD_RANDOM_PRIMARY_KEY, "pk of fieldObject");
         fieldObjectJson.put(RandomPrimaryKey.FIELD_INT, fieldObjectIntValue);
         json.put(DefaultValueOfField.FIELD_OBJECT, fieldObjectJson);
-        // value for 'fieldList'
+        // Value for 'fieldList'
         final JSONArray fieldListArrayJson = new JSONArray();
         final JSONObject fieldListItem0Json = new JSONObject();
         fieldListItem0Json.put(RandomPrimaryKey.FIELD_RANDOM_PRIMARY_KEY, "pk1 of fieldList");
@@ -49,13 +49,13 @@
         fieldListArrayJson.put(fieldListItem1Json);
         json.put(DefaultValueOfField.FIELD_LIST, fieldListArrayJson);
 
-        // Step 3: Update with JSONObject
+        // Step 3: Updates with JSONObject.
         realm.beginTransaction();
         final DefaultValueOfField managedObj = realm.createOrUpdateObjectFromJson(DefaultValueOfField.class, json);
         realm.commitTransaction();
 
-        // Step 4: Check that properly created
-        assertEquals(DefaultValueOfField.FIELD_IGNORED_DEFAULT_VALUE/*not fieldIgnoredValue*/,
+        // Step 4: Checks that properly created.
+        assertEquals(DefaultValueOfField.FIELD_IGNORED_DEFAULT_VALUE /* not fieldIgnoredValue */,
                 managedObj.getFieldIgnored());
         assertEquals(fieldStringValue, managedObj.getFieldString());
         assertEquals(fieldRandomStringValue, managedObj.getFieldRandomString());
@@ -80,7 +80,7 @@
                 managedObj.getFieldList().get(1).getFieldRandomPrimaryKey());
         assertEquals(fieldListIntValue + 1, managedObj.getFieldList().get(1).getFieldInt());
 
-        // make sure that excess object by default value is not created.
+        // Makes sure that excess object by default value is not created.
         assertEquals(3, realm.where(RandomPrimaryKey.class).count());
     }
 

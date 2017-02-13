@@ -14,7 +14,7 @@
                 .schema(StringOnly.class)
                 .build();
 
-        // 1. Write a copy of the encrypted Realm to a new file
+        // 1. Writes a copy of the encrypted Realm to a new file.
         Realm testRealm = Realm.getInstance(config);
         File copiedRealm = new File(config.getRealmDirectory(), "encrypted-copy.realm");
         if (copiedRealm.exists()) {
@@ -23,13 +23,13 @@
         testRealm.writeEncryptedCopyTo(copiedRealm, newPassword);
         testRealm.close();
 
-        // 2. Delete the old Realm.
+        // 2. Deletes the old Realm.
         Realm.deleteRealm(config);
 
-        // 3. Rename the new file to the old file name.
+        // 3. Renames the new file to the old file name.
         assertTrue(copiedRealm.renameTo(new File(config.getRealmDirectory(), REALM_NAME)));
 
-        // 4. Try to open the file again with the new password
+        // 4. Tries to open the file again with the new password.
         // If the configuration cache wasn't cleared this would fail as we would detect two
         // configurations with 2 different passwords pointing to the same file.
         RealmConfiguration newConfig = configFactory.createConfigurationBuilder()

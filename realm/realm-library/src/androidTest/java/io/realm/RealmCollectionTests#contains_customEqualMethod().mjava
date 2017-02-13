@@ -1,0 +1,13 @@
+    // Test that the custom equal methods is being used when testing if an object is part of the
+    // collection
+    @Test
+    public void contains_customEqualMethod() {
+        RealmCollection<CustomMethods> collection = createCustomMethodsCollection(realm, collectionClass);
+        // This custom equals method will only consider the field `name` when comparing objects.
+        // So this unmanaged version should be equal to any object with the same value, managed
+        // or not.
+        assertTrue(collection.contains(new CustomMethods("Child0")));
+        assertTrue(collection.contains(new CustomMethods("Child" + (TEST_SIZE - 1))));
+        assertFalse(collection.contains(new CustomMethods("Child" + TEST_SIZE)));
+    }
+

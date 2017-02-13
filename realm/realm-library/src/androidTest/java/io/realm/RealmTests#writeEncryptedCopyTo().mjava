@@ -4,7 +4,7 @@
         long before = realm.where(AllTypes.class).count();
         assertEquals(TEST_DATA_SIZE, before);
 
-        // Configure test realms
+        // Configures test realms.
         final String ENCRYPTED_REALM_FILE_NAME = "encryptedTestRealm.realm";
         final String RE_ENCRYPTED_REALM_FILE_NAME = "reEncryptedTestRealm.realm";
         final String DECRYPTED_REALM_FILE_NAME = "decryptedTestRealm.realm";
@@ -17,21 +17,21 @@
 
         RealmConfiguration decryptedRealmConfig = configFactory.createConfiguration(DECRYPTED_REALM_FILE_NAME);
 
-        // Write encrypted copy from a unencrypted Realm
+        // Writes encrypted copy from a unencrypted Realm.
         File destination = new File(encryptedRealmConfig.getPath());
         realm.writeEncryptedCopyTo(destination, encryptedRealmConfig.getEncryptionKey());
 
         Realm encryptedRealm = null;
         try {
 
-            // Verify encrypted Realm and write new encrypted copy with a new key
+            // Verifies encrypted Realm and writes new encrypted copy with a new key.
             encryptedRealm = Realm.getInstance(encryptedRealmConfig);
             assertEquals(TEST_DATA_SIZE, encryptedRealm.where(AllTypes.class).count());
 
             destination = new File(reEncryptedRealmConfig.getPath());
             encryptedRealm.writeEncryptedCopyTo(destination, reEncryptedRealmConfig.getEncryptionKey());
 
-            // Verify re-encrypted copy
+            // Verifies re-encrypted copy.
             Realm reEncryptedRealm = null;
             try {
                 reEncryptedRealm = Realm.getInstance(reEncryptedRealmConfig);
@@ -45,11 +45,11 @@
                 }
             }
 
-            // Write non-encrypted copy from the encrypted version
+            // Writes non-encrypted copy from the encrypted version.
             destination = new File(decryptedRealmConfig.getPath());
             encryptedRealm.writeEncryptedCopyTo(destination, null);
 
-            // Verify decrypted Realm and cleanup
+            // Verifies decrypted Realm and cleans up.
             Realm decryptedRealm = null;
             try {
                 decryptedRealm = Realm.getInstance(decryptedRealmConfig);

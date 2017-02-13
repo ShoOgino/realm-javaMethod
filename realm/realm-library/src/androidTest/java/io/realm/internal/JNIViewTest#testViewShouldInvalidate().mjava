@@ -6,22 +6,22 @@
         t.add(3);
 
         TableView view = t.where().equalTo(new long[]{0}, 2).findAll();
-        // access view is ok.
+        // Access view is ok.
         assertEquals(1, view.size());
 
-        // access view after change in value is ok
+        // Access view after change in value is ok.
         t.setLong(0, 0, 3, false);
         accessingViewOk(view);
 
-        // access view after additions to table must fail
+        // Access view after additions to table must fail.
         t.add(4);
         accessingViewMustThrow(view);
 
-        // recreate view to access again
+        // Recreates view to access again.
         view = t.where().equalTo(new long[]{0}, 2).findAll();
         accessingViewOk(view);
 
-        // Removing any row in Table should invalidate view
+        // Removing any row in Table should invalidate view.
         t.remove(3);
         accessingViewMustThrow(view);
     }

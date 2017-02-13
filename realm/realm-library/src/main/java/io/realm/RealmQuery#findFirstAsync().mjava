@@ -13,15 +13,15 @@
         checkQueryIsNotReused();
         final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();
 
-        // handover the query (to be used by a worker thread)
+        // Handovers the query (to be used by a worker thread).
         final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
 
-        // save query arguments (for future update)
+        // Saves query arguments (for future update).
         argumentsHolder = new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_FIRST);
 
         final RealmConfiguration realmConfiguration = realm.getConfiguration();
 
-        // prepare an empty reference of the RealmObject, so we can return it immediately (promise)
+        // Prepares an empty reference of the RealmObject, so we can return it immediately (promise)
         // then update it once the query complete in the background.
         final E result;
         if (isDynamicQuery()) {
@@ -46,7 +46,7 @@
                         sharedRealm = SharedRealm.getInstance(realmConfiguration);
 
                         long handoverRowPointer = TableQuery.findWithHandover(sharedRealm, handoverQueryPointer);
-                        if (handoverRowPointer == 0) { // empty row
+                        if (handoverRowPointer == 0) { // Empty row.
                             realm.handlerController.addToEmptyAsyncRealmObject(realmObjectWeakReference, RealmQuery.this);
                             realm.handlerController.removeFromAsyncRealmObject(realmObjectWeakReference);
                         }
@@ -61,7 +61,7 @@
 
                     } catch (Throwable e) {
                         RealmLog.error(e);
-                        // handler can't throw a checked exception need to wrap it into unchecked Exception
+                        // Handler can't throw a checked exception need to wrap it into unchecked Exception.
                         closeSharedRealmAndSendEventToNotifier(sharedRealm,
                                 weakNotifier, QueryUpdateTask.NotifyEvent.THROW_BACKGROUND_EXCEPTION, e);
                     } finally {

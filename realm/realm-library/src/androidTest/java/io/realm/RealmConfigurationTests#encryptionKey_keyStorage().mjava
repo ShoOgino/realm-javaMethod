@@ -1,6 +1,6 @@
     @Test
     public void encryptionKey_keyStorage() throws Exception {
-        // Generate a key and use it in a RealmConfiguration
+        // Generates a key and uses it in a RealmConfiguration.
         byte[] oldKey = TestHelper.getRandomKey(12345);
         byte[] key = oldKey;
         RealmConfiguration config = new RealmConfiguration.Builder(context)
@@ -8,13 +8,13 @@
                 .encryptionKey(key)
                 .build();
 
-        // Generate a different key and assign it to the same variable
+        // Generates a different key and assigns it to the same variable.
         byte[] newKey = TestHelper.getRandomKey(67890);
         MoreAsserts.assertNotEqual(key, newKey);
         key = newKey;
         MoreAsserts.assertEquals(key, newKey);
 
-        // Ensure that the stored key did not change
+        // Ensures that the stored key did not change.
         MoreAsserts.assertEquals(oldKey, config.getEncryptionKey());
     }
 

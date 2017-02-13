@@ -1,4 +1,4 @@
-    // Test that primary key constraints are actually removed
+    // Tests that primary key constraints are actually removed.
     @Test
     public void removingPrimaryKeyRemovesConstraint_typeSetters() {
         RealmConfiguration config = configFactory.createConfigurationBuilder()
@@ -10,14 +10,14 @@
         tbl.addColumn(RealmFieldType.STRING, "name");
         tbl.setPrimaryKey("name");
 
-        // Create first entry with name "Foo"
+        // Creates first entry with name "Foo".
         tbl.setString(0, tbl.addEmptyRow(), "Foo", false);
 
         long rowIndex = tbl.addEmptyRow();
         try {
-            tbl.setString(0, rowIndex, "Foo", false); // Try to create 2nd entry with name Foo
+            tbl.setString(0, rowIndex, "Foo", false); // Tries to create 2nd entry with name Foo.
         } catch (RealmPrimaryKeyConstraintException e1) {
-            tbl.setPrimaryKey(""); // Primary key check worked, now remove it and try again.
+            tbl.setPrimaryKey(""); // Primary key check worked, now removes it and tries again.
             try {
                 tbl.setString(0, rowIndex, "Foo", false);
                 return;

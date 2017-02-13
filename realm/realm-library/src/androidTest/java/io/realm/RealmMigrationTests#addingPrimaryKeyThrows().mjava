@@ -1,7 +1,7 @@
     @Test
     public void addingPrimaryKeyThrows() {
 
-        // Create v0 of the Realm
+        // Creates v0 of the Realm.
         RealmConfiguration originalConfig = configFactory.createConfigurationBuilder()
                 .schema(Thread.class)
                 .build();
@@ -12,13 +12,13 @@
             public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
                 RealmSchema schema = realm.getSchema();
                 schema.create("AnnotationTypes")
-                        .addField("id", long.class) // Forget to set @PrimaryKey
+                        .addField("id", long.class) // Forgets to set @PrimaryKey.
                         .addField("indexString", String.class, FieldAttribute.INDEXED)
                         .addField("notIndexString", String.class);
             }
         };
 
-        // Create v1 of the Realm
+        // Creates v1 of the Realm.
         RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                 .schemaVersion(1)
                 .schema(Thread.class, AnnotationTypes.class)

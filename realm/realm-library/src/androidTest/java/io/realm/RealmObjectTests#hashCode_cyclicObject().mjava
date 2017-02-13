@@ -4,11 +4,11 @@
         final CyclicType foo = createCyclicData();
         realm.commitTransaction();
 
-        // Check that the hash code is always the same between multiple calls.
+        // Checks that the hash code is always the same between multiple calls.
         assertEquals(foo.hashCode(), foo.hashCode());
-        // Check that the hash code is the same among same object
+        // Checks that the hash code is the same among same object.
         assertEquals(foo.hashCode(), realm.where(CyclicType.class).equalTo("name", foo.getName()).findFirst().hashCode());
-        // hash code is different from other objects.
+        // Hash code is different from other objects.
         assertNotEquals(foo.getObject().hashCode(), foo.hashCode());
 
         final int originalHashCode = foo.hashCode();
@@ -18,10 +18,10 @@
                 foo.setName(foo.getName() + "1234");
             }
         });
-        // Check that Updating the value of its field does not affect the hash code.
+        // Checks that Updating the value of its field does not affect the hash code.
         assertEquals(originalHashCode, foo.hashCode());
 
-        // Check the hash code of the object from a Realm in different file name.
+        // Checks the hash code of the object from a Realm in different file name.
         RealmConfiguration realmConfig_differentName = configFactory.createConfiguration(
                 "another_" + realmConfig.getRealmFileName());
         Realm realm_differentName = Realm.getInstance(realmConfig_differentName);
@@ -36,7 +36,7 @@
             realm_differentName.close();
         }
 
-        // Check the hash code of the object from a Realm in different directory.
+        // Checks the hash code of the object from a Realm in different directory.
         RealmConfiguration realmConfig_differentPath = configFactory.createConfiguration(
                 "anotherDir", realmConfig.getRealmFileName());
         Realm realm_differentPath = Realm.getInstance(realmConfig_differentPath);

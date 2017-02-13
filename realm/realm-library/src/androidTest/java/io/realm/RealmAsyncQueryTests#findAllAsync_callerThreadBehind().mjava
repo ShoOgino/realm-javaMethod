@@ -1,12 +1,12 @@
     // UC:
-    //   1- insert 10 objects
-    //   2- start 2 async queries to find all objects [0-9] & objects[0-4]
-    //   3- assert both RealmResults are empty (Worker Thread didn't complete)
-    //   4- start a third thread to insert 2 more elements
-    //   5- the third thread signal a REALM_CHANGE that should update all async queries
-    //   6- when the results from step [2] completes they should be ignored, since a pending
-    //      update (using the latest realm) for all async queries is in progress
-    //   7- onChange notification will be triggered once
+    //   1- Inserts 10 objects.
+    //   2- Starts 2 async queries to find all objects [0-9] & objects[0-4].
+    //   3- Asserts both RealmResults are empty (Worker Thread didn't complete).
+    //   4- Starts a third thread to insert 2 more elements.
+    //   5- The third thread signal a REALM_CHANGE that should update all async queries.
+    //   6- When the results from step [2] completes they should be ignored, since a pending
+    //      update (using the latest realm) for all async queries is in progress.
+    //   7- onChange notification will be triggered once.
     @Test
     @RunTestInLooperThread
     public void findAllAsync_callerThreadBehind() throws Throwable {
@@ -17,25 +17,25 @@
         final Realm realm = looperThread.realm;
         populateTestRealm(realm, 10);
 
-        // Configure Handler Interceptor
+        // Configures Handler Interceptor.
         final Handler handler = new HandlerProxy(realm.handlerController) {
             @Override
             public boolean onInterceptInMessage(int what) {
                 switch (what) {
                     case HandlerControllerConstants.REALM_CHANGED: {
-                        // should only intercept the first REALM_CHANGED coming from the
-                        // background update thread
+                        // Should only intercept the first REALM_CHANGED coming from the
+                        // background update thread.
 
-                        // swallow this message, so the caller thread
-                        // remain behind the worker thread. This has as
-                        // a consequence to ignore the delivered result & wait for the
-                        // upcoming REALM_CHANGED to batch update all async queries
+                        // Swallows this message, so the caller thread
+                        // remains behind the worker thread. This has as
+                        // a consequence to ignore the delivered result & waits for the
+                        // upcoming REALM_CHANGED to batch update all async queries.
                         return numberOfInterceptedChangeMessage.getAndIncrement() == 0;
                     }
                     case HandlerControllerConstants.COMPLETED_ASYNC_REALM_RESULTS: {
                         if (numberOfCompletedAsyncQuery.incrementAndGet() == 2) {
-                            // both queries have completed now (& their results should be ignored)
-                            // now send the REALM_CHANGED event that should batch update all queries
+                            // Both queries have completed now (& their results should be ignored)
+                            // now sends the REALM_CHANGED event that should batch update all queries.
                             sendEmptyMessage(HandlerControllerConstants.REALM_CHANGED);
                         }
                     }
@@ -46,7 +46,7 @@
         realm.setHandler(handler);
         Realm.asyncTaskExecutor.pause();
 
-        // Create async queries and check they haven't completed
+        // Creates async queries and checks they haven't completed.
         final RealmResults<AllTypes> realmResults1 = realm.where(AllTypes.class)
                 .findAllAsync();
         final RealmResults<AllTypes> realmResults2 = realm.where(AllTypes.class)
@@ -57,7 +57,7 @@
         assertEquals(0, realmResults1.size());
         assertEquals(0, realmResults2.size());
 
-        // advance the Realm from a background thread
+        // Advances the Realm from a background thread.
         new RealmBackgroundTask(looperThread.realmConfiguration) {
             @Override
             public void doInBackground(Realm realm) {
@@ -70,7 +70,7 @@
         }.awaitOrFail();
         Realm.asyncTaskExecutor.resume();
 
-        // Setup change listeners
+        // Setups change listeners.
         final Runnable signalCallbackDone = new Runnable() {
             private AtomicInteger signalCallbackFinished = new AtomicInteger(2);
             @Override

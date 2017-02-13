@@ -1,0 +1,32 @@
+    private RealmCollection<CustomMethods> createCustomMethodsCollection(Realm realm, CollectionClass collectionClass) {
+        switch (collectionClass) {
+            case MANAGED_REALMLIST:
+                realm.beginTransaction();
+                CustomMethods top = realm.createObject(CustomMethods.class);
+                top.setName("Top");
+                for (int i = 0; i < TEST_SIZE; i++) {
+                    top.getMethods().add(new CustomMethods("Child" + i));
+                }
+                realm.commitTransaction();
+                return top.getMethods();
+
+            case UNMANAGED_REALMLIST:
+                RealmList<CustomMethods> list = new RealmList<CustomMethods>();
+                for (int i = 0; i < TEST_SIZE; i++) {
+                    list.add(new CustomMethods("Child" + i));
+                }
+                return list;
+
+            case REALMRESULTS:
+                realm.beginTransaction();
+                for (int i = 0; i < TEST_SIZE; i++) {
+                    realm.copyToRealm(new CustomMethods("Child" + i));
+                }
+                realm.commitTransaction();
+                return realm.where(CustomMethods.class).findAll();
+
+            default:
+                throw new AssertionError("Unsupported class: " + collectionClass);
+        }
+    }
+

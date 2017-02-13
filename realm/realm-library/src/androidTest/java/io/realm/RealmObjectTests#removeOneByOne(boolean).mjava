@@ -1,5 +1,5 @@
     private void removeOneByOne(boolean removeFromFront) {
-        // Create test data
+        // Creates test data.
         realm.beginTransaction();
         realm.delete(Dog.class);
         for (int i = 0; i < TEST_SIZE; i++) {
@@ -7,11 +7,11 @@
         }
         realm.commitTransaction();
 
-        // Check initial size
+        // Checks initial size.
         RealmResults<Dog> dogs = realm.where(Dog.class).findAll();
         assertEquals(TEST_SIZE, dogs.size());
 
-        // Check that calling deleteFromRealm doesn't remove the object from the RealmResult
+        // Checks that calling deleteFromRealm doesn't remove the object from the RealmResult.
         realm.beginTransaction();
         for (int i = 0; i < TEST_SIZE; i++) {
             dogs.get(removeFromFront ? i : TEST_SIZE - 1 - i).deleteFromRealm();

@@ -1,7 +1,7 @@
     @Test
     public void changingPrimaryKeyThrows() {
 
-        // Create v0 of the Realm
+        // Creates v0 of the Realm.
         RealmConfiguration originalConfig = configFactory.createConfigurationBuilder()
                 .schema(Thread.class)
                 .build();
@@ -12,12 +12,12 @@
             public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
                 RealmSchema schema = realm.getSchema();
                 schema.create("PrimaryKeyAsString")
-                        .addField("id", long.class, FieldAttribute.PRIMARY_KEY) // initial @PrimaryKey is on the int
+                        .addField("id", long.class, FieldAttribute.PRIMARY_KEY) // Initial @PrimaryKey is on the int.
                         .addField("name", String.class);
             }
         };
 
-        // Create v1 of the Realm
+        // Creates v1 of the Realm.
         RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                 .schemaVersion(1)
                 .schema(Thread.class, PrimaryKeyAsString.class)

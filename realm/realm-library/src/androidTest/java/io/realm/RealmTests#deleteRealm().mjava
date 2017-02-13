@@ -13,7 +13,7 @@
         final CountDownLatch closedLatch = new CountDownLatch(1);
 
         Realm realm = Realm.getInstance(configuration);
-        // Create another Realm to ensure the log files are generated
+        // Creates another Realm to ensure the log files are generated.
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -32,7 +32,7 @@
         realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
-        // Wait for bg thread's opening the same Realm.
+        // Waits for bg thread's opening the same Realm.
         TestHelper.awaitOrFail(bgThreadReadyLatch);
 
         // A core upgrade might change the location of the files
@@ -46,7 +46,7 @@
 
         assertTrue(Realm.deleteRealm(configuration));
 
-        // Directory should be empty now
+        // Directory should be empty now.
         assertEquals(0, tempDir.listFiles().length);
     }
 

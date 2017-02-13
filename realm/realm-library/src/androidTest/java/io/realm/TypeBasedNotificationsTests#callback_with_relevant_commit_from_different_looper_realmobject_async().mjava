@@ -1,4 +1,4 @@
-    // UC 1 Async RealmObject
+    // UC 1 Async RealmObject.
     @Test
     @RunTestInLooperThread
     public void callback_with_relevant_commit_from_different_looper_realmobject_async() {
@@ -29,7 +29,7 @@
             @Override
             public void onChange(Dog object) {
                 switch (typebasedCommitInvocations.incrementAndGet()) {
-                    case 1: // triggered by COMPLETED_ASYNC_REALM_OBJECT from calling dog.load()
+                    case 1: // Triggered by COMPLETED_ASYNC_REALM_OBJECT from calling dog.load().
                         assertTrue(dog.isLoaded());
                         assertFalse(dog.isValid());
 
@@ -44,7 +44,7 @@
                             }
                         });
                         break;
-                    case 2: // triggered by the irrelevant commit (not affecting Dog table) from LooperThread1
+                    case 2: // Triggered by the irrelevant commit (not affecting Dog table) from LooperThread1.
                         assertTrue(dog.isLoaded());
                         assertFalse(dog.isValid());
 
@@ -52,7 +52,7 @@
                             @Override
                             public void run() {
                                 Realm realmLooperThread2 = Realm.getInstance(realm.getConfiguration());
-                                // trigger first callback invocation
+                                // Triggers first callback invocation.
                                 realmLooperThread2.beginTransaction();
                                 Dog dog = realmLooperThread2.createObject(Dog.class);
                                 dog.setName("Akamaru");
@@ -63,12 +63,12 @@
                         });
                         break;
 
-                    case 3: // triggered by relevant commit from LooperThread2
+                    case 3: // Triggered by relevant commit from LooperThread2.
                         assertEquals("Akamaru", dog.getName());
                         looperThread.postRunnable(new Runnable() {
                             @Override
                             public void run() {
-                                // trigger second callback invocation
+                                // Triggers second callback invocation.
                                 looperHandler3.post(new Runnable() {
                                     @Override
                                     public void run() {
@@ -86,9 +86,9 @@
                     case 4:
                         assertEquals("Akamaru", dog.getName());
                         assertEquals(17, dog.getAge());
-                        // posting as an event will give the handler a chance
-                        // to deliver the notification for globalCommitInvocations
-                        // otherwise, test will exit before the callback get a chance to be invoked
+                        // Posting as an event will give the handler a chance
+                        // to deliver the notification for globalCommitInvocations.
+                        // Otherwise, test will exit before the callback get a chance to be invoked.
                         looperThread.postRunnable(new Runnable() {
                             @Override
                             public void run() {
