@@ -1,5 +1,10 @@
         public Iterator(Collection collection) {
-            collectionWeakReference = new WeakReference<Collection>(collection);
-            collection.stableIterators.add(new WeakReference<Iterator>(this));
+            this.iteratorCollection = collection;
+
+            if (collection.sharedRealm.isInTransaction()) {
+                detach();
+            } else {
+                iteratorCollection.sharedRealm.addIterator(this);
+            }
         }
 
