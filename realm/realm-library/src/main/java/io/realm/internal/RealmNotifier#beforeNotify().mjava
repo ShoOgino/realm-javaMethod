@@ -1,0 +1,12 @@
+    // Called from JavaBindingContext::before_notify.
+    // This will be called in the caller thread when:
+    // 1. Get changed notification by this/other Realm instances.
+    // 2. SharedRealm::refresh called.
+    // In both cases, this will be called before the any other callbacks (changed callbacks, async query callbacks.).
+    // Package protected to avoid finding class by name in JNI.
+    @SuppressWarnings("unused")
+    void beforeNotify() {
+        // For the stable iteration.
+        sharedRealm.invalidateIterators();
+    }
+

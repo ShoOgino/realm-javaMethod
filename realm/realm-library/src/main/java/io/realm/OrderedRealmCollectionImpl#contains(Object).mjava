@@ -1,0 +1,27 @@
+    /**
+     * Searches this {@link OrderedRealmCollection} for the specified object.
+     *
+     * @param object the object to search for.
+     * @return {@code true} if {@code object} is an element of this {@code OrderedRealmCollection},
+     *         {@code false} otherwise.
+     */
+    @Override
+    public boolean contains(Object object) {
+        if (isLoaded()) {
+            // Deleted objects can never be part of a RealmResults
+            if (object instanceof RealmObjectProxy) {
+                RealmObjectProxy proxy = (RealmObjectProxy) object;
+                if (proxy.realmGet$proxyState().getRow$realm() == InvalidRow.INSTANCE) {
+                    return false;
+                }
+            }
+
+            for (E e : this) {
+                if (e.equals(object)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+

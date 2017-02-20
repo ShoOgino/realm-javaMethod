@@ -1,0 +1,8 @@
+    public <T> void removeListener(T observer, RealmChangeListener<T> listener) {
+        CollectionObserverPair<T> collectionObserverPair = new CollectionObserverPair<T>(observer, listener);
+        observerPairs.remove(collectionObserverPair);
+        if (observerPairs.isEmpty()) {
+            nativeStopListening(nativePtr);
+        }
+    }
+

@@ -16,6 +16,10 @@
         realm.beginTransaction();
         assertTrue(collection.deleteAllFromRealm());
         realm.commitTransaction();
-        assertEquals(0, collection.size());
+        if (isSnapshot(collectionClass)) {
+            assertEquals(TEST_SIZE, collection.size());
+        } else {
+            assertEquals(0, collection.size());
+        }
     }
 

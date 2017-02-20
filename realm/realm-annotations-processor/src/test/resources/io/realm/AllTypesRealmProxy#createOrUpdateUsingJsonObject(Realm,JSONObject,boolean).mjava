@@ -6,13 +6,13 @@
         if (update) {
             Table table = realm.getTable(some.test.AllTypes.class);
             long pkColumnIndex = table.getPrimaryKey();
-            long rowIndex = TableOrView.NO_MATCH;
+            long rowIndex = Table.NO_MATCH;
             if (json.isNull("columnString")) {
                 rowIndex = table.findFirstNull(pkColumnIndex);
             } else {
                 rowIndex = table.findFirstString(pkColumnIndex, json.getString("columnString"));
             }
-            if (rowIndex != TableOrView.NO_MATCH) {
+            if (rowIndex != Table.NO_MATCH) {
                 final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get();
                 try {
                     objectContext.set(realm, table.getUncheckedRow(rowIndex), realm.schema.getColumnInfo(some.test.AllTypes.class), false, Collections.<String> emptyList());

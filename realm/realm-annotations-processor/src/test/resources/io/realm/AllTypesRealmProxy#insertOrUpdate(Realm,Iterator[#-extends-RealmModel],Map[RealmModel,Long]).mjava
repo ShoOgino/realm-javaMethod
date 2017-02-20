@@ -12,13 +12,13 @@
                     continue;
                 }
                 String primaryKeyValue = ((AllTypesRealmProxyInterface) object).realmGet$columnString();
-                long rowIndex = TableOrView.NO_MATCH;
+                long rowIndex = Table.NO_MATCH;
                 if (primaryKeyValue == null) {
                     rowIndex = Table.nativeFindFirstNull(tableNativePtr, pkColumnIndex);
                 } else {
                     rowIndex = Table.nativeFindFirstString(tableNativePtr, pkColumnIndex, primaryKeyValue);
                 }
-                if (rowIndex == TableOrView.NO_MATCH) {
+                if (rowIndex == Table.NO_MATCH) {
                     rowIndex = table.addEmptyRowWithPrimaryKey(primaryKeyValue, false);
                 }
                 cache.put(object, rowIndex);

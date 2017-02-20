@@ -1,0 +1,13 @@
+    @Test
+    public void listIterator_remove_nonRealmList_throwUnsupported() {
+        if (skipTest(CollectionClass.MANAGED_REALMLIST, CollectionClass.UNMANAGED_REALMLIST)) {
+           return;
+        }
+        ListIterator<AllJavaTypes> it = collection.listIterator();
+        AllJavaTypes obj = it.next();
+        assertEquals("test data 0", obj.getFieldString());
+        realm.beginTransaction();
+        thrown.expect(UnsupportedOperationException.class);
+        it.remove();
+    }
+

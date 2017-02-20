@@ -7,16 +7,20 @@
         realm.commitTransaction();
 
         switch (collectionClass) {
+            // Snapshot
+            case REALMRESULTS_SNAPSHOT_RESULTS_BASE:
+            case REALMRESULTS_SNAPSHOT_LIST_BASE:
+                assertFalse(collection.get(1).isValid());
+                break;
             // Managed RealmLists are directly associated with their table. Thus any indirect deletion will
             // also remove it from the LinkView.
             case MANAGED_REALMLIST:
+            case REALMRESULTS:
                 assertEquals(TEST_SIZE - 1, collection.size());
                 break;
 
-            // Unmanaged collections are not affected by changes to Realm and RealmResult should maintain a stable
-            // view until next time sync_if_needed is called.
+            // Unmanaged collections are not affected by changes to Realm.
             case UNMANAGED_REALMLIST:
-            case REALMRESULTS:
                 assertEquals(TEST_SIZE, collection.size());
                 break;
 

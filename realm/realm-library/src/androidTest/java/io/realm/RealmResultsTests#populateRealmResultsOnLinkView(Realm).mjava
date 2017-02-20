@@ -1,0 +1,17 @@
+    private RealmResults<Dog> populateRealmResultsOnLinkView(Realm realm) {
+        realm.beginTransaction();
+        Owner owner = realm.createObject(Owner.class);
+        for (int i = 0; i < 10; i++) {
+            Dog dog = new Dog();
+            dog.setName("name_" + i);
+            dog.setOwner(owner);
+            dog.setAge(i);
+            dog.setBirthday(new Date(i));
+            owner.getDogs().add(dog);
+        }
+        realm.commitTransaction();
+
+
+        return owner.getDogs().where().lessThan(Dog.FIELD_AGE, 5).findAll();
+    }
+

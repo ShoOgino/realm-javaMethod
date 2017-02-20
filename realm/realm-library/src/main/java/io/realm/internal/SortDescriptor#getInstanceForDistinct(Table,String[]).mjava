@@ -1,0 +1,15 @@
+    public static SortDescriptor getInstanceForDistinct(Table table, String[] fieldDescriptions) {
+        if (fieldDescriptions == null || fieldDescriptions.length == 0) {
+            throw new IllegalArgumentException("You must provide at least one field name.");
+        }
+
+        long[][] columnIndices = new long[fieldDescriptions.length][];
+        for (int i = 0; i < fieldDescriptions.length; i++) {
+            FieldDescriptor descriptor = new FieldDescriptor(table, fieldDescriptions[i], false, false);
+            checkFieldTypeForDistinct(descriptor, fieldDescriptions[i]);
+            columnIndices[i] = descriptor.getColumnIndices();
+        }
+
+        return new SortDescriptor(table, columnIndices, null);
+    }
+

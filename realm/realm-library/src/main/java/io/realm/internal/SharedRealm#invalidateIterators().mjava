@@ -1,0 +1,11 @@
+    // Invalidates all iterators when a remote change notification is received.
+    void invalidateIterators() {
+        for (WeakReference<Collection.Iterator> iteratorRef : iterators) {
+            Collection.Iterator iterator = iteratorRef.get();
+            if (iterator != null) {
+                iterator.invalidate();
+            }
+        }
+        iterators.clear();
+    }
+

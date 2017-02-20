@@ -4,7 +4,12 @@
         realm.beginTransaction();
         assertTrue(collection.deleteLastFromRealm());
         realm.commitTransaction();
-        assertEquals(TEST_SIZE - 1, collection.size());
-        assertEquals(TEST_SIZE - 2, collection.last().getFieldLong());
+        if (isSnapshot(collectionClass)) {
+            assertEquals(TEST_SIZE, collection.size());
+            assertFalse(collection.last().isValid());
+        } else {
+            assertEquals(TEST_SIZE - 1, collection.size());
+            assertEquals(TEST_SIZE - 2, collection.last().getFieldLong());
+        }
     }
 

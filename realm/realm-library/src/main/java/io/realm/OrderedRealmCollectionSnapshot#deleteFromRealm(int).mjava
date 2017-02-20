@@ -1,0 +1,17 @@
+    /**
+     * Deletes the object at the given index from the Realm. The object at the given index will become invalid. Just
+     * returns if the object is invalid already.
+     *
+     * @param location the array index identifying the object to be removed.
+     * @throws IndexOutOfBoundsException if {@code location < 0 || location >= size()}.
+     * @throws java.lang.IllegalStateException if the Realm is closed or the method is called from the wrong thread.
+     */
+    @Override
+    public void deleteFromRealm(int location) {
+        realm.checkIfValidAndInTransaction();
+        UncheckedRow row = collection.getUncheckedRow(location);
+        if (row.isAttached()) {
+            collection.delete(location);
+        }
+    }
+

@@ -1,0 +1,14 @@
+    private E lastImpl(boolean shouldThrow, E defaultValue) {
+        UncheckedRow row = collection.lastUncheckedRow();
+
+        if (row != null) {
+            return realm.get(classSpec, className, row);
+        } else {
+            if (shouldThrow) {
+                throw new IndexOutOfBoundsException("No results were found.");
+            } else {
+                return defaultValue;
+            }
+        }
+    }
+

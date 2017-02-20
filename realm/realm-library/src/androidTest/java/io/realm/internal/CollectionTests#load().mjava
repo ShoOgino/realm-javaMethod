@@ -1,0 +1,15 @@
+    @Test
+    @RunTestInLooperThread
+    public void load() {
+        final Collection collection = new Collection(sharedRealm, table.where());
+        collection.addListener(collection, new RealmChangeListener<Collection>() {
+            @Override
+            public void onChange(Collection element) {
+                assertTrue(collection.isLoaded());
+                looperThread.testComplete();
+            }
+        });
+        assertFalse(collection.isLoaded());
+        collection.load();
+    }
+

@@ -1,0 +1,22 @@
+    @Test
+    public void foreach_canRemove() {
+        final AtomicInteger count = new AtomicInteger(0);
+        final TestObserverPair pair1 = new TestObserverPair(ONE, new TestListener());
+        final TestObserverPair pair2 = new TestObserverPair(TWO, new TestListener());
+        final TestObserverPair pair3 = new TestObserverPair(THREE, new TestListener());
+        observerPairs.add(pair1);
+        observerPairs.add(pair2);
+        observerPairs.add(pair3);
+        assertEquals(3, observerPairs.size());
+        observerPairs.foreach(new ObserverPairList.Callback<TestObserverPair>() {
+            @Override
+            public void onCalled(TestObserverPair pair, Object observer) {
+                assertFalse(((Integer) observer) == 2);
+                observerPairs.remove(pair2);
+                count.getAndIncrement();
+            }
+        });
+        assertEquals(2, observerPairs.size());
+        assertEquals(2, count.get());
+    }
+
