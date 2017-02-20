@@ -18,8 +18,7 @@
                 int listenerCount = listenerCounter.addAndGet(1);
                 assertEquals(commits, listenerCount);
                 if (commits == TIMES) {
-                    // FIXME: Enable this after https://github.com/realm/realm-object-store/pull/318 fixed
-                    //sharedRealm.close();
+                    sharedRealm.close();
                     looperThread.testComplete();
                 } else {
                     makeRemoteChanges(looperThread.realmConfiguration);
