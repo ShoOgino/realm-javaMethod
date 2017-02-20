@@ -1,11 +1,10 @@
     @Test
-    @Ignore("Enable this test when support RealmCollectionSnapshot")
     public void useCase_simpleIterator_modifyQueryResult_outerTransaction() {
-        if (skipTest(CollectionClass.MANAGED_REALMLIST, CollectionClass.UNMANAGED_REALMLIST)) {
+        if (skipTest(CollectionClass.MANAGED_REALMLIST, CollectionClass.UNMANAGED_REALMLIST,
+                CollectionClass.REALMRESULTS)) {
             return;
         }
 
-        collection = realm.where(AllJavaTypes.class).lessThan(AllJavaTypes.FIELD_LONG, TEST_SIZE).findAll();
         assertEquals(TEST_SIZE, collection.size());
         realm.beginTransaction();
         for (int i = 0; i < collection.size(); i++) {

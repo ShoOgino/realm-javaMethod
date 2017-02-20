@@ -1,0 +1,15 @@
+    // aux. method used by sort methods
+    private long getColumnIndexForSort(String fieldName) {
+        if (fieldName == null || fieldName.isEmpty()) {
+            throw new IllegalArgumentException("Non-empty field name required.");
+        }
+        if (fieldName.contains(".")) {
+            throw new IllegalArgumentException("Aggregates on child object fields are not supported: " + fieldName);
+        }
+        long columnIndex = collection.getTable().getColumnIndex(fieldName);
+        if (columnIndex < 0) {
+            throw new IllegalArgumentException(String.format("Field '%s' does not exist.", fieldName));
+        }
+        return columnIndex;
+    }
+

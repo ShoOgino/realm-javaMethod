@@ -1,4 +1,9 @@
     public Collection createSnapshot() {
-        return new Collection(sharedRealm, table, nativeCreateSnapshot(nativePtr));
+        if (isSnapshot) {
+            return this;
+        }
+        Collection collection = new Collection(sharedRealm, table, nativeCreateSnapshot(nativePtr));
+        collection.isSnapshot = true;
+        return collection;
     }
 

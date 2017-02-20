@@ -1,0 +1,13 @@
+    /**
+     * Deletes the last object from the Realm. The last object will become invalid.
+     *
+     * @return {@code true} if an object was deleted, {@code false} otherwise.
+     * @throws java.lang.IllegalStateException if the Realm is closed or the method is called from the wrong thread.
+     */
+    @Override
+    public boolean deleteLastFromRealm() {
+        realm.checkIfValidAndInTransaction();
+        UncheckedRow row = collection.lastUncheckedRow();
+        return row != null && row.isAttached() && collection.deleteLast();
+    }
+

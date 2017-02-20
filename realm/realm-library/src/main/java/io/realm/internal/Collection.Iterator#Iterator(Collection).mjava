@@ -1,6 +1,11 @@
         public Iterator(Collection collection) {
             this.iteratorCollection = collection;
 
+            if (collection.isSnapshot) {
+                // No need to detach a snapshot.
+                return;
+            }
+
             if (collection.sharedRealm.isInTransaction()) {
                 detach();
             } else {

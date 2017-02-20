@@ -1,0 +1,32 @@
+    // Accessing RealmResults iterator after receving remote change notification will throw.
+    // But it is valid operation for snapshot.
+    @Test
+    public void iterator_realmResultsThrowConcurrentModification_snapshotJustWorks() {
+        if (skipTest(CollectionClass.MANAGED_REALMLIST, CollectionClass.UNMANAGED_REALMLIST)) {
+            return;
+        }
+
+        // Verifies that ConcurrentModification is correctly detected on non-looper threads.
+        Iterator<AllJavaTypes> it = collection.iterator();
+        final CountDownLatch bgDone = new CountDownLatch(1);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+                bgRealm.beginTransaction();
+                bgRealm.createObject(AllJavaTypes.class, TEST_SIZE);
+                bgRealm.commitTransaction();
+                bgRealm.close();
+                bgDone.countDown();
+            }
+        }).start();
+        TestHelper.awaitOrFail(bgDone);
+        realm.waitForChange();
+        try {
+            it.next();
+            assertEquals(TEST_SIZE, collection.size());
+        } catch (ConcurrentModificationException ignored) {
+            assertEquals(collectionClass, CollectionClass.REALMRESULTS);
+        }
+    }
+

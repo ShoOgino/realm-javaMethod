@@ -8,7 +8,7 @@
 
                 // Defines expected exception.
                 Class<? extends Throwable> expected = IllegalStateException.class;
-                if (collectionClass == ManagedCollection.REALMRESULTS) {
+                if (collectionClass == ManagedCollection.REALMRESULTS || isSnapshot(collectionClass)) {
                     switch (method) {
                         case ADD_OBJECT:
                         case ADD_ALL_OBJECTS:
@@ -27,7 +27,9 @@
                         case CLEAR: collection.clear();
                         case CONTAINS:
                         case CONTAINS_ALL: collection.containsAll(Collections.singletonList(tempObject)); break;
-                        case EQUALS: collection.equals(createCollection(collectionClass)); break;
+                        case EQUALS:
+                            //noinspection ResultOfMethodCallIgnored
+                            collection.equals(createCollection(collectionClass)); break;
                         case HASHCODE:
                             //noinspection ResultOfMethodCallIgnored
                             collection.hashCode();
