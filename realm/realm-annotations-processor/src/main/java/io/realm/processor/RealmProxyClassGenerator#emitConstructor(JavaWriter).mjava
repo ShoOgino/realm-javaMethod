@@ -1,9 +1,6 @@
     private void emitConstructor(JavaWriter writer) throws IOException {
         // FooRealmProxy(ColumnInfo)
         writer.beginConstructor(EnumSet.noneOf(Modifier.class));
-        writer.beginControlFlow("if (proxyState == null)")
-                .emitStatement("injectObjectContext()")
-                .endControlFlow();
         writer.emitStatement("proxyState.setConstructionFinished()");
         writer.endConstructor();
         writer.emitEmptyLine();
