@@ -1,6 +1,7 @@
     @Test
     public void iterator_outsideChangeToSizeThrowsConcurrentModification_managedCollection() {
-        if (skipTest(CollectionClass.REALMRESULTS, CollectionClass.UNMANAGED_REALMLIST)) {
+        if (skipTest(CollectionClass.REALMRESULTS, CollectionClass.UNMANAGED_REALMLIST,
+                CollectionClass.REALMRESULTS_SNAPSHOT_LIST_BASE, CollectionClass.REALMRESULTS_SNAPSHOT_RESULTS_BASE)) {
             return;
         }
 
@@ -47,6 +48,7 @@
                 case SORT_FIELD:
                 case SORT_2FIELDS:
                 case SORT_MULTI:
+                case CREATE_SNAPSHOT:
                     realm.cancelTransaction();
                     continue;
                 default:

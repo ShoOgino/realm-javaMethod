@@ -1,7 +1,10 @@
     @Test
     public void sort_nonExistingColumn() {
-        RealmResults<AllJavaTypes> resultList = realm.where(AllJavaTypes.class).findAll();
-        thrown.expect(IllegalArgumentException.class);
-        resultList.sort("Non-existing");
+        if (isSnapshot(collectionClass)) {
+            thrown.expect(UnsupportedOperationException.class);
+        } else {
+            thrown.expect(IllegalArgumentException.class);
+        }
+        collection.sort("Non-existing");
     }
 

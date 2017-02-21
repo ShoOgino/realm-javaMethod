@@ -2,17 +2,15 @@
      * Makes an asynchronous query blocking. This will also trigger any registered {@link RealmChangeListener} when
      * the query completes.
      *
-     * @return {@code true} if it successfully completed the query, {@code false} otherwise. {@code true} will always
-     *         be returned for unmanaged objects.
+     * @return {@code true} if it successfully completed the query, {@code false} otherwise.
      */
     public boolean load() {
-        //noinspection SimplifiableIfStatement
-        if (isLoaded()) {
-            return true;
-        } else {
-            // doesn't guarantee to correctly import the result (because the user may have advanced)
-            // in this case the Realm#handler will be responsible of retrying
-            return onAsyncQueryCompleted();
-        }
+        // The Collection doesn't have to be loaded before accessing it if the query has not returned.
+        // Instead, accessing the Collection will just trigger the execution of query if needed. We add this flag is
+        // only to keep the original behavior of those APIs. eg.: For a async RealmResults, before query returns, the
+        // size() call should return 0 instead of running the query get the real size.
+        realm.checkIfValid();
+        collection.load();
+        return true;
     }
 

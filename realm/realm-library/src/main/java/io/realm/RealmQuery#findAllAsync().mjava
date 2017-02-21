@@ -7,77 +7,7 @@
      * @see io.realm.RealmResults
      */
     public RealmResults<E> findAllAsync() {
-        checkQueryIsNotReused();
-        final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();
-
-        // Handovers the query (to be used by a worker thread).
-        final long handoverQueryPointer = query.handoverQuery(realm.sharedRealm);
-
-        // Saves query arguments (for future update).
-        argumentsHolder = new ArgumentsHolder(ArgumentsHolder.TYPE_FIND_ALL);
-
-        // We need to use the same configuration to open a background SharedRealm (i.e Realm)
-        // to perform the query.
-        final RealmConfiguration realmConfiguration = realm.getConfiguration();
-
-        // Prepares an empty reference of the RealmResults, so we can return it immediately (promise)
-        // then update it once the query completes in the background.
-        RealmResults<E> realmResults;
-        if (isDynamicQuery()) {
-            //noinspection unchecked
-            realmResults = (RealmResults<E>) RealmResults.createFromDynamicClass(realm, query, className);
-        } else {
-            realmResults = RealmResults.createFromTableQuery(realm, query, clazz);
-        }
-
-        final WeakReference<RealmResults<? extends RealmModel>> weakRealmResults = realm.handlerController.addToAsyncRealmResults(realmResults, this);
-
-        final Future<Long> pendingQuery = Realm.asyncTaskExecutor.submitQuery(new Callable<Long>() {
-            @Override
-            public Long call() throws Exception {
-                if (!Thread.currentThread().isInterrupted()) {
-                    SharedRealm sharedRealm = null;
-
-                    try {
-                        sharedRealm = SharedRealm.getInstance(realmConfiguration);
-
-                        // Runs the query & handover the table view for the caller thread.
-                        // Note: the handoverQueryPointer contains the versionID needed by the SG in order
-                        // to import it.
-                        long handoverTableViewPointer = TableQuery.findAllWithHandover(sharedRealm,
-                                handoverQueryPointer);
-
-                        QueryUpdateTask.Result result = QueryUpdateTask.Result.newRealmResultsResponse();
-                        result.updatedTableViews.put(weakRealmResults, handoverTableViewPointer);
-                        result.versionID = sharedRealm.getVersionID();
-                        closeSharedRealmAndSendEventToNotifier(sharedRealm,
-                                weakNotifier, QueryUpdateTask.NotifyEvent.COMPLETE_ASYNC_RESULTS, result);
-
-                        return handoverTableViewPointer;
-
-                    } catch (BadVersionException e) {
-                        // In some rare race conditions, this can happen. In that case, just ignore the error.
-                        RealmLog.debug("findAllAsync handover could not complete due to a BadVersionException. " +
-                                "Retry is scheduled by a REALM_CHANGED event.");
-
-                    } catch (Throwable e) {
-                        RealmLog.error(e);
-                        closeSharedRealmAndSendEventToNotifier(sharedRealm,
-                                weakNotifier, QueryUpdateTask.NotifyEvent.THROW_BACKGROUND_EXCEPTION, e);
-                    } finally {
-                        if (sharedRealm != null && !sharedRealm.isClosed()) {
-                            sharedRealm.close();
-                        }
-                    }
-                } else {
-                    TableQuery.nativeCloseQueryHandover(handoverQueryPointer);
-                }
-
-                return INVALID_NATIVE_POINTER;
-            }
-        });
-
-        realmResults.setPendingQuery(pendingQuery);
-        return realmResults;
+        realm.sharedRealm.capabilities.checkCanDeliverNotification(ASYNC_QUERY_WRONG_THREAD_MESSAGE);
+        return createRealmResults(query, null, null, false);
     }
 

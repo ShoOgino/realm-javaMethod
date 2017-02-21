@@ -1,4 +1,5 @@
-    private boolean runMethodOnWrongThread(final RealmCollectionMethod method) throws ExecutionException, InterruptedException {
+    private boolean runMethodOnWrongThread(final RealmCollectionMethod method)
+            throws ExecutionException, InterruptedException {
         realm.beginTransaction();
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
@@ -20,6 +21,8 @@
                     return false;
                 } catch (IllegalStateException ignored) {
                     return true;
+                } catch (UnsupportedOperationException ignored) {
+                    return (method == RealmCollectionMethod.WHERE && isSnapshot(collectionClass));
                 }
             }
         });

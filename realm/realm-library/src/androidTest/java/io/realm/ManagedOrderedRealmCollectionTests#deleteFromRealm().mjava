@@ -5,7 +5,12 @@
         realm.beginTransaction();
         collection.deleteFromRealm(0);
         realm.commitTransaction();
-        assertEquals(TEST_SIZE - 1, collection.size());
-        assertEquals(2, collection.get(1).getAge());
+        if (isSnapshot(collectionClass)) {
+            assertEquals(TEST_SIZE, collection.size());
+            assertFalse(collection.get(0).isValid());
+        } else {
+            assertEquals(TEST_SIZE - 1, collection.size());
+            assertEquals(2, collection.get(1).getAge());
+        }
     }
 

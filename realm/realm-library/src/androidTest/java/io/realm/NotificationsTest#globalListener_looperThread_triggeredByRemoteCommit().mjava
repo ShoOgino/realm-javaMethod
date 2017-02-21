@@ -1,0 +1,21 @@
+    @Test
+    @RunTestInLooperThread
+    public void globalListener_looperThread_triggeredByRemoteCommit() {
+        final AtomicInteger success = new AtomicInteger(0);
+        Realm realm = looperThread.realm;
+        realm.addChangeListener(new RealmChangeListener<Realm>() {
+            @Override
+            public void onChange(Realm object) {
+                assertEquals(1, success.get());
+                looperThread.testComplete();
+            }
+        });
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.createObject(AllTypes.class);
+            }
+        });
+        assertEquals(0, success.getAndIncrement());
+    }
+

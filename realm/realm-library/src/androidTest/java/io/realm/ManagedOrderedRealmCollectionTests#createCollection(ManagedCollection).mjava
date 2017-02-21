@@ -1,16 +1,25 @@
     OrderedRealmCollection<AllJavaTypes> createCollection(ManagedCollection collectionClass) {
+        OrderedRealmCollection<AllJavaTypes> orderedCollection;
         switch (collectionClass) {
+            case REALMRESULTS_SNAPSHOT_LIST_BASE:
             case MANAGED_REALMLIST:
-                return realm.where(AllJavaTypes.class)
+                orderedCollection = realm.where(AllJavaTypes.class)
                         .equalTo(AllJavaTypes.FIELD_LONG, 0)
                         .findFirst()
                         .getFieldList();
+                break;
 
+            case REALMRESULTS_SNAPSHOT_RESULTS_BASE:
             case REALMRESULTS:
-                return realm.where(AllJavaTypes.class).findAll();
+                orderedCollection = realm.where(AllJavaTypes.class).findAll();
+                break;
 
             default:
                 throw new AssertionError("Unsupported class: " + collectionClass);
         }
+        if (isSnapshot(collectionClass)) {
+            orderedCollection = orderedCollection.createSnapshot();
+        }
+        return orderedCollection;
     }
 

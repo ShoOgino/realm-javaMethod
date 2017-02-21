@@ -1,13 +1,17 @@
     private OrderedRealmCollection<AllJavaTypes> createCollection(Realm realm, CollectionClass collectionClass, int sampleSize) {
+        OrderedRealmCollection<AllJavaTypes> orderedCollection;
+
         switch (collectionClass) {
+            case REALMRESULTS_SNAPSHOT_LIST_BASE:
             case MANAGED_REALMLIST:
                 boolean isEmpty = (sampleSize == 0);
                 int newSampleSize = (isEmpty) ? 2 : sampleSize;
                 populateRealm(realm, newSampleSize);
-                return realm.where(AllJavaTypes.class)
-                    .equalTo(AllJavaTypes.FIELD_LONG, isEmpty ? 1 : 0)
-                    .findFirst()
-                    .getFieldList();
+                orderedCollection = realm.where(AllJavaTypes.class)
+                        .equalTo(AllJavaTypes.FIELD_LONG, isEmpty ? 1 : 0)
+                        .findFirst()
+                        .getFieldList();
+                break;
 
             case UNMANAGED_REALMLIST:
                 populateRealm(realm, sampleSize);
@@ -16,12 +20,19 @@
                 inMemoryList.addAll(objects);
                 return inMemoryList;
 
+            case REALMRESULTS_SNAPSHOT_RESULTS_BASE:
             case REALMRESULTS:
                 populateRealm(realm, sampleSize);
-                return realm.where(AllJavaTypes.class).findAllSorted(AllJavaTypes.FIELD_LONG, Sort.ASCENDING);
+                orderedCollection = realm.where(AllJavaTypes.class)
+                        .findAllSorted(AllJavaTypes.FIELD_LONG, Sort.ASCENDING);
+                break;
 
             default:
                 throw new AssertionError("Unsupported class: " + collectionClass);
         }
+        if (isSnapshot(collectionClass)) {
+            orderedCollection = orderedCollection.createSnapshot();
+        }
+        return orderedCollection;
     }
 

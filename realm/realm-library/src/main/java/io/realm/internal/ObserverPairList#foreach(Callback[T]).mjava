@@ -1,0 +1,22 @@
+    /**
+     * Iterate every valid pair in the list and call the callback on it. The pair with GCed observer will be removed and
+     * callback won't be executed. Before executing the callback, a strong reference to the observer will be kept and
+     * passed to the callback in case the observer gets GCed before callback returns.
+     *
+     * @param callback to be executed on the pair.
+     */
+    public void foreach(Callback<T> callback) {
+        for (T pair : pairs) {
+            if (cleared) {
+                break;
+            } else {
+                Object observer = pair.observerRef.get();
+                if (observer == null) {
+                    pairs.remove(pair);
+                } else if (!pair.removed) {
+                    callback.onCalled(pair, observer);
+                }
+            }
+        }
+    }
+

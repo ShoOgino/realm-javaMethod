@@ -1,0 +1,13 @@
+    // Called by JNI
+    @SuppressWarnings("unused")
+    private void notifyChangeListeners(boolean emptyChanges) {
+        if (emptyChanges && isLoaded()) {
+            return;
+        }
+        loaded = true;
+        // TODO: For the fine grained notification, remember to call the callback with empty change set if the
+        // isLoaded() returns false even when the change set is not empty. Since in that case, it is the first time
+        // the listener gets called to indicate async query returns.
+        observerPairs.foreach(onChangeCallback);
+    }
+
