@@ -1,16 +1,9 @@
     /**
-     * Removes a previously registered listener.
-     *
-     * @param listener the instance to be removed.
-     * @throws IllegalArgumentException if the change listener is {@code null}.
-     * @throws IllegalStateException if you try to remove a listener from a non-Looper Thread.
+     * {@inheritDoc}
      */
+    @Override
     public void removeChangeListener(RealmChangeListener listener) {
-        if (listener == null) {
-            throw new IllegalArgumentException("Listener should not be null");
-        }
-        realm.checkIfValid();
-        realm.sharedRealm.capabilities.checkCanDeliverNotification(BaseRealm.LISTENER_NOT_ALLOWED_MESSAGE);
+        checkForAddRemoveListener(listener);
         collection.removeListener(this, listener);
     }
 

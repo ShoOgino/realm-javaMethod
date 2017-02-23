@@ -1,0 +1,30 @@
+    @Test
+    @RunTestInLooperThread
+    public void deletion() {
+        Realm realm = looperThread.realm;
+        populateData(realm, 10);
+        RealmResults<AllTypes> results = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_LONG);
+        results.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> collection, OrderedCollectionChangeSet changeSet) {
+                checkRanges(changeSet.getDeletionRanges(),
+                        0, 1,
+                        2, 3,
+                        8, 2);
+                assertArrayEquals(changeSet.getDeletions(), new int[]{0, 2, 3, 4, 8, 9});
+                assertEquals(0, changeSet.getChangeRanges().length);
+                assertEquals(0, changeSet.getInsertionRanges().length);
+                assertEquals(0, changeSet.getChanges().length);
+                assertEquals(0, changeSet.getInsertions().length);
+                looperThread.testComplete();
+            }
+        });
+
+        realm.beginTransaction();
+        deleteObjects(realm,
+                0,
+                2, 3, 4,
+                8, 9);
+        realm.commitTransaction();
+    }
+

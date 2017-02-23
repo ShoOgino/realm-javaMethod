@@ -7,18 +7,15 @@
 
         // Create a new Integer 1 to see if the equality is checked by the same object.
         //noinspection UnnecessaryBoxing
-        pair = new TestObserverPair(new Integer(1), testListener);
-        observerPairs.remove(pair);
+        observerPairs.remove(new Integer(1), testListener);
         assertEquals(1, observerPairs.size());
 
         // Different listener
-        pair = new TestObserverPair(ONE, new TestListener());
-        observerPairs.remove(pair);
+        observerPairs.remove(ONE, new TestListener());
         assertEquals(1, observerPairs.size());
 
         // Should remove now
-        pair = new TestObserverPair(ONE, testListener);
-        observerPairs.remove(pair);
+        observerPairs.remove(ONE, testListener);
         assertEquals(0, observerPairs.size());
     }
 
