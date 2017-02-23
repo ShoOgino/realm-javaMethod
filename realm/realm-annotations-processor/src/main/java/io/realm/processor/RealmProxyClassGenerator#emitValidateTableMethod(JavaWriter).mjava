@@ -102,7 +102,7 @@
                     // check before migrating a nullable field containing null value to not-nullable PrimaryKey field for Realm version 0.89+
                     if (metadata.isPrimaryKey(field)) {
                         writer
-                            .beginControlFlow("if (table.isColumnNullable(%s) && table.findFirstNull(%s) != TableOrView.NO_MATCH)",
+                            .beginControlFlow("if (table.isColumnNullable(%s) && table.findFirstNull(%s) != Table.NO_MATCH)",
                                     fieldIndexVariableReference(field), fieldIndexVariableReference(field))
                             .emitStatement("throw new IllegalStateException(\"Cannot migrate an object with null value in field '%s'." +
                                     " Either maintain the same type for primary key field '%s', or remove the object with null value before migration.\")",

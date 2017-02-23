@@ -8,7 +8,7 @@
 
         AllTypesPrimaryKey allTypesPrimaryKey = new AllTypesPrimaryKey();
         allTypesPrimaryKey.setColumnLong(1);
-        allTypesPrimaryKey.setColumnFloat(42f);
+        allTypesPrimaryKey.setColumnFloat(0f);
         allTypesPrimaryKey = realm.copyToRealmOrUpdate(allTypesPrimaryKey);
         realm.commitTransaction();
 
@@ -20,5 +20,10 @@
                 looperThread.testComplete();
             }
         });
+
+        // Change the object to trigger the listener.
+        realm.beginTransaction();
+        allTypesPrimaryKey.setColumnFloat(42f);
+        realm.commitTransaction();
     }
 

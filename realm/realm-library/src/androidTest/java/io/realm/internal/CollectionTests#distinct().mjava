@@ -1,0 +1,16 @@
+    @Test
+    public void distinct() {
+        Collection collection = new Collection(sharedRealm, table.where().lessThan(new long[]{2}, 4));
+
+        SortDescriptor distinctDescriptor = new SortDescriptor(table, new long[] {2});
+        Collection collection2 = collection.distinct(distinctDescriptor);
+
+        // A new native Results should be created.
+        assertTrue(collection.getNativePtr() != collection2.getNativePtr());
+        assertEquals(3, collection.size());
+        assertEquals(2, collection2.size());
+
+        assertEquals(collection2.getUncheckedRow(0).getLong(2), 3);
+        assertEquals(collection2.getUncheckedRow(1).getLong(2), 1);
+    }
+

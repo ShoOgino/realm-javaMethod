@@ -1,8 +1,7 @@
     /**
      * Adds a change listener to the Realm.
      * <p>
-     * The listeners will be executed on every loop of a Handler thread if
-     * the current thread or other threads committed changes to the Realm.
+     * The listeners will be executed when changes are committed by this or another thread.
      * <p>
      * Realm instances are per thread singletons and cached, so listeners should be
      * removed manually even if calling {@link #close()}. Otherwise there is a
@@ -15,6 +14,7 @@
      * @see #removeChangeListener(RealmChangeListener)
      * @see #removeAllChangeListeners()
      */
+    @Override
     public void addChangeListener(RealmChangeListener<Realm> listener) {
         super.addListener(listener);
     }

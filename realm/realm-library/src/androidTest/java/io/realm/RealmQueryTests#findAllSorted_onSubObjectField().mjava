@@ -1,0 +1,9 @@
+    @Test
+    public void findAllSorted_onSubObjectField() {
+        populateTestRealm(realm, TEST_DATA_SIZE);
+        RealmResults<AllTypes> results = realm.where(AllTypes.class)
+                .findAllSorted(AllTypes.FIELD_REALMOBJECT + "." + Dog.FIELD_AGE);
+        assertEquals(0, results.get(0).getColumnRealmObject().getAge());
+        assertEquals(TEST_DATA_SIZE - 1, results.get(TEST_DATA_SIZE - 1).getColumnRealmObject().getAge());
+    }
+

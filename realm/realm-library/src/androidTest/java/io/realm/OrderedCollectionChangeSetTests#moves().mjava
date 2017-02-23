@@ -1,0 +1,28 @@
+    @Test
+    @RunTestInLooperThread
+    public void moves() {
+        Realm realm = looperThread.realm;
+        populateData(realm, 10);
+        RealmResults<AllTypes> results = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_LONG);
+        results.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> collection, OrderedCollectionChangeSet changeSet) {
+                checkRanges(changeSet.getDeletionRanges(),
+                        0, 1,
+                        9, 1);
+                assertArrayEquals(changeSet.getDeletions(), new int[]{0, 9});
+                checkRanges(changeSet.getInsertionRanges(),
+                        0, 1,
+                        9, 1);
+                assertArrayEquals(changeSet.getInsertions(), new int[]{0, 9});
+                assertEquals(0, changeSet.getChangeRanges().length);
+                assertEquals(0, changeSet.getChanges().length);
+                looperThread.testComplete();
+            }
+        });
+        realm.beginTransaction();
+        realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, 0).findFirst().setColumnLong(10);
+        realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, 9).findFirst().setColumnLong(0);
+        realm.commitTransaction();
+    }
+

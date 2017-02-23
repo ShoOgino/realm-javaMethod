@@ -1,0 +1,12 @@
+    @Test
+    public void getInstanceForSort_shouldThrowOnLinkListField() {
+        RealmFieldType type = RealmFieldType.STRING;
+        RealmFieldType listType = RealmFieldType.LIST;
+        table.addColumn(type, type.name());
+        table.addColumnLink(listType, listType.name(), table);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("is not a supported link field");
+        SortDescriptor.getInstanceForSort(table, String.format("%s.%s", listType.name(), type.name()), Sort.ASCENDING);
+    }
+

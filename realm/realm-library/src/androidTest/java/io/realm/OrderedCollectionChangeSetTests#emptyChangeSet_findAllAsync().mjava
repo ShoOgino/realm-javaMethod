@@ -1,0 +1,35 @@
+    // The change set should empty when the async query returns at the first time.
+    @Test
+    @RunTestInLooperThread
+    public void emptyChangeSet_findAllAsync(){
+        Realm realm = looperThread.realm;
+        populateData(realm, 10);
+        final RealmResults<AllTypes> results = realm.where(AllTypes.class).findAllSortedAsync(AllTypes.FIELD_LONG);
+        results.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> collection, OrderedCollectionChangeSet changeSet) {
+                assertSame(collection, results);
+                assertEquals(9, collection.size());
+                assertNull(changeSet);
+                looperThread.testComplete();
+            }
+        });
+
+        final CountDownLatch bgDeletionLatch = new CountDownLatch(1);
+        // beginTransaction() will make the async query return immediately. So we have to delete an object in another
+        // thread. Also, the latch has to be counted down after transaction committed so the async query results can
+        // contain the modification in the background transaction.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(looperThread.realmConfiguration)      ;
+                realm.beginTransaction();
+                realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, 0).findFirst().deleteFromRealm();
+                realm.commitTransaction();
+                realm.close();
+                bgDeletionLatch.countDown();
+            }
+        }).start();
+        TestHelper.awaitOrFail(bgDeletionLatch);
+    }
+

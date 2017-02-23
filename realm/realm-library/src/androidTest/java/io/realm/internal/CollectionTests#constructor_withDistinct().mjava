@@ -1,0 +1,11 @@
+    @Test
+    public void constructor_withDistinct() {
+        SortDescriptor distinctDescriptor = SortDescriptor.getInstanceForDistinct(table, "firstName");
+        Collection collection = new Collection(sharedRealm, table.where(), null, distinctDescriptor);
+
+        assertEquals(collection.size(), 3);
+        assertEquals(collection.getUncheckedRow(0).getString(0), "John");
+        assertEquals(collection.getUncheckedRow(1).getString(0), "Erik");
+        assertEquals(collection.getUncheckedRow(2).getString(0), "Henry");
+    }
+

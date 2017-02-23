@@ -1,0 +1,16 @@
+    // Called from JavaBindingContext::did_change.
+    // This will be called in the caller thread when:
+    // - A committed remote transaction, called from changed event handler.
+    // - A committed remote transaction, called directly from refresh call.
+    // - A committed local transaction, called directly from commitTransaction instead of next event.
+    //   loop.
+    // Package protected to avoid finding class by name in JNI.
+    @SuppressWarnings("unused") // called from java_binding_context.cpp
+    void didChange() {
+        realmObserverPairs.foreach(onChangeCallBack);
+        for (Runnable runnable : transactionCallbacks) {
+            runnable.run();
+        }
+        transactionCallbacks.clear();
+    }
+

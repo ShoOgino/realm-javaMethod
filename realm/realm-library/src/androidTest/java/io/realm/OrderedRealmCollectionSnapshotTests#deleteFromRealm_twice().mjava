@@ -1,0 +1,9 @@
+    @Test
+    public void deleteFromRealm_twice() {
+        realm.beginTransaction();
+        snapshot.deleteFromRealm(0);
+        snapshot.deleteFromRealm(0);
+        realm.commitTransaction();
+        assertFalse(snapshot.get(0).isValid());
+    }
+

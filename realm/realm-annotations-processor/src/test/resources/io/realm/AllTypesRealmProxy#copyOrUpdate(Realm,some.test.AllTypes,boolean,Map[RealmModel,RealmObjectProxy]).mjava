@@ -16,13 +16,13 @@
                 Table table = realm.getTable(some.test.AllTypes.class);
                 long pkColumnIndex = table.getPrimaryKey();
                 String value = ((AllTypesRealmProxyInterface) object).realmGet$columnString();
-                long rowIndex = TableOrView.NO_MATCH;
+                long rowIndex = Table.NO_MATCH;
                 if (value == null) {
                     rowIndex = table.findFirstNull(pkColumnIndex);
                 } else {
                     rowIndex = table.findFirstString(pkColumnIndex, value);
                 }
-                if (rowIndex != TableOrView.NO_MATCH) {
+                if (rowIndex != Table.NO_MATCH) {
                     try {
                         objectContext.set(realm, table.getUncheckedRow(rowIndex), realm.schema.getColumnInfo(some.test.AllTypes.class), false, Collections.<String> emptyList());
                         realmObject = new io.realm.AllTypesRealmProxy();

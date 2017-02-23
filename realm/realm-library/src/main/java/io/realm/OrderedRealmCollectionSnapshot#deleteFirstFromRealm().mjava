@@ -1,0 +1,13 @@
+    /**
+     * Deletes the first object from the Realm. The first object will become invalid.
+     *
+     * @return {@code true} if an object was deleted, {@code false} otherwise.
+     * @throws java.lang.IllegalStateException if the Realm is closed or the method is called on the wrong thread.
+     */
+    @Override
+    public boolean deleteFirstFromRealm() {
+        realm.checkIfValidAndInTransaction();
+        UncheckedRow row = collection.firstUncheckedRow();
+        return row != null && row.isAttached() && collection.deleteFirst();
+    }
+

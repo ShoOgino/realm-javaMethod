@@ -1,0 +1,32 @@
+    @Test
+    @RunTestInLooperThread
+    public void addChangeListener_byRemoteChanges() {
+        // To catch https://github.com/realm/realm-java/pull/4037 CI failure.
+        // In this case, object store should not send more than 100 notifications.
+        final int TIMES = 100;
+        final AtomicInteger commitCounter = new AtomicInteger(0);
+        final AtomicInteger listenerCounter = new AtomicInteger(0);
+
+        looperThread.realm.close();
+
+        SharedRealm sharedRealm = getSharedRealm(looperThread.realmConfiguration);
+        looperThread.keepStrongReference.add(sharedRealm);
+        sharedRealm.realmNotifier.addChangeListener(sharedRealm, new RealmChangeListener<SharedRealm>() {
+            @Override
+            public void onChange(SharedRealm sharedRealm) {
+                int commits = commitCounter.get();
+                int listenerCount = listenerCounter.addAndGet(1);
+                assertEquals(commits, listenerCount);
+                if (commits == TIMES) {
+                    sharedRealm.close();
+                    looperThread.testComplete();
+                } else {
+                    makeRemoteChanges(looperThread.realmConfiguration);
+                    commitCounter.getAndIncrement();
+                }
+            }
+        });
+        makeRemoteChanges(looperThread.realmConfiguration);
+        commitCounter.getAndIncrement();
+    }
+

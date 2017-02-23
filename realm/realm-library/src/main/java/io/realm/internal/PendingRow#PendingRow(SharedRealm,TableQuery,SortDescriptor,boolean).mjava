@@ -1,0 +1,37 @@
+    public PendingRow(SharedRealm sharedRealm, TableQuery query, SortDescriptor sortDescriptor,
+                      final boolean returnCheckedRow) {
+        pendingCollection = new Collection(sharedRealm, query, sortDescriptor, null);
+
+        listener = new RealmChangeListener<PendingRow>() {
+            @Override
+            public void onChange(PendingRow pendingRow) {
+                if (frontEndRef == null) {
+                    throw new IllegalStateException(PROXY_NOT_SET_MESSAGE);
+                }
+                FrontEnd frontEnd = frontEndRef.get();
+                if (frontEnd == null) {
+                    // The front end is GCed.
+                    clearPendingCollection();
+                    return;
+                }
+
+                if (pendingCollection.isValid()) {
+                    // PendingRow will always get the first Row of the query since we only support findFirst.
+                    UncheckedRow uncheckedRow = pendingCollection.firstUncheckedRow();
+                    // If no rows returned by the query, just wait for the query updates until it returns a valid row.
+                    if (uncheckedRow != null) {
+                        Row row = returnCheckedRow ? CheckedRow.getFromRow(uncheckedRow) : uncheckedRow;
+                        // Ask the front end to reset the row and stop async query.
+                        frontEnd.onQueryFinished(row);
+                        clearPendingCollection();
+                    }
+                } else {
+                    // The Realm is closed. Do nothing then.
+                    clearPendingCollection();
+                }
+            }
+        };
+        pendingCollection.addListener(this, listener);
+        this.returnCheckedRow = returnCheckedRow;
+    }
+

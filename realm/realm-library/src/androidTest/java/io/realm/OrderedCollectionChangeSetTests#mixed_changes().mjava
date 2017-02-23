@@ -1,0 +1,38 @@
+    @Test
+    @RunTestInLooperThread
+    public void mixed_changes() {
+        Realm realm = looperThread.realm;
+        populateData(realm, 10);
+        RealmResults<AllTypes> results = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_LONG);
+        results.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> collection, OrderedCollectionChangeSet changeSet) {
+                checkRanges(changeSet.getDeletionRanges(),
+                        0, 2,
+                        5, 1);
+                assertArrayEquals(changeSet.getDeletions(), new int[]{0, 1, 5});
+
+                checkRanges(changeSet.getInsertionRanges(),
+                        0, 2,
+                        9, 2);
+                assertArrayEquals(changeSet.getInsertions(), new int[]{0, 1, 9, 10});
+
+                checkRanges(changeSet.getChangeRanges(),
+                        3, 2,
+                        8, 1);
+                assertArrayEquals(changeSet.getChanges(), new int[]{3, 4, 8});
+
+                looperThread.testComplete();
+            }
+        });
+
+        realm.beginTransaction();
+        createObjects(realm, 11, 12, -1, -2);
+        deleteObjects(realm, 0, 1, 5);
+        modifyObjects(realm, 12, 3, 4, 9);
+        realm.commitTransaction();
+        // After transaction, '*' means the object has been modified. 12 has been modified as well, but it is created
+        // and modified in the same transaction, should not be counted in the changes range.
+        // [-1, -2, 2, *3, *4, 6, 7, 8, *9, 11, 12]
+    }
+
