@@ -4,13 +4,14 @@
     public void insert_then_delete() {
         Realm realm = looperThread.realm;
         populateData(realm, 10);
-        RealmResults<AllTypes> results = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_LONG);
-        results.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<AllTypes>>() {
+        ChangesCheck changesCheck = new ChangesCheck() {
             @Override
-            public void onChange(RealmResults<AllTypes> collection, OrderedCollectionChangeSet changeSet) {
+            public void check(OrderedCollectionChangeSet changeSet) {
                 fail("The listener should not be triggered since the collection has no changes compared with before.");
             }
-        });
+        };
+
+        registerCheckListener(realm, changesCheck);
 
         looperThread.postRunnableDelayed(new Runnable() {
             @Override

@@ -4,10 +4,9 @@
     public void changes_then_delete() {
         Realm realm = looperThread.realm;
         populateData(realm, 10);
-        RealmResults<AllTypes> results = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_LONG);
-        results.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<AllTypes>>() {
+        ChangesCheck changesCheck = new ChangesCheck() {
             @Override
-            public void onChange(RealmResults<AllTypes> collection, OrderedCollectionChangeSet changeSet) {
+            public void check(OrderedCollectionChangeSet changeSet) {
                 checkRanges(changeSet.getDeletionRanges(),
                         0, 2,
                         5, 1);
@@ -20,7 +19,8 @@
 
                 looperThread.testComplete();
             }
-        });
+        };
+        registerCheckListener(realm, changesCheck);
 
         realm.beginTransaction();
         modifyObjects(realm, 0, 1, 5);
