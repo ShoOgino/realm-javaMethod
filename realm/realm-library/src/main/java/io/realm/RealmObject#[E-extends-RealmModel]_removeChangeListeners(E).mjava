@@ -3,14 +3,10 @@
      *
      * @param object RealmObject to remove all listeners from.
      * @throws IllegalArgumentException if object is {@code null} or isn't managed by Realm.
+     * @deprecated Use {@link RealmObject#removeAllChangeListeners(RealmModel)} instead.
      */
+    @Deprecated
     public static <E extends RealmModel> void removeChangeListeners(E object) {
-        if (object instanceof RealmObjectProxy) {
-            RealmObjectProxy proxy = (RealmObjectProxy) object;
-            proxy.realmGet$proxyState().getRealm$realm().checkIfValid();
-            proxy.realmGet$proxyState().getListeners$realm().clear();
-        } else {
-            throw new IllegalArgumentException("Cannot remove listeners from this unmanaged RealmObject (created outside of Realm)");
-        }
+        removeAllChangeListeners(object);
     }
 

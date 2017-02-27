@@ -1,0 +1,14 @@
+    private RealmList<Dog> prepareRealmListInLooperThread() {
+        Realm realm = looperThread.realm;
+        realm.beginTransaction();
+        Owner owner = realm.createObject(Owner.class);
+        owner.setName("Owner");
+        for (int i = 0; i < TEST_SIZE; i++) {
+            Dog dog = realm.createObject(Dog.class);
+            dog.setName("Dog " + i);
+            owner.getDogs().add(dog);
+        }
+        realm.commitTransaction();
+        return owner.getDogs();
+    }
+

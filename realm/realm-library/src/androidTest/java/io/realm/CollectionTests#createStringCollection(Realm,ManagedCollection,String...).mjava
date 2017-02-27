@@ -2,7 +2,9 @@
     protected OrderedRealmCollection<AllJavaTypes> createStringCollection(Realm realm, ManagedCollection collectionClass, String... args) {
         realm.beginTransaction();
         realm.deleteAll();
+        OrderedRealmCollection<AllJavaTypes> orderedCollection;
         switch (collectionClass) {
+            case REALMRESULTS_SNAPSHOT_RESULTS_BASE:
             case REALMRESULTS:
                 int id = 0;
                 for (String arg : args) {
@@ -10,8 +12,10 @@
                     obj.setFieldString(arg);
                 }
                 realm.commitTransaction();
-                return realm.where(AllJavaTypes.class).findAllSorted(AllJavaTypes.FIELD_STRING);
+                orderedCollection = realm.where(AllJavaTypes.class).findAllSorted(AllJavaTypes.FIELD_STRING);
+                break;
 
+            case REALMRESULTS_SNAPSHOT_LIST_BASE:
             case MANAGED_REALMLIST:
                 AllJavaTypes first = realm.createObject(AllJavaTypes.class, 0);
                 first.setFieldString(args[0]);
@@ -22,10 +26,17 @@
                     first.getFieldList().add(obj);
                 }
                 realm.commitTransaction();
-                return first.getFieldList();
+                orderedCollection = first.getFieldList();
+                break;
 
             default:
                 throw new AssertionError("Unknown collection: " + collectionClass);
         }
+
+        if (isSnapshot(collectionClass)) {
+            orderedCollection = orderedCollection.createSnapshot();
+        }
+
+        return orderedCollection;
     }
 

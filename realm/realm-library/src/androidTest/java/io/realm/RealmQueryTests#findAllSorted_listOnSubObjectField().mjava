@@ -1,0 +1,17 @@
+    @Test
+    public void findAllSorted_listOnSubObjectField() {
+        String[] fieldNames = new String[2];
+        fieldNames[0] = AllTypes.FIELD_REALMOBJECT + "." + Dog.FIELD_AGE;
+        fieldNames[1] = AllTypes.FIELD_REALMOBJECT + "." + Dog.FIELD_AGE;
+
+        Sort[] sorts = new Sort[2];
+        sorts[0] = Sort.ASCENDING;
+        sorts[1] = Sort.ASCENDING;
+
+        populateTestRealm(realm, TEST_DATA_SIZE);
+        RealmResults<AllTypes> results = realm.where(AllTypes.class)
+                .findAllSorted(fieldNames, sorts);
+        assertEquals(0, results.get(0).getColumnRealmObject().getAge());
+        assertEquals(TEST_DATA_SIZE - 1, results.get(TEST_DATA_SIZE - 1).getColumnRealmObject().getAge());
+    }
+

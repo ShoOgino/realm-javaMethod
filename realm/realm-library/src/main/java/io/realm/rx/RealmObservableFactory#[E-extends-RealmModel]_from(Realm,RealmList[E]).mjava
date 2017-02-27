@@ -1,5 +1,36 @@
     @Override
-    public <E extends RealmModel> Observable<RealmList<E>> from(Realm realm, RealmList<E> list) {
-        return getRealmListObservable();
+    public <E extends RealmModel> Observable<RealmList<E>> from(Realm realm, final RealmList<E> list) {
+        final RealmConfiguration realmConfig = realm.getConfiguration();
+        return Observable.create(new Observable.OnSubscribe<RealmList<E>>() {
+            @Override
+            public void call(final Subscriber<? super RealmList<E>> subscriber) {
+                // Gets instance to make sure that the Realm is open for as long as the
+                // Observable is subscribed to it.
+                final Realm observableRealm = Realm.getInstance(realmConfig);
+                listRefs.get().acquireReference(list);
+
+                final RealmChangeListener<RealmList<E>> listener = new RealmChangeListener<RealmList<E>>() {
+                    @Override
+                    public void onChange(RealmList<E> result) {
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(list);
+                        }
+                    }
+                };
+                list.addChangeListener(listener);
+                subscriber.add(Subscriptions.create(new Action0() {
+                    @Override
+                    public void call() {
+                        list.removeChangeListener(listener);
+                        observableRealm.close();
+                        listRefs.get().releaseReference(list);
+                    }
+                }));
+
+                // Immediately calls onNext with the current value, as due to Realm's auto-update, it will be the latest
+                // value.
+                subscriber.onNext(list);
+            }
+        });
     }
 

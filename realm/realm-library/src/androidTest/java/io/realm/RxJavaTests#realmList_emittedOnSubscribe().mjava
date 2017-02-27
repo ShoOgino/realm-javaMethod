@@ -1,0 +1,18 @@
+    @Test
+    @UiThreadTest
+    public void realmList_emittedOnSubscribe() {
+        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
+        realm.beginTransaction();
+        final RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
+        realm.commitTransaction();
+        subscription = list.asObservable().subscribe(new Action1<RealmList<Dog>>() {
+            @Override
+            public void call(RealmList<Dog> rxList) {
+                assertTrue(rxList == list);
+                subscribedNotified.set(true);
+            }
+        });
+        assertTrue(subscribedNotified.get());
+        subscription.unsubscribe();
+    }
+

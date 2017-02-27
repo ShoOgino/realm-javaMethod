@@ -1,0 +1,22 @@
+    @Test
+    public void getInstanceForDistinct_shouldThrowOnLinkAndListListField() {
+        RealmFieldType type = RealmFieldType.STRING;
+        RealmFieldType objectType = RealmFieldType.OBJECT;
+        RealmFieldType listType = RealmFieldType.LIST;
+        table.addColumn(type, type.name());
+        table.addColumnLink(objectType, objectType.name(), table);
+        table.addColumnLink(listType, listType.name(), table);
+
+        try {
+            SortDescriptor.getInstanceForDistinct(table, String.format("%s.%s", listType.name(), type.name()));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        try {
+            SortDescriptor.getInstanceForDistinct(table, String.format("%s.%s", objectType.name(), type.name()));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

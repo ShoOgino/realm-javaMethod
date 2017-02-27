@@ -1,0 +1,21 @@
+    @SuppressLint("UseValueOf")
+    @Test
+    public void remove() {
+        TestObserverPair pair = new TestObserverPair(ONE, testListener);
+        observerPairs.add(pair);
+        assertEquals(1, observerPairs.size());
+
+        // Create a new Integer 1 to see if the equality is checked by the same object.
+        //noinspection UnnecessaryBoxing
+        observerPairs.remove(new Integer(1), testListener);
+        assertEquals(1, observerPairs.size());
+
+        // Different listener
+        observerPairs.remove(ONE, new TestListener());
+        assertEquals(1, observerPairs.size());
+
+        // Should remove now
+        observerPairs.remove(ONE, testListener);
+        assertEquals(0, observerPairs.size());
+    }
+

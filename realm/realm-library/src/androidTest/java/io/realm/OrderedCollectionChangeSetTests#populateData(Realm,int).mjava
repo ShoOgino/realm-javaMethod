@@ -1,0 +1,16 @@
+    private void populateData(Realm realm, int testSize) {
+        Owner owner = null;
+        realm.beginTransaction();
+        if (type == ObservablesType.REALM_LIST) {
+            owner = realm.createObject(Owner.class);
+        }
+        for (int i = 0; i < testSize; i++) {
+            Dog dog = realm.createObject(Dog.class);
+            dog.setAge(i);
+            if (type == ObservablesType.REALM_LIST) {
+                owner.getDogs().add(dog);
+            }
+        }
+        realm.commitTransaction();
+    }
+

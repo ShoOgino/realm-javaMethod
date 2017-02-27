@@ -1,0 +1,19 @@
+    private SharedRealm(long nativeConfigPtr,
+                        RealmConfiguration configuration,
+                        SchemaVersionListener schemaVersionListener) {
+        Capabilities capabilities = new AndroidCapabilities();
+        RealmNotifier realmNotifier = new AndroidRealmNotifier(this, capabilities);
+
+        this.nativePtr = nativeGetSharedRealm(nativeConfigPtr, realmNotifier);
+        this.configuration = configuration;
+
+        this.capabilities = capabilities;
+        this.realmNotifier = realmNotifier;
+        this.schemaChangeListener = schemaVersionListener;
+        context = new Context();
+        context.addReference(this);
+        this.lastSchemaVersion = schemaVersionListener == null ? -1L : getSchemaVersion();
+        objectServerFacade = null;
+        nativeSetAutoRefresh(nativePtr, capabilities.canDeliverNotification());
+    }
+

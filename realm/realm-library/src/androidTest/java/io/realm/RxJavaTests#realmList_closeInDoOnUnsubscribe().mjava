@@ -1,0 +1,23 @@
+    @Test
+    @UiThreadTest
+    public void realmList_closeInDoOnUnsubscribe() {
+        realm.beginTransaction();
+        RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
+        realm.commitTransaction();
+
+        Observable<RealmList<Dog>> observable = list.asObservable().doOnUnsubscribe(new Action0() {
+            @Override
+            public void call() {
+                realm.close();
+            }
+        });
+        subscription = observable.subscribe(new Action1<RealmList<Dog>>() {
+            @Override
+            public void call(RealmList<Dog> dogs) {
+            }
+        });
+
+        subscription.unsubscribe();
+        assertTrue(realm.isClosed());
+    }
+

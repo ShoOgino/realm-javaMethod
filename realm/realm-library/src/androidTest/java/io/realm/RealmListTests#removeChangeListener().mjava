@@ -1,0 +1,35 @@
+    @Test
+    @RunTestInLooperThread
+    public void removeChangeListener() {
+        collection = prepareRealmListInLooperThread();
+        Realm realm = looperThread.realm;
+        final AtomicInteger listenerCalledCount = new AtomicInteger(0);
+        RealmChangeListener<RealmList<Dog>> listener1 = new RealmChangeListener<RealmList<Dog>>() {
+            @Override
+            public void onChange(RealmList<Dog> element) {
+                fail();
+            }
+        };
+        OrderedRealmCollectionChangeListener<RealmList<Dog>> listener2 =
+                new OrderedRealmCollectionChangeListener<RealmList<Dog>>() {
+                    @Override
+                    public void onChange(RealmList<Dog> collection, OrderedCollectionChangeSet changes) {
+                        assertEquals(0, listenerCalledCount.getAndIncrement());
+                    }
+                };
+
+        collection.addChangeListener(listener1);
+        collection.addChangeListener(listener2);
+        realm.beginTransaction();
+        collection.get(0).setAge(42);
+        realm.commitTransaction();
+
+        collection.removeChangeListener(listener1);
+
+        // This should trigger the listener if there is any.
+        realm.beginTransaction();
+        realm.cancelTransaction();
+        assertEquals(1, listenerCalledCount.get());
+        looperThread.testComplete();
+    }
+

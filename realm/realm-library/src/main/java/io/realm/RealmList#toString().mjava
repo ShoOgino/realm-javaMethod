@@ -1,13 +1,13 @@
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(managedMode ? clazz.getSimpleName() : getClass().getSimpleName());
+        sb.append(isManaged() ? clazz.getSimpleName() : getClass().getSimpleName());
         sb.append("@[");
-        if (managedMode && !isAttached()) {
+        if (isManaged() && !isAttached()) {
             sb.append("invalid");
         } else {
             for (int i = 0; i < size(); i++) {
-                if (managedMode) {
+                if (isManaged()) {
                     sb.append(((RealmObjectProxy) get(i)).realmGet$proxyState().getRow$realm().getIndex());
                 } else {
                     sb.append(System.identityHashCode(get(i)));

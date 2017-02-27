@@ -7,13 +7,6 @@
      */
     @SuppressWarnings("unchecked")
     public RealmResults<E> findAll() {
-        checkQueryIsNotReused();
-        RealmResults<E> realmResults;
-        if (isDynamicQuery()) {
-            realmResults =  (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, query.findAll(), className);
-        } else {
-            realmResults = RealmResults.createFromTableOrView(realm, query.findAll(), clazz);
-        }
-        return realmResults;
+        return createRealmResults(query, null, null, true);
     }
 

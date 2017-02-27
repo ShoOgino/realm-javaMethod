@@ -16,7 +16,7 @@
      */
     @Override
     public boolean removeAll(Collection<?> collection) {
-        if (managedMode && !realm.isInTransaction()) {
+        if (isManaged() && !realm.isInTransaction()) {
             throw new IllegalStateException(REMOVE_OUTSIDE_TRANSACTION_ERROR);
         }
         return super.removeAll(collection);

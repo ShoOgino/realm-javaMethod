@@ -1,5 +1,8 @@
     @Test
     public void where() {
+        if (isSnapshot(collectionClass)) {
+            thrown.expect(UnsupportedOperationException.class);
+        }
         RealmResults<AllJavaTypes> results = collection.where().findAll();
         assertEquals(TEST_SIZE, results.size());
     }

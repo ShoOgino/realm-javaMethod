@@ -1,0 +1,22 @@
+    @Test
+    public void add() {
+        TestObserverPair pair = new TestObserverPair(ONE, testListener);
+        observerPairs.add(pair);
+        assertEquals(1, observerPairs.size());
+
+        // Same observer object, different listener.
+        pair = new TestObserverPair(ONE, new TestListener<Integer>());
+        observerPairs.add(pair);
+        assertEquals(2, observerPairs.size());
+
+        // Different observer object, different listener.
+        pair = new TestObserverPair(TWO, new TestListener<Integer>());
+        observerPairs.add(pair);
+        assertEquals(3, observerPairs.size());
+
+        // Different observer object, same listener.
+        pair = new TestObserverPair(TWO, testListener);
+        observerPairs.add(pair);
+        assertEquals(4, observerPairs.size());
+    }
+

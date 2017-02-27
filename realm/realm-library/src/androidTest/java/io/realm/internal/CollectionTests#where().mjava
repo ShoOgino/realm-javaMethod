@@ -1,0 +1,15 @@
+    @Test
+    public void where() {
+        Collection collection = new Collection(sharedRealm, table.where());
+        Collection collection2 = new Collection(sharedRealm, collection.where().equalTo(new long[]{0}, "John"));
+        Collection collection3 =new Collection(sharedRealm, collection2.where().equalTo(new long[]{1}, "Anderson"));
+
+        // A new native Results should be created.
+        assertTrue(collection.getNativePtr() != collection2.getNativePtr());
+        assertTrue(collection2.getNativePtr() != collection3.getNativePtr());
+
+        assertEquals(4, collection.size());
+        assertEquals(2, collection2.size());
+        assertEquals(1, collection3.size());
+    }
+
