@@ -7,6 +7,8 @@
      * of DynamicRealmObject doesn't match or it belongs to a different Realm.
      */
     public void setObject(String fieldName, DynamicRealmObject value) {
+        proxyState.getRealm$realm().checkIfValid();
+
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
         if (value == null) {
             proxyState.getRow$realm().nullifyLink(columnIndex);

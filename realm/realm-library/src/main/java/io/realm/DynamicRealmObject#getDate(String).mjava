@@ -6,6 +6,8 @@
      * @throws IllegalArgumentException if field name doesn't exist or it doesn't contain Dates.
      */
     public Date getDate(String fieldName) {
+        proxyState.getRealm$realm().checkIfValid();
+
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
         checkFieldType(fieldName, columnIndex, RealmFieldType.DATE);
         if (proxyState.getRow$realm().isNull(columnIndex)) {

@@ -6,6 +6,8 @@
      * @throws RealmException if the field is a {@link io.realm.annotations.PrimaryKey} field.
      */
     public void setNull(String fieldName) {
+        proxyState.getRealm$realm().checkIfValid();
+
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
         RealmFieldType type = proxyState.getRow$realm().getColumnType(columnIndex);
         if (type == RealmFieldType.OBJECT) {
