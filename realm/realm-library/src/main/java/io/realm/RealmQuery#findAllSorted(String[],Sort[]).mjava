@@ -12,6 +12,8 @@
      * {@link RealmObject} or a child {@link RealmList}.
      */
     public RealmResults<E> findAllSorted(String fieldNames[], Sort sortOrders[]) {
+        realm.checkIfValid();
+
         SortDescriptor sortDescriptor = SortDescriptor.getInstanceForSort(query.getTable(), fieldNames, sortOrders);
         return createRealmResults(query, sortDescriptor, null, true);
     }

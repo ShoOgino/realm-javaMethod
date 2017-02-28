@@ -7,6 +7,8 @@
      * String or byte array.
      */
     public RealmQuery<E> isNotEmpty(String fieldName) {
+        realm.checkIfValid();
+
         long columnIndices[] = schema.getColumnIndices(fieldName, RealmFieldType.STRING, RealmFieldType.BINARY, RealmFieldType.LIST);
         this.query.isNotEmpty(columnIndices);
         return this;

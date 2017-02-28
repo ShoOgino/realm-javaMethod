@@ -5,6 +5,8 @@
      * @see io.realm.RealmObject
      */
     public E findFirst() {
+        realm.checkIfValid();
+
         long tableRowIndex = getSourceRowIndexForFirstObject();
         if (tableRowIndex >= 0) {
             E realmObject = realm.get(clazz, className, tableRowIndex);

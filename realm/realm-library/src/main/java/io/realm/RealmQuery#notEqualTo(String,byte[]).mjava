@@ -7,6 +7,8 @@
      * @throws java.lang.IllegalArgumentException if one or more arguments do not match class or field type.
      */
     public RealmQuery<E> notEqualTo(String fieldName, byte[] value) {
+        realm.checkIfValid();
+
         long[] columnIndices = schema.getColumnIndices(fieldName, RealmFieldType.BINARY);
         if (value == null) {
             this.query.isNotNull(columnIndices);
