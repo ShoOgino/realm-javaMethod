@@ -8,13 +8,15 @@
      * empty.
      */
     public RealmQuery<E> in(String fieldName, Short[] values) {
+        realm.checkIfValid();
+
         if (values == null || values.length == 0) {
             throw new IllegalArgumentException(EMPTY_VALUES);
         }
-        beginGroup().equalTo(fieldName, values[0]);
+        beginGroupWithoutThreadValidation().equalToWithoutThreadValidation(fieldName, values[0]);
         for (int i = 1; i < values.length; i++) {
-            or().equalTo(fieldName, values[i]);
+            orWithoutThreadValidation().equalToWithoutThreadValidation(fieldName, values[i]);
         }
-        return endGroup();
+        return endGroupWithoutThreadValidation();
     }
 

@@ -13,6 +13,8 @@
      */
     @SuppressWarnings("unchecked")
     public RealmResults<E> findAllSorted(String fieldName, Sort sortOrder) {
+        realm.checkIfValid();
+
         checkQueryIsNotReused();
         TableView tableView = query.findAll();
         long columnIndex = getColumnIndexForSort(fieldName);

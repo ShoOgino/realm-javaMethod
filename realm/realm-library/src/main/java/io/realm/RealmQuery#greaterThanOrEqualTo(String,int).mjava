@@ -7,6 +7,8 @@
      * @throws java.lang.IllegalArgumentException if one or more arguments do not match class or field type.
      */
     public RealmQuery<E> greaterThanOrEqualTo(String fieldName, int value) {
+        realm.checkIfValid();
+
         long columnIndices[] = schema.getColumnIndices(fieldName, RealmFieldType.INTEGER);
         this.query.greaterThanOrEqual(columnIndices, value);
         return this;

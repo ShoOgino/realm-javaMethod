@@ -11,6 +11,8 @@
      * is not indexed, or points to linked fields.
      */
     public RealmResults<E> distinctAsync(String fieldName) {
+        realm.checkIfValid();
+
         checkQueryIsNotReused();
         final long columnIndex = getAndValidateDistinctColumnIndex(fieldName, this.table.getTable());
         final WeakReference<RealmNotifier> weakNotifier = getWeakReferenceNotifier();

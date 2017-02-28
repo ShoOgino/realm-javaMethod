@@ -9,6 +9,8 @@
      * is not indexed, or points to linked fields.
      */
     public RealmResults<E> distinct(String fieldName) {
+        realm.checkIfValid();
+
         checkQueryIsNotReused();
         long columnIndex = getAndValidateDistinctColumnIndex(fieldName, this.table.getTable());
         TableView tableView = this.query.findAll();

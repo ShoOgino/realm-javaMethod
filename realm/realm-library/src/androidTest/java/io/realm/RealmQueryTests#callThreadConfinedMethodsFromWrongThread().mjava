@@ -1,0 +1,50 @@
+    @Test
+    public void callThreadConfinedMethodsFromWrongThread() throws Throwable {
+        final RealmQuery<AllJavaTypes> query = realm.where(AllJavaTypes.class);
+
+        final AtomicReference<Throwable> throwableFromThread = new AtomicReference<Throwable>();
+        final CountDownLatch testFinished = new CountDownLatch(1);
+
+        final String expectedMessage;
+        //noinspection TryWithIdenticalCatches
+        try {
+            final Field expectedMessageField = BaseRealm.class.getDeclaredField("INCORRECT_THREAD_MESSAGE");
+            expectedMessageField.setAccessible(true);
+            expectedMessage = (String) expectedMessageField.get(null);
+        } catch (NoSuchFieldException e) {
+            throw new AssertionError(e);
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
+
+        final Thread thread = new Thread("callThreadConfinedMethodsFromWrongThread") {
+            @Override
+            public void run() {
+                try {
+                    for (ThreadConfinedMethods method : ThreadConfinedMethods.values()) {
+                        try {
+                            callThreadConfinedMethod(query, method);
+                            fail("IllegalStateException must be thrown.");
+                        } catch (Throwable e) {
+                            if (e instanceof IllegalStateException && expectedMessage.equals(e.getMessage())) {
+                                // expected exception
+                                continue;
+                            }
+                            throwableFromThread.set(e);
+                            return;
+                        }
+                    }
+                } finally {
+                    testFinished.countDown();
+                }
+            }
+        };
+        thread.start();
+
+        TestHelper.awaitOrFail(testFinished);
+        final Throwable throwable = throwableFromThread.get();
+        if (throwable != null) {
+            throw throwable;
+        }
+    }
+
