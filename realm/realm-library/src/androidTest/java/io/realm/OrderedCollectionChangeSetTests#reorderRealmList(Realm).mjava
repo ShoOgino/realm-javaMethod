@@ -1,0 +1,10 @@
+    // Re-adds the dogs so they would be sorted by age in the list.
+    private void reorderRealmList(Realm realm) {
+        RealmResults<Dog> dogs = realm.where(Dog.class).findAllSorted(Dog.FIELD_AGE);
+        Owner owner = realm.where(Owner.class).findFirst();
+        owner.getDogs().clear();
+        for (Dog dog : dogs) {
+            owner.getDogs().add(dog);
+        }
+    }
+

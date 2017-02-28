@@ -1,5 +1,36 @@
     @Override
-    public Observable<RealmList<DynamicRealmObject>> from(DynamicRealm realm, RealmList<DynamicRealmObject> list) {
-        return getRealmListObservable();
+    public Observable<RealmList<DynamicRealmObject>> from(DynamicRealm realm, final RealmList<DynamicRealmObject> list) {
+        final RealmConfiguration realmConfig = realm.getConfiguration();
+        return Observable.create(new Observable.OnSubscribe<RealmList<DynamicRealmObject>>() {
+            @Override
+            public void call(final Subscriber<? super RealmList<DynamicRealmObject>> subscriber) {
+                // Gets instance to make sure that the Realm is open for as long as the
+                // Observable is subscribed to it.
+                final DynamicRealm observableRealm = DynamicRealm.getInstance(realmConfig);
+                listRefs.get().acquireReference(list);
+
+                final RealmChangeListener<RealmList<DynamicRealmObject>> listener = new RealmChangeListener<RealmList<DynamicRealmObject>>() {
+                    @Override
+                    public void onChange(RealmList<DynamicRealmObject> result) {
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(list);
+                        }
+                    }
+                };
+                list.addChangeListener(listener);
+                subscriber.add(Subscriptions.create(new Action0() {
+                    @Override
+                    public void call() {
+                        list.removeChangeListener(listener);
+                        observableRealm.close();
+                        listRefs.get().releaseReference(list);
+                    }
+                }));
+
+                // Immediately calls onNext with the current value, as due to Realm's auto-update, it will be the latest
+                // value.
+                subscriber.onNext(list);
+            }
+        });
     }
 

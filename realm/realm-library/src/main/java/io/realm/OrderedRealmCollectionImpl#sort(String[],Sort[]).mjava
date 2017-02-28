@@ -1,0 +1,12 @@
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealmResults<E> sort(String fieldNames[], Sort sortOrders[]) {
+        SortDescriptor sortDescriptor =
+                SortDescriptor.getInstanceForSort(collection.getTable(), fieldNames, sortOrders);
+
+        Collection sortedCollection = collection.sort(sortDescriptor);
+        return createLoadedResults(sortedCollection);
+    }
+

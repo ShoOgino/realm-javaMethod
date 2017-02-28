@@ -1,0 +1,18 @@
+    // The args should be [startIndex1, length1, startIndex2, length2, ...]
+    private void checkRanges(OrderedCollectionChangeSet.Range[] ranges, int... indexAndLen) {
+        if ((indexAndLen.length % 2 != 0))  {
+            fail("The 'indexAndLen' array length is not an even number.");
+        }
+        if (ranges.length != indexAndLen.length / 2) {
+            fail("The lengths of 'ranges' and 'indexAndLen' don't match.");
+        }
+        for (int i = 0; i < ranges.length; i++) {
+            OrderedCollectionChangeSet.Range range = ranges[i];
+            int startIndex = indexAndLen[i * 2];
+            int length = indexAndLen[i * 2 + 1];
+            if (range.startIndex != startIndex || range.length != length) {
+                fail("Range at index " + i + " doesn't match start index " + startIndex + " length " + length + ".");
+            }
+        }
+    }
+

@@ -4,6 +4,20 @@
         Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
+                // Defines expected exception.
+                Class<? extends Throwable> expected = IllegalStateException.class;
+                if (isSnapshot(collectionClass)) {
+                    switch (method) {
+                        case SORT:
+                        case SORT_FIELD:
+                        case SORT_2FIELDS:
+                        case SORT_MULTI:
+                            expected = UnsupportedOperationException.class;
+                        default:
+                            break;
+                    }
+                }
+
                 try {
                     switch (method) {
                         case DELETE_INDEX: collection.deleteFromRealm(0); break;
@@ -13,10 +27,11 @@
                         case SORT_FIELD: collection.sort(AllJavaTypes.FIELD_STRING, Sort.ASCENDING); break;
                         case SORT_2FIELDS: collection.sort(AllJavaTypes.FIELD_STRING, Sort.ASCENDING, AllJavaTypes.FIELD_LONG, Sort.DESCENDING); break;
                         case SORT_MULTI: collection.sort(new String[] { AllJavaTypes.FIELD_STRING }, new Sort[] { Sort.ASCENDING }); break;
+                        case CREATE_SNAPSHOT: collection.createSnapshot(); break;
                     }
                     return false;
-                } catch (IllegalStateException ignored) {
-                    return true;
+                } catch (Throwable t) {
+                    return t.getClass().equals(expected);
                 }
             }
         });

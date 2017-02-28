@@ -1,0 +1,17 @@
+    @Test
+    public void getInstanceForDistinct() {
+        for (RealmFieldType type : SortDescriptor.validFieldTypesForDistinct) {
+            long column = table.addColumn(type, type.name());
+            table.addSearchIndex(column);
+        }
+
+        long i = 0;
+        for (RealmFieldType type : SortDescriptor.validFieldTypesForDistinct) {
+            SortDescriptor sortDescriptor = SortDescriptor.getInstanceForDistinct(table, type.name());
+            assertEquals(1, sortDescriptor.getColumnIndices()[0].length);
+            assertEquals(i, sortDescriptor.getColumnIndices()[0][0]);
+            assertNull(sortDescriptor.getAscendings());
+            i++;
+        }
+    }
+

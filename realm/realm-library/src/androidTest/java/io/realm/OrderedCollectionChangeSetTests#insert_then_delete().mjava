@@ -1,0 +1,28 @@
+    // Insert some objects then delete them in the same transaction, the listener should not be triggered.
+    @Test
+    @RunTestInLooperThread
+    public void insert_then_delete() {
+        Realm realm = looperThread.realm;
+        populateData(realm, 10);
+        ChangesCheck changesCheck = new ChangesCheck() {
+            @Override
+            public void check(OrderedCollectionChangeSet changeSet) {
+                fail("The listener should not be triggered since the collection has no changes compared with before.");
+            }
+        };
+
+        registerCheckListener(realm, changesCheck);
+
+        looperThread.postRunnableDelayed(new Runnable() {
+            @Override
+            public void run() {
+                looperThread.testComplete();
+            }
+        }, 1000);
+
+        realm.beginTransaction();
+        createObjects(realm, 10, 11);
+        deleteObjects(realm, 10, 11);
+        realm.commitTransaction();
+    }
+

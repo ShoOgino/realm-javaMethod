@@ -1,0 +1,32 @@
+    @Test
+    @RunTestInLooperThread
+    public void deletion() {
+        Realm realm = looperThread.realm;
+        populateData(realm, 10);
+
+        final ChangesCheck changesCheck = new ChangesCheck() {
+            @Override
+            public void check(OrderedCollectionChangeSet changeSet) {
+                checkRanges(changeSet.getDeletionRanges(),
+                        0, 1,
+                        2, 3,
+                        8, 2);
+                assertArrayEquals(changeSet.getDeletions(), new int[]{0, 2, 3, 4, 8, 9});
+                assertEquals(0, changeSet.getChangeRanges().length);
+                assertEquals(0, changeSet.getInsertionRanges().length);
+                assertEquals(0, changeSet.getChanges().length);
+                assertEquals(0, changeSet.getInsertions().length);
+                looperThread.testComplete();
+            }
+        };
+
+        registerCheckListener(realm, changesCheck);
+
+        realm.beginTransaction();
+        deleteObjects(realm,
+                0,
+                2, 3, 4,
+                8, 9);
+        realm.commitTransaction();
+    }
+

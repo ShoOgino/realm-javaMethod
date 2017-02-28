@@ -1,5 +1,8 @@
     @Test
     public void sort_twoFields() {
+        if (isSnapshot(collectionClass)) {
+            thrown.expect(UnsupportedOperationException.class);
+        }
         OrderedRealmCollection<AllJavaTypes> sortedList = collection.sort(AllJavaTypes.FIELD_BOOLEAN, Sort.ASCENDING, AllJavaTypes.FIELD_LONG, Sort.DESCENDING);
         AllJavaTypes obj = sortedList.first();
         assertFalse(obj.isFieldBoolean());

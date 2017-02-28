@@ -1,0 +1,23 @@
+    // Deletes the last row in the collection then tests the aggregates methods.
+    // Since deletion will turn the corresponding object into invalid for collection snapshot, this tests if the
+    // aggregates methods ignore the invalid rows and return the correct result.
+    @Test
+    public void aggregates_deleteLastRow() {
+        assertTrue(TEST_SIZE > 3);
+        assertEquals(TEST_SIZE, collection.size());
+        realm.beginTransaction();
+        realm.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_LONG, TEST_SIZE - 1).findFirst().deleteFromRealm();
+        realm.commitTransaction();
+
+        int sizeAfterRemove = TEST_SIZE - 1;
+
+        assertEquals(0, collection.min(AllJavaTypes.FIELD_LONG).intValue());
+        assertEquals(sizeAfterRemove - 1, collection.max(AllJavaTypes.FIELD_LONG).intValue());
+        // Sum of numbers 0 to M-1: (M-1)*M/2
+        assertEquals((sizeAfterRemove - 1) * sizeAfterRemove / 2, collection.sum(AllJavaTypes.FIELD_LONG).intValue());
+        double average = 3.1415 + (sizeAfterRemove - 1.0) * 0.5;
+        assertEquals(average, collection.average(AllJavaTypes.FIELD_DOUBLE), 0.0001);
+        assertEquals(new Date(YEAR_MILLIS * 20 * (sizeAfterRemove / 2 - 1)), collection.maxDate(AllJavaTypes.FIELD_DATE));
+        assertEquals(new Date(-YEAR_MILLIS * 20 * TEST_SIZE / 2), collection.minDate(AllJavaTypes.FIELD_DATE));
+    }
+

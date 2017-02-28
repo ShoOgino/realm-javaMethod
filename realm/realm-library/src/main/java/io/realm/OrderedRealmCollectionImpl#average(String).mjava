@@ -1,0 +1,12 @@
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double average(String fieldName) {
+        realm.checkIfValid();
+        long columnIndex = getColumnIndexForSort(fieldName);
+
+        Number avg = collection.aggregateNumber(Collection.Aggregate.AVERAGE, columnIndex);
+        return avg.doubleValue();
+    }
+

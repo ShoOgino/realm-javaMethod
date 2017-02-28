@@ -1,0 +1,23 @@
+    @Test
+    public void getInstanceForSort_multipleFields() {
+        RealmFieldType stringType = RealmFieldType.STRING;
+        long stringColumn = table.addColumn(stringType, stringType.name());
+        RealmFieldType intType = RealmFieldType.INTEGER;
+        long intColumn = table.addColumn(intType, intType.name());
+
+        SortDescriptor sortDescriptor = SortDescriptor.getInstanceForSort(table, new String[] {
+                stringType.name(), intType.name()}, new Sort[] {Sort.ASCENDING, Sort.DESCENDING});
+
+        assertEquals(2, sortDescriptor.getAscendings().length);
+        assertEquals(2, sortDescriptor.getColumnIndices().length);
+
+        assertEquals(1, sortDescriptor.getColumnIndices()[0].length);
+        assertEquals(stringColumn, sortDescriptor.getColumnIndices()[0][0]);
+        assertTrue(sortDescriptor.getAscendings()[0]);
+
+        assertEquals(1, sortDescriptor.getColumnIndices()[1].length);
+        assertEquals(intColumn, sortDescriptor.getColumnIndices()[1][0]);
+        assertFalse(sortDescriptor.getAscendings()[1]);
+
+    }
+

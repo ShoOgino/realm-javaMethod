@@ -1,0 +1,13 @@
+    @Test
+    public void createSnapshot() {
+        Collection collection = new Collection(sharedRealm, table.where());
+        Collection snapshot = collection.createSnapshot();
+        assertTrue(Collection.Mode.TABLEVIEW == snapshot.getMode());
+        thrown.expect(IllegalStateException.class);
+        snapshot.addListener(snapshot, new RealmChangeListener<Collection>() {
+            @Override
+            public void onChange(Collection element) {
+            }
+        });
+    }
+

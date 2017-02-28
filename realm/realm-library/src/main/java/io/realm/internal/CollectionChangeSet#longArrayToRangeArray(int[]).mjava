@@ -1,0 +1,14 @@
+    // Convert long array returned by the nativeGetXxxRanges() to Range array.
+    private Range[] longArrayToRangeArray(int[] longArray) {
+        if (longArray == null) {
+            // Returns a size 0 array so we know JNI gets called.
+            return new Range[0];
+        }
+
+        Range[] ranges = new Range[longArray.length / 2];
+        for (int i = 0; i < ranges.length; i++) {
+            ranges[i] = new Range(longArray[i * 2], longArray[i * 2 + 1]);
+        }
+        return ranges;
+    }
+

@@ -11,18 +11,7 @@
     public RealmResults<E> distinct(String fieldName) {
         realm.checkIfValid();
 
-        checkQueryIsNotReused();
-        long columnIndex = getAndValidateDistinctColumnIndex(fieldName, this.table.getTable());
-        TableView tableView = this.query.findAll();
-        tableView.distinct(columnIndex);
-
-        RealmResults<E> realmResults;
-        if (isDynamicQuery()) {
-            //noinspection unchecked
-            realmResults = (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, tableView, className);
-        } else {
-            realmResults = RealmResults.createFromTableOrView(realm, tableView, clazz);
-        }
-        return realmResults;
+        SortDescriptor distinctDescriptor = SortDescriptor.getInstanceForDistinct(query.getTable(), fieldName);
+        return createRealmResults(query, null, distinctDescriptor, true);
     }
 

@@ -1,0 +1,11 @@
+    // The detaching should happen before transaction begins.
+    void detachIterators() {
+        for (WeakReference<Collection.Iterator> iteratorRef : iterators) {
+            Collection.Iterator iterator = iteratorRef.get();
+            if (iterator != null) {
+                iterator.detach();
+            }
+        }
+        iterators.clear();
+    }
+
