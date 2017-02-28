@@ -1,0 +1,9 @@
+    // Modifies Dogs objects which's columnLong is in the indices array.
+    private void modifyObjects(Realm realm, int... indices) {
+        for (int index : indices) {
+            Dog obj = realm.where(Dog.class).equalTo(Dog.FIELD_AGE, index).findFirst();
+            assertNotNull(obj);
+            obj.setName("modified");
+        }
+    }
+

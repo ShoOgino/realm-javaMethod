@@ -13,18 +13,11 @@
     public RealmResults<E> distinct(String firstFieldName, String... remainingFieldNames) {
         realm.checkIfValid();
 
-        checkQueryIsNotReused();
-        List<Long> columnIndexes = getValidatedColumIndexes(this.table.getTable(), firstFieldName, remainingFieldNames);
-        TableView tableView = this.query.findAll();
-        tableView.distinct(columnIndexes);
+        String[] fieldNames = new String[1 + remainingFieldNames.length];
 
-        RealmResults<E> realmResults;
-        if (isDynamicQuery()) {
-            //noinspection unchecked
-            realmResults = (RealmResults<E>) RealmResults.createFromDynamicTableOrView(realm, tableView, className);
-        } else {
-            realmResults = RealmResults.createFromTableOrView(realm, tableView, clazz);
-        }
-        return realmResults;
+        fieldNames[0] = firstFieldName;
+        System.arraycopy(remainingFieldNames, 0, fieldNames, 1, remainingFieldNames.length);
+        SortDescriptor distinctDescriptor = SortDescriptor.getInstanceForDistinct(table.getTable(), fieldNames);
+        return createRealmResults(query, null, distinctDescriptor, true);
     }
 

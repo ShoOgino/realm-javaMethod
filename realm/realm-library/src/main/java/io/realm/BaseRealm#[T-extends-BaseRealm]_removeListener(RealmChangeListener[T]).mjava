@@ -1,0 +1,18 @@
+    /**
+     * Removes the specified change listener.
+     *
+     * @param listener the change listener to be removed.
+     * @throws IllegalArgumentException if the change listener is {@code null}.
+     * @throws IllegalStateException if you try to remove a listener from a non-Looper Thread.
+     * @see io.realm.RealmChangeListener
+     */
+    protected <T extends BaseRealm> void removeListener(RealmChangeListener<T> listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("Listener should not be null");
+        }
+        checkIfValid();
+        sharedRealm.capabilities.checkCanDeliverNotification(LISTENER_NOT_ALLOWED_MESSAGE);
+        //noinspection unchecked
+        sharedRealm.realmNotifier.removeChangeListener((T) this, listener);
+    }
+

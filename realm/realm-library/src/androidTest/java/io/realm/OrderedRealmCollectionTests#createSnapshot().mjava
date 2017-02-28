@@ -1,0 +1,21 @@
+    @Test
+    public void createSnapshot() {
+        if (collectionClass == CollectionClass.UNMANAGED_REALMLIST) {
+            thrown.expect(UnsupportedOperationException.class);
+        }
+        OrderedRealmCollectionSnapshot snapshot = collection.createSnapshot();
+        switch (collectionClass) {
+            case REALMRESULTS_SNAPSHOT_LIST_BASE:
+            case REALMRESULTS_SNAPSHOT_RESULTS_BASE:
+                // Creating snapshot from a snapshot will just return the same object.
+                assertSame(collection, snapshot);
+                break;
+            case MANAGED_REALMLIST:
+            case REALMRESULTS:
+                assertEquals(collection.size(), snapshot.size());
+                break;
+            default:
+                break;
+        }
+    }
+

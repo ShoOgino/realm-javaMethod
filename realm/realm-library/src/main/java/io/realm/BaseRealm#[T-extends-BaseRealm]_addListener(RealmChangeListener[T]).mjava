@@ -1,0 +1,10 @@
+    protected <T extends BaseRealm> void addListener(RealmChangeListener<T> listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("Listener should not be null");
+        }
+        checkIfValid();
+        sharedRealm.capabilities.checkCanDeliverNotification(LISTENER_NOT_ALLOWED_MESSAGE);
+        //noinspection unchecked
+        sharedRealm.realmNotifier.addChangeListener((T) this, listener);
+    }
+

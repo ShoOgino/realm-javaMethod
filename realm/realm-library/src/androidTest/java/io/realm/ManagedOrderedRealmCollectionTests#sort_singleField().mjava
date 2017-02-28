@@ -1,5 +1,8 @@
     @Test
     public void sort_singleField() {
+        if (isSnapshot(collectionClass)) {
+            thrown.expect(UnsupportedOperationException.class);
+        }
         RealmResults<AllJavaTypes> sortedList = collection.sort(new String[]{AllJavaTypes.FIELD_LONG}, new Sort[]{Sort.DESCENDING});
         assertEquals(TEST_SIZE, sortedList.size());
         assertEquals(TEST_SIZE - 1, sortedList.first().getFieldLong());

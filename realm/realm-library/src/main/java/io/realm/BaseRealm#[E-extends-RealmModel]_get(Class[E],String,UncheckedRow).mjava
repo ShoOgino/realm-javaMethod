@@ -1,0 +1,18 @@
+    // Used by RealmList/RealmResults, to create RealmObject from a Collection.
+    // Invariant: if dynamicClassName != null -> clazz == DynamicRealmObject
+    <E extends RealmModel> E get(Class<E> clazz, String dynamicClassName, UncheckedRow row) {
+        final boolean isDynamicRealmObject = dynamicClassName != null;
+
+        E result;
+        if (isDynamicRealmObject) {
+            //noinspection unchecked
+            result = (E) new DynamicRealmObject(this, CheckedRow.getFromRow(row));
+        } else {
+            result = configuration.getSchemaMediator().newInstance(clazz, this, row, schema.getColumnInfo(clazz),
+                    false, Collections.<String> emptyList());
+        }
+        RealmObjectProxy proxy = (RealmObjectProxy) result;
+        proxy.realmGet$proxyState().setTableVersion$realm();
+        return result;
+    }
+

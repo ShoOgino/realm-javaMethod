@@ -1,0 +1,27 @@
+    @Test
+    public void renameAndAddField() {
+        final Class<MigrationFieldRenameAndAdd> schemaClass = MigrationFieldRenameAndAdd.class;
+
+        RealmMigration migration = new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                realm.getSchema().get(schemaClass.getSimpleName())
+                        .renameField("string1", "string2")
+                        .addField("string1", String.class);
+            }
+        };
+
+        RealmConfiguration config = configFactory.createConfigurationBuilder()
+                .schema(schemaClass)
+                .schemaVersion(2)
+                .migration(migration)
+                .assetFile("rename-and-add.realm")
+                .build();
+        Realm realm = Realm.getInstance(config);
+
+        RealmObjectSchema schema = realm.getSchema().get(schemaClass.getSimpleName());
+        assertTrue(schema.hasField("string1"));
+        assertTrue(schema.hasField("string2"));
+        realm.close();
+    }
+

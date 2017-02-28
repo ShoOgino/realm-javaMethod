@@ -14,12 +14,12 @@
                 looperThread.testComplete();
             }
         });
-        assertTrue(firstAsync.load());
-        assertTrue(firstAsync.isLoaded());
-        assertFalse(firstAsync.isValid());
 
         realm.beginTransaction();
         realm.createObject(AllTypes.class).setColumnLong(0);
         realm.commitTransaction();
+
+        assertTrue(firstAsync.load());
+        assertTrue(firstAsync.isLoaded());
     }
 

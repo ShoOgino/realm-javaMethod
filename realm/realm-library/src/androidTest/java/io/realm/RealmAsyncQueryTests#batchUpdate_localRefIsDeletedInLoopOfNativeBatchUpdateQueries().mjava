@@ -1,6 +1,8 @@
     // This test reproduces the issue in https://secure.helpscout.net/conversation/244053233/6163/?folderId=366141
-    // First it creates 512 async queries, then triggers a transaction to make the queries gets update with
+    // First it creates 512 async queries, then trigger a transaction to make the queries gets update with
     // nativeBatchUpdateQueries. It should not exceed the limits of local ref map size in JNI.
+    // NOTE: This test is not checking the same thing after the OS results integration. Just keep it for an additional
+    // test for async.
     @Test
     @RunTestInLooperThread
     public void batchUpdate_localRefIsDeletedInLoopOfNativeBatchUpdateQueries() {

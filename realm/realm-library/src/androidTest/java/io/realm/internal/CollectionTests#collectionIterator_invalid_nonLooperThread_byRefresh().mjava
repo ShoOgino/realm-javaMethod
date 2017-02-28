@@ -1,0 +1,10 @@
+    @Test
+    public void collectionIterator_invalid_nonLooperThread_byRefresh() {
+        final Collection collection = new Collection(sharedRealm, table.where());
+        TestIterator iterator = new TestIterator(collection);
+        assertFalse(iterator.isDetached(sharedRealm));
+        sharedRealm.refresh();
+        thrown.expect(ConcurrentModificationException.class);
+        iterator.checkValid();
+    }
+

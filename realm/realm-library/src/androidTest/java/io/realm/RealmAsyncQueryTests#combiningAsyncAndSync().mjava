@@ -3,21 +3,21 @@
     public void combiningAsyncAndSync() {
         populateTestRealm(looperThread.realm, 10);
 
-        Realm.asyncTaskExecutor.pause();
         final RealmResults<AllTypes> allTypesAsync = looperThread.realm.where(AllTypes.class).greaterThan("columnLong", 5).findAllAsync();
         final RealmResults<AllTypes> allTypesSync = allTypesAsync.where().greaterThan("columnLong", 3).findAll();
 
+        // Call where() on an async results will load query. But to maintain the pre version 2.4.0 behaviour of
+        // RealmResults.load(), we still treat it as a not loaded results.
         assertEquals(0, allTypesAsync.size());
-        assertEquals(6, allTypesSync.size());
+        assertEquals(4, allTypesSync.size()); // columnLong > 5 && columnLong > 3
         allTypesAsync.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> object) {
                 assertEquals(4, allTypesAsync.size());
-                assertEquals(6, allTypesSync.size());
+                assertEquals(4, allTypesSync.size());
                 looperThread.testComplete();
             }
         });
-        Realm.asyncTaskExecutor.resume();
         looperThread.keepStrongReference.add(allTypesAsync);
     }
 

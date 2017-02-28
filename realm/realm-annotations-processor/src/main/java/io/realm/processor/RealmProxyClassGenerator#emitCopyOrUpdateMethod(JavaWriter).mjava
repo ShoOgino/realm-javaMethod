@@ -41,7 +41,7 @@
                     if (Utils.isString(primaryKeyElement)) {
                         writer
                             .emitStatement("String value = ((%s) object).%s()", interfaceName, primaryKeyGetter)
-                            .emitStatement("long rowIndex = TableOrView.NO_MATCH")
+                            .emitStatement("long rowIndex = Table.NO_MATCH")
                             .beginControlFlow("if (value == null)")
                                 .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
                             .nextControlFlow("else")
@@ -50,7 +50,7 @@
                     } else {
                         writer
                             .emitStatement("Number value = ((%s) object).%s()", interfaceName, primaryKeyGetter)
-                            .emitStatement("long rowIndex = TableOrView.NO_MATCH")
+                            .emitStatement("long rowIndex = Table.NO_MATCH")
                             .beginControlFlow("if (value == null)")
                                 .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
                             .nextControlFlow("else")
@@ -64,7 +64,7 @@
                 }
 
                 writer
-                    .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
+                    .beginControlFlow("if (rowIndex != Table.NO_MATCH)")
                         .beginControlFlow("try")
                             .emitStatement("objectContext.set(realm, table.getUncheckedRow(rowIndex)," +
                                     " realm.schema.getColumnInfo(%s.class)," +

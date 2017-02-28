@@ -1,0 +1,34 @@
+    @Test
+    @RunTestInLooperThread
+    public void insertion() {
+        Realm realm = looperThread.realm;
+        populateData(realm, 0); // We need to create the owner.
+        realm.beginTransaction();
+        createObjects(realm, 0, 2, 5, 6, 7, 9);
+        realm.commitTransaction();
+
+        ChangesCheck changesCheck = new ChangesCheck() {
+            @Override
+            public void check(OrderedCollectionChangeSet changeSet) {
+                checkRanges(changeSet.getInsertionRanges(),
+                        1, 1,
+                        3, 2,
+                        8, 1);
+                assertArrayEquals(changeSet.getInsertions(), new int[]{1, 3, 4, 8});
+                assertEquals(0, changeSet.getChangeRanges().length);
+                assertEquals(0, changeSet.getDeletionRanges().length);
+                assertEquals(0, changeSet.getChanges().length);
+                assertEquals(0, changeSet.getDeletions().length);
+                looperThread.testComplete();
+            }
+        };
+        registerCheckListener(realm, changesCheck);
+
+        realm.beginTransaction();
+        createObjects(realm,
+                1,
+                3, 4,
+                8);
+        realm.commitTransaction();
+    }
+

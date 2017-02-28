@@ -1,5 +1,8 @@
     @Test
     public void sort_boolean() {
+        if (isSnapshot(collectionClass)) {
+            thrown.expect(UnsupportedOperationException.class);
+        }
         OrderedRealmCollection<AllJavaTypes> sortedList = collection.sort(AllJavaTypes.FIELD_BOOLEAN, Sort.DESCENDING);
         assertEquals(TEST_SIZE, sortedList.size());
         assertEquals(false, sortedList.last().isFieldBoolean());

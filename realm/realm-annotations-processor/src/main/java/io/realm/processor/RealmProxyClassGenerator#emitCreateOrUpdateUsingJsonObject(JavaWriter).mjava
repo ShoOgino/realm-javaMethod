@@ -25,7 +25,7 @@
                 .beginControlFlow("if (update)")
                     .emitStatement("Table table = realm.getTable(%s.class)", qualifiedClassName)
                     .emitStatement("long pkColumnIndex = table.getPrimaryKey()")
-                    .emitStatement("long rowIndex = TableOrView.NO_MATCH");
+                    .emitStatement("long rowIndex = Table.NO_MATCH");
             if (metadata.isNullable(metadata.getPrimaryKey())) {
                 writer
                     .beginControlFlow("if (json.isNull(\"%s\"))", metadata.getPrimaryKey().getSimpleName())
@@ -42,7 +42,7 @@
                     .endControlFlow();
             }
             writer
-                    .beginControlFlow("if (rowIndex != TableOrView.NO_MATCH)")
+                    .beginControlFlow("if (rowIndex != Table.NO_MATCH)")
                         .emitStatement("final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get()")
                         .beginControlFlow("try")
                             .emitStatement("objectContext.set(realm, table.getUncheckedRow(rowIndex)," +

@@ -1,0 +1,22 @@
+    // 1. add 2. clear 3. add 4. Check if the last listener can still be called.
+    @Test
+    public void add_worksAfterClears() {
+        final AtomicBoolean foreachCalled = new AtomicBoolean(false);
+        TestObserverPair pair = new TestObserverPair(ONE, testListener);
+        observerPairs.add(pair);
+        assertEquals(1, observerPairs.size());
+
+        observerPairs.clear();
+
+        observerPairs.add(pair);
+        assertEquals(1, observerPairs.size());
+        observerPairs.foreach(new ObserverPairList.Callback<TestObserverPair>() {
+            @Override
+            public void onCalled(TestObserverPair pair, Object observer) {
+                assertEquals(ONE, observer);
+                foreachCalled.set(true);
+            }
+        });
+        assertTrue(foreachCalled.get());
+    }
+

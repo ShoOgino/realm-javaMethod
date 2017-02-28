@@ -16,8 +16,11 @@
         }
         if (object instanceof RealmObjectProxy) {
             RealmObjectProxy proxy = (RealmObjectProxy) object;
-            proxy.realmGet$proxyState().getRealm$realm().checkIfValid();
-            proxy.realmGet$proxyState().getListeners$realm().remove(listener);
+            BaseRealm realm = proxy.realmGet$proxyState().getRealm$realm();
+            realm.checkIfValid();
+            realm.sharedRealm.capabilities.checkCanDeliverNotification(BaseRealm.LISTENER_NOT_ALLOWED_MESSAGE);
+            //noinspection unchecked
+            proxy.realmGet$proxyState().removeChangeListener(listener);
         } else {
             throw new IllegalArgumentException("Cannot remove listener from this unmanaged RealmObject (created outside of Realm)");
         }

@@ -1,0 +1,30 @@
+    // Change some objects then delete them. Only deletion changes should be sent.
+    @Test
+    @RunTestInLooperThread
+    public void changes_then_delete() {
+        Realm realm = looperThread.realm;
+        populateData(realm, 10);
+        ChangesCheck changesCheck = new ChangesCheck() {
+            @Override
+            public void check(OrderedCollectionChangeSet changeSet) {
+                checkRanges(changeSet.getDeletionRanges(),
+                        0, 2,
+                        5, 1);
+                assertArrayEquals(changeSet.getDeletions(), new int[]{0, 1, 5});
+
+                assertEquals(0, changeSet.getInsertionRanges().length);
+                assertEquals(0, changeSet.getInsertions().length);
+                assertEquals(0, changeSet.getChangeRanges().length);
+                assertEquals(0, changeSet.getChanges().length);
+
+                looperThread.testComplete();
+            }
+        };
+        registerCheckListener(realm, changesCheck);
+
+        realm.beginTransaction();
+        modifyObjects(realm, 0, 1, 5);
+        deleteObjects(realm, 0, 1, 5);
+        realm.commitTransaction();
+    }
+

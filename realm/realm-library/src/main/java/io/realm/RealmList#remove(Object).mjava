@@ -17,7 +17,7 @@
      */
     @Override
     public boolean remove(Object object) {
-        if (managedMode && !realm.isInTransaction()) {
+        if (isManaged() && !realm.isInTransaction()) {
             throw new IllegalStateException(REMOVE_OUTSIDE_TRANSACTION_ERROR);
         }
         return super.remove(object);
