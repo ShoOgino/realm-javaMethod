@@ -6,6 +6,8 @@
      * @throws IllegalArgumentException if field name doesn't exist or it doesn't contain links to other objects.
      */
     public DynamicRealmObject getObject(String fieldName) {
+        proxyState.getRealm$realm().checkIfValid();
+
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
         checkFieldType(fieldName, columnIndex, RealmFieldType.OBJECT);
         if (proxyState.getRow$realm().isNullLink(columnIndex)) {
