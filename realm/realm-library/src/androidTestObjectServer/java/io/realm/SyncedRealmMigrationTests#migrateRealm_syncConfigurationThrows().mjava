@@ -1,0 +1,12 @@
+    @Test
+    public void migrateRealm_syncConfigurationThrows() {
+        SyncConfiguration config = configFactory.createSyncConfigurationBuilder(SyncTestUtils.createTestUser(), "http://foo.com/auth").build();
+        try {
+            Realm.migrateRealm(config);
+            fail();
+        } catch (FileNotFoundException e) {
+            fail(e.toString());
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
