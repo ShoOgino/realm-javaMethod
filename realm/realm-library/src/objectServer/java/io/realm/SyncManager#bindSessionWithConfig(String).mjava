@@ -1,0 +1,26 @@
+    /**
+     * This is called from the Object Store (through JNI) to request an {@code access_token} for
+     * the session specified by sessionPath.
+     *
+     * This will also schedule a timer to proactively refresh the {@code access_token} regularly, before
+     * the {@code access_token} expires.
+     *
+     * @throws IllegalStateException if the wrapped Java session is not found.
+     * @param sessionPath The path to the previously Java wraped session.
+     * @return a valid cached {@code access_token} if available or null.
+     */
+    @SuppressWarnings("unused")
+    private synchronized static String bindSessionWithConfig(String sessionPath) {
+        final SyncSession syncSession = sessions.get(sessionPath);
+        if (syncSession == null) {
+            RealmLog.error("Matching Java SyncSession could not be found for: " + sessionPath);
+        } else {
+            try {
+                return syncSession.accessToken(authServer);
+            } catch (Exception exception) {
+                RealmLog.error(exception);
+            }
+        }
+        return null;
+    }
+

@@ -28,13 +28,6 @@
                 }
             }
 
-            // Stop all active sessions immediately. If we waited until after talking to the server
-            // there is a high chance errors would be reported from the Sync Client first which would
-            // be confusing.
-            for (SyncSession session : sessions) {
-                session.getOsSession().stop();
-            }
-
             SyncManager.getUserStore().remove(syncUser.getIdentity());
 
             // Delete all Realms if needed.

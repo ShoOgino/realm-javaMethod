@@ -1,0 +1,15 @@
+    /**
+     * Remove the wrapped Java session.
+     * @param syncConfiguration configuration object for the synchronized Realm.
+     */
+    @SuppressWarnings("unused")
+    private static synchronized void removeSession(SyncConfiguration syncConfiguration) {
+        if (syncConfiguration == null) {
+            throw new IllegalArgumentException("A non-empty 'syncConfiguration' is required.");
+        }
+        SyncSession syncSession = sessions.remove(syncConfiguration.getPath());
+        if (syncSession != null) {
+            syncSession.close();
+        }
+    }
+

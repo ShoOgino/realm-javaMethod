@@ -1,10 +1,11 @@
     @Test
-    public void session() {
+    public void session() throws IOException {
         SyncUser user = createTestUser();
         String url = "realm://objectserver.realm.io/default";
         SyncConfiguration config = new SyncConfiguration.Builder(user, url)
                 .build();
-
+        // This will trigger the creation of the session
+        Realm.getInstance(config);
         SyncSession session = SyncManager.getSession(config);
         assertEquals(user, session.getUser()); // see also SessionTests
     }

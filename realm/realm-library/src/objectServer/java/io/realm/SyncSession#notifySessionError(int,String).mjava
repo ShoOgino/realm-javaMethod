@@ -1,0 +1,9 @@
+    // This callback will happen on the thread running the Sync Client.
+    @KeepMember
+    void notifySessionError(int errorCode, String errorMessage) {
+        ObjectServerError error = new ObjectServerError(ErrorCode.fromInt(errorCode), errorMessage);
+        if (errorHandler != null) {
+            errorHandler.onError(this, error);
+        }
+    }
+

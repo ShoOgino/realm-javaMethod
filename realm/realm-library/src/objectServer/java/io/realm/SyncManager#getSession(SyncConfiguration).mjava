@@ -7,25 +7,21 @@
      * @throws IllegalArgumentException if syncConfiguration is {@code null}.
      */
     public static synchronized SyncSession getSession(SyncConfiguration syncConfiguration) {
+        // This will not create a new native (Object Store) session, this will only associate a Realm's path
+        // with a SyncSession. Object Store's SyncManager is responsible of the life cycle (including creation)
+        // of the native session, the provided Java wrap, helps interact with the native session, when reporting error
+        // or requesting an access_token for example.
+
         if (syncConfiguration == null) {
             throw new IllegalArgumentException("A non-empty 'syncConfiguration' is required.");
         }
 
-        if (SessionStore.hasSession(syncConfiguration)) {
-            return SessionStore.getPublicSession(syncConfiguration);
-        } else {
-            ObjectServerSession internalSession = new ObjectServerSession(
-                    syncConfiguration,
-                    authServer,
-                    syncConfiguration.getUser().getSyncUser(),
-                    syncConfiguration.getSyncPolicy(),
-                    syncConfiguration.getErrorHandler()
-            );
-            SyncSession publicSession = new SyncSession(internalSession);
-            SessionStore.addSession(publicSession, internalSession);
-            syncConfiguration.getUser().getSyncUser().addSession(publicSession);
-            syncConfiguration.getSyncPolicy().onSessionCreated(internalSession);
-            return publicSession;
+        SyncSession session = sessions.get(syncConfiguration.getPath());
+        if (session == null) {
+            session = new SyncSession(syncConfiguration);
+            sessions.put(syncConfiguration.getPath(), session);
         }
+
+        return session;
     }
 
