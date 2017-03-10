@@ -1,24 +1,30 @@
     public static SharedRealm getInstance(RealmConfiguration config, SchemaVersionListener schemaVersionListener,
                                           boolean autoChangeNotifications) {
-        String[] userAndServer = ObjectServerFacade.getSyncFacadeIfPossible().getUserAndServerUrl(config);
-        String rosServerUrl = userAndServer[0];
-        String rosUserToken = userAndServer[1];
+        String[] syncUserConf = ObjectServerFacade.getSyncFacadeIfPossible().getUserAndServerUrl(config);
+        String syncUserIdentifier = syncUserConf[0];
+        String syncRealmUrl = syncUserConf[1];
+        String syncRealmAuthUrl = syncUserConf[2];
+        String syncRefreshToken = syncUserConf[3];
         boolean enable_caching = false; // Handled in Java currently
         boolean disableFormatUpgrade = false; // TODO Double negatives :/
 
         long nativeConfigPtr = nativeCreateConfig(
                 config.getPath(),
                 config.getEncryptionKey(),
-                rosServerUrl != null ? SchemaMode.SCHEMA_MODE_ADDITIVE.getNativeValue() : SchemaMode.SCHEMA_MODE_MANUAL.getNativeValue(),
+                syncRealmUrl != null ? SchemaMode.SCHEMA_MODE_ADDITIVE.getNativeValue() : SchemaMode.SCHEMA_MODE_MANUAL.getNativeValue(),
                 config.getDurability() == Durability.MEM_ONLY,
                 enable_caching,
                 config.getSchemaVersion(),
                 disableFormatUpgrade,
                 autoChangeNotifications,
-                rosServerUrl,
-                rosUserToken);
+                syncRealmUrl,
+                syncRealmAuthUrl,
+                syncUserIdentifier,
+                syncRefreshToken);
 
         try {
+            ObjectServerFacade.getSyncFacadeIfPossible().wrapObjectStoreSessionIfRequired(config);
+
             return new SharedRealm(nativeConfigPtr, config, schemaVersionListener);
         } finally {
             nativeCloseConfig(nativeConfigPtr);

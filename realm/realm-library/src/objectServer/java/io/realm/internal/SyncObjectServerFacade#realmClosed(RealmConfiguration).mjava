@@ -1,0 +1,12 @@
+    @Override
+    public void realmClosed(RealmConfiguration configuration) {
+        // Last Thread using the specified configuration is closed
+        // delete the wrapped Java session
+        if (configuration instanceof SyncConfiguration) {
+            SyncConfiguration syncConfig = (SyncConfiguration) configuration;
+            invokeRemoveSession(syncConfig);
+        } else {
+            throw new IllegalArgumentException(WRONG_TYPE_OF_CONFIGURATION);
+        }
+    }
+
