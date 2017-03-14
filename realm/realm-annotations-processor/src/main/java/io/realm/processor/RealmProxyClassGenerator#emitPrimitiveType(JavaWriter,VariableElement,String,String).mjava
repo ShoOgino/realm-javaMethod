@@ -1,0 +1,88 @@
+    /**
+     * Primitives and boxed types
+     */
+    private void emitPrimitiveType(
+        JavaWriter writer,
+        final VariableElement field,
+        final String fieldName,
+        String fieldTypeCanonicalName) throws IOException
+    {
+        final String realmType = Constants.JAVA_TO_REALM_TYPES.get(fieldTypeCanonicalName);
+
+        // Getter
+        writer.emitAnnotation("SuppressWarnings", "\"cast\"")
+            .beginMethod(fieldTypeCanonicalName, metadata.getInternalGetter(fieldName), EnumSet.of(Modifier.PUBLIC))
+            .emitStatement("proxyState.getRealm$realm().checkIfValid()");
+
+        // For String and bytes[], null value will be returned by JNI code. Try to save one JNI call here.
+        if (metadata.isNullable(field) && !Utils.isString(field) && !Utils.isByteArray(field)) {
+            writer.beginControlFlow("if (proxyState.getRow$realm().isNull(%s))", fieldIndexVariableReference(field))
+                .emitStatement("return null")
+                .endControlFlow();
+        }
+
+        // For Boxed types, this should be the corresponding primitive types. Others remain the same.
+        String castingBackType;
+        if (Utils.isBoxedType(fieldTypeCanonicalName)) {
+            Types typeUtils = processingEnvironment.getTypeUtils();
+            castingBackType = typeUtils.unboxedType(field.asType()).toString();
+        } else {
+            castingBackType = fieldTypeCanonicalName;
+        }
+        writer.emitStatement(
+            "return (%s) proxyState.getRow$realm().get%s(%s)",
+            castingBackType, realmType, fieldIndexVariableReference(field));
+        writer.endMethod()
+            .emitEmptyLine();
+
+        // Setter
+        writer.beginMethod("void", metadata.getInternalSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+        emitCodeForUnderConstruction(writer, metadata.isPrimaryKey(field), new CodeEmitter() {
+            @Override
+            public void emit(JavaWriter writer) throws IOException {
+                // set value as default value
+                writer.emitStatement("final Row row = proxyState.getRow$realm()");
+
+                if (metadata.isNullable(field)) {
+                    writer.beginControlFlow("if (value == null)")
+                        .emitStatement("row.getTable().setNull(%s, row.getIndex(), true)",
+                            fieldIndexVariableReference(field))
+                        .emitStatement("return")
+                        .endControlFlow();
+                } else if (!metadata.isNullable(field) && !Utils.isPrimitiveType(field)) {
+                    writer.beginControlFlow("if (value == null)")
+                        .emitStatement(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName)
+                        .endControlFlow();
+                }
+                writer.emitStatement(
+                    "row.getTable().set%s(%s, row.getIndex(), value, true)",
+                    realmType, fieldIndexVariableReference(field));
+                writer.emitStatement("return");
+            }
+        });
+        writer.emitStatement("proxyState.getRealm$realm().checkIfValid()");
+        // Although setting null value for String and bytes[] can be handled by the JNI code, we still generate the same code here.
+        // Compared with getter, null value won't trigger more native calls in setter which is relatively cheaper.
+        if (metadata.isPrimaryKey(field)) {
+            // Primary key is not allowed to be changed after object created.
+            writer.emitStatement(Constants.STATEMENT_EXCEPTION_PRIMARY_KEY_CANNOT_BE_CHANGED, fieldName);
+        } else {
+            if (metadata.isNullable(field)) {
+                writer.beginControlFlow("if (value == null)")
+                    .emitStatement("proxyState.getRow$realm().setNull(%s)", fieldIndexVariableReference(field))
+                    .emitStatement("return")
+                    .endControlFlow();
+            } else if (!metadata.isNullable(field) && !Utils.isPrimitiveType(field)) {
+                // Same reason, throw IAE earlier.
+                writer
+                    .beginControlFlow("if (value == null)")
+                    .emitStatement(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName)
+                    .endControlFlow();
+            }
+            writer.emitStatement(
+                "proxyState.getRow$realm().set%s(%s, value)",
+                realmType, fieldIndexVariableReference(field));
+        }
+        writer.endMethod();
+    }
+

@@ -8,26 +8,27 @@
         // Get the package of the class
         Element enclosingElement = classType.getEnclosingElement();
         if (!enclosingElement.getKind().equals(ElementKind.PACKAGE)) {
-            Utils.error("The RealmClass annotation does not support nested classes", classType);
+            Utils.error("The RealmClass annotation does not support nested classes.", classType);
             return false;
         }
 
         TypeElement parentElement = (TypeElement) Utils.getSuperClass(classType);
-        if (!parentElement.toString().equals("java.lang.Object") && !parentElement.toString().equals("io.realm.RealmObject")) {
-                Utils.error("Realm model classes must either extend RealmObject or implement RealmModel to be considered a valid model class", classType);
-                return false;
+        if (!parentElement.toString().equals("java.lang.Object") && !parentElement.toString().equals("io.realm.RealmObject"))
+        {
+            Utils.error("Valid model classes must either extend RealmObject or implement RealmModel.", classType);
+            return false;
         }
 
         PackageElement packageElement = (PackageElement) enclosingElement;
         packageName = packageElement.getQualifiedName().toString();
 
-        if (!categorizeClassElements()) return false;
-        if (!checkListTypes()) return  false;
-        if (!checkReferenceTypes()) return  false;
-        if (!checkDefaultConstructor()) return false;
-        if (!checkForFinalFields()) return false;
-        if (!checkForTransientFields()) return false;
-        if (!checkForVolatileFields()) return false;
+        if (!categorizeClassElements()) { return false; }
+        if (!checkListTypes()) { return false; }
+        if (!checkReferenceTypes()) { return false; }
+        if (!checkDefaultConstructor()) { return false; }
+        if (!checkForFinalFields()) { return false; }
+        if (!checkForTransientFields()) { return false; }
+        if (!checkForVolatileFields()) { return false; }
 
         return true; // Meta data was successfully generated
     }

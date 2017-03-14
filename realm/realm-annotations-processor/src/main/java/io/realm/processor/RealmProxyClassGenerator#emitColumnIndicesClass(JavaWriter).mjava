@@ -24,17 +24,17 @@
             final String columnName = variableElement.getSimpleName().toString();
             final String columnIndexVarName = columnIndexVarName(variableElement);
             writer.emitStatement("this.%s = getValidColumnIndex(path, table, \"%s\", \"%s\")",
-                    columnIndexVarName, simpleClassName, columnName);
-            writer.emitStatement("indicesMap.put(\"%s\", this.%s)", columnName, columnIndexVarName);
+                    columnIndexVarName, simpleClassName, columnName)
+                .emitStatement("indicesMap.put(\"%s\", this.%s)", columnName, columnIndexVarName);
         }
-        writer.emitEmptyLine();
-        writer.emitStatement("setIndicesMap(indicesMap)");
-        writer.endConstructor();
-        writer.emitEmptyLine();
+        writer.emitEmptyLine()
+            .emitStatement("setIndicesMap(indicesMap)");
+        writer.endConstructor()
+            .emitEmptyLine();
 
         // copyColumnInfoFrom method
-        writer.emitAnnotation("Override");
-        writer.beginMethod(
+        writer.emitAnnotation("Override")
+            .beginMethod(
                 "void",                      // return type
                 "copyColumnInfoFrom",        // method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.FINAL), // modifiers
@@ -46,15 +46,15 @@
             for (VariableElement variableElement : metadata.getFields()) {
                 writer.emitStatement("this.%1$s = otherInfo.%1$s", columnIndexVarName(variableElement));
             }
-            writer.emitEmptyLine();
-            writer.emitStatement("setIndicesMap(otherInfo.getIndicesMap())");
+            writer.emitEmptyLine()
+                .emitStatement("setIndicesMap(otherInfo.getIndicesMap())");
         }
-        writer.endMethod();
-        writer.emitEmptyLine();
+        writer.endMethod()
+            .emitEmptyLine();
 
         // clone method
-        writer.emitAnnotation("Override");
-        writer.beginMethod(
+        writer.emitAnnotation("Override")
+            .beginMethod(
                 columnInfoClassName(),       // return type
                 "clone",                     // method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.FINAL)) // modifiers

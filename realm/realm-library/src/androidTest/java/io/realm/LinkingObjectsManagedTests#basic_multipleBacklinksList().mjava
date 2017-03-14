@@ -1,0 +1,13 @@
+    // Setting multiple list links creates multiple backlinks
+    @Test
+    public void basic_multipleBacklinksList() {
+        realm.beginTransaction();
+        AllJavaTypes child = realm.createObject(AllJavaTypes.class, 1);
+        AllJavaTypes parent1 = realm.createObject(AllJavaTypes.class, 2);
+        AllJavaTypes parent2 = realm.createObject(AllJavaTypes.class, 3);
+        parent1.getFieldList().add(child);
+        parent2.getFieldList().add(child);
+        realm.commitTransaction();
+        assertEquals(2, child.getListParents().size());
+    }
+
