@@ -1,0 +1,32 @@
+    // Check that a Client Reset is correctly reported.
+    @Test
+    @RunTestInLooperThread
+    public void errorHandler_clientResetReported() {
+        SyncUser user = createTestUser();
+        String url = "realm://objectserver.realm.io/default";
+        final SyncConfiguration config = configFactory.createSyncConfigurationBuilder(user , url)
+                .errorHandler(new SyncSession.ErrorHandler() {
+                    @Override
+                    public void onError(SyncSession session, ObjectServerError error) {
+                        fail("Wrong error " + error.toString());
+                    }
+
+                    @Override
+                    public void onClientResetRequired(SyncSession session, ClientResetHandler handler) {
+                        String filePathFromError = handler.getOriginalFile().getAbsolutePath();
+                        String filePathFromConfig = session.getConfiguration().getPath();
+                        assertEquals(filePathFromError, filePathFromConfig);
+                        assertFalse(handler.getBackupFile().exists());
+                        assertTrue(handler.getOriginalFile().exists());
+                        looperThread.testComplete();
+                    }
+                })
+                .build();
+
+        Realm realm = Realm.getInstance(config);
+        looperThread.testRealms.add(realm);
+
+        // Trigger error
+        SyncManager.simulateClientReset(SyncManager.getSession(config));
+    }
+

@@ -1,9 +1,17 @@
     // This callback will happen on the thread running the Sync Client.
     @KeepMember
     void notifySessionError(int errorCode, String errorMessage) {
-        ObjectServerError error = new ObjectServerError(ErrorCode.fromInt(errorCode), errorMessage);
-        if (errorHandler != null) {
-            errorHandler.onError(this, error);
+        if (errorHandler == null) {
+            return;
+        }
+        ErrorCode errCode = ErrorCode.fromInt(errorCode);
+        if (errCode == ErrorCode.CLIENT_RESET) {
+            // errorMessage contains the path to the backed up file
+            errorHandler.onClientResetRequired(this, new ClientResetHandler(errCode, "A Client Reset is required. " +
+                    "Read more here: https://realm.io/docs/realm-object-server/#client-recovery-from-a-backup.",
+                    errorMessage, getConfiguration()));
+        } else {
+            errorHandler.onError(this, new ObjectServerError(errCode, errorMessage));
         }
     }
 
