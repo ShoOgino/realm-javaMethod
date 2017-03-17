@@ -4,8 +4,10 @@
                 // Check that the referenced type is a concrete class and not an interface
                 TypeElement typeElement = elements.getTypeElement(field.asType().toString());
                 if (typeElement.getSuperclass().getKind() == TypeKind.NONE) {
-                    Utils.error("Only concrete Realm classes can be referenced in model classes. " +
-                            "Neither interfaces nor abstract classes can be used.", field);
+                    Utils.error(
+                        "Only concrete Realm classes can be referenced from model classes. "
+                            + "Neither interfaces nor abstract classes are allowed.",
+                        field);
                     return false;
                 }
             }

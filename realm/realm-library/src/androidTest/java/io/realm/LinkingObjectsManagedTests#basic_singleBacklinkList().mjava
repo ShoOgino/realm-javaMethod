@@ -1,0 +1,13 @@
+    // Setting a linked list field creates the correct backlink
+    @Test
+    public void basic_singleBacklinkList() {
+        realm.beginTransaction();
+        AllJavaTypes child = realm.createObject(AllJavaTypes.class, 1);
+        AllJavaTypes parent = realm.createObject(AllJavaTypes.class, 2);
+        parent.getFieldList().add(child);
+        realm.commitTransaction();
+
+        assertEquals(1, child.getListParents().size());
+        assertTrue(child.getListParents().contains(parent));
+    }
+

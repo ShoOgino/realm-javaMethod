@@ -74,7 +74,7 @@
             if (Utils.isRealmModel(field)) {
                 RealmJsonTypeHelper.emitFillRealmObjectWithJsonValue(
                         interfaceName,
-                        metadata.getSetter(fieldName),
+                        metadata.getInternalSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
                         Utils.getProxyClassSimpleName(field),
@@ -84,8 +84,8 @@
             } else if (Utils.isRealmList(field)) {
                 RealmJsonTypeHelper.emitFillRealmListWithJsonValue(
                         interfaceName,
-                        metadata.getGetter(fieldName),
-                        metadata.getSetter(fieldName),
+                        metadata.getInternalGetter(fieldName),
+                        metadata.getInternalSetter(fieldName),
                         fieldName,
                         ((DeclaredType) field.asType()).getTypeArguments().get(0).toString(),
                         Utils.getProxyClassSimpleName(field),
@@ -94,7 +94,7 @@
             } else {
                 RealmJsonTypeHelper.emitFillJavaTypeWithJsonValue(
                         interfaceName,
-                        metadata.getSetter(fieldName),
+                        metadata.getInternalSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
                         writer

@@ -1,8 +1,7 @@
     // Returns true if modules was processed successfully, false otherwise
     private boolean processModules(RoundEnvironment roundEnv) {
-
-        ModuleMetaData moduleMetaData = new ModuleMetaData(roundEnv, classesToValidate);
-        if (!moduleMetaData.generate(processingEnv)) {
+        ModuleMetaData moduleMetaData = new ModuleMetaData(classesToValidate);
+        if (!moduleMetaData.generate(roundEnv.getElementsAnnotatedWith(RealmModule.class))) {
             return false;
         }
 

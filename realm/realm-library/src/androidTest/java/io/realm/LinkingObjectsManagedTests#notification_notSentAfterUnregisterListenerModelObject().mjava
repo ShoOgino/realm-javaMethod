@@ -1,0 +1,34 @@
+    // A listener registered on the backlinked object should not be called after the listener is removed
+    @Test
+    @RunTestInLooperThread
+    public void notification_notSentAfterUnregisterListenerModelObject() {
+        final Realm looperThreadRealm = looperThread.realm;
+
+        looperThreadRealm.beginTransaction();
+        AllJavaTypes child = looperThreadRealm.createObject(AllJavaTypes.class, 10);
+        looperThreadRealm.commitTransaction();
+
+        RealmChangeListener<AllJavaTypes> listener = new RealmChangeListener<AllJavaTypes>() {
+            @Override
+            public void onChange(AllJavaTypes object) {
+                fail("Not expecting notification after unregister");
+            }
+        };
+        child.addChangeListener(listener);
+        child.removeChangeListener(listener);
+
+        looperThreadRealm.beginTransaction();
+        AllJavaTypes parent = looperThreadRealm.createObject(AllJavaTypes.class, 1);
+        parent.setFieldObject(child);
+        looperThreadRealm.commitTransaction();
+
+        verifyPostConditions(
+            looperThreadRealm,
+            new PostConditions() {
+                public void run(Realm realm) {
+                    assertEquals(2, looperThreadRealm.where(AllJavaTypes.class).findAll().size());
+                }
+            },
+            child, parent);
+    }
+

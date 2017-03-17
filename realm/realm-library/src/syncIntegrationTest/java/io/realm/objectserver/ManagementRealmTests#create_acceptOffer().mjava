@@ -13,6 +13,11 @@
                     public void onError(SyncSession session, ObjectServerError error) {
                         fail("Realm 1 unexpected error: " + error);
                     }
+
+                    @Override
+                    public void onClientResetRequired(SyncSession session, ClientResetHandler handler) {
+                        fail("Client Reset");
+                    }
                 })
                 .build();
         final Realm realm1 = Realm.getInstance(config1);

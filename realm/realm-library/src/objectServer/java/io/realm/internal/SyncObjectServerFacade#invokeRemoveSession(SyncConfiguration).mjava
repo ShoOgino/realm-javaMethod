@@ -1,0 +1,25 @@
+    //FIXME remove this reflection call once we redesign the SyncManager to separate interface
+    //      from implementation to avoid issue like exposing internal method like SyncManager#removeSession
+    //      or SyncSession#close. This happens because SyncObjectServerFacade is internal, whereas
+    //      SyncManager#removeSession or SyncSession#close are package private & should not be public.
+    private void invokeRemoveSession(SyncConfiguration syncConfig) {
+        try {
+            if (removeSessionMethod == null) {
+                synchronized (SyncObjectServerFacade.class) {
+                    if (removeSessionMethod == null) {
+                        Method removeSession = SyncManager.class.getDeclaredMethod("removeSession", SyncConfiguration.class);
+                        removeSession.setAccessible(true);
+                        removeSessionMethod = removeSession;
+                    }
+                }
+            }
+            removeSessionMethod.invoke(null, syncConfig);
+        } catch (NoSuchMethodException e) {
+            throw new RealmException("Could not lookup method to remove session: " + syncConfig.toString(), e);
+        } catch (InvocationTargetException e) {
+            throw new RealmException("Could not invoke method to remove session: " + syncConfig.toString(), e);
+        } catch (IllegalAccessException e) {
+            throw new RealmException("Could not remove session: " + syncConfig.toString(), e);
+        }
+    }
+

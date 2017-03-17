@@ -1,0 +1,13 @@
+    // Setting the linked object field creates the correct backlink
+    @Test
+    public void basic_singleBacklinkObject() {
+        realm.beginTransaction();
+        AllJavaTypes child = realm.createObject(AllJavaTypes.class, 1);
+        AllJavaTypes parent = realm.createObject(AllJavaTypes.class, 2);
+        parent.setFieldObject(child);
+        realm.commitTransaction();
+
+        assertEquals(1, child.getObjectParents().size());
+        assertTrue(child.getObjectParents().contains(parent));
+    }
+

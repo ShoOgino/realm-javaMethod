@@ -1,0 +1,40 @@
+    /**
+     * Table validation should fail if the backinked column points to a non-existent class.
+     * The realm `backlinks-missingSourceClass.realm` contains two tables very like those
+     * defined by `BacklinksSource` and `BacklinksTarget`.  In it, though, the source class
+     * is named XXXBacklinksSource, like so:
+     * <pre>
+     * {@code
+     * @LinkingObjects("child")
+     *     private final RealmResults<XXXBacklinksSource> parents = null;
+     * }
+     * </pre>
+     * If the both classes were used in the configuration, the test would fail because of the
+     * missing class.  Since the configuration contains only the single class `BacklinksTarget`,
+     * basic validation passes.  Backlink validation, however, should fail, seeking the
+     * `BacklinksSource` table.
+     */
+    @Test
+    public void migration_backlinkedSourceClassDoesntExist() throws IOException {
+        final String realmName = "backlinks-missingSourceClass.realm";
+
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+            .name(realmName)
+            .schema(BacklinksTarget.class)
+            .build();
+
+        try {
+            configFactory.copyRealmFromAssets(context, realmName, realmName);
+
+            Realm localRealm = Realm.getInstance(realmConfig);
+            localRealm.close();
+            fail("A migration should have been required");
+        } catch (IOException e) {
+            fail("Failed copying realm");
+        } catch (RealmMigrationNeededException expected) {
+            assertTrue(expected.getMessage().contains("Cannot find source class"));
+        } finally {
+            Realm.deleteRealm(realmConfig);
+        }
+    }
+

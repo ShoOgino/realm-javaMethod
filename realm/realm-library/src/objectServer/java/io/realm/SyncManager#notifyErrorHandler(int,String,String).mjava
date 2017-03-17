@@ -1,0 +1,17 @@
+    /**
+     * All errors from native Sync is reported to this method. From the path we can determine which
+     * session to contact. If {@code path == null} all sessions are effected.
+     */
+    @SuppressWarnings("unused")
+    private static synchronized void notifyErrorHandler(int errorCode, String errorMessage, String path) {
+        for (SyncSession syncSession : sessions.values()) {
+            if (path == null || path.equals(syncSession.getConfiguration().getPath())) {
+                try {
+                    syncSession.notifySessionError(errorCode, errorMessage);
+                } catch (Exception exception) {
+                    RealmLog.error(exception);
+                }
+            }
+        }
+    }
+

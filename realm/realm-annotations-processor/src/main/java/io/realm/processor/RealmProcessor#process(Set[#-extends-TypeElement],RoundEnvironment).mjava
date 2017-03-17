@@ -1,61 +1,26 @@
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        // Don't run this processor in subsequent runs. We created everything in the first one.
-        if (hasProcessedModules) {
-            return CONSUME_ANNOTATIONS;
-        }
-        RealmVersionChecker updateChecker = RealmVersionChecker.getInstance(processingEnv);
-        updateChecker.executeRealmVersionUpdate();
+        round++;
 
-        Utils.initialize(processingEnv);
-
-        Set<String> packages = new TreeSet<String>();
-
-        // Create all proxy classes
-        for (Element classElement : roundEnv.getElementsAnnotatedWith(RealmClass.class)) {
-
-            // The class must either extend RealmObject or implement RealmModel
-            if (!Utils.isImplementingMarkerInterface(classElement)) {
-                Utils.error("A RealmClass annotated object must implement RealmModel or derive from RealmObject", classElement);
-            }
-
-            // Check the annotation was applied to a Class
-            if (!classElement.getKind().equals(ElementKind.CLASS)) {
-                Utils.error("The RealmClass annotation can only be applied to classes", classElement);
-                return true; // Abort processing by claiming all annotations
-            }
-
-            ClassMetaData metadata = new ClassMetaData(processingEnv, (TypeElement) classElement);
-            if (!metadata.isModelClass()) {
-                continue;
-            }
-            Utils.note("Processing class " + metadata.getSimpleClassName());
-            boolean success = metadata.generate();
-            if (!success) {
-                return true;
-            }
-            classesToValidate.add(metadata);
-            packages.add(metadata.getPackageName());
-
-            RealmProxyInterfaceGenerator interfaceGenerator = new RealmProxyInterfaceGenerator(processingEnv, metadata);
-            try {
-                interfaceGenerator.generate();
-            } catch (IOException e) {
-                Utils.error(e.getMessage(), classElement);
-            }
-
-            RealmProxyClassGenerator sourceCodeGenerator = new RealmProxyClassGenerator(processingEnv, metadata);
-            try {
-                sourceCodeGenerator.generate();
-            } catch (IOException e) {
-                Utils.error(e.getMessage(), classElement);
-            } catch (UnsupportedOperationException e) {
-                Utils.error(e.getMessage(), classElement);
-            }
+        if (round == 0) {
+            RealmVersionChecker updateChecker = RealmVersionChecker.getInstance(processingEnv);
+            updateChecker.executeRealmVersionUpdate();
         }
 
-        hasProcessedModules = true;
-        processModules(roundEnv);
+        if (roundEnv.errorRaised()) { return true; }
+
+        if (!hasProcessedModules) {
+            Utils.initialize(processingEnv);
+
+            if (!processAnnotations(roundEnv)) { return true; }
+
+            hasProcessedModules = true;
+            if (!processModules(roundEnv)) { return true; }
+        }
+
+        if (roundEnv.processingOver()) {
+            if (!validateBacklinks()) { return true; }
+        }
 
         return CONSUME_ANNOTATIONS;
     }

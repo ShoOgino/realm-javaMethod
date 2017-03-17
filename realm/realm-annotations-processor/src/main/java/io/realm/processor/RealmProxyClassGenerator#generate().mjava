@@ -6,7 +6,7 @@
         writer.setIndent(Constants.INDENT);
 
         writer.emitPackage(Constants.REALM_PACKAGE_NAME)
-                .emitEmptyLine();
+            .emitEmptyLine();
 
         ArrayList<String> imports = new ArrayList<String>();
         imports.add("android.annotation.TargetApi");
@@ -36,9 +36,8 @@
         imports.add("org.json.JSONException");
         imports.add("org.json.JSONArray");
 
-        Collections.sort(imports);
-        writer.emitImports(imports);
-        writer.emitEmptyLine();
+        writer.emitImports(imports)
+            .emitEmptyLine();
 
         // Begin the class definition
         writer.beginType(
@@ -54,8 +53,10 @@
 
         emitClassFields(writer);
         emitConstructor(writer);
+
         emitInjectContextMethod(writer);
-        emitAccessors(writer);
+        emitPersistedFieldAccessors(writer);
+        emitBacklinkFieldAccessors(writer);
         emitCreateRealmObjectSchemaMethod(writer);
         emitInitTableMethod(writer);
         emitValidateTableMethod(writer);
