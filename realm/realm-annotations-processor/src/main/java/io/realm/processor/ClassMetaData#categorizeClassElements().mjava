@@ -1,98 +1,23 @@
     // Iterate through all class elements and add them to the appropriate internal data structures.
-    // Returns true if all elements could be false if elements could not be categorized,
+    // Returns true if all elements could be categorized and false otherwise.
     private boolean categorizeClassElements() {
         for (Element element : classType.getEnclosedElements()) {
             ElementKind elementKind = element.getKind();
+            switch (elementKind) {
+                case CONSTRUCTOR:
+                    if (Utils.isDefaultConstructor(element)) { hasDefaultConstructor = true; }
+                    break;
 
-            if (elementKind.equals(ElementKind.FIELD)) {
-                VariableElement variableElement = (VariableElement) element;
+                case FIELD:
+                    if (!categorizeField(element)) { return false; }
+                    break;
 
-                Set<Modifier> modifiers = variableElement.getModifiers();
-                if (modifiers.contains(Modifier.STATIC)) {
-                    continue; // completely ignore any static fields
-                }
-
-                if (variableElement.getAnnotation(Ignore.class) != null) {
-                    continue;
-                }
-
-                if (variableElement.getAnnotation(Index.class) != null) {
-                    // The field has the @Index annotation. It's only valid for column types:
-                    // STRING, DATE, INTEGER, BOOLEAN
-                    String elementTypeCanonicalName = variableElement.asType().toString();
-                    String columnType = Constants.JAVA_TO_COLUMN_TYPES.get(elementTypeCanonicalName);
-                    if (columnType != null && (columnType.equals("RealmFieldType.STRING") ||
-                            columnType.equals("RealmFieldType.DATE") ||
-                            columnType.equals("RealmFieldType.INTEGER") ||
-                            columnType.equals("RealmFieldType.BOOLEAN"))) {
-                        indexedFields.add(variableElement);
-                    } else {
-                        Utils.error("@Index is not applicable to this field " + element + ".");
-                        return false;
-                    }
-                }
-
-                if (variableElement.getAnnotation(Required.class) == null) {
-                    // The field doesn't have the @Required annotation.
-                    // Without @Required annotation, boxed types/RealmObject/Date/String/bytes should be added to
-                    // nullableFields.
-                    // RealmList and Primitive types are NOT nullable always. @Required annotation is not supported.
-                    if (!Utils.isPrimitiveType(variableElement) && !Utils.isRealmList(variableElement)) {
-                        nullableFields.add(variableElement);
-                    }
-                } else {
-                    // The field has the @Required annotation
-                    if (Utils.isPrimitiveType(variableElement)) {
-                        Utils.error("@Required is not needed for field " + element +
-                                " with the type " + element.asType());
-                    } else if (Utils.isRealmList(variableElement)) {
-                        Utils.error("@Required is invalid for field " + element +
-                                " with the type " + element.asType());
-                    } else if (Utils.isRealmModel(variableElement)) {
-                        Utils.error("@Required is invalid for field " + element +
-                                " with the type " + element.asType());
-                    } else {
-                        // Should never get here - user should remove @Required
-                        if (nullableFields.contains(variableElement)) {
-                            Utils.error("Annotated field " + element + " with type " + element.asType() +
-                                    " has been added to the nullableFields before. Consider to remove @Required.");
-                        }
-                    }
-                }
-
-                if (variableElement.getAnnotation(PrimaryKey.class) != null) {
-                    // The field has the @PrimaryKey annotation. It is only valid for
-                    // String, short, int, long and must only be present one time
-                    if (primaryKey != null) {
-                        Utils.error(String.format("@PrimaryKey cannot be defined more than once. It was found here \"%s\" and here \"%s\"",
-                                primaryKey.getSimpleName().toString(),
-                                variableElement.getSimpleName().toString()));
-                        return false;
-                    }
-
-                    TypeMirror fieldType = variableElement.asType();
-                    if (!isValidPrimaryKeyType(fieldType)) {
-                        Utils.error("\"" + variableElement.getSimpleName().toString() + "\" is not allowed as primary key. See @PrimaryKey for allowed types.");
-                        return false;
-                    }
-
-                    primaryKey = variableElement;
-
-                    // Also add as index. All types of primary key can be indexed.
-                    if (!indexedFields.contains(variableElement)) {
-                        indexedFields.add(variableElement);
-                    }
-                }
-
-                fields.add(variableElement);
-            } else if (elementKind.equals(ElementKind.CONSTRUCTOR)) {
-                hasDefaultConstructor =  hasDefaultConstructor || Utils.isDefaultConstructor(element);
-
+                default:
             }
         }
 
         if (fields.size() == 0) {
-            Utils.error(className + " must contain at least 1 persistable field");
+            Utils.error(String.format("Class \"%s\" must contain at least 1 persistable field.", className));
         }
 
         return true;

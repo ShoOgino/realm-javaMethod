@@ -1,17 +1,8 @@
     @Test
     public void get_syncValues() {
-        ObjectServerSession internalSession = new ObjectServerSession(
-                configuration,
-                authServer,
-                configuration.getUser().getSyncUser(),
-                configuration.getSyncPolicy(),
-                configuration.getErrorHandler()
-        );
-        SyncSession session = new SyncSession(internalSession);
-
+        SyncSession session = new SyncSession(configuration);
         assertEquals("realm://objectserver.realm.io/JohnDoe/default", session.getServerUrl().toString());
         assertEquals(user, session.getUser());
         assertEquals(configuration, session.getConfiguration());
-        assertNull(session.getState());
     }
 

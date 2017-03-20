@@ -17,22 +17,18 @@
         writer.emitStatement("reader.beginObject()");
         writer.beginControlFlow("while (reader.hasNext())");
         writer.emitStatement("String name = reader.nextName()");
+        writer.beginControlFlow("if (false)");
 
-        List<VariableElement> fields = metadata.getFields();
-        for (int i = 0; i < fields.size(); i++) {
-            VariableElement field = fields.get(i);
+        Collection<VariableElement> fields = metadata.getFields();
+        for (VariableElement field: fields) {
             String fieldName = field.getSimpleName().toString();
             String qualifiedFieldType = field.asType().toString();
+            writer.nextControlFlow("else if (name.equals(\"%s\"))", fieldName);
 
-            if (i == 0) {
-                writer.beginControlFlow("if (name.equals(\"%s\"))", fieldName);
-            } else {
-                writer.nextControlFlow("else if (name.equals(\"%s\"))", fieldName);
-            }
             if (Utils.isRealmModel(field)) {
                 RealmJsonTypeHelper.emitFillRealmObjectFromStream(
                         interfaceName,
-                        metadata.getSetter(fieldName),
+                        metadata.getInternalSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
                         Utils.getProxyClassSimpleName(field),
@@ -42,8 +38,8 @@
             } else if (Utils.isRealmList(field)) {
                 RealmJsonTypeHelper.emitFillRealmListFromStream(
                         interfaceName,
-                        metadata.getGetter(fieldName),
-                        metadata.getSetter(fieldName),
+                        metadata.getInternalGetter(fieldName),
+                        metadata.getInternalSetter(fieldName),
                         ((DeclaredType) field.asType()).getTypeArguments().get(0).toString(),
                         Utils.getProxyClassSimpleName(field),
                         writer);
@@ -59,22 +55,22 @@
             }
         }
 
-        if (fields.size() > 0) {
-            writer.nextControlFlow("else");
-            writer.emitStatement("reader.skipValue()");
-            writer.endControlFlow();
-        }
+        writer.nextControlFlow("else");
+        writer.emitStatement("reader.skipValue()");
+        writer.endControlFlow();
+
         writer.endControlFlow();
         writer.emitStatement("reader.endObject()");
+
         if (metadata.hasPrimaryKey()) {
-            writer.beginControlFlow("if (!jsonHasPrimaryKey)");
-            writer.emitStatement(Constants.STATEMENT_EXCEPTION_NO_PRIMARY_KEY_IN_JSON, metadata.getPrimaryKey());
-            writer.endControlFlow();
+            writer.beginControlFlow("if (!jsonHasPrimaryKey)")
+                    .emitStatement(Constants.STATEMENT_EXCEPTION_NO_PRIMARY_KEY_IN_JSON, metadata.getPrimaryKey())
+                .endControlFlow();
         }
+
         writer.emitStatement("obj = realm.copyToRealm(obj)");
         writer.emitStatement("return obj");
         writer.endMethod();
         writer.emitEmptyLine();
-
     }
 

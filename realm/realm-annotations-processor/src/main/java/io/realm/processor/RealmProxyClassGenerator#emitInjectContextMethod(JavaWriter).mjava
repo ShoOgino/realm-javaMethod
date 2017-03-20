@@ -6,18 +6,18 @@
                 EnumSet.of(Modifier.PUBLIC) // Modifiers
                 ); // Argument type & argument name
 
-        writer.beginControlFlow("if (this.proxyState != null)");
-        writer.emitStatement("return");
-        writer.endControlFlow();
-        writer.emitStatement("final BaseRealm.RealmObjectContext context = BaseRealm.objectContext.get()");
-        writer.emitStatement("this.columnInfo = (%1$s) context.getColumnInfo()", columnInfoClassName());
-        writer.emitStatement("this.proxyState = new ProxyState<%1$s>(this)", qualifiedClassName);
-        writer.emitStatement("proxyState.setRealm$realm(context.getRealm())");
-        writer.emitStatement("proxyState.setRow$realm(context.getRow())");
-        writer.emitStatement("proxyState.setAcceptDefaultValue$realm(context.getAcceptDefaultValue())");
-        writer.emitStatement("proxyState.setExcludeFields$realm(context.getExcludeFields())");
+        writer.beginControlFlow("if (this.proxyState != null)")
+                .emitStatement("return")
+            .endControlFlow()
+            .emitStatement("final BaseRealm.RealmObjectContext context = BaseRealm.objectContext.get()")
+            .emitStatement("this.columnInfo = (%1$s) context.getColumnInfo()", columnInfoClassName())
+            .emitStatement("this.proxyState = new ProxyState<%1$s>(this)", qualifiedClassName)
+            .emitStatement("proxyState.setRealm$realm(context.getRealm())")
+            .emitStatement("proxyState.setRow$realm(context.getRow())")
+            .emitStatement("proxyState.setAcceptDefaultValue$realm(context.getAcceptDefaultValue())")
+            .emitStatement("proxyState.setExcludeFields$realm(context.getExcludeFields())");
 
-        writer.endMethod();
-        writer.emitEmptyLine();
+        writer.endMethod()
+            .emitEmptyLine();
     }
 

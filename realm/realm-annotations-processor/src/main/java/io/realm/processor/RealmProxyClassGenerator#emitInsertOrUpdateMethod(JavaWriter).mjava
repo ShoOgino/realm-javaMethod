@@ -25,7 +25,7 @@
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
             String fieldType = field.asType().toString();
-            String getter = metadata.getGetter(fieldName);
+            String getter = metadata.getInternalGetter(fieldName);
 
             if (Utils.isRealmModel(field)) {
                 writer
@@ -71,7 +71,7 @@
 
         writer.emitStatement("return rowIndex");
 
-        writer.endMethod();
-        writer.emitEmptyLine();
+        writer.endMethod()
+            .emitEmptyLine();
     }
 

@@ -2,7 +2,7 @@
     @RunTestInLooperThread
     public void login_withAccessToken() {
         SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
-        SyncCredentials credentials = SyncCredentials.accessToken(admin.getAccessToken(), "custom-admin-user");
+        SyncCredentials credentials = SyncCredentials.accessToken(admin.getAccessToken().value(), "custom-admin-user");
         SyncUser.loginAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback() {
             @Override
             public void onSuccess(SyncUser user) {
@@ -11,6 +11,11 @@
                             @Override
                             public void onError(SyncSession session, ObjectServerError error) {
                                 fail("Session failed: " + error);
+                            }
+
+                            @Override
+                            public void onClientResetRequired(SyncSession session, ClientResetHandler handler) {
+                                fail("Client Reset");
                             }
                         })
                         .build();
@@ -23,7 +28,7 @@
                 looperThread.postRunnableDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        assertEquals(SessionState.BOUND, SyncManager.getSession(config).getState());
+                        assertTrue(SyncManager.getSession(config).getUser().isValid());
                         looperThread.testComplete();
                     }
                 }, 1000);

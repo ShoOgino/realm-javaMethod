@@ -3,50 +3,51 @@
             return;
         }
         writer.emitAnnotation("Override");
-        writer.emitAnnotation("SuppressWarnings", "\"ArrayToString\"");
-        writer.beginMethod("String", "toString", EnumSet.of(Modifier.PUBLIC));
-        writer.beginControlFlow("if (!RealmObject.isValid(this))");
-        writer.emitStatement("return \"Invalid object\"");
-        writer.endControlFlow();
+        writer.emitAnnotation("SuppressWarnings", "\"ArrayToString\"")
+            .beginMethod("String", "toString", EnumSet.of(Modifier.PUBLIC))
+            .beginControlFlow("if (!RealmObject.isValid(this))")
+                .emitStatement("return \"Invalid object\"")
+            .endControlFlow();
         writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = [\")", simpleClassName);
-        List<VariableElement> fields = metadata.getFields();
-        for (int i = 0; i < fields.size(); i++) {
-            VariableElement field = fields.get(i);
-            String fieldName = field.getSimpleName().toString();
+
+        Collection<VariableElement> fields = metadata.getFields();
+        int i = fields.size() - 1;
+        for (VariableElement field: fields) {
+             String fieldName = field.getSimpleName().toString();
 
             writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
             if (Utils.isRealmModel(field)) {
                 String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
                 writer.emitStatement(
                         "stringBuilder.append(%s() != null ? \"%s\" : \"null\")",
-                        metadata.getGetter(fieldName),
+                        metadata.getInternalGetter(fieldName),
                         fieldTypeSimpleName
                 );
             } else if (Utils.isRealmList(field)) {
                 String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
                 writer.emitStatement("stringBuilder.append(\"RealmList<%s>[\").append(%s().size()).append(\"]\")",
                         genericTypeSimpleName,
-                        metadata.getGetter(fieldName));
+                        metadata.getInternalGetter(fieldName));
             } else {
                 if (metadata.isNullable(field)) {
                     writer.emitStatement("stringBuilder.append(%s() != null ? %s() : \"null\")",
-                            metadata.getGetter(fieldName),
-                            metadata.getGetter(fieldName)
+                            metadata.getInternalGetter(fieldName),
+                            metadata.getInternalGetter(fieldName)
                     );
                 } else {
-                    writer.emitStatement("stringBuilder.append(%s())", metadata.getGetter(fieldName));
+                    writer.emitStatement("stringBuilder.append(%s())", metadata.getInternalGetter(fieldName));
                 }
             }
             writer.emitStatement("stringBuilder.append(\"}\")");
 
-            if (i < fields.size() - 1) {
+            if (i-- > 0) {
                 writer.emitStatement("stringBuilder.append(\",\")");
             }
         }
 
         writer.emitStatement("stringBuilder.append(\"]\")");
         writer.emitStatement("return stringBuilder.toString()");
-        writer.endMethod();
-        writer.emitEmptyLine();
+        writer.endMethod()
+            .emitEmptyLine();
     }
 

@@ -1,0 +1,25 @@
+    private void emitValidateRealmModelType(JavaWriter writer, VariableElement field, long fieldIndex, String fieldName)
+        throws IOException {
+        String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
+
+        writer.beginControlFlow("if (!columnTypes.containsKey(\"%s\"))", fieldName);
+        emitMigrationNeededException(writer, "\"Missing field '%s' in existing Realm file. " +
+            "Either remove field or migrate using io.realm.internal.Table.addColumn().\")", fieldName);
+        writer.endControlFlow();
+        writer.beginControlFlow("if (columnTypes.get(\"%s\") != RealmFieldType.OBJECT)", fieldName);
+        emitMigrationNeededException(writer, "\"Invalid type '%s' for field '%s'\")",
+            fieldTypeSimpleName, fieldName);
+        writer.endControlFlow();
+        writer.beginControlFlow("if (!sharedRealm.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, fieldTypeSimpleName);
+        emitMigrationNeededException(writer, "\"Missing class '%s%s' for field '%s'\")",
+            Constants.TABLE_PREFIX, fieldTypeSimpleName, fieldName);
+        writer.endControlFlow();
+
+        writer.emitStatement("Table table_%d = sharedRealm.getTable(\"%s%s\")", fieldIndex, Constants.TABLE_PREFIX, fieldTypeSimpleName);
+        writer.beginControlFlow("if (!table.getLinkTarget(%s).hasSameSchema(table_%d))",
+            fieldIndexVariableReference(field), fieldIndex);
+        emitMigrationNeededException(writer, "\"Invalid RealmObject for field '%s': '\" + table.getLinkTarget(%s).getName() + \"' expected - was '\" + table_%d.getName() + \"'\")",
+            fieldName, fieldIndexVariableReference(field), fieldIndex);
+        writer.endControlFlow();
+    }
+

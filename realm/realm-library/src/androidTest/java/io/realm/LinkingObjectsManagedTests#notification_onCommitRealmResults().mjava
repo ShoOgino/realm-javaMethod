@@ -1,0 +1,35 @@
+    // A listener registered on the backlinked field should be called when a commit adds a backlink
+    @Test
+    @RunTestInLooperThread
+    public void notification_onCommitRealmResults() {
+        final Realm looperThreadRealm = looperThread.realm;
+
+        looperThreadRealm.beginTransaction();
+        AllJavaTypes child = looperThreadRealm.createObject(AllJavaTypes.class, 10);
+        looperThreadRealm.commitTransaction();
+
+        final AtomicInteger counter = new AtomicInteger(0);
+        RealmChangeListener<RealmResults<AllJavaTypes>> listener = new RealmChangeListener<RealmResults<AllJavaTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllJavaTypes> object) {
+                counter.incrementAndGet();
+            }
+        };
+        child.getObjectParents().addChangeListener(listener);
+
+        looperThreadRealm.beginTransaction();
+        AllJavaTypes parent = looperThreadRealm.createObject(AllJavaTypes.class, 1);
+        parent.setFieldObject(child);
+        looperThreadRealm.commitTransaction();
+
+        verifyPostConditions(
+            looperThreadRealm,
+            new PostConditions() {
+                public void run(Realm realm) {
+                    assertEquals(2, looperThreadRealm.where(AllJavaTypes.class).findAll().size());
+                    assertEquals(1, counter.get());
+                }
+            },
+            child, parent);
+    }
+

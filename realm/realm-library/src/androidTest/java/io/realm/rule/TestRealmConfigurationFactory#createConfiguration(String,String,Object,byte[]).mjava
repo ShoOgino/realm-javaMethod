@@ -1,0 +1,28 @@
+    public RealmConfiguration createConfiguration(String subDir, String name, Object module, byte[] key) {
+        RealmConfiguration.Builder builder = createConfigurationBuilder();
+
+        File folder = getRoot();
+        if (subDir != null) {
+            folder = new File(folder, subDir);
+            assertTrue(folder.mkdirs());
+        }
+        builder.directory(folder);
+
+        if (name != null) {
+            builder.name(name);
+        }
+
+        if (module != null) {
+            builder.modules(module);
+        }
+
+        if (key != null) {
+            builder.encryptionKey(key);
+        }
+
+        RealmConfiguration configuration = builder.build();
+        configurations.add(configuration);
+
+        return configuration;
+    }
+

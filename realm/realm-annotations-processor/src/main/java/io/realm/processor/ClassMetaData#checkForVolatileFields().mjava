@@ -1,8 +1,10 @@
     private boolean checkForVolatileFields() {
         for (VariableElement field : fields) {
             if (field.getModifiers().contains(Modifier.VOLATILE)) {
-                Utils.error("Volatile fields are not allowed. Class: " + className + ", Field: " +
-                        field.getSimpleName().toString());
+                Utils.error(String.format(
+                    "Class \"%s\" contains illegal volatile field \"%s\".",
+                    className,
+                    field.getSimpleName().toString()));
                 return false;
             }
         }
