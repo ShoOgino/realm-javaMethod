@@ -6,6 +6,7 @@
         final RealmResults<DynamicRealmObject> results = dynamicRealm.where(AllTypes.CLASS_NAME).findAll();
         subscription = results.asObservable().subscribe(new Action1<RealmResults<DynamicRealmObject>>() {
             @Override
+            @SuppressWarnings("ReferenceEquality")
             public void call(RealmResults<DynamicRealmObject> rxResults) {
                 assertTrue(rxResults == results);
                 subscribedNotified.set(true);
