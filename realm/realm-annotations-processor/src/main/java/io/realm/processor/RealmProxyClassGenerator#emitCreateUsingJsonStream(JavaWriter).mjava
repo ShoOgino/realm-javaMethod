@@ -20,7 +20,7 @@
         writer.beginControlFlow("if (false)");
 
         Collection<VariableElement> fields = metadata.getFields();
-        for (VariableElement field: fields) {
+        for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String qualifiedFieldType = field.asType().toString();
             writer.nextControlFlow("else if (name.equals(\"%s\"))", fieldName);
@@ -65,7 +65,7 @@
         if (metadata.hasPrimaryKey()) {
             writer.beginControlFlow("if (!jsonHasPrimaryKey)")
                     .emitStatement(Constants.STATEMENT_EXCEPTION_NO_PRIMARY_KEY_IN_JSON, metadata.getPrimaryKey())
-                .endControlFlow();
+                    .endControlFlow();
         }
 
         writer.emitStatement("obj = realm.copyToRealm(obj)");

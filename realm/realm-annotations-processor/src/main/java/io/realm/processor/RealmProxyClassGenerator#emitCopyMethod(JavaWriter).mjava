@@ -7,29 +7,30 @@
 
         writer.emitStatement("RealmObjectProxy cachedRealmObject = cache.get(newObject)");
         writer.beginControlFlow("if (cachedRealmObject != null)")
-              .emitStatement("return (%s) cachedRealmObject", qualifiedClassName)
-              .nextControlFlow("else");
+                .emitStatement("return (%s) cachedRealmObject", qualifiedClassName)
+                .nextControlFlow("else");
 
-            writer.emitSingleLineComment("rejecting default values to avoid creating unexpected objects from RealmModel/RealmList fields.");
-            if (metadata.hasPrimaryKey()) {
-                writer.emitStatement("%s realmObject = realm.createObjectInternal(%s.class, ((%s) newObject).%s(), false, Collections.<String>emptyList())",
-                        qualifiedClassName, qualifiedClassName, interfaceName, metadata.getPrimaryKeyGetter());
-            } else {
-                writer.emitStatement("%s realmObject = realm.createObjectInternal(%s.class, false, Collections.<String>emptyList())",
-                        qualifiedClassName, qualifiedClassName);
+        writer.emitSingleLineComment("rejecting default values to avoid creating unexpected objects from RealmModel/RealmList fields.");
+        if (metadata.hasPrimaryKey()) {
+            writer.emitStatement("%s realmObject = realm.createObjectInternal(%s.class, ((%s) newObject).%s(), false, Collections.<String>emptyList())",
+                    qualifiedClassName, qualifiedClassName, interfaceName, metadata.getPrimaryKeyGetter());
+        } else {
+            writer.emitStatement("%s realmObject = realm.createObjectInternal(%s.class, false, Collections.<String>emptyList())",
+                    qualifiedClassName, qualifiedClassName);
+        }
+        writer.emitStatement("cache.put(newObject, (RealmObjectProxy) realmObject)");
+        for (VariableElement field : metadata.getFields()) {
+            String fieldName = field.getSimpleName().toString();
+            String fieldType = field.asType().toString();
+            String setter = metadata.getInternalSetter(fieldName);
+            String getter = metadata.getInternalGetter(fieldName);
+
+            if (metadata.isPrimaryKey(field)) {
+                // PK has been set when creating object.
+                continue;
             }
-            writer.emitStatement("cache.put(newObject, (RealmObjectProxy) realmObject)");
-            for (VariableElement field : metadata.getFields()) {
-                String fieldName = field.getSimpleName().toString();
-                String fieldType = field.asType().toString();
-                String setter = metadata.getInternalSetter(fieldName);
-                String getter = metadata.getInternalGetter(fieldName);
 
-                if (metadata.isPrimaryKey(field)) {
-                    // PK has been set when creating object.
-                    continue;
-                }
-
+            //@formatter:off
                 if (Utils.isRealmModel(field)) {
                     writer
                         .emitEmptyLine()
@@ -74,10 +75,11 @@
                     writer.emitStatement("((%s) realmObject).%s(((%s) newObject).%s())",
                             interfaceName, setter, interfaceName, getter);
                 }
-            }
+                //@formatter:on
+        }
 
-            writer.emitStatement("return realmObject");
-          writer.endControlFlow();
+        writer.emitStatement("return realmObject");
+        writer.endControlFlow();
         writer.endMethod();
         writer.emitEmptyLine();
     }

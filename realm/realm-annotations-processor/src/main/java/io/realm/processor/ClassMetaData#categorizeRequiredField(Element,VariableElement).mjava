@@ -2,17 +2,17 @@
     private void categorizeRequiredField(Element element, VariableElement variableElement) {
         if (Utils.isPrimitiveType(variableElement)) {
             Utils.error(String.format(
-                "@Required annotation is unnecessary for primitive field \"%s\".", element));
+                    "@Required annotation is unnecessary for primitive field \"%s\".", element));
         } else if (Utils.isRealmList(variableElement) || Utils.isRealmModel(variableElement)) {
             Utils.error(String.format(
-                "Field \"%s\" with type \"%s\" cannot be @Required.", element, element.asType()));
+                    "Field \"%s\" with type \"%s\" cannot be @Required.", element, element.asType()));
         } else {
             // Should never get here - user should remove @Required
             if (nullableFields.contains(variableElement)) {
                 Utils.error(String.format(
-                    "Field \"%s\" with type \"%s\" appears to be nullable. Consider removing @Required.",
-                    element,
-                    element.asType()));
+                        "Field \"%s\" with type \"%s\" appears to be nullable. Consider removing @Required.",
+                        element,
+                        element.asType()));
             }
         }
     }

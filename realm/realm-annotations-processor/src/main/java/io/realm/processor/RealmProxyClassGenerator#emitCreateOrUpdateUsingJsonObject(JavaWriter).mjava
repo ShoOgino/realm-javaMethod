@@ -14,6 +14,8 @@
             writer.emitStatement("final List<String> excludeFields = new ArrayList<String>(%1$d)",
                     modelOrListCount);
         }
+
+        //@formatter:off
         if (!metadata.hasPrimaryKey()) {
             buildExcludeFieldsList(writer, metadata.getFields());
             writer.emitStatement("%s obj = realm.createObjectInternal(%s.class, true, excludeFields)",
@@ -63,6 +65,7 @@
                     primaryKeyFieldType, primaryKeyFieldName, writer);
             writer.endControlFlow();
         }
+        //@formatter:on
 
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();

@@ -3,18 +3,18 @@
     private boolean categorizePrimaryKeyField(VariableElement variableElement) {
         if (primaryKey != null) {
             Utils.error(String.format(
-                "A class cannot have more than one @PrimaryKey. Both \"%s\" and \"%s\" are annotated as @PrimaryKey.",
-                primaryKey.getSimpleName().toString(),
-                variableElement.getSimpleName().toString()));
+                    "A class cannot have more than one @PrimaryKey. Both \"%s\" and \"%s\" are annotated as @PrimaryKey.",
+                    primaryKey.getSimpleName().toString(),
+                    variableElement.getSimpleName().toString()));
             return false;
         }
 
         TypeMirror fieldType = variableElement.asType();
         if (!isValidPrimaryKeyType(fieldType)) {
             Utils.error(String.format(
-                "Field \"%s\" with type \"%s\" cannot be used as primary key. See @PrimaryKey for legal types.",
-                variableElement.getSimpleName().toString(),
-                fieldType));
+                    "Field \"%s\" with type \"%s\" cannot be used as primary key. See @PrimaryKey for legal types.",
+                    variableElement.getSimpleName().toString(),
+                    fieldType));
             return false;
         }
 

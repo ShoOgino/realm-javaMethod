@@ -4,16 +4,16 @@
         }
         writer.emitAnnotation("Override");
         writer.emitAnnotation("SuppressWarnings", "\"ArrayToString\"")
-            .beginMethod("String", "toString", EnumSet.of(Modifier.PUBLIC))
-            .beginControlFlow("if (!RealmObject.isValid(this))")
+                .beginMethod("String", "toString", EnumSet.of(Modifier.PUBLIC))
+                .beginControlFlow("if (!RealmObject.isValid(this))")
                 .emitStatement("return \"Invalid object\"")
-            .endControlFlow();
+                .endControlFlow();
         writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = [\")", simpleClassName);
 
         Collection<VariableElement> fields = metadata.getFields();
         int i = fields.size() - 1;
-        for (VariableElement field: fields) {
-             String fieldName = field.getSimpleName().toString();
+        for (VariableElement field : fields) {
+            String fieldName = field.getSimpleName().toString();
 
             writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
             if (Utils.isRealmModel(field)) {
@@ -48,6 +48,6 @@
         writer.emitStatement("stringBuilder.append(\"]\")");
         writer.emitStatement("return stringBuilder.toString()");
         writer.endMethod()
-            .emitEmptyLine();
+                .emitEmptyLine();
     }
 

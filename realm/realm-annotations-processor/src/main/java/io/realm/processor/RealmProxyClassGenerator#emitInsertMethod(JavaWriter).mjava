@@ -27,6 +27,7 @@
             String fieldType = field.asType().toString();
             String getter = metadata.getInternalGetter(fieldName);
 
+            //@formatter:off
             if (Utils.isRealmModel(field)) {
                 writer
                         .emitEmptyLine()
@@ -64,10 +65,11 @@
                     setTableValues(writer, fieldType, fieldName, interfaceName, getter, false);
                 }
             }
+            //@formatter:on
         }
 
         writer.emitStatement("return rowIndex");
         writer.endMethod()
-            .emitEmptyLine();
+                .emitEmptyLine();
     }
 

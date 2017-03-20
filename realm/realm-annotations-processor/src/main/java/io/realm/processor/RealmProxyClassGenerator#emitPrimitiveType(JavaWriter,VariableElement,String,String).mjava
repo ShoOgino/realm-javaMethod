@@ -2,14 +2,14 @@
      * Primitives and boxed types
      */
     private void emitPrimitiveType(
-        JavaWriter writer,
-        final VariableElement field,
-        final String fieldName,
-        String fieldTypeCanonicalName) throws IOException
-    {
+            JavaWriter writer,
+            final VariableElement field,
+            final String fieldName,
+            String fieldTypeCanonicalName) throws IOException {
         final String realmType = Constants.JAVA_TO_REALM_TYPES.get(fieldTypeCanonicalName);
 
         // Getter
+        //@formatter:off
         writer.emitAnnotation("Override");
         writer.emitAnnotation("SuppressWarnings", "\"cast\"")
             .beginMethod(fieldTypeCanonicalName, metadata.getInternalGetter(fieldName), EnumSet.of(Modifier.PUBLIC))
@@ -21,6 +21,7 @@
                 .emitStatement("return null")
                 .endControlFlow();
         }
+        //@formatter:on
 
         // For Boxed types, this should be the corresponding primitive types. Others remain the same.
         String castingBackType;
@@ -31,10 +32,10 @@
             castingBackType = fieldTypeCanonicalName;
         }
         writer.emitStatement(
-            "return (%s) proxyState.getRow$realm().get%s(%s)",
-            castingBackType, realmType, fieldIndexVariableReference(field));
+                "return (%s) proxyState.getRow$realm().get%s(%s)",
+                castingBackType, realmType, fieldIndexVariableReference(field));
         writer.endMethod()
-            .emitEmptyLine();
+                .emitEmptyLine();
 
         // Setter
         writer.emitAnnotation("Override");
@@ -45,6 +46,7 @@
                 // set value as default value
                 writer.emitStatement("final Row row = proxyState.getRow$realm()");
 
+                //@formatter:off
                 if (metadata.isNullable(field)) {
                     writer.beginControlFlow("if (value == null)")
                         .emitStatement("row.getTable().setNull(%s, row.getIndex(), true)",
@@ -56,9 +58,11 @@
                         .emitStatement(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName)
                         .endControlFlow();
                 }
+                //@formatter:on
+
                 writer.emitStatement(
-                    "row.getTable().set%s(%s, row.getIndex(), value, true)",
-                    realmType, fieldIndexVariableReference(field));
+                        "row.getTable().set%s(%s, row.getIndex(), value, true)",
+                        realmType, fieldIndexVariableReference(field));
                 writer.emitStatement("return");
             }
         });
@@ -69,6 +73,7 @@
             // Primary key is not allowed to be changed after object created.
             writer.emitStatement(Constants.STATEMENT_EXCEPTION_PRIMARY_KEY_CANNOT_BE_CHANGED, fieldName);
         } else {
+            //@formatter:off
             if (metadata.isNullable(field)) {
                 writer.beginControlFlow("if (value == null)")
                     .emitStatement("proxyState.getRow$realm().setNull(%s)", fieldIndexVariableReference(field))
@@ -81,9 +86,10 @@
                     .emitStatement(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName)
                     .endControlFlow();
             }
+            //@formatter:on
             writer.emitStatement(
-                "proxyState.getRow$realm().set%s(%s, value)",
-                realmType, fieldIndexVariableReference(field));
+                    "proxyState.getRow$realm().set%s(%s, value)",
+                    realmType, fieldIndexVariableReference(field));
         }
         writer.endMethod();
     }

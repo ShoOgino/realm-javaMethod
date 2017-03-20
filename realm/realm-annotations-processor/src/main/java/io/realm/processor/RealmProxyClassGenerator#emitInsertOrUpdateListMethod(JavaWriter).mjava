@@ -20,8 +20,8 @@
         writer.beginControlFlow("if(!cache.containsKey(object))");
 
         writer.beginControlFlow("if (object instanceof RealmObjectProxy && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm().getPath().equals(realm.getPath()))");
-            writer.emitStatement("cache.put(object, ((RealmObjectProxy)object).realmGet$proxyState().getRow$realm().getIndex())")
-                  .emitStatement("continue");
+        writer.emitStatement("cache.put(object, ((RealmObjectProxy)object).realmGet$proxyState().getRow$realm().getIndex())")
+                .emitStatement("continue");
         writer.endControlFlow();
         addPrimaryKeyCheckIfNeeded(metadata, false, writer);
 
@@ -30,6 +30,7 @@
             String fieldType = field.asType().toString();
             String getter = metadata.getInternalGetter(fieldName);
 
+            //@formatter:off
             if (Utils.isRealmModel(field)) {
                 writer
                         .emitEmptyLine()
@@ -70,8 +71,9 @@
                     setTableValues(writer, fieldType, fieldName, interfaceName, getter, true);
                 }
             }
+            //@formatter:on
         }
-            writer.endControlFlow();
+        writer.endControlFlow();
         writer.endControlFlow();
 
         writer.endMethod();

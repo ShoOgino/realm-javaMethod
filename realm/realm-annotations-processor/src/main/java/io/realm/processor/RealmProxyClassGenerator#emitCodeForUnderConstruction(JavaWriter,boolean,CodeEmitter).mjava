@@ -1,9 +1,9 @@
     private void emitCodeForUnderConstruction(JavaWriter writer, boolean isPrimaryKey,
-                                              CodeEmitter defaultValueCodeEmitter) throws IOException {
+            CodeEmitter defaultValueCodeEmitter) throws IOException {
         writer.beginControlFlow("if (proxyState.isUnderConstruction())");
         if (isPrimaryKey) {
             writer.emitSingleLineComment("default value of the primary key is always ignored.")
-                .emitStatement("return");
+                    .emitStatement("return");
         } else {
             writer.beginControlFlow("if (!proxyState.getAcceptDefaultValue$realm())")
                     .emitStatement("return")
@@ -11,6 +11,6 @@
             defaultValueCodeEmitter.emit(writer);
         }
         writer.endControlFlow()
-            .emitEmptyLine();
+                .emitEmptyLine();
     }
 

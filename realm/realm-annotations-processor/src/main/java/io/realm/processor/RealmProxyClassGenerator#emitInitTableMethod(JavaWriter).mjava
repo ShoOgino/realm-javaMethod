@@ -27,16 +27,16 @@
             } else if (Utils.isRealmModel(field)) {
                 writer.beginControlFlow("if (!sharedRealm.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, fieldTypeSimpleName)
                         .emitStatement("%s%s.initTable(sharedRealm)", fieldTypeSimpleName, Constants.PROXY_SUFFIX)
-                    .endControlFlow()
-                    .emitStatement("table.addColumnLink(RealmFieldType.OBJECT, \"%s\", sharedRealm.getTable(\"%s%s\"))",
-                        fieldName, Constants.TABLE_PREFIX, fieldTypeSimpleName);
+                        .endControlFlow()
+                        .emitStatement("table.addColumnLink(RealmFieldType.OBJECT, \"%s\", sharedRealm.getTable(\"%s%s\"))",
+                                fieldName, Constants.TABLE_PREFIX, fieldTypeSimpleName);
             } else if (Utils.isRealmList(field)) {
                 String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
                 writer.beginControlFlow("if (!sharedRealm.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericTypeSimpleName)
                         .emitStatement("%s.initTable(sharedRealm)", Utils.getProxyClassName(genericTypeSimpleName))
-                    .endControlFlow()
-                    .emitStatement("table.addColumnLink(RealmFieldType.LIST, \"%s\", sharedRealm.getTable(\"%s%s\"))",
-                        fieldName, Constants.TABLE_PREFIX, genericTypeSimpleName);
+                        .endControlFlow()
+                        .emitStatement("table.addColumnLink(RealmFieldType.LIST, \"%s\", sharedRealm.getTable(\"%s%s\"))",
+                                fieldName, Constants.TABLE_PREFIX, genericTypeSimpleName);
             }
         }
 
@@ -58,6 +58,6 @@
 
         writer.emitStatement("return sharedRealm.getTable(\"%s%s\")", Constants.TABLE_PREFIX, this.simpleClassName);
         writer.endMethod()
-            .emitEmptyLine();
+                .emitEmptyLine();
     }
 
