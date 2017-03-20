@@ -4,14 +4,14 @@
         populateTestRealm(realm, TEST_OBJECTS_COUNT);
 
         RealmResults<AllTypes> resultList = realm.where(AllTypes.class)
-                .greaterThan(AllTypes.FIELD_FLOAT, 10.234567f).findAll();
+                .greaterThan(AllTypes.FIELD_FLOAT, 10.2345f).findAll();
         assertEquals(TEST_OBJECTS_COUNT - 10, resultList.size());
 
         resultList = realm.where(AllTypes.class).beginsWith(AllTypes.FIELD_STRING, "test data 1")
-                .greaterThan(AllTypes.FIELD_FLOAT, 50.234567f).findAll();
-        assertEquals(TEST_OBJECTS_COUNT - 100, resultList.size());
+                .greaterThan(AllTypes.FIELD_FLOAT, 150.2345f).findAll();
+        assertEquals(TEST_OBJECTS_COUNT - 150, resultList.size());
 
-        RealmQuery<AllTypes> query = realm.where(AllTypes.class).greaterThan(AllTypes.FIELD_FLOAT, 11.234567f);
+        RealmQuery<AllTypes> query = realm.where(AllTypes.class).greaterThan(AllTypes.FIELD_FLOAT, 11.2345f);
         resultList = query.between(AllTypes.FIELD_LONG, 1, 20).findAll();
         assertEquals(10, resultList.size());
     }

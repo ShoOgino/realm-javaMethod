@@ -15,13 +15,16 @@
                     case REMOVE_ALL:
                     case RETAIN_ALL:
                         expected = UnsupportedOperationException.class;
+                        break;
+                    default:
+                        // use default exception
                 }
             }
 
             try {
                 switch (method) {
                     case DELETE_ALL: collection.deleteAllFromRealm(); break;
-                    case ADD_OBJECT: collection.add(new AllJavaTypes());
+                    case ADD_OBJECT: collection.add(new AllJavaTypes()); break;
                     case ADD_ALL_OBJECTS: collection.addAll(Collections.singletonList(new AllJavaTypes())); break;
                     case CLEAR: collection.clear(); break;
                     case REMOVE_OBJECT: collection.remove(new AllJavaTypes()); break;

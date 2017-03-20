@@ -17,6 +17,9 @@
                         case REMOVE_ALL:
                         case RETAIN_ALL:
                             expected = UnsupportedOperationException.class;
+                            break;
+                        default:
+                            // use default exception
                     }
                 }
 
@@ -24,8 +27,8 @@
                     switch (method) {
                         case ADD_OBJECT: collection.add(new AllJavaTypes()); break;
                         case ADD_ALL_OBJECTS: collection.addAll(Collections.singletonList(new AllJavaTypes())); break;
-                        case CLEAR: collection.clear();
-                        case CONTAINS:
+                        case CLEAR: collection.clear(); break;
+                        case CONTAINS: collection.contains(tempObject); break;
                         case CONTAINS_ALL: collection.containsAll(Collections.singletonList(tempObject)); break;
                         case EQUALS:
                             //noinspection ResultOfMethodCallIgnored
