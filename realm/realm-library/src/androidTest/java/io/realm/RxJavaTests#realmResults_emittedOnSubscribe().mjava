@@ -5,6 +5,7 @@
         final RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
         subscription = results.asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
             @Override
+            @SuppressWarnings("ReferenceEquality")
             public void call(RealmResults<AllTypes> rxResults) {
                 assertTrue(rxResults == results);
                 subscribedNotified.set(true);
