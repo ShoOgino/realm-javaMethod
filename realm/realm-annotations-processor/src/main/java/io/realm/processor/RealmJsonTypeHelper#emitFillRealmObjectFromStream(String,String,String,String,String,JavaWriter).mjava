@@ -1,5 +1,6 @@
-    public static void emitFillRealmObjectFromStream(String interfaceName, String setter, String fieldName, String
-            fieldTypeCanonicalName, String proxyClass, JavaWriter writer) throws IOException {
+    // @formatter:off
+    public static void emitFillRealmObjectFromStream(String interfaceName, String setter, String fieldName,
+        String fieldTypeCanonicalName, String proxyClass, JavaWriter writer) throws IOException {
         writer
             .beginControlFlow("if (reader.peek() == JsonToken.NULL)")
                 .emitStatement("reader.skipValue()")
@@ -10,4 +11,5 @@
                 .emitStatement("((%s) obj).%s(%sObj)", interfaceName, setter, fieldName)
             .endControlFlow();
     }
+    //@formatter:on
 

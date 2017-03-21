@@ -1,0 +1,18 @@
+    // Adding multiple list links creates multiple backlinks,
+    // even if the links are to a single object
+    @Test
+    public void basic_multipleReferencesFromParentList() {
+        realm.beginTransaction();
+        AllJavaTypes child = realm.createObject(AllJavaTypes.class, 1);
+        AllJavaTypes parent = realm.createObject(AllJavaTypes.class, 2);
+        parent.getFieldList().add(child);
+        parent.getFieldList().add(child);
+        realm.commitTransaction();
+
+        // One entry for each reference, so two references from a LinkList will
+        // result in two backlinks.
+        assertEquals(2, child.getListParents().size());
+        assertEquals(parent, child.getListParents().first());
+        assertEquals(parent, child.getListParents().last());
+    }
+

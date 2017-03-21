@@ -3,9 +3,9 @@
      *
      * @param configuration {@link RealmConfiguration} used to create the Realm.
      * @param globalCacheArray if this is not {@code null} and contains an entry for current schema version,
-     *                         the {@link BaseRealm#schema#columnIndices} will be initialized with the copy of
-     *                         the entry. Otherwise, {@link BaseRealm#schema#columnIndices} will be populated
-     *                         from the Realm file.
+     * the {@link BaseRealm#schema#columnIndices} will be initialized with the copy of
+     * the entry. Otherwise, {@link BaseRealm#schema#columnIndices} will be populated
+     * from the Realm file.
      * @return a {@link Realm} instance.
      */
     static Realm createInstance(RealmConfiguration configuration, ColumnIndices[] globalCacheArray) {
@@ -17,7 +17,9 @@
                 deleteRealm(configuration);
             } else {
                 try {
-                    migrateRealm(configuration, e);
+                    if (configuration.getMigration() != null) {
+                        migrateRealm(configuration, e);
+                    }
                 } catch (FileNotFoundException fileNotFoundException) {
                     // Should never happen.
                     throw new RealmFileException(RealmFileException.Kind.NOT_FOUND, fileNotFoundException);

@@ -2,7 +2,7 @@
      * Removes a column in the table dynamically. If {@code columnIndex} is smaller than the primary
      * key column index, {@link #invalidateCachedPrimaryKeyIndex()} will be called to recalculate the
      * primary key column index.
-     *
+     * <p>
      * <p>It should be noted if {@code columnIndex} is the same as the primary key column index,
      * the primary key column is removed from the meta table.
      *
@@ -28,8 +28,8 @@
             if (oldPkColumnIndex == columnIndex) {
                 setPrimaryKey(null);
 
-            // But if you remove a column with a smaller index than that of PK column, you need to
-            // recalculate the PK column index as core could have changed its column index.
+                // But if you remove a column with a smaller index than that of PK column, you need to
+                // recalculate the PK column index as core could have changed its column index.
             } else if (oldPkColumnIndex > columnIndex) {
                 invalidateCachedPrimaryKeyIndex();
             }

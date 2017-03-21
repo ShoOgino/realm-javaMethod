@@ -1,0 +1,39 @@
+    private boolean categorizeField(Element element) {
+        VariableElement variableElement = (VariableElement) element;
+
+        // completely ignore any static fields
+        if (variableElement.getModifiers().contains(Modifier.STATIC)) { return true; }
+
+        if (variableElement.getAnnotation(Ignore.class) != null) { return true; }
+
+        if (variableElement.getAnnotation(Index.class) != null) {
+            if (!categorizeIndexField(element, variableElement)) { return false; }
+        }
+
+        if (variableElement.getAnnotation(Required.class) != null) {
+            categorizeRequiredField(element, variableElement);
+        } else {
+            // The field doesn't have the @Required annotation.
+            // Without @Required annotation, boxed types/RealmObject/Date/String/bytes should be added to
+            // nullableFields.
+            // RealmList and Primitive types are NOT nullable always. @Required annotation is not supported.
+            if (!Utils.isPrimitiveType(variableElement) && !Utils.isRealmList(variableElement)) {
+                nullableFields.add(variableElement);
+            }
+        }
+
+        if (variableElement.getAnnotation(PrimaryKey.class) != null) {
+            if (!categorizePrimaryKeyField(variableElement)) { return false; }
+        }
+
+        // Check @LinkingObjects last since it is not allowed to be either @Index, @Required or @PrimaryKey
+        if (variableElement.getAnnotation(LinkingObjects.class) != null) {
+            return categorizeBacklinkField(variableElement);
+        }
+
+        // Standard field that appear valid (more fine grained checks might fail later).
+        fields.add(variableElement);
+
+        return true;
+    }
+

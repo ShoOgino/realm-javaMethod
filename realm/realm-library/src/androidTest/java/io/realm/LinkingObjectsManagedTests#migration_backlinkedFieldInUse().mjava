@@ -1,0 +1,34 @@
+    /**
+     * Table validation should fail if the backinked column already exists in the target table.
+     * The realm `backlinks-fieldInUse.realm` contains the classes `BacklinksSource` and `BacklinksTarget`
+     * except that in the definition of `BacklinksTarget`, the field parent is defined as:
+     * <pre>
+     * {@code
+     *     private RealmList<BacklinksSource> parents;
+     * }
+     * </pre>
+     */
+    @Test
+    public void migration_backlinkedFieldInUse() {
+        final String realmName = "backlinks-fieldInUse.realm";
+
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+            .name(realmName)
+            .schema(BacklinksSource.class, BacklinksTarget.class)
+            .build();
+
+        try {
+            configFactory.copyRealmFromAssets(context, realmName, realmName);
+
+            Realm localRealm = Realm.getInstance(realmConfig);
+            localRealm.close();
+            fail("A migration should have been required");
+        } catch (IOException e) {
+            fail("Failed copying realm");
+        } catch (RealmMigrationNeededException expected) {
+            assertTrue(expected.getMessage().contains("Field count is"));
+        } finally {
+            Realm.deleteRealm(realmConfig);
+        }
+    }
+

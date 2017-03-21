@@ -1,3 +1,4 @@
+    //@formatter:off
     private void emitCreateDetachedCopyMethod(JavaWriter writer) throws IOException {
         writer.beginMethod(
                 qualifiedClassName, // Return type
@@ -25,8 +26,8 @@
 
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
-            String setter = metadata.getSetter(fieldName);
-            String getter = metadata.getGetter(fieldName);
+            String setter = metadata.getInternalSetter(fieldName);
+            String getter = metadata.getInternalGetter(fieldName);
 
             if (Utils.isRealmModel(field)) {
                 writer
@@ -63,4 +64,5 @@
         writer.endMethod();
         writer.emitEmptyLine();
     }
+    //@formatter:on
 

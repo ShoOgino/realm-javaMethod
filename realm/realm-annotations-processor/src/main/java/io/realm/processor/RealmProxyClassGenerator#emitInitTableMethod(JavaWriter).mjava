@@ -25,18 +25,18 @@
                         Constants.JAVA_TO_COLUMN_TYPES.get(fieldTypeCanonicalName),
                         fieldName, nullableFlag);
             } else if (Utils.isRealmModel(field)) {
-                writer.beginControlFlow("if (!sharedRealm.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, fieldTypeSimpleName);
-                writer.emitStatement("%s%s.initTable(sharedRealm)", fieldTypeSimpleName, Constants.PROXY_SUFFIX);
-                writer.endControlFlow();
-                writer.emitStatement("table.addColumnLink(RealmFieldType.OBJECT, \"%s\", sharedRealm.getTable(\"%s%s\"))",
-                        fieldName, Constants.TABLE_PREFIX, fieldTypeSimpleName);
+                writer.beginControlFlow("if (!sharedRealm.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, fieldTypeSimpleName)
+                        .emitStatement("%s%s.initTable(sharedRealm)", fieldTypeSimpleName, Constants.PROXY_SUFFIX)
+                        .endControlFlow()
+                        .emitStatement("table.addColumnLink(RealmFieldType.OBJECT, \"%s\", sharedRealm.getTable(\"%s%s\"))",
+                                fieldName, Constants.TABLE_PREFIX, fieldTypeSimpleName);
             } else if (Utils.isRealmList(field)) {
                 String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
-                writer.beginControlFlow("if (!sharedRealm.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericTypeSimpleName);
-                writer.emitStatement("%s.initTable(sharedRealm)", Utils.getProxyClassName(genericTypeSimpleName));
-                writer.endControlFlow();
-                writer.emitStatement("table.addColumnLink(RealmFieldType.LIST, \"%s\", sharedRealm.getTable(\"%s%s\"))",
-                        fieldName, Constants.TABLE_PREFIX, genericTypeSimpleName);
+                writer.beginControlFlow("if (!sharedRealm.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericTypeSimpleName)
+                        .emitStatement("%s.initTable(sharedRealm)", Utils.getProxyClassName(genericTypeSimpleName))
+                        .endControlFlow()
+                        .emitStatement("table.addColumnLink(RealmFieldType.LIST, \"%s\", sharedRealm.getTable(\"%s%s\"))",
+                                fieldName, Constants.TABLE_PREFIX, genericTypeSimpleName);
             }
         }
 
@@ -53,9 +53,11 @@
         }
 
         writer.emitStatement("return table");
+
         writer.endControlFlow();
+
         writer.emitStatement("return sharedRealm.getTable(\"%s%s\")", Constants.TABLE_PREFIX, this.simpleClassName);
-        writer.endMethod();
-        writer.emitEmptyLine();
+        writer.endMethod()
+                .emitEmptyLine();
     }
 

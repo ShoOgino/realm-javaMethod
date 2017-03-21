@@ -1,0 +1,19 @@
+    /**
+     * Find the named field in this classes list of fields.
+     * This method is called only during backlink checking,
+     * so creating a map, even lazily, doesn't seem like a worthwhile optimization.
+     * If it gets used more widely, that decision should be revisited.
+     *
+     * @param fieldName The name of the sought field
+     * @return the named field's VariableElement, or null if not found
+     */
+    public VariableElement getDeclaredField(String fieldName) {
+        if (fieldName == null) { return null; }
+        for (VariableElement field : fields) {
+            if (field.getSimpleName().toString().equals(fieldName)) {
+                return field;
+            }
+        }
+        return null;
+    }
+

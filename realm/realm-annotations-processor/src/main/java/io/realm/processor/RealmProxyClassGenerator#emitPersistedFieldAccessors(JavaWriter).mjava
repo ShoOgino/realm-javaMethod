@@ -1,0 +1,20 @@
+    private void emitPersistedFieldAccessors(final JavaWriter writer) throws IOException {
+        for (final VariableElement field : metadata.getFields()) {
+            final String fieldName = field.getSimpleName().toString();
+            final String fieldTypeCanonicalName = field.asType().toString();
+
+            if (Constants.JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
+                emitPrimitiveType(writer, field, fieldName, fieldTypeCanonicalName);
+            } else if (Utils.isRealmModel(field)) {
+                emitRealmModel(writer, field, fieldName, fieldTypeCanonicalName);
+            } else if (Utils.isRealmList(field)) {
+                emitRealmList(writer, field, fieldName, fieldTypeCanonicalName);
+            } else {
+                throw new UnsupportedOperationException(String.format(
+                        "Field \"%s\" of type \"%s\" is not supported.", fieldName, fieldTypeCanonicalName));
+            }
+
+            writer.emitEmptyLine();
+        }
+    }
+

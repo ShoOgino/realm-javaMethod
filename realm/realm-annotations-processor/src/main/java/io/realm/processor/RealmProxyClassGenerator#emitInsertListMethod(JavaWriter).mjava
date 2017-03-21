@@ -15,21 +15,22 @@
         }
         writer.emitStatement("%s object = null", qualifiedClassName);
 
-        writer.beginControlFlow("while (objects.hasNext())");
-        writer.emitStatement("object = (%s) objects.next()", qualifiedClassName);
+        writer.beginControlFlow("while (objects.hasNext())")
+                .emitStatement("object = (%s) objects.next()", qualifiedClassName);
         writer.beginControlFlow("if(!cache.containsKey(object))");
 
         writer.beginControlFlow("if (object instanceof RealmObjectProxy && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm().getPath().equals(realm.getPath()))");
-                writer.emitStatement("cache.put(object, ((RealmObjectProxy)object).realmGet$proxyState().getRow$realm().getIndex())")
+        writer.emitStatement("cache.put(object, ((RealmObjectProxy)object).realmGet$proxyState().getRow$realm().getIndex())")
                 .emitStatement("continue");
         writer.endControlFlow();
 
         addPrimaryKeyCheckIfNeeded(metadata, true, writer);
 
+        //@formatter:off
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
             String fieldType = field.asType().toString();
-            String getter = metadata.getGetter(fieldName);
+            String getter = metadata.getInternalGetter(fieldName);
 
             if (Utils.isRealmModel(field)) {
                 writer
@@ -69,6 +70,7 @@
                 }
             }
         }
+        //@formatter:on
 
         writer.endControlFlow();
         writer.endControlFlow();

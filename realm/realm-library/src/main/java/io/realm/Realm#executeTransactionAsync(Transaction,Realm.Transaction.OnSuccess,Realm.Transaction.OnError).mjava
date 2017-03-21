@@ -6,11 +6,11 @@
      * @param onError callback invoked when the transaction fails.
      * @return a {@link RealmAsyncTask} representing a cancellable task.
      * @throws IllegalArgumentException if the {@code transaction} is {@code null}, or if the realm is opened from
-     *                                  another thread.
+     * another thread.
      */
     public RealmAsyncTask executeTransactionAsync(final Transaction transaction,
-                                                  final Realm.Transaction.OnSuccess onSuccess,
-                                                  final Realm.Transaction.OnError onError) {
+            final Realm.Transaction.OnSuccess onSuccess,
+            final Realm.Transaction.OnError onError) {
         checkIfValid();
 
         if (transaction == null) {
@@ -70,7 +70,7 @@
                 final Throwable backgroundException = exception;
                 final SharedRealm.VersionID backgroundVersionID = versionID;
                 // Cannot be interrupted anymore.
-                if (canDeliverNotification ) {
+                if (canDeliverNotification) {
                     if (backgroundVersionID != null && onSuccess != null) {
                         realmNotifier.post(new Runnable() {
                             @Override

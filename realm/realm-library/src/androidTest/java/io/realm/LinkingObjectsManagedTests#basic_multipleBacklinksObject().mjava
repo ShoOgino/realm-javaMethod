@@ -1,0 +1,13 @@
+    // Setting multiple object links creates multiple backlinks
+    @Test
+    public void basic_multipleBacklinksObject() {
+        realm.beginTransaction();
+        AllJavaTypes child = realm.createObject(AllJavaTypes.class, 1);
+        AllJavaTypes parent1 = realm.createObject(AllJavaTypes.class, 2);
+        AllJavaTypes parent2 = realm.createObject(AllJavaTypes.class, 3);
+        parent1.setFieldObject(child);
+        parent2.setFieldObject(child);
+        realm.commitTransaction();
+        assertEquals(2, child.getObjectParents().size());
+    }
+

@@ -1,8 +1,6 @@
         @Override
         public void emitTypeConversion(String interfaceName, String setter, String fieldName, String fieldType,
-                                       JavaWriter
-                writer)
-                throws IOException {
+                JavaWriter writer) throws IOException {
             String statementSetNullOrThrow;
             if (Utils.isPrimitiveType(fieldType)) {
                 // Only throw exception for primitive types. For boxed types and String, exception will be thrown in
@@ -11,6 +9,7 @@
             } else {
                 statementSetNullOrThrow = String.format("((%s) obj).%s(null)", interfaceName, setter);
             }
+            // @formatter:off
             writer
                 .beginControlFlow("if (json.has(\"%s\"))", fieldName)
                     .beginControlFlow("if (json.isNull(\"%s\"))", fieldName)
@@ -20,5 +19,6 @@
                                 jsonType, fieldName)
                     .endControlFlow()
                 .endControlFlow();
+            //@formatter:on
         }
 

@@ -6,7 +6,7 @@
      * @return the {@link Realm} or {@link DynamicRealm} instance.
      */
     static synchronized <E extends BaseRealm> E createRealmOrGetFromCache(RealmConfiguration configuration,
-                                                        Class<E> realmClass) {
+            Class<E> realmClass) {
         boolean isCacheInMap = true;
         RealmCache cache = cachesMap.get(configuration.getPath());
         if (cache == null) {
@@ -39,7 +39,6 @@
         if (refAndCount.localRealm.get() == null) {
             // Creates a new local Realm instance
             BaseRealm realm;
-
 
             if (realmClass == Realm.class) {
                 // RealmMigrationNeededException might be thrown here.
@@ -75,10 +74,6 @@
         @SuppressWarnings("unchecked")
         E realm = (E) refAndCount.localRealm.get();
 
-        // Notifies SyncPolicy that the Realm has been opened for the first time
-        if (refAndCount.globalCount == 1) {
-            ObjectServerFacade.getFacade(configuration.isSyncConfiguration()).realmOpened(configuration);
-        }
         return realm;
     }
 

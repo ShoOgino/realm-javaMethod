@@ -1,0 +1,34 @@
+    // A listener registered on the backlinked object should not called for an unrelated change
+    @Test
+    @RunTestInLooperThread
+    public void notification_notSentOnUnrelatedChangeRealmResults() {
+        final Realm looperThreadRealm = looperThread.realm;
+
+        looperThreadRealm.beginTransaction();
+        AllJavaTypes child = looperThreadRealm.createObject(AllJavaTypes.class, 10);
+        AllJavaTypes parent = looperThreadRealm.createObject(AllJavaTypes.class, 1);
+        looperThreadRealm.commitTransaction();
+
+        RealmChangeListener<RealmResults<AllJavaTypes>> listener = new RealmChangeListener<RealmResults<AllJavaTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllJavaTypes> object) {
+                fail("Not expecting notification after unregister");
+            }
+        };
+        child.getObjectParents().addChangeListener(listener);
+
+        looperThreadRealm.beginTransaction();
+        looperThreadRealm.where(AllJavaTypes.class).equalTo("fieldId", 1).findAll().deleteAllFromRealm();
+        looperThreadRealm.commitTransaction();
+
+        verifyPostConditions(
+            looperThreadRealm,
+            new PostConditions() {
+                @Override
+                public void run(Realm realm) {
+                    assertEquals(1, looperThreadRealm.where(AllJavaTypes.class).findAll().size());
+                }
+            },
+            child, parent);
+    }
+

@@ -1,0 +1,41 @@
+    /**
+     * Table validation should fail if the backlinked column points to a non-existent field in the source class.
+     * This test is quite a chore to construct!
+     * The realm `backlinks-missingSourceField.realm` was constructed with classes `BacklinksMissingFieldTarget`
+     * and `BacklinksMissingFieldSource`.  They are identical in their definitions to `BacklinkSource` and
+     * `BacklinkTarget` except for their names.  The library `backlinks-missing-field-source.jar` contains
+     * the class `BacklinksMissingFieldSource` and all of its annotation generated code.  The library
+     * `backlinks-missing-field-target.jar` however, contains a version of `BacklinksMissingFieldTarget` that
+     * was compiled with its backlink field referring to a field in `BacklinksMissingFieldSource`, called
+     * `xxxchild`.  Clearly, in order to compile successfully, the definition of `BacklinksMissingFieldSource`
+     * had to be changed accordingly.  The modified version, however, is *NOT* the version that is in
+     * `backlinks-missing-field-source.jar`!
+     * So, now, the proxy in `backlinks-missing-field-source.jar` will correctly validate the its table
+     * (it generated it!). Similarly, the proxy in `backlinks-missing-field-target.jar` will successfully
+     * validate its table.  If we have been living clean lives, though, the validator for
+     * `BacklinksMissingFieldTarget` should notice that there is no field named `BacklinksMissingFieldSource.xxxchild`.
+     */
+    @Test
+    public void migration_backlinkedSourceFieldDoesntExist() {
+        final String realmName = "backlinks-missingSourceField.realm";
+
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+            .name(realmName)
+            .modules(new BacklinksMissingFieldSourceModule(), new BacklinksMissingFieldTargetModule())
+            .build();
+
+        try {
+            configFactory.copyRealmFromAssets(context, realmName, realmName);
+
+            Realm localRealm = Realm.getInstance(realmConfig);
+            localRealm.close();
+            fail("A migration should have been required");
+        } catch (IOException e) {
+            fail("Failed copying realm");
+        } catch (RealmMigrationNeededException expected) {
+            assertTrue(expected.getMessage().contains("Cannot find source field"));
+        } finally {
+            Realm.deleteRealm(realmConfig);
+        }
+    }
+

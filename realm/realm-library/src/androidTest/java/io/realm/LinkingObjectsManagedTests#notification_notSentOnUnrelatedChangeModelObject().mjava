@@ -1,0 +1,38 @@
+    // A listener registered on the backlinked object is called
+    // for an unrelated change on the an object of the same type!!
+    // This test exists only to document existing (but odd) behavior.
+    @Test
+    @RunTestInLooperThread
+    public void notification_notSentOnUnrelatedChangeModelObject() {
+        final Realm looperThreadRealm = looperThread.realm;
+
+        looperThreadRealm.beginTransaction();
+        AllJavaTypes child = looperThreadRealm.createObject(AllJavaTypes.class, 10);
+        AllJavaTypes parent = looperThreadRealm.createObject(AllJavaTypes.class, 1);
+        looperThreadRealm.commitTransaction();
+
+        final AtomicInteger counter = new AtomicInteger(0);
+        RealmChangeListener<AllJavaTypes> listener = new RealmChangeListener<AllJavaTypes>() {
+            @Override
+            public void onChange(AllJavaTypes object) {
+                counter.incrementAndGet();
+            }
+        };
+        child.addChangeListener(listener);
+
+        looperThreadRealm.beginTransaction();
+        looperThreadRealm.where(AllJavaTypes.class).equalTo("fieldId", 1).findAll().deleteAllFromRealm();
+        looperThreadRealm.commitTransaction();
+
+        verifyPostConditions(
+            looperThreadRealm,
+            new PostConditions() {
+                @Override
+                public void run(Realm realm) {
+                    assertEquals(1, looperThreadRealm.where(AllJavaTypes.class).findAll().size());
+                    assertEquals(1, counter.get());
+                }
+            },
+            child, parent);
+    }
+

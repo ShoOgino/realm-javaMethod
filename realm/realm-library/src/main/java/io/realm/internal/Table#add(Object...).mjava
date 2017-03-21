@@ -13,7 +13,7 @@
         checkImmutable();
 
         // Checks values types.
-        int columns = (int)getColumnCount();
+        int columns = (int) getColumnCount();
         if (columns != values.length) {
             throw new IllegalArgumentException("The number of value parameters (" +
                     String.valueOf(values.length) +
@@ -41,51 +41,49 @@
 
         // Inserts values.
         for (long columnIndex = 0; columnIndex < columns; columnIndex++) {
-            Object value = values[(int)columnIndex];
-            switch (colTypes[(int)columnIndex]) {
-            case BOOLEAN:
-                nativeSetBoolean(nativePtr, columnIndex, rowIndex, (Boolean)value, false);
-                break;
-            case INTEGER:
-                if (value == null) {
-                    checkDuplicatedNullForPrimaryKeyValue(columnIndex, rowIndex);
-                    nativeSetNull(nativePtr, columnIndex, rowIndex, false);
-                } else {
-                    long intValue = ((Number) value).longValue();
-                    checkIntValueIsLegal(columnIndex, rowIndex, intValue);
-                    nativeSetLong(nativePtr, columnIndex, rowIndex, intValue, false);
-                }
-                break;
-            case FLOAT:
-                nativeSetFloat(nativePtr, columnIndex, rowIndex, (Float) value, false);
-                break;
-            case DOUBLE:
-                nativeSetDouble(nativePtr, columnIndex, rowIndex, (Double) value, false);
-                break;
-            case STRING:
-                if (value == null) {
-                    checkDuplicatedNullForPrimaryKeyValue(columnIndex, rowIndex);
-                    nativeSetNull(nativePtr, columnIndex, rowIndex, false);
-                } else {
-                    String stringValue = (String) value;
-                    checkStringValueIsLegal(columnIndex, rowIndex, stringValue);
-                    nativeSetString(nativePtr, columnIndex, rowIndex, (String) value, false);
-                }
-                break;
-            case DATE:
-                if (value == null)
-                    throw new IllegalArgumentException("Null Date is not allowed.");
-                nativeSetTimestamp(nativePtr, columnIndex, rowIndex, ((Date) value).getTime(), false);
-                break;
-            case BINARY:
-                if (value == null)
-                    throw new IllegalArgumentException("Null Array is not allowed");
-                nativeSetByteArray(nativePtr, columnIndex, rowIndex, (byte[])value, false);
-                break;
-            case UNSUPPORTED_MIXED:
-            case UNSUPPORTED_TABLE:
-            default:
-                throw new RuntimeException("Unexpected columnType: " + String.valueOf(colTypes[(int)columnIndex]));
+            Object value = values[(int) columnIndex];
+            switch (colTypes[(int) columnIndex]) {
+                case BOOLEAN:
+                    nativeSetBoolean(nativePtr, columnIndex, rowIndex, (Boolean) value, false);
+                    break;
+                case INTEGER:
+                    if (value == null) {
+                        checkDuplicatedNullForPrimaryKeyValue(columnIndex, rowIndex);
+                        nativeSetNull(nativePtr, columnIndex, rowIndex, false);
+                    } else {
+                        long intValue = ((Number) value).longValue();
+                        checkIntValueIsLegal(columnIndex, rowIndex, intValue);
+                        nativeSetLong(nativePtr, columnIndex, rowIndex, intValue, false);
+                    }
+                    break;
+                case FLOAT:
+                    nativeSetFloat(nativePtr, columnIndex, rowIndex, (Float) value, false);
+                    break;
+                case DOUBLE:
+                    nativeSetDouble(nativePtr, columnIndex, rowIndex, (Double) value, false);
+                    break;
+                case STRING:
+                    if (value == null) {
+                        checkDuplicatedNullForPrimaryKeyValue(columnIndex, rowIndex);
+                        nativeSetNull(nativePtr, columnIndex, rowIndex, false);
+                    } else {
+                        String stringValue = (String) value;
+                        checkStringValueIsLegal(columnIndex, rowIndex, stringValue);
+                        nativeSetString(nativePtr, columnIndex, rowIndex, (String) value, false);
+                    }
+                    break;
+                case DATE:
+                    if (value == null) { throw new IllegalArgumentException("Null Date is not allowed."); }
+                    nativeSetTimestamp(nativePtr, columnIndex, rowIndex, ((Date) value).getTime(), false);
+                    break;
+                case BINARY:
+                    if (value == null) { throw new IllegalArgumentException("Null Array is not allowed"); }
+                    nativeSetByteArray(nativePtr, columnIndex, rowIndex, (byte[]) value, false);
+                    break;
+                case UNSUPPORTED_MIXED:
+                case UNSUPPORTED_TABLE:
+                default:
+                    throw new RuntimeException("Unexpected columnType: " + String.valueOf(colTypes[(int) columnIndex]));
             }
         }
         return rowIndex;
