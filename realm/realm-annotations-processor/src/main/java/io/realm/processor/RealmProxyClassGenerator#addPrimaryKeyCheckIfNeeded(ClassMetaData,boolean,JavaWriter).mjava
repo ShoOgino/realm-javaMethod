@@ -3,6 +3,7 @@
             String primaryKeyGetter = metadata.getPrimaryKeyGetter();
             VariableElement primaryKeyElement = metadata.getPrimaryKey();
             if (metadata.isNullable(primaryKeyElement)) {
+                //@formatter:off
                 if (Utils.isString(primaryKeyElement)) {
                     writer
                         .emitStatement("String primaryKeyValue = ((%s) object).%s()", interfaceName, primaryKeyGetter)
@@ -22,6 +23,7 @@
                         .emitStatement("rowIndex = Table.nativeFindFirstInt(tableNativePtr, pkColumnIndex, ((%s) object).%s())", interfaceName, primaryKeyGetter)
                         .endControlFlow();
                 }
+                //@formatter:on
             } else {
                 writer.emitStatement("long rowIndex = Table.NO_MATCH");
                 writer.emitStatement("Object primaryKeyValue = ((%s) object).%s()", interfaceName, primaryKeyGetter);

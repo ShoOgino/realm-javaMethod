@@ -25,24 +25,24 @@
                         indexedFlag,
                         nullableFlag);
             } else if (Utils.isRealmModel(field)) {
-                writer.beginControlFlow("if (!realmSchema.contains(\"" + fieldTypeSimpleName + "\"))");
-                writer.emitStatement("%s%s.createRealmObjectSchema(realmSchema)", fieldTypeSimpleName, Constants.PROXY_SUFFIX);
-                writer.endControlFlow();
-                writer.emitStatement("realmObjectSchema.add(new Property(\"%s\", RealmFieldType.OBJECT, realmSchema.get(\"%s\")))",
-                        fieldName, fieldTypeSimpleName);
+                writer.beginControlFlow("if (!realmSchema.contains(\"" + fieldTypeSimpleName + "\"))")
+                        .emitStatement("%s%s.createRealmObjectSchema(realmSchema)", fieldTypeSimpleName, Constants.PROXY_SUFFIX)
+                        .endControlFlow()
+                        .emitStatement("realmObjectSchema.add(new Property(\"%s\", RealmFieldType.OBJECT, realmSchema.get(\"%s\")))",
+                                fieldName, fieldTypeSimpleName);
             } else if (Utils.isRealmList(field)) {
                 String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
-                writer.beginControlFlow("if (!realmSchema.contains(\"" + genericTypeSimpleName +"\"))");
-                writer.emitStatement("%s%s.createRealmObjectSchema(realmSchema)", genericTypeSimpleName, Constants.PROXY_SUFFIX);
-                writer.endControlFlow();
-                writer.emitStatement("realmObjectSchema.add(new Property(\"%s\", RealmFieldType.LIST, realmSchema.get(\"%s\")))",
-                        fieldName, genericTypeSimpleName);
+                writer.beginControlFlow("if (!realmSchema.contains(\"" + genericTypeSimpleName + "\"))")
+                        .emitStatement("%s%s.createRealmObjectSchema(realmSchema)", genericTypeSimpleName, Constants.PROXY_SUFFIX)
+                        .endControlFlow()
+                        .emitStatement("realmObjectSchema.add(new Property(\"%s\", RealmFieldType.LIST, realmSchema.get(\"%s\")))",
+                                fieldName, genericTypeSimpleName);
             }
         }
         writer.emitStatement("return realmObjectSchema");
         writer.endControlFlow();
         writer.emitStatement("return realmSchema.get(\"" + this.simpleClassName + "\")");
-        writer.endMethod();
-        writer.emitEmptyLine();
+        writer.endMethod()
+                .emitEmptyLine();
     }
 

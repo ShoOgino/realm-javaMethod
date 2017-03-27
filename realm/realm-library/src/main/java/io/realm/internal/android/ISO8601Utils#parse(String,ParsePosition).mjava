@@ -60,7 +60,9 @@
                     char c = date.charAt(offset);
                     if (c != 'Z' && c != '+' && c != '-') {
                         seconds = parseInt(date, offset, offset += 2);
-                        if (seconds > 59 && seconds < 63) seconds = 59; // Truncates up to 3 leap seconds.
+                        if (seconds > 59 && seconds < 63) {
+                            seconds = 59; // Truncates up to 3 leap seconds.
+                        }
                         // Milliseconds can be optional in the format.
                         if (checkOffset(date, offset, '.')) {
                             offset += 1;
@@ -119,13 +121,13 @@
                          */
                         String cleaned = act.replace(":", "");
                         if (!cleaned.equals(timezoneId)) {
-                            throw new IndexOutOfBoundsException("Mismatching time zone indicator: "+timezoneId+" given, resolves to "
-                                    +timezone.getID());
+                            throw new IndexOutOfBoundsException("Mismatching time zone indicator: " + timezoneId + " given, resolves to "
+                                    + timezone.getID());
                         }
                     }
                 }
             } else {
-                throw new IndexOutOfBoundsException("Invalid time zone indicator '" + timezoneIndicator+"'");
+                throw new IndexOutOfBoundsException("Invalid time zone indicator '" + timezoneIndicator + "'");
             }
 
             Calendar calendar = new GregorianCalendar(timezone);
@@ -152,7 +154,7 @@
         String input = (date == null) ? null : ('"' + date + "'");
         String msg = fail.getMessage();
         if (msg == null || msg.isEmpty()) {
-            msg = "("+fail.getClass().getName()+")";
+            msg = "(" + fail.getClass().getName() + ")";
         }
         ParseException ex = new ParseException("Failed to parse date [" + input + "]: " + msg, pos.getIndex());
         ex.initCause(fail);

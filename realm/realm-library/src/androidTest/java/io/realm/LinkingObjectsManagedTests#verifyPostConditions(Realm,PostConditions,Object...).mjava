@@ -1,0 +1,29 @@
+    // Based on a quick conversation with Christian Melchior and Mark Rowe,
+    // it appears that notifications are enqueued, briefly, on a non-Java
+    // thread.  That makes their delivery onto the looper thread unpredictable.
+    // Fortunately, it appears that beginning a transaction forces the delivery of
+    // any outstanding notifications.
+    // The closure passed to this method will be run *after* the body of the test
+    // completes, and *after* the notifications have been delivered.  Because the
+    // test method has been popped off the stack any objects referenced only from
+    // the stack are subject to GC.  To hang on to them, until the test completes,
+    // just pass them to the final vararg to this method.
+    // @zaki50 has some evidence that notifications are delivered on a commit.
+    // If that is the case, we may be able to eliminate the ugly begin-commit
+    // that is the prologue to this method.
+    private void verifyPostConditions(final Realm realm, final PostConditions test, final Object... refs) {
+        realm.beginTransaction();
+        realm.commitTransaction();
+
+        // Runnable is guaranteed to be enqueued on the Looper queue, after the notifications
+        looperThread.keepStrongReference.addAll(Arrays.asList(refs));
+        looperThread.postRunnable(
+            new Runnable() {
+                @Override
+                public void run() {
+                    test.run(realm);
+                    looperThread.testComplete();
+                }
+            });
+    }
+

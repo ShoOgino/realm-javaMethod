@@ -1,0 +1,38 @@
+    /**
+     * Table validation should fail if the backinked column points to a field of the wrong type.
+     * This test is built in almost exactly the way as was `migration_backlinkedSourceFieldDoesntExist`
+     * The realm `backlinks-sourceFieldWrongType.realm` was constructed with classes `BacklinksWrongTypeTarget`
+     * and `BacklinksWrongTypeSource`.  Again, these two classes are nearly identical in their counterparts
+     * `BacklinkSource` and `BacklinkTarget` except for their names.  Unlike `BacklinkSource`,
+     * `BacklinksWrongTypeSource` has two fields, `child` and `childId`. The first is exactly as it is in
+     * `BacklinkSource`, the second is of type `Integer`.  To construct `backlinks-wrong-type-target.jar`
+     * I reversed the names of the two fields in `BacklinkSource`, and made then adjusted `parents` in
+     * `BacklinkTarget` to point to `childId`.
+     * All of the proxies in in the two jars should correctly validate their tables.  The backlink validation
+     * for `BacklinksWrongTypeTarget` should notice, though, that its `parents` field points to an object
+     * of the wrong type, `Integer`, instead of `BacklinksWrongTypeSource`.
+     */
+    @Test
+    public void migration_backlinkedSourceFieldWrongType() {
+        final String realmName = "backlinks-sourceFieldWrongType.realm";
+
+        RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
+            .name(realmName)
+            .modules(new BacklinksWrongTypeSourceModule(), new BacklinksWrongTypeTargetModule())
+            .build();
+
+        try {
+            configFactory.copyRealmFromAssets(context, realmName, realmName);
+
+            Realm localRealm = Realm.getInstance(realmConfig);
+            localRealm.close();
+            fail("A migration should have been required");
+        } catch (IOException e) {
+            fail("Failed copying realm");
+        } catch (RealmMigrationNeededException expected) {
+            assertTrue(expected.getMessage().contains("is not a RealmObject type"));
+        } finally {
+            Realm.deleteRealm(realmConfig);
+        }
+    }
+

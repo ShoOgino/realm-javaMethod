@@ -1,0 +1,28 @@
+    public boolean validateTarget(ClassMetaData clazz) {
+        VariableElement field = clazz.getDeclaredField(sourceField);
+
+        if (field == null) {
+            Utils.error(String.format(
+                    "Field \"%s\", the target of the @LinkedObjects annotation on field \"%s.%s\", does not exist in class \"%s\".",
+                    sourceField,
+                    targetClass,
+                    targetField,
+                    sourceClass));
+            return false;
+        }
+
+        String fieldType = field.asType().toString();
+        if (!(targetClass.equals(fieldType) || targetClass.equals(Utils.getRealmListType(field)))) {
+            Utils.error(String.format(
+                    "Field \"%s.%s\", the target of the @LinkedObjects annotation on field \"%s.%s\", has type \"%s\" instead of \"%3$s\".",
+                    sourceClass,
+                    sourceField,
+                    targetClass,
+                    targetField,
+                    fieldType));
+            return false;
+        }
+
+        return true;
+    }
+

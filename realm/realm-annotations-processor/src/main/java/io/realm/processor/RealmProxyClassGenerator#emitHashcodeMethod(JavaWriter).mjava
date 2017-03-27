@@ -3,22 +3,24 @@
      * alternate due to Realm Java using {@code Table#moveLastOver()}. Hash codes should therefore not
      * be considered stable, i.e. don't save them in a HashSet or use them as a key in a HashMap.
      */
+    //@formatter:off
     private void emitHashcodeMethod(JavaWriter writer) throws IOException {
         if (metadata.containsHashCode()) {
             return;
         }
-        writer.emitAnnotation("Override");
-        writer.beginMethod("int", "hashCode", EnumSet.of(Modifier.PUBLIC));
-        writer.emitStatement("String realmName = proxyState.getRealm$realm().getPath()");
-        writer.emitStatement("String tableName = proxyState.getRow$realm().getTable().getName()");
-        writer.emitStatement("long rowIndex = proxyState.getRow$realm().getIndex()");
-        writer.emitEmptyLine();
-        writer.emitStatement("int result = 17");
-        writer.emitStatement("result = 31 * result + ((realmName != null) ? realmName.hashCode() : 0)");
-        writer.emitStatement("result = 31 * result + ((tableName != null) ? tableName.hashCode() : 0)");
-        writer.emitStatement("result = 31 * result + (int) (rowIndex ^ (rowIndex >>> 32))");
-        writer.emitStatement("return result");
-        writer.endMethod();
-        writer.emitEmptyLine();
+        writer.emitAnnotation("Override")
+            .beginMethod("int", "hashCode", EnumSet.of(Modifier.PUBLIC))
+                .emitStatement("String realmName = proxyState.getRealm$realm().getPath()")
+                .emitStatement("String tableName = proxyState.getRow$realm().getTable().getName()")
+                .emitStatement("long rowIndex = proxyState.getRow$realm().getIndex()")
+                .emitEmptyLine()
+                .emitStatement("int result = 17")
+                .emitStatement("result = 31 * result + ((realmName != null) ? realmName.hashCode() : 0)")
+                .emitStatement("result = 31 * result + ((tableName != null) ? tableName.hashCode() : 0)")
+                .emitStatement("result = 31 * result + (int) (rowIndex ^ (rowIndex >>> 32))")
+                .emitStatement("return result")
+            .endMethod()
+            .emitEmptyLine();
     }
+    //@formatter:on
 

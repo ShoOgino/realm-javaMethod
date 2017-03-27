@@ -1,0 +1,15 @@
+    // When unmanaged, an object's backlinks fields have their initialized value (probably null).
+    @Test
+    public void copyFromRealm() {
+        realm.beginTransaction();
+        AllJavaTypes child = realm.createObject(AllJavaTypes.class, 1);
+        AllJavaTypes parent = realm.createObject(AllJavaTypes.class, 2);
+        parent.setFieldObject(child);
+        realm.commitTransaction();
+        assertEquals(1, child.getObjectParents().size());
+        assertEquals(parent, child.getObjectParents().first());
+
+        AllJavaTypes unmanagedChild = realm.copyFromRealm(child);
+        assertEquals(new AllJavaTypes().getObjectParents(), unmanagedChild.getObjectParents());
+    }
+

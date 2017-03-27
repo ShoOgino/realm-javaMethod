@@ -1,0 +1,21 @@
+    /**
+     * Calling this method will execute the Client Reset manually instead of waiting until next app restart. This will
+     * only be possible if all instances of that Realm have been closed, otherwise a {@link IllegalStateException} will
+     * be thrown.
+     * <p>
+     * After this method returns, the backup file can be found in the location returned by {@link #getBackupFile()}.
+     * The file at {@link #getOriginalFile()} have been deleted, but will be recreated from scratch next time a
+     * Realm instance is opened.
+     *
+     * @throws IllegalStateException if not all instances have been closed.
+     */
+    public void executeClientReset()  {
+        synchronized (Realm.class) {
+            if (Realm.getGlobalInstanceCount(configuration) > 0) {
+                throw new IllegalStateException("Realm has not been fully closed. Client Reset cannot run before all " +
+                        "instances have been closed.");
+            }
+            nativeExecuteClientReset(configuration.getPath());
+        }
+    }
+

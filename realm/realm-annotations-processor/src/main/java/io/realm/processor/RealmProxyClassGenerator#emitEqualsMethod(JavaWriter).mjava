@@ -1,27 +1,29 @@
+    //@formatter:off
     private void emitEqualsMethod(JavaWriter writer) throws IOException {
         if (metadata.containsEquals()) {
             return;
         }
         String proxyClassName = Utils.getProxyClassName(simpleClassName);
         String otherObjectVarName = "a" + simpleClassName;
-        writer.emitAnnotation("Override");
-        writer.beginMethod("boolean", "equals", EnumSet.of(Modifier.PUBLIC), "Object", "o");
-        writer.emitStatement("if (this == o) return true");
-        writer.emitStatement("if (o == null || getClass() != o.getClass()) return false");
-        writer.emitStatement("%s %s = (%s)o", proxyClassName, otherObjectVarName, proxyClassName);  // FooRealmProxy aFoo = (FooRealmProxy)o
-        writer.emitEmptyLine();
-        writer.emitStatement("String path = proxyState.getRealm$realm().getPath()");
-        writer.emitStatement("String otherPath = %s.proxyState.getRealm$realm().getPath()", otherObjectVarName);
-        writer.emitStatement("if (path != null ? !path.equals(otherPath) : otherPath != null) return false");
-        writer.emitEmptyLine();
-        writer.emitStatement("String tableName = proxyState.getRow$realm().getTable().getName()");
-        writer.emitStatement("String otherTableName = %s.proxyState.getRow$realm().getTable().getName()", otherObjectVarName);
-        writer.emitStatement("if (tableName != null ? !tableName.equals(otherTableName) : otherTableName != null) return false");
-        writer.emitEmptyLine();
-        writer.emitStatement("if (proxyState.getRow$realm().getIndex() != %s.proxyState.getRow$realm().getIndex()) return false", otherObjectVarName);
-        writer.emitEmptyLine();
-        writer.emitStatement("return true");
-        writer.endMethod();
-        writer.emitEmptyLine();
+        writer.emitAnnotation("Override")
+            .beginMethod("boolean", "equals", EnumSet.of(Modifier.PUBLIC), "Object", "o")
+                .emitStatement("if (this == o) return true")
+                .emitStatement("if (o == null || getClass() != o.getClass()) return false")
+                .emitStatement("%s %s = (%s)o", proxyClassName, otherObjectVarName, proxyClassName)  // FooRealmProxy aFoo = (FooRealmProxy)o
+                .emitEmptyLine()
+                .emitStatement("String path = proxyState.getRealm$realm().getPath()")
+                .emitStatement("String otherPath = %s.proxyState.getRealm$realm().getPath()", otherObjectVarName)
+                .emitStatement("if (path != null ? !path.equals(otherPath) : otherPath != null) return false")
+                .emitEmptyLine()
+                .emitStatement("String tableName = proxyState.getRow$realm().getTable().getName()")
+                .emitStatement("String otherTableName = %s.proxyState.getRow$realm().getTable().getName()", otherObjectVarName)
+                .emitStatement("if (tableName != null ? !tableName.equals(otherTableName) : otherTableName != null) return false")
+                .emitEmptyLine()
+                .emitStatement("if (proxyState.getRow$realm().getIndex() != %s.proxyState.getRow$realm().getIndex()) return false", otherObjectVarName)
+                .emitEmptyLine()
+                .emitStatement("return true")
+            .endMethod()
+            .emitEmptyLine();
     }
+    //@formatter:on
 

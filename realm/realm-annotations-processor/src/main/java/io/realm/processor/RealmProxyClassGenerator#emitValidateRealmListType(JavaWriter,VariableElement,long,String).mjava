@@ -1,0 +1,23 @@
+    private void emitValidateRealmListType(JavaWriter writer, VariableElement field, long fieldIndex, String fieldName)
+            throws IOException {
+        String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
+        writer.beginControlFlow("if (!columnTypes.containsKey(\"%s\"))", fieldName);
+        emitMigrationNeededException(writer, "\"Missing field '%s'\")", fieldName);
+        writer.endControlFlow();
+        writer.beginControlFlow("if (columnTypes.get(\"%s\") != RealmFieldType.LIST)", fieldName);
+        emitMigrationNeededException(writer, "\"Invalid type '%s' for field '%s'\")",
+                genericTypeSimpleName, fieldName);
+        writer.endControlFlow();
+        writer.beginControlFlow("if (!sharedRealm.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericTypeSimpleName);
+        emitMigrationNeededException(writer, "\"Missing class '%s%s' for field '%s'\")",
+                Constants.TABLE_PREFIX, genericTypeSimpleName, fieldName);
+        writer.endControlFlow();
+
+        writer.emitStatement("Table table_%d = sharedRealm.getTable(\"%s%s\")", fieldIndex, Constants.TABLE_PREFIX, genericTypeSimpleName);
+        writer.beginControlFlow("if (!table.getLinkTarget(%s).hasSameSchema(table_%d))",
+                fieldIndexVariableReference(field), fieldIndex);
+        emitMigrationNeededException(writer, "\"Invalid RealmList type for field '%s': '\" + table.getLinkTarget(%s).getName() + \"' expected - was '\" + table_%d.getName() + \"'\")",
+                fieldName, fieldIndexVariableReference(field), fieldIndex);
+        writer.endControlFlow();
+    }
+

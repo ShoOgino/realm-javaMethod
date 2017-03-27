@@ -1,0 +1,28 @@
+    // Because library classes are processed separately, there is no guarantee
+    // that this method can see all of the classes necessary to completely validate
+    // all of the backlinks.  If it can find the fully-qualified class, though,
+    // and prove that the class either does not contain the necessary field, or
+    // that it does contain the field, but the field is of the wrong type, it can
+    // catch the error at compile time.
+    // Give all failure messages before failing
+    private boolean validateBacklinks() {
+        boolean allValid = true;
+
+        Map<String, ClassMetaData> realmClasses = new HashMap<String, ClassMetaData>(classesToValidate.size());
+        for (ClassMetaData classData : classesToValidate) {
+            realmClasses.put(classData.getFullyQualifiedClassName(), classData);
+        }
+
+        for (Backlink backlink : backlinksToValidate) {
+            ClassMetaData clazz = realmClasses.get(backlink.getSourceClass());
+
+            // If the class is not here it might be part of some other compilation unit.
+            if (clazz == null) { continue; }
+
+            // If the class is here, we can validate it.
+            if (!backlink.validateTarget(clazz) && allValid) { allValid = false; }
+        }
+
+        return allValid;
+    }
+

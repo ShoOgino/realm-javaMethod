@@ -1,6 +1,6 @@
     private void emitClassFields(JavaWriter writer) throws IOException {
-        writer.emitField(columnInfoClassName(), "columnInfo", EnumSet.of(Modifier.PRIVATE));
-        writer.emitField("ProxyState<" + qualifiedClassName + ">", "proxyState", EnumSet.of(Modifier.PRIVATE));
+        writer.emitField(columnInfoClassName(), "columnInfo", EnumSet.of(Modifier.PRIVATE))
+                .emitField("ProxyState<" + qualifiedClassName + ">", "proxyState", EnumSet.of(Modifier.PRIVATE));
 
         for (VariableElement variableElement : metadata.getFields()) {
             if (Utils.isRealmList(variableElement)) {
@@ -9,14 +9,23 @@
             }
         }
 
-        writer.emitField("List<String>", "FIELD_NAMES", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL));
-        writer.beginInitializer(true);
-        writer.emitStatement("List<String> fieldNames = new ArrayList<String>()");
+        for (Backlink backlink : metadata.getBacklinkFields()) {
+            writer.emitField(
+                    backlink.getTargetFieldType(),
+                    backlink.getTargetField() + BACKLINKS_FIELD_EXTENSION,
+                    EnumSet.of(Modifier.PRIVATE));
+        }
+
+        //@formatter:off
+        writer.emitField("List<String>", "FIELD_NAMES", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL))
+            .beginInitializer(true)
+            .emitStatement("List<String> fieldNames = new ArrayList<String>()");
         for (VariableElement field : metadata.getFields()) {
             writer.emitStatement("fieldNames.add(\"%s\")", field.getSimpleName().toString());
         }
-        writer.emitStatement("FIELD_NAMES = Collections.unmodifiableList(fieldNames)");
-        writer.endInitializer();
-        writer.emitEmptyLine();
+        writer.emitStatement("FIELD_NAMES = Collections.unmodifiableList(fieldNames)")
+            .endInitializer()
+            .emitEmptyLine();
+        //@formatter:on
     }
 
