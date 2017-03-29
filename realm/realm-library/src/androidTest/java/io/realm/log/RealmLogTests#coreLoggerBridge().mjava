@@ -1,0 +1,19 @@
+    @Test
+    public void coreLoggerBridge() {
+        TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
+        RealmLog.setLevel(LogLevel.INFO);
+        RealmLog.add(testLogger);
+
+        long ptr = RealmLog.nativeCreateCoreLoggerBridge("TEST");
+        RealmLog.nativeLogToCoreLoggerBridge(ptr, LogLevel.INFO, "42");
+        assertTrue(testLogger.message.equals("42"));
+
+        RealmLog.setLevel(LogLevel.FATAL);
+        RealmLog.nativeLogToCoreLoggerBridge(ptr, LogLevel.INFO, "44");
+        assertTrue(testLogger.message.equals("42"));
+        assertFalse(testLogger.message.equals("44"));
+        RealmLog.nativeLogToCoreLoggerBridge(ptr, LogLevel.FATAL, "45");
+        assertTrue(testLogger.message.equals("45"));
+        RealmLog.nativeCloseCoreLoggerBridge(ptr);
+    }
+
