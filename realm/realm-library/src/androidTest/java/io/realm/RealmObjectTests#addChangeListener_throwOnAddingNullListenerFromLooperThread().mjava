@@ -5,11 +5,17 @@
         Dog dog = createManagedDogObjectFromRealmInstance(realm);
 
         try {
-            dog.addChangeListener(null);
+            dog.addChangeListener((RealmChangeListener) null);
             fail("adding null change listener must throw an exception.");
         } catch (IllegalArgumentException ignore) {
-        } finally {
-            looperThread.testComplete();
         }
+
+        try {
+            dog.addChangeListener((RealmObjectChangeListener) null);
+            fail("adding null change listener must throw an exception.");
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        looperThread.testComplete();
     }
 

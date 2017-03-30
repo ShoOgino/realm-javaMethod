@@ -1,17 +1,9 @@
-    public Row executeQuery() {
+    // Execute the query immediately and call frontend's onQueryFinished().
+    public void executeQuery() {
         if (pendingCollection == null) {
             throw new IllegalStateException(QUERY_EXECUTED_MESSAGE);
         }
-        if (frontEndRef == null) {
-            throw new IllegalStateException(PROXY_NOT_SET_MESSAGE);
-        }
 
-        UncheckedRow uncheckedRow = pendingCollection.firstUncheckedRow();
-        clearPendingCollection();
-
-        if (uncheckedRow == null) {
-            return InvalidRow.INSTANCE;
-        }
-        return returnCheckedRow ? CheckedRow.getFromRow(uncheckedRow) : uncheckedRow;
+        notifyFrontEnd();
     }
 

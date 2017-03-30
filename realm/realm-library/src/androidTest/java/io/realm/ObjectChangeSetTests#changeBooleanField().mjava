@@ -1,0 +1,11 @@
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void changeBooleanField() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        checkChangedField(allTypes, AllTypes.FIELD_BOOLEAN);
+        realm.beginTransaction();
+        allTypes.setColumnBoolean(true);
+        realm.commitTransaction();
+    }
+

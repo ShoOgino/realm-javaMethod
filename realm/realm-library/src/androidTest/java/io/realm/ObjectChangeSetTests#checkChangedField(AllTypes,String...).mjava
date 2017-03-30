@@ -1,0 +1,20 @@
+    private void checkChangedField(AllTypes allTypes, final String... fieldNames) {
+        assertNotNull(fieldNames);
+        allTypes.addChangeListener(new RealmObjectChangeListener<RealmModel>() {
+            @Override
+            public void onChange(RealmModel object, ObjectChangeSet changeSet) {
+                assertEquals(fieldNames.length, changeSet.getChangedFields().length);
+                List<String> changedFields = Arrays.asList(changeSet.getChangedFields());
+                for (String name : fieldNames) {
+                    assertTrue(changeSet.isFieldChanged(name));
+                    assertFalse(changeSet.isFieldChanged(name + "NotThere"));
+                    if (!changedFields.contains(name)) {
+                        fail("Cannot find field " + name + " in field changes.");
+                    }
+                }
+                looperThread.testComplete();
+            }
+        });
+        looperThread.keepStrongReference.add(allTypes);
+    }
+

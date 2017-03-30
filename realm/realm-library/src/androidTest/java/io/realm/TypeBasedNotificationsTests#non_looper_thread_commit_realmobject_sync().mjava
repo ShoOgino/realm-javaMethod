@@ -6,20 +6,6 @@
     @RunTestInLooperThread
     public void non_looper_thread_commit_realmobject_sync() {
         final Realm realm = looperThread.realm;
-        realm.addChangeListener(new RealmChangeListener<Realm>() {
-            @Override
-            public void onChange(Realm object) {
-                if (realm.where(Dog.class).count() == 2) {
-                    looperThread.postRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            assertEquals(1, typebasedCommitInvocations.get());
-                            looperThread.testComplete();
-                        }
-                    });
-                }
-            }
-        });
 
         realm.beginTransaction();
         realm.createObject(Dog.class);
@@ -30,25 +16,16 @@
         dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
             public void onChange(Dog object) {
-                typebasedCommitInvocations.incrementAndGet();
+                assertEquals(17, object.getAge());
+                looperThread.testComplete();
             }
         });
 
-        Thread thread = new Thread() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
-            public void run() {
-                Realm bgRealm = Realm.getInstance(realm.getConfiguration());
-                bgRealm.beginTransaction();
-                bgRealm.createObject(Dog.class);
-                bgRealm.commitTransaction();
-                bgRealm.close();
+            public void execute(Realm realm) {
+                realm.where(Dog.class).findFirst().setAge(17);
             }
-        };
-        thread.start();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            fail(e.getMessage());
-        }
+        });
     }
 

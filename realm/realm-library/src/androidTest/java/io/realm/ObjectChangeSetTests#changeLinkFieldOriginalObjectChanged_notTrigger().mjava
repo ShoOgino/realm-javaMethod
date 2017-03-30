@@ -1,0 +1,11 @@
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void changeLinkFieldOriginalObjectChanged_notTrigger() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        listenerShouldNotBeCalled(allTypes);
+        realm.beginTransaction();
+        allTypes.getColumnRealmObject().setAge(42);
+        realm.commitTransaction();
+    }
+

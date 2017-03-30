@@ -1,0 +1,11 @@
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void changeBinaryField() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        checkChangedField(allTypes, AllTypes.FIELD_BINARY);
+        realm.beginTransaction();
+        allTypes.setColumnBinary(new byte[] { 42 });
+        realm.commitTransaction();
+    }
+

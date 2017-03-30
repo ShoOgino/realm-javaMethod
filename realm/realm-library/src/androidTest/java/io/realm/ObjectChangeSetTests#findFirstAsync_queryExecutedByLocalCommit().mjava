@@ -1,0 +1,34 @@
+    // Due to the fact that Object Store disallow adding notification block inside a transaction, the pending query
+    // for findFirstAsync needs to be executed first then move the listener from collection to the object before begin
+    // transaction.
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void findFirstAsync_queryExecutedByLocalCommit() {
+        Realm realm = looperThread.realm;
+        final AtomicInteger listenerCounter = new AtomicInteger(0);
+        final AllTypes allTypes = realm.where(AllTypes.class).findFirstAsync();
+        allTypes.addChangeListener(new RealmObjectChangeListener<AllTypes>() {
+            @Override
+            public void onChange(AllTypes object, ObjectChangeSet changeSet) {
+                int counter = listenerCounter.getAndIncrement();
+                switch (counter) {
+                    case 0:
+                        assertTrue(object.isValid());
+                        assertNull(changeSet);
+                        break;
+                    case 1:
+                        assertFalse(object.isValid());
+                        assertTrue(changeSet.isDeleted());
+                        assertEquals(0, changeSet.getChangedFields().length);
+                        looperThread.testComplete();
+                        break;
+                    default:
+                        fail();
+                }
+            }
+        });
+        realm.beginTransaction();
+        allTypes.deleteFromRealm();
+        realm.commitTransaction();
+    }
+

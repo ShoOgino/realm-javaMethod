@@ -11,8 +11,18 @@
             });
             fail("adding change listener on unmanaged object must throw an exception.");
         } catch (IllegalArgumentException ignore) {
-        } finally {
-            looperThread.testComplete();
         }
+
+        try {
+            dog.addChangeListener(new RealmObjectChangeListener<Dog>() {
+                @Override
+                public void onChange(Dog object, ObjectChangeSet changeSet) {
+                }
+            });
+            fail("adding change listener on unmanaged object must throw an exception.");
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        looperThread.testComplete();
     }
 

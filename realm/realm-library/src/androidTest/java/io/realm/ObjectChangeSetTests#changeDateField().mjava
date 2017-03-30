@@ -1,0 +1,11 @@
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void changeDateField() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        checkChangedField(allTypes, AllTypes.FIELD_DATE);
+        realm.beginTransaction();
+        allTypes.setColumnDate(new Date());
+        realm.commitTransaction();
+    }
+

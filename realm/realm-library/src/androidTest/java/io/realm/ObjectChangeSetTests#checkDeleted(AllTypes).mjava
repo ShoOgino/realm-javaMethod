@@ -1,0 +1,13 @@
+    private void checkDeleted(AllTypes allTypes) {
+        allTypes.addChangeListener(new RealmObjectChangeListener<AllTypes>() {
+            @Override
+            public void onChange(AllTypes object, ObjectChangeSet changeSet) {
+                assertEquals(0, changeSet.getChangedFields().length);
+                assertFalse(object.isValid());
+                assertTrue(changeSet.isDeleted());
+                looperThread.testComplete();
+            }
+        });
+        looperThread.keepStrongReference.add(allTypes);
+    }
+

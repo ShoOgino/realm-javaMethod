@@ -12,7 +12,13 @@
         dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
             public void onChange(Dog object) {
-                assertTrue(false);
+                fail();
+            }
+        });
+        dog.addChangeListener(new RealmObjectChangeListener<Dog>() {
+            @Override
+            public void onChange(Dog object, ObjectChangeSet changeSet) {
+                fail();
             }
         });
         dog.removeAllChangeListeners();
@@ -21,6 +27,8 @@
         Dog sameDog = realm.where(Dog.class).equalTo(Dog.FIELD_AGE, 13).findFirst();
         sameDog.setName("Jesper");
         realm.commitTransaction();
+        // Try to trigger the listeners.
+        realm.sharedRealm.refresh();
         looperThread.testComplete();
     }
 

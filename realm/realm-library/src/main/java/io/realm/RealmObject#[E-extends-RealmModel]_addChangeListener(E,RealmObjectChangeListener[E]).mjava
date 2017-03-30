@@ -1,0 +1,31 @@
+    /**
+     * Adds a change listener to a RealmObject to get detailed information about the changes. The listener will be
+     * triggered if any value field or referenced RealmObject field is changed, or the RealmList field itself is
+     * changed.
+     *
+     * @param object RealmObject to add listener to.
+     * @param listener the change listener to be notified.
+     * @throws IllegalArgumentException if the {@code object} is {@code null} or an unmanaged object, or the change
+     * listener is {@code null}.
+     * @throws IllegalStateException if you try to add a listener from a non-Looper or {@link IntentService} thread.
+     * @throws IllegalStateException if you try to add a listener inside a transaction.
+     */
+    public static <E extends RealmModel> void addChangeListener(E object, RealmObjectChangeListener<E> listener) {
+        if (object == null) {
+            throw new IllegalArgumentException("Object should not be null");
+        }
+        if (listener == null) {
+            throw new IllegalArgumentException("Listener should not be null");
+        }
+        if (object instanceof RealmObjectProxy) {
+            RealmObjectProxy proxy = (RealmObjectProxy) object;
+            BaseRealm realm = proxy.realmGet$proxyState().getRealm$realm();
+            realm.checkIfValid();
+            realm.sharedRealm.capabilities.checkCanDeliverNotification(BaseRealm.LISTENER_NOT_ALLOWED_MESSAGE);
+            //noinspection unchecked
+            proxy.realmGet$proxyState().addChangeListener(listener);
+        } else {
+            throw new IllegalArgumentException("Cannot add listener from this unmanaged RealmObject (created outside of Realm)");
+        }
+    }
+

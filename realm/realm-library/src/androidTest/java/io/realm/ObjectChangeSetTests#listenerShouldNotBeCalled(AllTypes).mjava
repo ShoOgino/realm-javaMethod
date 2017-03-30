@@ -1,0 +1,15 @@
+    private void listenerShouldNotBeCalled(AllTypes allTypes) {
+        allTypes.addChangeListener(new RealmObjectChangeListener<RealmModel>() {
+            @Override
+            public void onChange(RealmModel object, ObjectChangeSet changeSet) {
+                fail();
+            }
+        });
+        looperThread.postRunnableDelayed(new Runnable() {
+            @Override
+            public void run() {
+                looperThread.testComplete();
+            }
+        }, 100);
+    }
+

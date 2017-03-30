@@ -1,0 +1,28 @@
+    private void notifyFrontEnd() {
+        if (frontEndRef == null) {
+            throw new IllegalStateException(PROXY_NOT_SET_MESSAGE);
+        }
+        FrontEnd frontEnd = frontEndRef.get();
+        if (frontEnd == null) {
+            // The front end is GCed.
+            clearPendingCollection();
+            return;
+        }
+
+        if (pendingCollection.isValid()) {
+            // PendingRow will always get the first Row of the query since we only support findFirst.
+            UncheckedRow uncheckedRow = pendingCollection.firstUncheckedRow();
+            // If no rows returned by the query, notify the frontend with an invalid row.
+            if (uncheckedRow != null) {
+                Row row = returnCheckedRow ? CheckedRow.getFromRow(uncheckedRow) : uncheckedRow;
+                // Ask the front end to reset the row and stop async query.
+                frontEnd.onQueryFinished(row);
+            } else {
+                // No row matches the query, return a invalid row.
+                frontEnd.onQueryFinished(InvalidRow.INSTANCE);
+            }
+        }
+
+        clearPendingCollection();
+    }
+

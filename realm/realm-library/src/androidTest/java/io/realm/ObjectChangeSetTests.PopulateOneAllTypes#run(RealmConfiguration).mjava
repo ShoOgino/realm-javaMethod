@@ -1,0 +1,14 @@
+        @Override
+        public void run(RealmConfiguration realmConfig) {
+            Realm realm = Realm.getInstance(realmConfig);
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    AllTypes allTypes = realm.createObject(AllTypes.class);
+                    allTypes.setColumnRealmObject(realm.createObject(Dog.class));
+                    allTypes.getColumnRealmList().add(realm.createObject(Dog.class));
+                }
+            });
+            realm.close();
+        }
+

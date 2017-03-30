@@ -1,0 +1,11 @@
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void changeDoubleField() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        checkChangedField(allTypes, AllTypes.FIELD_DOUBLE);
+        realm.beginTransaction();
+        allTypes.setColumnDouble(42.0d);
+        realm.commitTransaction();
+    }
+

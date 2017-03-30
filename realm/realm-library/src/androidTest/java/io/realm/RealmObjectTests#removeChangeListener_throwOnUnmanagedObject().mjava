@@ -7,12 +7,24 @@
             public void onChange(Dog object) {
             }
         };
+        RealmObjectChangeListener objectChangeListener = new RealmObjectChangeListener<Dog>() {
+            @Override
+            public void onChange(Dog object, ObjectChangeSet changeSet) {
+            }
+        };
 
         try {
             dog.removeChangeListener(listener);
             fail("Failed to remove a listener from null Realm.");
         } catch (IllegalArgumentException ignore) {
-            looperThread.testComplete();
         }
+
+        try {
+            dog.removeChangeListener(objectChangeListener);
+            fail("Failed to remove a listener from null Realm.");
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        looperThread.testComplete();
     }
 

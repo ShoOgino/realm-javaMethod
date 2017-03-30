@@ -1,0 +1,11 @@
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void changeLongField() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        checkChangedField(allTypes, AllTypes.FIELD_LONG);
+        realm.beginTransaction();
+        allTypes.setColumnLong(42);
+        realm.commitTransaction();
+    }
+

@@ -1,0 +1,11 @@
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void changeLinkFieldSetNewObject() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        checkChangedField(allTypes, AllTypes.FIELD_REALMOBJECT);
+        realm.beginTransaction();
+        allTypes.setColumnRealmObject(realm.createObject(Dog.class));
+        realm.commitTransaction();
+    }
+

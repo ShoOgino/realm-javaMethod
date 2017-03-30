@@ -1,0 +1,11 @@
+    public void addChangeListener(RealmObjectChangeListener<E> listener) {
+        if (row instanceof PendingRow) {
+            observerPairs.add(new OsObject.ObjectObserverPair<E>(model, listener));
+        } else if (row instanceof UncheckedRow) {
+            registerToObjectNotifier();
+            if (osObject != null) {
+                osObject.addListener(model, listener);
+            }
+        }
+    }
+

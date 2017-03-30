@@ -4,20 +4,6 @@
     public void multiple_callbacks_should_be_invoked_realmobject_async() {
         final int NUMBER_OF_LISTENERS = 7;
         final Realm realm = looperThread.realm;
-        RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
-            @Override
-            public void onChange(Realm object) {
-                looperThread.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        assertEquals(NUMBER_OF_LISTENERS, typebasedCommitInvocations.get());
-                        looperThread.testComplete();
-                    }
-                });
-            }
-        };
-
-        realm.addChangeListener(listener);
 
         realm.beginTransaction();
         Dog akamaru = realm.createObject(Dog.class);
@@ -31,6 +17,17 @@
                 @Override
                 public void onChange(Dog object) {
                     typebasedCommitInvocations.incrementAndGet();
+                    if (typebasedCommitInvocations.get() > NUMBER_OF_LISTENERS) {
+                        fail();
+                    } else if (typebasedCommitInvocations.get() == NUMBER_OF_LISTENERS) {
+                        // Delayed post in case the listener gets triggered more time than expected.
+                        looperThread.postRunnableDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                looperThread.testComplete();
+                            }
+                        }, 500);
+                    }
                 }
             });
         }

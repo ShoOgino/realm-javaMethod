@@ -1,0 +1,11 @@
+    // Execute all pending row queries.
+    private void executePendingRowQueries() {
+        for (WeakReference<PendingRow> ref : pendingRows) {
+            PendingRow row = ref.get();
+            if (row != null) {
+                row.executeQuery();
+            }
+        }
+        pendingRows.clear();
+    }
+

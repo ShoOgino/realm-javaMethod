@@ -1,11 +1,10 @@
     @Override
     public void onQueryFinished(Row row) {
         this.row = row;
-        notifyChangeListeners();
+        // getTable should return a non-null table since the row should always be valid here.
+        notifyQueryFinished();
         if (row.isAttached()) {
-            // getTable should return a non-null table since the row should always be valid here.
-            currentTableVersion = row.getTable().getVersion();
-            registerToRealmNotifier();
+            registerToObjectNotifier();
         }
     }
 

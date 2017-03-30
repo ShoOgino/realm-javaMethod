@@ -1,0 +1,21 @@
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void changeAllFields() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        checkChangedField(allTypes, AllTypes.FIELD_LONG, AllTypes.FIELD_REALMLIST, AllTypes.FIELD_REALMOBJECT,
+                AllTypes.FIELD_DOUBLE, AllTypes.FIELD_FLOAT, AllTypes.FIELD_STRING, AllTypes.FIELD_BOOLEAN,
+                AllTypes.FIELD_BINARY, AllTypes.FIELD_DATE);
+        realm.beginTransaction();
+        allTypes.setColumnLong(42);
+        allTypes.getColumnRealmList().add(realm.createObject(Dog.class));
+        allTypes.setColumnRealmObject(realm.createObject(Dog.class));
+        allTypes.setColumnDouble(42.0d);
+        allTypes.setColumnFloat(42.0f);
+        allTypes.setColumnString("42");
+        allTypes.setColumnBoolean(true);
+        allTypes.setColumnBinary(new byte[] { 42 });
+        allTypes.setColumnDate(new Date());
+        realm.commitTransaction();
+    }
+

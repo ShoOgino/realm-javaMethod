@@ -1,0 +1,15 @@
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void findFirstAsync_changeSetIsNullWhenQueryReturns() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirstAsync();
+        allTypes.addChangeListener(new RealmObjectChangeListener<AllTypes>() {
+            @Override
+            public void onChange(AllTypes object, ObjectChangeSet changeSet) {
+                assertTrue(object.isValid());
+                assertNull(changeSet);
+                looperThread.testComplete();
+            }
+        });
+    }
+

@@ -1,0 +1,11 @@
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void changeFloatField() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        checkChangedField(allTypes, AllTypes.FIELD_FLOAT);
+        realm.beginTransaction();
+        allTypes.setColumnFloat(42.0f);
+        realm.commitTransaction();
+    }
+

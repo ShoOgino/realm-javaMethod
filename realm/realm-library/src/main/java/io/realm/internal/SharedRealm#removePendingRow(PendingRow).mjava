@@ -1,0 +1,10 @@
+    // Remove pending row from the list. It should be called when pending row's query finished.
+    void removePendingRow(PendingRow pendingRow) {
+        for (WeakReference<PendingRow> ref : pendingRows) {
+            PendingRow row = ref.get();
+            if (row == null || row == pendingRow) {
+                pendingRows.remove(ref);
+            }
+        }
+    }
+
