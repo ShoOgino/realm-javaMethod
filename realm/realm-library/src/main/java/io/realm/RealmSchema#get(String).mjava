@@ -4,23 +4,5 @@
      * @param className name of the class
      * @return schema object for that class or {@code null} if the class doesn't exists.
      */
-    public RealmObjectSchema get(String className) {
-        checkEmpty(className, EMPTY_STRING_MSG);
-        if (realm == null) {
-            if (contains(className)) {
-                return dynamicClassToSchema.get(className);
-            } else {
-                return null;
-            }
-        } else {
-            String internalClassName = TABLE_PREFIX + className;
-            if (realm.sharedRealm.hasTable(internalClassName)) {
-                Table table = realm.sharedRealm.getTable(internalClassName);
-                RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
-                return new RealmObjectSchema(realm, table, columnIndices);
-            } else {
-                return null;
-            }
-        }
-    }
+    public abstract RealmObjectSchema get(String className);
 

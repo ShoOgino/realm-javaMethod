@@ -8,11 +8,6 @@
         realm.checkIfValid();
 
         long tableRowIndex = getSourceRowIndexForFirstObject();
-        if (tableRowIndex >= 0) {
-            E realmObject = realm.get(clazz, className, tableRowIndex);
-            return realmObject;
-        } else {
-            return null;
-        }
+        return (tableRowIndex < 0) ? null : realm.get(clazz, className, tableRowIndex);
     }
 

@@ -8,7 +8,7 @@
      */
     ColumnIndices updateSchemaCache(ColumnIndices[] globalCacheArray) {
         final long currentSchemaVersion = sharedRealm.getSchemaVersion();
-        final long cacheSchemaVersion = schema.columnIndices.getSchemaVersion();
+        final long cacheSchemaVersion = schema.getSchemaVersion();
         if (currentSchemaVersion == cacheSchemaVersion) {
             return null;
         }
@@ -21,7 +21,7 @@
             // Not found in global cache. create it.
             final Set<Class<? extends RealmModel>> modelClasses = mediator.getModelClasses();
             final Map<Class<? extends RealmModel>, ColumnInfo> map;
-            map = new HashMap<Class<? extends RealmModel>, ColumnInfo>(modelClasses.size());
+            map = new HashMap<>(modelClasses.size());
             try {
                 for (Class<? extends RealmModel> clazz : modelClasses) {
                     final ColumnInfo columnInfo = mediator.validateTable(clazz, sharedRealm, true);
@@ -33,7 +33,7 @@
 
             cacheForCurrentVersion = createdGlobalCache = new ColumnIndices(currentSchemaVersion, map);
         }
-        schema.columnIndices.copyFrom(cacheForCurrentVersion, mediator);
+        schema.setColumnIndices(cacheForCurrentVersion, mediator);
         return createdGlobalCache;
     }
 

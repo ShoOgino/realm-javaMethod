@@ -1,8 +1,5 @@
-    ColumnInfo getColumnInfo(Class<? extends RealmModel> clazz) {
-        final ColumnInfo columnInfo = columnIndices.getColumnInfo(clazz);
-        if (columnInfo == null) {
-            throw new IllegalStateException("No validated schema information found for " + realm.configuration.getSchemaMediator().getTableName(clazz));
-        }
-        return columnInfo;
+    final ColumnInfo getColumnInfo(Class<? extends RealmModel> clazz) {
+        checkIndices();
+        return columnIndices.getColumnInfo(clazz);
     }
 

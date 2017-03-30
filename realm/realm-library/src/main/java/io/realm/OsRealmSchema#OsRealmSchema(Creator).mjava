@@ -1,0 +1,10 @@
+    OsRealmSchema(Creator creator) {
+        Set<RealmObjectSchema> realmObjectSchemas = creator.getAll();
+        long[] schemaNativePointers = new long[realmObjectSchemas.size()];
+        int i = 0;
+        for (RealmObjectSchema schema : realmObjectSchemas) {
+            schemaNativePointers[i++] = schema.getNativePtr();
+        }
+        this.nativePtr = nativeCreateFromList(schemaNativePointers);
+    }
+

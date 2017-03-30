@@ -1,29 +1,7 @@
     /**
-     * Returns the {@link RealmObjectSchema} for all RealmObject classes that can be saved in this Realm.
+     * Returns the {@link RealmObjectSchema}s for all RealmObject classes that can be saved in this Realm.
      *
      * @return the set of all classes in this Realm or no RealmObject classes can be saved in the Realm.
      */
-    public Set<RealmObjectSchema> getAll() {
-        if (realm == null) {
-            long[] ptrs = nativeGetAll(nativePtr);
-            Set<RealmObjectSchema> schemas = new LinkedHashSet<RealmObjectSchema>(ptrs.length);
-            for (int i = 0; i < ptrs.length; i++) {
-                schemas.add(new RealmObjectSchema(ptrs[i]));
-            }
-            return schemas;
-        } else {
-            int tableCount = (int) realm.sharedRealm.size();
-            Set<RealmObjectSchema> schemas = new LinkedHashSet<RealmObjectSchema>(tableCount);
-            for (int i = 0; i < tableCount; i++) {
-                String tableName = realm.sharedRealm.getTableName(i);
-                if (!Table.isModelTable(tableName)) {
-                    continue;
-                }
-                Table table = realm.sharedRealm.getTable(tableName);
-                RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
-                schemas.add(new RealmObjectSchema(realm, table, columnIndices));
-            }
-            return schemas;
-        }
-    }
+    public abstract Set<RealmObjectSchema> getAll();
 

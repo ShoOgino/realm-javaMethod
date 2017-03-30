@@ -2,10 +2,10 @@
         className = Table.TABLE_PREFIX + className;
         RealmObjectSchema dynamicSchema = dynamicClassToSchema.get(className);
         if (dynamicSchema == null) {
-            if (!realm.sharedRealm.hasTable(className)) {
+            if (!realm.getSharedRealm().hasTable(className)) {
                 throw new IllegalArgumentException("The class " + className + " doesn't exist in this Realm.");
             }
-            Table table = realm.sharedRealm.getTable(className);
+            Table table = realm.getSharedRealm().getTable(className);
             RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
             dynamicSchema = new RealmObjectSchema(realm, table, columnIndices);
             dynamicClassToSchema.put(className, dynamicSchema);

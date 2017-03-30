@@ -4,24 +4,5 @@
      * @param className name of the class.
      * @return a Realm schema object for that class.
      */
-    public RealmObjectSchema create(String className) {
-        // Adding a class is always permitted.
-        checkEmpty(className, EMPTY_STRING_MSG);
-        if (realm == null) {
-            RealmObjectSchema realmObjectSchema = new RealmObjectSchema(className);
-            dynamicClassToSchema.put(className, realmObjectSchema);
-            return realmObjectSchema;
-        } else {
-            String internalTableName = TABLE_PREFIX + className;
-            if (internalTableName.length() > Table.TABLE_MAX_LENGTH) {
-                throw new IllegalArgumentException("Class name is too long. Limit is 56 characters: " + className.length());
-            }
-            if (realm.sharedRealm.hasTable(internalTableName)) {
-                throw new IllegalArgumentException("Class already exists: " + className);
-            }
-            Table table = realm.sharedRealm.getTable(internalTableName);
-            RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
-            return new RealmObjectSchema(realm, table, columnIndices);
-        }
-    }
+    public abstract RealmObjectSchema create(String className);
 

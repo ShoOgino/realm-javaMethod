@@ -1,0 +1,14 @@
+    Table getTable(String className) {
+        className = Table.TABLE_PREFIX + className;
+        Table table = dynamicClassToTable.get(className);
+        if (table != null) { return table; }
+
+        if (!realm.getSharedRealm().hasTable(className)) {
+            throw new IllegalArgumentException("The class " + className + " doesn't exist in this Realm.");
+        }
+        table = realm.getSharedRealm().getTable(className);
+        dynamicClassToTable.put(className, table);
+
+        return table;
+    }
+

@@ -26,8 +26,9 @@
                 columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm, false));
             }
 
-            realm.schema.columnIndices = new ColumnIndices(
-                    (unversioned) ? realm.configuration.getSchemaVersion() : currentVersion, columnInfoMap);
+            realm.schema.setColumnIndices(
+                    (unversioned) ? realm.configuration.getSchemaVersion() : currentVersion,
+                    columnInfoMap);
 
             if (unversioned) {
                 final Transaction transaction = realm.configuration.getInitialDataTransaction();

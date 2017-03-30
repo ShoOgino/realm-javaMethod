@@ -1,0 +1,18 @@
+    /**
+     * Returns the Realm schema for a given class.
+     *
+     * @param className name of the class
+     * @return schema object for that class or {@code null} if the class doesn't exists.
+     */
+    @Override
+    public RealmObjectSchema get(String className) {
+        checkEmpty(className, EMPTY_STRING_MSG);
+
+        String internalClassName = TABLE_PREFIX + className;
+        if (!realm.getSharedRealm().hasTable(internalClassName)) { return null; }
+
+        Table table = realm.getSharedRealm().getTable(internalClassName);
+        RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
+        return new RealmObjectSchema(realm, table, columnIndices);
+    }
+
