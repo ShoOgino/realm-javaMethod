@@ -1,0 +1,28 @@
+    @Test
+    public void downloadProgressListener_changesOnly() {
+        final CountDownLatch allChangesDownloaded = new CountDownLatch(1);
+        SyncUser userWithData = loginUser();
+        URI serverUrl = createRemoteData(userWithData);
+        SyncUser adminUser = loginAdminUser();
+
+        final SyncConfiguration config = configFactory.createSyncConfigurationBuilder(adminUser, serverUrl.toString()).build();
+        Realm realm = Realm.getInstance(config);
+        SyncSession session = SyncManager.getSession(config);
+        session.addDownloadProgressListener(ProgressMode.CURRENT_CHANGES, new ProgressListener() {
+            @Override
+            public void onChange(Progress progress) {
+                if (progress.isTransferComplete()) {
+                    assertTransferComplete(progress, true);
+                    Realm realm = Realm.getInstance(config);
+                    assertEquals(TEST_SIZE, realm.where(AllTypes.class).count());
+                    realm.close();
+                    allChangesDownloaded.countDown();
+                }
+            }
+        });
+        TestHelper.awaitOrFail(allChangesDownloaded);
+        realm.close();
+        userWithData.logout();
+        adminUser.logout();
+    }
+

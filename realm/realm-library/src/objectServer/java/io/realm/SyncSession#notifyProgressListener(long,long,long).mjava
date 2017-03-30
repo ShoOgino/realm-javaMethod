@@ -1,0 +1,16 @@
+    // Called from native code
+    @SuppressWarnings("unused")
+    @KeepMember
+    synchronized void notifyProgressListener(long listenerId, long transferredBytes, long transferableBytes) {
+        Pair<ProgressListener, Progress> listener = listenerIdToProgressListenerMap.get(listenerId);
+        if (listener != null) {
+            Progress newProgressNotification = new Progress(transferredBytes, transferableBytes);
+            if (!newProgressNotification.equals(listener.second)) {
+                listener.first.onChange(newProgressNotification);
+                listener.second = newProgressNotification;
+            }
+        } else {
+            RealmLog.debug("Trying unknown listener failed: " + listenerId);
+        }
+    }
+
