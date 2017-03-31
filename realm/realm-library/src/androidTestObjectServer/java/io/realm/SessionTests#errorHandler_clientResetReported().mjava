@@ -8,11 +8,12 @@
                 .errorHandler(new SyncSession.ErrorHandler() {
                     @Override
                     public void onError(SyncSession session, ObjectServerError error) {
-                        fail("Wrong error " + error.toString());
-                    }
+                        if (error.getErrorCode() != ErrorCode.CLIENT_RESET) {
+                            fail("Wrong error " + error.toString());
+                            return;
+                        }
 
-                    @Override
-                    public void onClientResetRequired(SyncSession session, ClientResetHandler handler) {
+                        final ClientResetRequiredError handler = (ClientResetRequiredError) error;
                         String filePathFromError = handler.getOriginalFile().getAbsolutePath();
                         String filePathFromConfig = session.getConfiguration().getPath();
                         assertEquals(filePathFromError, filePathFromConfig);
