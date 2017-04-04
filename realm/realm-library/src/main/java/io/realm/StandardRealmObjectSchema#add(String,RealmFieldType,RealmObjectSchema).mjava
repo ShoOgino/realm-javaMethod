@@ -1,0 +1,9 @@
+    @Override
+    StandardRealmObjectSchema add(String name, RealmFieldType type, RealmObjectSchema linkedTo) {
+        table.addColumnLink(
+                type,
+                name,
+                realm.getSharedRealm().getTable(StandardRealmSchema.TABLE_PREFIX + linkedTo.getClassName()));
+        return this;
+    }
+

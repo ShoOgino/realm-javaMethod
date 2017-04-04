@@ -1,0 +1,38 @@
+    /**
+     * Sets a field to be required i.e., it is not allowed to hold {@code null} values. This is equivalent to switching
+     * between boxed types and their primitive variant e.g., {@code Integer} to {@code int}.
+     *
+     * @param fieldName name of field in the class.
+     * @param required {@code true} if field should be required, {@code false} otherwise.
+     * @return the updated schema.
+     * @throws IllegalArgumentException if the field name doesn't exist, cannot have the {@link Required} annotation or
+     * the field already have been set as required.
+     * @see Required
+     */
+    @Override
+    public StandardRealmObjectSchema setRequired(String fieldName, boolean required) {
+        long columnIndex = table.getColumnIndex(fieldName);
+        boolean currentColumnRequired = isRequired(fieldName);
+        RealmFieldType type = table.getColumnType(columnIndex);
+
+        if (type == RealmFieldType.OBJECT) {
+            throw new IllegalArgumentException("Cannot modify the required state for RealmObject references: " + fieldName);
+        }
+        if (type == RealmFieldType.LIST) {
+            throw new IllegalArgumentException("Cannot modify the required state for RealmList references: " + fieldName);
+        }
+        if (required && currentColumnRequired) {
+            throw new IllegalStateException("Field is already required: " + fieldName);
+        }
+        if (!required && !currentColumnRequired) {
+            throw new IllegalStateException("Field is already nullable: " + fieldName);
+        }
+
+        if (required) {
+            table.convertColumnToNotNullable(columnIndex);
+        } else {
+            table.convertColumnToNullable(columnIndex);
+        }
+        return this;
+    }
+

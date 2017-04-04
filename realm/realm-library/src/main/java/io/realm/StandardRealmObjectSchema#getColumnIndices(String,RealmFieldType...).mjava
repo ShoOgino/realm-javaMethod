@@ -1,0 +1,66 @@
+    /**
+     * Returns the column indices for the given field name. If a linked field is defined, the column index for
+     * each field is returned.
+     *
+     * @param fieldDescription fieldName or link path to a field name.
+     * @param validColumnTypes valid field type for the last field in a linked field
+     * @return list of column indices.
+     */
+    // TODO: consider another caching strategy so linked classes are included in the cache.
+    @Override
+    long[] getColumnIndices(String fieldDescription, RealmFieldType... validColumnTypes) {
+        if (fieldDescription == null || fieldDescription.equals("")) {
+            throw new IllegalArgumentException("Invalid query: field name is empty");
+        }
+        if (fieldDescription.endsWith(".")) {
+            throw new IllegalArgumentException("Invalid query: field name must not end with a period ('.')");
+        }
+        String[] names = fieldDescription.split("\\.");
+
+        //final RealmProxyMediator mediator = realm.getConfiguration().getSchemaMediator();
+
+        long[] columnIndices = new long[names.length];
+        Table currentTable = table;
+        RealmFieldType columnType;
+        String columnName;
+        String tableName;
+        for (int i = 0; /* loop exits in the middle */ ; i++) {
+            columnName = names[i];
+            if (columnName.length() <= 0) {
+                throw new IllegalArgumentException(String.format(
+                        "Invalid query: empty column name in field '%s'.  " +
+                                "A field name must not begin with, end with, or contain adjacent periods ('.').",
+                                fieldDescription));
+            }
+
+            tableName = getTableName(currentTable);
+            long index = currentTable.getColumnIndex(columnName);
+            if (index < 0) {
+                throw new IllegalArgumentException(
+                        String.format("Invalid query: field '%s' does not exist in table '%s'.",
+                                columnName, tableName));
+            }
+            columnIndices[i] = index;
+
+            columnType = currentTable.getColumnType(index);
+
+            if (i >= names.length - 1) { break; }
+
+            if ((columnType != RealmFieldType.OBJECT) && (columnType != RealmFieldType.LIST)) {
+                throw new IllegalArgumentException(
+                        String.format("Invalid query: field '%s' in table '%s' is of type '%s'.  It must be a LIST or OBJECT type.",
+                                columnName, tableName, columnType.toString()));
+            }
+
+            currentTable = currentTable.getLinkTarget(index);
+        }
+
+        if ((validColumnTypes != null) && (validColumnTypes.length > 0) && !isValidType(columnType, validColumnTypes)) {
+            throw new IllegalArgumentException(
+                    String.format("Invalid query: field '%s' in table '%s' is of invalid type '%s'.",
+                            columnName, tableName, columnType.toString()));
+        }
+
+        return columnIndices;
+    }
+

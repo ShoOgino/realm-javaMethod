@@ -1,13 +1,13 @@
-    RealmObjectSchema getSchemaForClass(String className) {
+    StandardRealmObjectSchema getSchemaForClass(String className) {
         className = Table.TABLE_PREFIX + className;
-        RealmObjectSchema dynamicSchema = dynamicClassToSchema.get(className);
+        StandardRealmObjectSchema dynamicSchema = dynamicClassToSchema.get(className);
         if (dynamicSchema == null) {
             if (!realm.getSharedRealm().hasTable(className)) {
                 throw new IllegalArgumentException("The class " + className + " doesn't exist in this Realm.");
             }
             Table table = realm.getSharedRealm().getTable(className);
-            RealmObjectSchema.DynamicColumnMap columnIndices = new RealmObjectSchema.DynamicColumnMap(table);
-            dynamicSchema = new RealmObjectSchema(realm, table, columnIndices);
+            StandardRealmObjectSchema.DynamicColumnMap columnIndices = new StandardRealmObjectSchema.DynamicColumnMap(table);
+            dynamicSchema = new StandardRealmObjectSchema(realm, table, columnIndices);
             dynamicClassToSchema.put(className, dynamicSchema);
         }
         return dynamicSchema;

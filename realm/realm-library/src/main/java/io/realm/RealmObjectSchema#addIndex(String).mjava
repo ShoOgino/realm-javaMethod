@@ -7,14 +7,5 @@
      * @throws IllegalArgumentException if field name doesn't exist, the field cannot be indexed or it already has a
      * index defined.
      */
-    public RealmObjectSchema addIndex(String fieldName) {
-        checkLegalName(fieldName);
-        checkFieldExists(fieldName);
-        long columnIndex = getColumnIndex(fieldName);
-        if (table.hasSearchIndex(columnIndex)) {
-            throw new IllegalStateException(fieldName + " already has an index.");
-        }
-        table.addSearchIndex(columnIndex);
-        return this;
-    }
+    public abstract RealmObjectSchema addIndex(String fieldName);
 

@@ -1,0 +1,16 @@
+    /**
+     * Adds a new field that references a {@link RealmList}.
+     *
+     * @param fieldName name of the field to add.
+     * @param objectSchema schema for the Realm type being referenced.
+     * @return the updated schema.
+     * @throws IllegalArgumentException if the field name is illegal or a field with that name already exists.
+     */
+    @Override
+    public StandardRealmObjectSchema addRealmListField(String fieldName, RealmObjectSchema objectSchema) {
+        checkLegalName(fieldName);
+        checkFieldNameIsAvailable(fieldName);
+        table.addColumnLink(RealmFieldType.LIST, fieldName, realm.sharedRealm.getTable(Table.TABLE_PREFIX + objectSchema.getClassName()));
+        return this;
+    }
+

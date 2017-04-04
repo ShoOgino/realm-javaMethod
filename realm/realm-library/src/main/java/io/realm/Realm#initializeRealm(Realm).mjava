@@ -8,30 +8,34 @@
             boolean unversioned = currentVersion == UNVERSIONED;
             commitChanges = unversioned;
 
+            RealmConfiguration configuration = realm.getConfiguration();
+
             if (unversioned) {
-                realm.setVersion(realm.configuration.getSchemaVersion());
+                realm.setVersion(configuration.getSchemaVersion());
             }
-            final RealmProxyMediator mediator = realm.configuration.getSchemaMediator();
+
+            final RealmProxyMediator mediator = configuration.getSchemaMediator();
             final Set<Class<? extends RealmModel>> modelClasses = mediator.getModelClasses();
 
-            final Map<Class<? extends RealmModel>, ColumnInfo> columnInfoMap = new HashMap<>(modelClasses.size());
             if (unversioned) {
                 // Create all of the tables.
                 for (Class<? extends RealmModel> modelClass : modelClasses) {
-                    mediator.createTable(modelClass, realm.sharedRealm);
+                    mediator.createRealmObjectSchema(modelClass, realm.getSchema());
                 }
             }
+
+            final Map<Class<? extends RealmModel>, ColumnInfo> columnInfoMap = new HashMap<>(modelClasses.size());
             for (Class<? extends RealmModel> modelClass : modelClasses) {
                 // Now that they have all been created, validate them.
                 columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm, false));
             }
 
-            realm.schema.setColumnIndices(
-                    (unversioned) ? realm.configuration.getSchemaVersion() : currentVersion,
+            realm.getSchema().setColumnIndices(
+                    (unversioned) ? configuration.getSchemaVersion() : currentVersion,
                     columnInfoMap);
 
             if (unversioned) {
-                final Transaction transaction = realm.configuration.getInitialDataTransaction();
+                final Transaction transaction = configuration.getInitialDataTransaction();
                 if (transaction != null) {
                     transaction.execute(realm);
                 }
