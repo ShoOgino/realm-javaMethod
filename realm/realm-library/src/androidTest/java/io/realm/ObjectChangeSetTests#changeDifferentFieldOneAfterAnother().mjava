@@ -1,0 +1,47 @@
+    // Relevant to https://github.com/realm/realm-java/issues/4437
+    // When the object listener triggered at the 2nd time, the local ref m_field_names_array has not been reset and it
+    // contains an invalid local ref which has been released before.
+    @Test
+    @RunTestInLooperThread(before = PopulateOneAllTypes.class)
+    public void changeDifferentFieldOneAfterAnother() {
+        Realm realm = looperThread.realm;
+        AllTypes allTypes = realm.where(AllTypes.class).findFirst();
+        final AtomicBoolean stringChanged = new AtomicBoolean(false);
+        final AtomicBoolean longChanged = new AtomicBoolean(false);
+        final AtomicBoolean floatChanged = new AtomicBoolean(false);
+
+        allTypes.addChangeListener(new RealmObjectChangeListener<RealmModel>() {
+            @Override
+            public void onChange(RealmModel object, ObjectChangeSet changeSet) {
+                assertEquals(1, changeSet.getChangedFields().length);
+                if (changeSet.isFieldChanged(AllTypes.FIELD_STRING)) {
+                    assertFalse(stringChanged.get());
+                    stringChanged.set(true);
+                } else if (changeSet.isFieldChanged(AllTypes.FIELD_LONG)) {
+                    assertFalse(longChanged.get());
+                    longChanged.set(true);
+                } else if (changeSet.isFieldChanged(AllTypes.FIELD_FLOAT)) {
+                    assertTrue(stringChanged.get());
+                    assertTrue(longChanged.get());
+                    assertFalse(floatChanged.get());
+                    floatChanged.set(true);
+                    looperThread.testComplete();
+                } else {
+                    fail();
+                }
+            }
+        });
+
+        realm.beginTransaction();
+        allTypes.setColumnString("42");
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        allTypes.setColumnLong(42);
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        allTypes.setColumnFloat(42.0f);
+        realm.commitTransaction();
+    }
+
