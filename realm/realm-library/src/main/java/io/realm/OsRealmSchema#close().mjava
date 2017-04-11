@@ -5,6 +5,9 @@
         for (RealmObjectSchema schema : schemas) {
             schema.close();
         }
-        nativeClose(nativePtr);
+        if (nativePtr != 0L) {
+            nativeClose(nativePtr);
+            nativePtr = 0L;
+        }
     }
 
