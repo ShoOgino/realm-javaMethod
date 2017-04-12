@@ -1,9 +1,8 @@
     @Override
     public void close() {
-        Set<Property> properties = getProperties();
-        for (Property property : properties) {
-            property.close();
+        if (nativePtr != 0L) {
+            nativeClose(nativePtr);
+            nativePtr = 0L;
         }
-        nativeClose(nativePtr);
     }
 
