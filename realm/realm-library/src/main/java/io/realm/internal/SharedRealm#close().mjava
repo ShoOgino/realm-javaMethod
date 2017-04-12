@@ -4,12 +4,9 @@
             realmNotifier.close();
         }
         synchronized (context) {
-            if (nativePtr != 0) {
-                nativeCloseSharedRealm(nativePtr);
-                // It is OK to clear the nativePtr. It has been saved to the NativeObjectReference when adding to the
-                // context.
-                nativePtr = 0;
-            }
+            nativeCloseSharedRealm(nativePtr);
+            // Don't reset the nativePtr since we still rely on Object Store to check if the given SharedRealm ptr
+            // is closed or not.
         }
     }
 
