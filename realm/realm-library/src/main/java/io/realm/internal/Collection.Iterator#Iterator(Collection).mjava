@@ -1,4 +1,8 @@
         public Iterator(Collection collection) {
+            if (collection.sharedRealm.isClosed()) {
+                throw new IllegalStateException(CLOSED_REALM_MESSAGE);
+            }
+
             this.iteratorCollection = collection;
 
             if (collection.isSnapshot) {
