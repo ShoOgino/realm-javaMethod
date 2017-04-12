@@ -1,10 +1,9 @@
     // See BaseRealm uses a StandardRealmSchema, not a OsRealmSchema.
     @Override
     public void close() {
-        Set<RealmObjectSchema> schemas = getAll();
-        for (RealmObjectSchema schema : schemas) {
-            schema.close();
+        if (nativePtr != 0L) {
+            nativeClose(nativePtr);
+            nativePtr = 0L;
         }
-        nativeClose(nativePtr);
     }
 
