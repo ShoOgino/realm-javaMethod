@@ -5,12 +5,14 @@
         txtKeystoreState = (TextView) findViewById(R.id.txtLabelKeyStore);
 
         try {
-            cryptoClient = new CipherClient(this);
-            if (cryptoClient.isKeystoreUnlocked()) {
+            secureUserStore = new SecureUserStore(this);
+            SyncManager.setUserStore(secureUserStore);
+
+            if (secureUserStore.isKeystoreUnlocked()) {
                 buildSyncConf();
                 keystoreUnlockedMessage();
             } else {
-                cryptoClient.unlockKeystore();
+                secureUserStore.unlockKeystore();
             }
         } catch (KeyStoreException e) {
             e.printStackTrace();
