@@ -11,5 +11,9 @@
         if (syncSession != null) {
             syncSession.close();
         }
+        if (sessions.isEmpty()) {
+            RealmLog.debug("last session dropped, remove network listener");
+            NetworkStateReceiver.removeListener(networkListener);
+        }
     }
 

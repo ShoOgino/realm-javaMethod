@@ -20,6 +20,10 @@
         if (session == null) {
             session = new SyncSession(syncConfiguration);
             sessions.put(syncConfiguration.getPath(), session);
+            if (sessions.size() == 1) {
+                RealmLog.debug("first session created add network listener");
+                NetworkStateReceiver.addListener(networkListener);
+            }
         }
 
         return session;
