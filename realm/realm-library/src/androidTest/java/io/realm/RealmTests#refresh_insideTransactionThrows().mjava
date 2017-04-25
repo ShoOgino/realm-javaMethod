@@ -1,0 +1,11 @@
+    @Test
+    public void refresh_insideTransactionThrows() {
+        realm.beginTransaction();
+        try {
+            realm.refresh();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+        realm.cancelTransaction();
+    }
+
