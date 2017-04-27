@@ -1,0 +1,15 @@
+        @Override
+        @SuppressWarnings("ClassNewInstance")
+        public void evaluate() throws Throwable {
+            before();
+
+            Class<? extends RunnableBefore> runnableBefore = annotation.before();
+            if (!runnableBefore.isInterface()) {
+                // this is dangerous: newInstance can throw checked exceptions.
+                // this is dangerous: config is mutable.
+                runnableBefore.newInstance().run(getConfiguration());
+            }
+
+            runTest(annotation.threadName());
+        }
+

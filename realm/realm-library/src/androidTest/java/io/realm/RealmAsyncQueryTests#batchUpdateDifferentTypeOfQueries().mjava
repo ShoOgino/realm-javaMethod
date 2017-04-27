@@ -1,7 +1,7 @@
     @Test
     @RunTestInLooperThread
     public void batchUpdateDifferentTypeOfQueries() {
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         realm.beginTransaction();
         for (int i = 0; i < 5; ) {
             AllTypes allTypes = realm.createObject(AllTypes.class);
@@ -23,10 +23,10 @@
                 new Sort[]{Sort.ASCENDING, Sort.DESCENDING});
         RealmResults<AnnotationIndexTypes> findDistinct = realm.where(AnnotationIndexTypes.class).distinctAsync("indexString");
 
-        looperThread.keepStrongReference.add(findAllAsync);
-        looperThread.keepStrongReference.add(findAllSorted);
-        looperThread.keepStrongReference.add(findAllSortedMulti);
-        looperThread.keepStrongReference.add(findDistinct);
+        looperThread.keepStrongReference(findAllAsync);
+        looperThread.keepStrongReference(findAllSorted);
+        looperThread.keepStrongReference(findAllSortedMulti);
+        looperThread.keepStrongReference(findDistinct);
 
         final CountDownLatch queriesCompleted = new CountDownLatch(4);
         final CountDownLatch bgRealmClosedLatch = new CountDownLatch(1);

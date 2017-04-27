@@ -1,8 +1,17 @@
     @Override
     protected void before() throws Throwable {
         super.before();
-        realmConfiguration = createConfiguration(UUID.randomUUID().toString());
-        signalTestCompleted = new CountDownLatch(1);
-        keepStrongReference = new LinkedList<Object>();
+
+        RealmConfiguration config = createConfiguration(UUID.randomUUID().toString());
+        LinkedList<Object> refs = new LinkedList<>();
+        List<Realm> realms = new LinkedList<>();
+
+        synchronized (lock) {
+            realmConfiguration = config;
+            realm = null;
+            backgroundHandler = null;
+            keepStrongReference = refs;
+            testRealms = realms;
+        }
     }
 

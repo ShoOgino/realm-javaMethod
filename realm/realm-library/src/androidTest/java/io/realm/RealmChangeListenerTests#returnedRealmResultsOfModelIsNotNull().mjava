@@ -1,9 +1,9 @@
     @Test
     @RunTestInLooperThread
     public void returnedRealmResultsOfModelIsNotNull() {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         RealmResults<AllTypesRealmModel> alltypes = realm.where(AllTypesRealmModel.class).findAll();
-        looperThread.keepStrongReference.add(alltypes);
+        looperThread.keepStrongReference(alltypes);
         alltypes.addChangeListener(new RealmChangeListener<RealmResults<AllTypesRealmModel>>() {
             @Override
             public void onChange(RealmResults<AllTypesRealmModel> result) {

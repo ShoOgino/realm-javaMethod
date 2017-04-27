@@ -3,7 +3,7 @@
     @Test
     @RunTestInLooperThread
     public void findAllAsync_withNotification() throws Throwable {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         populateTestRealm(realm, 10);
         final RealmResults<AllTypes> results = realm.where(AllTypes.class)
                 .between("columnLong", 0, 4)
@@ -18,7 +18,7 @@
                 looperThread.testComplete();
             }
         });
-        looperThread.keepStrongReference.add(results);
+        looperThread.keepStrongReference(results);
 
         assertFalse(results.isLoaded());
         assertEquals(0, results.size());

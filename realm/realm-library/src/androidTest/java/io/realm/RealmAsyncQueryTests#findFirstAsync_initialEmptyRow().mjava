@@ -2,9 +2,9 @@
     @Test
     @RunTestInLooperThread
     public void findFirstAsync_initialEmptyRow() throws Throwable {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         final AllTypes firstAsync = realm.where(AllTypes.class).findFirstAsync();
-        looperThread.keepStrongReference.add(firstAsync);
+        looperThread.keepStrongReference(firstAsync);
         firstAsync.addChangeListener(new RealmChangeListener<AllTypes>() {
             @Override
             public void onChange(AllTypes object) {

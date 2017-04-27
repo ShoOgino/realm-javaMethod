@@ -1,0 +1,9 @@
+    // Accessed from both test and main threads
+    // Storing the handler is the gate that indicates that the test thread has started.
+    void setBackgroundHandler(Handler backgroundHandler) {
+        synchronized (lock) {
+            this.backgroundHandler = backgroundHandler;
+            lock.notifyAll();
+        }
+    }
+

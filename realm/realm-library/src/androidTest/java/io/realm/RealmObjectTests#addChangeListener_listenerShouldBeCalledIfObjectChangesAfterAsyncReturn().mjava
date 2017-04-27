@@ -5,14 +5,14 @@
     @RunTestInLooperThread
     public void addChangeListener_listenerShouldBeCalledIfObjectChangesAfterAsyncReturn() {
         final AtomicInteger listenerCounter = new AtomicInteger(0);
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         realm.beginTransaction();
         realm.createObject(AllTypesPrimaryKey.class, 1);
         realm.commitTransaction();
 
         // Step 1
         final AllTypesPrimaryKey allTypesPrimaryKey = realm.where(AllTypesPrimaryKey.class).findFirstAsync();
-        looperThread.keepStrongReference.add(allTypesPrimaryKey);
+        looperThread.keepStrongReference(allTypesPrimaryKey);
         allTypesPrimaryKey.addChangeListener(new RealmChangeListener<AllTypesPrimaryKey>() {
             @Override
             public void onChange(AllTypesPrimaryKey element) {

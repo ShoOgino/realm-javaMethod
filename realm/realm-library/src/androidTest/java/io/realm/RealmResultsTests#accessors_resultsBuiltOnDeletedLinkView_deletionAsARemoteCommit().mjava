@@ -9,9 +9,9 @@
     @RunTestInLooperThread
     public void accessors_resultsBuiltOnDeletedLinkView_deletionAsARemoteCommit() {
         // Step 1
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         RealmResults<Dog> dogs = populateRealmResultsOnLinkView(realm);
-        looperThread.keepStrongReference.add(dogs);
+        looperThread.keepStrongReference(dogs);
         dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
             public void onChange(RealmResults<Dog> dogs) {

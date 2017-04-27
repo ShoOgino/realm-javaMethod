@@ -2,7 +2,7 @@
     @RunTestInLooperThread
     public void removeAllChangeListeners() {
         final AtomicInteger listenersTriggered = new AtomicInteger(0);
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         RealmResults<AllTypes> collection = realm.where(AllTypes.class).findAll();
 
         RealmChangeListener<RealmResults<AllTypes>> listenerA = new RealmChangeListener<RealmResults<AllTypes>>() {
@@ -18,7 +18,7 @@
             }
         };
 
-        looperThread.keepStrongReference.add(collection);
+        looperThread.keepStrongReference(collection);
         collection.addChangeListener(listenerA);
         collection.addChangeListener(listenerB);
         collection.removeAllChangeListeners();

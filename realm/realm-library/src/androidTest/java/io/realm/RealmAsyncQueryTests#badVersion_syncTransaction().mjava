@@ -6,11 +6,11 @@
     @RunTestInLooperThread
     public void badVersion_syncTransaction() throws NoSuchFieldException, IllegalAccessException {
         final AtomicInteger listenerCount = new AtomicInteger(0);
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
 
         // 1. Makes sure that async query is not started.
         final RealmResults<AllTypes> result = realm.where(AllTypes.class).findAllSortedAsync(AllTypes.FIELD_STRING);
-        looperThread.keepStrongReference.add(result);
+        looperThread.keepStrongReference(result);
         result.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> object) {

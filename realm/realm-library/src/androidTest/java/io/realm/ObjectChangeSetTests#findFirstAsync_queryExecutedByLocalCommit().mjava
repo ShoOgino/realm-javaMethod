@@ -4,7 +4,7 @@
     @Test
     @RunTestInLooperThread(before = PopulateOneAllTypes.class)
     public void findFirstAsync_queryExecutedByLocalCommit() {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         final AtomicInteger listenerCounter = new AtomicInteger(0);
         final AllTypes allTypes = realm.where(AllTypes.class).findFirstAsync();
         allTypes.addChangeListener(new RealmObjectChangeListener<AllTypes>() {

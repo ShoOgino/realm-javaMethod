@@ -8,10 +8,10 @@
     @Test
     @RunTestInLooperThread
     public void accessors_resultsBuiltOnDeletedLinkView_deletionAsALocalCommit() {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         // Step 1
         RealmResults<Dog> dogs = populateRealmResultsOnLinkView(realm);
-        looperThread.keepStrongReference.add(dogs);
+        looperThread.keepStrongReference(dogs);
         dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
             public void onChange(RealmResults<Dog> dogs) {

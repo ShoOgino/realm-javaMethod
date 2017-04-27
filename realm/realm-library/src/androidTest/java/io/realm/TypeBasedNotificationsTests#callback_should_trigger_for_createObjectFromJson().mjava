@@ -4,7 +4,7 @@
     public void callback_should_trigger_for_createObjectFromJson() {
         assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
 
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         try {
             InputStream in = TestHelper.loadJsonFromAssets(InstrumentationRegistry.getTargetContext(), "all_simple_types.json");
             realm.beginTransaction();
@@ -12,7 +12,7 @@
             realm.commitTransaction();
             in.close();
 
-            looperThread.keepStrongReference.add(objectFromJson);
+            looperThread.keepStrongReference(objectFromJson);
             objectFromJson.addChangeListener(new RealmChangeListener<AllTypes>() {
                 @Override
                 public void onChange(AllTypes object) {

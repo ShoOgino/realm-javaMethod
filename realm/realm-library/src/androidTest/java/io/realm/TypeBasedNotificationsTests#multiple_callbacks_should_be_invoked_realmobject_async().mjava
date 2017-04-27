@@ -3,7 +3,7 @@
     @RunTestInLooperThread
     public void multiple_callbacks_should_be_invoked_realmobject_async() {
         final int NUMBER_OF_LISTENERS = 7;
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
 
         realm.beginTransaction();
         Dog akamaru = realm.createObject(Dog.class);
@@ -11,7 +11,7 @@
 
         Dog dog = realm.where(Dog.class).findFirstAsync();
         assertTrue(dog.load());
-        looperThread.keepStrongReference.add(dog);
+        looperThread.keepStrongReference(dog);
         for (int i = 0; i < NUMBER_OF_LISTENERS; i++) {
             dog.addChangeListener(new RealmChangeListener<Dog>() {
                 @Override

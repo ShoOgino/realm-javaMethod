@@ -1,0 +1,15 @@
+    // Accessed from both test and main threads
+    // Valid after the test thread has started.
+    private Handler getBackgroundHandler() {
+        synchronized (lock) {
+            while (backgroundHandler == null) {
+                try {
+                    lock.wait(WAIT_TIMEOUT_MS);
+                } catch (InterruptedException ignore) {
+                    break;
+                }
+            }
+            return this.backgroundHandler;
+        }
+    }
+

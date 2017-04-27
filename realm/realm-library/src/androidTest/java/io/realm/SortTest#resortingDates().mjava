@@ -20,7 +20,7 @@
 
         RealmResults<AllTypes> objectsAscending = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_DATE, Sort.ASCENDING);
         assertEquals(TEST_SIZE, objectsAscending.size());
-        looperThread.keepStrongReference.add(objectsAscending);
+        looperThread.keepStrongReference(objectsAscending);
         objectsAscending.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> element) {
@@ -36,7 +36,7 @@
 
         RealmResults<AllTypes> objectsDescending = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_DATE, Sort.DESCENDING);
         assertEquals(TEST_SIZE, objectsDescending.size());
-        looperThread.keepStrongReference.add(objectsDescending);
+        looperThread.keepStrongReference(objectsDescending);
         objectsDescending.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> element) {

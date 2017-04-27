@@ -1,0 +1,16 @@
+    private void closeRealms() {
+        closeTestRealms();
+
+        Realm oldRealm;
+        synchronized (lock) {
+            oldRealm = realm;
+
+            realm = null;
+            realmConfiguration = null;
+        }
+
+        if (oldRealm != null) {
+            oldRealm.close();
+        }
+    }
+

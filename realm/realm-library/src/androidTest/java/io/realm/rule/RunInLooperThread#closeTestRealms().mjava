@@ -1,0 +1,19 @@
+    /**
+     * Explicitly close all held realms.
+     * <p>
+     * 'testRealms' is accessed from both test and main threads.
+     * 'testRealms' is valid after {@code before}.
+     */
+    public void closeTestRealms() {
+        List<Realm> realms = new ArrayList<>();
+        synchronized (lock) {
+            List<Realm> tmp = testRealms;
+            testRealms = realms;
+            realms = tmp;
+        }
+
+        for (Realm testRealm : realms) {
+            testRealm.close();
+        }
+    }
+

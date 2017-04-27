@@ -1,8 +1,8 @@
     @Test
     @RunTestInLooperThread
     public void callback_should_trigger_for_createObject_dynamic_realm() {
-        final DynamicRealm realm = DynamicRealm.getInstance(looperThread.realmConfiguration);
-        looperThread.keepStrongReference.add(realm);
+        final DynamicRealm realm = DynamicRealm.getInstance(looperThread.getConfiguration());
+        looperThread.keepStrongReference(realm);
         realm.addChangeListener(new RealmChangeListener<DynamicRealm>() {
             @Override
             public void onChange(DynamicRealm object) {
@@ -23,7 +23,7 @@
         final DynamicRealmObject dog = realm.createObject("Dog");
         realm.commitTransaction();
 
-        looperThread.keepStrongReference.add(dog);
+        looperThread.keepStrongReference(dog);
         dog.addChangeListener(new RealmChangeListener<DynamicRealmObject>() {
             @Override
             public void onChange(DynamicRealmObject object) {

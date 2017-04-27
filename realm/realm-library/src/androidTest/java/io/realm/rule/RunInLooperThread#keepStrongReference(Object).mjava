@@ -1,0 +1,13 @@
+    /**
+     * Hold a reference to an object, to prevent it from being GCed,
+     * until after the test completes.
+     * <p>
+     * Accessed only from the main thread, here, but synchronized in case it is called from within a test.
+     * Valid after {@code before}.
+     */
+    public void keepStrongReference(Object obj) {
+        synchronized (lock) {
+            keepStrongReference.add(obj);
+        }
+    }
+

@@ -13,7 +13,7 @@
             @Override
             public void run() {
                 Random random = new Random(System.currentTimeMillis());
-                Realm backgroundThreadRealm = Realm.getInstance(looperThread.realm.getConfiguration());
+                Realm backgroundThreadRealm = Realm.getInstance(looperThread.getRealm().getConfiguration());
                 for (int i = 0; i < NUMBER_OF_COMMITS; i++) {
                     backgroundThreadRealm.beginTransaction();
                     AllTypes object = backgroundThreadRealm.createObject(AllTypes.class);
@@ -31,13 +31,13 @@
             }
         };
 
-        final RealmResults<AllTypes> allAsync = looperThread.realm.where(AllTypes.class).findAllAsync();
+        final RealmResults<AllTypes> allAsync = looperThread.getRealm().where(AllTypes.class).findAllAsync();
         allAsync.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> object) {
                 assertTrue(allAsync.isLoaded());
                 if (allAsync.size() == NUMBER_OF_COMMITS) {
-                    AllTypes lastInserted = looperThread.realm.where(AllTypes.class)
+                    AllTypes lastInserted = looperThread.getRealm().where(AllTypes.class)
                             .equalTo("columnLong", latestLongValue[0])
                             .equalTo("columnFloat", latestFloatValue[0])
                             .findFirst();
@@ -47,7 +47,7 @@
                 }
             }
         });
-        looperThread.keepStrongReference.add(allAsync);
+        looperThread.keepStrongReference(allAsync);
 
         looperThread.postRunnableDelayed(new Runnable() {
             @Override

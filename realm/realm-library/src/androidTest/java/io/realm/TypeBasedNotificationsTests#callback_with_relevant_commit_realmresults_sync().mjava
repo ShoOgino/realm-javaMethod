@@ -2,7 +2,7 @@
     @Test
     @RunTestInLooperThread
     public void callback_with_relevant_commit_realmresults_sync() {
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
 
         // Step 1: Creates object.
         realm.beginTransaction();
@@ -11,7 +11,7 @@
         realm.commitTransaction();
 
         final RealmResults<Dog> dogs = realm.where(Dog.class).findAll();
-        looperThread.keepStrongReference.add(dogs);
+        looperThread.keepStrongReference(dogs);
         dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
             public void onChange(RealmResults<Dog> object) {

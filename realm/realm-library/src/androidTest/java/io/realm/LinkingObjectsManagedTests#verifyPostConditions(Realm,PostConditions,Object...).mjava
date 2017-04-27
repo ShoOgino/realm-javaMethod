@@ -16,7 +16,9 @@
         realm.commitTransaction();
 
         // Runnable is guaranteed to be enqueued on the Looper queue, after the notifications
-        looperThread.keepStrongReference.addAll(Arrays.asList(refs));
+        for (Object ref : refs) {
+            looperThread.keepStrongReference(ref);
+        }
         looperThread.postRunnable(
             new Runnable() {
                 @Override

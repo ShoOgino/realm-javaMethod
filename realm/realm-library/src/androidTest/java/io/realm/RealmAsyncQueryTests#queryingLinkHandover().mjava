@@ -3,10 +3,10 @@
     @RunTestInLooperThread
     public void queryingLinkHandover() throws Throwable {
         final AtomicInteger numberOfInvocations = new AtomicInteger(0);
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
 
         final RealmResults<Dog> allAsync = realm.where(Dog.class).equalTo("owner.name", "kiba").findAllAsync();
-        looperThread.keepStrongReference.add(allAsync);
+        looperThread.keepStrongReference(allAsync);
         allAsync.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {
             @Override
             public void onChange(RealmResults<Dog> object) {

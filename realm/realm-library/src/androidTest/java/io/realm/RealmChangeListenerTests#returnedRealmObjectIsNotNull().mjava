@@ -1,12 +1,12 @@
     @Test
     @RunTestInLooperThread
     public void returnedRealmObjectIsNotNull() {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         realm.beginTransaction();
-        Cat cat = looperThread.realm.createObject(Cat.class);
+        Cat cat = realm.createObject(Cat.class);
         realm.commitTransaction();
 
-        looperThread.keepStrongReference.add(cat);
+        looperThread.keepStrongReference(cat);
         cat.addChangeListener(new RealmChangeListener<Cat>() {
             @Override
             public void onChange(Cat object) {

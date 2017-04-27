@@ -4,12 +4,12 @@
     @Test
     @RunTestInLooperThread
     public void asyncRealmResultsShouldNotBlockBackgroundCommitNotification() {
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         final RealmResults<Dog> dogs = realm.where(Dog.class).findAllAsync();
         final AtomicBoolean resultsListenerDone = new AtomicBoolean(false);
         final AtomicBoolean realmListenerDone = new AtomicBoolean(false);
 
-        looperThread.keepStrongReference.add(dogs);
+        looperThread.keepStrongReference(dogs);
         assertTrue(dogs.load());
         assertEquals(0, dogs.size());
         dogs.addChangeListener(new RealmChangeListener<RealmResults<Dog>>() {

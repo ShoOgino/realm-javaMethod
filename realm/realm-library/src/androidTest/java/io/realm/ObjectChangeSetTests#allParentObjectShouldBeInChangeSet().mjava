@@ -2,7 +2,7 @@
     @Test
     @RunTestInLooperThread
     public void allParentObjectShouldBeInChangeSet() {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
 
         realm.beginTransaction();
         Owner owner = realm.createObject(Owner.class);
@@ -22,7 +22,7 @@
         realm.commitTransaction();
 
         RealmResults<Dog> dogs = realm.where(Dog.class).equalTo(Dog.FIELD_HAS_TAIL, true).findAll();
-        looperThread.keepStrongReference.add(dogs);
+        looperThread.keepStrongReference(dogs);
         dogs.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Dog>>() {
             @Override
             public void onChange(RealmResults<Dog> collection, OrderedCollectionChangeSet changeSet) {

@@ -1,0 +1,21 @@
+    /**
+     * Get the test realm.
+     * <p>
+     * Set on test thread, accessed from main thread.
+     * Valid only after the test thread has started.
+     *
+     * @return the test realm.
+     */
+    public Realm getRealm() {
+        synchronized (lock) {
+            while (backgroundHandler == null) {
+                try {
+                    lock.wait(WAIT_TIMEOUT_MS);
+                } catch (InterruptedException ignore) {
+                    break;
+                }
+            }
+            return realm;
+        }
+    }
+

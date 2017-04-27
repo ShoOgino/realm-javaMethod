@@ -2,7 +2,7 @@
     @Test
     @RunTestInLooperThread
     public void callback_should_trigger_for_createObjectFromJson_from_JSONObject() {
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
 
         try {
             JSONObject json = new JSONObject();
@@ -17,7 +17,7 @@
             final AllTypes objectFromJson = realm.createObjectFromJson(AllTypes.class, json);
             realm.commitTransaction();
 
-            looperThread.keepStrongReference.add(objectFromJson);
+            looperThread.keepStrongReference(objectFromJson);
             objectFromJson.addChangeListener(new RealmChangeListener<AllTypes>() {
                 @Override
                 public void onChange(AllTypes object) {

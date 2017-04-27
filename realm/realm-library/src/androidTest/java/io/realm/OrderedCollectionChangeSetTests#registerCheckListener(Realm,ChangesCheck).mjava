@@ -2,7 +2,7 @@
         switch (type) {
             case REALM_RESULTS:
                 RealmResults<Dog> results = realm.where(Dog.class).findAllSorted(Dog.FIELD_AGE);
-                looperThread.keepStrongReference.add(results);
+                looperThread.keepStrongReference(results);
                 results.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Dog>>() {
                     @Override
                     public void onChange(RealmResults<Dog> collection, OrderedCollectionChangeSet changeSet) {
@@ -12,7 +12,7 @@
                 break;
             case REALM_LIST:
                 RealmList<Dog> list = realm.where(Owner.class).findFirst().getDogs();
-                looperThread.keepStrongReference.add(list);
+                looperThread.keepStrongReference(list);
                 list.addChangeListener(new OrderedRealmCollectionChangeListener<RealmList<Dog>>() {
                     @Override
                     public void onChange(RealmList<Dog> collection, OrderedCollectionChangeSet changeSet) {

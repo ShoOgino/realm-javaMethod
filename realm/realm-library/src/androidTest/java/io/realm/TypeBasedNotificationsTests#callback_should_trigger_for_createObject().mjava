@@ -2,7 +2,7 @@
     @Test
     @RunTestInLooperThread
     public void callback_should_trigger_for_createObject() {
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm object) {
@@ -22,7 +22,7 @@
         final Dog dog = realm.createObject(Dog.class);
         realm.commitTransaction();
 
-        looperThread.keepStrongReference.add(dog);
+        looperThread.keepStrongReference(dog);
         dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
             public void onChange(Dog object) {
