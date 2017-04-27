@@ -29,6 +29,7 @@
      *
      * @param context the Application Context.
      * @throws IllegalArgumentException if a {@code null} context is provided.
+     * @throws IllegalStateException if {@link Context#getFilesDir()} could not be found.
      * @see #getDefaultInstance()
      */
     public static synchronized void init(Context context) {
@@ -36,6 +37,7 @@
             if (context == null) {
                 throw new IllegalArgumentException("Non-null context required.");
             }
+            checkFilesDirAvailable(context);
             RealmCore.loadLibrary(context);
             defaultConfiguration = new RealmConfiguration.Builder(context).build();
             ObjectServerFacade.getSyncFacadeIfPossible().init(context);
