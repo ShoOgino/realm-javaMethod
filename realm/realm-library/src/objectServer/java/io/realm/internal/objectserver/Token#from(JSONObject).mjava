@@ -1,11 +1,11 @@
     public static Token from(JSONObject token) throws JSONException {
-        String value = token.getString("token");
-        JSONObject tokenData = token.getJSONObject("token_data");
-        String identity = tokenData.getString("identity");
-        String path = tokenData.optString("path");
-        long expiresSec = tokenData.getLong("expires");
+        String value = token.getString(KEY_TOKEN);
+        JSONObject tokenData = token.getJSONObject(KEY_TOKEN_DATA);
+        String identity = tokenData.getString(KEY_IDENTITY);
+        String path = tokenData.optString(KEY_PATH);
+        long expiresSec = tokenData.getLong(KEY_EXPIRES);
         Permission[] permissions;
-        JSONArray access = tokenData.getJSONArray("access");
+        JSONArray access = tokenData.getJSONArray(KEY_ACCESS);
         if (access != null) {
             permissions = new Permission[access.length()];
             for (int i = 0; i < access.length(); i++) {
@@ -18,7 +18,8 @@
         } else {
             permissions = new Permission[0];
         }
+        boolean isAdmin = tokenData.optBoolean(KEY_IS_ADMIN);
 
-        return new Token(value, identity, path, expiresSec, permissions);
+        return new Token(value, identity, path, expiresSec, permissions, isAdmin);
     }
 
