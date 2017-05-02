@@ -18,7 +18,7 @@
                 Realm realm = Realm.getInstance(realmConfig);
                 realmOpenedInBgLatch.countDown();
                 try {
-                    realmClosedInFgLatch.await();
+                    realmClosedInFgLatch.await(TestHelper.STANDARD_WAIT_SECS, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     exception.add(e);
                     realm.close();
@@ -29,7 +29,7 @@
                 realm.beginTransaction();
                 transBeganInBgLatch.countDown();
                 try {
-                    fgFinishedLatch.await();
+                    fgFinishedLatch.await(TestHelper.STANDARD_WAIT_SECS, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     exception.add(e);
                 }
@@ -41,16 +41,16 @@
         });
         thread.start();
 
-        realmOpenedInBgLatch.await();
+        TestHelper.awaitOrFail(realmOpenedInBgLatch);
         // Step 3: Closes all realm instances in foreground thread.
         realm.close();
         realmClosedInFgLatch.countDown();
-        transBeganInBgLatch.await();
+        TestHelper.awaitOrFail(transBeganInBgLatch);
 
         // Step 5: Gets a new Realm instance in foreground.
         realm = Realm.getInstance(realmConfig);
         fgFinishedLatch.countDown();
-        bgFinishedLatch.await();
+        TestHelper.awaitOrFail(bgFinishedLatch);
 
         if (!exception.isEmpty()) {
             throw exception.get(0);

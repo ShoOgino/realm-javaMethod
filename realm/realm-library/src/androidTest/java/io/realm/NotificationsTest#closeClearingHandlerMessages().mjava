@@ -17,7 +17,8 @@
                 if (dogs.size() != 0) {
                     return false;
                 }
-                addHandlerMessages.await(1, TimeUnit.SECONDS); // Wait for main thread to add update messages.
+                // Wait for main thread to add update messages.
+                addHandlerMessages.await(TestHelper.VERY_SHORT_WAIT_SECS, TimeUnit.SECONDS);
 
                 // Creates a Handler for the thread now. All message and references for the notification handler will be
                 // cleared once we call close().
@@ -47,7 +48,7 @@
         });
 
         // Waits until the looper is started on a background thread.
-        backgroundLooperStarted.await(1, TimeUnit.SECONDS);
+        backgroundLooperStarted.await(TestHelper.VERY_SHORT_WAIT_SECS, TimeUnit.SECONDS);
 
         // Executes a transaction that will trigger a Realm update.
         Realm realm = Realm.getInstance(realmConfig);

@@ -1,9 +1,9 @@
     @Test
     public void notificationsNumber() throws InterruptedException, ExecutionException {
+        final CountDownLatch isReady = new CountDownLatch(1);
+        final CountDownLatch isRealmOpen = new CountDownLatch(1);
         final AtomicInteger counter = new AtomicInteger(0);
-        final AtomicBoolean isReady = new AtomicBoolean(false);
         final Looper[] looper = new Looper[1];
-        final AtomicBoolean isRealmOpen = new AtomicBoolean(true);
         final RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm object) {
@@ -21,12 +21,12 @@
                     looper[0] = Looper.myLooper();
                     realm = Realm.getInstance(realmConfig);
                     realm.addChangeListener(listener);
-                    isReady.set(true);
+                    isReady.countDown();
                     Looper.loop();
                 } finally {
                     if (realm != null) {
                         realm.close();
-                        isRealmOpen.set(false);
+                        isRealmOpen.countDown();
                     }
                 }
                 return true;
@@ -34,10 +34,7 @@
         });
 
         // Waits until the looper in the background thread is started.
-        while (!isReady.get()) {
-            Thread.sleep(5);
-        }
-        Thread.sleep(100);
+        TestHelper.awaitOrFail(isReady);
 
         // Triggers OnRealmChanged on background thread.
         realm = Realm.getInstance(realmConfig);
@@ -55,9 +52,7 @@
         }
 
         // Waits until the Looper thread is actually closed.
-        while (isRealmOpen.get()) {
-            Thread.sleep(5);
-        }
+        TestHelper.awaitOrFail(isRealmOpen);
 
         assertEquals(1, counter.get());
         RealmCache.invokeWithGlobalRefCount(realmConfig, new TestHelper.ExpectedCountCallback(0));

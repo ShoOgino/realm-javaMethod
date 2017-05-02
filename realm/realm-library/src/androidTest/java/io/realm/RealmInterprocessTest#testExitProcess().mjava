@@ -25,12 +25,12 @@
                             ActivityManager.RunningAppProcessInfo processInfo = getRemoteProcessInfo();
                             if (processInfo != null && processInfo.pid == servicePid && i >= 6) {
                                 // The process is still alive.
-                                assertTrue(false);
+                                fail("Process is still alive");
                             } else if (processInfo == null || processInfo.pid != servicePid) {
                                 // The process is gone.
                                 break;
                             }
-                            Thread.sleep(500, 0);
+                            Thread.sleep(500);
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();

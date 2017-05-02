@@ -10,7 +10,7 @@
             @Override
             public void run() {
                 try {
-                    startLatch.await();
+                    startLatch.await(TestHelper.STANDARD_WAIT_SECS, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     exception.add(e);
                     return;
@@ -39,7 +39,7 @@
             realm = null;
         }
 
-        endLatch.await();
+        TestHelper.awaitOrFail(endLatch);
 
         if (!exception.isEmpty()) {
             throw exception.get(0);
