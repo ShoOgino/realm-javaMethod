@@ -2,7 +2,7 @@
     @Test
     @RunTestInLooperThread
     public void callback_should_trigger_for_copyToRealmOrUpdate() {
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm object) {
@@ -26,7 +26,7 @@
         final PrimaryKeyAsLong primaryKeyAsLong = realm.copyToRealmOrUpdate(obj);
         realm.commitTransaction();
 
-        looperThread.keepStrongReference.add(primaryKeyAsLong);
+        looperThread.keepStrongReference(primaryKeyAsLong);
         primaryKeyAsLong.addChangeListener(new RealmChangeListener<PrimaryKeyAsLong>() {
             @Override
             public void onChange(PrimaryKeyAsLong object) {

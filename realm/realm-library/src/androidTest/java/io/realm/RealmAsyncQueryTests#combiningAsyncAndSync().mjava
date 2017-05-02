@@ -1,9 +1,9 @@
     @Test
     @RunTestInLooperThread
     public void combiningAsyncAndSync() {
-        populateTestRealm(looperThread.realm, 10);
+        populateTestRealm(looperThread.getRealm(), 10);
 
-        final RealmResults<AllTypes> allTypesAsync = looperThread.realm.where(AllTypes.class).greaterThan("columnLong", 5).findAllAsync();
+        final RealmResults<AllTypes> allTypesAsync = looperThread.getRealm().where(AllTypes.class).greaterThan("columnLong", 5).findAllAsync();
         final RealmResults<AllTypes> allTypesSync = allTypesAsync.where().greaterThan("columnLong", 3).findAll();
 
         // Call where() on an async results will load query. But to maintain the pre version 2.4.0 behaviour of
@@ -18,6 +18,6 @@
                 looperThread.testComplete();
             }
         });
-        looperThread.keepStrongReference.add(allTypesAsync);
+        looperThread.keepStrongReference(allTypesAsync);
     }
 

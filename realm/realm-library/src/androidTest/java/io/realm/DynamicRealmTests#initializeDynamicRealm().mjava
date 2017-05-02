@@ -1,9 +1,9 @@
     // Initializes a Dynamic Realm used by the *Async tests and keeps it ref in the looperThread.
     private DynamicRealm initializeDynamicRealm() {
-        RealmConfiguration defaultConfig = looperThread.realmConfiguration;
+        RealmConfiguration defaultConfig = looperThread.getConfiguration();
         final DynamicRealm dynamicRealm = DynamicRealm.getInstance(defaultConfig);
         populateTestRealm(dynamicRealm, 10);
-        looperThread.keepStrongReference.add(dynamicRealm);
+        looperThread.keepStrongReference(dynamicRealm);
         return dynamicRealm;
     }
 

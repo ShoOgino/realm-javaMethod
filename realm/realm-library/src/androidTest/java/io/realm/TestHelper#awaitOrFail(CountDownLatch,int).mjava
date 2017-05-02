@@ -1,8 +1,8 @@
     public static void awaitOrFail(CountDownLatch latch, int numberOfSeconds) {
         try {
             if (android.os.Debug.isDebuggerConnected()) {
-                // If we are debugging the tests, just waits without a timeout. In case we are stopping at a break point
-                // and timeout happens.
+                // If we are debugging the tests, just waits without a timeout.
+                // Don't want a timeout while we are stopped at a break point.
                 latch.await();
             } else if (!latch.await(numberOfSeconds, TimeUnit.SECONDS)) {
                 fail("Test took longer than " + numberOfSeconds + " seconds");

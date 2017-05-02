@@ -19,10 +19,7 @@
             public void run() {
                 Realm realm = Realm.getInstance(configuration);
                 bgThreadReadyLatch.countDown();
-                try {
-                    readyToCloseLatch.await();
-                } catch (InterruptedException ignored) {
-                }
+                TestHelper.awaitOrFail(readyToCloseLatch);
                 realm.close();
                 closedLatch.countDown();
             }
@@ -40,7 +37,7 @@
         readyToCloseLatch.countDown();
 
         realm.close();
-        closedLatch.await();
+        TestHelper.awaitOrFail(closedLatch);
         // Now we get log files back!
         assertTrue(tempDirRenamed.renameTo(tempDir));
 

@@ -1,0 +1,26 @@
+        private Throwable cleanUp(Throwable testfailure) {
+            try {
+                after();
+                return testfailure;
+            } catch (Throwable afterFailure) {
+                if (testfailure == null) {
+                    // Only after() threw an exception
+                    return afterFailure;
+                }
+
+                // Both TestHelper.awaitOrFail() and after() threw exceptions
+                return new MultipleFailureException(Arrays.asList(testfailure, afterFailure)) {
+                    @Override
+                    public void printStackTrace(PrintStream out) {
+                        int i = 0;
+                        for (Throwable t : getFailures()) {
+                            out.println("Error " + i + ": " + t.getMessage());
+                            t.printStackTrace(out);
+                            out.println();
+                            i++;
+                        }
+                    }
+                };
+            }
+        }
+

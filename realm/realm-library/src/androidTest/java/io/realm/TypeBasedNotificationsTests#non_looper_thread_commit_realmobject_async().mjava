@@ -5,14 +5,14 @@
     @Test
     @RunTestInLooperThread
     public void non_looper_thread_commit_realmobject_async() {
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
 
         realm.beginTransaction();
         realm.createObject(Dog.class).setAge(1);
         realm.commitTransaction();
 
         Dog dog = realm.where(Dog.class).findFirstAsync();
-        looperThread.keepStrongReference.add(dog);
+        looperThread.keepStrongReference(dog);
         dog.addChangeListener(new RealmChangeListener<Dog>() {
             @Override
             public void onChange(Dog object) {

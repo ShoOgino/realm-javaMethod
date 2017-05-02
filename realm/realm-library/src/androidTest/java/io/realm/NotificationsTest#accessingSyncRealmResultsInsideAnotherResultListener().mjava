@@ -4,11 +4,11 @@
     @Test
     @RunTestInLooperThread
     public void accessingSyncRealmResultsInsideAnotherResultListener() {
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         final RealmResults<AllTypes> syncResults1 = realm.where(AllTypes.class).findAll();
         final RealmResults<AllTypes> syncResults2 = realm.where(AllTypes.class).findAll();
 
-        looperThread.keepStrongReference.add(syncResults1);
+        looperThread.keepStrongReference(syncResults1);
         syncResults1.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> element) {

@@ -4,7 +4,7 @@
     public void callback_should_trigger_for_createOrUpdateObjectFromJson() {
         assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
 
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm object) {
@@ -41,7 +41,7 @@
             realm.commitTransaction();
             in.close();
 
-            looperThread.keepStrongReference.add(objectFromJson);
+            looperThread.keepStrongReference(objectFromJson);
             objectFromJson.addChangeListener(new RealmChangeListener<AllTypesPrimaryKey>() {
                 @Override
                 public void onChange(AllTypesPrimaryKey object) {

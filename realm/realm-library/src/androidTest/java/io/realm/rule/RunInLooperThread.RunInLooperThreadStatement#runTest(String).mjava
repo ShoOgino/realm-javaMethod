@@ -1,0 +1,27 @@
+        private void runTest(final String threadName) throws Throwable {
+            Throwable failure = null;
+
+            try {
+                ExecutorService executorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+                    @Override
+                    public Thread newThread(Runnable runnable) { return new Thread(runnable, threadName); }
+                });
+
+                TestThread test = new TestThread(base);
+
+                @SuppressWarnings({"UnusedAssignment", "unused"})
+                Future<?> ignored = executorService.submit(test);
+
+                TestHelper.exitOrThrow(executorService, signalTestCompleted, test);
+            } catch (Throwable testfailure) {
+                // These exceptions should only come from TestHelper.awaitOrFail()
+                failure = testfailure;
+            } finally {
+                // Tries as hard as possible to close down gracefully, while still keeping all exceptions intact.
+                failure = cleanUp(failure);
+            }
+            if (failure != null) {
+                throw failure;
+            }
+        }
+

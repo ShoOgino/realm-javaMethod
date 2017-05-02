@@ -1,13 +1,13 @@
     @Test
     @RunTestInLooperThread
     public void accessingSyncRealmResultInsideAsyncResultListener() {
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         final AtomicInteger asyncResultCallback = new AtomicInteger(0);
 
         final RealmResults<AllTypes> syncResults = realm.where(AllTypes.class).findAll();
 
         RealmResults<AllTypes> results = realm.where(AllTypes.class).findAllAsync();
-        looperThread.keepStrongReference.add(results);
+        looperThread.keepStrongReference(results);
         results.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> results) {

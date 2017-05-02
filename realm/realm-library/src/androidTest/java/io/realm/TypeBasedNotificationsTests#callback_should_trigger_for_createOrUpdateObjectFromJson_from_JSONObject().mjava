@@ -2,7 +2,7 @@
     @Test
     @RunTestInLooperThread
     public void callback_should_trigger_for_createOrUpdateObjectFromJson_from_JSONObject() throws JSONException {
-        final Realm realm = looperThread.realm;
+        final Realm realm = looperThread.getRealm();
         realm.addChangeListener(new RealmChangeListener<Realm>() {
             @Override
             public void onChange(Realm object) {
@@ -33,7 +33,7 @@
         final AllTypesPrimaryKey newObj = realm.createOrUpdateObjectFromJson(AllTypesPrimaryKey.class, json);
         realm.commitTransaction();
 
-        looperThread.keepStrongReference.add(newObj);
+        looperThread.keepStrongReference(newObj);
         newObj.addChangeListener(new RealmChangeListener<AllTypesPrimaryKey>() {
             @Override
             public void onChange(AllTypesPrimaryKey object) {

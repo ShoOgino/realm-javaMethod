@@ -7,10 +7,10 @@
         final AtomicInteger commitCounter = new AtomicInteger(0);
         final AtomicInteger listenerCounter = new AtomicInteger(0);
 
-        looperThread.realm.close();
+        looperThread.getRealm().close();
 
-        SharedRealm sharedRealm = getSharedRealm(looperThread.realmConfiguration);
-        looperThread.keepStrongReference.add(sharedRealm);
+        SharedRealm sharedRealm = getSharedRealm(looperThread.getConfiguration());
+        looperThread.keepStrongReference(sharedRealm);
         sharedRealm.realmNotifier.addChangeListener(sharedRealm, new RealmChangeListener<SharedRealm>() {
             @Override
             public void onChange(SharedRealm sharedRealm) {
@@ -21,12 +21,12 @@
                     sharedRealm.close();
                     looperThread.testComplete();
                 } else {
-                    makeRemoteChanges(looperThread.realmConfiguration);
+                    makeRemoteChanges(looperThread.getConfiguration());
                     commitCounter.getAndIncrement();
                 }
             }
         });
-        makeRemoteChanges(looperThread.realmConfiguration);
+        makeRemoteChanges(looperThread.getConfiguration());
         commitCounter.getAndIncrement();
     }
 

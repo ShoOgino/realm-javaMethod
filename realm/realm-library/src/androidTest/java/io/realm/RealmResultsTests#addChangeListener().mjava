@@ -1,10 +1,10 @@
     @Test
     @RunTestInLooperThread
     public void addChangeListener() {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         RealmResults<AllTypes> collection = realm.where(AllTypes.class).findAll();
 
-        looperThread.keepStrongReference.add(collection);
+        looperThread.keepStrongReference(collection);
         collection.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override
             public void onChange(RealmResults<AllTypes> object) {

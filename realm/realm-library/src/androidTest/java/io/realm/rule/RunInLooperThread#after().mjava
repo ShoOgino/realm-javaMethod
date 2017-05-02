@@ -1,9 +1,11 @@
     @Override
     protected void after() {
         super.after();
-        realmConfiguration = null;
-        realm = null;
-        testRealms.clear();
-        keepStrongReference = null;
+
+        // probably belt *and* suspenders...
+        synchronized (lock) {
+            backgroundHandler = null;
+            keepStrongReference = null;
+        }
     }
 

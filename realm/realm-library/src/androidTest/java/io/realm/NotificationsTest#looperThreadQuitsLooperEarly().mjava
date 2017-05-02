@@ -18,11 +18,8 @@
                 realm.setAutoRefresh(false);
                 TestHelper.quitLooperOrFail();
                 backgroundLooperStartedAndStopped.countDown();
-                try {
-                    mainThreadCommitCompleted.await();
-                } catch (InterruptedException e) {
-                    fail("Thread interrupted"); // This will prevent backgroundThreadStopped from being called.
-                }
+                // This will prevent backgroundThreadStopped from being called.
+                TestHelper.awaitOrFail(mainThreadCommitCompleted);
                 realm.close();
                 backgroundThreadStopped.countDown();
             }

@@ -1,12 +1,12 @@
     @Test
     @RunTestInLooperThread
     public void returnedRealmModelIsNotNull() {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         realm.beginTransaction();
         AllTypesRealmModel model = realm.createObject(AllTypesRealmModel.class, 0);
         realm.commitTransaction();
 
-        looperThread.keepStrongReference.add(model);
+        looperThread.keepStrongReference(model);
         RealmObject.addChangeListener(model, new RealmChangeListener<AllTypesRealmModel>() {
             @Override
             public void onChange(AllTypesRealmModel object) {

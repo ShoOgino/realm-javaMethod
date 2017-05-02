@@ -3,13 +3,13 @@
     @Test
     @RunTestInLooperThread
     public void findAllAsync_forceLoad() throws Throwable {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         populateTestRealm(realm, 10);
         final RealmResults<AllTypes> realmResults = realm.where(AllTypes.class)
                 .between("columnLong", 0, 4)
                 .findAllAsync();
 
-        looperThread.keepStrongReference.add(realmResults);
+        looperThread.keepStrongReference(realmResults);
         // Notification should be called as well.
         realmResults.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override

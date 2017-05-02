@@ -6,7 +6,8 @@
             looperThread.testComplete();
             return;
         }
-        Realm realm = looperThread.realm;
+
+        Realm realm = looperThread.getRealm();
         populateData(realm, 10);
         final RealmResults<Dog> results = realm.where(Dog.class).findAllSortedAsync(Dog.FIELD_AGE);
         results.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Dog>>() {
@@ -26,7 +27,7 @@
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Realm realm = Realm.getInstance(looperThread.realmConfiguration)      ;
+                Realm realm = Realm.getInstance(looperThread.getConfiguration())      ;
                 realm.beginTransaction();
                 realm.where(Dog.class).equalTo(Dog.FIELD_AGE, 0).findFirst().deleteFromRealm();
                 realm.commitTransaction();

@@ -2,13 +2,13 @@
     @Test
     @RunTestInLooperThread
     public void findFirstAsync() {
-        Realm realm = looperThread.realm;
+        Realm realm = looperThread.getRealm();
         populateTestRealm(realm, 10);
 
         final AllTypes asyncObj = realm.where(AllTypes.class).findFirstAsync();
         assertFalse(asyncObj.isValid());
         assertFalse(asyncObj.isLoaded());
-        looperThread.keepStrongReference.add(asyncObj);
+        looperThread.keepStrongReference(asyncObj);
         asyncObj.addChangeListener(new RealmChangeListener<AllTypes>() {
             @Override
             public void onChange(AllTypes object) {
