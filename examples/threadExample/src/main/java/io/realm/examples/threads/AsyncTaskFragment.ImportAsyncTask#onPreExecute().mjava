@@ -1,7 +1,12 @@
         @Override
         protected void onPreExecute() {
-            logsView.removeAllViews();
-            progressView.setVisibility(View.VISIBLE);
-            showStatus("Starting import");
+            final AsyncTaskFragment fragment = fragmentRef.get();
+            if (fragment == null || fragment.isDetached()) {
+                cancel(false);
+                return;
+            }
+            fragment.logsView.removeAllViews();
+            fragment.progressView.setVisibility(View.VISIBLE);
+            fragment.showStatus("Starting import");
         }
 
