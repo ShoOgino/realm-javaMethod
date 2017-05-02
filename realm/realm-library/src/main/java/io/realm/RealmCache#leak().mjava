@@ -1,0 +1,10 @@
+    /**
+     * If a Realm instance is GCed but `Realm.close()` is not called before, we still want to track the cache for
+     * debugging. Adding them to the list to keep the strong ref of the cache to prevent the cache gets GCed.
+     */
+    void leak() {
+        if (!isLeaked.getAndSet(true)) {
+            leakedCaches.add(this);
+        }
+    }
+

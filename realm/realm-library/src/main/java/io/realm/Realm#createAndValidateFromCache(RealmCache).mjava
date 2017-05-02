@@ -1,10 +1,12 @@
-    private static Realm createAndValidate(RealmConfiguration configuration, ColumnIndices[] globalCacheArray) {
-        Realm realm = new Realm(configuration);
+    private static Realm createAndValidateFromCache(RealmCache cache) {
+        Realm realm = new Realm(cache);
+        RealmConfiguration configuration = realm.configuration;
 
         final long currentVersion = realm.getVersion();
         final long requiredVersion = configuration.getSchemaVersion();
 
-        final ColumnIndices columnIndices = RealmCache.findColumnIndices(globalCacheArray, requiredVersion);
+        final ColumnIndices columnIndices = RealmCache.findColumnIndices(cache.getTypedColumnIndicesArray(),
+                requiredVersion);
 
         if (columnIndices != null) {
             // Copies global cache as a Realm local indices cache.

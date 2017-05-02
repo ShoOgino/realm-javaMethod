@@ -1,16 +1,13 @@
     /**
      * Creates a {@link Realm} instance without checking the existence in the {@link RealmCache}.
      *
-     * @param configuration {@link RealmConfiguration} used to create the Realm.
-     * @param globalCacheArray if this is not {@code null} and contains an entry for current schema version,
-     * the {@link BaseRealm#schema#columnIndices} will be initialized with the copy of
-     * the entry. Otherwise, {@link BaseRealm#schema#columnIndices} will be populated
-     * from the Realm file.
+     * @param cache the {@link RealmCache} where to create the realm in.
      * @return a {@link Realm} instance.
      */
-    static Realm createInstance(RealmConfiguration configuration, ColumnIndices[] globalCacheArray) {
+    static Realm createInstance(RealmCache cache) {
+        RealmConfiguration configuration = cache.getConfiguration();
         try {
-            return createAndValidate(configuration, globalCacheArray);
+            return createAndValidateFromCache(cache);
 
         } catch (RealmMigrationNeededException e) {
             if (configuration.shouldDeleteRealmIfMigrationNeeded()) {
@@ -26,7 +23,7 @@
                 }
             }
 
-            return createAndValidate(configuration, globalCacheArray);
+            return createAndValidateFromCache(cache);
         }
     }
 
