@@ -1,6 +1,6 @@
-    public static AuthenticateResponse createLoginResponse(String userTokenValue, String userIdentity, long expires) {
+    public static AuthenticateResponse createLoginResponse(String userTokenValue, String userIdentity, long expires, boolean isAdmin) {
         try {
-            Token userToken = new Token(userTokenValue, userIdentity, null, expires, null);
+            Token userToken = new Token(userTokenValue, userIdentity, null, expires, null, isAdmin);
             JSONObject response = new JSONObject();
             response.put("refresh_token", userToken.toJson());
             return AuthenticateResponse.from(response.toString());

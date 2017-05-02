@@ -1,0 +1,36 @@
+    @Test
+    @RunTestInLooperThread
+    public void refresh_triggerNotifications() {
+        final CountDownLatch bgThreadDone = new CountDownLatch(1);
+        final AtomicBoolean listenerCalled = new AtomicBoolean(false);
+        Realm realm = looperThread.getRealm();
+        RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
+        assertEquals(0, results.size());
+        results.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
+            @Override
+            public void onChange(RealmResults<AllTypes> results) {
+                assertEquals(1, results.size());
+                listenerCalled.set(true);
+            }
+        });
+
+        // Advance the Realm on a background while blocking this thread. When we refresh, it should trigger
+        // the listener.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(looperThread.getConfiguration());
+                realm.beginTransaction();
+                realm.createObject(AllTypes.class);
+                realm.commitTransaction();
+                realm.close();
+                bgThreadDone.countDown();
+            }
+        }).run();
+        TestHelper.awaitOrFail(bgThreadDone);
+
+        realm.refresh();
+        assertTrue(listenerCalled.get());
+        looperThread.testComplete();
+    }
+
