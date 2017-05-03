@@ -1,0 +1,20 @@
+    @Test
+    @RunTestInLooperThread
+    public void getInstanceAsync_callbackDeliveredInFollowingEventLoopWhenLocalCacheExist() {
+        final RealmConfiguration configuration = looperThread.createConfiguration();
+        final AtomicBoolean realmCreated = new AtomicBoolean(false);
+        final Realm localRealm = Realm.getInstance(configuration);
+        Realm.getInstanceAsync(configuration, new Realm.Callback() {
+            @Override
+            public void onSuccess(Realm realm) {
+                realmCreated.set(true);
+                assertEquals(2, Realm.getLocalInstanceCount(configuration));
+                assertSame(realm, localRealm);
+                realm.close();
+                localRealm.close();
+                looperThread.testComplete();
+            }
+        });
+        assertFalse(realmCreated.get());
+    }
+
