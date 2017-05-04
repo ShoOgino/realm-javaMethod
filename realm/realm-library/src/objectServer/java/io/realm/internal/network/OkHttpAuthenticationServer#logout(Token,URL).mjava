@@ -1,8 +1,8 @@
     @Override
     public LogoutResponse logout(Token userToken, URL authenticationUrl) {
         try {
-            String requestBody = LogoutRequest.revoke(userToken).toJson();
-            return logout(buildLogoutUrl(authenticationUrl), requestBody);
+            String requestBody = LogoutRequest.create(userToken).toJson();
+            return logout(buildActionUrl(authenticationUrl, ACTION_LOGOUT), requestBody);
         } catch (Exception e) {
             return LogoutResponse.from(new ObjectServerError(ErrorCode.UNKNOWN, e));
         }

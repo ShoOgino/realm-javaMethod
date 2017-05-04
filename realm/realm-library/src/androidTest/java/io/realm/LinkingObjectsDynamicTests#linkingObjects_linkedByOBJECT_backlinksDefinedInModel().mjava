@@ -1,0 +1,59 @@
+    @Test
+    public void linkingObjects_linkedByOBJECT_backlinksDefinedInModel() {
+        final int numSourceOfTarget1 = 3;
+        final int numSourceOfTarget2 = 2;
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                final BacklinksTarget target1 = realm.createObject(BacklinksTarget.class);
+                target1.setId(1);
+
+                // create sources of target1
+                for (int i = 0; i < numSourceOfTarget1; i++) {
+                    final BacklinksSource source = realm.createObject(BacklinksSource.class);
+                    source.setName("source" + i + "_target1");
+                    source.setChild(target1);
+                }
+
+                final BacklinksTarget target2 = realm.createObject(BacklinksTarget.class);
+                target2.setId(2);
+
+                // create sources of target2
+                for (int i = 0; i < numSourceOfTarget2; i++) {
+                    final BacklinksSource source = realm.createObject(BacklinksSource.class);
+                    source.setName("source" + i + "_target2");
+                    source.setChild(target2);
+                }
+
+                // target3 has no owner
+                final BacklinksTarget target3 = realm.createObject(BacklinksTarget.class);
+                target3.setId(3);
+            }
+        });
+
+        final DynamicRealmObject target1 = dynamicRealm.where(BacklinksTarget.CLASS_NAME).equalTo(BacklinksTarget.FIELD_ID, 1).findFirst();
+        final RealmResults<DynamicRealmObject> target1Sources = target1.linkingObjects(BacklinksSource.CLASS_NAME, BacklinksSource.FIELD_CHILD);
+        assertNotNull(target1Sources);
+        assertEquals(numSourceOfTarget1, target1Sources.size());
+        for (DynamicRealmObject target1Source : target1Sources) {
+            assertEquals(BacklinksSource.CLASS_NAME, target1Source.getType());
+            assertTrue(target1Source.getString(BacklinksSource.FIELD_NAME).endsWith("_target1"));
+            assertEquals(target1, target1Source.getObject(BacklinksSource.FIELD_CHILD));
+        }
+
+        final DynamicRealmObject target2 = dynamicRealm.where(BacklinksTarget.CLASS_NAME).equalTo(BacklinksTarget.FIELD_ID, 2).findFirst();
+        final RealmResults<DynamicRealmObject> target2Sources = target2.linkingObjects(BacklinksSource.CLASS_NAME, BacklinksSource.FIELD_CHILD);
+        assertNotNull(target2Sources);
+        assertEquals(numSourceOfTarget2, target2Sources.size());
+        for (DynamicRealmObject target2Source : target2Sources) {
+            assertEquals(BacklinksSource.CLASS_NAME, target2Source.getType());
+            assertTrue(target2Source.getString(BacklinksSource.FIELD_NAME).endsWith("_target2"));
+            assertEquals(target2, target2Source.getObject(BacklinksSource.FIELD_CHILD));
+        }
+
+        final DynamicRealmObject target3 = dynamicRealm.where(BacklinksTarget.CLASS_NAME).equalTo(BacklinksTarget.FIELD_ID, 3).findFirst();
+        final RealmResults<DynamicRealmObject> target3Sources = target3.linkingObjects(BacklinksSource.CLASS_NAME, BacklinksSource.FIELD_CHILD);
+        assertNotNull(target3Sources);
+        assertTrue(target3Sources.isEmpty());
+    }
+

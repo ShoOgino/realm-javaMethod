@@ -5,16 +5,18 @@
      * @param configuration the {@link RealmConfiguration} of {@link Realm} or {@link DynamicRealm}.
      * @param callback the callback will be executed with the global reference count.
      */
-    static synchronized void invokeWithGlobalRefCount(RealmConfiguration configuration, Callback callback) {
-        RealmCache cache = cachesMap.get(configuration.getPath());
-        if (cache == null) {
-            callback.onResult(0);
-            return;
+    static void invokeWithGlobalRefCount(RealmConfiguration configuration, Callback callback) {
+        // NOTE: Although getCache is locked on the cacheMap, this whole method needs to be lock with it as
+        // well. Since we need to ensure there is no Realm instance can be opened when this method is called (for
+        // deleteRealm).
+        // Recursive lock cannot be avoided here.
+        synchronized (cachesList) {
+            RealmCache cache = getCache(configuration.getPath(), false);
+            if (cache == null) {
+                callback.onResult(0);
+                return;
+            }
+            cache.doInvokeWithGlobalRefCount(callback);
         }
-        int totalRefCount = 0;
-        for (RealmCacheType type : RealmCacheType.values()) {
-            totalRefCount += cache.refAndCountMap.get(type).globalCount;
-        }
-        callback.onResult(totalRefCount);
     }
 
