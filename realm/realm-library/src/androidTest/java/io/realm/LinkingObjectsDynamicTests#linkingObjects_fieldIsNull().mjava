@@ -1,0 +1,14 @@
+    @Test
+    public void linkingObjects_fieldIsNull() throws Exception {
+        dynamicRealm.beginTransaction();
+        final DynamicRealmObject object = dynamicRealm.createObject(AllJavaTypes.CLASS_NAME, 1L);
+        dynamicRealm.commitTransaction();
+
+        try {
+            object.linkingObjects(AllJavaTypes.CLASS_NAME, null);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertEquals("Non-null 'srcFieldName' required.", expected.getMessage());
+        }
+    }
+

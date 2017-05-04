@@ -1,0 +1,50 @@
+    @Test
+    public void linkingObjects_invalidFieldType() {
+        dynamicRealm.beginTransaction();
+        final DynamicRealmObject object = dynamicRealm.createObject(AllJavaTypes.CLASS_NAME, 1L);
+        dynamicRealm.commitTransaction();
+
+        for (RealmFieldType fieldType : RealmFieldType.values()) {
+            try {
+                switch (fieldType) {
+                    // skip valid types
+                    case OBJECT: // fall-through
+                    case LIST:
+                        continue;
+                        // skip unsupported types
+                    case UNSUPPORTED_TABLE: // fall-through
+                    case UNSUPPORTED_MIXED: // fall-through
+                    case UNSUPPORTED_DATE:
+                        continue;
+                    case INTEGER:
+                        object.linkingObjects(AllJavaTypes.CLASS_NAME, AllJavaTypes.FIELD_INT);
+                        break;
+                    case BOOLEAN:
+                        object.linkingObjects(AllJavaTypes.CLASS_NAME, AllJavaTypes.FIELD_BOOLEAN);
+                        break;
+                    case STRING:
+                        object.linkingObjects(AllJavaTypes.CLASS_NAME, AllJavaTypes.FIELD_STRING);
+                        break;
+                    case BINARY:
+                        object.linkingObjects(AllJavaTypes.CLASS_NAME, AllJavaTypes.FIELD_BINARY);
+                        break;
+                    case DATE:
+                        object.linkingObjects(AllJavaTypes.CLASS_NAME, AllJavaTypes.FIELD_DATE);
+                        break;
+                    case FLOAT:
+                        object.linkingObjects(AllJavaTypes.CLASS_NAME, AllJavaTypes.FIELD_FLOAT);
+                        break;
+                    case DOUBLE:
+                        object.linkingObjects(AllJavaTypes.CLASS_NAME, AllJavaTypes.FIELD_DOUBLE);
+                        break;
+                    default:
+                        fail("unknown type: " + fieldType);
+                        break;
+                }
+                fail();
+            } catch (IllegalArgumentException expected) {
+                assertTrue(expected.getMessage().startsWith("Unexpected field type"));
+            }
+        }
+    }
+

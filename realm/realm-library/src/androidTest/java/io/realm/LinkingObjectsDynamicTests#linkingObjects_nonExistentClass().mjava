@@ -1,0 +1,14 @@
+    @Test
+    public void linkingObjects_nonExistentClass() {
+        dynamicRealm.beginTransaction();
+        final DynamicRealmObject object = dynamicRealm.createObject(AllJavaTypes.CLASS_NAME, 1L);
+        dynamicRealm.commitTransaction();
+
+        try {
+            object.linkingObjects("ThisClassDoesNotExist", AllJavaTypes.FIELD_INT);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().startsWith("Class not found"));
+        }
+    }
+
