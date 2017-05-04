@@ -1,0 +1,38 @@
+    @Test
+    @RunTestInLooperThread
+    public void getInstanceAsync_callbackDeliveredInFollowingEventLoopWhenGlobalCacheExist() throws InterruptedException {
+        final RealmConfiguration configuration = looperThread.createConfiguration();
+        final AtomicBoolean realmCreated = new AtomicBoolean(false);
+        final CountDownLatch globalRealmCreated = new CountDownLatch(1);
+        final CountDownLatch getAsyncFinishedLatch = new CountDownLatch(1);
+
+        final Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(configuration);
+                globalRealmCreated.countDown();
+                TestHelper.awaitOrFail(getAsyncFinishedLatch);
+                realm.close();
+            }
+        });
+        thread.start();
+
+        TestHelper.awaitOrFail(globalRealmCreated);
+        Realm.getInstanceAsync(configuration, new Realm.Callback() {
+            @Override
+            public void onSuccess(Realm realm) {
+                realmCreated.set(true);
+                assertEquals(1, Realm.getLocalInstanceCount(configuration));
+                realm.close();
+                getAsyncFinishedLatch.countDown();
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    fail();
+                }
+                looperThread.testComplete();
+            }
+        });
+        assertFalse(realmCreated.get());
+    }
+

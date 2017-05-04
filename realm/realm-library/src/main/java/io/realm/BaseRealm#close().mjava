@@ -12,6 +12,10 @@
             throw new IllegalStateException(INCORRECT_THREAD_CLOSE_MESSAGE);
         }
 
-        RealmCache.release(this);
+        if (realmCache != null) {
+            realmCache.release(this);
+        } else {
+            doClose();
+        }
     }
 

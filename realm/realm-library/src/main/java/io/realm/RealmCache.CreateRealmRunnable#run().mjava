@@ -1,0 +1,59 @@
+        @Override
+        public void run() {
+            T instance = null;
+            try {
+                instance = createRealmOrGetFromCache(configuration, realmClass);
+                boolean results = notifier.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // If the RealmAsyncTask.cancel() is called before, we just return without creating the Realm
+                        // instance on the caller thread.
+                        // Thread.isInterrupted() cannot be used for checking here since CountDownLatch.await() will
+                        // will clear interrupted status.
+                        // Using the future to check which this runnable belongs to is to ensure if it is canceled from
+                        // the caller thread before, the callback will never be delivered.
+                        if (future == null || future.isCancelled()) {
+                            canReleaseBackgroundInstanceLatch.countDown();
+                            return;
+                        }
+                        T instanceToReturn = null;
+                        Throwable throwable = null;
+                        try {
+                            instanceToReturn = createRealmOrGetFromCache(configuration, realmClass);
+                        } catch (Throwable e) {
+                            throwable = e;
+                        } finally {
+                            canReleaseBackgroundInstanceLatch.countDown();
+                        }
+                        if (instanceToReturn != null) {
+                            callback.onSuccess(instanceToReturn);
+                        } else {
+                            callback.onError(throwable);
+                        }
+                    }
+                });
+                if (!results) {
+                    canReleaseBackgroundInstanceLatch.countDown();
+                }
+                // There is a small chance that the posted runnable cannot be executed because of the thread terminated
+                // before the runnable gets fetched from the event queue.
+                if (!canReleaseBackgroundInstanceLatch.await(2, TimeUnit.SECONDS)) {
+                    RealmLog.warn("Timeout for creating Realm instance in foreground thread in `CreateRealmRunnable` ");
+                }
+            } catch (InterruptedException e) {
+                RealmLog.warn(e, "`CreateRealmRunnable` has been interrupted.");
+            } catch (final Throwable e) {
+                RealmLog.error(e, "`CreateRealmRunnable` failed.");
+                notifier.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onError(e);
+                    }
+                });
+            } finally {
+                if (instance != null) {
+                    instance.close();
+                }
+            }
+        }
+

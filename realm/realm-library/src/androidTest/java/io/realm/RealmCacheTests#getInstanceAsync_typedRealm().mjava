@@ -1,0 +1,17 @@
+    @Test
+    @RunTestInLooperThread
+    public void getInstanceAsync_typedRealm() {
+        final RealmConfiguration configuration = looperThread.createConfiguration();
+        final AtomicBoolean realmCreated = new AtomicBoolean(false);
+        Realm.getInstanceAsync(configuration, new Realm.Callback() {
+            @Override
+            public void onSuccess(Realm realm) {
+                realmCreated.set(true);
+                assertEquals(1, Realm.getLocalInstanceCount(configuration));
+                realm.close();
+                looperThread.testComplete();
+            }
+        });
+        assertFalse(realmCreated.get());
+    }
+

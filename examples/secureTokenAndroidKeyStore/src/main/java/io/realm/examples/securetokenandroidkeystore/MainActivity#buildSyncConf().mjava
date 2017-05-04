@@ -1,16 +1,10 @@
     // build SyncConfiguration with a user store to store encrypted Token.
-    private void buildSyncConf () {
-        try {
-            SyncManager.setUserStore(new SecureUserStore(MainActivity.this));
-            // the rest of Sync logic ...
-            SyncUser user = createTestUser(0);
-            String url = "realm://objectserver.realm.io/default";
-            SyncConfiguration secureConfig = new SyncConfiguration.Builder(user, url).build();
-            Realm realm = Realm.getInstance(secureConfig);
-            // ... 
-
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        }
+    private void buildSyncConf() {
+        // the rest of Sync logic ...
+        SyncUser user = createTestUser(Long.MAX_VALUE);
+        String url = "realm://objectserver.realm.io/default";
+        SyncConfiguration secureConfig = new SyncConfiguration.Builder(user, url).build();
+        Realm realm = Realm.getInstance(secureConfig);
+        // ...
     }
 

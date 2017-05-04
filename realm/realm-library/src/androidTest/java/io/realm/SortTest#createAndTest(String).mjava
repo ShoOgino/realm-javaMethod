@@ -1,0 +1,14 @@
+    private void createAndTest(String str) {
+        realm.beginTransaction();
+        realm.delete(StringOnly.class);
+        for (int i = 0; i < str.length(); i++) {
+            StringOnly stringOnly = realm.createObject(StringOnly.class);
+            stringOnly.setChars(str.substring(i, i + 1));
+        }
+        realm.commitTransaction();
+        RealmResults<StringOnly> stringOnlies = realm.where(StringOnly.class).findAllSorted("chars");
+        for (int i = 0; i < chars.length(); i++) {
+            assertEquals(chars.substring(i, i + 1), stringOnlies.get(i).getChars());
+        }
+    }
+

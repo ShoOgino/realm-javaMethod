@@ -1,0 +1,38 @@
+    @Test
+    @RunTestInLooperThread
+    public void linkingObjects_IllegalStateException_ifDeleted() {
+        final Realm realm = looperThread.getRealm();
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                final BacklinksTarget target1 = realm.createObject(BacklinksTarget.class);
+                target1.setId(1);
+
+                final BacklinksSource source = realm.createObject(BacklinksSource.class);
+                source.setChild(target1);
+            }
+        });
+
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.getConfiguration());
+        try {
+            final DynamicRealmObject target = dynamicRealm.where(BacklinksTarget.CLASS_NAME)
+                    .equalTo(BacklinksTarget.FIELD_ID, 1L).findFirst();
+
+            dynamicRealm.executeTransaction(new DynamicRealm.Transaction() {
+                @Override
+                public void execute(DynamicRealm realm) {
+                    target.deleteFromRealm();
+                }
+            });
+
+            // precondition
+            assertFalse(target.isValid());
+
+            thrown.expect(IllegalStateException.class);
+            target.linkingObjects(BacklinksSource.CLASS_NAME, BacklinksSource.FIELD_CHILD);
+        } finally {
+            dynamicRealm.close();
+        }
+    }
+

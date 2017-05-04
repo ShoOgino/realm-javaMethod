@@ -1,13 +1,17 @@
-    protected BaseRealm(RealmConfiguration configuration) {
+    // Create a realm instance without associating it to any RealmCache.
+    BaseRealm(RealmConfiguration configuration) {
         this.threadId = Thread.currentThread().getId();
         this.configuration = configuration;
+        this.realmCache = null;
 
         this.sharedRealm = SharedRealm.getInstance(configuration,
                 !(this instanceof Realm) ? null :
                         new SharedRealm.SchemaVersionListener() {
                             @Override
                             public void onSchemaVersionChanged(long currentVersion) {
-                                RealmCache.updateSchemaCache((Realm) BaseRealm.this);
+                                if (realmCache != null) {
+                                    realmCache.updateSchemaCache((Realm) BaseRealm.this);
+                                }
                             }
                         }, true);
         this.schema = new StandardRealmSchema(this);

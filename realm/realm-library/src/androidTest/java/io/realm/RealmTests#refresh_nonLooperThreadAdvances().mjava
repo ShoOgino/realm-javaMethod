@@ -1,0 +1,23 @@
+    @Test
+    public void refresh_nonLooperThreadAdvances() {
+        final CountDownLatch bgThreadDone = new CountDownLatch(1);
+        RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
+        assertEquals(0, results.size());
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(RealmTests.this.realm.getConfiguration());
+                realm.beginTransaction();
+                realm.createObject(AllTypes.class);
+                realm.commitTransaction();
+                realm.close();
+                bgThreadDone.countDown();
+            }
+        }).run();
+        TestHelper.awaitOrFail(bgThreadDone);
+
+        realm.refresh();
+        assertEquals(1, results.size());
+    }
+
