@@ -1,0 +1,10 @@
+        /**
+         * Will throw an exception if the wait was terminated with an error. If it was canceled, this method will
+         * do nothing.
+         */
+        public void throwExceptionIfNeeded() {
+            if (resultReceived && errorCode != null) {
+                throw new ObjectServerError(ErrorCode.UNKNOWN, String.format("Internal error (%d): %s", errorCode, errorMessage));
+            }
+        }
+
