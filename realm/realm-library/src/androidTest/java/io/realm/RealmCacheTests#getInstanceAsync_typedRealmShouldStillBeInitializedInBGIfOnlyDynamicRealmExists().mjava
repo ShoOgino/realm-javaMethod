@@ -1,0 +1,23 @@
+    @Test
+    @RunTestInLooperThread
+    public void getInstanceAsync_typedRealmShouldStillBeInitializedInBGIfOnlyDynamicRealmExists() {
+        final RealmConfiguration configuration = looperThread.createConfiguration();
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(configuration);
+        final AtomicBoolean realmCreated = new AtomicBoolean(false);
+
+        Realm.getInstanceAsync(configuration, new Realm.Callback() {
+            @Override
+            public void onSuccess(Realm realm) {
+                realmCreated.set(false);
+                assertEquals(2, Realm.getLocalInstanceCount(configuration));
+                dynamicRealm.close();
+                realm.close();
+                looperThread.testComplete();
+            }
+        });
+        // Callback should not be called immediately since we need to create column indices cache in bg thread.
+        // Only a local dynamic Realm instance existing at this time.
+        assertFalse(realmCreated.get());
+        assertEquals(1, Realm.getLocalInstanceCount(configuration));
+    }
+

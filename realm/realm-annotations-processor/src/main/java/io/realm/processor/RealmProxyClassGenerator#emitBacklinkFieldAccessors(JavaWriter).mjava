@@ -11,7 +11,7 @@
                 .emitStatement("realm.checkIfValid()")
                 .emitStatement("proxyState.getRow$realm().checkIfAttached()")
                 .beginControlFlow("if (" + cacheFieldName + " == null)")
-                    .emitStatement(cacheFieldName + " = RealmResults.createBacklinkResults(realm, proxyState.getRow$realm(), %s.class, \"%s\")",
+                    .emitStatement(cacheFieldName + " = RealmResults.createBacklinkResults((Realm) realm, (UncheckedRow) proxyState.getRow$realm(), %s.class, \"%s\")",
                         backlink.getSourceClass(), backlink.getSourceField())
                 .endControlFlow()
                 .emitStatement("return " + cacheFieldName)

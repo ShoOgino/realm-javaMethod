@@ -1,0 +1,17 @@
+    @Test
+    public void linkingObjects_nonExistentField() {
+        dynamicRealm.beginTransaction();
+        final DynamicRealmObject object = dynamicRealm.createObject(AllJavaTypes.CLASS_NAME, 1L);
+        dynamicRealm.commitTransaction();
+
+        try {
+            object.linkingObjects(AllJavaTypes.CLASS_NAME, "fieldNotExist");
+            fail();
+        } catch (IllegalArgumentException expected) {
+            final String expectedMessage = String.format(Locale.ENGLISH,
+                    "Field name '%s' does not exist on schema for '%s'",
+                    "fieldNotExist", AllJavaTypes.CLASS_NAME);
+            assertEquals(expectedMessage, expected.getMessage());
+        }
+    }
+

@@ -4,22 +4,16 @@
      *
      * @param realm Realm instance to be released from cache.
      */
-    static synchronized void release(BaseRealm realm) {
+    synchronized void release(BaseRealm realm) {
         String canonicalPath = realm.getPath();
-        RealmCache cache = cachesMap.get(canonicalPath);
-        Integer refCount = null;
-        RefAndCount refAndCount = null;
-
-        if (cache != null) {
-            refAndCount = cache.refAndCountMap.get(RealmCacheType.valueOf(realm.getClass()));
-            refCount = refAndCount.localCount.get();
-        }
+        RefAndCount refAndCount = refAndCountMap.get(RealmCacheType.valueOf(realm.getClass()));
+        Integer refCount = refAndCount.localCount.get();
         if (refCount == null) {
             refCount = 0;
         }
 
         if (refCount <= 0) {
-            RealmLog.warn("%s has been closed already.", canonicalPath);
+            RealmLog.warn("%s has been closed already. refCount is %s", canonicalPath, refCount);
             return;
         }
 
@@ -43,20 +37,18 @@
             // Clears the column indices cache if needed.
             if (realm instanceof Realm && refAndCount.globalCount == 0) {
                 // All typed Realm instances of this file are cleared from cache.
-                Arrays.fill(cache.typedColumnIndicesArray, null);
-            }
-
-            int totalRefCount = 0;
-            for (RealmCacheType type : RealmCacheType.values()) {
-                totalRefCount += cache.refAndCountMap.get(type).globalCount;
+                Arrays.fill(typedColumnIndicesArray, null);
             }
 
             // No more local reference to this Realm in current thread, close the instance.
             realm.doClose();
 
-            // No more instance of typed Realm and dynamic Realm. Remove the configuration from cache.
-            if (totalRefCount == 0) {
-                cachesMap.remove(canonicalPath);
+            // No more instance of typed Realm and dynamic Realm.
+            if (getTotalGlobalRefCount() == 0) {
+                // We keep the cache in the caches list even when its global counter reaches 0. It will be reused when
+                // next time a Realm instance with the same path is opened. By not removing it, the lock on
+                // cachesList is not needed here.
+                configuration = null;
                 ObjectServerFacade.getFacade(realm.getConfiguration().isSyncConfiguration())
                         .realmClosed(realm.getConfiguration());
             }

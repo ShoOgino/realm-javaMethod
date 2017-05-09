@@ -1,0 +1,18 @@
+    private synchronized  <T extends BaseRealm> RealmAsyncTask doCreateRealmOrGetFromCacheAsync(
+            RealmConfiguration configuration, BaseRealm.InstanceCallback<T> callback, Class<T> realmClass) {
+        Capabilities capabilities = new AndroidCapabilities();
+        capabilities.checkCanDeliverNotification(ASYNC_NOT_ALLOWED_MSG);
+        if (callback == null) {
+            throw new IllegalArgumentException(ASYNC_CALLBACK_NULL_MSG);
+        }
+
+        // Always create a Realm instance in the background thread even when there are instances existing on current
+        // thread. This to ensure that onSuccess will always be called in the following event loop but not current one.
+        CreateRealmRunnable<T> createRealmRunnable = new CreateRealmRunnable<T>(
+                new AndroidRealmNotifier(null, capabilities), configuration, callback, realmClass);
+        Future<?> future = BaseRealm.asyncTaskExecutor.submitTransaction(createRealmRunnable);
+        createRealmRunnable.setFuture(future);
+
+        return new RealmAsyncTaskImpl(future, BaseRealm.asyncTaskExecutor);
+    }
+

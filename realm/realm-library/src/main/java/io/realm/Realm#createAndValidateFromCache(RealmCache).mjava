@@ -1,0 +1,46 @@
+    private static Realm createAndValidateFromCache(RealmCache cache) {
+        Realm realm = new Realm(cache);
+        RealmConfiguration configuration = realm.configuration;
+
+        final long currentVersion = realm.getVersion();
+        final long requiredVersion = configuration.getSchemaVersion();
+
+        final ColumnIndices columnIndices = RealmCache.findColumnIndices(cache.getTypedColumnIndicesArray(),
+                requiredVersion);
+
+        if (columnIndices != null) {
+            // Copies global cache as a Realm local indices cache.
+            realm.schema.setInitialColumnIndices(columnIndices);
+        } else {
+            final boolean syncingConfig = configuration.isSyncConfiguration();
+
+            if (!syncingConfig && (currentVersion != UNVERSIONED)) {
+                if (currentVersion < requiredVersion) {
+                    realm.doClose();
+                    throw new RealmMigrationNeededException(
+                            configuration.getPath(),
+                            String.format("Realm on disk need to migrate from v%s to v%s", currentVersion, requiredVersion));
+                }
+                if (requiredVersion < currentVersion) {
+                    realm.doClose();
+                    throw new IllegalArgumentException(
+                            String.format("Realm on disk is newer than the one specified: v%s vs. v%s", currentVersion, requiredVersion));
+                }
+            }
+
+            // Initializes Realm schema if needed.
+            try {
+                if (!syncingConfig) {
+                    initializeRealm(realm);
+                } else {
+                    initializeSyncedRealm(realm);
+                }
+            } catch (RuntimeException e) {
+                realm.doClose();
+                throw e;
+            }
+        }
+
+        return realm;
+    }
+

@@ -1,0 +1,36 @@
+    @Test
+    public void getInstance_differentConfigurationsShouldNotBlockEachOther() throws InterruptedException {
+        final CountDownLatch bgThreadStarted = new CountDownLatch(1);
+        final CountDownLatch realm2CreatedLatch = new CountDownLatch(1);
+
+        final RealmConfiguration config1 = configFactory.createConfigurationBuilder()
+                .name("config1.realm")
+                .initialData(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        bgThreadStarted.countDown();
+                        TestHelper.awaitOrFail(realm2CreatedLatch);
+                    }
+                })
+                .build();
+
+        RealmConfiguration config2 = configFactory.createConfigurationBuilder()
+                .name("config2.realm")
+                .build();
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getInstance(config1);
+                realm.close();
+            }
+        });
+        thread.start();
+
+        TestHelper.awaitOrFail(bgThreadStarted);
+        Realm realm = Realm.getInstance(config2);
+        realm2CreatedLatch.countDown();
+        realm.close();
+        thread.join();
+    }
+
