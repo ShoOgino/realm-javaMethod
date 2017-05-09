@@ -5,17 +5,18 @@
         String syncRealmUrl = syncUserConf[1];
         String syncRealmAuthUrl = syncUserConf[2];
         String syncRefreshToken = syncUserConf[3];
-        boolean enable_caching = false; // Handled in Java currently
-        boolean disableFormatUpgrade = false; // TODO Double negatives :/
+
+        final boolean enableCaching = false; // Handled in Java currently
+        final boolean enableFormatUpgrade = true;
 
         long nativeConfigPtr = nativeCreateConfig(
                 config.getPath(),
                 config.getEncryptionKey(),
                 syncRealmUrl != null ? SchemaMode.SCHEMA_MODE_ADDITIVE.getNativeValue() : SchemaMode.SCHEMA_MODE_MANUAL.getNativeValue(),
                 config.getDurability() == Durability.MEM_ONLY,
-                enable_caching,
+                enableCaching,
                 config.getSchemaVersion(),
-                disableFormatUpgrade,
+                enableFormatUpgrade,
                 autoChangeNotifications,
                 syncRealmUrl,
                 syncRealmAuthUrl,
