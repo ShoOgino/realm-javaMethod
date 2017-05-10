@@ -1,13 +1,18 @@
     /**
-     * Returns the column index for a given field on a clazz or {@code -1} if no such field exists.
+     * Convenience method to return the column index for a given field on a class
+     * or {@code -1} if no such field exists.
+     *
+     * @param clazz the class to search.
+     * @param fieldName the name of the field whose index is needed.
+     * @return the index in clazz of the field fieldName.
+     * @deprecated Use {@code getColumnInfo().getColumnIndex()} instead.
      */
+    @Deprecated
     public long getColumnIndex(Class<? extends RealmModel> clazz, String fieldName) {
-        final ColumnInfo columnInfo = classes.get(clazz);
-        if (columnInfo != null) {
-            Long index = columnInfo.getIndicesMap().get(fieldName);
-            return (index != null) ? index : -1;
-        } else {
+        final ColumnInfo columnInfo = getColumnInfo(clazz);
+        if (columnInfo == null) {
             return -1;
         }
+        return columnInfo.getColumnIndex(fieldName);
     }
 

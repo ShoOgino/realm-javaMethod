@@ -1,0 +1,25 @@
+    /**
+     * Store the results of compiling the field description.
+     * Subclasses call this as the last action in
+     *
+     * @param finalClassName the name of the final table in the field description.
+     * @param finalColumnName the name of the final column in the field description.
+     * @param finalColumnType the type of the final column in the field description: MAY NOT BE {@code null}!
+     * @param columnIndices the array of columnIndices.
+     * @param nativeTablePointers the array of table pointers
+     */
+    protected final void setCompilationResults(
+            String finalClassName,
+            String finalColumnName,
+            RealmFieldType finalColumnType,
+            long[] columnIndices,
+            long[] nativeTablePointers) {
+        if ((validFinalColumnTypes != null) && (validFinalColumnTypes.size() > 0)) {
+            verifyColumnType(finalClassName, finalColumnName, finalColumnType, validFinalColumnTypes);
+        }
+        this.finalColumnName = finalColumnName;
+        this.finalColumnType = finalColumnType;
+        this.columnIndices = columnIndices;
+        this.nativeTablePointers = nativeTablePointers;
+    }
+

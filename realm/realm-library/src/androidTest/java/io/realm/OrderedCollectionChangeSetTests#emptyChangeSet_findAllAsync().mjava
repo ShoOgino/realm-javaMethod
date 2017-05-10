@@ -1,13 +1,11 @@
     // The change set should empty when the async query returns at the first time.
     @Test
     @RunTestInLooperThread
-    public void emptyChangeSet_findAllAsync(){
+    public void emptyChangeSet_findAllAsync() {
         if (type == ObservablesType.REALM_LIST) {
             looperThread.testComplete();
             return;
         }
-
-        Log.d("####", "test running on thread: " + Thread.currentThread());
 
         Realm realm = looperThread.getRealm();
         populateData(realm, 10);
@@ -29,8 +27,7 @@
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d("####", "runnable running on thread: " + Thread.currentThread());
-                Realm realm = Realm.getInstance(looperThread.getConfiguration())      ;
+                Realm realm = Realm.getInstance(looperThread.getConfiguration());
                 realm.beginTransaction();
                 realm.where(Dog.class).equalTo(Dog.FIELD_AGE, 0).findFirst().deleteFromRealm();
                 realm.commitTransaction();

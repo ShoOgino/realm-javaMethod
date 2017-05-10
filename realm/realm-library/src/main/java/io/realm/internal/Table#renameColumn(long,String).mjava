@@ -22,13 +22,12 @@
         // Renames a primary key. At this point, renaming the column name should have been fine.
         if (oldPkColumnIndex == columnIndex) {
             try {
-                String className = tableNameToClassName(getName());
                 Table pkTable = getPrimaryKeyTable();
                 if (pkTable == null) {
                     throw new IllegalStateException(
                             "Table is not created from a SharedRealm, primary key is not available");
                 }
-                long pkRowIndex = pkTable.findFirstString(PRIMARY_KEY_CLASS_COLUMN_INDEX, className);
+                long pkRowIndex = pkTable.findFirstString(PRIMARY_KEY_CLASS_COLUMN_INDEX, getClassName());
                 if (pkRowIndex != NO_MATCH) {
                     nativeSetString(pkTable.nativePtr, PRIMARY_KEY_FIELD_COLUMN_INDEX, pkRowIndex, newName, false);
                 } else {

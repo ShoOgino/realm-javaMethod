@@ -13,7 +13,7 @@
                 .endControlFlow();
 
         writer.emitStatement("Table table = realm.getTable(%s.class)", qualifiedClassName);
-        writer.emitStatement("long tableNativePtr = table.getNativeTablePointer()");
+        writer.emitStatement("long tableNativePtr = table.getNativePtr()");
         writer.emitStatement("%s columnInfo = (%s) realm.schema.getColumnInfo(%s.class)",
                 columnInfoClassName(), columnInfoClassName(), qualifiedClassName);
 
@@ -33,16 +33,16 @@
                         .emitEmptyLine()
                         .emitStatement("%s %sObj = ((%s) object).%s()", fieldType, fieldName, interfaceName, getter)
                         .beginControlFlow("if (%sObj != null)", fieldName)
-                            .emitStatement("Long cache%1$s = cache.get(%1$sObj)", fieldName)
-                            .beginControlFlow("if (cache%s == null)", fieldName)
-                                .emitStatement("cache%1$s = %2$s.insertOrUpdate(realm, %1$sObj, cache)",
-                                        fieldName,
-                                        Utils.getProxyClassSimpleName(field))
-                            .endControlFlow()
-                            .emitStatement("Table.nativeSetLink(tableNativePtr, columnInfo.%1$sIndex, rowIndex, cache%1$s, false)", fieldName)
+                        .emitStatement("Long cache%1$s = cache.get(%1$sObj)", fieldName)
+                        .beginControlFlow("if (cache%s == null)", fieldName)
+                        .emitStatement("cache%1$s = %2$s.insertOrUpdate(realm, %1$sObj, cache)",
+                                fieldName,
+                                Utils.getProxyClassSimpleName(field))
+                        .endControlFlow()
+                        .emitStatement("Table.nativeSetLink(tableNativePtr, columnInfo.%1$sIndex, rowIndex, cache%1$s, false)", fieldName)
                         .nextControlFlow("else")
-                                // No need to throw exception here if the field is not nullable. A exception will be thrown in setter.
-                            .emitStatement("Table.nativeNullifyLink(tableNativePtr, columnInfo.%sIndex, rowIndex)", fieldName)
+                        // No need to throw exception here if the field is not nullable. A exception will be thrown in setter.
+                        .emitStatement("Table.nativeNullifyLink(tableNativePtr, columnInfo.%sIndex, rowIndex)", fieldName)
                         .endControlFlow();
             } else if (Utils.isRealmList(field)) {
                 final String genericType = Utils.getGenericTypeQualifiedName(field);
@@ -53,13 +53,13 @@
                         .emitStatement("RealmList<%s> %sList = ((%s) object).%s()",
                                 genericType, fieldName, interfaceName, getter)
                         .beginControlFlow("if (%sList != null)", fieldName)
-                            .beginControlFlow("for (%1$s %2$sItem : %2$sList)", genericType, fieldName)
-                                .emitStatement("Long cacheItemIndex%1$s = cache.get(%1$sItem)", fieldName)
-                                .beginControlFlow("if (cacheItemIndex%s == null)", fieldName)
-                                    .emitStatement("cacheItemIndex%1$s = %2$s.insertOrUpdate(realm, %1$sItem, cache)", fieldName, Utils.getProxyClassSimpleName(field))
-                                .endControlFlow()
-                                .emitStatement("LinkView.nativeAdd(%1$sNativeLinkViewPtr, cacheItemIndex%1$s)", fieldName)
-                            .endControlFlow()
+                        .beginControlFlow("for (%1$s %2$sItem : %2$sList)", genericType, fieldName)
+                        .emitStatement("Long cacheItemIndex%1$s = cache.get(%1$sItem)", fieldName)
+                        .beginControlFlow("if (cacheItemIndex%s == null)", fieldName)
+                        .emitStatement("cacheItemIndex%1$s = %2$s.insertOrUpdate(realm, %1$sItem, cache)", fieldName, Utils.getProxyClassSimpleName(field))
+                        .endControlFlow()
+                        .emitStatement("LinkView.nativeAdd(%1$sNativeLinkViewPtr, cacheItemIndex%1$s)", fieldName)
+                        .endControlFlow()
                         .endControlFlow()
                         .emitEmptyLine();
 

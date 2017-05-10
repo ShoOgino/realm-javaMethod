@@ -9,15 +9,13 @@
         // Adding a class is always permitted.
         checkEmpty(className, EMPTY_STRING_MSG);
 
-        String internalTableName = TABLE_PREFIX + className;
+        String internalTableName = Table.getTableNameForClass(className);
         if (internalTableName.length() > Table.TABLE_MAX_LENGTH) {
             throw new IllegalArgumentException("Class name is too long. Limit is 56 characters: " + className.length());
         }
         if (realm.getSharedRealm().hasTable(internalTableName)) {
             throw new IllegalArgumentException("Class already exists: " + className);
         }
-        Table table = realm.getSharedRealm().getTable(internalTableName);
-        StandardRealmObjectSchema.DynamicColumnMap columnIndices = new StandardRealmObjectSchema.DynamicColumnMap(table);
-        return new StandardRealmObjectSchema(realm, table, columnIndices);
+        return new StandardRealmObjectSchema(realm, this, realm.getSharedRealm().getTable(internalTableName));
     }
 

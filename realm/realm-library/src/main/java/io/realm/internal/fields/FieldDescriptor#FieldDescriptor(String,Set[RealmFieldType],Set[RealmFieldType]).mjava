@@ -1,0 +1,18 @@
+    /**
+     * @param fieldDescription fieldName or link path to a field name.
+     * @param validInternalColumnTypes valid internal link types.
+     * @param validFinalColumnTypes valid field types for the last field in a linked field
+     */
+    protected FieldDescriptor(
+            String fieldDescription, Set<RealmFieldType>
+            validInternalColumnTypes,
+            Set<RealmFieldType> validFinalColumnTypes) {
+        this.fields = parseFieldDescription(fieldDescription);
+        int nFields = fields.size();
+        if (nFields <= 0) {
+            throw new IllegalArgumentException("Invalid query: Empty field descriptor");
+        }
+        this.validInternalColumnTypes = validInternalColumnTypes;
+        this.validFinalColumnTypes = validFinalColumnTypes;
+    }
+

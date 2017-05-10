@@ -8,11 +8,9 @@
     public RealmObjectSchema get(String className) {
         checkEmpty(className, EMPTY_STRING_MSG);
 
-        String internalClassName = TABLE_PREFIX + className;
+        String internalClassName = Table.getTableNameForClass(className);
         if (!realm.getSharedRealm().hasTable(internalClassName)) { return null; }
-
         Table table = realm.getSharedRealm().getTable(internalClassName);
-        StandardRealmObjectSchema.DynamicColumnMap columnIndices = new StandardRealmObjectSchema.DynamicColumnMap(table);
-        return new StandardRealmObjectSchema(realm, table, columnIndices);
+        return new StandardRealmObjectSchema(realm, this, table);
     }
 

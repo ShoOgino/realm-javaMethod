@@ -5,13 +5,10 @@
      * @return {@link RealmQuery} object. After building the query call one of the {@code find*} methods
      * to run it.
      */
-
     @SuppressWarnings("unchecked")
     public static <E extends RealmModel> RealmQuery<E> createQueryFromResult(RealmResults<E> queryResults) {
-        if (queryResults.classSpec != null) {
-            return new RealmQuery<>(queryResults, queryResults.classSpec);
-        } else {
-            return new RealmQuery(queryResults, queryResults.className);
-        }
+        return (queryResults.classSpec == null)
+                ? new RealmQuery(queryResults, queryResults.className)
+                : new RealmQuery<>(queryResults, queryResults.classSpec);
     }
 

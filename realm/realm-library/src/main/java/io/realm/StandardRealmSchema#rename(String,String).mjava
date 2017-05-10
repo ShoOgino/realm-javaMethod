@@ -10,8 +10,8 @@
         realm.checkNotInSync(); // Destructive modifications are not permitted.
         checkEmpty(oldClassName, "Class names cannot be empty or null");
         checkEmpty(newClassName, "Class names cannot be empty or null");
-        String oldInternalName = TABLE_PREFIX + oldClassName;
-        String newInternalName = TABLE_PREFIX + newClassName;
+        String oldInternalName = Table.getTableNameForClass(oldClassName);
+        String newInternalName = Table.getTableNameForClass(newClassName);
         checkHasTable(oldClassName, "Cannot rename class because it doesn't exist in this Realm: " + oldClassName);
         if (realm.getSharedRealm().hasTable(newInternalName)) {
             throw new IllegalArgumentException(oldClassName + " cannot be renamed because the new class already exists: " + newClassName);
@@ -33,7 +33,6 @@
             table.setPrimaryKey(pkField);
         }
 
-        StandardRealmObjectSchema.DynamicColumnMap columnIndices = new StandardRealmObjectSchema.DynamicColumnMap(table);
-        return new StandardRealmObjectSchema(realm, table, columnIndices);
+        return new StandardRealmObjectSchema(realm, this, table);
     }
 

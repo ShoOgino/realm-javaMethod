@@ -1,0 +1,49 @@
+    @Test
+    public void copy_differentInstanceSameValues() {
+        final CatRealmProxy.CatColumnInfo columnInfo
+                = (CatRealmProxy.CatColumnInfo) mediator.validateTable(Cat.class, realm.sharedRealm, false);
+
+        columnInfo.nameIndex = 1;
+        columnInfo.ageIndex = 2;
+        columnInfo.heightIndex = 3;
+        columnInfo.weightIndex = 4;
+        columnInfo.hasTailIndex = 5;
+        columnInfo.birthdayIndex = 6;
+        columnInfo.ownerIndex = 7;
+        columnInfo.scaredOfDogIndex = 8;
+
+        CatRealmProxy.CatColumnInfo copy = (CatRealmProxy.CatColumnInfo) columnInfo.copy(true);
+
+        // verify that the copy is identical
+        assertNotSame(columnInfo, copy);
+        assertEquals(columnInfo.getIndicesMap(), copy.getIndicesMap());
+        assertEquals(columnInfo.nameIndex, copy.nameIndex);
+        assertEquals(columnInfo.ageIndex, copy.ageIndex);
+        assertEquals(columnInfo.heightIndex, copy.heightIndex);
+        assertEquals(columnInfo.weightIndex, copy.weightIndex);
+        assertEquals(columnInfo.hasTailIndex, copy.hasTailIndex);
+        assertEquals(columnInfo.birthdayIndex, copy.birthdayIndex);
+        assertEquals(columnInfo.ownerIndex, copy.ownerIndex);
+        assertEquals(columnInfo.scaredOfDogIndex, copy.scaredOfDogIndex);
+
+        // Modify original object
+        columnInfo.nameIndex = 0;
+        columnInfo.ageIndex = 0;
+        columnInfo.heightIndex = 0;
+        columnInfo.weightIndex = 0;
+        columnInfo.hasTailIndex = 0;
+        columnInfo.birthdayIndex = 0;
+        columnInfo.ownerIndex = 0;
+        columnInfo.scaredOfDogIndex = 0;
+
+        // the copy should not change
+        assertEquals(1, copy.nameIndex);
+        assertEquals(2, copy.ageIndex);
+        assertEquals(3, copy.heightIndex);
+        assertEquals(4, copy.weightIndex);
+        assertEquals(5, copy.hasTailIndex);
+        assertEquals(6, copy.birthdayIndex);
+        assertEquals(7, copy.ownerIndex);
+        assertEquals(8, copy.scaredOfDogIndex);
+    }
+

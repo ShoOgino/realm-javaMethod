@@ -6,20 +6,21 @@
             final VariableElement field,
             final String fieldName,
             String fieldTypeCanonicalName) throws IOException {
-        final String realmType = Constants.JAVA_TO_REALM_TYPES.get(fieldTypeCanonicalName);
+
+        final String fieldJavaType = getRealmTypeChecked(field).getJavaType();
 
         // Getter
         //@formatter:off
         writer.emitAnnotation("Override");
         writer.emitAnnotation("SuppressWarnings", "\"cast\"")
-            .beginMethod(fieldTypeCanonicalName, metadata.getInternalGetter(fieldName), EnumSet.of(Modifier.PUBLIC))
-            .emitStatement("proxyState.getRealm$realm().checkIfValid()");
+                .beginMethod(fieldTypeCanonicalName, metadata.getInternalGetter(fieldName), EnumSet.of(Modifier.PUBLIC))
+                .emitStatement("proxyState.getRealm$realm().checkIfValid()");
 
         // For String and bytes[], null value will be returned by JNI code. Try to save one JNI call here.
         if (metadata.isNullable(field) && !Utils.isString(field) && !Utils.isByteArray(field)) {
             writer.beginControlFlow("if (proxyState.getRow$realm().isNull(%s))", fieldIndexVariableReference(field))
-                .emitStatement("return null")
-                .endControlFlow();
+                    .emitStatement("return null")
+                    .endControlFlow();
         }
         //@formatter:on
 
@@ -33,7 +34,7 @@
         }
         writer.emitStatement(
                 "return (%s) proxyState.getRow$realm().get%s(%s)",
-                castingBackType, realmType, fieldIndexVariableReference(field));
+                castingBackType, fieldJavaType, fieldIndexVariableReference(field));
         writer.endMethod()
                 .emitEmptyLine();
 
@@ -49,20 +50,20 @@
                 //@formatter:off
                 if (metadata.isNullable(field)) {
                     writer.beginControlFlow("if (value == null)")
-                        .emitStatement("row.getTable().setNull(%s, row.getIndex(), true)",
-                            fieldIndexVariableReference(field))
-                        .emitStatement("return")
-                        .endControlFlow();
+                            .emitStatement("row.getTable().setNull(%s, row.getIndex(), true)",
+                                    fieldIndexVariableReference(field))
+                            .emitStatement("return")
+                            .endControlFlow();
                 } else if (!metadata.isNullable(field) && !Utils.isPrimitiveType(field)) {
                     writer.beginControlFlow("if (value == null)")
-                        .emitStatement(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName)
-                        .endControlFlow();
+                            .emitStatement(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName)
+                            .endControlFlow();
                 }
                 //@formatter:on
 
                 writer.emitStatement(
                         "row.getTable().set%s(%s, row.getIndex(), value, true)",
-                        realmType, fieldIndexVariableReference(field));
+                        fieldJavaType, fieldIndexVariableReference(field));
                 writer.emitStatement("return");
             }
         });
@@ -76,20 +77,20 @@
             //@formatter:off
             if (metadata.isNullable(field)) {
                 writer.beginControlFlow("if (value == null)")
-                    .emitStatement("proxyState.getRow$realm().setNull(%s)", fieldIndexVariableReference(field))
-                    .emitStatement("return")
-                    .endControlFlow();
+                        .emitStatement("proxyState.getRow$realm().setNull(%s)", fieldIndexVariableReference(field))
+                        .emitStatement("return")
+                        .endControlFlow();
             } else if (!metadata.isNullable(field) && !Utils.isPrimitiveType(field)) {
                 // Same reason, throw IAE earlier.
                 writer
-                    .beginControlFlow("if (value == null)")
-                    .emitStatement(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName)
-                    .endControlFlow();
+                        .beginControlFlow("if (value == null)")
+                        .emitStatement(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName)
+                        .endControlFlow();
             }
             //@formatter:on
             writer.emitStatement(
                     "proxyState.getRow$realm().set%s(%s, value)",
-                    realmType, fieldIndexVariableReference(field));
+                    fieldJavaType, fieldIndexVariableReference(field));
         }
         writer.endMethod();
     }

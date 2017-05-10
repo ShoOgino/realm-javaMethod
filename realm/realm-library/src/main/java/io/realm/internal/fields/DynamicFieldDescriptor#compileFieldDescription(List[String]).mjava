@@ -1,0 +1,37 @@
+    @Override
+    protected void compileFieldDescription(List<String> fields) {
+        final int nFields = fields.size();
+        long[] columnIndices = new long[nFields];
+        Table currentTable = table;
+
+        long columnIndex;
+        String tableName = null;
+        String columnName = null;
+        RealmFieldType columnType = null;
+        for (int i = 0; i < nFields; i++) {
+            columnName = fields.get(i);
+            if ((columnName == null) || (columnName.length() <= 0)) {
+                throw new IllegalArgumentException(
+                        "Invalid query: Field descriptor contains an empty field.  A field description may not begin with or contain adjacent periods ('.').");
+            }
+
+            tableName = currentTable.getClassName();
+
+            columnIndex = currentTable.getColumnIndex(columnName);
+            if (columnIndex < 0) {
+                throw new IllegalArgumentException(
+                        String.format("Invalid query: field '%s' not found in table '%s'.", columnName, tableName));
+            }
+
+            columnType = currentTable.getColumnType(columnIndex);
+            if (i < nFields - 1) {
+                verifyInternalColumnType(tableName, columnName, columnType);
+                currentTable = currentTable.getLinkTarget(columnIndex);
+            }
+
+            columnIndices[i] = columnIndex;
+        }
+
+        setCompilationResults(tableName, columnName, columnType, columnIndices, new long[nFields]);
+    }
+

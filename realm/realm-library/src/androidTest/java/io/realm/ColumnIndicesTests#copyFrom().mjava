@@ -15,10 +15,11 @@
         assertNotEquals(catColumnInfoInSource.nameIndex, catColumnInfoInTarget.nameIndex);
         assertNotSame(catColumnInfoInSource.getIndicesMap(), catColumnInfoInTarget.getIndicesMap());
 
-        target.copyFrom(source,  mediator);
+        target.copyFrom(source);
 
         assertEquals(sourceSchemaVersion, target.getSchemaVersion());
         assertEquals(catColumnInfoInSource.nameIndex, catColumnInfoInTarget.nameIndex);
-        assertSame(catColumnInfoInSource.getIndicesMap(), catColumnInfoInTarget.getIndicesMap());
+        // update, not replace
+        assertSame(catColumnInfoInTarget, target.getColumnInfo(Cat.class));
     }
 

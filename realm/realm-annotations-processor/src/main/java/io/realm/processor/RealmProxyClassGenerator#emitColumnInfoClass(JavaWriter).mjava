@@ -1,0 +1,69 @@
+    private void emitColumnInfoClass(JavaWriter writer) throws IOException {
+        writer.beginType(
+                columnInfoClassName(),                       // full qualified name of the item to generate
+                "class",                                     // the type of the item
+                EnumSet.of(Modifier.STATIC, Modifier.FINAL), // modifiers to apply
+                "ColumnInfo");                               // base class
+
+        // fields
+        for (VariableElement variableElement : metadata.getFields()) {
+            writer.emitField("long", columnIndexVarName(variableElement));
+        }
+        writer.emitEmptyLine();
+
+        // constructor #1
+        writer.beginConstructor(
+                EnumSet.noneOf(Modifier.class),
+                "SharedRealm", "realm", "Table", "table");
+        writer.emitStatement("super(%s)", metadata.getFields().size());
+        for (VariableElement field : metadata.getFields()) {
+            writer.emitStatement(
+                    "this.%1$sIndex = addColumnDetails(table, \"%1$s\", %2$s)",
+                    field.getSimpleName().toString(), getRealmTypeChecked(field).getRealmType());
+        }
+        for (Backlink backlink : metadata.getBacklinkFields()) {
+            writer.emitStatement(
+                    "addBacklinkDetails(realm, \"%1$s\", \"%2$s\", \"%3$s\")",
+                    backlink.getTargetField(), Utils.stripPackage(backlink.getSourceClass()), backlink.getSourceField());
+        }
+        writer.endConstructor()
+                .emitEmptyLine();
+
+        // constructor #2
+        writer.beginConstructor(
+                EnumSet.noneOf(Modifier.class),
+                "ColumnInfo", "src", "boolean", "mutable");
+        writer.emitStatement("super(src, mutable)")
+                .emitStatement("copy(src, this)");
+        writer.endConstructor()
+                .emitEmptyLine();
+
+        // no-args copy method
+        writer.emitAnnotation("Override")
+                .beginMethod(
+                        "ColumnInfo",                                   // return type
+                        "copy",                                         // method name
+                        EnumSet.of(Modifier.PROTECTED, Modifier.FINAL), // modifiers
+                        "boolean", "mutable");     // parameters
+        writer.emitStatement("return new %s(this, mutable)", columnInfoClassName());
+        writer.endMethod()
+                .emitEmptyLine();
+
+        // copy method
+        writer.emitAnnotation("Override")
+                .beginMethod(
+                        "void",                                          // return type
+                        "copy",                                          // method name
+                        EnumSet.of(Modifier.PROTECTED, Modifier.FINAL),  // modifiers
+                        "ColumnInfo", "rawSrc", "ColumnInfo", "rawDst"); // parameters
+        writer.emitStatement("final %1$s src = (%1$s) rawSrc", columnInfoClassName());
+        writer.emitStatement("final %1$s dst = (%1$s) rawDst", columnInfoClassName());
+        for (VariableElement variableElement : metadata.getFields()) {
+            writer.emitStatement("dst.%1$s = src.%1$s", columnIndexVarName(variableElement));
+        }
+        writer.endMethod();
+
+        writer.endType()
+                .emitEmptyLine();
+    }
+

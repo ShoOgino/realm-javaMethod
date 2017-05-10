@@ -1,0 +1,15 @@
+    private Constants.RealmFieldType getRealmType(VariableElement field) {
+        String fieldTypeCanonicalName = field.asType().toString();
+        Constants.RealmFieldType type = Constants.JAVA_TO_REALM_TYPES.get(fieldTypeCanonicalName);
+        if (type != null) {
+            return type;
+        }
+        if (Utils.isRealmModel(field)) {
+            return Constants.RealmFieldType.OBJECT;
+        }
+        if (Utils.isRealmList(field)) {
+            return Constants.RealmFieldType.LIST;
+        }
+        return Constants.RealmFieldType.NOTYPE;
+    }
+

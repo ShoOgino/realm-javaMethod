@@ -9,8 +9,8 @@
     public RealmQuery<E> greaterThan(String fieldName, Date value) {
         realm.checkIfValid();
 
-        long[] columnIndices = schema.getColumnIndices(fieldName, RealmFieldType.DATE);
-        this.query.greaterThan(columnIndices, value);
+        FieldDescriptor fd = schema.getColumnIndices(fieldName, RealmFieldType.DATE);
+        this.query.greaterThan(fd.getColumnIndices(), fd.getNativeTablePointers(), value);
         return this;
     }
 

@@ -1,0 +1,24 @@
+    private Set<RealmFieldType> getValidFieldTypes(Set<RealmFieldType> filter) {
+        Set<RealmFieldType> types = new HashSet<>();
+        for (RealmFieldType type : RealmFieldType.values()) {
+            if (!filter.contains(type)) {
+                switch (type) {
+                    case UNSUPPORTED_DATE:
+                    case UNSUPPORTED_TABLE:
+                    case UNSUPPORTED_MIXED:
+                    case LINKING_OBJECTS: // TODO: should be supported?s
+                        break;
+                    case LIST:
+                    case OBJECT:
+                        table.addColumnLink(type, type.name(), table);
+                        types.add(type);
+                        break;
+                    default:
+                        table.addColumn(type, type.name());
+                        types.add(type);
+                }
+            }
+        }
+        return types;
+    }
+

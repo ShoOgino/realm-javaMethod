@@ -1,0 +1,14 @@
+    /**
+     * Create an exact copy of the passed instance.
+     *
+     * @param src the instance to copy
+     * @param mutable false to make this instance effectively final
+     */
+    protected ColumnInfo(ColumnInfo src, boolean mutable) {
+        this((src == null) ? 0 : src.indicesMap.size(), mutable);
+        // ColumnDetails are immutable and may be re-used.
+        if (src != null) {
+            indicesMap.putAll(src.indicesMap);
+        }
+    }
+

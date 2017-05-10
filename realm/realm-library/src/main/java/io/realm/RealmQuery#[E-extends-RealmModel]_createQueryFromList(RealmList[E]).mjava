@@ -7,10 +7,8 @@
      */
     @SuppressWarnings("unchecked")
     public static <E extends RealmModel> RealmQuery<E> createQueryFromList(RealmList<E> list) {
-        if (list.clazz != null) {
-            return new RealmQuery(list.realm, list.view, list.clazz);
-        } else {
-            return new RealmQuery(list.realm, list.view, list.className);
-        }
+        return (list.clazz == null)
+                ? new RealmQuery(list.realm, list.view, list.className)
+                : new RealmQuery(list.realm, list.view, list.clazz);
     }
 

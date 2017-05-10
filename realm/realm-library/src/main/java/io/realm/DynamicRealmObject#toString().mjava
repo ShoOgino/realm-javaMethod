@@ -6,7 +6,7 @@
             return "Invalid object";
         }
 
-        final String className = Table.tableNameToClassName(proxyState.getRow$realm().getTable().getName());
+        final String className = proxyState.getRow$realm().getTable().getClassName();
         StringBuilder sb = new StringBuilder(className + " = [");
         String[] fields = getFieldNames();
         for (String field : fields) {
@@ -39,12 +39,11 @@
                 case OBJECT:
                     sb.append(proxyState.getRow$realm().isNullLink(columnIndex)
                             ? "null"
-                            : Table.tableNameToClassName(proxyState.getRow$realm().getTable().getLinkTarget(columnIndex).getName()));
+                            : proxyState.getRow$realm().getTable().getLinkTarget(columnIndex).getClassName());
                     break;
                 case LIST:
-                    final String tableName = proxyState.getRow$realm().getTable().getLinkTarget(columnIndex).getName();
-                    String targetType = Table.tableNameToClassName(tableName);
-                    sb.append(String.format("RealmList<%s>[%s]", targetType, proxyState.getRow$realm().getLinkList(columnIndex).size()));
+                    String targetClassName = proxyState.getRow$realm().getTable().getLinkTarget(columnIndex).getClassName();
+                    sb.append(String.format("RealmList<%s>[%s]", targetClassName, proxyState.getRow$realm().getLinkList(columnIndex).size()));
                     break;
                 case UNSUPPORTED_TABLE:
                 case UNSUPPORTED_MIXED:
@@ -52,9 +51,9 @@
                     sb.append("?");
                     break;
             }
-            sb.append("}, ");
+            sb.append("},");
         }
-        sb.replace(sb.length() - 2, sb.length(), "");
+        sb.replace(sb.length() - 1, sb.length(), "");
         sb.append("]");
         return sb.toString();
     }

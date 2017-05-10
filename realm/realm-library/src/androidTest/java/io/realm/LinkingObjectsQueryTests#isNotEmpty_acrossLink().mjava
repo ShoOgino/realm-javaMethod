@@ -1,0 +1,16 @@
+    @Test
+    public void isNotEmpty_acrossLink() {
+        createIsNotEmptyDataSet(realm);
+        for (RealmFieldType type : SUPPORTED_IS_NOT_EMPTY_TYPES) {
+            switch (type) {
+                case LINKING_OBJECTS:
+                    // tested in LinkingObjectsQueryTests;
+                    assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_LO_OBJECT).count());
+                    assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_LO_LIST).count());
+                    break;
+                default:
+                    // tested in RealmQueryTests
+            }
+        }
+    }
+

@@ -8,16 +8,16 @@
         );
 
         writer
-            .beginControlFlow("if (object instanceof RealmObjectProxy && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm().threadId != realm.threadId)")
+                .beginControlFlow("if (object instanceof RealmObjectProxy && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm().threadId != realm.threadId)")
                 .emitStatement("throw new IllegalArgumentException(\"Objects which belong to Realm instances in other" +
                         " threads cannot be copied into this Realm instance.\")")
-            .endControlFlow();
+                .endControlFlow();
 
         // If object is already in the Realm there is nothing to update
         writer
-            .beginControlFlow("if (object instanceof RealmObjectProxy && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm().getPath().equals(realm.getPath()))")
+                .beginControlFlow("if (object instanceof RealmObjectProxy && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy)object).realmGet$proxyState().getRealm$realm().getPath().equals(realm.getPath()))")
                 .emitStatement("return object")
-            .endControlFlow();
+                .endControlFlow();
 
         writer.emitStatement("final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get()");
 
@@ -26,74 +26,74 @@
                 .emitStatement("return (%s) cachedRealmObject", qualifiedClassName)
                 .nextControlFlow("else");
 
-            if (!metadata.hasPrimaryKey()) {
-                writer.emitStatement("return copy(realm, object, update, cache)");
-            } else {
-                writer
+        if (!metadata.hasPrimaryKey()) {
+            writer.emitStatement("return copy(realm, object, update, cache)");
+        } else {
+            writer
                     .emitStatement("%s realmObject = null", qualifiedClassName)
                     .emitStatement("boolean canUpdate = update")
                     .beginControlFlow("if (canUpdate)")
-                        .emitStatement("Table table = realm.getTable(%s.class)", qualifiedClassName)
-                        .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
+                    .emitStatement("Table table = realm.getTable(%s.class)", qualifiedClassName)
+                    .emitStatement("long pkColumnIndex = table.getPrimaryKey()");
 
-                String primaryKeyGetter = metadata.getPrimaryKeyGetter();
-                VariableElement primaryKeyElement = metadata.getPrimaryKey();
-                if (metadata.isNullable(primaryKeyElement)) {
-                    if (Utils.isString(primaryKeyElement)) {
-                        writer
+            String primaryKeyGetter = metadata.getPrimaryKeyGetter();
+            VariableElement primaryKeyElement = metadata.getPrimaryKey();
+            if (metadata.isNullable(primaryKeyElement)) {
+                if (Utils.isString(primaryKeyElement)) {
+                    writer
                             .emitStatement("String value = ((%s) object).%s()", interfaceName, primaryKeyGetter)
                             .emitStatement("long rowIndex = Table.NO_MATCH")
                             .beginControlFlow("if (value == null)")
-                                .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
+                            .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
                             .nextControlFlow("else")
-                                .emitStatement("rowIndex = table.findFirstString(pkColumnIndex, value)")
+                            .emitStatement("rowIndex = table.findFirstString(pkColumnIndex, value)")
                             .endControlFlow();
-                    } else {
-                        writer
+                } else {
+                    writer
                             .emitStatement("Number value = ((%s) object).%s()", interfaceName, primaryKeyGetter)
                             .emitStatement("long rowIndex = Table.NO_MATCH")
                             .beginControlFlow("if (value == null)")
-                                .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
+                            .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
                             .nextControlFlow("else")
-                                .emitStatement("rowIndex = table.findFirstLong(pkColumnIndex, value.longValue())")
+                            .emitStatement("rowIndex = table.findFirstLong(pkColumnIndex, value.longValue())")
                             .endControlFlow();
-                    }
-                } else {
-                    String pkType = Utils.isString(metadata.getPrimaryKey()) ? "String" : "Long";
-                    writer.emitStatement("long rowIndex = table.findFirst%s(pkColumnIndex, ((%s) object).%s())",
-                            pkType, interfaceName, primaryKeyGetter);
                 }
+            } else {
+                String pkType = Utils.isString(metadata.getPrimaryKey()) ? "String" : "Long";
+                writer.emitStatement("long rowIndex = table.findFirst%s(pkColumnIndex, ((%s) object).%s())",
+                        pkType, interfaceName, primaryKeyGetter);
+            }
 
-                writer
+            writer
                     .beginControlFlow("if (rowIndex != Table.NO_MATCH)")
-                        .beginControlFlow("try")
-                            .emitStatement("objectContext.set(realm, table.getUncheckedRow(rowIndex)," +
-                                    " realm.schema.getColumnInfo(%s.class)," +
-                                    " false, Collections.<String> emptyList())", qualifiedClassName)
-                            .emitStatement("realmObject = new %s()", qualifiedGeneratedClassName)
-                            .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
-                        .nextControlFlow("finally")
-                            .emitStatement("objectContext.clear()")
-                        .endControlFlow()
+                    .beginControlFlow("try")
+                    .emitStatement("objectContext.set(realm, table.getUncheckedRow(rowIndex)," +
+                            " realm.schema.getColumnInfo(%s.class)," +
+                            " false, Collections.<String> emptyList())", qualifiedClassName)
+                    .emitStatement("realmObject = new %s()", qualifiedGeneratedClassName)
+                    .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
+                    .nextControlFlow("finally")
+                    .emitStatement("objectContext.clear()")
+                    .endControlFlow()
 
                     .nextControlFlow("else")
-                        .emitStatement("canUpdate = false")
+                    .emitStatement("canUpdate = false")
                     .endControlFlow();
 
-                writer.endControlFlow();
+            writer.endControlFlow();
 
-                writer
+            writer
                     .emitEmptyLine()
                     .beginControlFlow("if (canUpdate)")
-                        .emitStatement("return update(realm, realmObject, object, cache)")
+                    .emitStatement("return update(realm, realmObject, object, cache)")
                     .nextControlFlow("else")
-                        .emitStatement("return copy(realm, object, update, cache)")
+                    .emitStatement("return copy(realm, object, update, cache)")
                     .endControlFlow();
-            }
+        }
 
         writer.endControlFlow();
         writer.endMethod()
-            .emitEmptyLine();
+                .emitEmptyLine();
     }
     //@formatter:on
 

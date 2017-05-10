@@ -1,0 +1,20 @@
+    /**
+     * Makes this ColumnInfo an exact copy of {@code src}.
+     *
+     * @param src The source for the copy.  This instance will be an exact copy of {@code src} after return.
+     * {@code src} must not be {@code null}.
+     * @throws IllegalArgumentException if {@code other} has different class than this.
+     */
+    public void copyFrom(ColumnInfo src) {
+        if (!mutable) {
+            throw new UnsupportedOperationException("Attempt to modify an immutable ColumnInfo");
+        }
+        if (null == src) {
+            throw new NullPointerException("Attempt to copy null ColumnInfo");
+        }
+
+        indicesMap.clear();
+        indicesMap.putAll(src.indicesMap);
+        copy(src, this);
+    }
+

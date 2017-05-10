@@ -23,39 +23,39 @@
         } else {
             String pkType = Utils.isString(metadata.getPrimaryKey()) ? "String" : "Long";
             writer
-                .emitStatement("%s obj = null", qualifiedClassName)
-                .beginControlFlow("if (update)")
+                    .emitStatement("%s obj = null", qualifiedClassName)
+                    .beginControlFlow("if (update)")
                     .emitStatement("Table table = realm.getTable(%s.class)", qualifiedClassName)
                     .emitStatement("long pkColumnIndex = table.getPrimaryKey()")
                     .emitStatement("long rowIndex = Table.NO_MATCH");
             if (metadata.isNullable(metadata.getPrimaryKey())) {
                 writer
-                    .beginControlFlow("if (json.isNull(\"%s\"))", metadata.getPrimaryKey().getSimpleName())
+                        .beginControlFlow("if (json.isNull(\"%s\"))", metadata.getPrimaryKey().getSimpleName())
                         .emitStatement("rowIndex = table.findFirstNull(pkColumnIndex)")
-                    .nextControlFlow("else")
+                        .nextControlFlow("else")
                         .emitStatement("rowIndex = table.findFirst%s(pkColumnIndex, json.get%s(\"%s\"))",
                                 pkType, pkType, metadata.getPrimaryKey().getSimpleName())
-                    .endControlFlow();
+                        .endControlFlow();
             } else {
                 writer
-                    .beginControlFlow("if (!json.isNull(\"%s\"))", metadata.getPrimaryKey().getSimpleName())
-                    .emitStatement("rowIndex = table.findFirst%s(pkColumnIndex, json.get%s(\"%s\"))",
-                            pkType, pkType, metadata.getPrimaryKey().getSimpleName())
-                    .endControlFlow();
+                        .beginControlFlow("if (!json.isNull(\"%s\"))", metadata.getPrimaryKey().getSimpleName())
+                        .emitStatement("rowIndex = table.findFirst%s(pkColumnIndex, json.get%s(\"%s\"))",
+                                pkType, pkType, metadata.getPrimaryKey().getSimpleName())
+                        .endControlFlow();
             }
             writer
                     .beginControlFlow("if (rowIndex != Table.NO_MATCH)")
-                        .emitStatement("final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get()")
-                        .beginControlFlow("try")
-                            .emitStatement("objectContext.set(realm, table.getUncheckedRow(rowIndex)," +
-                                    " realm.schema.getColumnInfo(%s.class)," +
-                                    " false, Collections.<String> emptyList())", qualifiedClassName)
-                            .emitStatement("obj = new %s()", qualifiedGeneratedClassName)
-                        .nextControlFlow("finally")
-                            .emitStatement("objectContext.clear()")
-                        .endControlFlow()
+                    .emitStatement("final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get()")
+                    .beginControlFlow("try")
+                    .emitStatement("objectContext.set(realm, table.getUncheckedRow(rowIndex)," +
+                            " realm.schema.getColumnInfo(%s.class)," +
+                            " false, Collections.<String> emptyList())", qualifiedClassName)
+                    .emitStatement("obj = new %s()", qualifiedGeneratedClassName)
+                    .nextControlFlow("finally")
+                    .emitStatement("objectContext.clear()")
                     .endControlFlow()
-                .endControlFlow();
+                    .endControlFlow()
+                    .endControlFlow();
 
             writer.beginControlFlow("if (obj == null)");
             buildExcludeFieldsList(writer, metadata.getFields());

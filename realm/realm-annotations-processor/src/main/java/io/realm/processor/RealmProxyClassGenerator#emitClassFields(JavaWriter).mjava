@@ -18,14 +18,14 @@
 
         //@formatter:off
         writer.emitField("List<String>", "FIELD_NAMES", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL))
-            .beginInitializer(true)
-            .emitStatement("List<String> fieldNames = new ArrayList<String>()");
+                .beginInitializer(true)
+                .emitStatement("List<String> fieldNames = new ArrayList<String>()");
         for (VariableElement field : metadata.getFields()) {
             writer.emitStatement("fieldNames.add(\"%s\")", field.getSimpleName().toString());
         }
         writer.emitStatement("FIELD_NAMES = Collections.unmodifiableList(fieldNames)")
-            .endInitializer()
-            .emitEmptyLine();
+                .endInitializer()
+                .emitEmptyLine();
         //@formatter:on
     }
 

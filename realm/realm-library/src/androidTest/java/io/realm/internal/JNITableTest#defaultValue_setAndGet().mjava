@@ -6,19 +6,19 @@
         //noinspection TryFinallyCanBeTryWithResources
         try {
             sharedRealm.beginTransaction();
-            final Table table = sharedRealm.getTable(Table.TABLE_PREFIX + "DefaultValueTest");
+            final Table table = sharedRealm.getTable(Table.getTableNameForClass("DefaultValueTest"));
             sharedRealm.commitTransaction();
 
             List<Pair<RealmFieldType, Object>> columnInfoList = Arrays.asList(
                     new Pair<RealmFieldType, Object>(RealmFieldType.STRING, "string value"),
                     new Pair<RealmFieldType, Object>(RealmFieldType.INTEGER, 100L),
                     new Pair<RealmFieldType, Object>(RealmFieldType.BOOLEAN, true),
-                    new Pair<RealmFieldType, Object>(RealmFieldType.BINARY, new byte[]{123}),
+                    new Pair<RealmFieldType, Object>(RealmFieldType.BINARY, new byte[] {123}),
                     new Pair<RealmFieldType, Object>(RealmFieldType.DATE, new Date(123456)),
-                    new Pair<RealmFieldType, Object>(RealmFieldType.FLOAT, 1.234f),
+                    new Pair<RealmFieldType, Object>(RealmFieldType.FLOAT, 1.234F),
                     new Pair<RealmFieldType, Object>(RealmFieldType.DOUBLE, Math.PI),
                     new Pair<RealmFieldType, Object>(RealmFieldType.OBJECT, 0L)
-                    // Currently, LIST does not support default value.
+                    // FIXME: Currently, LIST does not support default value.
                     // new Pair<RealmFieldType, Object>(RealmFieldType.LIST, )
             );
 

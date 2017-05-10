@@ -1,9 +1,9 @@
     @Test
     public void copyColumnInfoFrom_checkIndex() {
-        final RealmProxyMediator mediator = realm.getConfiguration().getSchemaMediator();
-        final CatRealmProxy.CatColumnInfo sourceColumnInfo, targetColumnInfo;
-        sourceColumnInfo = (CatRealmProxy.CatColumnInfo) mediator.validateTable(Cat.class, realm.sharedRealm, false);
-        targetColumnInfo = (CatRealmProxy.CatColumnInfo) mediator.validateTable(Cat.class, realm.sharedRealm, false);
+        CatRealmProxy.CatColumnInfo sourceColumnInfo
+                = (CatRealmProxy.CatColumnInfo) mediator.validateTable(Cat.class, realm.sharedRealm, false);
+        CatRealmProxy.CatColumnInfo targetColumnInfo
+                = (CatRealmProxy.CatColumnInfo) mediator.validateTable(Cat.class, realm.sharedRealm, false);
 
         // Checks precondition.
         assertNotSame(sourceColumnInfo, targetColumnInfo);
@@ -27,18 +27,15 @@
         targetColumnInfo.ownerIndex = 0;
         targetColumnInfo.scaredOfDogIndex = 0;
 
-        targetColumnInfo.copyColumnInfoFrom(sourceColumnInfo);
+        targetColumnInfo.copyFrom(sourceColumnInfo);
 
-        assertEquals(1, targetColumnInfo.nameIndex);
-        assertEquals(2, targetColumnInfo.ageIndex);
-        assertEquals(3, targetColumnInfo.heightIndex);
-        assertEquals(4, targetColumnInfo.weightIndex);
-        assertEquals(5, targetColumnInfo.hasTailIndex);
-        assertEquals(6, targetColumnInfo.birthdayIndex);
-        assertEquals(7, targetColumnInfo.ownerIndex);
-        assertEquals(8, targetColumnInfo.scaredOfDogIndex);
-
-        // Current implementation shares the indices map.
-        assertSame(sourceColumnInfo.getIndicesMap(), targetColumnInfo.getIndicesMap());
+        assertEquals(sourceColumnInfo.nameIndex, targetColumnInfo.nameIndex);
+        assertEquals(sourceColumnInfo.ageIndex, targetColumnInfo.ageIndex);
+        assertEquals(sourceColumnInfo.heightIndex, targetColumnInfo.heightIndex);
+        assertEquals(sourceColumnInfo.weightIndex, targetColumnInfo.weightIndex);
+        assertEquals(sourceColumnInfo.hasTailIndex, targetColumnInfo.hasTailIndex);
+        assertEquals(sourceColumnInfo.birthdayIndex, targetColumnInfo.birthdayIndex);
+        assertEquals(sourceColumnInfo.ownerIndex, targetColumnInfo.ownerIndex);
+        assertEquals(sourceColumnInfo.scaredOfDogIndex, targetColumnInfo.scaredOfDogIndex);
     }
 
