@@ -1,0 +1,40 @@
+    @Test
+    public void waitForInitialRemoteData_readOnlyTrue() {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+        SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
+
+        // 1. Copy a valid Realm to the server (and pray it does it within 10 seconds)
+        final SyncConfiguration configOld = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+                .schema(StringOnly.class)
+                .build();
+        Realm realm = Realm.getInstance(configOld);
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for (int i = 0; i < 10; i++) {
+                    realm.createObject(StringOnly.class).setChars("Foo" + i);
+                }
+            }
+        });
+        SystemClock.sleep(TimeUnit.SECONDS.toMillis(10));  // FIXME: Replace with Sync Progress Notifications once available.
+        realm.close();
+        user.logout();
+        Realm.deleteRealm(configOld);
+
+        // 2. Local state should now be completely reset. Open the Realm again with a new configuration which should
+        // download the uploaded changes (pray it managed to do so within the time frame).
+        user = SyncUser.login(SyncCredentials.usernamePassword(username, password, false), Constants.AUTH_URL);
+        final SyncConfiguration configNew = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+                .waitForInitialRemoteData()
+                .readOnly()
+                .schema(StringOnly.class)
+                .build();
+        assertFalse(configNew.realmExists());
+
+        realm = Realm.getInstance(configNew);
+        assertEquals(10, realm.where(StringOnly.class).count());
+        realm.close();
+        user.logout();
+    }
+

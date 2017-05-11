@@ -3,30 +3,34 @@
         // the Realm is initialized.
         boolean commitChanges = false;
         try {
-            realm.beginTransaction();
+            // We need to start a transaction no matter readOnly mode, because it acts as an interprocess lock.
+            // TODO: For proper inter-process support we also need to move e.g copying the asset file under an
+            // interprocess lock. This lock can obviously not be created by a Realm instance so we probably need
+            // to implement it in Object Store. When this happens, the `beginTransaction(true)` can be removed again.
+            realm.beginTransaction(true);
             long currentVersion = realm.getVersion();
             boolean unversioned = currentVersion == UNVERSIONED;
             commitChanges = unversioned;
 
             RealmConfiguration configuration = realm.getConfiguration();
+            RealmProxyMediator mediator = configuration.getSchemaMediator();
+            Set<Class<? extends RealmModel>> modelClasses = mediator.getModelClasses();
 
+            // Only allow creating the schema if not in read-only mode
             if (unversioned) {
+                if (configuration.isReadOnly()) {
+                    throw new IllegalArgumentException("Cannot create the Realm schema in a read-only file.");
+                }
                 realm.setVersion(configuration.getSchemaVersion());
-            }
-
-            final RealmProxyMediator mediator = configuration.getSchemaMediator();
-            final Set<Class<? extends RealmModel>> modelClasses = mediator.getModelClasses();
-
-            if (unversioned) {
                 // Create all of the tables.
                 for (Class<? extends RealmModel> modelClass : modelClasses) {
                     mediator.createRealmObjectSchema(modelClass, realm.getSchema());
                 }
             }
 
+            // Now that they have all been created, validate them.
             final Map<Class<? extends RealmModel>, ColumnInfo> columnInfoMap = new HashMap<>(modelClasses.size());
             for (Class<? extends RealmModel> modelClass : modelClasses) {
-                // Now that they have all been created, validate them.
                 columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm, false));
             }
 
@@ -34,11 +38,10 @@
                     (unversioned) ? configuration.getSchemaVersion() : currentVersion,
                     columnInfoMap);
 
-            if (unversioned) {
-                final Transaction transaction = configuration.getInitialDataTransaction();
-                if (transaction != null) {
-                    transaction.execute(realm);
-                }
+            // Finally add any initial data
+            final Transaction transaction = configuration.getInitialDataTransaction();
+            if (transaction != null && unversioned) {
+                transaction.execute(realm);
             }
         } catch (Exception e) {
             commitChanges = false;
@@ -46,7 +49,7 @@
         } finally {
             if (commitChanges) {
                 realm.commitTransaction();
-            } else {
+            } else if (realm.isInTransaction()) {
                 realm.cancelTransaction();
             }
         }

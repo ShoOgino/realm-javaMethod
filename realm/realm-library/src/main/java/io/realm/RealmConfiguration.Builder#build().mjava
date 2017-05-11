@@ -4,6 +4,20 @@
          * @return the created {@link RealmConfiguration}.
          */
         public RealmConfiguration build() {
+            // Check that readOnly() was applied to legal configuration. Right now it should only be allowed if
+            // an assetFile is configured
+            if (readOnly) {
+                if (initialDataTransaction != null) {
+                    throw new IllegalStateException("This Realm is marked as read-only. Read-only Realms cannot use initialData(Realm.Transaction).");
+                }
+                if (assetFilePath == null) {
+                    throw new IllegalStateException("Only Realms provided using 'assetFile(path)' can be marked read-only. No such Realm was provided.");
+                }
+                if (deleteRealmIfMigrationNeeded) {
+                    throw new IllegalStateException("'deleteRealmIfMigrationNeeded()' and read-only Realms cannot be combined");
+                }
+            }
+
             if (rxFactory == null && isRxJavaAvailable()) {
                 rxFactory = new RealmObservableFactory();
             }
@@ -19,7 +33,8 @@
                     durability,
                     createSchemaMediator(modules, debugSchema),
                     rxFactory,
-                    initialDataTransaction
+                    initialDataTransaction,
+                    readOnly
             );
         }
 

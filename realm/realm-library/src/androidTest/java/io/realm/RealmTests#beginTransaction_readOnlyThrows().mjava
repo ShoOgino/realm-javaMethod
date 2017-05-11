@@ -1,0 +1,19 @@
+    @Test
+    public void beginTransaction_readOnlyThrows() {
+        RealmConfiguration config = configFactory.createConfigurationBuilder()
+                .name("readonly.realm")
+                .schema(StringOnlyReadOnly.class)
+                .assetFile("readonly.realm")
+                .readOnly()
+                .build();
+        Realm realm = Realm.getInstance(config);
+        try {
+            realm.beginTransaction();
+            fail();
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().startsWith("Write transactions cannot be used "));
+        } finally {
+            realm.close();
+        }
+    }
+

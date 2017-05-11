@@ -1,0 +1,20 @@
+    @Test
+    public void readOnly_initialTransaction_throws() {
+        // Check assetFile(), then initialTransaction();
+        RealmConfiguration.Builder config = new RealmConfiguration.Builder()
+                .assetFile("foo")
+                .readOnly()
+                .initialData(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        // Do nothing
+                    }
+                });
+
+        try {
+            config.build();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+    }
+
