@@ -1,0 +1,22 @@
+    protected final void createIsEmptyDataSet(Realm realm) {
+        realm.beginTransaction();
+
+        AllJavaTypes emptyValues = new AllJavaTypes();
+        emptyValues.setFieldId(1);
+        emptyValues.setFieldString("");
+        emptyValues.setFieldBinary(new byte[0]);
+        emptyValues.setFieldObject(emptyValues);
+        emptyValues.setFieldList(new RealmList<AllJavaTypes>());
+        realm.copyToRealm(emptyValues);
+
+        AllJavaTypes nonEmpty = new AllJavaTypes();
+        nonEmpty.setFieldId(2);
+        nonEmpty.setFieldString("Foo");
+        nonEmpty.setFieldBinary(new byte[] {1, 2, 3});
+        nonEmpty.setFieldObject(nonEmpty);
+        nonEmpty.setFieldList(new RealmList<AllJavaTypes>(emptyValues));
+        realm.copyToRealmOrUpdate(nonEmpty);
+
+        realm.commitTransaction();
+    }
+

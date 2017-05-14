@@ -1,0 +1,17 @@
+    /**
+     * Parse the passed field description into its components.
+     * This must be standard across implementations and is, therefore, implemented in the base class.
+     *
+     * @param fieldDescription a field description.
+     * @return the parse tree: a list of column names
+     */
+    private List<String> parseFieldDescription(String fieldDescription) {
+        if (fieldDescription == null || fieldDescription.equals("")) {
+            throw new IllegalArgumentException("Invalid query: field name is empty");
+        }
+        if (fieldDescription.endsWith(".")) {
+            throw new IllegalArgumentException("Invalid query: field name must not end with a period ('.')");
+        }
+        return Arrays.asList(fieldDescription.split("\\."));
+    }
+

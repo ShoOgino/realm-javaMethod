@@ -1,0 +1,15 @@
+    /**
+     * Return a java array of native table pointers.  For most columns the table will be identified by
+     * the type of the column: no further information is needed.  In that case, this array will contain
+     * NativeObject.NULLPTR.  If, however, a column is a LinkingObjects column the <b>source</b> table
+     * cannot be inferred, so the returned array contains the native pointer to it.
+     *
+     * The return is an array because it will be, immediately, passed to native code
+     *
+     * @return an array of native table pointers.
+     */
+    public final long[] getNativeTablePointers() {
+        compileIfNecessary();
+        return Arrays.copyOf(nativeTablePointers, nativeTablePointers.length);
+    }
+

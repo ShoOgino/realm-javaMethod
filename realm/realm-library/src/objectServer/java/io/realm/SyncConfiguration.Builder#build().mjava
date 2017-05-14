@@ -9,6 +9,19 @@
                 throw new IllegalStateException("serverUrl() and user() are both required.");
             }
 
+            // Check that readOnly() was applied to legal configuration. Right now it should only be allowd if
+            // an assetFile is configured
+            if (readOnly) {
+                if (initialDataTransaction != null) {
+                    throw new IllegalStateException("This Realm is marked as read-only. " +
+                            "Read-only Realms cannot use initialData(Realm.Transaction).");
+                }
+                if (!waitForServerChanges) {
+                    throw new IllegalStateException("A read-only Realms must be provided by some source. " +
+                            "'waitForInitialRemoteData()' wasn't enabled which is currently the only supported source.");
+                }
+            }
+
             // Check if the user has an identifier, if not, it cannot use /~/.
             if (serverUrl.toString().contains("/~/") && user.getIdentity() == null) {
                 throw new IllegalStateException("The serverUrl contains a /~/, but the user does not have an identity." +
@@ -75,12 +88,14 @@
                     createSchemaMediator(modules, debugSchema),
                     rxFactory,
                     initialDataTransaction,
+                    readOnly,
 
                     // Sync Configuration specific
                     user,
                     resolvedServerUrl,
                     errorHandler,
-                    deleteRealmOnLogout
+                    deleteRealmOnLogout,
+                    waitForServerChanges
             );
         }
 

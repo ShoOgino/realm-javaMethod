@@ -1,9 +1,9 @@
     private RealmQuery<E> equalToWithoutThreadValidation(String fieldName, Integer value) {
-        long[] columnIndices = schema.getColumnIndices(fieldName, RealmFieldType.INTEGER);
+        FieldDescriptor fd = schema.getColumnIndices(fieldName, RealmFieldType.INTEGER);
         if (value == null) {
-            this.query.isNull(columnIndices);
+            this.query.isNull(fd.getColumnIndices(), fd.getNativeTablePointers());
         } else {
-            this.query.equalTo(columnIndices, value);
+            this.query.equalTo(fd.getColumnIndices(), fd.getNativeTablePointers(), value);
         }
         return this;
     }

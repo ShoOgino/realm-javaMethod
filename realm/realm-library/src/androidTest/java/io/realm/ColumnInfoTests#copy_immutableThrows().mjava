@@ -1,0 +1,13 @@
+    @Test
+    public void copy_immutableThrows() {
+        final CatRealmProxy.CatColumnInfo original
+                = (CatRealmProxy.CatColumnInfo) mediator.validateTable(Cat.class, realm.sharedRealm, false);
+
+        CatRealmProxy.CatColumnInfo copy = (CatRealmProxy.CatColumnInfo) original.copy(false);
+        try {
+            copy.copyFrom(original);
+            fail("Attempt to copy to an immutable ColumnInfo should throwS");
+        } catch (UnsupportedOperationException ignore) {
+        }
+    }
+

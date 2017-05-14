@@ -1,10 +1,9 @@
+    // Called from Realm Proxy classes
+    @SuppressLint("unused")
     static <T extends RealmModel> RealmResults<T> createBacklinkResults(BaseRealm realm, Row row, Class<T> srcTableType, String srcFieldName) {
-        if (!(row instanceof UncheckedRow)) {
-            throw new IllegalArgumentException("Row is " + row.getClass());
-        }
         UncheckedRow uncheckedRow = (UncheckedRow) row;
         Table srcTable = realm.getSchema().getTable(srcTableType);
-        return new RealmResults<T>(
+        return new RealmResults<>(
                 realm,
                 Collection.createBacklinksCollection(realm.sharedRealm, uncheckedRow, srcTable, srcFieldName),
                 srcTableType);

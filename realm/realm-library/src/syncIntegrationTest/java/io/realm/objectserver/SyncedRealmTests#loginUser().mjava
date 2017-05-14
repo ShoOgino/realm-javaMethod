@@ -1,0 +1,17 @@
+    // Login user on a worker thread, so this method can be used from both UI and non-ui threads.
+    @NonNull
+    private SyncUser loginUser() {
+        final CountDownLatch userReady = new CountDownLatch(1);
+        final AtomicReference<SyncUser> user = new AtomicReference<>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SyncCredentials credentials = SyncCredentials.usernamePassword(UUID.randomUUID().toString(), "password", true);
+                user.set(SyncUser.login(credentials, Constants.AUTH_URL));
+                userReady.countDown();
+            }
+        }).start();
+        TestHelper.awaitOrFail(userReady);
+        return user.get();
+    }
+

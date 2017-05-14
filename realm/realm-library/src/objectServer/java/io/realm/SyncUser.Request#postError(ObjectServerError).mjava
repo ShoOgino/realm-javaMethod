@@ -1,0 +1,17 @@
+        private void postError(final ObjectServerError error) {
+            boolean errorHandled = false;
+            if (callback != null) {
+                Runnable action = new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onError(error);
+                    }
+                };
+                errorHandled = handler.post(action);
+            }
+
+            if (!errorHandled) {
+                RealmLog.error(error, "An error was thrown, but could not be handled.");
+            }
+        }
+

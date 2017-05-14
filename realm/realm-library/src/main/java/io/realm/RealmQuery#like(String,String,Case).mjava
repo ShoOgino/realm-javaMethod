@@ -14,8 +14,8 @@
     public RealmQuery<E> like(String fieldName, String value, Case casing) {
         realm.checkIfValid();
 
-        long[] columnIndices = schema.getColumnIndices(fieldName, RealmFieldType.STRING);
-        this.query.like(columnIndices, value, casing);
+        FieldDescriptor fd = schema.getColumnIndices(fieldName, RealmFieldType.STRING);
+        this.query.like(fd.getColumnIndices(), fd.getNativeTablePointers(), value, casing);
         return this;
     }
 

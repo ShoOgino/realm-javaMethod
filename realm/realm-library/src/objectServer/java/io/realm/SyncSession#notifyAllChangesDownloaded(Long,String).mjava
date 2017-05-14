@@ -1,0 +1,13 @@
+    // This method will be called once all changes have been downloaded.
+    // This method might be called on another thread than the one that called `downloadAllServerChanges`.
+    // Be very careful with synchronized blocks.
+    // If the native listener was successfully registered, Object Store guarantees that this method will be called at
+    // least once, even if the session is closed.
+    @SuppressWarnings("unused")
+    private void notifyAllChangesDownloaded(Long errorcode, String errorMessage) {
+        WaitForServerChangesWrapper wrapper = waitingForServerChanges.get();
+        if (wrapper != null) {
+            wrapper.handleResult(errorcode, errorMessage);
+        }
+    }
+

@@ -42,7 +42,9 @@
                 RealmMigration realmMigration = (migration == null) ? configuration.getMigration() : migration;
                 DynamicRealm realm = null;
                 try {
-                    realm = DynamicRealm.getInstance(configuration);
+                    // Create a DynamicRealm WITHOUT putting it into a RealmCache to avoid recursive locks and call init
+                    // steps multiple times (copy asset file / initialData transaction).
+                    realm = DynamicRealm.createInstance(configuration);
                     realm.beginTransaction();
                     long currentVersion = realm.getVersion();
                     realmMigration.migrate(realm, currentVersion, configuration.getSchemaVersion());

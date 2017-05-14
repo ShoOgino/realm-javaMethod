@@ -1,0 +1,23 @@
+    private static RealmCache getCache(String realmPath, boolean createIfNotExist) {
+        RealmCache cacheToReturn = null;
+        synchronized (cachesList) {
+            Iterator<WeakReference<RealmCache>> it = cachesList.iterator();
+
+            while (it.hasNext()) {
+                RealmCache cache = it.next().get();
+                if (cache == null) {
+                    // Clear the entry if there is no one holding the RealmCache.
+                    it.remove();
+                } else if (cache.realmPath.equals(realmPath)) {
+                    cacheToReturn = cache;
+                }
+            }
+
+            if (cacheToReturn == null && createIfNotExist) {
+                cacheToReturn = new RealmCache(realmPath);
+                cachesList.add(new WeakReference<RealmCache>(cacheToReturn));
+            }
+        }
+        return cacheToReturn;
+    }
+

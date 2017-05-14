@@ -1,0 +1,15 @@
+    /**
+     * Create a copy of the passed ColumnIndices with the specified mutablity.
+     *
+     * @param other the ColumnIndices object to copy
+     * @param mutable if false the object is effectively final.
+     */
+    public ColumnIndices(ColumnIndices other, boolean mutable) {
+        this(other.schemaVersion, new HashMap<Class<? extends RealmModel>, ColumnInfo>(other.classes.size()), mutable);
+        for (Map.Entry<Class<? extends RealmModel>, ColumnInfo> entry : other.classes.entrySet()) {
+            ColumnInfo columnInfo = entry.getValue().copy(mutable);
+            this.classes.put(entry.getKey(), columnInfo);
+            this.classesByName.put(entry.getKey().getSimpleName(), columnInfo);
+        }
+    }
+

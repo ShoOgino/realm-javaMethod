@@ -10,13 +10,14 @@
         }
         if (classSchema == null) {
             Table table = getTable(clazz);
-            classSchema = new StandardRealmObjectSchema(realm, table, getColumnInfo(originalClass).getIndicesMap());
+            classSchema = new StandardRealmObjectSchema(realm, this, table, getColumnInfo(originalClass));
             classToSchema.put(originalClass, classSchema);
         }
         if (isProxyClass(originalClass, clazz)) {
             // 'clazz' is the proxy class for 'originalClass'.
             classToSchema.put(clazz, classSchema);
         }
+
         return classSchema;
     }
 

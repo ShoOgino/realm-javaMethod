@@ -1,6 +1,6 @@
     private RealmQuery<E> equalToWithoutThreadValidation(String fieldName, Date value) {
-        long[] columnIndices = schema.getColumnIndices(fieldName, RealmFieldType.DATE);
-        this.query.equalTo(columnIndices, value);
+        FieldDescriptor fd = schema.getColumnIndices(fieldName, RealmFieldType.DATE);
+        this.query.equalTo(fd.getColumnIndices(), fd.getNativeTablePointers(), value);
         return this;
     }
 

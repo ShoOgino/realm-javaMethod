@@ -1,23 +1,10 @@
     @Test
     public void getInstanceForSort_shouldThrowOnInvalidField() {
-        List<RealmFieldType> types = new ArrayList<RealmFieldType>();
-        for (RealmFieldType type : RealmFieldType.values()) {
-            if (!SortDescriptor.validFieldTypesForSort.contains(type) &&
-                    type != RealmFieldType.UNSUPPORTED_DATE &&
-                    type != RealmFieldType.UNSUPPORTED_TABLE&&
-                    type != RealmFieldType.UNSUPPORTED_MIXED) {
-                if (type == RealmFieldType.LIST || type == RealmFieldType.OBJECT) {
-                    table.addColumnLink(type, type.name(), table);
-                } else {
-                    table.addColumn(type, type.name());
-                }
-                types.add(type);
-            }
-        }
+        Set<RealmFieldType> types = getValidFieldTypes(SortDescriptor.SORT_VALID_FIELD_TYPES);
 
         for (RealmFieldType type : types) {
             try {
-                SortDescriptor.getInstanceForSort(table, type.name(), Sort.ASCENDING);
+                SortDescriptor.getInstanceForSort(null, table, type.name(), Sort.ASCENDING);
                 fail();
             } catch (IllegalArgumentException ignored) {
                 assertTrue(ignored.getMessage().contains("Sort is not supported"));

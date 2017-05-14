@@ -6,7 +6,7 @@
         String proxyClassName = Utils.getProxyClassName(simpleClassName);
         String otherObjectVarName = "a" + simpleClassName;
         writer.emitAnnotation("Override")
-            .beginMethod("boolean", "equals", EnumSet.of(Modifier.PUBLIC), "Object", "o")
+                .beginMethod("boolean", "equals", EnumSet.of(Modifier.PUBLIC), "Object", "o")
                 .emitStatement("if (this == o) return true")
                 .emitStatement("if (o == null || getClass() != o.getClass()) return false")
                 .emitStatement("%s %s = (%s)o", proxyClassName, otherObjectVarName, proxyClassName)  // FooRealmProxy aFoo = (FooRealmProxy)o
@@ -22,8 +22,8 @@
                 .emitStatement("if (proxyState.getRow$realm().getIndex() != %s.proxyState.getRow$realm().getIndex()) return false", otherObjectVarName)
                 .emitEmptyLine()
                 .emitStatement("return true")
-            .endMethod()
-            .emitEmptyLine();
+                .endMethod()
+                .emitEmptyLine();
     }
     //@formatter:on
 

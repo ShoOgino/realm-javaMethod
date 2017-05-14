@@ -11,7 +11,7 @@
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
         try {
             LinkView linkView = proxyState.getRow$realm().getLinkList(columnIndex);
-            String className = RealmSchema.getSchemaForTable(linkView.getTargetTable());
+            String className = linkView.getTargetTable().getClassName();
             return new RealmList<>(className, linkView, proxyState.getRealm$realm());
         } catch (IllegalArgumentException e) {
             checkFieldType(fieldName, columnIndex, RealmFieldType.LIST);

@@ -4,16 +4,15 @@
          * When opening the Realm for the first time, instead of creating an empty file,
          * the Realm file will be copied from the provided asset file and used instead.
          * <p>
-         * <p>This cannot be configured to clear and recreate schema by calling {@link #deleteRealmIfMigrationNeeded()}
-         * at the same time as doing so will delete the copied asset schema.
-         * <p>
+         * This cannot be combined with {@link #deleteRealmIfMigrationNeeded()} as doing so would just result in the
+         * copied file being deleted.
          * <p>
          * WARNING: This could potentially be a lengthy operation and should ideally be done on a background thread.
          *
          * @param assetFile path to the asset database file.
          * @throws IllegalStateException if this is configured to clear its schema by calling {@link #deleteRealmIfMigrationNeeded()}.
          */
-        public Builder assetFile(final String assetFile) {
+        public Builder assetFile(String assetFile) {
             if (TextUtils.isEmpty(assetFile)) {
                 throw new IllegalArgumentException("A non-empty asset file path must be provided");
             }
@@ -23,7 +22,6 @@
             if (this.deleteRealmIfMigrationNeeded) {
                 throw new IllegalStateException("Realm cannot use an asset file when previously configured to clear its schema in migration by calling deleteRealmIfMigrationNeeded().");
             }
-
             this.assetFilePath = assetFile;
 
             return this;

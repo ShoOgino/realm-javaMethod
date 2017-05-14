@@ -11,32 +11,41 @@
         // For each field generate corresponding table index constant
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
-            String fieldTypeCanonicalName = field.asType().toString();
             String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
 
-            if (Constants.JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
-                String nullableFlag = (metadata.isNullable(field) ? "!" : "") + "Property.REQUIRED";
-                String indexedFlag = (metadata.isIndexed(field) ? "" : "!") + "Property.INDEXED";
-                String primaryKeyFlag = (metadata.isPrimaryKey(field) ? "" : "!") + "Property.PRIMARY_KEY";
-                writer.emitStatement("realmObjectSchema.add(\"%s\", %s, %s, %s, %s)",
-                        fieldName,
-                        Constants.JAVA_TO_COLUMN_TYPES.get(fieldTypeCanonicalName),
-                        primaryKeyFlag,
-                        indexedFlag,
-                        nullableFlag);
-            } else if (Utils.isRealmModel(field)) {
-                writer.beginControlFlow("if (!realmSchema.contains(\"" + fieldTypeSimpleName + "\"))")
-                        .emitStatement("%s%s.createRealmObjectSchema(realmSchema)", fieldTypeSimpleName, Constants.PROXY_SUFFIX)
-                        .endControlFlow()
-                        .emitStatement("realmObjectSchema.add(\"%s\", RealmFieldType.OBJECT, realmSchema.get(\"%s\"))",
-                                fieldName, fieldTypeSimpleName);
-            } else if (Utils.isRealmList(field)) {
-                String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
-                writer.beginControlFlow("if (!realmSchema.contains(\"" + genericTypeSimpleName + "\"))")
-                        .emitStatement("%s%s.createRealmObjectSchema(realmSchema)", genericTypeSimpleName, Constants.PROXY_SUFFIX)
-                        .endControlFlow()
-                        .emitStatement("realmObjectSchema.add(\"%s\", RealmFieldType.LIST, realmSchema.get(\"%s\"))",
-                                fieldName, genericTypeSimpleName);
+            Constants.RealmFieldType fieldType = getRealmType(field);
+            switch (fieldType) {
+                case NOTYPE:
+                    // Perhaps this should fail quickly?
+                    break;
+
+                case OBJECT:
+                    writer.beginControlFlow("if (!realmSchema.contains(\"" + fieldTypeSimpleName + "\"))")
+                            .emitStatement("%s%s.createRealmObjectSchema(realmSchema)", fieldTypeSimpleName, Constants.PROXY_SUFFIX)
+                            .endControlFlow()
+                            .emitStatement("realmObjectSchema.add(\"%s\", RealmFieldType.OBJECT, realmSchema.get(\"%s\"))",
+                                    fieldName, fieldTypeSimpleName);
+                    break;
+
+                case LIST:
+                    String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
+                    writer.beginControlFlow("if (!realmSchema.contains(\"" + genericTypeSimpleName + "\"))")
+                            .emitStatement("%s%s.createRealmObjectSchema(realmSchema)", genericTypeSimpleName, Constants.PROXY_SUFFIX)
+                            .endControlFlow()
+                            .emitStatement("realmObjectSchema.add(\"%s\", RealmFieldType.LIST, realmSchema.get(\"%s\"))",
+                                    fieldName, genericTypeSimpleName);
+                    break;
+
+                default:
+                    String nullableFlag = (metadata.isNullable(field) ? "!" : "") + "Property.REQUIRED";
+                    String indexedFlag = (metadata.isIndexed(field) ? "" : "!") + "Property.INDEXED";
+                    String primaryKeyFlag = (metadata.isPrimaryKey(field) ? "" : "!") + "Property.PRIMARY_KEY";
+                    writer.emitStatement("realmObjectSchema.add(\"%s\", %s, %s, %s, %s)",
+                            fieldName,
+                            fieldType.getRealmType(),
+                            primaryKeyFlag,
+                            indexedFlag,
+                            nullableFlag);
             }
         }
         writer.emitStatement("return realmObjectSchema");

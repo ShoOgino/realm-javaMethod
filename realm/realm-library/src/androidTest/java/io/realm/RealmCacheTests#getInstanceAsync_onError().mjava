@@ -1,0 +1,21 @@
+    @Test
+    @RunTestInLooperThread
+    public void getInstanceAsync_onError() {
+        final RealmConfiguration configuration =
+                looperThread.createConfigurationBuilder()
+                .assetFile("NotExistingFile")
+                .build();
+        Realm.getInstanceAsync(configuration, new Realm.Callback() {
+            @Override
+            public void onSuccess(Realm realm) {
+                fail();
+            }
+
+            @Override
+            public void onError(Throwable exception) {
+                assertTrue(exception instanceof RealmFileException);
+                looperThread.testComplete();
+            }
+        });
+    }
+

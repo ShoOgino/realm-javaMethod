@@ -14,14 +14,15 @@
      * basic validation passes.  Backlink validation, however, should fail, seeking the
      * `BacklinksSource` table.
      */
+    @Ignore("Need to rebuild the test library")
     @Test
     public void migration_backlinkedSourceClassDoesntExist() throws IOException {
         final String realmName = "backlinks-missingSourceClass.realm";
 
         RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
-            .name(realmName)
-            .schema(BacklinksTarget.class)
-            .build();
+                .name(realmName)
+                .schema(BacklinksTarget.class)
+                .build();
 
         try {
             configFactory.copyRealmFromAssets(context, realmName, realmName);

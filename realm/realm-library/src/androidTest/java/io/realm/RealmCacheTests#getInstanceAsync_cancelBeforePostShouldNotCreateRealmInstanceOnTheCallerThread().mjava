@@ -1,0 +1,42 @@
+    // If the async task is canceled before the posted event to create Realm instance in caller thread, the event should
+    // just be ignored.
+    @Test
+    @RunTestInLooperThread
+    public void getInstanceAsync_cancelBeforePostShouldNotCreateRealmInstanceOnTheCallerThread() {
+        final AtomicReference<RealmAsyncTask> realmAsyncTasks = new AtomicReference<>();
+        final Runnable finishedRunnable = new Runnable() {
+            @Override
+            public void run() {
+                looperThread.testComplete();
+            }
+        };
+        final RealmConfiguration configuration = looperThread.createConfigurationBuilder()
+                .name("will_be_canceled")
+                .initialData(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        // The BG thread started to initial the first Realm instance. Post an event to the caller's
+                        // queue to cancel the task before the event to create the Realm instance in caller thread.
+                        looperThread.postRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                assertNotNull(realmAsyncTasks.get());
+                                realmAsyncTasks.get().cancel();
+                                // Wait the async task to be terminated.
+                                TestHelper.waitRealmThreadExecutorFinish();
+                                // Finish the test.
+                                looperThread.postRunnable(finishedRunnable);
+                            }
+                        });
+                    }
+                })
+                .build();
+
+        realmAsyncTasks.set(Realm.getInstanceAsync(configuration, new Realm.Callback() {
+            @Override
+            public void onSuccess(Realm realm) {
+                fail();
+            }
+        }));
+    }
+

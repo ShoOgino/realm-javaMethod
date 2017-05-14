@@ -9,8 +9,9 @@
     public RealmQuery<E> isEmpty(String fieldName) {
         realm.checkIfValid();
 
-        long[] columnIndices = schema.getColumnIndices(fieldName, RealmFieldType.STRING, RealmFieldType.BINARY, RealmFieldType.LIST);
-        this.query.isEmpty(columnIndices);
+        FieldDescriptor fd = schema.getColumnIndices(fieldName, RealmFieldType.STRING, RealmFieldType.BINARY, RealmFieldType.LIST, RealmFieldType.LINKING_OBJECTS);
+        this.query.isEmpty(fd.getColumnIndices(), fd.getNativeTablePointers());
+
         return this;
     }
 

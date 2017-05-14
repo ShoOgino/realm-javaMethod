@@ -1,0 +1,45 @@
+    /**
+     * Calling this method will block until all known remote changes have been downloaded and applied to the Realm.
+     * This will involve network access, so calling this method should only be done from a non-UI thread.
+     * <p>
+     * If the device is offline, this method might never return.
+     * <p>
+     * This method cannot be called before the session has been started.
+     *
+     * @throws IllegalStateException if called on the Android main thread.
+     * @throws InterruptedException if the thread was interrupted while downloading was in progress.
+     */
+    public void downloadAllServerChanges() throws InterruptedException {
+        checkIfNotOnMainThread("downloadAllServerChanges() cannot be called from the main thread.");
+
+        // Blocking only happens at the Java layer. To prevent deadlocking the underlying SyncSession we register
+        // an async listener there and let it callback to the Java Session when done. This feels icky at best, but
+        // since all operations on the SyncSession operate under a shared mutex, we would prevent all other actions on the
+        // session, including trying to stop it.
+        // In Java we cannot lock on the Session object either since it will prevent any attempt at modifying the
+        // lifecycle while it is in a waiting state. Thus we use a specialised mutex.
+        synchronized (waitForChangesMutex) {
+            if (!isClosed) {
+                WaitForServerChangesWrapper wrapper = new WaitForServerChangesWrapper();
+                waitingForServerChanges.set(wrapper);
+                boolean listenerRegistered = nativeWaitForDownloadCompletion(configuration.getPath());
+                if (!listenerRegistered) {
+                    waitingForServerChanges.set(null);
+                    throw new ObjectServerError(ErrorCode.UNKNOWN, "It was not possible to download all changes. Has the SyncClient been started?");
+                }
+                wrapper.waitForServerChanges();
+
+                // This might return after the session was closed. In that case, just ignore any result
+                try {
+                    if (!isClosed) {
+                        if (!wrapper.isSuccess()) {
+                            wrapper.throwExceptionIfNeeded();
+                        }
+                    }
+                } finally {
+                    waitingForServerChanges.set(null);
+                }
+            }
+        }
+    }
+

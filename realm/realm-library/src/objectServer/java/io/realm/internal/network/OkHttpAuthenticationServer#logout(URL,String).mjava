@@ -1,10 +1,6 @@
     private LogoutResponse logout(URL logoutUrl, String requestBody) throws Exception {
-        Request request = new Request.Builder()
-                .url(logoutUrl)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Accept", "application/json")
-                .post(RequestBody.create(JSON, requestBody))
-                .build();
+        RealmLog.debug("Network request (logout): " + logoutUrl);
+        Request request = newAuthRequest(logoutUrl).post(RequestBody.create(JSON, requestBody)).build();
         Call call = client.newCall(request);
         Response response = call.execute();
         return LogoutResponse.from(response);

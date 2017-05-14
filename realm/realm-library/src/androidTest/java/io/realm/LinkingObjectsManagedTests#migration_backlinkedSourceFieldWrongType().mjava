@@ -12,14 +12,15 @@
      * for `BacklinksWrongTypeTarget` should notice, though, that its `parents` field points to an object
      * of the wrong type, `Integer`, instead of `BacklinksWrongTypeSource`.
      */
+    @Ignore("Need to rebuild the test library")
     @Test
     public void migration_backlinkedSourceFieldWrongType() {
         final String realmName = "backlinks-sourceFieldWrongType.realm";
 
         RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
-            .name(realmName)
-            .modules(new BacklinksWrongTypeSourceModule(), new BacklinksWrongTypeTargetModule())
-            .build();
+                .name(realmName)
+                .modules(new BacklinksWrongTypeSourceModule(), new BacklinksWrongTypeTargetModule())
+                .build();
 
         try {
             configFactory.copyRealmFromAssets(context, realmName, realmName);

@@ -3,23 +3,22 @@
      */
     //@formatter:off
     private void emitRealmModel(
-        JavaWriter writer,
-        final VariableElement field,
-        String fieldName,
-        String fieldTypeCanonicalName) throws IOException
-    {
+            JavaWriter writer,
+            final VariableElement field,
+            String fieldName,
+            String fieldTypeCanonicalName) throws IOException {
 
         // Getter
         writer.emitAnnotation("Override");
         writer.beginMethod(fieldTypeCanonicalName, metadata.getInternalGetter(fieldName), EnumSet.of(Modifier.PUBLIC))
-            .emitStatement("proxyState.getRealm$realm().checkIfValid()")
-            .beginControlFlow("if (proxyState.getRow$realm().isNullLink(%s))", fieldIndexVariableReference(field))
+                .emitStatement("proxyState.getRealm$realm().checkIfValid()")
+                .beginControlFlow("if (proxyState.getRow$realm().isNullLink(%s))", fieldIndexVariableReference(field))
                 .emitStatement("return null")
-            .endControlFlow()
-            .emitStatement("return proxyState.getRealm$realm().get(%s.class, proxyState.getRow$realm().getLink(%s), false, Collections.<String>emptyList())",
-                fieldTypeCanonicalName, fieldIndexVariableReference(field))
-            .endMethod()
-            .emitEmptyLine();
+                .endControlFlow()
+                .emitStatement("return proxyState.getRealm$realm().get(%s.class, proxyState.getRow$realm().getLink(%s), false, Collections.<String>emptyList())",
+                        fieldTypeCanonicalName, fieldIndexVariableReference(field))
+                .endMethod()
+                .emitEmptyLine();
 
         // Setter
         writer.emitAnnotation("Override");
@@ -29,44 +28,44 @@
             public void emit(JavaWriter writer) throws IOException {
                 // check excludeFields
                 writer.beginControlFlow("if (proxyState.getExcludeFields$realm().contains(\"%1$s\"))",
-                    field.getSimpleName().toString())
-                    .emitStatement("return")
-                    .endControlFlow();
+                        field.getSimpleName().toString())
+                        .emitStatement("return")
+                        .endControlFlow();
                 writer.beginControlFlow("if (value != null && !RealmObject.isManaged(value))")
-                    .emitStatement("value = ((Realm) proxyState.getRealm$realm()).copyToRealm(value)")
-                    .endControlFlow();
+                        .emitStatement("value = ((Realm) proxyState.getRealm$realm()).copyToRealm(value)")
+                        .endControlFlow();
 
                 // set value as default value
                 writer.emitStatement("final Row row = proxyState.getRow$realm()");
                 writer.beginControlFlow("if (value == null)")
-                    .emitSingleLineComment("Table#nullifyLink() does not support default value. Just using Row.")
-                    .emitStatement("row.nullifyLink(%s)", fieldIndexVariableReference(field))
-                    .emitStatement("return")
-                    .endControlFlow();
+                        .emitSingleLineComment("Table#nullifyLink() does not support default value. Just using Row.")
+                        .emitStatement("row.nullifyLink(%s)", fieldIndexVariableReference(field))
+                        .emitStatement("return")
+                        .endControlFlow();
                 writer.beginControlFlow("if (!RealmObject.isValid(value))")
-                    .emitStatement("throw new IllegalArgumentException(\"'value' is not a valid managed object.\")")
-                    .endControlFlow();
+                        .emitStatement("throw new IllegalArgumentException(\"'value' is not a valid managed object.\")")
+                        .endControlFlow();
                 writer.beginControlFlow("if (((RealmObjectProxy) value).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm())")
-                    .emitStatement("throw new IllegalArgumentException(\"'value' belongs to a different Realm.\")")
-                    .endControlFlow();
+                        .emitStatement("throw new IllegalArgumentException(\"'value' belongs to a different Realm.\")")
+                        .endControlFlow();
                 writer.emitStatement("row.getTable().setLink(%s, row.getIndex(), ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getIndex(), true)",
-                    fieldIndexVariableReference(field));
+                        fieldIndexVariableReference(field));
                 writer.emitStatement("return");
             }
         });
         writer.emitStatement("proxyState.getRealm$realm().checkIfValid()")
-            .beginControlFlow("if (value == null)")
+                .beginControlFlow("if (value == null)")
                 .emitStatement("proxyState.getRow$realm().nullifyLink(%s)", fieldIndexVariableReference(field))
                 .emitStatement("return")
-            .endControlFlow()
-            .beginControlFlow("if (!(RealmObject.isManaged(value) && RealmObject.isValid(value)))")
+                .endControlFlow()
+                .beginControlFlow("if (!(RealmObject.isManaged(value) && RealmObject.isValid(value)))")
                 .emitStatement("throw new IllegalArgumentException(\"'value' is not a valid managed object.\")")
-            .endControlFlow()
-            .beginControlFlow("if (((RealmObjectProxy)value).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm())")
+                .endControlFlow()
+                .beginControlFlow("if (((RealmObjectProxy)value).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm())")
                 .emitStatement("throw new IllegalArgumentException(\"'value' belongs to a different Realm.\")")
-            .endControlFlow()
-            .emitStatement("proxyState.getRow$realm().setLink(%s, ((RealmObjectProxy)value).realmGet$proxyState().getRow$realm().getIndex())", fieldIndexVariableReference(field))
-            .endMethod();
+                .endControlFlow()
+                .emitStatement("proxyState.getRow$realm().setLink(%s, ((RealmObjectProxy)value).realmGet$proxyState().getRow$realm().getIndex())", fieldIndexVariableReference(field))
+                .endMethod();
     }
     //@formatter:on
 

@@ -1,0 +1,20 @@
+    @Test
+    public void isNull_unsupportedLinkedTypes() {
+        RealmQuery<NullTypes> result;
+
+        // Tests for other unsupported null types are in RealmQueryTests
+
+        try {
+            result = realm.where(NullTypes.class).isNull(NullTypes.FIELD_OBJECT_NULL + "." + NullTypes.FIELD_LO_OBJECT);
+            fail("isNull should throw on nested linked fields (LINKING_OBJECT => OBJECT)");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("Illegal Argument: LinkingObject from field fieldObjectNull is not nullable.", expected.getMessage());
+        }
+        try {
+            result = realm.where(NullTypes.class).isNull(NullTypes.FIELD_OBJECT_NULL + "." + NullTypes.FIELD_LO_LIST);
+            fail("isNull should throw on nested linked fields (LINKING_OBJECT => LIST)");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("Illegal Argument: LinkingObject from field fieldListNull is not nullable.", expected.getMessage());
+        }
+    }
+

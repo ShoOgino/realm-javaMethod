@@ -10,8 +10,8 @@
     public RealmQuery<E> contains(String fieldName, String value, Case casing) {
         realm.checkIfValid();
 
-        long[] columnIndices = schema.getColumnIndices(fieldName, RealmFieldType.STRING);
-        this.query.contains(columnIndices, value, casing);
+        FieldDescriptor fd = schema.getColumnIndices(fieldName, RealmFieldType.STRING);
+        this.query.contains(fd.getColumnIndices(), fd.getNativeTablePointers(), value, casing);
         return this;
     }
 

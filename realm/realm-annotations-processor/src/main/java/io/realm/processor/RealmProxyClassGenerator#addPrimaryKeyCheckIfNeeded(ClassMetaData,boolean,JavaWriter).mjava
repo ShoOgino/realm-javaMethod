@@ -6,22 +6,22 @@
                 //@formatter:off
                 if (Utils.isString(primaryKeyElement)) {
                     writer
-                        .emitStatement("String primaryKeyValue = ((%s) object).%s()", interfaceName, primaryKeyGetter)
-                        .emitStatement("long rowIndex = Table.NO_MATCH")
-                        .beginControlFlow("if (primaryKeyValue == null)")
-                        .emitStatement("rowIndex = Table.nativeFindFirstNull(tableNativePtr, pkColumnIndex)")
-                        .nextControlFlow("else")
-                        .emitStatement("rowIndex = Table.nativeFindFirstString(tableNativePtr, pkColumnIndex, primaryKeyValue)")
-                        .endControlFlow();
+                            .emitStatement("String primaryKeyValue = ((%s) object).%s()", interfaceName, primaryKeyGetter)
+                            .emitStatement("long rowIndex = Table.NO_MATCH")
+                            .beginControlFlow("if (primaryKeyValue == null)")
+                            .emitStatement("rowIndex = Table.nativeFindFirstNull(tableNativePtr, pkColumnIndex)")
+                            .nextControlFlow("else")
+                            .emitStatement("rowIndex = Table.nativeFindFirstString(tableNativePtr, pkColumnIndex, primaryKeyValue)")
+                            .endControlFlow();
                 } else {
                     writer
-                        .emitStatement("Object primaryKeyValue = ((%s) object).%s()", interfaceName, primaryKeyGetter)
-                        .emitStatement("long rowIndex = Table.NO_MATCH")
-                        .beginControlFlow("if (primaryKeyValue == null)")
-                        .emitStatement("rowIndex = Table.nativeFindFirstNull(tableNativePtr, pkColumnIndex)")
-                        .nextControlFlow("else")
-                        .emitStatement("rowIndex = Table.nativeFindFirstInt(tableNativePtr, pkColumnIndex, ((%s) object).%s())", interfaceName, primaryKeyGetter)
-                        .endControlFlow();
+                            .emitStatement("Object primaryKeyValue = ((%s) object).%s()", interfaceName, primaryKeyGetter)
+                            .emitStatement("long rowIndex = Table.NO_MATCH")
+                            .beginControlFlow("if (primaryKeyValue == null)")
+                            .emitStatement("rowIndex = Table.nativeFindFirstNull(tableNativePtr, pkColumnIndex)")
+                            .nextControlFlow("else")
+                            .emitStatement("rowIndex = Table.nativeFindFirstInt(tableNativePtr, pkColumnIndex, ((%s) object).%s())", interfaceName, primaryKeyGetter)
+                            .endControlFlow();
                 }
                 //@formatter:on
             } else {

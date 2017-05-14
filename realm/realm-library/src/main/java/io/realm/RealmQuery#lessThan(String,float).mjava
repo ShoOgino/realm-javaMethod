@@ -9,8 +9,8 @@
     public RealmQuery<E> lessThan(String fieldName, float value) {
         realm.checkIfValid();
 
-        long[] columnIndices = schema.getColumnIndices(fieldName, RealmFieldType.FLOAT);
-        this.query.lessThan(columnIndices, value);
+        FieldDescriptor fd = schema.getColumnIndices(fieldName, RealmFieldType.FLOAT);
+        this.query.lessThan(fd.getColumnIndices(), fd.getNativeTablePointers(), value);
         return this;
     }
 

@@ -1,12 +1,12 @@
     @Test
     public void getInstanceForSort() {
-        for (RealmFieldType type : SortDescriptor.validFieldTypesForSort) {
+        for (RealmFieldType type : SortDescriptor.SORT_VALID_FIELD_TYPES) {
             table.addColumn(type, type.name());
         }
 
         long i = 0;
-        for (RealmFieldType type : SortDescriptor.validFieldTypesForSort) {
-            SortDescriptor sortDescriptor = SortDescriptor.getInstanceForSort(table, type.name(), Sort.DESCENDING);
+        for (RealmFieldType type : SortDescriptor.SORT_VALID_FIELD_TYPES) {
+            SortDescriptor sortDescriptor = SortDescriptor.getInstanceForSort(null, table, type.name(), Sort.DESCENDING);
             assertEquals(1, sortDescriptor.getColumnIndices()[0].length);
             assertEquals(i, sortDescriptor.getColumnIndices()[0][0]);
             assertFalse(sortDescriptor.getAscendings()[0]);
