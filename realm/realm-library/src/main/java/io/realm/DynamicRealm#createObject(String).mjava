@@ -13,7 +13,7 @@
             throw new RealmException(String.format("'%s' has a primary key, use" +
                     " 'createObject(String, Object)' instead.", className));
         }
-        long rowIndex = table.addEmptyRow();
-        return get(DynamicRealmObject.class, className, rowIndex);
+
+        return new DynamicRealmObject(this, CheckedRow.getFromRow(OsObject.create(sharedRealm, table)));
     }
 

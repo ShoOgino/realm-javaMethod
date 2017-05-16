@@ -18,7 +18,10 @@
             boolean acceptDefaultValue,
             List<String> excludeFields) {
         Table table = schema.getTable(clazz);
-        long rowIndex = table.addEmptyRowWithPrimaryKey(primaryKeyValue);
-        return get(clazz, rowIndex, acceptDefaultValue, excludeFields);
+
+        return configuration.getSchemaMediator().newInstance(clazz, this,
+                OsObject.createWithPrimaryKey(sharedRealm, table, primaryKeyValue),
+                schema.getColumnInfo(clazz),
+                acceptDefaultValue, excludeFields);
     }
 
