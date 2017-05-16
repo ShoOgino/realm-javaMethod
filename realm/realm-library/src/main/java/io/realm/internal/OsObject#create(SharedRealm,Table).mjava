@@ -1,0 +1,11 @@
+    // TODO: consider to return a OsObject instead when integrating with Object Store's object accessor.
+    /**
+     * Create an object in the given table which doesn't have a primary key column defined.
+     *
+     * @return a newly created {@code UncheckedRow}.
+     */
+    public static UncheckedRow create(SharedRealm sharedRealm, Table table) {
+        return new UncheckedRow(sharedRealm.context, table,
+                nativeCreateNewObject(sharedRealm.getNativePtr(), table.getNativePtr()));
+    }
+

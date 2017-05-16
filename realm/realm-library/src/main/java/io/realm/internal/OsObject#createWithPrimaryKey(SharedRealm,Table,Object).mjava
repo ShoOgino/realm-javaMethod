@@ -1,0 +1,29 @@
+    // TODO: consider to return a OsObject instead when integrating with Object Store's object accessor.
+    /**
+     * Create an object in the given table which has a primary key column defined, and set the primary key with given
+     * value.
+     *
+     * @return a newly created {@code UncheckedRow}.
+     */
+    public static UncheckedRow createWithPrimaryKey(SharedRealm sharedRealm, Table table, Object primaryKeyValue) {
+        long primaryKeyColumnIndex = getAndVerifyPrimaryKeyColumnIndex(table);
+        RealmFieldType type = table.getColumnType(primaryKeyColumnIndex);
+
+        if (type == RealmFieldType.STRING) {
+            if (primaryKeyValue != null && !(primaryKeyValue instanceof String)) {
+                throw new IllegalArgumentException("Primary key value is not a String: " + primaryKeyValue);
+            }
+            return new UncheckedRow(sharedRealm.context, table,
+                    nativeCreateNewObjectWithStringPrimaryKey(sharedRealm.getNativePtr(), table.getNativePtr(),
+                            primaryKeyColumnIndex, (String) primaryKeyValue));
+
+        } else if (type == RealmFieldType.INTEGER) {
+            long value = primaryKeyValue == null ? 0 : Long.parseLong(primaryKeyValue.toString());
+            return new UncheckedRow(sharedRealm.context, table,
+                    nativeCreateNewObjectWithLongPrimaryKey(sharedRealm.getNativePtr(), table.getNativePtr(),
+                            primaryKeyColumnIndex, value, primaryKeyValue == null));
+        } else {
+            throw new RealmException("Cannot check for duplicate rows for unsupported primary key type: " + type);
+        }
+    }
+
