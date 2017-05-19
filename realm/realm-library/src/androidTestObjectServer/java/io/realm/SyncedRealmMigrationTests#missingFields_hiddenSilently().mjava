@@ -1,0 +1,32 @@
+    // Check that the Realm can still be opened even if the ondisk schema has more fields than in the model class.
+    // The underlying field should not be deleted, just hidden.
+    @Test
+    public void missingFields_hiddenSilently() {
+        SyncConfiguration config = configFactory.createSyncConfigurationBuilder(SyncTestUtils.createTestUser(), "http://foo.com/auth")
+                .schema(StringOnly.class)
+                .build();
+
+        // Setup initial Realm schema (with too many fields)
+        String className = StringOnly.class.getSimpleName();
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(config);
+        RealmSchema schema = dynamicRealm.getSchema();
+        dynamicRealm.beginTransaction();
+        schema.create(className)
+                .addField(StringOnly.FIELD_CHARS, String.class)
+                .addField("newField", String.class);
+        dynamicRealm.commitTransaction();
+        dynamicRealm.close();
+
+        // Open typed Realm, which will validate the schema
+        Realm realm = Realm.getInstance(config);
+        RealmObjectSchema stringOnlySchema = realm.getSchema().get(className);
+        try {
+            assertTrue(stringOnlySchema.hasField(StringOnly.FIELD_CHARS));
+            // TODO Field is currently hidden, but should the field be visible in the schema
+            assertFalse(stringOnlySchema.hasField("newField"));
+            assertEquals(1, stringOnlySchema.getFieldNames().size());
+        } finally {
+            realm.close();
+        }
+    }
+

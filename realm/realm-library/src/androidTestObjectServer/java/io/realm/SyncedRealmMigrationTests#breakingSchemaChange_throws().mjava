@@ -1,0 +1,24 @@
+    // Check that a Realm cannot be opened if it contain breaking schema changes, like changing a primary key
+    @Test
+    public void breakingSchemaChange_throws() {
+        SyncConfiguration config = configFactory.createSyncConfigurationBuilder(SyncTestUtils.createTestUser(), "http://foo.com/auth")
+                .schema(PrimaryKeyAsString.class)
+                .build();
+
+        // Setup initial Realm schema (with a different primary key)
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(config);
+        RealmSchema schema = dynamicRealm.getSchema();
+        dynamicRealm.beginTransaction();
+        schema.create(PrimaryKeyAsString.class.getSimpleName())
+                .addField(PrimaryKeyAsString.FIELD_PRIMARY_KEY, String.class)
+                .addField(PrimaryKeyAsString.FIELD_ID, long.class, FieldAttribute.PRIMARY_KEY);
+        dynamicRealm.commitTransaction();
+        dynamicRealm.close();
+
+        try {
+            Realm.getInstance(config);
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+    }
+
