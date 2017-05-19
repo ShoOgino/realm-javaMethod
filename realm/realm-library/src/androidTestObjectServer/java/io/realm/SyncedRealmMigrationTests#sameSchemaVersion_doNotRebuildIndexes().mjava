@@ -1,0 +1,37 @@
+    // Check that indexes are not being added if the schema version is the same
+    @Test
+    public void sameSchemaVersion_doNotRebuildIndexes() {
+
+        SyncConfiguration config = configFactory.createSyncConfigurationBuilder(SyncTestUtils.createTestUser(), "http://foo.com/auth")
+                .schema(IndexedFields.class)
+                .schemaVersion(42)
+                .build();
+
+        // Setup initial Realm schema (with no indexes)
+        String className = IndexedFields.class.getSimpleName();
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(config);
+        RealmSchema schema = dynamicRealm.getSchema();
+        dynamicRealm.beginTransaction();
+        schema.create(className)
+                .addField(IndexedFields.FIELD_INDEXED_STRING, String.class) // No index
+                .addField(IndexedFields.FIELD_NON_INDEXED_STRING, String.class);
+        dynamicRealm.setVersion(42);
+        dynamicRealm.commitTransaction();
+        dynamicRealm.close();
+
+        try {
+            Realm realm = Realm.getInstance(config); // Opening at same schema version (42) will not rebuild indexes
+            fail();
+        } catch (RealmMigrationNeededException ignored) {
+        }
+
+// FIXME: This is the intended behaviour
+//        RealmObjectSchema indexedFieldsSchema = realm.getSchema().get(className);
+//        try {
+//            assertFalse(indexedFieldsSchema.hasIndex(IndexedFields.FIELD_INDEXED_STRING));
+//            assertFalse(indexedFieldsSchema.hasIndex(IndexedFields.FIELD_NON_INDEXED_STRING));
+//        } finally {
+//            realm.close();
+//        }
+    }
+
