@@ -1,0 +1,19 @@
+    @Test
+    public void combining_trustedRootCA_and_withoutSSLVerification_willThrow() {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+        SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
+
+        TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
+        RealmLog.add(testLogger);
+        RealmLog.setLevel(LogLevel.WARN);
+
+        configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
+                .schema(StringOnly.class)
+                .trustedRootCA("trusted_ca.pem")
+                .disableSSLVerification()
+                .build();
+
+        assertEquals("SSL Verification is disable, server certificate provided will not be used", testLogger.message);
+    }
+
