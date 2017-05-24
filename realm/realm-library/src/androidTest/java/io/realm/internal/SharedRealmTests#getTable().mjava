@@ -2,11 +2,11 @@
     public void getTable() {
         assertFalse(sharedRealm.hasTable("MyTable"));
         sharedRealm.beginTransaction();
-        sharedRealm.getTable("MyTable");
+        sharedRealm.createTable("MyTable");
         sharedRealm.commitTransaction();
         assertTrue(sharedRealm.hasTable("MyTable"));
 
         // Table is existing, no need transaction to create it
-        sharedRealm.getTable("MyTable");
+        assertTrue(sharedRealm.getTable("MyTable").isValid());
     }
 
