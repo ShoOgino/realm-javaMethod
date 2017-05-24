@@ -1,14 +1,14 @@
     @Override
-    public String[] getUserAndServerUrl(RealmConfiguration config) {
+    public Object[] getUserAndServerUrl(RealmConfiguration config) {
         if (config instanceof SyncConfiguration) {
             SyncConfiguration syncConfig = (SyncConfiguration) config;
             String rosServerUrl = syncConfig.getServerUrl().toString();
             String rosUserIdentity = syncConfig.getUser().getIdentity();
             String syncRealmAuthUrl = syncConfig.getUser().getAuthenticationUrl().toString();
             String rosRefreshToken = syncConfig.getUser().getAccessToken().value();
-            return new String[]{rosUserIdentity, rosServerUrl, syncRealmAuthUrl, rosRefreshToken};
+            return new Object[]{rosUserIdentity, rosServerUrl, syncRealmAuthUrl, rosRefreshToken, syncConfig.syncClientValidateSsl(), syncConfig.getServerCertificateFilePath()};
         } else {
-            return new String[4];
+            return new Object[6];
         }
     }
 

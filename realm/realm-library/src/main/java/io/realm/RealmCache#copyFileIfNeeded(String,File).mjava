@@ -1,0 +1,50 @@
+    private static void copyFileIfNeeded(String assetFileName, File file) {
+        if (file.exists()) {
+            return;
+        }
+
+        IOException exceptionWhenClose = null;
+        InputStream inputStream = null;
+        FileOutputStream outputStream = null;
+        try {
+            inputStream = BaseRealm.applicationContext.getAssets().open(assetFileName);
+            if (inputStream == null) {
+                throw new RealmFileException(RealmFileException.Kind.ACCESS_ERROR,
+                        "Invalid input stream to the asset file: " + assetFileName);
+            }
+
+            outputStream = new FileOutputStream(file);
+            byte[] buf = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buf)) > -1) {
+                outputStream.write(buf, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            throw new RealmFileException(RealmFileException.Kind.ACCESS_ERROR,
+                    "Could not resolve the path to the asset file: " + assetFileName, e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    exceptionWhenClose = e;
+                }
+            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    // Ignores this one if there was an exception when close inputStream.
+                    if (exceptionWhenClose == null) {
+                        exceptionWhenClose = e;
+                    }
+                }
+            }
+        }
+
+        // No other exception has been thrown, only the exception when close. So, throw it.
+        if (exceptionWhenClose != null) {
+            throw new RealmFileException(RealmFileException.Kind.ACCESS_ERROR, exceptionWhenClose);
+        }
+    }
+
