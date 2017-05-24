@@ -4,7 +4,7 @@
     public void migratePrimaryKeyTableIfNeeded_primaryKeyTableNeedSearchIndex() {
         sharedRealm = SharedRealm.getInstance(config);
         sharedRealm.beginTransaction();
-        Table table = sharedRealm.getTable("TestTable");
+        Table table = sharedRealm.createTable("TestTable");
         long column = table.addColumn(RealmFieldType.INTEGER, "PKColumn");
         table.addSearchIndex(column);
         table.setPrimaryKey(column);
@@ -19,7 +19,7 @@
         pkTable.removeSearchIndex(classColumn);
 
         // Tries to add a pk for another table.
-        Table table2 = sharedRealm.getTable("TestTable2");
+        Table table2 = sharedRealm.createTable("TestTable2");
         long column2 = table2.addColumn(RealmFieldType.INTEGER, "PKColumn");
         table2.addSearchIndex(column2);
         try {
