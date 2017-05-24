@@ -1,0 +1,20 @@
+    /**
+     * Create a mutable ColumnIndices initialized with the ColumnInfo objects in the passed map.
+     *
+     * @param schemaVersion the schema version
+     * @param classesMap a map of table classes to their column info
+     * @throws IllegalArgumentException if any of the ColumnInfo object is immutable.
+     */
+    public ColumnIndices(long schemaVersion, Map<Pair<Class<? extends RealmModel>, String>, ColumnInfo> classesMap) {
+        this(schemaVersion, new HashMap<>(classesMap), true);
+        for (Map.Entry<Pair<Class<? extends RealmModel>, String>, ColumnInfo> entry : classesMap.entrySet()) {
+            ColumnInfo columnInfo = entry.getValue();
+            if (mutable != columnInfo.isMutable()) {
+                throw new IllegalArgumentException("ColumnInfo mutability does not match ColumnIndices");
+            }
+            Pair<Class<? extends RealmModel>, String> classDescription = entry.getKey();
+            this.classes.put(classDescription.first, columnInfo);
+            this.classesByName.put(classDescription.second, columnInfo);
+        }
+    }
+

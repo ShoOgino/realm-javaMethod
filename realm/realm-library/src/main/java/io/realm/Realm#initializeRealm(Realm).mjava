@@ -29,9 +29,11 @@
             }
 
             // Now that they have all been created, validate them.
-            final Map<Class<? extends RealmModel>, ColumnInfo> columnInfoMap = new HashMap<>(modelClasses.size());
+            final Map<Pair<Class<? extends RealmModel>, String>, ColumnInfo> columnInfoMap = new HashMap<>(modelClasses.size());
             for (Class<? extends RealmModel> modelClass : modelClasses) {
-                columnInfoMap.put(modelClass, mediator.validateTable(modelClass, realm.sharedRealm, false));
+                String className = Table.getClassNameForTable(mediator.getTableName(modelClass));
+                Pair<Class<? extends RealmModel>, String> key = Pair.<Class<? extends RealmModel>, String>create(modelClass, className);
+                columnInfoMap.put(key, mediator.validateTable(modelClass, realm.sharedRealm, false));
             }
 
             realm.getSchema().setInitialColumnIndices(
