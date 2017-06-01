@@ -3,6 +3,8 @@
      * fail until a new default configuration has been set using {@link #setDefaultConfiguration(RealmConfiguration)}.
      */
     public static void removeDefaultConfiguration() {
-        defaultConfiguration = null;
+        synchronized (monitorForDefaultConfiguration) {
+            defaultConfiguration = null;
+        }
     }
 
