@@ -9,6 +9,8 @@
         if (configuration == null) {
             throw new IllegalArgumentException("A non-null RealmConfiguration must be provided");
         }
-        defaultConfiguration = configuration;
+        synchronized (defaultConfigurationLock) {
+            defaultConfiguration = configuration;
+        }
     }
 
