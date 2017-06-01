@@ -26,11 +26,16 @@
 
         realm.commitTransaction();
 
-        // TODO: Explain what this test is doing
+        // row 0: no link, not included
+        // row 1: link to row 0, backlink to rows 1 and 2, row 2 has id < 2, included
+        // row 2: link to row 0, backlink to rows 1 and 2, row 2 has id < 2, included
+        // row 3: no link, not included
+        // summary: 2 rows (gen2A and gen2B)
         RealmResults<AllJavaTypes> result = realm.where(AllJavaTypes.class)
                 .lessThan(AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_LO_OBJECT + "." + AllJavaTypes.FIELD_ID, 2)
                 .findAll();
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         assertTrue(result.contains(gen2A));
+        assertTrue(result.contains(gen2B));
     }
 

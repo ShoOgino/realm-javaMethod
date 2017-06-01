@@ -26,6 +26,11 @@
 
         realm.commitTransaction();
 
+        // row 0: backlink to rows 1 and 2; row 1 link to row 0, included
+        // row 1: no backlink, not included
+        // row 2: no backlink, not included
+        // row 3: no backlink, not included
+        // summary: 1 row (gen1)
         RealmResults<AllJavaTypes> result = realm.where(AllJavaTypes.class)
                 .greaterThan(AllJavaTypes.FIELD_LO_OBJECT + "." + AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_ID, 1)
                 .findAll();
