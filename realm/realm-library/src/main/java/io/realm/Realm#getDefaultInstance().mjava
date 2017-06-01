@@ -11,14 +11,9 @@
      * was set and the thread opening the Realm was interrupted while the download was in progress.
      */
     public static Realm getDefaultInstance() {
-        RealmConfiguration configuration = getDefaultConfiguration();
-        if (configuration == null) {
-            if (BaseRealm.applicationContext == null) {
-                throw new IllegalStateException("Call `Realm.init(Context)` before calling this method.");
-            } else {
-                throw new IllegalStateException("Set default configuration by using `Realm.setDefaultConfiguration(RealmConfiguration)`.");
-            }
+        if (defaultConfiguration == null) {
+            throw new IllegalStateException("Call `Realm.init(Context)` before calling this method.");
         }
-        return RealmCache.createRealmOrGetFromCache(configuration, Realm.class);
+        return RealmCache.createRealmOrGetFromCache(defaultConfiguration, Realm.class);
     }
 
