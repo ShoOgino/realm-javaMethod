@@ -10,7 +10,7 @@
         // V1 config
         RealmConfiguration v1Config = configFactory.createConfigurationBuilder()
                 .name(MIGRATED_REALM)
-                .schema(AllTypes.class)
+                .schema(StringOnly.class)
                 .schemaVersion(1)
                 .build();
         Realm oldRealm = Realm.getInstance(v1Config);
@@ -29,7 +29,7 @@
 
         RealmConfiguration v2Config = configFactory.createConfigurationBuilder()
                 .name(MIGRATED_REALM)
-                .schema(AllTypes.class, FieldOrder.class)
+                .schema(StringOnly.class, FieldOrder.class)
                 .schemaVersion(2)
                 .migration(migration)
                 .build();
@@ -40,7 +40,7 @@
         RealmConfiguration newConfig = configFactory.createConfigurationBuilder()
                 .name(NEW_REALM)
                 .schemaVersion(2)
-                .schema(AllTypes.class, FieldOrder.class)
+                .schema(StringOnly.class, FieldOrder.class)
                 .build();
         Realm newRealm = Realm.getInstance(newConfig);
         newRealm.close();
