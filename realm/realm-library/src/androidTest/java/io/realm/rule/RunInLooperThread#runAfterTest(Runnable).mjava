@@ -1,0 +1,15 @@
+    /**
+     * Run this task after the unit test either failed or succeeded.
+     * This is a work-around for the the current @After being triggered right after the unit test method exits,
+     * but before the @RunTestInLooperThread has determined the test is done
+     *
+     * TODO: Consider replacing this pattern with `@AfterLooperTest` annotation.
+     *
+     * @param task task to run. Only one task can be provided
+     */
+    public void runAfterTest(Runnable task) {
+        synchronized (lock) {
+            runAfterTestIsComplete = task;
+        }
+    }
+

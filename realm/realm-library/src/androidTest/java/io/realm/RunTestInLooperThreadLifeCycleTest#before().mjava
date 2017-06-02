@@ -1,0 +1,23 @@
+    @Before
+    public void before() {
+        assertTrue(beforeCalled.compareAndSet(false, true));
+        assertTrue(beforeRunnableCalled.get());
+
+        looperThread.closeAfterTest(new Closeable() {
+            @Override
+            public void close() throws IOException {
+                assertTrue(testExited.get());
+                assertFalse(afterRunnableCalled.get());
+                assertTrue(closableClosed.compareAndSet(false, true));
+            }
+        });
+        looperThread.runAfterTest(new Runnable() {
+            @Override
+            public void run() {
+                assertTrue(testExited.get());
+                assertTrue(afterRunnableCalled.compareAndSet(false, true));
+                assertTrue(looperThread.isTestComplete());
+            }
+        });
+;    }
+

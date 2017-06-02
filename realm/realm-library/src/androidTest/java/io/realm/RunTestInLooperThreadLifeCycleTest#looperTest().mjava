@@ -1,0 +1,14 @@
+    @Test
+    @RunTestInLooperThread(before = PrepareLooperTest.class)
+    public void looperTest() {
+        looperThread.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                assertTrue(afterCalled.get());
+                assertFalse(looperThread.isTestComplete());
+                looperThread.testComplete();
+            }
+        });
+        assertTrue(testExited.compareAndSet(false, true));
+    }
+
