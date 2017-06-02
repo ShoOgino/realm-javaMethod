@@ -5,6 +5,7 @@
         RealmConfiguration config = createConfiguration(UUID.randomUUID().toString());
         LinkedList<Object> refs = new LinkedList<>();
         List<Realm> realms = new LinkedList<>();
+        LinkedList<Closeable> closeables = new LinkedList<>();
 
         synchronized (lock) {
             realmConfiguration = config;
@@ -12,6 +13,7 @@
             backgroundHandler = null;
             keepStrongReference = refs;
             testRealms = realms;
+            closableResources = closeables;
         }
     }
 
