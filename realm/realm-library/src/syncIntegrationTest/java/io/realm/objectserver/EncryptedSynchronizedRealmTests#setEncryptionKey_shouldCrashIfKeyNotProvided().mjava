@@ -1,0 +1,56 @@
+    // If an encrypted synced Realm is re-opened with the wrong key, throw an exception.
+    // TODO: enable again once https://github.com/realm/realm-java/pull/4707 is merged
+    @Ignore("This test crash the Sync client thread")
+    @Test
+    public void setEncryptionKey_shouldCrashIfKeyNotProvided() {
+        // STEP 1: open a synced Realm using a local encryption key
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+        SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
+
+        final byte[] randomKey = TestHelper.getRandomKey();
+
+        SyncConfiguration configWithEncryption = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+                .modules(new StringOnlyModule())
+                .waitForInitialRemoteData()
+                .errorHandler(new SyncSession.ErrorHandler() {
+                    @Override
+                    public void onError(SyncSession session, ObjectServerError error) {
+                        fail(error.getErrorMessage());
+                    }
+                })
+                .encryptionKey(randomKey)
+                .build();
+
+        Realm realm = Realm.getInstance(configWithEncryption);
+        assertTrue(realm.isEmpty());
+
+        realm.beginTransaction();
+        realm.createObject(StringOnly.class).setChars("Hi Alice");
+        realm.commitTransaction();
+
+        // STEP 2: make sure the changes gets to the server
+        SystemClock.sleep(TimeUnit.SECONDS.toMillis(2));  // FIXME: Replace with Sync Progress Notifications once available.
+        realm.close(); // Realm is not deleted, just closed
+        user.logout();
+
+        // STEP 3: try to open again the Realm without the encryption key should fail
+        user = SyncUser.login(SyncCredentials.usernamePassword(username, password, false), Constants.AUTH_URL);
+        SyncConfiguration configWithoutEncryption = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+                .modules(new StringOnlyModule())
+                .waitForInitialRemoteData()
+                .errorHandler(new SyncSession.ErrorHandler() {
+                    @Override
+                    public void onError(SyncSession session, ObjectServerError error) {
+                        fail(error.getErrorMessage());
+                    }
+                })
+                .build();
+
+        try {
+            realm = Realm.getInstance(configWithoutEncryption);
+            fail("It should not be possible to open the Realm without the encryption key set previously.");
+        } catch (RealmFileException ignored) {
+        }
+    }
+
