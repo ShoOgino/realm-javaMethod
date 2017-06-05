@@ -3,25 +3,25 @@
         // Populates v0 of a Realm with an object.
         RealmConfiguration config = new RealmConfiguration.Builder(context)
                 .directory(configFactory.getRoot())
-                .schema(Dog.class)
+                .schema(StringOnly.class)
                 .schemaVersion(0)
                 .build();
         Realm.deleteRealm(config);
         realm = Realm.getInstance(config);
         realm.beginTransaction();
-        realm.copyToRealm(new Dog("Foo"));
+        realm.copyToRealm(new StringOnly());
         realm.commitTransaction();
-        assertEquals(1, realm.where(Dog.class).count());
+        assertEquals(1, realm.where(StringOnly.class).count());
         realm.close();
 
         // Changes schema and verifies that Realm has been cleared.
         config = new RealmConfiguration.Builder(context)
                 .directory(configFactory.getRoot())
-                .schema(Owner.class, Dog.class)
+                .schema(StringOnly.class, StringAndInt.class)
                 .schemaVersion(1)
                 .deleteRealmIfMigrationNeeded()
                 .build();
         realm = Realm.getInstance(config);
-        assertEquals(0, realm.where(Dog.class).count());
+        assertEquals(0, realm.where(StringOnly.class).count());
     }
 
