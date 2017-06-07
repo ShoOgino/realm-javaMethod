@@ -1,0 +1,32 @@
+    // 1. Open a sync Realm and listen to changes.
+    // A. Open the same sync Realm and add one object.
+    // 2. Get the notification, check if the change in A is received.
+    @Test
+    @RunTestWithRemoteService(SimpleCommitRemoteService.class)
+    @RunTestInLooperThread
+    public void expectSimpleCommit() {
+        remoteService.createHandler(Looper.myLooper());
+
+        final SyncUser user = UserFactory.getInstance().createDefaultUser(Constants.AUTH_URL);
+        String realmUrl = Constants.SYNC_SERVER_URL;
+        final SyncConfiguration syncConfig = configFactory.createSyncConfigurationBuilder(user, realmUrl).build();
+        final Realm realm = Realm.getInstance(syncConfig);
+        final RealmResults<ProcessInfo> all = realm.where(ProcessInfo.class).findAll();
+        looperThread.keepStrongReference(all);
+        all.addChangeListener(new RealmChangeListener<RealmResults<ProcessInfo>>() {
+            @Override
+            public void onChange(RealmResults<ProcessInfo> element) {
+                assertEquals(1, all.size());
+                assertEquals("Background_Process1", all.get(0).getName());
+                realm.close();
+                user.logout();
+
+                remoteService.triggerServiceStep(SimpleCommitRemoteService.stepB_closeRealmAndLogOut);
+
+                looperThread.testComplete();
+            }
+        });
+
+        remoteService.triggerServiceStep(SimpleCommitRemoteService.stepA_openRealmAndCreateOneObject);
+    }
+

@@ -1,0 +1,19 @@
+    @Override
+    public Statement apply(final Statement base, Description description) {
+        final RunTestWithRemoteService annotation = description.getAnnotation(RunTestWithRemoteService.class);
+        if (annotation == null) {
+            return base;
+        }
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                before(annotation.value());
+                try {
+                    base.evaluate();
+                } finally {
+                    after();
+                }
+            }
+        };
+    }
+

@@ -1,0 +1,9 @@
+    // The @Before method will be called before the looper tests finished. We need to find a better place to call this.
+    public static void clearInstance()  {
+        Realm realm = Realm.getInstance(configuration);
+        realm.beginTransaction();
+        realm.delete(UserFactoryStore.class);
+        realm.commitTransaction();
+        realm.close();
+    }
+

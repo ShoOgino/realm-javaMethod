@@ -1,0 +1,18 @@
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        try {
+            rootFolder = File.createTempFile(this.getClass().getSimpleName(), "");
+        } catch (IOException e) {
+            RealmLog.error(e);
+        }
+        //noinspection ResultOfMethodCallIgnored
+        rootFolder.delete();
+        //noinspection ResultOfMethodCallIgnored
+        rootFolder.mkdir();
+
+        Realm.init(getApplicationContext());
+    }
+

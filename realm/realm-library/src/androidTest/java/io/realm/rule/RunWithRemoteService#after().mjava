@@ -1,0 +1,22 @@
+    public void after() {
+        getContext().unbindService(serviceConnection);
+
+        // Kill the remote process.
+        ActivityManager.RunningAppProcessInfo info = getRemoteProcessInfo();
+        if (info != null) {
+            android.os.Process.killProcess(info.pid);
+        }
+        int counter = 10;
+        while (getRemoteProcessInfo() != null) {
+            if (counter == 0) {
+                fail("The remote process is still alive.");
+            }
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            counter--;
+        }
+    }
+

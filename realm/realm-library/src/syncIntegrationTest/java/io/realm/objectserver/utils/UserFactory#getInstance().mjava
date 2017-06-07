@@ -1,0 +1,15 @@
+    public static synchronized UserFactory getInstance() {
+        if (instance == null)  {
+            Realm realm = Realm.getInstance(configuration);
+            UserFactoryStore store = realm.where(UserFactoryStore.class).findFirst();
+            if (store == null || store.getUserName() == null) {
+                throw new IllegalStateException("Current user has not been set. Call resetInstance() first.");
+            }
+
+            instance = new UserFactory(store.getUserName());
+            realm.close();
+        }
+        RealmLog.debug("UserFactory.getInstance, the default user is " + instance.userName + " .");
+        return instance;
+    }
+

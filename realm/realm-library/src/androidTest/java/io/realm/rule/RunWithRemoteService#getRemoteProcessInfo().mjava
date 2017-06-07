@@ -1,0 +1,13 @@
+    // Get the remote process info if it is alive.
+    private ActivityManager.RunningAppProcessInfo getRemoteProcessInfo() {
+        ActivityManager manager = (ActivityManager)getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> processInfoList = manager.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo info : processInfoList) {
+            if (info.processName.equals(getContext().getPackageName() + REMOTE_PROCESS_POSTFIX)) {
+                return info;
+            }
+        }
+
+        return null;
+    }
+
