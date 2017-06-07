@@ -1,0 +1,12 @@
+    // Call this to trigger the next step of remote process
+    public void triggerServiceStep(RemoteTestService.Step step) {
+        Message msg = Message.obtain(null, step.message);
+        msg.replyTo = localMessenger;
+        try {
+            remoteMessenger.send(msg);
+        } catch (RemoteException e) {
+            fail(e.getMessage());
+        }
+        // TODO: Find a way to block caller thread until the service process finishes current step.
+    }
+

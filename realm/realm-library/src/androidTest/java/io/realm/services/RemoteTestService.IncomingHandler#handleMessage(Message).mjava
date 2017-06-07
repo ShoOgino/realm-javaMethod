@@ -1,0 +1,25 @@
+        @Override
+        public void handleMessage(Message msg) {
+            thiz.client = msg.replyTo;
+            if (thiz.client == null) {
+                throw new RuntimeException("Message with an empty client.");
+            }
+            Step step = stepMap.get(msg.what);
+            Throwable throwable = null;
+            if (step != null) {
+                try {
+                    step.run();
+                } catch (Throwable t) {
+                    throwable = t;
+                } finally {
+                    if (throwable != null) {
+                        step.response(throwable.getMessage() + "\n" + Util.getStackTrace(throwable));
+                    } else {
+                        step.response(null);
+                    }
+                }
+            } else {
+                throw new RuntimeException("Cannot find corresponding step to message " + msg.what + ".");
+            }
+        }
+
