@@ -17,14 +17,15 @@
                 synchronized (SyncSession.this) {
                     if (!isClosed && !Thread.currentThread().isInterrupted()) {
                         RealmLog.debug("Access Token refreshed successfully, Sync URL: " + configuration.getServerUrl());
-                        if (nativeRefreshAccessToken(configuration.getPath(), response.getAccessToken().value(), configuration.getUser().getAuthenticationUrl().toString())) {
+                        URI realmUrl = configuration.getServerUrl();
+                        if (nativeRefreshAccessToken(configuration.getPath(), response.getAccessToken().value(), realmUrl.toString())) {
                             // replaced the user old access_token
                             ObjectServerUser.AccessDescription desc = new ObjectServerUser.AccessDescription(
                                     response.getAccessToken(),
                                     configuration.getPath(),
                                     configuration.shouldDeleteRealmOnLogout()
                             );
-                            getUser().getSyncUser().addRealm(configuration.getServerUrl(), desc);
+                            getUser().getSyncUser().addRealm(realmUrl, desc);
 
                             // schedule the next refresh
                             scheduleRefreshAccessToken(authServer, response.getAccessToken().expiresMs());

@@ -2,14 +2,11 @@
     public static void setUp () throws Exception {
         SyncManager.Debug.skipOnlineChecking = true;
         try {
-            Realm.init(InstrumentationRegistry.getContext());
-            originalLogLevel = RealmLog.getLevel();
-            RealmLog.setLevel(LogLevel.DEBUG);
             HttpUtils.startSyncServer();
         } catch (Exception e) {
             // Throwing an exception from this method will crash JUnit. Instead just log it.
             // If this setup method fails, all unit tests in the class extending it will most likely fail as well.
-            RealmLog.error("Could not start Sync Server", e);
+            Log.e(HttpUtils.TAG, "Could not start Sync Server: " + Util.getStackTrace(e));
         }
     }
 
