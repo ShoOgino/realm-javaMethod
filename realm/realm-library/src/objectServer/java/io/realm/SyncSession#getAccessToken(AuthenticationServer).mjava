@@ -1,6 +1,7 @@
-    String accessToken(final AuthenticationServer authServer) {
+    // Return the access token for the Realm this Session is connected to.
+    String getAccessToken(final AuthenticationServer authServer) {
         // check first if there's a valid access_token we can return immediately
-        if (getUser().getSyncUser().isAuthenticated(configuration)) {
+        if (getUser().getSyncUser().isRealmAuthenticated(configuration)) {
             Token accessToken = getUser().getSyncUser().getAccessToken(configuration.getServerUrl());
             // start refreshing this token if a refresh is not going on
             if (!onGoingAccessTokenQuery.getAndSet(true)) {
