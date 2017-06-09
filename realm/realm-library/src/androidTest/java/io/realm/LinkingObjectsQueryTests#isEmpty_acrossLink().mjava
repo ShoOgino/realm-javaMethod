@@ -4,7 +4,12 @@
         for (RealmFieldType type : SUPPORTED_IS_EMPTY_TYPES) {
             switch (type) {
                 case LINKING_OBJECTS:
+                    // Rows 0 and 1 are not included as they are linked to another row through FIELD_OBJECT
+                    // Row 2 is included (no link)
                     assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_LO_OBJECT).count());
+                    // Row 0 has link to row 0 which has a backlink (list); not included
+                    // Row 1 has link to row 1 which has a backlink (list); not included
+                    // Row 2 has no link; included
                     assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_LO_LIST).count());
                     break;
                 default:

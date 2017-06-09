@@ -1,20 +1,33 @@
     @Test
     public void isEmpty_acrossLinkingObjectListLink() {
         createIsEmptyDataSet(realm);
+        assertEquals(3, realm.where(AllJavaTypes.class).findAll().size());
         for (RealmFieldType type : SUPPORTED_IS_EMPTY_TYPES) {
             switch (type) {
                 case STRING:
+                    // Row 2 included (has no backlink)
                     assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LO_LIST + "." + AllJavaTypes.FIELD_STRING).count());
                     break;
                 case BINARY:
+                    // Row 2 included (has no backlink)
                     assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LO_LIST + "." + AllJavaTypes.FIELD_BINARY).count());
                     break;
                 case LIST:
                     assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LO_LIST + "." + AllJavaTypes.FIELD_LIST).count());
                     break;
                 case LINKING_OBJECTS:
-                    assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LO_LIST + "." + AllJavaTypes.FIELD_LO_OBJECT).count());
-                    assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LO_LIST + "." + AllJavaTypes.FIELD_LO_LIST).count());
+                    // Row 0: Backlink (list) to row 1, row 1 backlink to row 1; not included
+                    // Row 1: Backlink (list) to row 2, row 2 no backlink; included
+                    // Row 2: No backlink (list); included
+                    assertEquals(2, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LO_LIST + "." + AllJavaTypes.FIELD_LO_OBJECT).count());
+
+                    // Step 1:
+                    //  Row 0 skipped; FIELD_LO_LIST.count > 0
+                    //  Row 1 included; FIELD_LO_LIST.count() == 0
+                    //
+                    // Step 2: now checking Row 2
+                    // Row 0 included: goes to Row 1 where FIELD_LO_LIST.count() == 0
+                    assertEquals(2, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LO_LIST + "." + AllJavaTypes.FIELD_LO_LIST).count());
                     break;
                 default:
                     fail("Unknown type: " + type);
