@@ -1,5 +1,16 @@
     @After
     public void tearDownTest() throws IOException {
-        RealmLog.setLevel(originalLogLevel);
+        if (looperThread.isTestComplete()) {
+            // Non-looper tests can reset here
+            RealmLog.setLevel(originalLogLevel);
+        } else {
+            // Otherwise we need to wait for the test to complete
+            looperThread.runAfterTest(new Runnable() {
+                @Override
+                public void run() {
+                    RealmLog.setLevel(originalLogLevel);
+                }
+            });
+        }
     }
 
