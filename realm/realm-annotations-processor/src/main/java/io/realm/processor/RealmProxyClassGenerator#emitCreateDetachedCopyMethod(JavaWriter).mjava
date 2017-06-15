@@ -11,19 +11,21 @@
                 .endControlFlow()
                 .emitStatement("CacheData<RealmModel> cachedObject = cache.get(realmObject)")
                 .emitStatement("%s unmanagedObject", qualifiedClassName)
-                .beginControlFlow("if (cachedObject != null)")
-                .emitSingleLineComment("Reuse cached object or recreate it because it was encountered at a lower depth.")
-                .beginControlFlow("if (currentDepth >= cachedObject.minDepth)")
-                .emitStatement("return (%s)cachedObject.object", qualifiedClassName)
-                .nextControlFlow("else")
-                .emitStatement("unmanagedObject = (%s)cachedObject.object", qualifiedClassName)
-                .emitStatement("cachedObject.minDepth = currentDepth")
-                .endControlFlow()
-                .nextControlFlow("else")
+                .beginControlFlow("if (cachedObject == null)")
                 .emitStatement("unmanagedObject = new %s()", qualifiedClassName)
                 .emitStatement("cache.put(realmObject, new RealmObjectProxy.CacheData<RealmModel>(currentDepth, unmanagedObject))")
+                .nextControlFlow("else")
+                .emitSingleLineComment("Reuse cached object or recreate it because it was encountered at a lower depth.")
+                .beginControlFlow("if (currentDepth >= cachedObject.minDepth)")
+                .emitStatement("return (%s) cachedObject.object", qualifiedClassName)
+                .endControlFlow()
+                .emitStatement("unmanagedObject = (%s) cachedObject.object", qualifiedClassName)
+                .emitStatement("cachedObject.minDepth = currentDepth")
                 .endControlFlow();
 
+        // may cause an unused variable warning if the object contains only null lists
+        writer.emitStatement("%1$s unmanagedCopy = (%1$s) unmanagedObject", interfaceName);
+        writer.emitStatement("%1$s realmSource = (%1$s) realmObject", interfaceName);
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
             String setter = metadata.getInternalSetter(fieldName);
@@ -33,19 +35,19 @@
                 writer
                         .emitEmptyLine()
                         .emitSingleLineComment("Deep copy of %s", fieldName)
-                        .emitStatement("((%s) unmanagedObject).%s(%s.createDetachedCopy(((%s) realmObject).%s(), currentDepth + 1, maxDepth, cache))",
-                                interfaceName, setter, Utils.getProxyClassSimpleName(field), interfaceName, getter);
+                        .emitStatement("unmanagedCopy.%s(%s.createDetachedCopy(realmSource.%s(), currentDepth + 1, maxDepth, cache))",
+                                setter, Utils.getProxyClassSimpleName(field), getter);
             } else if (Utils.isRealmList(field)) {
                 writer
                         .emitEmptyLine()
                         .emitSingleLineComment("Deep copy of %s", fieldName)
                         .beginControlFlow("if (currentDepth == maxDepth)")
-                        .emitStatement("((%s) unmanagedObject).%s(null)", interfaceName, setter)
+                        .emitStatement("unmanagedCopy.%s(null)", setter)
                         .nextControlFlow("else")
-                        .emitStatement("RealmList<%s> managed%sList = ((%s) realmObject).%s()",
-                                Utils.getGenericTypeQualifiedName(field), fieldName, interfaceName, getter)
+                        .emitStatement("RealmList<%s> managed%sList = realmSource.%s()",
+                                Utils.getGenericTypeQualifiedName(field), fieldName, getter)
                         .emitStatement("RealmList<%1$s> unmanaged%2$sList = new RealmList<%1$s>()", Utils.getGenericTypeQualifiedName(field), fieldName)
-                        .emitStatement("((%s) unmanagedObject).%s(unmanaged%sList)", interfaceName, setter, fieldName)
+                        .emitStatement("unmanagedCopy.%s(unmanaged%sList)", setter, fieldName)
                         .emitStatement("int nextDepth = currentDepth + 1")
                         .emitStatement("int size = managed%sList.size()", fieldName)
                         .beginControlFlow("for (int i = 0; i < size; i++)")
@@ -55,8 +57,7 @@
                         .endControlFlow()
                         .endControlFlow();
             } else {
-                writer.emitStatement("((%s) unmanagedObject).%s(((%s) realmObject).%s())",
-                        interfaceName, setter, interfaceName, getter);
+                writer.emitStatement("unmanagedCopy.%s(realmSource.%s())", setter, getter);
             }
         }
 
