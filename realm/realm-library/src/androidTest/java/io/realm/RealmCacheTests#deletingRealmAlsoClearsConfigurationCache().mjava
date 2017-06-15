@@ -4,13 +4,9 @@
         byte[] oldPassword = TestHelper.SHA512("realm");
         byte[] newPassword = TestHelper.SHA512("realm-copy");
 
-        configFactory.copyRealmFromAssets(context, REALM_NAME, REALM_NAME);
-        RealmMigration realmMigration = TestHelper.prepareMigrationToNullSupportStep();
-
         RealmConfiguration config = configFactory.createConfigurationBuilder()
                 .name(REALM_NAME)
                 .encryptionKey(oldPassword)
-                .migration(realmMigration)
                 .schema(StringOnly.class)
                 .build();
 
@@ -35,7 +31,6 @@
         RealmConfiguration newConfig = configFactory.createConfigurationBuilder()
                 .name(REALM_NAME)
                 .encryptionKey(newPassword)
-                .migration(realmMigration)
                 .schema(StringOnly.class)
                 .build();
 
