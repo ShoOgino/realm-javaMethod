@@ -5,7 +5,10 @@
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
                 "RealmSchema", "realmSchema"); // Argument type & argument name
 
-        writer.beginControlFlow("if (!realmSchema.contains(\"" + this.simpleClassName + "\"))");
+        writer.beginControlFlow("if (realmSchema.contains(\"%s\"))", this.simpleClassName)
+            .emitStatement("return realmSchema.get(\"%s\")", this.simpleClassName)
+            .endControlFlow();
+
         writer.emitStatement("RealmObjectSchema realmObjectSchema = realmSchema.create(\"%s\")", this.simpleClassName);
 
         // For each field generate corresponding table index constant
@@ -49,8 +52,6 @@
             }
         }
         writer.emitStatement("return realmObjectSchema");
-        writer.endControlFlow();
-        writer.emitStatement("return realmSchema.get(\"" + this.simpleClassName + "\")");
         writer.endMethod()
                 .emitEmptyLine();
     }

@@ -4,20 +4,21 @@
         }
         CacheData<RealmModel> cachedObject = cache.get(realmObject);
         some.test.Simple unmanagedObject;
-        if (cachedObject != null) {
-            // Reuse cached object or recreate it because it was encountered at a lower depth.
-            if (currentDepth >= cachedObject.minDepth) {
-                return (some.test.Simple)cachedObject.object;
-            } else {
-                unmanagedObject = (some.test.Simple)cachedObject.object;
-                cachedObject.minDepth = currentDepth;
-            }
-        } else {
+        if (cachedObject == null) {
             unmanagedObject = new some.test.Simple();
             cache.put(realmObject, new RealmObjectProxy.CacheData<RealmModel>(currentDepth, unmanagedObject));
+        } else {
+            // Reuse cached object or recreate it because it was encountered at a lower depth.
+            if (currentDepth >= cachedObject.minDepth) {
+                return (some.test.Simple) cachedObject.object;
+            }
+            unmanagedObject = (some.test.Simple) cachedObject.object;
+            cachedObject.minDepth = currentDepth;
         }
-        ((SimpleRealmProxyInterface) unmanagedObject).realmSet$name(((SimpleRealmProxyInterface) realmObject).realmGet$name());
-        ((SimpleRealmProxyInterface) unmanagedObject).realmSet$age(((SimpleRealmProxyInterface) realmObject).realmGet$age());
+        SimpleRealmProxyInterface unmanagedCopy = (SimpleRealmProxyInterface) unmanagedObject;
+        SimpleRealmProxyInterface realmSource = (SimpleRealmProxyInterface) realmObject;
+        unmanagedCopy.realmSet$name(realmSource.realmGet$name());
+        unmanagedCopy.realmSet$age(realmSource.realmGet$age());
         return unmanagedObject;
     }
 
