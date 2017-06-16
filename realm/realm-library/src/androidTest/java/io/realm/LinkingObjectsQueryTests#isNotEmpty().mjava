@@ -4,7 +4,8 @@
         for (RealmFieldType type : SUPPORTED_IS_NOT_EMPTY_TYPES) {
             switch (type) {
                 case LINKING_OBJECTS:
-                    assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LO_OBJECT).count());
+                    // Row 0 and 1 have a link/backlink so no row is empty
+                    assertEquals(0, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LO_OBJECT).count());
                     assertEquals(1, realm.where(AllJavaTypes.class).isEmpty(AllJavaTypes.FIELD_LO_LIST).count());
                     break;
                 default:
