@@ -6,9 +6,9 @@
     public void shouldBeAbleToVerifyTransactionCalls() {
 
         // Create activity
-	    ExampleActivity activity = Robolectric.buildActivity(ExampleActivity.class).create().start().resume().visible().get();
+        ExampleActivity activity = Robolectric.buildActivity(ExampleActivity.class).create().start().resume().visible().get();
 
-	    assertThat(activity.getTitle().toString(), is("Unit Test Example"));
+        assertThat(activity.getTitle().toString(), is("Unit Test Example"));
 
         // Verify that two Realm.getInstance() calls took place.
         verifyStatic(times(2));
@@ -26,7 +26,7 @@
         verify(mockRealm, times(5)).executeTransaction(Mockito.any(Realm.Transaction.class));
 
         // Call the destroy method so we can verify that the .close() method was called (below)
-	    activity.onDestroy();
+        activity.onDestroy();
 
         // Verify that the realm got closed 2 separate times. Once in the AsyncTask, once
         // in onDestroy
