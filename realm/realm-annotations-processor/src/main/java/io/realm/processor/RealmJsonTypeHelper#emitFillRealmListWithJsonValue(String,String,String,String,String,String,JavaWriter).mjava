@@ -9,12 +9,13 @@
                     .emitStatement("((%s) obj).%s().clear()", interfaceName, getter)
                     .emitStatement("JSONArray array = json.getJSONArray(\"%s\")", fieldName)
                     .beginControlFlow("for (int i = 0; i < array.length(); i++)")
-                        .emitStatement("%s item = %s.createOrUpdateUsingJsonObject(realm, array.getJSONObject(i), update)",
+                        .emitStatement(
+                                "%s item = %s.createOrUpdateUsingJsonObject(realm, array.getJSONObject(i), update)",
                                 fieldTypeCanonicalName, proxyClass, fieldTypeCanonicalName)
                         .emitStatement("((%s) obj).%s().add(item)", interfaceName, getter)
                     .endControlFlow()
                 .endControlFlow()
             .endControlFlow();
     }
-    //@formatter:on
+    // @formatter:on
 

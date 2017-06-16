@@ -1,24 +1,23 @@
         @Override
-        public void emitTypeConversion(String interfaceName, String setter, String fieldName, String fieldType,
-                JavaWriter writer) throws IOException {
-            String statementSetNullOrThrow;
-            if (Utils.isPrimitiveType(fieldType)) {
-                // Only throw exception for primitive types. For boxed types and String, exception will be thrown in
-                // the setter.
-                statementSetNullOrThrow = String.format(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName);
-            } else {
-                statementSetNullOrThrow = String.format("((%s) obj).%s(null)", interfaceName, setter);
-            }
+        public void emitTypeConversion(
+                String interfaceName, String setter, String fieldName, String fieldType, JavaWriter writer)
+                throws IOException {
+            // Only throw exception for primitive types.
+            // For boxed types and String, exception will be thrown in the setter.
+            String statementSetNullOrThrow = Utils.isPrimitiveType(fieldType) ?
+                    String.format(Constants.STATEMENT_EXCEPTION_ILLEGAL_NULL_VALUE, fieldName) :
+                    String.format("((%s) obj).%s(null)", interfaceName, setter);
             // @formatter:off
             writer
                 .beginControlFlow("if (json.has(\"%s\"))", fieldName)
                     .beginControlFlow("if (json.isNull(\"%s\"))", fieldName)
                         .emitStatement(statementSetNullOrThrow)
                     .nextControlFlow("else")
-                        .emitStatement("((%s) obj).%s((%s) json.get%s(\"%s\"))", interfaceName, setter, castType,
-                                jsonType, fieldName)
+                        .emitStatement(
+                                "((%s) obj).%s((%s) json.get%s(\"%s\"))",
+                                interfaceName, setter, castType, jsonType, fieldName)
                     .endControlFlow()
                 .endControlFlow();
-            //@formatter:on
+            // @formatter:on
         }
 

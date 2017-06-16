@@ -1,0 +1,21 @@
+        // @formatter:off
+        @Override
+        public void emitTypeConversion(
+                String interfaceName, String setter, String fieldName, String fieldType, JavaWriter writer)
+                throws IOException {
+            writer
+                .beginControlFlow("if (json.has(\"%s\"))", fieldName)
+                    .beginControlFlow("if (json.isNull(\"%s\"))", fieldName)
+                        .emitStatement("((%s) obj).%s(null)", interfaceName, setter)
+                    .nextControlFlow("else")
+                        .emitStatement("Object timestamp = json.get(\"%s\")", fieldName)
+                        .beginControlFlow("if (timestamp instanceof String)")
+                            .emitStatement("((%s) obj).%s(JsonUtils.stringToDate((String) timestamp))", interfaceName, setter)
+                        .nextControlFlow("else")
+                            .emitStatement("((%s) obj).%s(new Date(json.getLong(\"%s\")))", interfaceName, setter, fieldName)
+                        .endControlFlow()
+                    .endControlFlow()
+                .endControlFlow();
+        }
+        // @formatter:on
+
