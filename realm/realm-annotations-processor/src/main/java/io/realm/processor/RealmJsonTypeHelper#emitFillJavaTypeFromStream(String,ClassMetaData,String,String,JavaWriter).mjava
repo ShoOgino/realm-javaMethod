@@ -1,13 +1,11 @@
-    public static void emitFillJavaTypeFromStream(String interfaceName, ClassMetaData metaData, String fieldName,
-            String fieldType, JavaWriter writer) throws IOException {
+    public static void emitFillJavaTypeFromStream(
+            String interfaceName, ClassMetaData metaData, String fieldName, String fieldType, JavaWriter writer)
+            throws IOException {
         String setter = metaData.getInternalSetter(fieldName);
-        boolean isPrimaryKey = false;
-        if (metaData.hasPrimaryKey() && metaData.getPrimaryKey().getSimpleName().toString().equals(fieldName)) {
-            isPrimaryKey = true;
-        }
+        boolean isPrimaryKey = metaData.hasPrimaryKey() && metaData.getPrimaryKey().getSimpleName().toString().equals(fieldName);
         if (JAVA_TO_JSON_TYPES.containsKey(fieldType)) {
-            JAVA_TO_JSON_TYPES.get(fieldType).emitStreamTypeConversion(interfaceName, setter, fieldName, fieldType,
-                    writer, isPrimaryKey);
+            JAVA_TO_JSON_TYPES.get(fieldType)
+                    .emitStreamTypeConversion(interfaceName, setter, fieldName, fieldType, writer, isPrimaryKey);
         }
     }
 
