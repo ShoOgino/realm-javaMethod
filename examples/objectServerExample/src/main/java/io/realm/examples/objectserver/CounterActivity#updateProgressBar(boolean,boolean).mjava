@@ -1,0 +1,16 @@
+    private void updateProgressBar(boolean downloading, boolean uploading) {
+        @ColorRes int color = android.R.color.black;
+        int visibility = View.VISIBLE;
+        if (downloading && uploading) {
+            color = R.color.progress_both;
+        } else if (downloading) {
+            color = R.color.progress_download;
+        } else if (uploading) {
+            color = R.color.progress_upload;
+        } else {
+            visibility = View.GONE;
+        }
+        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(color), PorterDuff.Mode.SRC_IN);
+        progressBar.setVisibility(visibility);
+    }
+

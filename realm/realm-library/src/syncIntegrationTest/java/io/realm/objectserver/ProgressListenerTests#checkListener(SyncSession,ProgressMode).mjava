@@ -1,0 +1,11 @@
+    private void checkListener(SyncSession session, ProgressMode progressMode) {
+        final CountDownLatch listenerCalled = new CountDownLatch(1);
+        session.addDownloadProgressListener(progressMode, new ProgressListener() {
+            @Override
+            public void onChange(Progress progress) {
+                listenerCalled.countDown();
+            }
+        });
+        TestHelper.awaitOrFail(listenerCalled);
+    }
+

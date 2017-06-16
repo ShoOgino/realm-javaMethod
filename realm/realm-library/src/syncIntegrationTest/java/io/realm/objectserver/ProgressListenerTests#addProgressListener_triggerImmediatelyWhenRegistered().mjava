@@ -1,0 +1,12 @@
+    @Test
+    public void addProgressListener_triggerImmediatelyWhenRegistered() {
+        final SyncConfiguration config = createSyncConfig();
+        Realm realm = Realm.getInstance(config);
+        SyncSession session = SyncManager.getSession(config);
+
+        checkListener(session, ProgressMode.INDEFINITELY);
+        checkListener(session, ProgressMode.CURRENT_CHANGES);
+
+        realm.close();
+    }
+

@@ -1,0 +1,21 @@
+    // Create remote data for a given user.
+    private URI createRemoteData(SyncUser user) {
+        SyncConfiguration config = configFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM).build();
+        final Realm realm = Realm.getInstance(config);
+        writeSampleData(realm);
+        final CountDownLatch changesUploaded = new CountDownLatch(1);
+        final SyncSession session = SyncManager.getSession(config);
+        session.addUploadProgressListener(ProgressMode.CURRENT_CHANGES, new ProgressListener() {
+            @Override
+            public void onChange(Progress progress) {
+                if (progress.isTransferComplete()) {
+                    session.removeProgressListener(this);
+                    changesUploaded.countDown();
+                }
+            }
+        });
+        TestHelper.awaitOrFail(changesUploaded);
+        realm.close();
+        return config.getServerUrl();
+    }
+
