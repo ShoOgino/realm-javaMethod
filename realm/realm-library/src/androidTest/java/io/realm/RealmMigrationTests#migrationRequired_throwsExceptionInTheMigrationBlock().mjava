@@ -1,0 +1,29 @@
+    @Test
+    public void migrationRequired_throwsExceptionInTheMigrationBlock() {
+        final RuntimeException exception = new RuntimeException("TEST");
+
+        RealmMigration migration = new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                throw exception;
+            }
+        };
+        RealmConfiguration config = configFactory.createConfigurationBuilder()
+                .migration(migration)
+                .schemaVersion(1)
+                .assetFile("default0.realm") // This Realm does not have the correct schema
+                .build();
+
+        Realm realm = null;
+        try {
+            realm = Realm.getInstance(config);
+            fail();
+        } catch (RuntimeException expected) {
+            assertEquals(exception, expected);
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+        }
+    }
+

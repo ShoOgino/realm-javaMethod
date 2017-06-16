@@ -27,9 +27,8 @@
             realm = Realm.getInstance(realmConfig);
             fail();
         } catch (RealmMigrationNeededException e) {
-            if (!e.getMessage().equals("Primary Key annotation definition was changed, from field id to field name")) {
-                fail(e.toString());
-            }
+            assertThat(e.getMessage(), CoreMatchers.containsString(
+                    "Primary Key for class 'PrimaryKeyAsString' has changed from 'id' to 'name'."));
         } finally {
             if (realm != null) {
                 realm.close();

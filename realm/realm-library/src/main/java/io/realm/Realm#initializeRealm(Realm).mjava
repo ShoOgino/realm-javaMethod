@@ -8,7 +8,7 @@
             // interprocess lock. This lock can obviously not be created by a Realm instance so we probably need
             // to implement it in Object Store. When this happens, the `beginTransaction(true)` can be removed again.
             realm.beginTransaction(true);
-            RealmConfiguration configuration = realm.getConfiguration();
+            final RealmConfiguration configuration = realm.getConfiguration();
             long currentVersion = realm.getVersion();
             boolean unversioned = currentVersion == UNVERSIONED;
             long newVersion = configuration.getSchemaVersion();
@@ -22,21 +22,29 @@
                     OsSchemaInfo schema = new OsSchemaInfo(mediator.getExpectedObjectSchemaInfoMap().values());
 
                     // Object Store handles all update logic
-                    realm.sharedRealm.updateSchema(schema, newVersion);
+                    realm.sharedRealm.updateSchema(schema, newVersion, null);
                     commitChanges = true;
                 }
             } else {
                 // Only allow creating the schema if not in read-only mode
-                if (unversioned) {
-                    if (configuration.isReadOnly()) {
-                        throw new IllegalArgumentException("Cannot create the Realm schema in a read-only file.");
-                    }
-
-                    // Let Object Store initialize all tables
-                    OsSchemaInfo schemaInfo = new OsSchemaInfo(mediator.getExpectedObjectSchemaInfoMap().values());
-                    realm.sharedRealm.updateSchema(schemaInfo, newVersion);
-                    commitChanges = true;
+                if (unversioned && configuration.isReadOnly()) {
+                    throw new IllegalArgumentException("Cannot create the Realm schema in a read-only file.");
                 }
+
+                // Let Object Store initialize all tables
+                OsSchemaInfo schemaInfo = new OsSchemaInfo(mediator.getExpectedObjectSchemaInfoMap().values());
+                SharedRealm.MigrationCallback migrationCallback = null;
+                if (configuration.getMigration() != null) {
+                    migrationCallback = new SharedRealm.MigrationCallback() {
+                        @Override
+                        public void onMigrationNeeded(SharedRealm sharedRealm, long oldVersion, long newVersion) {
+                            configuration.getMigration().migrate(DynamicRealm.createInstance(sharedRealm),
+                                    oldVersion, newVersion);
+                        }
+                    };
+                }
+                realm.sharedRealm.updateSchema(schemaInfo, newVersion, migrationCallback);
+                commitChanges = true;
             }
 
             // Now that they have all been created, validate them.
@@ -49,9 +57,7 @@
                         configuration.isSyncConfiguration()));
             }
 
-            realm.getSchema().setInitialColumnIndices(
-                    (unversioned) ? newVersion : currentVersion,
-                    columnInfoMap);
+            realm.getSchema().setInitialColumnIndices(realm.getVersion(), columnInfoMap);
 
             // Finally add any initial data
             final Transaction transaction = configuration.getInitialDataTransaction();
