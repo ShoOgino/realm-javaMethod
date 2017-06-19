@@ -1,0 +1,23 @@
+    @Test
+    public void setRequired_true_onPrimaryKeyField_containsNullValues_shouldThrow() {
+        for (PrimaryKeyFieldType fieldType : PrimaryKeyFieldType.values()) {
+            String className = fieldType.getType().getSimpleName() + "Class";
+            String fieldName = "primaryKey";
+            schema = realmSchema.create(className);
+            if (!fieldType.isNullable()) {
+                continue;
+            }
+            schema.addField(fieldName, fieldType.getType(), FieldAttribute.PRIMARY_KEY);
+            DynamicRealmObject object = realm.createObject(schema.getClassName(), null);
+            assertTrue(object.isNull(fieldName));
+            try {
+                schema.setRequired(fieldName, true);
+                fail();
+            } catch (IllegalStateException expected) {
+                assertThat(expected.getMessage(),
+                        CoreMatchers.containsString("The primary key field 'primaryKey' has 'null' values stored."));
+            }
+            realmSchema.remove(className);
+        }
+    }
+
