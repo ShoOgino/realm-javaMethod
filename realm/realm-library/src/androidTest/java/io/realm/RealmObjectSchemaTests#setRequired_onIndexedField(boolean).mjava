@@ -1,0 +1,18 @@
+    private void setRequired_onIndexedField(boolean toRequired) {
+        String fieldName = "IndexedField";
+        for (IndexFieldType fieldType : IndexFieldType.values()) {
+            if (!fieldType.isNullable()) {
+                continue;
+            }
+            if (toRequired) {
+                schema.addField(fieldName, fieldType.getType(), FieldAttribute.INDEXED);
+            } else {
+                schema.addField(fieldName, fieldType.getType(), FieldAttribute.INDEXED, FieldAttribute.REQUIRED);
+            }
+            assertTrue(schema.hasIndex(fieldName));
+            schema.setRequired(fieldName, toRequired);
+            assertTrue(schema.hasIndex(fieldName));
+            schema.removeField(fieldName);
+        }
+    }
+
