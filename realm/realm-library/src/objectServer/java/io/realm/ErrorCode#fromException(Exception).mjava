@@ -1,0 +1,10 @@
+    /**
+     * Helper method for mapping between {@link Exception} and {@link ErrorCode}.
+     * @param exception to be mapped as an {@link ErrorCode}.
+     * @return mapped {@link ErrorCode}.
+     */
+    public static ErrorCode fromException(Exception exception) {
+        // ConnectException is recoverable (with exponential backoff)
+        return (exception instanceof ConnectException) ? ErrorCode.IO_EXCEPTION : ErrorCode.UNKNOWN;
+    }
+
