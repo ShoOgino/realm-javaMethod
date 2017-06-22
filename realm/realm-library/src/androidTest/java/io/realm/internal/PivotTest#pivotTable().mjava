@@ -1,4 +1,5 @@
-    public void testPivotTable(){
+    @Test
+    public void pivotTable(){
 
         Table resultCount = t.pivot(colIndexSex, colIndexAge, PivotType.COUNT);
         assertEquals(2, resultCount.size());
@@ -13,7 +14,7 @@
         assertEquals(38, resultMax.getLong(1, 0));
         assertEquals(39, resultMax.getLong(1, 1));
 
-        try { t.pivot(colIndexHired, colIndexAge, PivotType.SUM); fail("Group by not a String column"); } catch (UnsupportedOperationException e) { }
-        try { t.pivot(colIndexSex, colIndexHired, PivotType.SUM); fail("Aggregation not an int column"); } catch (UnsupportedOperationException e) { }
+        try { t.pivot(colIndexHired, colIndexAge, PivotType.SUM); fail("Group by not a String column"); } catch (UnsupportedOperationException ignore) { }
+        try { t.pivot(colIndexSex, colIndexHired, PivotType.SUM); fail("Aggregation not an int column"); } catch (UnsupportedOperationException ignore) { }
     }
 
