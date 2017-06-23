@@ -1,20 +1,24 @@
     @Test
     public void tableNumbers() {
-        Table t = new Table();
-        t.addColumn(RealmFieldType.INTEGER, "intCol");
-        t.addColumn(RealmFieldType.DOUBLE, "doubleCol");
-        t.addColumn(RealmFieldType.FLOAT, "floatCol");
-        t.addColumn(RealmFieldType.STRING, "StringCol");
+        Table t = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
+            @Override
+            public void execute(Table t) {
+                t.addColumn(RealmFieldType.INTEGER, "intCol");
+                t.addColumn(RealmFieldType.DOUBLE, "doubleCol");
+                t.addColumn(RealmFieldType.FLOAT, "floatCol");
+                t.addColumn(RealmFieldType.STRING, "StringCol");
 
-        // Adds 3 rows of data with same values in each column.
-        t.add(1, 2.0D, 3.0F, "s1");
-        t.add(1, 2.0D, 3.0F, "s1");
-        t.add(1, 2.0D, 3.0F, "s1");
+                // Adds 3 rows of data with same values in each column.
+                TestHelper.addRowWithValues(t, 1, 2.0D, 3.0F, "s1");
+                TestHelper.addRowWithValues(t, 1, 2.0D, 3.0F, "s1");
+                TestHelper.addRowWithValues(t, 1, 2.0D, 3.0F, "s1");
 
-        // Adds other values.
-        t.add(10, 20.0D, 30.0F, "s10");
-        t.add(100, 200.0D, 300.0F, "s100");
-        t.add(1000, 2000.0D, 3000.0F, "s1000");
+                // Adds other values.
+                TestHelper.addRowWithValues(t, 10, 20.0D, 30.0F, "s10");
+                TestHelper.addRowWithValues(t, 100, 200.0D, 300.0F, "s100");
+                TestHelper.addRowWithValues(t, 1000, 2000.0D, 3000.0F, "s1000");
+            }
+        });
 
         // Counts instances of values added in the first 3 rows.
         assertEquals(3, t.count(0, 1));
@@ -27,8 +31,10 @@
         assertEquals(4, t.findFirstFloat(2, 300.0F)); // Find rows index for first float value of 300.0 in column 2.
 
         // Sets double and float.
+        sharedRealm.beginTransaction();
         t.setDouble(1, 2, -2.0D, false);
         t.setFloat(2, 2, -3.0F, false);
+        sharedRealm.commitTransaction();
 
         // Gets double tests.
         assertEquals(-2.0D, t.getDouble(1, 2));

@@ -1,8 +1,10 @@
     @Test
     public void queryTestForNoMatches() {
-        Table t = TestHelper.getTableWithAllColumnTypes();
+        Table t = TestHelper.createTableWithAllColumnTypes(sharedRealm);
 
-        t.add(new byte[]{1,2,3}, true, new Date(1384423149761L), 4.5d, 5.7f, 100, "string");
+        sharedRealm.beginTransaction();
+        TestHelper.addRowWithValues(t, new byte[]{1,2,3}, true, new Date(1384423149761L), 4.5d, 5.7f, 100, "string");
+        sharedRealm.commitTransaction();
 
         TableQuery q = t.where().greaterThan(new long[]{5}, oneNullTable, 1000); // No matches
 

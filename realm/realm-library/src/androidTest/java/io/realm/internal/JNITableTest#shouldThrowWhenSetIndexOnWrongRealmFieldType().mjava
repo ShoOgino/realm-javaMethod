@@ -1,5 +1,6 @@
     @Test
     public void shouldThrowWhenSetIndexOnWrongRealmFieldType() {
+        Table t = TestHelper.createTableWithAllColumnTypes(sharedRealm);
         for (long colIndex = 0; colIndex < t.getColumnCount(); colIndex++) {
 
             // All types supported addSearchIndex and removeSearchIndex.
@@ -10,6 +11,7 @@
                             t.getColumnType(colIndex) != RealmFieldType.DATE);
 
             // Tries to addSearchIndex().
+            sharedRealm.beginTransaction();
             try {
                 t.addSearchIndex(colIndex);
                 if (exceptionExpected) {
@@ -17,8 +19,10 @@
                 }
             } catch (IllegalArgumentException ignored) {
             }
+            sharedRealm.commitTransaction();
 
             // Tries to removeSearchIndex().
+            sharedRealm.beginTransaction();
             try {
                 // Currently core will do nothing if the column doesn't have a search index.
                 t.removeSearchIndex(colIndex);
@@ -27,7 +31,7 @@
                 }
             } catch (IllegalArgumentException ignored) {
             }
-
+            sharedRealm.commitTransaction();
 
             // Tries to hasSearchIndex() for all columnTypes.
             t.hasSearchIndex(colIndex);

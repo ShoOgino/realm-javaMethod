@@ -1,8 +1,7 @@
     @Test
     public void nullValues() {
 
-        Table table = new Table();
-
+        Table table = TestHelper.createTable(sharedRealm, "temp");
         long colStringIndex = table.addColumn(RealmFieldType.STRING, "string", true);
         long colIntIndex = table.addColumn(RealmFieldType.INTEGER, "integer", true);
         table.addColumn(RealmFieldType.FLOAT, "float");
@@ -10,8 +9,8 @@
         long colBoolIndex = table.addColumn(RealmFieldType.BOOLEAN, "boolean", true);
         table.addColumn(RealmFieldType.DATE, "date");
         table.addColumn(RealmFieldType.BINARY, "binary");
+        long rowIndex = OsObject.createRow(table);
 
-        long rowIndex = table.addEmptyRow();
         UncheckedRow row = table.getUncheckedRow(rowIndex);
 
         row.setString(colStringIndex, "test");

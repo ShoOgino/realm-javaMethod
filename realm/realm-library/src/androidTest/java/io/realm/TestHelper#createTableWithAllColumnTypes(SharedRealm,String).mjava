@@ -1,0 +1,38 @@
+    /**
+     * Creates an empty table with 1 column of all our supported column types, currently 7 columns.
+     *
+     * @param sharedRealm A {@link SharedRealm} where the table is created.
+     * @param name name of the table.
+     * @return created table.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static Table createTableWithAllColumnTypes(SharedRealm sharedRealm,
+            @SuppressWarnings("SameParameterValue") String name) {
+        boolean wasInTransaction = sharedRealm.isInTransaction();
+        if (!wasInTransaction) {
+            sharedRealm.beginTransaction();
+        }
+        try {
+            Table t = sharedRealm.createTable(name);
+
+            t.addColumn(RealmFieldType.BINARY, "binary");
+            t.addColumn(RealmFieldType.BOOLEAN, "boolean");
+            t.addColumn(RealmFieldType.DATE, "date");
+            t.addColumn(RealmFieldType.DOUBLE, "double");
+            t.addColumn(RealmFieldType.FLOAT, "float");
+            t.addColumn(RealmFieldType.INTEGER, "long");
+            t.addColumn(RealmFieldType.STRING, "string");
+
+            return t;
+        } catch (RuntimeException e) {
+            if (!wasInTransaction) {
+                sharedRealm.cancelTransaction();
+            }
+            throw e;
+        } finally {
+            if (!wasInTransaction && sharedRealm.isInTransaction()) {
+                sharedRealm.commitTransaction();
+            }
+        }
+    }
+

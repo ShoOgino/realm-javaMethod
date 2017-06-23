@@ -1,12 +1,16 @@
     @Test
     public void minimumDate() {
 
-        Table table = new Table();
-        table.addColumn(RealmFieldType.DATE, "date");
+        Table table = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
+            @Override
+            public void execute(Table table) {
+                table.addColumn(RealmFieldType.DATE, "date");
 
-        table.add(new Date(10000));
-        table.add(new Date(0));
-        table.add(new Date(1000));
+                TestHelper.addRowWithValues(table, new Date(10000));
+                TestHelper.addRowWithValues(table, new Date(0));
+                TestHelper.addRowWithValues(table, new Date(1000));
+            }
+        });
 
         assertEquals(new Date(0), table.where().minimumDate(0));
     }

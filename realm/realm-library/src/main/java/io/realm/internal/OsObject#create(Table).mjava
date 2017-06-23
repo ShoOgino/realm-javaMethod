@@ -2,9 +2,11 @@
     /**
      * Create an object in the given table which doesn't have a primary key column defined.
      *
+     * @param table the table where the object is created. This table must be atached to {@link SharedRealm}.
      * @return a newly created {@code UncheckedRow}.
      */
-    public static UncheckedRow create(SharedRealm sharedRealm, Table table) {
+    public static UncheckedRow create(Table table) {
+        final SharedRealm sharedRealm = table.getSharedRealm();
         return new UncheckedRow(sharedRealm.context, table,
                 nativeCreateNewObject(sharedRealm.getNativePtr(), table.getNativePtr()));
     }

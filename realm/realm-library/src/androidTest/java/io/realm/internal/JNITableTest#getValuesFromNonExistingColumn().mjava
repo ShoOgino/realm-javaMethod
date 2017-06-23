@@ -1,7 +1,11 @@
     @Test
     public void getValuesFromNonExistingColumn() {
-        Table t = TestHelper.getTableWithAllColumnTypes();
-        t.addEmptyRows(10);
+        Table t = TestHelper.createTableWithAllColumnTypes(sharedRealm);
+        sharedRealm.beginTransaction();
+        for (int i = 0; i < 10; i++) {
+            OsObject.createRow(t);
+        }
+        sharedRealm.commitTransaction();
 
         try {
             t.getBinaryByteArray(-1, 0);

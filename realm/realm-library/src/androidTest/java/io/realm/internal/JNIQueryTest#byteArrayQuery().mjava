@@ -1,18 +1,22 @@
     @Test
     public void byteArrayQuery() throws Exception {
 
-        Table table = new Table();
-        table.addColumn(RealmFieldType.BINARY, "binary");
-
         final byte[] binary1 = new byte[] {0x01, 0x02, 0x03, 0x04};
         final byte[] binary2 = new byte[] {0x05, 0x02, 0x03, 0x08};
         final byte[] binary3 = new byte[] {0x09, 0x0a, 0x0b, 0x04};
         final byte[] binary4 = new byte[] {0x05, 0x0a, 0x0b, 0x10};
 
-        table.add((Object) binary1);
-        table.add((Object) binary2);
-        table.add((Object) binary3);
-        table.add((Object) binary4);
+        Table table = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
+            @Override
+            public void execute(Table table) {
+                table.addColumn(RealmFieldType.BINARY, "binary");
+
+                TestHelper.addRowWithValues(table, (Object) binary1);
+                TestHelper.addRowWithValues(table, (Object) binary2);
+                TestHelper.addRowWithValues(table, (Object) binary3);
+                TestHelper.addRowWithValues(table, (Object) binary4);
+            }
+        });
 
         // Equal to
 

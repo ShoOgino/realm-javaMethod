@@ -1,7 +1,9 @@
     @Test
     public void findFirstNonExisting() {
-        Table t = TestHelper.getTableWithAllColumnTypes();
-        t.add(new byte[] {1, 2, 3}, true, new Date(1384423149761L), 4.5D, 5.7F, 100, "string");
+        Table t = TestHelper.createTableWithAllColumnTypes(sharedRealm);
+        sharedRealm.beginTransaction();
+        TestHelper.addRowWithValues(t, new byte[] {1, 2, 3}, true, new Date(1384423149761L), 4.5D, 5.7F, 100, "string");
+        sharedRealm.commitTransaction();
 
         assertEquals(-1, t.findFirstBoolean(1, false));
         assertEquals(-1, t.findFirstDate(2, new Date(138442314986L)));

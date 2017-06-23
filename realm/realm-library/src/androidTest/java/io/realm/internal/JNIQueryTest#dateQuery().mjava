@@ -1,21 +1,25 @@
     @Test
     public void dateQuery() throws Exception {
 
-        Table table = new Table();
-        table.addColumn(RealmFieldType.DATE, "date");
-
         final Date past = new Date(TimeUnit.SECONDS.toMillis(Integer.MIN_VALUE - 100L));
         final Date future = new Date(TimeUnit.SECONDS.toMillis(Integer.MAX_VALUE + 1L));
         final Date distantPast = new Date(Long.MIN_VALUE);
         final Date distantFuture = new Date(Long.MAX_VALUE);
 
-        table.add(new Date(10000));
-        table.add(new Date(0));
-        table.add(new Date(1000));
-        table.add(future);
-        table.add(distantFuture);
-        table.add(past);
-        table.add(distantPast);
+        Table table = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
+            @Override
+            public void execute(Table table) {
+                table.addColumn(RealmFieldType.DATE, "date");
+
+                TestHelper.addRowWithValues(table, new Date(10000));
+                TestHelper.addRowWithValues(table, new Date(0));
+                TestHelper.addRowWithValues(table, new Date(1000));
+                TestHelper.addRowWithValues(table, future);
+                TestHelper.addRowWithValues(table, distantFuture);
+                TestHelper.addRowWithValues(table, past);
+                TestHelper.addRowWithValues(table, distantPast);
+            }
+        });
 
         assertEquals(1L, table.where().equalTo(new long[]{0}, oneNullTable, distantPast).count());
         assertEquals(6L, table.where().notEqualTo(new long[]{0}, oneNullTable, distantPast).count());

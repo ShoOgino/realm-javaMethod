@@ -1,6 +1,8 @@
     @Test
     public void rowOperationsOnZeroRow() {
-        Table t = new Table();
+        Table t = TestHelper.createTable(sharedRealm, "temp");
+
+        sharedRealm.beginTransaction();
         // Removes rows without columns.
         try { t.moveLastOver(0);  fail("No rows in table"); } catch (ArrayIndexOutOfBoundsException ignored) {}
         try { t.moveLastOver(10); fail("No rows in table"); } catch (ArrayIndexOutOfBoundsException ignored) {}
@@ -9,5 +11,6 @@
         t.addColumn(RealmFieldType.STRING, "");
         try { t.moveLastOver(0);  fail("No rows in table"); } catch (ArrayIndexOutOfBoundsException ignored) {}
         try { t.moveLastOver(10); fail("No rows in table"); } catch (ArrayIndexOutOfBoundsException ignored) {}
+        sharedRealm.commitTransaction();
     }
 

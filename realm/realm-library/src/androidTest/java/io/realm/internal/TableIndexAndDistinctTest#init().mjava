@@ -1,16 +1,20 @@
-    void init() {
-        table = new Table();
-        table.addColumn(RealmFieldType.INTEGER, "number");
-        table.addColumn(RealmFieldType.STRING, "name");
+    private void init() {
+        table = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
+            @Override
+            public void execute(Table table) {
+                table.addColumn(RealmFieldType.INTEGER, "number");
+                table.addColumn(RealmFieldType.STRING, "name");
 
-        long i = 0;
-        table.add(0, "A");
-        table.add(1, "B");
-        table.add(2, "C");
-        table.add(3, "B");
-        table.add(4, "D");
-        table.add(5, "D");
-        table.add(6, "D");
+                TestHelper.addRowWithValues(table, 0, "A");
+                TestHelper.addRowWithValues(table, 1, "B");
+                TestHelper.addRowWithValues(table, 2, "C");
+                TestHelper.addRowWithValues(table, 3, "B");
+                TestHelper.addRowWithValues(table, 4, "D");
+                TestHelper.addRowWithValues(table, 5, "D");
+                TestHelper.addRowWithValues(table, 6, "D");
+            }
+        });
+
         assertEquals(7, table.size());
     }
 

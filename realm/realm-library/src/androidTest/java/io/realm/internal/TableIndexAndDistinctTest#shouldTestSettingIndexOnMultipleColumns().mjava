@@ -6,21 +6,26 @@
     public void shouldTestSettingIndexOnMultipleColumns() {
 
         // Creates a table only with String type columns
-        Table t = new Table();
-        t.addColumn(RealmFieldType.STRING, "col1");
-        t.addColumn(RealmFieldType.STRING, "col2");
-        t.addColumn(RealmFieldType.STRING, "col3");
-        t.addColumn(RealmFieldType.STRING, "col4");
-        t.addColumn(RealmFieldType.STRING, "col5");
-        t.add("row1", "row2", "row3", "row4", "row5");
-        t.add("row1", "row2", "row3", "row4", "row5");
-        t.add("row1", "row2", "row3", "row4", "row5");
-        t.add("row1", "row2", "row3", "row4", "row5");
-        t.add("row1", "row2", "row3", "row4", "row5");
+        Table t = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
+            @Override
+            public void execute(Table t) {
+                t.addColumn(RealmFieldType.STRING, "col1");
+                t.addColumn(RealmFieldType.STRING, "col2");
+                t.addColumn(RealmFieldType.STRING, "col3");
+                t.addColumn(RealmFieldType.STRING, "col4");
+                t.addColumn(RealmFieldType.STRING, "col5");
+                TestHelper.addRowWithValues(t, "row1", "row2", "row3", "row4", "row5");
+                TestHelper.addRowWithValues(t, "row1", "row2", "row3", "row4", "row5");
+                TestHelper.addRowWithValues(t, "row1", "row2", "row3", "row4", "row5");
+                TestHelper.addRowWithValues(t, "row1", "row2", "row3", "row4", "row5");
+                TestHelper.addRowWithValues(t, "row1", "row2", "row3", "row4", "row5");
+            }
+        });
 
         for (long c=0;c<t.getColumnCount();c++){
             t.addSearchIndex(c);
             assertEquals(true, t.hasSearchIndex(c));
         }
+
     }
 

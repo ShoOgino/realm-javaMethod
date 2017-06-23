@@ -3,56 +3,68 @@
     public void convertToNullable() {
         RealmFieldType[] columnTypes = {RealmFieldType.BOOLEAN, RealmFieldType.DATE, RealmFieldType.DOUBLE,
                 RealmFieldType.FLOAT, RealmFieldType.INTEGER, RealmFieldType.BINARY, RealmFieldType.STRING};
-        for (RealmFieldType columnType : columnTypes) {
+        int tableIndex = 0;
+        for (final RealmFieldType columnType : columnTypes) {
             // Tests various combinations of column names and nullability.
             String[] columnNames = {"foobar", "__TMP__0"};
-            for (boolean nullable : new boolean[] {Table.NOT_NULLABLE, Table.NULLABLE}) {
-                for (String columnName : columnNames) {
-                    Table table = new Table();
-                    long colIndex = table.addColumn(columnType, columnName, nullable);
-                    table.addColumn(RealmFieldType.BOOLEAN, "bool");
-                    table.addEmptyRow();
-                    if (columnType == RealmFieldType.BOOLEAN) {
-                        table.setBoolean(colIndex, 0, true, false);
-                    } else if (columnType == RealmFieldType.DATE) {
-                        table.setDate(colIndex, 0, new Date(0), false);
-                    } else if (columnType == RealmFieldType.DOUBLE) {
-                        table.setDouble(colIndex, 0, 1.0, false);
-                    } else if (columnType == RealmFieldType.FLOAT) {
-                        table.setFloat(colIndex, 0, 1.0F, false);
-                    } else if (columnType == RealmFieldType.INTEGER) {
-                        table.setLong(colIndex, 0, 1, false);
-                    } else if (columnType == RealmFieldType.BINARY) {
-                        table.setBinaryByteArray(colIndex, 0, new byte[] {0}, false);
-                    } else if (columnType == RealmFieldType.STRING) {
-                        table.setString(colIndex, 0, "Foo", false);
-                    }
-                    try {
-                        table.addEmptyRow();
-                        if (columnType == RealmFieldType.BINARY) {
-                            table.setBinaryByteArray(colIndex, 1, null, false);
-                        } else if (columnType == RealmFieldType.STRING) {
-                            table.setString(colIndex, 1, null, false);
-                        } else {
-                            table.getCheckedRow(1).setNull(colIndex);
-                        }
+            for (final boolean nullable : new boolean[] {Table.NOT_NULLABLE, Table.NULLABLE}) {
+                for (final String columnName : columnNames) {
+                    final AtomicLong colIndexRef = new AtomicLong();
+                    Table table = TestHelper.createTable(sharedRealm, "temp" + tableIndex, new TestHelper.AdditionalTableSetup() {
+                        @Override
+                        public void execute(Table table) {
+                            long colIndex = table.addColumn(columnType, columnName, nullable);
+                            colIndexRef.set(colIndex);
+                            table.addColumn(RealmFieldType.BOOLEAN, "bool");
+                            OsObject.createRow(table);
+                            if (columnType == RealmFieldType.BOOLEAN) {
+                                table.setBoolean(colIndex, 0, true, false);
+                            } else if (columnType == RealmFieldType.DATE) {
+                                table.setDate(colIndex, 0, new Date(0), false);
+                            } else if (columnType == RealmFieldType.DOUBLE) {
+                                table.setDouble(colIndex, 0, 1.0, false);
+                            } else if (columnType == RealmFieldType.FLOAT) {
+                                table.setFloat(colIndex, 0, 1.0F, false);
+                            } else if (columnType == RealmFieldType.INTEGER) {
+                                table.setLong(colIndex, 0, 1, false);
+                            } else if (columnType == RealmFieldType.BINARY) {
+                                table.setBinaryByteArray(colIndex, 0, new byte[] {0}, false);
+                            } else if (columnType == RealmFieldType.STRING) {
+                                table.setString(colIndex, 0, "Foo", false);
+                            }
+                            try {
+                                OsObject.createRow(table);
+                                if (columnType == RealmFieldType.BINARY) {
+                                    table.setBinaryByteArray(colIndex, 1, null, false);
+                                } else if (columnType == RealmFieldType.STRING) {
+                                    table.setString(colIndex, 1, null, false);
+                                } else {
+                                    table.getCheckedRow(1).setNull(colIndex);
+                                }
 
-                        if (!nullable) {
-                            fail();
+                                if (!nullable) {
+                                    fail();
+                                }
+                            } catch (IllegalArgumentException ignored) {
+                            }
+                            table.moveLastOver(table.size() - 1);
                         }
-                    } catch (IllegalArgumentException ignored) {
-                    }
-                    table.moveLastOver(table.size() - 1);
+                    });
                     assertEquals(1, table.size());
 
+                    long colIndex = colIndexRef.get();
+
+                    sharedRealm.beginTransaction();
                     table.convertColumnToNullable(colIndex);
+                    sharedRealm.commitTransaction();
                     assertTrue(table.isColumnNullable(colIndex));
                     assertEquals(1, table.size());
                     assertEquals(2, table.getColumnCount());
                     assertTrue(table.getColumnIndex(columnName) >= 0);
                     assertEquals(colIndex, table.getColumnIndex(columnName));
 
-                    table.addEmptyRow();
+                    sharedRealm.beginTransaction();
+                    OsObject.createRow(table);
                     if (columnType == RealmFieldType.BINARY) {
                         table.setBinaryByteArray(colIndex, 0, null, false);
                     } else if (columnType == RealmFieldType.STRING) {
@@ -60,6 +72,7 @@
                     } else {
                         table.getCheckedRow(0).setNull(colIndex);
                     }
+                    sharedRealm.commitTransaction();
 
                     assertEquals(2, table.size());
 
@@ -70,6 +83,7 @@
                     } else {
                         assertTrue(table.getUncheckedRow(1).isNull(colIndex));
                     }
+                    tableIndex++;
                 }
             }
         }
