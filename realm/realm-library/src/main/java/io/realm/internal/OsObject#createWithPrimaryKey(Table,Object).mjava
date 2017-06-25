@@ -3,11 +3,13 @@
      * Create an object in the given table which has a primary key column defined, and set the primary key with given
      * value.
      *
+     * @param table the table where the object is created. This table must be atached to {@link SharedRealm}.
      * @return a newly created {@code UncheckedRow}.
      */
-    public static UncheckedRow createWithPrimaryKey(SharedRealm sharedRealm, Table table, Object primaryKeyValue) {
+    public static UncheckedRow createWithPrimaryKey(Table table, Object primaryKeyValue) {
         long primaryKeyColumnIndex = getAndVerifyPrimaryKeyColumnIndex(table);
         RealmFieldType type = table.getColumnType(primaryKeyColumnIndex);
+        final SharedRealm sharedRealm = table.getSharedRealm();
 
         if (type == RealmFieldType.STRING) {
             if (primaryKeyValue != null && !(primaryKeyValue instanceof String)) {

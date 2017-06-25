@@ -1,9 +1,13 @@
     @SuppressWarnings("ConstantConditions")
     @Test
     public void nullInputQuery() {
-        Table t = new Table();
-        t.addColumn(RealmFieldType.DATE, "dateCol");
-        t.addColumn(RealmFieldType.STRING, "stringCol");
+        Table t = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
+            @Override
+            public void execute(Table t) {
+                t.addColumn(RealmFieldType.DATE, "dateCol");
+                t.addColumn(RealmFieldType.STRING, "stringCol");
+            }
+        });
 
         Date nullDate = null;
         try { t.where().equalTo(new long[]{0}, oneNullTable, nullDate);               fail("Date is null"); } catch (IllegalArgumentException ignore) { }

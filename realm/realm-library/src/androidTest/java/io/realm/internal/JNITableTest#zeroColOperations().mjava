@@ -1,22 +1,8 @@
     @Test
     public void zeroColOperations() {
-        Table tableZeroCols = new Table();
+        Table tableZeroCols = TestHelper.createTable(sharedRealm, "temp");
 
-        // Adds rows.
-        try {
-            tableZeroCols.add("val");
-            fail("No columns in table");
-        } catch (IndexOutOfBoundsException ignored) {}
-        try {
-            tableZeroCols.addEmptyRow();
-            fail("No columns in table");
-        } catch (IndexOutOfBoundsException ignored) {}
-        try {
-            tableZeroCols.addEmptyRows(10);
-            fail("No columns in table");
-        } catch (IndexOutOfBoundsException ignored) {}
-
-
+        sharedRealm.beginTransaction();
         // Col operations
         try {
             tableZeroCols.removeColumn(0);
@@ -34,5 +20,6 @@
             tableZeroCols.renameColumn(10, "newName");
             fail("No columns in table");
         } catch (ArrayIndexOutOfBoundsException ignored) {}
+        sharedRealm.commitTransaction();
     }
 

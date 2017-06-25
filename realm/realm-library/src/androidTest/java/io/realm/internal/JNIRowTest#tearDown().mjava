@@ -1,0 +1,11 @@
+    @After
+    public void tearDown() {
+        if (sharedRealm != null && sharedRealm.isInTransaction()) {
+            sharedRealm.cancelTransaction();
+        }
+
+        if (sharedRealm != null && !sharedRealm.isClosed()) {
+            sharedRealm.close();
+        }
+    }
+

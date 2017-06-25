@@ -1,7 +1,5 @@
     @Test
     public void defaultValue_overwrittenByNonDefault() {
-        // t is not used in this test.
-        t = null;
         final SharedRealm sharedRealm = SharedRealm.getInstance(configFactory.createConfiguration());
         //noinspection TryFinallyCanBeTryWithResources
         try {
@@ -32,8 +30,8 @@
             }
 
             sharedRealm.beginTransaction();
-            table.addEmptyRow();
-            table.addEmptyRow(); // For link field update.
+            OsObject.createRow(table);
+            OsObject.createRow(table); // For link field update.
 
             // Sets as default.
             ListIterator<Pair<RealmFieldType, Object>> it = columnInfoList.listIterator();

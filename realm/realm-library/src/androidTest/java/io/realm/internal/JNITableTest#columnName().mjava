@@ -1,10 +1,14 @@
     @Test
     public void columnName() {
-        Table t = new Table();
-        try {
-            t.addColumn(RealmFieldType.STRING, "I am 64 characters..............................................");
-            fail("Only 63 characters supported");
-        } catch (IllegalArgumentException ignored) { }
-        t.addColumn(RealmFieldType.STRING, "I am 63 characters.............................................");
+        TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
+            @Override
+            public void execute(Table t) {
+                try {
+                    t.addColumn(RealmFieldType.STRING, "I am 64 characters..............................................");
+                    fail("Only 63 characters supported");
+                } catch (IllegalArgumentException ignored) { }
+                t.addColumn(RealmFieldType.STRING, "I am 63 characters.............................................");
+            }
+        });
     }
 

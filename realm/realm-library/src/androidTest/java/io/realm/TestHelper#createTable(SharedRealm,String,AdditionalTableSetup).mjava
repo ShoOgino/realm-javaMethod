@@ -1,0 +1,23 @@
+    public static Table createTable(SharedRealm sharedRealm, String name, AdditionalTableSetup additionalSetup) {
+        boolean wasInTransaction = sharedRealm.isInTransaction();
+        if (!wasInTransaction) {
+            sharedRealm.beginTransaction();
+        }
+        try {
+            Table table = sharedRealm.createTable(name);
+            if (additionalSetup != null) {
+                additionalSetup.execute(table);
+            }
+            return table;
+        } catch (RuntimeException e) {
+            if (!wasInTransaction) {
+                sharedRealm.cancelTransaction();
+            }
+            throw e;
+        } finally {
+            if (!wasInTransaction && sharedRealm.isInTransaction()) {
+                sharedRealm.commitTransaction();
+            }
+        }
+    }
+
