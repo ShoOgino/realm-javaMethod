@@ -3,13 +3,15 @@
     // old class (without @Required) can be used,
     @Test
     public void migratePreNull() throws IOException {
+        final AtomicBoolean migrationCalled = new AtomicBoolean(false);
         configFactory.copyRealmFromAssets(context,
-                "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
+                "string-only-pre-null-0.82.2.realm", Realm.DEFAULT_REALM_NAME);
         RealmMigration migration = new RealmMigration() {
             @Override
             public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
                 RealmObjectSchema objectSchema = realm.getSchema().get(StringOnly.CLASS_NAME);
                 objectSchema.setRequired(StringOnly.FIELD_CHARS, false);
+                migrationCalled.set(true);
             }
         };
 
@@ -19,8 +21,13 @@
                 .migration(migration)
                 .build();
         Realm realm = Realm.getInstance(realmConfig);
+        assertTrue(migrationCalled.get());
+
+        StringOnly stringOnly = realm.where(StringOnly.class).findFirst();
+        assertNotNull(stringOnly);
+        // This object was created with 0.82.2
+        assertEquals("String_set_with_0.82.2", stringOnly.getChars());
         realm.beginTransaction();
-        StringOnly stringOnly = realm.createObject(StringOnly.class);
         stringOnly.setChars(null);
         realm.commitTransaction();
         realm.close();
