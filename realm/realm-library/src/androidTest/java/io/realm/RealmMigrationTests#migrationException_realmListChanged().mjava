@@ -1,13 +1,26 @@
-    // In default-before-migration.realm, CatOwner has a RealmList<Dog> field.
-    // This is changed to RealmList<Cat> and getInstance() must throw an exception.
+    // Check if the RealmList type change can trigger a RealmMigrationNeededException.
     @Test
     public void migrationException_realmListChanged() throws IOException {
-        configFactory.copyRealmFromAssets(context,
-                "default-before-migration.realm", Realm.DEFAULT_REALM_NAME);
+        RealmConfiguration config = configFactory.createConfiguration();
+        // Initialize the schema with RealmList<Cat>
+        Realm.getInstance(configFactory.createConfiguration()).close();
+
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(config);
+        dynamicRealm.beginTransaction();
+        // Change the RealmList type to RealmList<Dog>
+        RealmObjectSchema dogSchema = dynamicRealm.getSchema().get(Dog.CLASS_NAME);
+        RealmObjectSchema ownerSchema = dynamicRealm.getSchema().get(CatOwner.CLASS_NAME);
+        ownerSchema.removeField(CatOwner.FIELD_CATS);
+        ownerSchema.addRealmListField(CatOwner.FIELD_CATS, dogSchema);
+        dynamicRealm.commitTransaction();
+        dynamicRealm.close();
+
         try {
-            realm = Realm.getInstance(configFactory.createConfiguration());
+            realm = Realm.getInstance(config);
             fail();
         } catch (RealmMigrationNeededException ignored) {
+            assertThat(ignored.getMessage(),
+                    CoreMatchers.containsString("Invalid RealmList type for field 'cats': 'class_Dog' expected "));
         }
     }
 
