@@ -5,5 +5,17 @@
      * @return the updated schema.
      * @throws IllegalArgumentException if field name doesn't exist.
      */
-    public abstract RealmObjectSchema removeField(String fieldName);
+    public RealmObjectSchema removeField(String fieldName) {
+        realm.checkNotInSync(); // destructive modification of a schema is not permitted
+        checkLegalName(fieldName);
+        if (!hasField(fieldName)) {
+            throw new IllegalStateException(fieldName + " does not exist.");
+        }
+        long columnIndex = getColumnIndex(fieldName);
+        if (table.getPrimaryKey() == columnIndex) {
+            table.setPrimaryKey(null);
+        }
+        table.removeColumn(columnIndex);
+        return this;
+    }
 

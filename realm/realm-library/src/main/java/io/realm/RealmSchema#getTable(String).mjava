@@ -1,2 +1,11 @@
-    abstract Table getTable(String className);
+    Table getTable(String className) {
+        String tableName = Table.getTableNameForClass(className);
+        Table table = dynamicClassToTable.get(tableName);
+        if (table != null) { return table; }
+
+        table = realm.getSharedRealm().getTable(tableName);
+        dynamicClassToTable.put(tableName, table);
+
+        return table;
+    }
 

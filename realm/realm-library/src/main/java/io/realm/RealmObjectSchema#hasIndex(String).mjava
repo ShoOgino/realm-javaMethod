@@ -6,5 +6,9 @@
      * @throws IllegalArgumentException if field name doesn't exist.
      * @see io.realm.annotations.Index
      */
-    public abstract boolean hasIndex(String fieldName);
+    public boolean hasIndex(String fieldName) {
+        checkLegalName(fieldName);
+        checkFieldExists(fieldName);
+        return table.hasSearchIndex(table.getColumnIndex(fieldName));
+    }
 
