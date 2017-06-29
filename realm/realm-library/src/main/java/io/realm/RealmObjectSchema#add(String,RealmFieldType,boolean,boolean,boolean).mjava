@@ -1,2 +1,10 @@
-    abstract RealmObjectSchema add(String name, RealmFieldType type, boolean primary, boolean indexed, boolean required);
+    RealmObjectSchema add(String name, RealmFieldType type, boolean primary, boolean indexed, boolean required) {
+        long columnIndex = table.addColumn(type, name, (required) ? Table.NOT_NULLABLE : Table.NULLABLE);
+
+        if (indexed) { table.addSearchIndex(columnIndex); }
+
+        if (primary) { table.setPrimaryKey(name); }
+
+        return this;
+    }
 
