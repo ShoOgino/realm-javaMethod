@@ -1,0 +1,20 @@
+    private void emitGetExpectedObjectSchemaInfoMap(JavaWriter writer) throws IOException {
+        writer.emitAnnotation("Override");
+        writer.beginMethod(
+                "Map<Class<? extends RealmModel>, OsObjectSchemaInfo>",
+                "getExpectedObjectSchemaInfoMap",
+                EnumSet.of(Modifier.PUBLIC));
+
+        writer.emitStatement(
+                "Map<Class<? extends RealmModel>, OsObjectSchemaInfo> infoMap = " +
+                        "new HashMap<Class<? extends RealmModel>, OsObjectSchemaInfo>()");
+        for (int i = 0; i < qualifiedProxyClasses.size(); i++) {
+            writer.emitStatement("infoMap.put(%s.class, %s.getExpectedObjectSchemaInfo())",
+                    qualifiedModelClasses.get(i), qualifiedProxyClasses.get(i));
+        }
+        writer.emitStatement("return infoMap");
+
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+

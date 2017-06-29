@@ -1,6 +1,10 @@
     private void emitClassFields(JavaWriter writer) throws IOException {
         writer.emitField(columnInfoClassName(), "columnInfo", EnumSet.of(Modifier.PRIVATE))
-                .emitField("ProxyState<" + qualifiedClassName + ">", "proxyState", EnumSet.of(Modifier.PRIVATE));
+                .emitField("ProxyState<" + qualifiedClassName + ">", "proxyState", EnumSet.of(Modifier.PRIVATE))
+                .emitField("OsObjectSchemaInfo", "expectedObjectSchemaInfo",
+                        EnumSet.of(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL),
+                        "createExpectedObjectSchemaInfo()");
+
 
         for (VariableElement variableElement : metadata.getFields()) {
             if (Utils.isRealmList(variableElement)) {

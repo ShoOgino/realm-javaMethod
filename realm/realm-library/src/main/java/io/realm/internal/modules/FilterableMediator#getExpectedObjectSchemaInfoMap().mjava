@@ -1,0 +1,13 @@
+    @Override
+    public Map<Class<? extends RealmModel>, OsObjectSchemaInfo> getExpectedObjectSchemaInfoMap() {
+        Map<Class<? extends RealmModel>, OsObjectSchemaInfo> infoMap =
+                new HashMap<Class<? extends RealmModel>, OsObjectSchemaInfo>();
+        for (Map.Entry<Class<? extends RealmModel>, OsObjectSchemaInfo> entry :
+                originalMediator.getExpectedObjectSchemaInfoMap().entrySet()) {
+            if (allowedClasses.contains(entry.getKey())) {
+                infoMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return infoMap;
+    }
+
