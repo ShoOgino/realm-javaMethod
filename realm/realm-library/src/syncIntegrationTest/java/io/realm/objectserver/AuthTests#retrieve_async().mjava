@@ -1,0 +1,33 @@
+    @Test
+    @RunTestInLooperThread
+    public void retrieve_async() {
+        final String username = UUID.randomUUID().toString();
+        final String password = "password";
+        final SyncCredentials credentials = SyncCredentials.usernamePassword(username, password, true);
+        final SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
+        assertTrue(user.isValid());
+
+        // Login an admin user
+        final SyncUser adminUser = UserFactory.createAdminUser(Constants.AUTH_URL);
+        assertTrue(adminUser.isValid());
+        assertTrue(adminUser.isAdmin());
+
+        final String identity = user.getIdentity();
+        adminUser.retrieveUserAsync("password", username, new SyncUser.Callback() {
+            @Override
+            public void onSuccess(SyncUser syncUser) {
+
+                assertNotNull(syncUser);
+                assertEquals(identity, syncUser.getIdentity());
+                assertFalse(syncUser.isAdmin());
+                assertTrue(syncUser.isValid());
+                looperThread.testComplete();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail(error.getErrorMessage());
+            }
+        });
+    }
+
