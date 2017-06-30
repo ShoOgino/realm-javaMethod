@@ -1,0 +1,19 @@
+    // logging out 'user' should have the same impact on other instance(s) of the same user
+    @Test
+    public void loggingOutUserShouldImpactOtherInstances() throws InterruptedException {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+
+        SyncCredentials credentials = SyncCredentials.usernamePassword(username, password, true);
+        SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
+        SyncUser currentUser = SyncUser.currentUser();
+
+        assertTrue(user.isValid());
+        assertEquals(user, currentUser);
+
+        user.logout();
+
+        assertFalse(user.isValid());
+        assertFalse(currentUser.isValid());
+    }
+
