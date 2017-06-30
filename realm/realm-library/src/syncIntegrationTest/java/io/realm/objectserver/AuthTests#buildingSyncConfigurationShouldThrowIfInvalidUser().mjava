@@ -1,0 +1,29 @@
+    @Test
+    public void buildingSyncConfigurationShouldThrowIfInvalidUser() {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+
+        SyncCredentials credentials = SyncCredentials.usernamePassword(username, password, true);
+        SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
+        SyncUser currentUser = SyncUser.currentUser();
+        user.logout();
+
+        assertFalse(user.isValid());
+
+        try {
+            // We should not be able to build a configuration with an invalid/logged out user
+            new SyncConfiguration.Builder(user, Constants.USER_REALM).build();
+            fail("Invalid user, it should not be possible to create a SyncConfiguration");
+        } catch (IllegalArgumentException expected) {
+            // User not authenticated or authentication expired.
+        }
+
+        try {
+            // We should not be able to build a configuration with an invalid/logged out user
+            new SyncConfiguration.Builder(currentUser, Constants.USER_REALM).build();
+            fail("Invalid currentUser, it should not be possible to create a SyncConfiguration");
+        } catch (IllegalArgumentException expected) {
+            // User not authenticated or authentication expired.
+        }
+    }
+
