@@ -1,0 +1,51 @@
+    /**
+     * Helper method for Admin users in order to lookup a {@code SyncUser} using the identity provider and the used username.
+     *
+     * @param provider identity providers {@link io.realm.SyncCredentials.IdentityProvider} used when the account was created.
+     * @param providerId username or email used to create the account for the first time,
+     *                   what is needed will depend on what type of {@link SyncCredentials} was used.
+     *
+     * @return {@code SyncUser} associated with the given identity provider and providerId, or {@code null} in case
+     * of an {@code invalid} provider or {@code providerId}.
+     * @throws ObjectServerError in case of an error.
+     */
+    public SyncUser retrieveUser(final String provider, final String providerId) throws ObjectServerError {
+        if (Util.isEmptyString(provider)) {
+            throw new IllegalArgumentException("Not-null 'provider' required.");
+        }
+
+        if (Util.isEmptyString(providerId)) {
+            throw new IllegalArgumentException("None empty 'providerId' required.");
+        }
+
+        if (!isAdmin()) {
+            throw new IllegalArgumentException("SyncUser needs to be admin in order to lookup other users ID.");
+        }
+
+        AuthenticationServer authServer = SyncManager.getAuthServer();
+        LookupUserIdResponse response = authServer.retrieveUser(getSyncUser().getUserToken(), provider, providerId, getAuthenticationUrl());
+        if (!response.isValid()) {
+            // the endpoint returns a 404 if it can't honor the query, either because
+            // - provider is not valid
+            // - provider_id is not valid
+            // - token used is not an admin one
+            // in this case we should return null instead of throwing
+            if (response.getError().getErrorCode() == ErrorCode.NOT_FOUND) {
+                return null;
+            } else {
+                throw response.getError();
+            }
+        } else {
+            SyncUser syncUser = SyncManager.getUserStore().get(response.getUserId());
+            if (syncUser != null) {
+                return syncUser;
+            } else {
+                // build an SynUser without a token
+                Token refreshToken = new Token(null, response.getUserId(), null, 0, null, response.isAdmin());
+                ObjectServerUser objectServerUser = new ObjectServerUser(refreshToken, getAuthenticationUrl());
+                objectServerUser.localLogout();
+                return new SyncUser(objectServerUser);
+            }
+        }
+    }
+

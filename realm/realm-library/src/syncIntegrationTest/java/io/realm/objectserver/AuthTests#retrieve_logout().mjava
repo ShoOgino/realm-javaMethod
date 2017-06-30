@@ -1,0 +1,19 @@
+    @Test
+    public void retrieve_logout() {
+        final SyncUser adminUser = UserFactory.createAdminUser(Constants.AUTH_URL);
+
+        final String username = UUID.randomUUID().toString();
+        final String password = "password";
+        final SyncCredentials credentials = SyncCredentials.usernamePassword(username, password, true);
+        final SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
+        final String identity = user.getIdentity();
+        user.logout();
+        assertFalse(user.isValid());
+
+        SyncUser syncUser = adminUser.retrieveUser(SyncCredentials.IdentityProvider.USERNAME_PASSWORD, username);
+        assertNotNull(syncUser);
+        assertEquals(identity, syncUser.getIdentity());
+        assertFalse(syncUser.isAdmin());
+        assertFalse(syncUser.isValid());
+    }
+
