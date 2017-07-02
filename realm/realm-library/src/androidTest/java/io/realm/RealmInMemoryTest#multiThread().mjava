@@ -23,7 +23,7 @@
                 realm.commitTransaction();
 
                 try {
-                    assertEquals(realm.where(Dog.class).count(), 1);
+                    assertEquals(1, realm.where(Dog.class).count());
                 } catch (AssertionFailedError afe) {
                     threadError[0] = afe;
                     realm.close();
@@ -53,7 +53,7 @@
 
         // Refreshes will be ran in the next loop, manually refreshes it here.
         testRealm.waitForChange();
-        assertEquals(testRealm.where(Dog.class).count(), 1);
+        assertEquals(1, testRealm.where(Dog.class).count());
 
         // Step 3.
         // Releases the main thread Realm reference, and the worker thread holds the reference still.
@@ -62,7 +62,7 @@
         // Step 4.
         // Creates a new Realm reference in main thread and checks the data.
         testRealm = Realm.getInstance(inMemConf);
-        assertEquals(testRealm.where(Dog.class).count(), 1);
+        assertEquals(1, testRealm.where(Dog.class).count());
         testRealm.close();
 
         // Let the worker thread continue.
@@ -74,6 +74,6 @@
 
         // Since all previous Realm instances has been closed before, below will create a fresh new in-mem-realm instance.
         testRealm = Realm.getInstance(inMemConf);
-        assertEquals(testRealm.where(Dog.class).count(), 0);
+        assertEquals(0, testRealm.where(Dog.class).count());
     }
 
