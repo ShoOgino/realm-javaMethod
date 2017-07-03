@@ -23,13 +23,13 @@
         // Tests a normal Realm file.
         testRealm.writeCopyTo(new File(configFactory.getRoot(), fileName));
         Realm onDiskRealm = Realm.getInstance(conf);
-        assertEquals(onDiskRealm.where(Dog.class).count(), 1);
+        assertEquals(1, onDiskRealm.where(Dog.class).count());
         onDiskRealm.close();
 
         // Tests a encrypted Realm file.
         testRealm.writeEncryptedCopyTo(new File(configFactory.getRoot(), encFileName), key);
         onDiskRealm = Realm.getInstance(encConf);
-        assertEquals(onDiskRealm.where(Dog.class).count(), 1);
+        assertEquals(1, onDiskRealm.where(Dog.class).count());
         onDiskRealm.close();
         // Tests with a wrong key to see if it fails as expected.
         try {
@@ -40,7 +40,7 @@
             Realm.getInstance(wrongKeyConf);
             fail("Realm.getInstance should fail with RealmFileException");
         } catch (RealmFileException expected) {
-            assertEquals(expected.getKind(), RealmFileException.Kind.ACCESS_ERROR);
+            assertEquals(RealmFileException.Kind.ACCESS_ERROR, expected.getKind());
         }
     }
 
