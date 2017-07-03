@@ -2,9 +2,10 @@
     // A. Open the same sync Realm and add one object.
     // 2. Get the notification, check if the change in A is received.
     @Test
-    @RunTestWithRemoteService(SimpleCommitRemoteService.class)
     @RunTestInLooperThread
+    @RunTestWithRemoteService(remoteService = SimpleCommitRemoteService.class, onLooperThread = true)
     public void expectSimpleCommit() {
+        looperThread.runAfterTest(remoteService.afterRunnable);
         remoteService.createHandler(Looper.myLooper());
 
         final SyncUser user = UserFactory.getInstance().createDefaultUser(Constants.AUTH_URL);
