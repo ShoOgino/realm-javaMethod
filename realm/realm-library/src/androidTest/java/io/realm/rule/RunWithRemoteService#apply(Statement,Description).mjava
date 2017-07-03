@@ -7,11 +7,13 @@
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                before(annotation.value());
+                before(annotation.remoteService());
                 try {
                     base.evaluate();
                 } finally {
-                    after();
+                    if (!annotation.onLooperThread()) {
+                        after();
+                    }
                 }
             }
         };
