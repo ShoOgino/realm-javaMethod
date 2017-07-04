@@ -10,7 +10,9 @@
 
         final SyncUser user = UserFactory.getInstance().createDefaultUser(Constants.AUTH_URL);
         String realmUrl = Constants.SYNC_SERVER_URL;
-        final SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, realmUrl).build();
+        final SyncConfiguration syncConfig = new SyncConfiguration.Builder(user,realmUrl)
+                .directory(looperThread.getRoot())
+                .build();
         final Realm realm = Realm.getInstance(syncConfig);
         final RealmResults<ProcessInfo> all = realm.where(ProcessInfo.class).findAll();
         looperThread.keepStrongReference(all);
