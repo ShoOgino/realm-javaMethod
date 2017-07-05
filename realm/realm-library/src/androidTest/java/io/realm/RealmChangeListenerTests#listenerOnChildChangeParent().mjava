@@ -1,0 +1,39 @@
+    // 1. adding a listener on the children
+    // 2. modify parent
+    // 3. at least one child is modified
+    // 4. listener is not triggered (backlink)
+    // FIXME: will break when https://github.com/realm/realm-java/issues/4875 is solved
+    @Test
+    @RunTestInLooperThread
+    public void listenerOnChildChangeParent() {
+        final long[] nCalls = {0};
+        final Realm realm = Realm.getInstance(looperThread.getConfiguration());
+        TestHelper.populateLinkedDataSet(realm);
+
+        RealmResults<BacklinksTarget> backlinksTargets = realm.where(BacklinksTarget.class).findAll();
+        assertEquals(3, backlinksTargets.size());
+        assertTrue(backlinksTargets.last().getParents().isEmpty());
+        assertEquals(2, backlinksTargets.first().getParents().size());
+
+        looperThread.keepStrongReference(backlinksTargets);
+
+        backlinksTargets.addChangeListener(new RealmChangeListener<RealmResults<BacklinksTarget>>() {
+            @Override
+            public void onChange(RealmResults<BacklinksTarget> backlinksTargets) {
+                nCalls[0]++;
+            }
+        });
+
+        realm.beginTransaction();
+        BacklinksTarget target = backlinksTargets.last();
+        realm.where(BacklinksSource.class).findFirst().setChild(target);
+        realm.commitTransaction();
+
+        // backlinks are updated
+        assertEquals(1, backlinksTargets.last().getParents().size());
+        assertEquals(1, backlinksTargets.first().getParents().size());
+        assertEquals(0, nCalls[0]);
+        realm.close();
+        looperThread.testComplete();
+    }
+
