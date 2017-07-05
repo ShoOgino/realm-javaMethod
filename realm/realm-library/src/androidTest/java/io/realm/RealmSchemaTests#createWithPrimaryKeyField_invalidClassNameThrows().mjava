@@ -1,0 +1,14 @@
+    @Test
+    public void createWithPrimaryKeyField_invalidClassNameThrows() {
+        String[] invalidNames = { null, "", TestHelper.getRandomString(57) };
+
+        for (String name : invalidNames) {
+            try {
+                realmSchema.createWithPrimaryKeyField(name, "pkField", int.class);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+            assertFalse(String.format("'%s' failed", name), realmSchema.contains(name));
+        }
+    }
+
