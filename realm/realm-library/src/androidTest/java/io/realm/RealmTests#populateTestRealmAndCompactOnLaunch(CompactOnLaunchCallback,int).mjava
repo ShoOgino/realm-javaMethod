@@ -1,0 +1,27 @@
+    private Pair<Long, Long> populateTestRealmAndCompactOnLaunch(CompactOnLaunchCallback compactOnLaunch, int objects) {
+        final String REALM_NAME = "test.realm";
+        RealmConfiguration realmConfig = configFactory.createConfiguration(REALM_NAME);
+        Realm realm = Realm.getInstance(realmConfig);
+        populateTestRealm(realm, objects);
+        realm.beginTransaction();
+        realm.deleteAll();
+        realm.commitTransaction();
+        realm.close();
+        long before = new File(realmConfig.getPath()).length();
+        if (compactOnLaunch != null) {
+            realmConfig = configFactory.createConfigurationBuilder()
+                    .name(REALM_NAME)
+                    .compactOnLaunch(compactOnLaunch)
+                    .build();
+        } else {
+            realmConfig = configFactory.createConfigurationBuilder()
+                    .name(REALM_NAME)
+                    .compactOnLaunch()
+                    .build();
+        }
+        realm = Realm.getInstance(realmConfig);
+        realm.close();
+        long after = new File(realmConfig.getPath()).length();
+        return new Pair(before, after);
+    }
+
