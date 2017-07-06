@@ -6,5 +6,10 @@
      * @return the updated schema.
      * @throws IllegalArgumentException if the field name is illegal or a field with that name already exists.
      */
-    public abstract RealmObjectSchema addRealmListField(String fieldName, RealmObjectSchema objectSchema);
+    public RealmObjectSchema addRealmListField(String fieldName, RealmObjectSchema objectSchema) {
+        checkLegalName(fieldName);
+        checkFieldNameIsAvailable(fieldName);
+        table.addColumnLink(RealmFieldType.LIST, fieldName, realm.sharedRealm.getTable(Table.getTableNameForClass(objectSchema.getClassName())));
+        return this;
+    }
 

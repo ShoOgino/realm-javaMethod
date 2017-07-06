@@ -1,2 +1,8 @@
-    abstract RealmObjectSchema add(String name, RealmFieldType type, RealmObjectSchema linkedTo);
+    RealmObjectSchema add(String name, RealmFieldType type, RealmObjectSchema linkedTo) {
+        table.addColumnLink(
+                type,
+                name,
+                realm.getSharedRealm().getTable(Table.getTableNameForClass(linkedTo.getClassName())));
+        return this;
+    }
 

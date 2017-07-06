@@ -1,2 +1,21 @@
-    abstract Table getTable(Class<? extends RealmModel> clazz);
+    Table getTable(Class<? extends RealmModel> clazz) {
+        Table table = classToTable.get(clazz);
+        if (table != null) { return table; }
+
+        Class<? extends RealmModel> originalClass = Util.getOriginalModelClass(clazz);
+        if (isProxyClass(originalClass, clazz)) {
+            // If passed 'clazz' is the proxy, try again with model class.
+            table = classToTable.get(originalClass);
+        }
+        if (table == null) {
+            table = realm.getSharedRealm().getTable(realm.getConfiguration().getSchemaMediator().getTableName(originalClass));
+            classToTable.put(originalClass, table);
+        }
+        if (isProxyClass(originalClass, clazz)) {
+            // 'clazz' is the proxy class for 'originalClass'.
+            classToTable.put(clazz, table);
+        }
+
+        return table;
+    }
 

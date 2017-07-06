@@ -4,5 +4,12 @@
      * @param className name of the class
      * @return schema object for that class or {@code null} if the class doesn't exists.
      */
-    public abstract RealmObjectSchema get(String className);
+    public RealmObjectSchema get(String className) {
+        checkEmpty(className, EMPTY_STRING_MSG);
+
+        String internalClassName = Table.getTableNameForClass(className);
+        if (!realm.getSharedRealm().hasTable(internalClassName)) { return null; }
+        Table table = realm.getSharedRealm().getTable(internalClassName);
+        return new RealmObjectSchema(realm, this, table);
+    }
 

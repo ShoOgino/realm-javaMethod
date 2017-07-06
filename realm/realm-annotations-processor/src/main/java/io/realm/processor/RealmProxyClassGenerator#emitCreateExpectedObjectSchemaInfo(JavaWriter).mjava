@@ -1,0 +1,48 @@
+    private void emitCreateExpectedObjectSchemaInfo(JavaWriter writer) throws IOException {
+        writer.beginMethod(
+                "OsObjectSchemaInfo", // Return type
+                "createExpectedObjectSchemaInfo", // Method name
+                EnumSet.of(Modifier.PRIVATE, Modifier.STATIC)); // Modifiers
+
+        writer.emitStatement(
+                "OsObjectSchemaInfo.Builder builder = new OsObjectSchemaInfo.Builder(\"%s\")", this.simpleClassName);
+
+        // For each field generate corresponding table index constant
+        for (VariableElement field : metadata.getFields()) {
+            String fieldName = field.getSimpleName().toString();
+
+            Constants.RealmFieldType fieldType = getRealmType(field);
+            switch (fieldType) {
+                case NOTYPE:
+                    // Perhaps this should fail quickly?
+                    break;
+
+                case OBJECT:
+                    String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
+                    writer.emitStatement("builder.addLinkedProperty(\"%s\", RealmFieldType.OBJECT, \"%s\")",
+                            fieldName, fieldTypeSimpleName);
+                    break;
+
+                case LIST:
+                    String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
+                    writer.emitStatement("builder.addLinkedProperty(\"%s\", RealmFieldType.LIST, \"%s\")",
+                            fieldName, genericTypeSimpleName);
+                    break;
+
+                default:
+                    String nullableFlag = (metadata.isNullable(field) ? "!" : "") + "Property.REQUIRED";
+                    String indexedFlag = (metadata.isIndexed(field) ? "" : "!") + "Property.INDEXED";
+                    String primaryKeyFlag = (metadata.isPrimaryKey(field) ? "" : "!") + "Property.PRIMARY_KEY";
+                    writer.emitStatement("builder.addProperty(\"%s\", %s, %s, %s, %s)",
+                            fieldName,
+                            fieldType.getRealmType(),
+                            primaryKeyFlag,
+                            indexedFlag,
+                            nullableFlag);
+            }
+        }
+        writer.emitStatement("return builder.build()");
+        writer.endMethod()
+                .emitEmptyLine();
+    }
+

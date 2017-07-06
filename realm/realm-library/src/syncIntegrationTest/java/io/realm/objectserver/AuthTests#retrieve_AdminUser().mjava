@@ -1,0 +1,10 @@
+    @Test
+    public void retrieve_AdminUser() {
+        final SyncUser adminUser = UserFactory.createAdminUser(Constants.AUTH_URL);
+        SyncUser syncUser = adminUser.retrieveUser(SyncCredentials.IdentityProvider.DEBUG, "admin");// TODO use enum for auth provider
+        assertNotNull(syncUser);
+        assertEquals(adminUser.getIdentity(), syncUser.getIdentity());
+        assertTrue(syncUser.isAdmin());
+        assertTrue(syncUser.isValid());
+    }
+
