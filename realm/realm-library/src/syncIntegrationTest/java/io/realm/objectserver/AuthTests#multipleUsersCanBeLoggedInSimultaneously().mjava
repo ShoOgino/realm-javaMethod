@@ -1,0 +1,25 @@
+    // verify that multiple users can be logged in at the same time
+    @Test
+    public void multipleUsersCanBeLoggedInSimultaneously() {
+        final String password = "password";
+        final SyncUser[] users = new SyncUser[3];
+
+        for (int i = 0; i < users.length; i++) {
+            SyncCredentials credentials = SyncCredentials.usernamePassword(UUID.randomUUID().toString(), password,
+                    true);
+            users[i] = SyncUser.login(credentials, Constants.AUTH_URL);
+        }
+
+        for (int i = 0; i < users.length; i++) {
+            assertTrue(users[i].isValid());
+        }
+
+        for (int i = 0; i < users.length; i++) {
+            users[i].logout();
+        }
+
+        for (int i = 0; i < users.length; i++) {
+            assertFalse(users[i].isValid());
+        }
+    }
+

@@ -1,0 +1,12 @@
+    @Test
+    public void defaultCompactOnLaunch_onlyCallback() {
+        DefaultCompactOnLaunchCallback callback = new DefaultCompactOnLaunchCallback();
+        final long thresholdSize = 50 * 1024 * 1024;
+        final long big = thresholdSize + 1024;
+        assertFalse(callback.shouldCompact(big, (long) (big * 0.6)));
+        assertTrue(callback.shouldCompact(big, (long) (big * 0.3)));
+        final long small = thresholdSize - 1024;
+        assertFalse(callback.shouldCompact(small, (long) (small * 0.6)));
+        assertFalse(callback.shouldCompact(small, (long) (small * 0.3)));
+    }
+

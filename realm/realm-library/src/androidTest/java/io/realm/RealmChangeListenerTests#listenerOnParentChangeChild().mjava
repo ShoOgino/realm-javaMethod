@@ -1,0 +1,32 @@
+    // 1. adding a listener if on the parent
+    // 2. modify child
+    // 3. listener is triggered (forward link)
+    @Test@RunTestInLooperThread
+    public void listenerOnParentChangeChild() {
+        final long[] nCalls = {0};
+        final Realm realm = Realm.getInstance(looperThread.getConfiguration());
+        TestHelper.populateLinkedDataSet(realm);
+
+        RealmResults<BacklinksSource> backlinksSources = realm.where(BacklinksSource.class).findAll();
+        assertEquals(4, backlinksSources.size());
+
+        looperThread.keepStrongReference(backlinksSources);
+        backlinksSources.addChangeListener(new RealmChangeListener<RealmResults<BacklinksSource>>() {
+            @Override
+            public void onChange(RealmResults<BacklinksSource> backlinksSources) {
+                nCalls[0]++;
+            }
+        });
+
+        realm.beginTransaction();
+        BacklinksTarget backlinksTarget = realm.where(BacklinksTarget.class).findFirst();
+        backlinksTarget.setId(42);
+        realm.commitTransaction();
+
+        assertEquals(42, backlinksSources.first().getChild().getId());
+        assertEquals(1, nCalls[0]);
+
+        realm.close();
+        looperThread.testComplete();
+    }
+
