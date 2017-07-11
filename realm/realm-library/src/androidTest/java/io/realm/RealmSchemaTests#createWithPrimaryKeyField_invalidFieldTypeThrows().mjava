@@ -1,0 +1,13 @@
+    @Test
+    public void createWithPrimaryKeyField_invalidFieldTypeThrows() {
+        Class<?>[] fieldTypes = new Class<?>[] {float.class, Float.class, Double.class, double.class, RealmObject.class,
+                RealmList.class, Object.class};
+        for (Class<?> fieldType : fieldTypes) {
+            try {
+                realmSchema.createWithPrimaryKeyField("Foo", "pkField", fieldType);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+

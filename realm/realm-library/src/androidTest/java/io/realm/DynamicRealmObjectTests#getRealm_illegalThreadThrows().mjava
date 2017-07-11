@@ -1,0 +1,34 @@
+    @Test
+    public void getRealm_illegalThreadThrows() throws Throwable {
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        dynamicRealm.refresh();
+        final DynamicRealmObject object = dynamicRealm.where(AllTypes.CLASS_NAME).findFirst();
+
+        final CountDownLatch threadFinished = new CountDownLatch(1);
+        final AtomicReference<Throwable> throwable = new AtomicReference<>();
+        final Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    object.getDynamicRealm();
+                    fail();
+                } catch (Throwable t) {
+                    throwable.set(t);
+                } finally {
+                    threadFinished.countDown();
+                }
+            }
+        });
+        thread.start();
+        TestHelper.awaitOrFail(threadFinished);
+
+        final Throwable thrownInTheThread = throwable.get();
+        if (!(thrownInTheThread instanceof IllegalStateException)) {
+            throw thrownInTheThread;
+        }
+        assertEquals(BaseRealm.INCORRECT_THREAD_MESSAGE, thrownInTheThread.getMessage());
+    }
+
