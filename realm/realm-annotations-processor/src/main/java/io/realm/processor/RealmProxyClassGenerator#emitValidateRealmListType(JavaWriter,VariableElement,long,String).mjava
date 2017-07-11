@@ -1,13 +1,12 @@
     private void emitValidateRealmListType(JavaWriter writer, VariableElement field, long fieldIndex, String fieldName)
             throws IOException {
+
         String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
-        writer.beginControlFlow("if (!columnTypes.containsKey(\"%s\"))", fieldName);
-        emitMigrationNeededException(writer, "\"Missing field '%s'\")", fieldName);
-        writer.endControlFlow();
-        writer.beginControlFlow("if (columnTypes.get(\"%s\") != RealmFieldType.LIST)", fieldName);
-        emitMigrationNeededException(writer, "\"Invalid type '%s' for field '%s'\")",
-                genericTypeSimpleName, fieldName);
-        writer.endControlFlow();
+
+        writer.emitStatement(
+                "ProxyUtils.verifyField(sharedRealm, columnTypes, \"%s\", RealmFieldType.LIST, \"%s\")",
+                fieldName, genericTypeSimpleName);
+
         writer.beginControlFlow("if (!sharedRealm.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, genericTypeSimpleName);
         emitMigrationNeededException(writer, "\"Missing class '%s%s' for field '%s'\")",
                 Constants.TABLE_PREFIX, genericTypeSimpleName, fieldName);
