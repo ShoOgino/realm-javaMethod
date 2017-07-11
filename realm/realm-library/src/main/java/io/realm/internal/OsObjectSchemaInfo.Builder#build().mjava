@@ -1,7 +1,10 @@
         public OsObjectSchemaInfo build() {
             OsObjectSchemaInfo info = new OsObjectSchemaInfo(className);
-            for (Property property : propertyList) {
-                nativeAddProperty(info.nativePtr, property.getNativePtr());
+            for (Property property : persistedPropertyList) {
+                nativeAddProperty(info.nativePtr, property.getNativePtr(), false);
+            }
+            for (Property property : computedPropertyList) {
+                nativeAddProperty(info.nativePtr, property.getNativePtr(), true);
             }
 
             return info;
