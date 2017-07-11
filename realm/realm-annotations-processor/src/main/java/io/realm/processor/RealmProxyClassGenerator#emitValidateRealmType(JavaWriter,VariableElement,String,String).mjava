@@ -1,19 +1,27 @@
     private void emitValidateRealmType(JavaWriter writer, VariableElement field, String fieldName, String fieldTypeQualifiedName)
             throws IOException {
 
-        // make sure types align
-        writer.beginControlFlow("if (!columnTypes.containsKey(\"%s\"))", fieldName);
-        emitMigrationNeededException(writer, "\"Missing field '%s' in existing Realm file. " +
-                "Either remove field or migrate using io.realm.internal.Table.addColumn()." +
-                "\")", fieldName);
-        writer.endControlFlow();
-        writer.beginControlFlow("if (columnTypes.get(\"%s\") != %s)", fieldName, getRealmTypeChecked(field).getRealmType());
-        emitMigrationNeededException(writer, "\"Invalid type '%s' for field '%s' in existing Realm file.\")",
-                Utils.getFieldTypeSimpleName(field), fieldName);
-        writer.endControlFlow();
+        // make field sure types align
+        writer.emitStatement(
+                "ProxyUtils.verifyField(sharedRealm, columnTypes, \"%s\", %s, \"%s\")",
+                fieldName, getRealmTypeChecked(field).getRealmType(), Utils.getFieldTypeSimpleName(field));
 
         // make sure that nullability matches
-        if (metadata.isNullable(field)) {
+        if (!metadata.isNullable(field)) {
+            writer.beginControlFlow("if (table.isColumnNullable(%s))", fieldIndexVariableReference(field));
+            if (Utils.isPrimitiveType(fieldTypeQualifiedName)) {
+                writer.emitStatement("throw new RealmMigrationNeededException(sharedRealm.getPath()," +
+                                " \"Field '%s' does support null values in the existing Realm file. " +
+                                "Use corresponding boxed type for field '%s' or migrate using RealmObjectSchema.setNullable().\")",
+                        fieldName, fieldName);
+            } else {
+                writer.emitStatement("throw new RealmMigrationNeededException(sharedRealm.getPath()," +
+                                " \"Field '%s' does support null values in the existing Realm file. " +
+                                "Remove @Required or @PrimaryKey from field '%s' or migrate using RealmObjectSchema.setNullable().\")",
+                        fieldName, fieldName);
+            }
+            writer.endControlFlow();
+        } else {
             writer.beginControlFlow("if (!table.isColumnNullable(%s))", fieldIndexVariableReference(field));
             // Check if the existing PrimaryKey does support null value for String, Byte, Short, Integer, & Long
             if (metadata.isPrimaryKey(field)) {
@@ -32,20 +40,6 @@
                 writer.emitStatement("throw new RealmMigrationNeededException(sharedRealm.getPath()," +
                                 " \"Field '%s' is required. Either set @Required to field '%s' " +
                                 "or migrate using RealmObjectSchema.setNullable().\")",
-                        fieldName, fieldName);
-            }
-            writer.endControlFlow();
-        } else {
-            writer.beginControlFlow("if (table.isColumnNullable(%s))", fieldIndexVariableReference(field));
-            if (Utils.isPrimitiveType(fieldTypeQualifiedName)) {
-                writer.emitStatement("throw new RealmMigrationNeededException(sharedRealm.getPath()," +
-                                " \"Field '%s' does support null values in the existing Realm file. " +
-                                "Use corresponding boxed type for field '%s' or migrate using RealmObjectSchema.setNullable().\")",
-                        fieldName, fieldName);
-            } else {
-                writer.emitStatement("throw new RealmMigrationNeededException(sharedRealm.getPath()," +
-                                " \"Field '%s' does support null values in the existing Realm file. " +
-                                "Remove @Required or @PrimaryKey from field '%s' or migrate using RealmObjectSchema.setNullable().\")",
                         fieldName, fieldName);
             }
             writer.endControlFlow();

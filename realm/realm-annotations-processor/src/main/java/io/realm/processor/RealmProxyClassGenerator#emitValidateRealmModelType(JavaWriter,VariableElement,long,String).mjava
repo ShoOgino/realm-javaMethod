@@ -2,14 +2,10 @@
             throws IOException {
         String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
 
-        writer.beginControlFlow("if (!columnTypes.containsKey(\"%s\"))", fieldName);
-        emitMigrationNeededException(writer, "\"Missing field '%s' in existing Realm file. " +
-                "Either remove field or migrate using io.realm.internal.Table.addColumn().\")", fieldName);
-        writer.endControlFlow();
-        writer.beginControlFlow("if (columnTypes.get(\"%s\") != RealmFieldType.OBJECT)", fieldName);
-        emitMigrationNeededException(writer, "\"Invalid type '%s' for field '%s'\")",
-                fieldTypeSimpleName, fieldName);
-        writer.endControlFlow();
+        // make field sure types align
+        writer.emitStatement(
+                "ProxyUtils.verifyField(sharedRealm, columnTypes, \"%s\", RealmFieldType.OBJECT, \"%s\")",
+                fieldName, Utils.getFieldTypeSimpleName(field));
         writer.beginControlFlow("if (!sharedRealm.hasTable(\"%s%s\"))", Constants.TABLE_PREFIX, fieldTypeSimpleName);
         emitMigrationNeededException(writer, "\"Missing class '%s%s' for field '%s'\")",
                 Constants.TABLE_PREFIX, fieldTypeSimpleName, fieldName);
