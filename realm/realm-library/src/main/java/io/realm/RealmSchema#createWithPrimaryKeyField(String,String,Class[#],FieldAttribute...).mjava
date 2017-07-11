@@ -1,0 +1,36 @@
+    /**
+     * Adds a new class to the Realm with a primary key field defined.
+     *
+     * @param className           name of the class.
+     * @param primaryKeyFieldName name of the primary key field.
+     * @param fieldType           type of field to add. Only {@code byte}, {@code short}, {@code int}, {@code long}
+     *                            and their boxed types or the {@code String} is supported.
+     * @param attributes          set of attributes for this field. This method implicitly adds
+     *                            {@link FieldAttribute#PRIMARY_KEY} and {@link FieldAttribute#INDEXED} attributes to
+     *                            the field.
+     * @return a Realm schema object for that class.
+     */
+    public RealmObjectSchema createWithPrimaryKeyField(String className, String primaryKeyFieldName, Class<?> fieldType,
+                                                       FieldAttribute... attributes) {
+        checkEmpty(className, EMPTY_STRING_MSG);
+        RealmObjectSchema.checkLegalName(primaryKeyFieldName);
+        String internalTableName = checkAndGetTableNameFromClassName(className);
+
+        RealmObjectSchema.FieldMetaData metadata = RealmObjectSchema.getSupportedSimpleFields().get(fieldType);
+        if (metadata == null || (metadata.realmType != RealmFieldType.STRING &&
+                metadata.realmType != RealmFieldType.INTEGER)) {
+            throw new IllegalArgumentException(String.format("Realm doesn't support primary key field type '%s'.",
+                    fieldType));
+        }
+        boolean isStringField = (metadata.realmType == RealmFieldType.STRING);
+
+        boolean nullable = metadata.defaultNullable;
+        if (RealmObjectSchema.containsAttribute(attributes, FieldAttribute.REQUIRED)) {
+            nullable = false;
+        }
+
+        return new RealmObjectSchema(realm, this,
+                realm.getSharedRealm().createTableWithPrimaryKey(internalTableName, primaryKeyFieldName,
+                        isStringField, nullable));
+    }
+
