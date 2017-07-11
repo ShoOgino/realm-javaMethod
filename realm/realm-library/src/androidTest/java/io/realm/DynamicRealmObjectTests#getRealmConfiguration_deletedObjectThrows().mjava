@@ -1,0 +1,20 @@
+    @Test
+    public void getRealmConfiguration_deletedObjectThrows() {
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        dynamicRealm.refresh();
+        final DynamicRealmObject object = dynamicRealm.where(AllTypes.CLASS_NAME).findFirst();
+        dynamicRealm.beginTransaction();
+        object.deleteFromRealm();
+        dynamicRealm.commitTransaction();
+
+        try {
+            object.getDynamicRealm();
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals(RealmObject.MSG_DELETED_OBJECT, e.getMessage());
+        }
+    }
+

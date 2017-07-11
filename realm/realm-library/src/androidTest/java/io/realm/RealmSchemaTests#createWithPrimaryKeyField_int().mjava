@@ -1,0 +1,20 @@
+    @Test
+    public void createWithPrimaryKeyField_int() {
+        // Without Required
+        realmSchema.createWithPrimaryKeyField("Foo", "pkField", int.class);
+        RealmObjectSchema objectSchema = realmSchema.getSchemaForClass("Foo");
+        assertEquals("pkField", objectSchema.getPrimaryKey());
+        assertEquals(RealmFieldType.INTEGER, objectSchema.getFieldType("pkField"));
+        assertFalse(objectSchema.isNullable("pkField"));
+        assertTrue(objectSchema.hasIndex("pkField"));
+
+        // With Required
+        realmSchema.createWithPrimaryKeyField("FooRequired", "pkField", int.class,
+                FieldAttribute.REQUIRED);
+        objectSchema = realmSchema.getSchemaForClass("FooRequired");
+        assertEquals("pkField", objectSchema.getPrimaryKey());
+        assertEquals(RealmFieldType.INTEGER, objectSchema.getFieldType("pkField"));
+        assertFalse(objectSchema.isNullable("pkField"));
+        assertTrue(objectSchema.hasIndex("pkField"));
+    }
+

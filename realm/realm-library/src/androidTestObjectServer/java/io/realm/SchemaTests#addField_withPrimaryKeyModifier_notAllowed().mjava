@@ -1,0 +1,18 @@
+    @Test
+    public void addField_withPrimaryKeyModifier_notAllowed() {
+        String className = "StringOnly";
+        Realm realm = Realm.getInstance(config);
+
+        realm.beginTransaction();
+        RealmObjectSchema objectSchema = realm.getSchema().get(className);
+
+        try {
+            objectSchema.addField("foo", String.class, FieldAttribute.PRIMARY_KEY);
+            fail();
+        } catch (UnsupportedOperationException ignored) {
+        } finally {
+            realm.commitTransaction();
+            realm.close();
+        }
+    }
+
