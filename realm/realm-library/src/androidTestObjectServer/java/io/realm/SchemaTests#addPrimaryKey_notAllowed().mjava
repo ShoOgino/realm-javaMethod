@@ -1,0 +1,19 @@
+    @Test
+    public void addPrimaryKey_notAllowed() {
+        String className = "StringOnly";
+        Realm realm = Realm.getInstance(config);
+
+        realm.beginTransaction();
+        RealmObjectSchema objectSchema = realm.getSchema().get(className);
+        objectSchema.addField("foo", String.class);
+
+        try {
+            objectSchema.addPrimaryKey("foo");
+            fail();
+        } catch (UnsupportedOperationException ignored) {
+        } finally {
+            realm.commitTransaction();
+            realm.close();
+        }
+    }
+

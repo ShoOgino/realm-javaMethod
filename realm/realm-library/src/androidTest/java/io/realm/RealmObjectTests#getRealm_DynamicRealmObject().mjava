@@ -1,0 +1,26 @@
+    @Test
+    public void getRealm_DynamicRealmObject() {
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(realmConfig);
+        //noinspection TryFinallyCanBeTryWithResources
+        try {
+            dynamicRealm.beginTransaction();
+            DynamicRealmObject object = dynamicRealm.createObject("AllTypesRealmModel", 1L);
+            dynamicRealm.commitTransaction();
+
+            try {
+                object.getRealm();
+                fail();
+            } catch (IllegalStateException expected) {
+                assertEquals(RealmObject.MSG_DYNAMIC_OBJECT, expected.getMessage());
+            }
+            try {
+                RealmObject.getRealm(object);
+                fail();
+            } catch (IllegalStateException expected) {
+                assertEquals(RealmObject.MSG_DYNAMIC_OBJECT, expected.getMessage());
+            }
+        } finally {
+            dynamicRealm.close();
+        }
+    }
+
