@@ -1,5 +1,10 @@
     @Test
     public void renameField() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            thrown.expect(UnsupportedOperationException.class);
+            schema.renameField("test", "test1");
+            return;
+        }
         String oldFieldName = "old";
         String newFieldName = "new";
         schema.addField(oldFieldName, String.class);

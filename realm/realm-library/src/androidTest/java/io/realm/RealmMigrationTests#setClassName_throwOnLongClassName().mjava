@@ -1,13 +1,12 @@
     @Test
     public void setClassName_throwOnLongClassName() {
+        RealmConfiguration config = configFactory.createConfigurationBuilder().build();
         // Creates the first version of schema.
-        Realm realm = Realm.getInstance(configFactory.createConfigurationBuilder().build());
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.getSchema().create(MigrationPrimaryKey.CLASS_NAME);
-            }
-        });
+        Realm.getInstance(config).close();
+        DynamicRealm realm = DynamicRealm.getInstance(config);
+        realm.beginTransaction();
+        realm.getSchema().create(MigrationPrimaryKey.CLASS_NAME);
+        realm.commitTransaction();
         realm.close();
 
         // Gets ready for the 2nd version migration.

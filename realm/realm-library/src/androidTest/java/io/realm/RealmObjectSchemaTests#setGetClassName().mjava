@@ -2,8 +2,13 @@
     public void setGetClassName() {
         assertEquals("Dog", DOG_SCHEMA.getClassName());
         String newClassName = "Darby";
-        DOG_SCHEMA.setClassName(newClassName);
-        assertEquals(newClassName, DOG_SCHEMA.getClassName());
-        assertTrue(realmSchema.contains(newClassName));
+        if (type == ObjectSchemaType.MUTABLE) {
+            DOG_SCHEMA.setClassName(newClassName);
+            assertEquals(newClassName, DOG_SCHEMA.getClassName());
+            assertTrue(realmSchema.contains(newClassName));
+        } else {
+            thrown.expect(UnsupportedOperationException.class);
+            DOG_SCHEMA.setClassName(newClassName);
+        }
     }
 

@@ -3,15 +3,7 @@
      * as a {@link DynamicRealmObject}.
      *
      * @return this schema.
+     * @throws UnsupportedOperationException if this {@link RealmObjectSchema} is immutable.
      */
-    public RealmObjectSchema transform(Function function) {
-        if (function != null) {
-            long size = table.size();
-            for (long i = 0; i < size; i++) {
-                function.apply(new DynamicRealmObject(realm, table.getCheckedRow(i)));
-            }
-        }
-
-        return this;
-    }
+    public abstract RealmObjectSchema transform(Function function);
 

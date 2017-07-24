@@ -1,16 +1,10 @@
     /**
-     * Returns the Realm schema for a given class.
+     * Returns the {@link RealmObjectSchema} for a given class. If this {@link RealmSchema} is immutable, an immutable
+     * {@link RealmObjectSchema} will be returned. Otherwise, it returns an mutable {@link RealmObjectSchema}.
      *
      * @param className name of the class
      * @return schema object for that class or {@code null} if the class doesn't exists.
      */
     @Nullable
-    public RealmObjectSchema get(String className) {
-        checkEmpty(className, EMPTY_STRING_MSG);
-
-        String internalClassName = Table.getTableNameForClass(className);
-        if (!realm.getSharedRealm().hasTable(internalClassName)) { return null; }
-        Table table = realm.getSharedRealm().getTable(internalClassName);
-        return new RealmObjectSchema(realm, this, table);
-    }
+    public abstract RealmObjectSchema get(String className);
 

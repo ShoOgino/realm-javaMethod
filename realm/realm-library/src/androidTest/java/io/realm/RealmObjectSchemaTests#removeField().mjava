@@ -1,5 +1,10 @@
     @Test
     public void removeField() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            thrown.expect(UnsupportedOperationException.class);
+            DOG_SCHEMA.removeField(Dog.FIELD_HEIGHT);
+            return;
+        }
         String fieldName = "foo";
         schema.addField(fieldName, String.class);
         assertTrue(schema.hasField(fieldName));

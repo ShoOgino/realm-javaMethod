@@ -1,5 +1,29 @@
     @Test
     public void addRemoveField() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            try {
+                schema.addField("test", int.class);
+                fail();
+            } catch (UnsupportedOperationException ignore) {
+            }
+            try {
+                schema.addRealmObjectField("test", DOG_SCHEMA);
+                fail();
+            } catch (UnsupportedOperationException ignore) {
+            }
+            try {
+                schema.addRealmListField("test", DOG_SCHEMA);
+                fail();
+            } catch (UnsupportedOperationException ignore) {
+            }
+
+            try {
+                schema.removeField("test");
+                fail();
+            } catch (UnsupportedOperationException ignore) {
+            }
+            return;
+        }
         for (FieldType fieldType : FieldType.values()) {
             String fieldName = "foo";
             switch (fieldType) {

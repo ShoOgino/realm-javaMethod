@@ -1,5 +1,8 @@
     @Test
     public void addPrimaryKeyFieldModifier_alreadyExistsThrows() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            return;
+        }
         for (PrimaryKeyFieldType fieldType : PrimaryKeyFieldType.values()) {
             String fieldName = "foo";
             schema.addField(fieldName, fieldType.getType());
