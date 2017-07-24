@@ -1,10 +1,11 @@
     @Test
     public void addPrimaryKey_notAllowed() {
         String className = "StringOnly";
-        Realm realm = Realm.getInstance(config);
+        DynamicRealm realm = DynamicRealm.getInstance(config);
 
         realm.beginTransaction();
         RealmObjectSchema objectSchema = realm.getSchema().get(className);
+        assertNotNull(objectSchema);
         objectSchema.addField("foo", String.class);
 
         try {

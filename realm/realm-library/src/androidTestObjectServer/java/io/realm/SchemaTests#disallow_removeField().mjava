@@ -6,10 +6,12 @@
         DynamicRealm realm = DynamicRealm.getInstance(config);
         String className = "StringOnly";
         String fieldName = "chars";
+        final RealmObjectSchema objectSchema = realm.getSchema().get(className);
+        assertNotNull(objectSchema);
         realm.beginTransaction();
-        assertTrue(realm.getSchema().get(className).hasField(fieldName));
+        assertTrue(objectSchema.hasField(fieldName));
         try {
-            realm.getSchema().get(className).removeField(fieldName);
+            objectSchema.removeField(fieldName);
             fail();
         } catch (IllegalArgumentException ignored) {
         } finally {
