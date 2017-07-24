@@ -1,0 +1,22 @@
+    @Test
+    public void createWithPrimaryKeyField_string() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
+        // Not nullable
+        realmSchema.createWithPrimaryKeyField("FooNonNull", "pkField", String.class, FieldAttribute.REQUIRED);
+        RealmObjectSchema objectSchema = realmSchema.getSchemaForClass("FooNonNull");
+        assertEquals("pkField", objectSchema.getPrimaryKey());
+        assertEquals(RealmFieldType.STRING, objectSchema.getFieldType("pkField"));
+        assertFalse(objectSchema.isNullable("pkField"));
+        assertTrue(objectSchema.hasIndex("pkField"));
+
+        // Nullable
+        realmSchema.createWithPrimaryKeyField("FooNull", "pkField", String.class);
+        objectSchema = realmSchema.getSchemaForClass("FooNull");
+        assertEquals("pkField", objectSchema.getPrimaryKey());
+        assertEquals(RealmFieldType.STRING, objectSchema.getFieldType("pkField"));
+        assertTrue(objectSchema.isNullable("pkField"));
+        assertTrue(objectSchema.hasIndex("pkField"));
+    }
+

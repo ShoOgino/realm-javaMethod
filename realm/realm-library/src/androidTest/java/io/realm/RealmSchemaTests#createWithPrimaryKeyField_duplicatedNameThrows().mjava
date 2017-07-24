@@ -1,0 +1,10 @@
+    @Test
+    public void createWithPrimaryKeyField_duplicatedNameThrows() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
+        realmSchema.createWithPrimaryKeyField("Foo", "pkField", int.class);
+        thrown.expect(IllegalArgumentException.class);
+        realmSchema.createWithPrimaryKeyField("Foo", "pkField", int.class);
+    }
+
