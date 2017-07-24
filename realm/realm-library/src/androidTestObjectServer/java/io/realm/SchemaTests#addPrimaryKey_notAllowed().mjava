@@ -1,18 +1,22 @@
     @Test
     public void addPrimaryKey_notAllowed() {
+        // Init schema
+        Realm.getInstance(config).close();
         String className = "StringOnly";
-        Realm realm = Realm.getInstance(config);
+        String fieldName = "chars";
+        DynamicRealm realm = DynamicRealm.getInstance(config);
+
+        RealmObjectSchema objectSchema = realm.getSchema().get(className);
+        assertNotNull(objectSchema);
+        assertTrue(objectSchema.hasField(fieldName));
 
         realm.beginTransaction();
-        RealmObjectSchema objectSchema = realm.getSchema().get(className);
-        objectSchema.addField("foo", String.class);
-
         try {
-            objectSchema.addPrimaryKey("foo");
+            objectSchema.addPrimaryKey(fieldName);
             fail();
         } catch (UnsupportedOperationException ignored) {
         } finally {
-            realm.commitTransaction();
+            realm.cancelTransaction();
             realm.close();
         }
     }

@@ -1,6 +1,11 @@
     @Test
     public void create() {
-        realmSchema.create("Foo");
-        assertTrue(realmSchema.contains("Foo"));
+        if (type == SchemaType.MUTABLE) {
+            realmSchema.create("Foo");
+            assertTrue(realmSchema.contains("Foo"));
+        } else {
+            thrown.expect(UnsupportedOperationException.class);
+            realmSchema.create("Foo");
+        }
     }
 

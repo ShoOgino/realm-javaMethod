@@ -1,5 +1,7 @@
     /**
-     * Returns the {@link RealmObjectSchema}s for all RealmObject classes that can be saved in this Realm.
+     * Returns the {@link RealmObjectSchema}s for all RealmObject classes that can be saved in this Realm. If this
+     * {@link RealmSchema} is immutable, an immutable {@link RealmObjectSchema} set will be returned. Otherwise, it
+     * returns an mutable {@link RealmObjectSchema} set.
      *
      * @return the set of all classes in this Realm or no RealmObject classes can be saved in the Realm.
      */
@@ -7,11 +9,10 @@
         int tableCount = (int) realm.getSharedRealm().size();
         Set<RealmObjectSchema> schemas = new LinkedHashSet<>(tableCount);
         for (int i = 0; i < tableCount; i++) {
-            String tableName = realm.getSharedRealm().getTableName(i);
-            if (!Table.isModelTable(tableName)) {
-                continue;
+            RealmObjectSchema objectSchema = get(realm.getSharedRealm().getTableName(i));
+            if (objectSchema != null) {
+                schemas.add(objectSchema);
             }
-            schemas.add(new RealmObjectSchema(realm, this, realm.getSharedRealm().getTable(tableName)));
         }
         return schemas;
     }

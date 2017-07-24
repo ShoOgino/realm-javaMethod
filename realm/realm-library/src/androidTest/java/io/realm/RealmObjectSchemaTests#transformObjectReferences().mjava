@@ -1,18 +1,21 @@
     @Test
     public void transformObjectReferences() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            return;
+        }
         String className = DOG_SCHEMA.getClassName();
-        DynamicRealmObject dog1 = realm.createObject(className);
+        DynamicRealmObject dog1 = ((DynamicRealm)realm).createObject(className);
         dog1.setInt("age", 1);
 
         DOG_SCHEMA.transform(new RealmObjectSchema.Function() {
             @Override
             public void apply(DynamicRealmObject dog) {
-                DynamicRealmObject owner = realm.createObject("Owner");
+                DynamicRealmObject owner = ((DynamicRealm)realm).createObject("Owner");
                 owner.setString("name", "John");
                 dog.setObject("owner", owner);
             }
         });
         //noinspection ConstantConditions
-        assertEquals("John", realm.where("Dog").findFirst().getObject("owner").getString("name"));
+        assertEquals("John", ((DynamicRealm)realm).where("Dog").findFirst().getObject("owner").getString("name"));
     }
 

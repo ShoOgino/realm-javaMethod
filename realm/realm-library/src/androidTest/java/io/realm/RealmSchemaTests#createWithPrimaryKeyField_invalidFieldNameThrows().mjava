@@ -1,5 +1,8 @@
     @Test
     public void createWithPrimaryKeyField_invalidFieldNameThrows() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
         String[] invalidFieldNames = new String[] { null, "", "foo.bar", TestHelper.getRandomString(65) };
         for (String fieldName : invalidFieldNames) {
             try {

@@ -8,7 +8,7 @@
             RealmMigration migration = new RealmMigration() {
                 @Override
                 public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
-                    RealmObjectSchema schema = realm.getSchema().getSchemaForClass(clazz.getSimpleName());
+                    RealmObjectSchema schema = realm.getSchema().get(clazz.getSimpleName());
                     if (clazz == PrimaryKeyAsString.class) {
                         schema.setNullable("name", true);
                     } else {
@@ -26,7 +26,7 @@
             configFactory.copyRealmFromAssets(context, "default-notnullable-primarykey.realm", Realm.DEFAULT_REALM_NAME);
             Realm.migrateRealm(realmConfig);
             realm = Realm.getInstance(realmConfig);
-            RealmObjectSchema schema = realm.getSchema().getSchemaForClass(clazz);
+            RealmObjectSchema schema = realm.getSchema().get(clazz.getSimpleName());
             assertEquals(SCHEMA_VERSION, realm.getVersion());
             assertTrue(didMigrate.get());
             if (clazz == PrimaryKeyAsString.class) {

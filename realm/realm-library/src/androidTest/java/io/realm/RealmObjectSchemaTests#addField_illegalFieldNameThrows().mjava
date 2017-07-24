@@ -1,5 +1,8 @@
     @Test
     public void addField_illegalFieldNameThrows() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            return;
+        }
         String[] fieldNames = new String[] { null, "", "foo.bar", TestHelper.getRandomString(65) };
         for (SchemaFieldType schemaFieldType : SchemaFieldType.values()) {
             for (String fieldName : fieldNames) {

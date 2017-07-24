@@ -1,12 +1,17 @@
     @Test
     public void disallow_removeField() {
-        Realm realm = Realm.getInstance(config);
+        // Init schema
+        Realm.getInstance(config).close();
+
+        DynamicRealm realm = DynamicRealm.getInstance(config);
         String className = "StringOnly";
         String fieldName = "chars";
+        final RealmObjectSchema objectSchema = realm.getSchema().get(className);
+        assertNotNull(objectSchema);
+        assertTrue(objectSchema.hasField(fieldName));
         realm.beginTransaction();
-        assertTrue(realm.getSchema().get(className).hasField(fieldName));
         try {
-            realm.getSchema().get(className).removeField(fieldName);
+            objectSchema.removeField(fieldName);
             fail();
         } catch (IllegalArgumentException ignored) {
         } finally {

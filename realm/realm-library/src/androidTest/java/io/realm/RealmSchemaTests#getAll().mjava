@@ -6,6 +6,7 @@
         List<String> expectedTables = Arrays.asList(
                 AllJavaTypes.CLASS_NAME, "Owner", "Cat", "Dog", "DogPrimaryKey", "PrimaryKeyAsString");
         for (RealmObjectSchema objectSchema : objectSchemas) {
+            assertThat(objectSchema, CoreMatchers.instanceOf(type.objectSchemaClass));
             if (!expectedTables.contains(objectSchema.getClassName())) {
                 fail(objectSchema.getClassName() + " was not found");
             }

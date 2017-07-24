@@ -1,5 +1,8 @@
     @Test
     public void createWithPrimaryKeyField_int() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
         // Without Required
         realmSchema.createWithPrimaryKeyField("Foo", "pkField", int.class);
         RealmObjectSchema objectSchema = realmSchema.getSchemaForClass("Foo");

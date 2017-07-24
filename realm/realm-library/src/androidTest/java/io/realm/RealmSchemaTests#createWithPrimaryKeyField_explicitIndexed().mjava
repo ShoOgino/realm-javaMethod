@@ -1,5 +1,8 @@
     @Test
     public void createWithPrimaryKeyField_explicitIndexed() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
         realmSchema.createWithPrimaryKeyField("Foo", "pkField", int.class,
                 FieldAttribute.INDEXED);
         RealmObjectSchema objectSchema = realmSchema.getSchemaForClass("Foo");

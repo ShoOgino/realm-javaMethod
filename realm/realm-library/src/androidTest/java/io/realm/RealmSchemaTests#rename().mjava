@@ -1,7 +1,12 @@
     @Test
     public void rename() {
-        realmSchema.rename("Owner", "Owner2");
-        assertFalse(realmSchema.contains("Owner"));
-        assertTrue(realmSchema.contains("Owner2"));
+        if (type == SchemaType.MUTABLE) {
+            realmSchema.rename("Owner", "Owner2");
+            assertFalse(realmSchema.contains("Owner"));
+            assertTrue(realmSchema.contains("Owner2"));
+        } else {
+            thrown.expect(UnsupportedOperationException.class);
+            realmSchema.rename("Owner", "Owner2");
+        }
     }
 

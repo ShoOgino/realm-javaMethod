@@ -1,5 +1,8 @@
     @Test
     public void createWithPrimaryKeyField_invalidFieldTypeThrows() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
         Class<?>[] fieldTypes = new Class<?>[] {float.class, Float.class, Double.class, double.class, RealmObject.class,
                 RealmList.class, Object.class};
         for (Class<?> fieldType : fieldTypes) {

@@ -8,29 +8,9 @@
      * @param attributes          set of attributes for this field. This method implicitly adds
      *                            {@link FieldAttribute#PRIMARY_KEY} and {@link FieldAttribute#INDEXED} attributes to
      *                            the field.
+     * @throws UnsupportedOperationException if this {@link RealmSchema} is immutable.
      * @return a Realm schema object for that class.
      */
-    public RealmObjectSchema createWithPrimaryKeyField(String className, String primaryKeyFieldName, Class<?> fieldType,
-                                                       FieldAttribute... attributes) {
-        checkEmpty(className, EMPTY_STRING_MSG);
-        RealmObjectSchema.checkLegalName(primaryKeyFieldName);
-        String internalTableName = checkAndGetTableNameFromClassName(className);
-
-        RealmObjectSchema.FieldMetaData metadata = RealmObjectSchema.getSupportedSimpleFields().get(fieldType);
-        if (metadata == null || (metadata.realmType != RealmFieldType.STRING &&
-                metadata.realmType != RealmFieldType.INTEGER)) {
-            throw new IllegalArgumentException(String.format("Realm doesn't support primary key field type '%s'.",
-                    fieldType));
-        }
-        boolean isStringField = (metadata.realmType == RealmFieldType.STRING);
-
-        boolean nullable = metadata.defaultNullable;
-        if (RealmObjectSchema.containsAttribute(attributes, FieldAttribute.REQUIRED)) {
-            nullable = false;
-        }
-
-        return new RealmObjectSchema(realm, this,
-                realm.getSharedRealm().createTableWithPrimaryKey(internalTableName, primaryKeyFieldName,
-                        isStringField, nullable));
-    }
+    public abstract RealmObjectSchema createWithPrimaryKeyField(String className, String primaryKeyFieldName, Class<?> fieldType,
+                                                       FieldAttribute... attributes);
 

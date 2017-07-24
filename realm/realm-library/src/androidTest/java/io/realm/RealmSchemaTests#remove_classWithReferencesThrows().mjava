@@ -2,6 +2,10 @@
     // class. This also include transitive dependencies.
     @Test
     public void remove_classWithReferencesThrows() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
+
         try {
             realmSchema.remove("Cat");
             fail();

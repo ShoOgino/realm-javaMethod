@@ -1,5 +1,10 @@
     @Test
     public void setRemoveNullable() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            thrown.expect(UnsupportedOperationException.class);
+            schema.setNullable("test", true);
+            return;
+        }
         for (FieldType fieldType : FieldType.values()) {
             String fieldName = "foo";
             switch (fieldType) {

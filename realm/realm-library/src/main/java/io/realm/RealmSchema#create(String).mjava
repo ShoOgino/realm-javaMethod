@@ -3,15 +3,7 @@
      *
      * @param className name of the class.
      * @return a Realm schema object for that class.
+     * @throws UnsupportedOperationException if this {@link RealmSchema} is immutable.
      */
-    public RealmObjectSchema create(String className) {
-        // Adding a class is always permitted.
-        checkEmpty(className, EMPTY_STRING_MSG);
-
-        String internalTableName = Table.getTableNameForClass(className);
-        if (internalTableName.length() > Table.TABLE_MAX_LENGTH) {
-            throw new IllegalArgumentException("Class name is too long. Limit is 56 characters: " + className.length());
-        }
-        return new RealmObjectSchema(realm, this, realm.getSharedRealm().createTable(internalTableName));
-    }
+    public abstract RealmObjectSchema create(String className);
 

@@ -1,5 +1,10 @@
     @Test
     public void setRemoveRequired() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            thrown.expect(UnsupportedOperationException.class);
+            schema.setRequired("test", true);
+            return;
+        }
         for (FieldType fieldType : FieldType.values()) {
             String fieldName = "foo";
             switch (fieldType) {
