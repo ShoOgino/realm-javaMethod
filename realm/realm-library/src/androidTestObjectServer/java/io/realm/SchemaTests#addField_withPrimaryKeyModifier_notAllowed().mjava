@@ -1,5 +1,7 @@
     @Test
     public void addField_withPrimaryKeyModifier_notAllowed() {
+        // Init schema
+        Realm.getInstance(config).close();
         String className = "StringOnly";
         DynamicRealm realm = DynamicRealm.getInstance(config);
 
@@ -8,11 +10,11 @@
         assertNotNull(objectSchema);
 
         try {
-            objectSchema.addField("foo", String.class, FieldAttribute.PRIMARY_KEY);
+            objectSchema.addField("bar", String.class, FieldAttribute.PRIMARY_KEY);
             fail();
         } catch (UnsupportedOperationException ignored) {
         } finally {
-            realm.commitTransaction();
+            realm.cancelTransaction();
             realm.close();
         }
     }

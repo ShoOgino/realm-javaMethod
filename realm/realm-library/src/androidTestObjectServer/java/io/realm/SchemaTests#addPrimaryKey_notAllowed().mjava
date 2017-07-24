@@ -1,5 +1,7 @@
     @Test
     public void addPrimaryKey_notAllowed() {
+        // Init schema
+        Realm.getInstance(config).close();
         String className = "StringOnly";
         String fieldName = "chars";
         DynamicRealm realm = DynamicRealm.getInstance(config);
@@ -14,7 +16,7 @@
             fail();
         } catch (UnsupportedOperationException ignored) {
         } finally {
-            realm.commitTransaction();
+            realm.cancelTransaction();
             realm.close();
         }
     }
