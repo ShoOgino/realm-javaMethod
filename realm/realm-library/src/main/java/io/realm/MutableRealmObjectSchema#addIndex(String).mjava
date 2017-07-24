@@ -1,0 +1,12 @@
+    @Override
+    public RealmObjectSchema addIndex(String fieldName) {
+        checkLegalName(fieldName);
+        checkFieldExists(fieldName);
+        long columnIndex = getColumnIndex(fieldName);
+        if (table.hasSearchIndex(columnIndex)) {
+            throw new IllegalStateException(fieldName + " already has an index.");
+        }
+        table.addSearchIndex(columnIndex);
+        return this;
+    }
+

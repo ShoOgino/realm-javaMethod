@@ -1,7 +1,7 @@
     <E extends RealmModel> E get(Class<E> clazz, long rowIndex, boolean acceptDefaultValue, List<String> excludeFields) {
-        Table table = schema.getTable(clazz);
+        Table table = getSchema().getTable(clazz);
         UncheckedRow row = table.getUncheckedRow(rowIndex);
-        return configuration.getSchemaMediator().newInstance(clazz, this, row, schema.getColumnInfo(clazz),
+        return configuration.getSchemaMediator().newInstance(clazz, this, row, getSchema().getColumnInfo(clazz),
                 acceptDefaultValue, excludeFields);
     }
 

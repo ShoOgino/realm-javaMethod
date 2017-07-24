@@ -1,12 +1,15 @@
     @Test
     public void addPrimaryKeyFieldModifier_duplicateValues() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            return;
+        }
         for (PrimaryKeyFieldType fieldType : PrimaryKeyFieldType.values()) {
             final String fieldName = "foo";
             schema.addField(fieldName, fieldType.getType());
 
             // Creates multiple objects with same values.
-            realm.createObject(schema.getClassName());
-            realm.createObject(schema.getClassName());
+            ((DynamicRealm)realm).createObject(schema.getClassName());
+            ((DynamicRealm)realm).createObject(schema.getClassName());
 
             try {
                 schema.addPrimaryKey(fieldName);

@@ -1,5 +1,19 @@
     @Test
     public void setRemovePrimaryKey() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            try {
+                schema.addPrimaryKey("test");
+                fail();
+            } catch (UnsupportedOperationException ignore){
+
+            }
+            try {
+                schema.removePrimaryKey();
+                fail();
+            } catch (UnsupportedOperationException ignore){
+            }
+            return;
+        }
         for (PrimaryKeyFieldType fieldType : PrimaryKeyFieldType.values()) {
             String fieldName = "foo";
             schema.addField(fieldName, fieldType.getType());

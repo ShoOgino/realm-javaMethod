@@ -3,7 +3,7 @@
     // TODO: Remove this after RealmList is backed by OS Results.
     <E extends RealmModel> E get(Class<E> clazz, String dynamicClassName, long rowIndex) {
         final boolean isDynamicRealmObject = dynamicClassName != null;
-        final Table table = isDynamicRealmObject ? schema.getTable(dynamicClassName) : schema.getTable(clazz);
+        final Table table = isDynamicRealmObject ? getSchema().getTable(dynamicClassName) : getSchema().getTable(clazz);
 
         E result;
         if (isDynamicRealmObject) {
@@ -14,7 +14,7 @@
         } else {
             result = configuration.getSchemaMediator().newInstance(clazz, this,
                     (rowIndex != Table.NO_MATCH) ? table.getUncheckedRow(rowIndex) : InvalidRow.INSTANCE,
-                    schema.getColumnInfo(clazz), false, Collections.<String>emptyList());
+                    getSchema().getColumnInfo(clazz), false, Collections.<String>emptyList());
         }
 
         return result;

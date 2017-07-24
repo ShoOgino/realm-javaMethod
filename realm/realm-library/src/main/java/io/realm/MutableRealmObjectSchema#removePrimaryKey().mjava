@@ -1,0 +1,14 @@
+    @Override
+    public RealmObjectSchema removePrimaryKey() {
+        realm.checkNotInSync(); // Destructive modifications are not permitted.
+        if (!table.hasPrimaryKey()) {
+            throw new IllegalStateException(getClassName() + " doesn't have a primary key.");
+        }
+        long columnIndex = table.getPrimaryKey();
+        if (table.hasSearchIndex(columnIndex)) {
+            table.removeSearchIndex(columnIndex);
+        }
+        table.setPrimaryKey("");
+        return this;
+    }
+

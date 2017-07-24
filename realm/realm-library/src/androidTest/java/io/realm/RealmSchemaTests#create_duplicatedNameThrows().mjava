@@ -1,5 +1,9 @@
     @Test
     public void create_duplicatedNameThrows() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
+
         realmSchema.create("Foo");
         thrown.expect(IllegalArgumentException.class);
         realmSchema.create("Foo");

@@ -1,5 +1,9 @@
     @Test
     public void remove_shouldRemoveInfoFromPKTable() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
+
         assertTrue(realmSchema.contains(PrimaryKeyAsString.CLASS_NAME));
         realmSchema.remove(PrimaryKeyAsString.CLASS_NAME);
         assertFalse(realmSchema.contains(PrimaryKeyAsString.CLASS_NAME));

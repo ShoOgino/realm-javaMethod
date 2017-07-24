@@ -1,11 +1,15 @@
     @Test
     public void rename_shouldChangeInfoInPKTable() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
+
         final String NEW_NAME = "NewPrimaryKeyAsString";
         assertTrue(realmSchema.contains(PrimaryKeyAsString.CLASS_NAME));
         realmSchema.rename(PrimaryKeyAsString.CLASS_NAME, NEW_NAME);
         assertFalse(realmSchema.contains(PrimaryKeyAsString.CLASS_NAME));
         assertTrue(realmSchema.contains(NEW_NAME));
-        RealmObjectSchema objectSchema = realmSchema.getSchemaForClass(NEW_NAME);
+        RealmObjectSchema objectSchema = realmSchema.get(NEW_NAME);
 
         assertEquals(PrimaryKeyAsString.FIELD_PRIMARY_KEY, objectSchema.getPrimaryKey());
 

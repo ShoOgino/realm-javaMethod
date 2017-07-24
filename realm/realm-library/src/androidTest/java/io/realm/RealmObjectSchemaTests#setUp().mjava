@@ -2,10 +2,24 @@
     public void setUp() {
         RealmConfiguration realmConfig = configFactory.createConfiguration();
         Realm.getInstance(realmConfig).close(); // Creates Schema.
+
         realm = DynamicRealm.getInstance(realmConfig);
-        realmSchema = realm.getSchema();
-        DOG_SCHEMA = realmSchema.get("Dog");
         realm.beginTransaction();
-        schema = realmSchema.create("NewClass");
+        realm.getSchema().create("NewClass");
+        realm.commitTransaction();
+        realm.close();
+
+        if (type == ObjectSchemaType.MUTABLE)  {
+            realm = DynamicRealm.getInstance(realmConfig);
+            realmSchema = realm.getSchema();
+            DOG_SCHEMA = realmSchema.get("Dog");
+            schema = realmSchema.get("NewClass");
+        } else {
+            realm = Realm.getInstance(realmConfig);
+            realmSchema = realm.getSchema();
+            DOG_SCHEMA = realmSchema.get("Dog");
+            schema = realmSchema.get("NewClass");
+        }
+        realm.beginTransaction();
     }
 

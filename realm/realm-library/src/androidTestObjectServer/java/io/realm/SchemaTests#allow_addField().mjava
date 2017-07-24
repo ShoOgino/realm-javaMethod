@@ -1,8 +1,10 @@
     @Test
     public void allow_addField() {
+        // Init schema
+        Realm.getInstance(config).close();
         String className = "StringOnly";
-        Realm realm = Realm.getInstance(config);
 
+        DynamicRealm realm = DynamicRealm.getInstance(config);
         realm.beginTransaction();
         realm.getSchema().get(className).addField("foo", String.class);
         realm.commitTransaction();

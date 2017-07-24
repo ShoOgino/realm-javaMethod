@@ -1,5 +1,8 @@
     @Test
     public void setRequired_true_onPrimaryKeyField_containsNullValues_shouldThrow() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            return;
+        }
         for (PrimaryKeyFieldType fieldType : PrimaryKeyFieldType.values()) {
             String className = fieldType.getType().getSimpleName() + "Class";
             String fieldName = "primaryKey";
@@ -8,7 +11,7 @@
                 continue;
             }
             schema.addField(fieldName, fieldType.getType(), FieldAttribute.PRIMARY_KEY);
-            DynamicRealmObject object = realm.createObject(schema.getClassName(), null);
+            DynamicRealmObject object = ((DynamicRealm)realm).createObject(schema.getClassName(), null);
             assertTrue(object.isNull(fieldName));
             try {
                 schema.setRequired(fieldName, true);

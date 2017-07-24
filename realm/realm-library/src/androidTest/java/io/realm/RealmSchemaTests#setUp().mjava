@@ -5,7 +5,11 @@
                         DogPrimaryKey.class)
                 .build();
         Realm.getInstance(realmConfig).close(); // create Schema
-        realm = DynamicRealm.getInstance(realmConfig);
+        if (type == SchemaType.MUTABLE) {
+            realm = DynamicRealm.getInstance(realmConfig);
+        } else {
+            realm = Realm.getInstance(realmConfig);
+        }
         realmSchema = this.realm.getSchema();
         realm.beginTransaction();
     }
