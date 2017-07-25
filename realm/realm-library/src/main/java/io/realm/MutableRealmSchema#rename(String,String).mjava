@@ -1,8 +1,8 @@
     @Override
     public RealmObjectSchema rename(String oldClassName, String newClassName) {
         realm.checkNotInSync(); // Destructive modifications are not permitted.
-        checkEmpty(oldClassName, "Class names cannot be empty or null");
-        checkEmpty(newClassName, "Class names cannot be empty or null");
+        checkNotEmpty(oldClassName, "Class names cannot be empty or null");
+        checkNotEmpty(newClassName, "Class names cannot be empty or null");
         String oldInternalName = Table.getTableNameForClass(oldClassName);
         String newInternalName = Table.getTableNameForClass(newClassName);
         checkHasTable(oldClassName, "Cannot rename class because it doesn't exist in this Realm: " + oldClassName);
