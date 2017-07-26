@@ -24,8 +24,9 @@
                 .endControlFlow();
 
         // may cause an unused variable warning if the object contains only null lists
-        writer.emitStatement("%1$s unmanagedCopy = (%1$s) unmanagedObject", interfaceName);
-        writer.emitStatement("%1$s realmSource = (%1$s) realmObject", interfaceName);
+        writer.emitStatement("%1$s unmanagedCopy = (%1$s) unmanagedObject", interfaceName)
+            .emitStatement("%1$s realmSource = (%1$s) realmObject", interfaceName);
+
         for (VariableElement field : metadata.getFields()) {
             String fieldName = field.getSimpleName().toString();
             String setter = metadata.getInternalSetter(fieldName);
@@ -56,6 +57,9 @@
                         .emitStatement("unmanaged%sList.add(item)", fieldName)
                         .endControlFlow()
                         .endControlFlow();
+            } else if (Utils.isMutableRealmInteger(field)) {
+                // If the user initializes the unmanaged MutableRealmInteger to null, this will fail mysteriously.
+                writer.emitStatement("unmanagedCopy.%s().set(realmSource.%s().get())", getter, getter);
             } else {
                 writer.emitStatement("unmanagedCopy.%s(realmSource.%s())", setter, getter);
             }

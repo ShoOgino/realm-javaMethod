@@ -1,0 +1,10 @@
+    public static void emitFillJavaTypeFromStream(
+            String varName, ClassMetaData metaData, String accessor, String fieldName, String fieldType, JavaWriter writer)
+            throws IOException {
+        boolean isPrimaryKey = metaData.hasPrimaryKey() && metaData.getPrimaryKey().getSimpleName().toString().equals(fieldName);
+        JsonToRealmFieldTypeConverter typeEmitter = JAVA_TO_JSON_TYPES.get(fieldType);
+        if (typeEmitter != null) {
+            typeEmitter.emitStreamTypeConversion(varName, accessor, fieldName, fieldType, writer, isPrimaryKey);
+        }
+    }
+

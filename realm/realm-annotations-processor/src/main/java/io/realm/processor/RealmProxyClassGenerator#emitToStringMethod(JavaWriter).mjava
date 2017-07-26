@@ -28,6 +28,8 @@
                 writer.emitStatement("stringBuilder.append(\"RealmList<%s>[\").append(%s().size()).append(\"]\")",
                         genericTypeSimpleName,
                         metadata.getInternalGetter(fieldName));
+            } else if (Utils.isMutableRealmInteger(field)) {
+                writer.emitStatement("stringBuilder.append(%s().get())", metadata.getInternalGetter(fieldName));
             } else {
                 if (metadata.isNullable(field)) {
                     writer.emitStatement("stringBuilder.append(%s() != null ? %s() : \"null\")",

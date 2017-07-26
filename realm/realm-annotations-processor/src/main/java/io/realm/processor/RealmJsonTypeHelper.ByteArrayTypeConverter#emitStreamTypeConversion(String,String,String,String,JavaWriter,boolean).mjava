@@ -1,13 +1,13 @@
         // @formatter:off
         @Override
-        public void emitStreamTypeConversion(String interfaceName, String setter, String fieldName,
-                String fieldType, JavaWriter writer, boolean isPrimaryKey) throws IOException {
+        public void emitStreamTypeConversion(String varName, String accessor, String fieldName, String fieldType, JavaWriter writer, boolean isPrimaryKey)
+                throws IOException {
             writer
-                .beginControlFlow("if (reader.peek() == JsonToken.NULL)")
-                    .emitStatement("reader.skipValue()")
-                    .emitStatement("((%s) obj).%s(null)", interfaceName, setter)
+                .beginControlFlow("if (reader.peek() != JsonToken.NULL)")
+                    .emitStatement("%s.%s(JsonUtils.stringToBytes(reader.nextString()))", varName, accessor)
                 .nextControlFlow("else")
-                    .emitStatement("((%s) obj).%s(JsonUtils.stringToBytes(reader.nextString()))", interfaceName, setter)
+                    .emitStatement("reader.skipValue()")
+                    .emitStatement("%s.%s(null)", varName, accessor)
                 .endControlFlow();
         }
         // @formatter:on

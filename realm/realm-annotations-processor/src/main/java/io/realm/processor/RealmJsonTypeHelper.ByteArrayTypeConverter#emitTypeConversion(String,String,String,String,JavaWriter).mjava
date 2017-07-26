@@ -1,15 +1,13 @@
         // @formatter:off
         @Override
-        public void emitTypeConversion(String interfaceName, String setter, String fieldName, String fieldType,
-                JavaWriter writer) throws IOException {
+        public void emitTypeConversion(String varName, String accessor, String fieldName, String fieldType, JavaWriter writer)
+                throws IOException {
             writer
                 .beginControlFlow("if (json.has(\"%s\"))", fieldName)
                     .beginControlFlow("if (json.isNull(\"%s\"))", fieldName)
-                        .emitStatement("((%s) obj).%s(null)", interfaceName, setter)
+                        .emitStatement("%s.%s(null)", varName, accessor)
                     .nextControlFlow("else")
-                        .emitStatement(
-                                "((%s) obj).%s(JsonUtils.stringToBytes(json.getString(\"%s\")))",
-                                interfaceName, setter, fieldName)
+                        .emitStatement("%s.%s(JsonUtils.stringToBytes(json.getString(\"%s\")))", varName, accessor, fieldName)
                     .endControlFlow()
                 .endControlFlow();
         }

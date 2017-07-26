@@ -74,6 +74,9 @@
                         .endControlFlow()
                         .emitEmptyLine();
 
+            } else if (Utils.isMutableRealmInteger(field)) {
+                writer.emitEmptyLine()
+                        .emitStatement("realmObjectCopy.%1$s().set(realmObjectSource.%1$s().get())", getter);
             } else {
                 writer.emitStatement("realmObjectCopy.%s(realmObjectSource.%s())", setter, getter);
             }

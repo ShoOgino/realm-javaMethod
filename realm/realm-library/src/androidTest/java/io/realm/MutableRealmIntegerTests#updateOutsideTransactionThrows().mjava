@@ -1,0 +1,32 @@
+    /**
+     * Assure that an attempt to change the value of a managed MutableRealmInteger, outside a transaction, fails.
+     */
+    @Test
+    public void updateOutsideTransactionThrows() {
+        realm.beginTransaction();
+        realm.createObject(MutableRealmIntegerTypes.class).getColumnNullableMutableRealmInteger().set(42);
+        realm.commitTransaction();
+
+        MutableRealmInteger managedRI = realm.where(MutableRealmIntegerTypes.class).findFirst().getColumnNullableMutableRealmInteger();
+        try {
+            managedRI.set(1);
+            fail("Setting a managed MutableRealmInteger outside a transaction should fail");
+        } catch (IllegalStateException e) {
+            checkTransactionException(e);
+        }
+
+        try {
+            managedRI.increment(1);
+            fail("Incrementing a managed MutableRealmInteger outside a transaction should fail");
+        } catch (IllegalStateException e) {
+            checkTransactionException(e);
+        }
+
+        try {
+            managedRI.decrement(1);
+            fail("Decrementing a managed MutableRealmInteger outside a transaction should fail");
+        } catch (IllegalStateException e) {
+            checkTransactionException(e);
+        }
+    }
+
