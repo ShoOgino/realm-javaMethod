@@ -1,0 +1,16 @@
+    /**
+     * {@code MutableRealmInteger}s compare strictly by their values.
+     * Null is a legal value for a {@code MutableRealmInteger} and {@code null} &lt; any non-{@code null} value
+     *
+     * @param o the compare target
+     * @return -1, 0, or 1, depending on whether this object's value is &lt;, =, or &gt; the target's.
+     */
+    @Override
+    public final int compareTo(MutableRealmInteger o) {
+        Long thisValue = get();
+        Long otherValue = o.get();
+        return (thisValue == null)
+                ? ((otherValue == null) ? 0 : -1)
+                : ((otherValue == null) ? 1 : thisValue.compareTo (otherValue));
+    }
+

@@ -1,0 +1,39 @@
+    @Test
+    public void testStream() throws IOException {
+        Context context = InstrumentationRegistry.getTargetContext();
+
+        InputStream in = TestHelper.loadJsonFromAssets(context, "empty.json");
+        realm.beginTransaction();
+        MutableRealmIntegerTypes obj = realm.createObjectFromJson(MutableRealmIntegerTypes.class, in);
+        realm.commitTransaction();
+        assertTrue(obj.columnNullableMutableRealmInteger.isNull());
+
+        in = TestHelper.loadJsonFromAssets(context, "mutablerealminteger-long.json");
+        realm.beginTransaction();
+        obj = realm.createObjectFromJson(MutableRealmIntegerTypes.class, in);
+        realm.commitTransaction();
+        assertEquals(Long.valueOf(8589934592L), obj.columnNullableMutableRealmInteger.get());
+
+        in = TestHelper.loadJsonFromAssets(context, "mutablerealminteger-int.json");
+        realm.beginTransaction();
+        obj = realm.createObjectFromJson(MutableRealmIntegerTypes.class, in);
+        realm.commitTransaction();
+        assertEquals(Long.valueOf(22), obj.columnNullableMutableRealmInteger.get());
+
+        in = TestHelper.loadJsonFromAssets(context, "mutablerealminteger-null.json");
+        realm.beginTransaction();
+        obj = realm.createObjectFromJson(MutableRealmIntegerTypes.class, in);
+        realm.commitTransaction();
+        assertTrue(obj.columnNullableMutableRealmInteger.isNull());
+
+        in = TestHelper.loadJsonFromAssets(context, "mutablerealminteger-required-null.json");
+        realm.beginTransaction();
+        try {
+            obj = realm.createObjectFromJson(MutableRealmIntegerTypes.class, in);
+            fail("Attempt to set @Required Mutable Realm Integer null, from JSON, should fail");
+        } catch (IllegalArgumentException ignore) {
+            checkException(ignore, "is not nullable");
+        }
+        realm.commitTransaction();
+    }
+

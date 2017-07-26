@@ -1,0 +1,18 @@
+    /**
+     * @Indexed MutableRealmIntegers should have indices.
+     * Without @Index they should not.
+     */
+    @Test
+    public void indexed() {
+        realm.beginTransaction();
+        MutableRealmIntegerTypes c1 = realm.createObject(MutableRealmIntegerTypes.class);
+        realm.commitTransaction();
+
+        assertTrue(
+                realm.getSchema().get("MutableRealmIntegerTypes")
+                        .hasIndex(MutableRealmIntegerTypes.FIELD_INDEXED_MUTABLEREALMINTEGER));
+        assertFalse(
+                realm.getSchema().get("MutableRealmIntegerTypes")
+                        .hasIndex(MutableRealmIntegerTypes.FIELD_NULLABLE_MUTABLEEALMINTEGER));
+    }
+

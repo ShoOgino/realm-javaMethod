@@ -1,0 +1,17 @@
+        @Override
+        public final void set(Long value) {
+            ProxyState proxyState = getProxyState();
+            proxyState.getRealm$realm().checkIfValidAndInTransaction();
+
+            if (!proxyState.isUnderConstruction()) {
+                setValue(value, false);
+                return;
+            }
+
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+
+            setValue(value, true);
+        }
+
