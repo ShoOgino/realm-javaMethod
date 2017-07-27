@@ -1,19 +1,20 @@
     @Test
-    public void disallow_removeField() {
+    public void addPrimaryKey_notAllowed() {
         // Init schema
         Realm.getInstance(config).close();
-
-        DynamicRealm realm = DynamicRealm.getInstance(config);
         String className = "StringOnly";
         String fieldName = "chars";
-        final RealmObjectSchema objectSchema = realm.getSchema().get(className);
+        DynamicRealm realm = DynamicRealm.getInstance(config);
+
+        RealmObjectSchema objectSchema = realm.getSchema().get(className);
         assertNotNull(objectSchema);
         assertTrue(objectSchema.hasField(fieldName));
+
         realm.beginTransaction();
         try {
-            objectSchema.removeField(fieldName);
+            objectSchema.addPrimaryKey(fieldName);
             fail();
-        } catch (IllegalArgumentException ignored) {
+        } catch (UnsupportedOperationException ignored) {
         } finally {
             realm.cancelTransaction();
             realm.close();

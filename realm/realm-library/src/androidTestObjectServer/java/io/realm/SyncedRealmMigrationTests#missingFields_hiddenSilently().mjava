@@ -14,6 +14,9 @@
         schema.create(className)
                 .addField(StringOnly.FIELD_CHARS, String.class)
                 .addField("newField", String.class);
+        // A schema version has to be set otherwise Object Store will try to initialize the schema again and reach an
+        // error branch. That is not a real case.
+        dynamicRealm.setVersion(0);
         dynamicRealm.commitTransaction();
         dynamicRealm.close();
 
@@ -22,9 +25,8 @@
         RealmObjectSchema stringOnlySchema = realm.getSchema().get(className);
         try {
             assertTrue(stringOnlySchema.hasField(StringOnly.FIELD_CHARS));
-            // TODO Field is currently hidden, but should the field be visible in the schema
-            assertFalse(stringOnlySchema.hasField("newField"));
-            assertEquals(1, stringOnlySchema.getFieldNames().size());
+            assertTrue(stringOnlySchema.hasField("newField"));
+            assertEquals(2, stringOnlySchema.getFieldNames().size());
         } finally {
             realm.close();
         }
