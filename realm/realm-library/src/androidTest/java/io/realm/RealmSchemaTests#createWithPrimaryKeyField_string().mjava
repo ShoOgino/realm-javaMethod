@@ -14,8 +14,8 @@
 
         for (String validClassName : validClassNames) {
             // Not nullable
-            realmSchema.createWithPrimaryKeyField(validClassName, "pkField", String.class, FieldAttribute.REQUIRED);
-            RealmObjectSchema objectSchema = realmSchema.getSchemaForClass(validClassName);
+            RealmObjectSchema objectSchema = realmSchema.createWithPrimaryKeyField(validClassName,
+                    "pkField", String.class, FieldAttribute.REQUIRED);
             assertEquals("pkField", objectSchema.getPrimaryKey());
             assertEquals(RealmFieldType.STRING, objectSchema.getFieldType("pkField"));
             assertFalse(objectSchema.isNullable("pkField"));
@@ -24,8 +24,8 @@
             realmSchema.remove(validClassName);
 
             // Nullable
-            realmSchema.createWithPrimaryKeyField(validClassName, "pkField", String.class);
-            objectSchema = realmSchema.getSchemaForClass(validClassName);
+            objectSchema = realmSchema.createWithPrimaryKeyField(validClassName,
+                    "pkField", String.class);
             assertEquals("pkField", objectSchema.getPrimaryKey());
             assertEquals(RealmFieldType.STRING, objectSchema.getFieldType("pkField"));
             assertTrue(objectSchema.isNullable("pkField"));
