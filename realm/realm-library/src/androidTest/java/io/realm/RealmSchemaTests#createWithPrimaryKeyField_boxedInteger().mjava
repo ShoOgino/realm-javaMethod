@@ -1,23 +1,34 @@
     @Test
     public void createWithPrimaryKeyField_boxedInteger() {
+        final String[] validClassNames = {
+                TestHelper.getRandomString(1),
+                "Darby",
+                TestHelper.getRandomString(Table.CLASS_NAME_MAX_LENGTH)
+        };
+
         if (type == SchemaType.IMMUTABLE) {
+            thrown.expect(UnsupportedOperationException.class);
+            realmSchema.createWithPrimaryKeyField(validClassNames[0], "pkField", Integer.class);
             return;
         }
-        // Not nullable
-        realmSchema.createWithPrimaryKeyField("FooNonNull", "pkField", Integer.class,
-                FieldAttribute.REQUIRED);
-        RealmObjectSchema objectSchema = realmSchema.getSchemaForClass("FooNonNull");
-        assertEquals("pkField", objectSchema.getPrimaryKey());
-        assertEquals(RealmFieldType.INTEGER, objectSchema.getFieldType("pkField"));
-        assertFalse(objectSchema.isNullable("pkField"));
-        assertTrue(objectSchema.hasIndex("pkField"));
 
-        // Nullable
-        realmSchema.createWithPrimaryKeyField("FooNull", "pkField", Integer.class);
-        objectSchema = realmSchema.getSchemaForClass("FooNull");
-        assertEquals("pkField", objectSchema.getPrimaryKey());
-        assertEquals(RealmFieldType.INTEGER, objectSchema.getFieldType("pkField"));
-        assertTrue(objectSchema.isNullable("pkField"));
-        assertTrue(objectSchema.hasIndex("pkField"));
+        for (String validClassName : validClassNames) {
+            // Not nullable
+            realmSchema.createWithPrimaryKeyField(validClassName, "pkField", Integer.class,
+                    FieldAttribute.REQUIRED);
+            RealmObjectSchema objectSchema = realmSchema.getSchemaForClass(validClassName);
+            assertEquals("pkField", objectSchema.getPrimaryKey());
+            assertEquals(RealmFieldType.INTEGER, objectSchema.getFieldType("pkField"));
+            assertFalse(objectSchema.isNullable("pkField"));
+            assertTrue(objectSchema.hasIndex("pkField"));
+
+            // Nullable
+            realmSchema.createWithPrimaryKeyField(validClassName, "pkField", Integer.class);
+            objectSchema = realmSchema.getSchemaForClass(validClassName);
+            assertEquals("pkField", objectSchema.getPrimaryKey());
+            assertEquals(RealmFieldType.INTEGER, objectSchema.getFieldType("pkField"));
+            assertTrue(objectSchema.isNullable("pkField"));
+            assertTrue(objectSchema.hasIndex("pkField"));
+        }
     }
 
