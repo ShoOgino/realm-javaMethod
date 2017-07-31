@@ -1,9 +1,18 @@
     @Test
     public void transform() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            thrown.expect(UnsupportedOperationException.class);
+            DOG_SCHEMA.transform(new RealmObjectSchema.Function() {
+                @Override
+                public void apply(DynamicRealmObject obj) {
+                }
+            });
+            return;
+        }
         String className = DOG_SCHEMA.getClassName();
-        DynamicRealmObject dog1 = realm.createObject(className);
+        DynamicRealmObject dog1 = ((DynamicRealm)realm).createObject(className);
         dog1.setInt("age", 1);
-        DynamicRealmObject dog2 = realm.createObject(className);
+        DynamicRealmObject dog2 = ((DynamicRealm)realm).createObject(className);
         dog2.setInt("age", 2);
 
         DOG_SCHEMA.transform(new RealmObjectSchema.Function() {
@@ -12,6 +21,6 @@
                 obj.setInt("age", obj.getInt("age") + 1);
             }
         });
-        assertEquals(5, realm.where("Dog").sum("age").intValue());
+        assertEquals(5, ((DynamicRealm)realm).where("Dog").sum("age").intValue());
     }
 

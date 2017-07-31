@@ -7,31 +7,8 @@
      * @return the updated schema.
      * @throws IllegalArgumentException if the field name doesn't exist, cannot have the {@link Required} annotation or
      * the field already have been set as required.
+     * @throws UnsupportedOperationException if this {@link RealmObjectSchema} is immutable.
      * @see Required
      */
-    public RealmObjectSchema setRequired(String fieldName, boolean required) {
-        long columnIndex = table.getColumnIndex(fieldName);
-        boolean currentColumnRequired = isRequired(fieldName);
-        RealmFieldType type = table.getColumnType(columnIndex);
-
-        if (type == RealmFieldType.OBJECT) {
-            throw new IllegalArgumentException("Cannot modify the required state for RealmObject references: " + fieldName);
-        }
-        if (type == RealmFieldType.LIST) {
-            throw new IllegalArgumentException("Cannot modify the required state for RealmList references: " + fieldName);
-        }
-        if (required && currentColumnRequired) {
-            throw new IllegalStateException("Field is already required: " + fieldName);
-        }
-        if (!required && !currentColumnRequired) {
-            throw new IllegalStateException("Field is already nullable: " + fieldName);
-        }
-
-        if (required) {
-            table.convertColumnToNotNullable(columnIndex);
-        } else {
-            table.convertColumnToNullable(columnIndex);
-        }
-        return this;
-    }
+    public abstract RealmObjectSchema setRequired(String fieldName, boolean required);
 

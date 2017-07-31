@@ -1,0 +1,38 @@
+    /**
+     * {@literal @}Required MutableRealmIntegers should not be nullable.
+     * There are other tests testing nullabilty: just need to test @Required here.
+     * There is no attempt to control the nullability of an unmanaged MutableRealmInteger.
+     * An attempt to copy an unmanaged model object with a null-valued MutableRealmInteger
+     * into an @Required field should fail.
+     */
+    @Test
+    public void required() {
+        realm.beginTransaction();
+        MutableRealmIntegerTypes c1 = realm.createObject(MutableRealmIntegerTypes.class);
+        realm.commitTransaction();
+
+        assertFalse(
+                realm.getSchema().get("MutableRealmIntegerTypes")
+                        .isNullable(MutableRealmIntegerTypes.FIELD_NONNULLABLE_MUTABLEREALMINTEGER));
+
+        realm.beginTransaction();
+        try {
+            c1.columnNonNullableMutableRealmInteger.set(null);
+            fail("should not be able to set an @Required MutableRealmInteger null");
+        } catch(IllegalArgumentException ignore) {
+            checkException(ignore, "is not nullable");
+        }
+        realm.commitTransaction();
+
+        c1 = new MutableRealmIntegerTypes();
+        c1.columnNonNullableMutableRealmInteger.set(null);
+        realm.beginTransaction();
+        try {
+            MutableRealmIntegerTypes c2 = realm.copyToRealm(c1);
+            fail("should not be able to copy a null value to a @Required MutableRealmInteger");
+        } catch(IllegalArgumentException ignore) {
+            checkException(ignore, "is not nullable");
+        }
+        realm.commitTransaction();
+    }
+

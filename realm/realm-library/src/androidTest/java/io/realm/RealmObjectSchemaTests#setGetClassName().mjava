@@ -1,9 +1,22 @@
     @Test
     public void setGetClassName() {
+        final String[] validClassNames = {
+                TestHelper.getRandomString(1),
+                "Darby",
+                TestHelper.getRandomString(Table.CLASS_NAME_MAX_LENGTH)
+        };
+
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            thrown.expect(UnsupportedOperationException.class);
+            DOG_SCHEMA.setClassName(validClassNames[0]);
+            return;
+        }
+
         assertEquals("Dog", DOG_SCHEMA.getClassName());
-        String newClassName = "Darby";
-        DOG_SCHEMA.setClassName(newClassName);
-        assertEquals(newClassName, DOG_SCHEMA.getClassName());
-        assertTrue(realmSchema.contains(newClassName));
+        for (String validClassName : validClassNames) {
+            DOG_SCHEMA.setClassName(validClassName);
+            assertEquals(validClassName, DOG_SCHEMA.getClassName());
+            assertTrue(realmSchema.contains(validClassName));
+        }
     }
 

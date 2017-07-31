@@ -1,6 +1,9 @@
     @Test
     public void disallow_removeClass() {
-        Realm realm = Realm.getInstance(config);
+        // Init schema
+        Realm.getInstance(config).close();
+
+        DynamicRealm realm = DynamicRealm.getInstance(config);
         String className = "StringOnly";
         realm.beginTransaction();
         assertTrue(realm.getSchema().contains(className));

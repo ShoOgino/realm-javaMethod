@@ -9,22 +9,23 @@
      * @param createBase create a schema named "MigrationPrimaryKey" instead of {@code className} if {@code true}
      */
     private void buildInitialMigrationSchema(final String className, final boolean createBase) {
-        Realm realm = Realm.getInstance(configFactory.createConfigurationBuilder().build());
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                // First, removes an existing schema.
-                realm.getSchema().remove(className);
-                // Then recreates the deleted schema or builds a base schema.
-                realm.getSchema()
-                        .create(createBase ? MigrationPrimaryKey.CLASS_NAME : className)
-                        .addField(MigrationPrimaryKey.FIELD_FIRST,   Byte.class)
-                        .addField(MigrationPrimaryKey.FIELD_SECOND,  Short.class)
-                        .addField(MigrationPrimaryKey.FIELD_PRIMARY, String.class, FieldAttribute.PRIMARY_KEY)
-                        .addField(MigrationPrimaryKey.FIELD_FOURTH,  Integer.class)
-                        .addField(MigrationPrimaryKey.FIELD_FIFTH,   Long.class);
-            }
-        });
+        RealmConfiguration config = configFactory.createConfigurationBuilder().build();
+        // Init the schema
+        Realm.getInstance(config).close();
+
+        DynamicRealm realm = DynamicRealm.getInstance(config);
+        realm.beginTransaction();
+        // First, removes an existing schema.
+        realm.getSchema().remove(className);
+        // Then recreates the deleted schema or builds a base schema.
+        realm.getSchema()
+                .create(createBase ? MigrationPrimaryKey.CLASS_NAME : className)
+                .addField(MigrationPrimaryKey.FIELD_FIRST,   Byte.class)
+                .addField(MigrationPrimaryKey.FIELD_SECOND,  Short.class)
+                .addField(MigrationPrimaryKey.FIELD_PRIMARY, String.class, FieldAttribute.PRIMARY_KEY)
+                .addField(MigrationPrimaryKey.FIELD_FOURTH,  Integer.class)
+                .addField(MigrationPrimaryKey.FIELD_FIFTH,   Long.class);
+        realm.commitTransaction();
         realm.close();
     }
 

@@ -1,6 +1,20 @@
     @Test
     public void create() {
-        realmSchema.create("Foo");
-        assertTrue(realmSchema.contains("Foo"));
+        final String[] validClassNames = {
+                TestHelper.getRandomString(1),
+                "Darby",
+                TestHelper.getRandomString(Table.CLASS_NAME_MAX_LENGTH)
+        };
+
+        if (type == SchemaType.IMMUTABLE) {
+            thrown.expect(UnsupportedOperationException.class);
+            realmSchema.create(validClassNames[0]);
+            return;
+        }
+
+        for (String validClassName : validClassNames) {
+            realmSchema.create(validClassName);
+            assertTrue(realmSchema.contains(validClassName));
+        }
     }
 

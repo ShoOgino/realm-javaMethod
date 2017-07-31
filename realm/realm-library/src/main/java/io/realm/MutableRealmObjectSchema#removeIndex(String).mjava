@@ -1,0 +1,13 @@
+    @Override
+    public RealmObjectSchema removeIndex(String fieldName) {
+        realm.checkNotInSync(); // Destructive modifications are not permitted.
+        checkLegalName(fieldName);
+        checkFieldExists(fieldName);
+        long columnIndex = getColumnIndex(fieldName);
+        if (!table.hasSearchIndex(columnIndex)) {
+            throw new IllegalStateException("Field is not indexed: " + fieldName);
+        }
+        table.removeSearchIndex(columnIndex);
+        return this;
+    }
+

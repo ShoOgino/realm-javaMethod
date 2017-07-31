@@ -1,0 +1,43 @@
+    /**
+     * This method should only be called when guarded by the {@link #waitForChangesMutex}.
+     * It will block into all changes have been either uploaded or downloaded depending on the chosen direction.
+     *
+     * @param direction either {@link #DIRECTION_DOWNLOAD} or {@link #DIRECTION_UPLOAD}
+     */
+    private void waitForChanges(int direction) throws InterruptedException {
+        if (direction != DIRECTION_DOWNLOAD && direction != DIRECTION_UPLOAD) {
+            throw new IllegalArgumentException("Unknown direction: " + direction);
+        }
+        if (!isClosed) {
+            WaitForSessionWrapper wrapper = new WaitForSessionWrapper();
+            waitingForServerChanges.set(wrapper);
+            boolean listenerRegistered = (direction == DIRECTION_DOWNLOAD)
+                    ? nativeWaitForDownloadCompletion(configuration.getPath())
+                    : nativeWaitForUploadCompletion(configuration.getPath());
+            if (!listenerRegistered) {
+                waitingForServerChanges.set(null);
+                String errorMsg = "";
+                switch (direction) {
+                    case DIRECTION_DOWNLOAD: errorMsg = "It was not possible to download all remote changes."; break;
+                    case DIRECTION_UPLOAD: errorMsg = "It was not possible upload all local changes."; break;
+                    default:
+                        throw new IllegalArgumentException("Unknown direction: " + direction);
+                }
+
+                throw new ObjectServerError(ErrorCode.UNKNOWN, errorMsg + " Has the SyncClient been started?");
+            }
+            wrapper.waitForServerChanges();
+
+            // This might return after the session was closed. In that case, just ignore any result
+            try {
+                if (!isClosed) {
+                    if (!wrapper.isSuccess()) {
+                        wrapper.throwExceptionIfNeeded();
+                    }
+                }
+            } finally {
+                waitingForServerChanges.set(null);
+            }
+        }
+    }
+

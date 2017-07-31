@@ -74,6 +74,8 @@
             String fieldTypeQualifiedName = Utils.getFieldTypeQualifiedName(field);
             if (Constants.JAVA_TO_REALM_TYPES.containsKey(fieldTypeQualifiedName)) {
                 emitValidateRealmType(writer, field, fieldName, fieldTypeQualifiedName);
+            } else if (Utils.isMutableRealmInteger(field)) {
+                emitValidateRealmType(writer, field, fieldName, fieldTypeQualifiedName);
             } else if (Utils.isRealmModel(field)) { // Links
                 emitValidateRealmModelType(writer, field, fieldIndex, fieldName);
             } else if (Utils.isRealmList(field)) { // Link Lists

@@ -7,19 +7,7 @@
      * @return the updated schema.
      * @throws IllegalArgumentException if field name doesn't exist, the field cannot be a primary key or it already
      * has a primary key defined.
+     * @throws UnsupportedOperationException if this {@link RealmObjectSchema} is immutable.
      */
-    public RealmObjectSchema addPrimaryKey(String fieldName) {
-        checkLegalName(fieldName);
-        checkFieldExists(fieldName);
-        if (table.hasPrimaryKey()) {
-            throw new IllegalStateException("A primary key is already defined");
-        }
-        table.setPrimaryKey(fieldName);
-        long columnIndex = getColumnIndex(fieldName);
-        if (!table.hasSearchIndex(columnIndex)) {
-            // No exception will be thrown since adding PrimaryKey implies the column has an index.
-            table.addSearchIndex(columnIndex);
-        }
-        return this;
-    }
+    public abstract RealmObjectSchema addPrimaryKey(String fieldName);
 

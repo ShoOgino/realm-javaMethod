@@ -2,6 +2,9 @@
     // according to the field type.
     @Test
     public void setRequired_nullValueBecomesDefaultValue() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            return;
+        }
         for (FieldType fieldType : FieldType.values()) {
             String fieldName = fieldType.name();
             switch (fieldType) {
@@ -15,7 +18,7 @@
                         break;
                     }
                     schema.addField(fieldName, fieldType.getType());
-                    DynamicRealmObject object = realm.createObject(schema.getClassName());
+                    DynamicRealmObject object = ((DynamicRealm)realm).createObject(schema.getClassName());
                     assertTrue(object.isNull(fieldName));
                     schema.setRequired(fieldName, true);
                     assertFalse(object.isNull(fieldName));

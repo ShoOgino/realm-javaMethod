@@ -19,27 +19,7 @@
         // In Java we cannot lock on the Session object either since it will prevent any attempt at modifying the
         // lifecycle while it is in a waiting state. Thus we use a specialised mutex.
         synchronized (waitForChangesMutex) {
-            if (!isClosed) {
-                WaitForServerChangesWrapper wrapper = new WaitForServerChangesWrapper();
-                waitingForServerChanges.set(wrapper);
-                boolean listenerRegistered = nativeWaitForDownloadCompletion(configuration.getPath());
-                if (!listenerRegistered) {
-                    waitingForServerChanges.set(null);
-                    throw new ObjectServerError(ErrorCode.UNKNOWN, "It was not possible to download all changes. Has the SyncClient been started?");
-                }
-                wrapper.waitForServerChanges();
-
-                // This might return after the session was closed. In that case, just ignore any result
-                try {
-                    if (!isClosed) {
-                        if (!wrapper.isSuccess()) {
-                            wrapper.throwExceptionIfNeeded();
-                        }
-                    }
-                } finally {
-                    waitingForServerChanges.set(null);
-                }
-            }
+            waitForChanges(DIRECTION_DOWNLOAD);
         }
     }
 

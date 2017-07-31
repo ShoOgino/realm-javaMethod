@@ -1,5 +1,8 @@
     @Test
     public void removeField_withPrimaryKey() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            return;
+        }
         String fieldName = "foo";
         schema.addField(fieldName, String.class, FieldAttribute.PRIMARY_KEY);
         assertTrue(schema.hasField(fieldName));

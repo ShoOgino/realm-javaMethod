@@ -11,8 +11,8 @@
             } else {
                 schema.addField(fieldName, fieldType.getType(), FieldAttribute.PRIMARY_KEY, FieldAttribute.REQUIRED);
             }
-            realm.createObject(schema.getClassName(), "1");
-            realm.createObject(schema.getClassName(), "2");
+            ((DynamicRealm)realm).createObject(schema.getClassName(), "1");
+            ((DynamicRealm)realm).createObject(schema.getClassName(), "2");
             assertTrue(schema.hasPrimaryKey());
             assertTrue(schema.hasIndex(fieldName));
 
@@ -20,7 +20,7 @@
             assertTrue(schema.hasPrimaryKey());
             assertTrue(schema.hasIndex(fieldName));
 
-            RealmResults<DynamicRealmObject> results = realm.where(className).findAllSorted(fieldName);
+            RealmResults<DynamicRealmObject> results = ((DynamicRealm)realm).where(className).findAllSorted(fieldName);
             assertEquals(2, results.size());
             if (fieldType == PrimaryKeyFieldType.STRING) {
                 assertEquals("1", results.get(0).getString(fieldName));

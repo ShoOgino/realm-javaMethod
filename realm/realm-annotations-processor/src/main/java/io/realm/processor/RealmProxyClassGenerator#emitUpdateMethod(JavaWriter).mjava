@@ -55,6 +55,8 @@
                         .endControlFlow()
                         .endControlFlow();
 
+            } else if (Utils.isMutableRealmInteger(field)) {
+                writer.emitStatement("realmObjectTarget.%s().set(realmObjectSource.%s().get())", getter, getter);
             } else {
                 if (field != metadata.getPrimaryKey()) {
                     writer.emitStatement("realmObjectTarget.%s(realmObjectSource.%s())", setter, getter);
