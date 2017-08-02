@@ -4,8 +4,8 @@
         final String[] invalidIndexFieldTypes = {"float", "double", "byte[]", "Simple", "RealmList", "Float", "Double"};
 
         for (String fieldType : invalidIndexFieldTypes) {
-            TestRealmObjectFileObject javaFileObject = TestRealmObjectFileObject.getSingleFieldInstance(
-                    "InvalidIndexType", "Index", fieldType, "testField");
+            RealmSyntheticTestClass javaFileObject =
+                    new RealmSyntheticTestClass.Builder().name("InvalidIndexType").field("testField", fieldType, "Index").build();
             ASSERT.about(javaSource())
                     .that(javaFileObject)
                     .processedWith(new RealmProcessor())

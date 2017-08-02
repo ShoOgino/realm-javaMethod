@@ -1,7 +1,12 @@
     @Test
-    public void failsOnLinkingObjectsMissingFieldName() {
+    public void failsOnLinkingObjectsMissingFieldName() throws IOException {
+        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
+                // No backlinked field specified
+                .clearAnnotations()
+                .annotation("LinkingObjects")
+                .builder().build();
         ASSERT.about(javaSources())
-                .that(Arrays.asList(backlinks, backlinksTarget, backlinksMissingParam))
+                .that(Arrays.asList(backlinksTarget, javaFileObject))
                 .processedWith(new RealmProcessor())
                 .failsToCompile()
                 .withErrorContaining("must have a parameter identifying the link target");
