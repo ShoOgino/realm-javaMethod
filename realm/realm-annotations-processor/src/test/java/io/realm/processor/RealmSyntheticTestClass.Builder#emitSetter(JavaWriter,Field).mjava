@@ -1,0 +1,18 @@
+        private void emitSetter(JavaWriter writer, Field field) throws IOException {
+            // Setter
+            writer.beginMethod(
+                    "void", // Return type
+                    "set" + field.name, // Method name
+                    EnumSet.of(Modifier.PUBLIC), field.type, field.name); // Modifiers
+            writer.emitStatement("realmSet$" + field.name + "(" + field.name + ")");
+            writer.endMethod();
+
+            // Realm Setter
+            writer.beginMethod(
+                    "void", // Return type
+                    "realmSet$" + field.name, // Method name
+                    EnumSet.of(Modifier.PUBLIC), field.type, field.name); // Modifiers
+            writer.emitStatement("this." + field.name + "=" + field.name);
+            writer.endMethod();
+        }
+

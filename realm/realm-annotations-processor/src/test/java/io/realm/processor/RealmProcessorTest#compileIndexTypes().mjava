@@ -5,8 +5,8 @@
                 "Byte", "Short", "Integer", "Long", "Boolean"};
 
         for (String fieldType : validIndexFieldTypes) {
-            TestRealmObjectFileObject javaFileObject =
-                    TestRealmObjectFileObject.getSingleFieldInstance("ValidIndexType", "Index", fieldType, "testField");
+            RealmSyntheticTestClass javaFileObject =
+                    new RealmSyntheticTestClass.Builder().name("ValidIndexType").field("testField", fieldType, "Index").build();
             ASSERT.about(javaSource())
                     .that(javaFileObject)
                     .processedWith(new RealmProcessor())
