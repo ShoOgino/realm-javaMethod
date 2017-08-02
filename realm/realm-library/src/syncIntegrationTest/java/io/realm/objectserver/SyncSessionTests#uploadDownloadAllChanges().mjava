@@ -1,0 +1,25 @@
+    @Test
+    public void uploadDownloadAllChanges() throws InterruptedException {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        SyncUser adminUser = UserFactory.createAdminUser(Constants.AUTH_URL);
+        SyncConfiguration userConfig = configFactory
+                .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .build();
+        SyncConfiguration adminConfig = configFactory
+                .createSyncConfigurationBuilder(adminUser, userConfig.getServerUrl().toString())
+                .build();
+
+        Realm userRealm = Realm.getInstance(userConfig);
+        userRealm.beginTransaction();
+        userRealm.createObject(AllTypes.class);
+        userRealm.commitTransaction();
+        SyncManager.getSession(userConfig).uploadAllLocalChanges();
+        userRealm.close();
+
+        Realm adminRealm = Realm.getInstance(adminConfig);
+        SyncManager.getSession(adminConfig).downloadAllServerChanges();
+        adminRealm.refresh();
+        assertEquals(1, adminRealm.where(AllTypes.class).count());
+        adminRealm.close();
+    }
+

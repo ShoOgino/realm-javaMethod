@@ -1,0 +1,41 @@
+    /**
+     * Thorough tests of equality, as defined <a href="https://github.com/realm/realm-java/issues/4266#issuecomment-308772718">here</a>
+     * and in subsequent comments.  The general principles are:
+     * <ul>
+     *     <li>MutableRealmInteger.equals tests the value of the wrapped integer<./li>
+     *     <li>All references to a single MutableRealmInteger must be {@code .equals} to the same thing.</li>
+     *     <li>Except when set to {@code null} MutableRealmInteger does not distinguish boxed and primitive types.</li>
+     * </ul>
+     * Since the implementations of managed and unmanaged MutableRealmIntegers are completely
+     * different these tests should be run on both implementations.
+     *
+     * @param c1 a MutableRealmIntegerTypes
+     * @param c2 another MutableRealmIntegerTypes
+     */
+    @SuppressWarnings({"ReferenceEquality", "EqualsIncompatibleType"})
+    private void testEquality(MutableRealmIntegerTypes c1, MutableRealmIntegerTypes c2) {
+        assertFalse(c1 == c2);
+
+        c1.columnNullableMutableRealmInteger.set(7);
+        c2.columnNullableMutableRealmInteger.set(Long.valueOf(7));
+        assertTrue(c1.columnNullableMutableRealmInteger != c2.columnNullableMutableRealmInteger);
+        assertTrue(c1.columnNullableMutableRealmInteger.equals(c2.columnNullableMutableRealmInteger));
+
+        MutableRealmInteger r1 = c1.columnNullableMutableRealmInteger;
+        r1.increment(1);
+        assertTrue(r1.equals(c1.columnNullableMutableRealmInteger));
+        assertTrue(r1 == c1.columnNullableMutableRealmInteger);
+        assertTrue(c1.columnNullableMutableRealmInteger.get().equals(8L));
+        assertFalse(c1.columnNullableMutableRealmInteger.get().equals(c2.columnNullableMutableRealmInteger.get()));
+        assertTrue(c1.columnNullableMutableRealmInteger.get().intValue() == 8);
+
+        Long n = c1.columnNullableMutableRealmInteger.get();
+        assertTrue(n.equals(Long.valueOf(8)));
+        assertTrue(n.equals(c1.columnNullableMutableRealmInteger.get()));
+        assertTrue(n.intValue() == c1.columnNullableMutableRealmInteger.get().intValue());
+
+        c1.columnNullableMutableRealmInteger.increment(1);
+        assertFalse(n.intValue() == c1.columnNullableMutableRealmInteger.get().intValue());
+        assertFalse(n.intValue() == r1.get().intValue());
+    }
+

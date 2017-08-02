@@ -1,16 +1,17 @@
     // @formatter:off
-    public static void emitFillRealmListFromStream(String interfaceName, String getter, String setter,
-        String fieldTypeCanonicalName, String proxyClass, JavaWriter writer) throws IOException {
+    public static void emitFillRealmListFromStream(
+            String varName, String getter, String setter, String fieldTypeCanonicalName, String proxyClass, JavaWriter writer)
+            throws IOException {
         writer
             .beginControlFlow("if (reader.peek() == JsonToken.NULL)")
                 .emitStatement("reader.skipValue()")
-                .emitStatement("((%s) obj).%s(null)", interfaceName, setter)
+                .emitStatement("%s.%s(null)", varName, setter)
             .nextControlFlow("else")
-                .emitStatement("((%s) obj).%s(new RealmList<%s>())", interfaceName, setter, fieldTypeCanonicalName)
+                .emitStatement("%s.%s(new RealmList<%s>())", varName, setter, fieldTypeCanonicalName)
                 .emitStatement("reader.beginArray()")
                 .beginControlFlow("while (reader.hasNext())")
                     .emitStatement("%s item = %s.createUsingJsonStream(realm, reader)", fieldTypeCanonicalName, proxyClass)
-                    .emitStatement("((%s) obj).%s().add(item)", interfaceName, getter)
+                    .emitStatement("%s.%s().add(item)", varName, getter)
                 .endControlFlow()
                 .emitStatement("reader.endArray()")
             .endControlFlow();

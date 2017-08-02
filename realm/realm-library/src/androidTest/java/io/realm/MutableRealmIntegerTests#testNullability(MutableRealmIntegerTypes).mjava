@@ -1,0 +1,43 @@
+    /**
+     * Thorough tests of nullability, as defined <a href="https://github.com/realm/realm-java/issues/4266#issuecomment-308772718">here</a>
+     * and in subsequent comments.  The general principles are:
+     * <ul>
+     *     <li>Unless @Required, MutableRealmIntegers are nullable.</li>
+     *     <li>0L and null are distinct values.</li>
+     *     <li>All references to a single MutableRealmInteger must be {@code null} if any are./li>
+     *     <li>A null value cannot be incremented or decremented/li>
+     * </ul>
+     * Since the implementations of managed and unmanaged MutableRealmIntegers are completely
+     * different these tests should be run on both implementations.
+     *
+     * @param c1 a MutableRealmIntegerTypes
+     */
+    private void testNullability(MutableRealmIntegerTypes c1) {
+        MutableRealmInteger r1 = c1.columnNullableMutableRealmInteger;
+
+        c1.columnNullableMutableRealmInteger.set(0L);
+        assertFalse(c1.columnNullableMutableRealmInteger.isNull());
+        assertFalse(r1.isNull());
+
+        c1.columnNullableMutableRealmInteger.set(null);
+        assertFalse(c1.columnNullableMutableRealmInteger == null);
+        assertTrue(c1.columnNullableMutableRealmInteger.isNull());
+        assertTrue(r1.isNull());
+
+        assertTrue(c1.columnNullableMutableRealmInteger.get() == null);
+        assertTrue(r1.get() == null);
+
+        try {
+            c1.columnNullableMutableRealmInteger.increment(5);
+            fail("Attempt to increment a null valued MutableRealmInteger should throw ISE");
+        } catch (IllegalStateException ignore) {
+            checkException(ignore, "Set its value first");
+        }
+        try {
+            c1.columnNullableMutableRealmInteger.decrement(5);
+            fail("Attempt to decrement a null valued MutableRealmInteger should throw ISE");
+        } catch (IllegalStateException ignore) {
+            checkException(ignore, "Set its value first");
+        }
+    }
+

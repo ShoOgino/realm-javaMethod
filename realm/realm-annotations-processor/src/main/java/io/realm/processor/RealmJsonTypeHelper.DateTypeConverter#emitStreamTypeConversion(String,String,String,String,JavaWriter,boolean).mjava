@@ -1,19 +1,19 @@
         // @formatter:off
         @Override
         public void emitStreamTypeConversion(
-                String interfaceName, String setter, String fieldName, String fieldType, JavaWriter writer, boolean isPrimaryKey)
+                String varName, String accessor, String fieldName, String fieldType, JavaWriter writer, boolean isPrimaryKey)
                 throws IOException {
             writer
                 .beginControlFlow("if (reader.peek() == JsonToken.NULL)")
                     .emitStatement("reader.skipValue()")
-                    .emitStatement("((%s) obj).%s(null)", interfaceName, setter)
+                    .emitStatement("%s.%s(null)", varName, accessor)
                 .nextControlFlow("else if (reader.peek() == JsonToken.NUMBER)")
                     .emitStatement("long timestamp = reader.nextLong()", fieldName)
                     .beginControlFlow("if (timestamp > -1)")
-                        .emitStatement("((%s) obj).%s(new Date(timestamp))", interfaceName, setter)
+                        .emitStatement("%s.%s(new Date(timestamp))", varName, accessor)
                     .endControlFlow()
                 .nextControlFlow("else")
-                    .emitStatement("((%s) obj).%s(JsonUtils.stringToDate(reader.nextString()))", interfaceName, setter)
+                    .emitStatement("%s.%s(JsonUtils.stringToDate(reader.nextString()))", varName, accessor)
                 .endControlFlow();
         }
         // @formatter:on
