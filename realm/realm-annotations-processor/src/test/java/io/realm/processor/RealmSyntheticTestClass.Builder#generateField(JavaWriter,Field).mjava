@@ -1,0 +1,12 @@
+        private void generateField(JavaWriter writer, Field field) throws IOException {
+            if (field.name == null) { throw new IllegalArgumentException("A field must have a name"); }
+            if (field.type == null) { throw new IllegalArgumentException("A field must have a type"); }
+
+            // Declaration of field
+            for (String annotation : field.annotations) { writer.emitAnnotation(annotation); }
+            writer.emitField(field.type, field.name, field.modifiers, field.initializer);
+
+            if (field.hasSetter) { emitSetter(writer, field); }
+            if (field.hasGetter) { emitGetter(writer, field); }
+       }
+
