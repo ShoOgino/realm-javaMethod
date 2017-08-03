@@ -1,0 +1,23 @@
+    @Test
+    public void getRealm_closedObjectThrows() {
+        realm.beginTransaction();
+        AllTypes object = realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        realm.close();
+        realm = null;
+
+        try {
+            object.getRealm();
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals(BaseRealm.CLOSED_REALM_MESSAGE, e.getMessage());
+        }
+        try {
+            RealmObject.getRealm(object);
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals(BaseRealm.CLOSED_REALM_MESSAGE, e.getMessage());
+        }
+    }
+

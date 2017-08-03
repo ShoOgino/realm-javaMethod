@@ -1,0 +1,21 @@
+    @Test
+    public void getRealmConfiguration_deletedObjectThrows() {
+        realm.beginTransaction();
+        AllTypes object = realm.createObject(AllTypes.class);
+        object.deleteFromRealm();
+        realm.commitTransaction();
+
+        try {
+            object.getRealm();
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals(RealmObject.MSG_DELETED_OBJECT, e.getMessage());
+        }
+        try {
+            RealmObject.getRealm(object);
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals(RealmObject.MSG_DELETED_OBJECT, e.getMessage());
+        }
+    }
+
