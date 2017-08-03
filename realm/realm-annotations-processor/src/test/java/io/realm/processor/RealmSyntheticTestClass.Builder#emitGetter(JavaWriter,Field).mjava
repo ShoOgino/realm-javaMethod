@@ -1,0 +1,18 @@
+        private void emitGetter(JavaWriter writer, Field field) throws IOException {
+            // Getter
+            writer.beginMethod(
+                    field.type, // Return type
+                    "get" + field.name, // Method name
+                    EnumSet.of(Modifier.PUBLIC)); // Modifiers
+            writer.emitStatement("return realmGet$" + field.name + "()");
+            writer.endMethod();
+
+            // Realm Getter
+            writer.beginMethod(
+                    field.type, // Return type
+                    "realmGet$" + field.name, // Method name
+                    EnumSet.of(Modifier.PUBLIC)); // Modifiers
+            writer.emitStatement("return " + field.name);
+            writer.endMethod();
+        }
+

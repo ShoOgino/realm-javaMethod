@@ -1,0 +1,16 @@
+    // This method constructs a synthetic Backlinks test class that *should* compile correctly.
+    // It returns the ref to the backlinked Field.  Tests can modify the
+    // field in perverse ways, to verify failure modes.
+    private RealmSyntheticTestClass.Field createBacklinkTestClass() {
+        return new RealmSyntheticTestClass.Builder().name("Backlinks")
+                .field().name("id").type("int").builder()
+                .field()
+                    .name("parents")
+                    .type("RealmResults<BacklinkTarget>")
+                    .modifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .annotation("LinkingObjects(\"child\")")
+                    .initializer("null")
+                    .hasGetter(false)
+                    .hasSetter(false);
+    }
+

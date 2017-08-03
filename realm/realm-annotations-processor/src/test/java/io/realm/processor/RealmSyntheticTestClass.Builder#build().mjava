@@ -1,0 +1,26 @@
+        public RealmSyntheticTestClass build() throws IOException {
+            StringWriter stringWriter = new StringWriter();
+            JavaWriter writer = new JavaWriter(stringWriter);
+
+            // Package name
+            writer.emitPackage("some.test");
+
+            // Import Realm classes
+            writer.emitImports("io.realm.*");
+            writer.emitImports("io.realm.annotations.*");
+
+            // Begin the class definition
+            writer.beginType(
+                    name,                        // full qualified name of the item to generate
+                    "class",                     // the type of the item
+                    EnumSet.of(Modifier.PUBLIC), // modifiers to apply
+                    "RealmObject")               // class to extend
+                    .emitEmptyLine();
+
+            for (Field field : fields) { generateField(writer, field); }
+
+            writer.endType();
+
+            return new RealmSyntheticTestClass(stringWriter, name);
+        }
+

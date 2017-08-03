@@ -1,7 +1,11 @@
     @Test
-    public void failsOnLinkingObjectsWithIgnoreFields() {
+    public void failsOnLinkingObjectsWithIgnoreFields() throws IOException {
+        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
+                // An  @Ignored, backlinked field is completely ignored
+                .annotation("Ignore")
+                .builder().build();
         ASSERT.about(javaSources())
-                .that(Arrays.asList(backlinks, backlinksTarget, backlinksIgnored))
+                .that(Arrays.asList(backlinksTarget, javaFileObject))
                 .processedWith(new RealmProcessor())
                 .compilesWithoutError();
     }

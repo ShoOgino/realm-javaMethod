@@ -1,0 +1,10 @@
+    @Test
+    public void compileSyntheticBacklinks() throws IOException {
+        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
+                .builder().build();
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(backlinksTarget, javaFileObject))
+                .processedWith(new RealmProcessor())
+                .compilesWithoutError();
+    }
+
