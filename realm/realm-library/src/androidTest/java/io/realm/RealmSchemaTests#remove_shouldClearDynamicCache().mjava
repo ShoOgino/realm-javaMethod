@@ -1,0 +1,26 @@
+    @Test
+    public void remove_shouldClearDynamicCache() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
+
+        realmSchema.create("foo");
+        // getSchemaForClass is an internal method, but used from DynamicRealmObject and RealmQuery
+        final RealmObjectSchema previousFoo = realmSchema.getSchemaForClass("foo");
+
+        realmSchema.remove("foo");
+
+        realmSchema.create("foo");
+        final RealmObjectSchema newFoo = realmSchema.getSchemaForClass("foo");
+
+        assertNotSame(previousFoo, newFoo);
+
+        try {
+            previousFoo.getClassName();
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+
+        assertEquals("foo", newFoo.getClassName());
+    }
+
