@@ -1,0 +1,18 @@
+    @Test
+    public void rename_shouldUpdateDynamicCache() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
+
+        realmSchema.create("foo");
+        // getSchemaForClass is an internal method, but used from DynamicRealmObject and RealmQuery
+        final RealmObjectSchema foo = realmSchema.getSchemaForClass("foo");
+
+        realmSchema.rename("foo", "bar");
+
+        final RealmObjectSchema bar = realmSchema.getSchemaForClass("bar");
+
+        assertSame(foo, bar);
+        assertEquals("bar", bar.getClassName());
+    }
+
