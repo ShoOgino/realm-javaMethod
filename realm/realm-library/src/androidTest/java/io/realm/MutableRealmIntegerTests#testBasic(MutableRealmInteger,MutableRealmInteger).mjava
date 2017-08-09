@@ -1,0 +1,30 @@
+    /**
+     * Test basic arithmetic: set, increment, decrement and equals.
+     * Since the implementations of managed and unmanaged MutableRealmIntegers are completely
+     * different these tests should be run on both implementations.
+     *
+     * @param r1 a MutableRealmInteger
+     * @param r2 another MutableRealmInteger
+     */
+    @SuppressWarnings({"ReferenceEquality", "EqualsIncompatibleType"})
+    private void testBasic(MutableRealmInteger r1, MutableRealmInteger r2) {
+        assertFalse(r1 == r2);
+
+        r1.set(10);
+        r2.set(Long.valueOf(10));
+        assertEquals(r1, r2);
+        assertEquals(r2, r1);
+
+        r1.set(15);
+        r1.decrement(2);
+        r2.increment(3);
+        assertEquals(r1, r2);
+
+        MutableRealmInteger r3 = r1;
+        r1.set(19);
+        assertEquals(19, r3.get().intValue());
+
+        assertFalse(r2.equals(r3));
+        assertFalse(r3.equals(r2));
+    }
+

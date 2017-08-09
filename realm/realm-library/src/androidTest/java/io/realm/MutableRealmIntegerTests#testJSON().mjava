@@ -1,0 +1,41 @@
+    @Test
+    public void testJSON() throws JSONException {
+        JSONObject json = new JSONObject();
+        realm.beginTransaction();
+        MutableRealmIntegerTypes obj = realm.createObjectFromJson(MutableRealmIntegerTypes.class, json);
+        realm.commitTransaction();
+        assertTrue(obj.columnNullableMutableRealmInteger.isNull());
+
+        json = new JSONObject();
+        json.put("columnNullableMutableRealmInteger", 8589934592L);
+        realm.beginTransaction();
+        obj = realm.createObjectFromJson(MutableRealmIntegerTypes.class, json);
+        realm.commitTransaction();
+        assertEquals(Long.valueOf(8589934592L), obj.columnNullableMutableRealmInteger.get());
+
+        json = new JSONObject();
+        json.put("columnNullableMutableRealmInteger", 22);
+        realm.beginTransaction();
+        obj = realm.createObjectFromJson(MutableRealmIntegerTypes.class, json);
+        realm.commitTransaction();
+        assertEquals(Long.valueOf(22), obj.columnNullableMutableRealmInteger.get());
+
+        json = new JSONObject();
+        json.put("columnNullableMutableRealmInteger", JSONObject.NULL);
+        realm.beginTransaction();
+        obj = realm.createObjectFromJson(MutableRealmIntegerTypes.class, json);
+        realm.commitTransaction();
+        assertTrue(obj.columnNullableMutableRealmInteger.isNull());
+
+        json = new JSONObject();
+        json.put("columnNonNullableMutableRealmInteger", JSONObject.NULL);
+        realm.beginTransaction();
+        try {
+            obj = realm.createObjectFromJson(MutableRealmIntegerTypes.class, json);
+            fail("Attempt to set @Required Mutable Realm Integer null, from JSON, should fail");
+        } catch (IllegalArgumentException ignore) {
+            checkException(ignore, "is not nullable");
+        }
+        realm.commitTransaction();
+    }
+

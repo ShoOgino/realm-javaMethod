@@ -1,0 +1,10 @@
+    //@formatter:off
+    private void emitMutableRealmInteger(JavaWriter writer, VariableElement field, String fieldName, String fieldTypeCanonicalName) throws IOException {
+        writer.emitAnnotation("Override")
+            .beginMethod(fieldTypeCanonicalName, metadata.getInternalGetter(fieldName), EnumSet.of(Modifier.PUBLIC))
+                .emitStatement("proxyState.getRealm$realm().checkIfValid()")
+                .emitStatement("return this.%s", mutableRealmIntegerFieldName(field))
+            .endMethod();
+    }
+    //@formatter:on
+
