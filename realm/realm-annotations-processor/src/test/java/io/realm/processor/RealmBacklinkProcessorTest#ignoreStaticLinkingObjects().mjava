@@ -1,0 +1,15 @@
+    // TODO: This seems like a "gottcha".  We should warn.
+    @Test
+    public void ignoreStaticLinkingObjects() throws IOException {
+        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
+                .modifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .type("RealmResults")
+                .clearAnnotations()
+                .annotation("LinkingObjects(\"xxx\")")
+                .builder().build();
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(backlinksTarget, javaFileObject))
+                .processedWith(new RealmProcessor())
+                .compilesWithoutError();
+    }
+

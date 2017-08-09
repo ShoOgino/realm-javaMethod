@@ -1,12 +1,17 @@
     /**
-     * Table validation should fail if the backinked column already exists in the target table.
+     * Table validation should fail if the backlinked column already exists in the target table.
      * The realm `backlinks-fieldInUse.realm` contains the classes `BacklinksSource` and `BacklinksTarget`
-     * except that in the definition of `BacklinksTarget`, the field parent is defined as:
+     * except that in the definition of {@code BacklinksTarget}, the field parent is defined as:
      * <pre>
      * {@code
      *     private RealmList<BacklinksSource> parents;
      * }
      * </pre>
+     *
+     * <p/>
+     * The backlinked field does exist but it is list of links to {@code BacklinksSource} children
+     * not a list of backlinks to  {@code BacklinksSource} parents of which the {@code BacklinksTarget}
+     * is a child.
      */
     @Test
     public void migration_backlinkedFieldInUse() {
