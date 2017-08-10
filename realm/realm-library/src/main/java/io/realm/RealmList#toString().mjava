@@ -1,7 +1,13 @@
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(isManaged() ? clazz.getSimpleName() : getClass().getSimpleName());
+        if (isManaged()) {
+            // 'clazz' is non-null when 'dynamicClassName' is null.
+            //noinspection ConstantConditions
+            sb.append(className != null ? className : realm.getSchema().getSchemaForClass(clazz).getClassName());
+        } else {
+            sb.append(getClass().getSimpleName());
+        }
         sb.append("@[");
         if (isManaged() && !isAttached()) {
             sb.append("invalid");
