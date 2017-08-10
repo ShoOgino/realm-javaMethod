@@ -1,6 +1,6 @@
     // Used by RealmList/RealmResults, to create RealmObject from a Collection.
     // Invariant: if dynamicClassName != null -> clazz == DynamicRealmObject
-    <E extends RealmModel> E get(Class<E> clazz, String dynamicClassName, UncheckedRow row) {
+    <E extends RealmModel> E get(@Nullable Class<E> clazz, @Nullable String dynamicClassName, UncheckedRow row) {
         final boolean isDynamicRealmObject = dynamicClassName != null;
 
         E result;
@@ -8,6 +8,8 @@
             //noinspection unchecked
             result = (E) new DynamicRealmObject(this, CheckedRow.getFromRow(row));
         } else {
+            // 'clazz' is non-null when 'dynamicClassName' is null.
+            //noinspection ConstantConditions
             result = configuration.getSchemaMediator().newInstance(clazz, this, row, getSchema().getColumnInfo(clazz),
                     false, Collections.<String>emptyList());
         }
