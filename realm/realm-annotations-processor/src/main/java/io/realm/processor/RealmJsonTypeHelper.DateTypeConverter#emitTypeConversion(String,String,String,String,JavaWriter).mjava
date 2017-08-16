@@ -1,18 +1,18 @@
         // @formatter:off
         @Override
         public void emitTypeConversion(
-                String interfaceName, String setter, String fieldName, String fieldType, JavaWriter writer)
+                String varName, String accessor, String fieldName, String fieldType, JavaWriter writer)
                 throws IOException {
             writer
                 .beginControlFlow("if (json.has(\"%s\"))", fieldName)
                     .beginControlFlow("if (json.isNull(\"%s\"))", fieldName)
-                        .emitStatement("((%s) obj).%s(null)", interfaceName, setter)
+                        .emitStatement("%s.%s(null)", varName, accessor)
                     .nextControlFlow("else")
                         .emitStatement("Object timestamp = json.get(\"%s\")", fieldName)
                         .beginControlFlow("if (timestamp instanceof String)")
-                            .emitStatement("((%s) obj).%s(JsonUtils.stringToDate((String) timestamp))", interfaceName, setter)
+                            .emitStatement("%s.%s(JsonUtils.stringToDate((String) timestamp))", varName, accessor)
                         .nextControlFlow("else")
-                            .emitStatement("((%s) obj).%s(new Date(json.getLong(\"%s\")))", interfaceName, setter, fieldName)
+                            .emitStatement("%s.%s(new Date(json.getLong(\"%s\")))", varName, accessor, fieldName)
                         .endControlFlow()
                     .endControlFlow()
                 .endControlFlow();

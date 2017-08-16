@@ -5,6 +5,8 @@
 
             if (Constants.JAVA_TO_REALM_TYPES.containsKey(fieldTypeCanonicalName)) {
                 emitPrimitiveType(writer, field, fieldName, fieldTypeCanonicalName);
+            } else if (Utils.isMutableRealmInteger(field)) {
+                emitMutableRealmInteger(writer, field, fieldName, fieldTypeCanonicalName);
             } else if (Utils.isRealmModel(field)) {
                 emitRealmModel(writer, field, fieldName, fieldTypeCanonicalName);
             } else if (Utils.isRealmList(field)) {

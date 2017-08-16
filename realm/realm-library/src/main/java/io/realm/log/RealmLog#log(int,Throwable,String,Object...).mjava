@@ -1,11 +1,11 @@
     // Formats the message, parses the stacktrace of given throwable and passes them to nativeLog.
-    private static void log(int level, Throwable throwable, String message, Object... args) {
+    private static void log(int level, @Nullable Throwable throwable, @Nullable String message, @Nullable Object... args) {
         if (level < getLevel()) {
             return;
         }
 
         StringBuilder stringBuilder = new StringBuilder();
-        if (args != null && args.length > 0) {
+        if (message != null && args != null && args.length > 0) {
             message = String.format(Locale.US, message, args);
         }
         if (throwable != null) {

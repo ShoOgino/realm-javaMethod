@@ -4,12 +4,14 @@
          * previously configured modules.
          */
         SyncConfiguration.Builder schema(Class<? extends RealmModel> firstClass, Class<? extends RealmModel>... additionalClasses) {
+            //noinspection ConstantConditions
             if (firstClass == null) {
                 throw new IllegalArgumentException("A non-null class must be provided");
             }
             modules.clear();
             modules.add(DEFAULT_MODULE_MEDIATOR);
             debugSchema.add(firstClass);
+            //noinspection ConstantConditions
             if (additionalClasses != null) {
                 Collections.addAll(debugSchema, additionalClasses);
             }

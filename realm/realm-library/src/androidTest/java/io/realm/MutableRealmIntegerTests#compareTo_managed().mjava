@@ -1,0 +1,24 @@
+    /**
+     * Be absolutely certain that we can actually compare two longs.
+     */
+    @Test
+    public void compareTo_managed() {
+        realm.beginTransaction();
+        MutableRealmInteger ri1 = realm.createObject(MutableRealmIntegerTypes.class).getColumnNullableMutableRealmInteger();
+        ri1.set(0);
+        MutableRealmInteger ri2 = realm.createObject(MutableRealmIntegerTypes.class).getColumnNullableMutableRealmInteger();
+        ri2.set(Long.MAX_VALUE);
+        realm.commitTransaction();
+        assertEquals(-1, ri1.compareTo(ri2));
+
+        realm.beginTransaction();
+        ri2.decrement(Long.MAX_VALUE);
+        realm.commitTransaction();
+        assertEquals(0, ri1.compareTo(ri2));
+
+        realm.beginTransaction();
+        ri2.decrement(Long.MAX_VALUE);
+        realm.commitTransaction();
+        assertEquals(1, ri1.compareTo(ri2));
+    }
+

@@ -1,0 +1,12 @@
+    @Test
+    public void failUnlessFinalMutableRealmInteger() throws IOException {
+        RealmSyntheticTestClass javaFileObject = createCounterTestClass()
+                .modifiers(Modifier.PRIVATE)
+                .builder().build();
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(javaFileObject))
+                .processedWith(new RealmProcessor())
+                .failsToCompile()
+                .withErrorContaining("must be final");
+    }
+

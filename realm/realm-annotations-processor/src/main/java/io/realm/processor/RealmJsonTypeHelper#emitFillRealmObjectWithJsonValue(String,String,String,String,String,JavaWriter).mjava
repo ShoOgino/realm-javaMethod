@@ -1,17 +1,16 @@
     // @formatter:off
     public static void emitFillRealmObjectWithJsonValue(
-            String interfaceName, String setter, String fieldName,
-            String qualifiedFieldType, String proxyClass, JavaWriter writer)
+            String varName, String setter, String fieldName, String qualifiedFieldType, String proxyClass, JavaWriter writer)
             throws IOException {
         writer
             .beginControlFlow("if (json.has(\"%s\"))", fieldName)
                 .beginControlFlow("if (json.isNull(\"%s\"))", fieldName)
-                    .emitStatement("((%s) obj).%s(null)", interfaceName, setter)
+                    .emitStatement("%s.%s(null)", varName, setter)
                 .nextControlFlow("else")
                     .emitStatement(
-                            "%s %sObj = %s.createOrUpdateUsingJsonObject(realm, json.getJSONObject(\"%s\"), update)",
-                            qualifiedFieldType, fieldName, proxyClass, fieldName)
-                    .emitStatement("((%s) obj).%s(%sObj)", interfaceName, setter, fieldName)
+                        "%s %sObj = %s.createOrUpdateUsingJsonObject(realm, json.getJSONObject(\"%s\"), update)",
+                        qualifiedFieldType, fieldName, proxyClass, fieldName)
+                    .emitStatement("%s.%s(%sObj)", varName, setter, fieldName)
                 .endControlFlow()
             .endControlFlow();
     }

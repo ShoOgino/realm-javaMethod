@@ -10,6 +10,7 @@
     public void setList(String fieldName, RealmList<DynamicRealmObject> list) {
         proxyState.getRealm$realm().checkIfValid();
 
+        //noinspection ConstantConditions
         if (list == null) {
             throw new IllegalArgumentException("Null values not allowed for lists");
         }
@@ -17,6 +18,8 @@
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
         LinkView links = proxyState.getRow$realm().getLinkList(columnIndex);
         Table linkTargetTable = links.getTargetTable();
+        //noinspection ConstantConditions
+        @Nonnull
         final String linkTargetTableName = linkTargetTable.getClassName();
 
         boolean typeValidated;

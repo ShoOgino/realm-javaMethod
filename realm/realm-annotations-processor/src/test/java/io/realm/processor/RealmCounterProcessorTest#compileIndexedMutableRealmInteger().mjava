@@ -1,0 +1,11 @@
+    @Test
+    public void compileIndexedMutableRealmInteger() throws IOException {
+        RealmSyntheticTestClass javaFileObject = createCounterTestClass()
+                .annotation("Index")
+                .builder().build();
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(javaFileObject))
+                .processedWith(new RealmProcessor())
+                .compilesWithoutError();
+    }
+
