@@ -13,14 +13,15 @@
         assertTrue(adminUser.isAdmin());
 
         final String identity = user.getIdentity();
-        adminUser.retrieveUserAsync("password", username, new SyncUser.Callback() {
+        adminUser.retrieveInfoForUserAsync(username, SyncCredentials.IdentityProvider.USERNAME_PASSWORD, new SyncUser.RequestCallback<SyncUserInfo>() {
             @Override
-            public void onSuccess(SyncUser syncUser) {
+            public void onSuccess(SyncUserInfo userInfo) {
+                assertNotNull(userInfo);
+                assertEquals(SyncCredentials.IdentityProvider.USERNAME_PASSWORD, userInfo.getProvider());
+                assertEquals(username, userInfo.getProviderUserIdentity());
+                assertEquals(identity, userInfo.getIdentity());
+                assertFalse(userInfo.isAdmin());
 
-                assertNotNull(syncUser);
-                assertEquals(identity, syncUser.getIdentity());
-                assertFalse(syncUser.isAdmin());
-                assertTrue(syncUser.isValid());
                 looperThread.testComplete();
             }
 
