@@ -13,12 +13,12 @@
         if (metadata.hasPrimaryKey()) {
             writer.emitStatement("boolean jsonHasPrimaryKey = false");
         }
-        writer.emitStatement("%s obj = new %s()", qualifiedClassName, qualifiedClassName);
+        writer.emitStatement("final %s obj = new %s()", qualifiedClassName, qualifiedClassName);
+        writer.emitStatement("final %1$s objProxy = (%1$s) obj", interfaceName);
         writer.emitStatement("reader.beginObject()");
         writer.beginControlFlow("while (reader.hasNext())");
         writer.emitStatement("String name = reader.nextName()");
         writer.beginControlFlow("if (false)");
-
         Collection<VariableElement> fields = metadata.getFields();
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
@@ -27,7 +27,7 @@
 
             if (Utils.isRealmModel(field)) {
                 RealmJsonTypeHelper.emitFillRealmObjectFromStream(
-                        interfaceName,
+                        "objProxy",
                         metadata.getInternalSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
@@ -37,17 +37,27 @@
 
             } else if (Utils.isRealmList(field)) {
                 RealmJsonTypeHelper.emitFillRealmListFromStream(
-                        interfaceName,
+                        "objProxy",
                         metadata.getInternalGetter(fieldName),
                         metadata.getInternalSetter(fieldName),
                         ((DeclaredType) field.asType()).getTypeArguments().get(0).toString(),
                         Utils.getProxyClassSimpleName(field),
                         writer);
 
+            } else if (Utils.isMutableRealmInteger(field)) {
+                RealmJsonTypeHelper.emitFillJavaTypeFromStream(
+                        "objProxy",
+                        metadata,
+                        metadata.getInternalGetter(fieldName),
+                        fieldName,
+                        qualifiedFieldType,
+                        writer
+                );
             } else {
                 RealmJsonTypeHelper.emitFillJavaTypeFromStream(
-                        interfaceName,
+                        "objProxy",
                         metadata,
+                        metadata.getInternalSetter(fieldName),
                         fieldName,
                         qualifiedFieldType,
                         writer
@@ -68,8 +78,7 @@
                     .endControlFlow();
         }
 
-        writer.emitStatement("obj = realm.copyToRealm(obj)");
-        writer.emitStatement("return obj");
+        writer.emitStatement("return realm.copyToRealm(obj)");
         writer.endMethod();
         writer.emitEmptyLine();
     }

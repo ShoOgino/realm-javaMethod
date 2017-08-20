@@ -1,4 +1,6 @@
+    // retrieving a logged out user
     @Test
+    @RunTestInLooperThread
     public void retrieve_logout() {
         final SyncUser adminUser = UserFactory.createAdminUser(Constants.AUTH_URL);
 
@@ -7,13 +9,42 @@
         final SyncCredentials credentials = SyncCredentials.usernamePassword(username, password, true);
         final SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
         final String identity = user.getIdentity();
-        user.logout();
-        assertFalse(user.isValid());
 
-        SyncUser syncUser = adminUser.retrieveUser(SyncCredentials.IdentityProvider.USERNAME_PASSWORD, username);
-        assertNotNull(syncUser);
-        assertEquals(identity, syncUser.getIdentity());
-        assertFalse(syncUser.isAdmin());
-        assertFalse(syncUser.isValid());
+        // unless the refresh_token is revoked (via logout) the admin user can still retrieve the user
+        // we make sure the token is revoked before trying to retrieve the user
+        SyncManager.addAuthenticationListener(new AuthenticationListener() {
+            @Override
+            public void loggedIn(SyncUser user) {
+                SyncManager.removeAuthenticationListener(this);
+                looperThread.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        fail("loggedIn should not be invoked");
+                    }
+                });
+            }
+
+            @Override
+            public void loggedOut(final SyncUser user) {
+                SyncManager.removeAuthenticationListener(this);
+                looperThread.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        assertFalse(user.isValid());
+                        SyncUserInfo userInfo = adminUser.retrieveInfoForUser(username, SyncCredentials.IdentityProvider.USERNAME_PASSWORD);
+
+                        assertNotNull(userInfo);
+                        assertEquals(SyncCredentials.IdentityProvider.USERNAME_PASSWORD, userInfo.getProvider());
+                        assertEquals(username, userInfo.getProviderUserIdentity());
+                        assertEquals(identity, userInfo.getIdentity());
+                        assertFalse(userInfo.isAdmin());
+
+                        looperThread.testComplete();
+                    }
+                });
+
+            }
+        });
+        user.logout();
     }
 

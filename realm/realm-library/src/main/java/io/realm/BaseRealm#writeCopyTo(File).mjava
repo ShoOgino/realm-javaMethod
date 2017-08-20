@@ -11,6 +11,11 @@
      * destination file.
      */
     public void writeCopyTo(File destination) {
-        writeEncryptedCopyTo(destination, null);
+        //noinspection ConstantConditions
+        if (destination == null) {
+            throw new IllegalArgumentException("The destination argument cannot be null");
+        }
+        checkIfValid();
+        sharedRealm.writeCopy(destination, null);
     }
 

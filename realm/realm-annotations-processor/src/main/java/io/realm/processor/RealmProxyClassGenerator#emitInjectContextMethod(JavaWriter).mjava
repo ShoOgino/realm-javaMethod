@@ -1,3 +1,5 @@
+    // Note that because of bytecode hackery, this method may run before the constructor!
+    // It may even run before fields have been initialized.
     //@formatter:off
     private void emitInjectContextMethod(JavaWriter writer) throws IOException {
         writer.emitAnnotation("Override");
@@ -16,9 +18,8 @@
                 .emitStatement("proxyState.setRealm$realm(context.getRealm())")
                 .emitStatement("proxyState.setRow$realm(context.getRow())")
                 .emitStatement("proxyState.setAcceptDefaultValue$realm(context.getAcceptDefaultValue())")
-                .emitStatement("proxyState.setExcludeFields$realm(context.getExcludeFields())");
-
-        writer.endMethod()
+                .emitStatement("proxyState.setExcludeFields$realm(context.getExcludeFields())")
+                .endMethod()
                 .emitEmptyLine();
     }
     //@formatter:on

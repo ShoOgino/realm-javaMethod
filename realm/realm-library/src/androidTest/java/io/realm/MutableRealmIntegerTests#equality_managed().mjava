@@ -1,0 +1,15 @@
+    /**
+     * Validate basic equality semantics.
+     */
+    @Test
+    public void equality_managed() {
+        realm.beginTransaction();
+        MutableRealmIntegerTypes c1 = realm.createObject(MutableRealmIntegerTypes.class);
+        MutableRealmIntegerTypes c2 = realm.createObject(MutableRealmIntegerTypes.class);
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        testEquality(c1, c2);
+        realm.commitTransaction();
+    }
+

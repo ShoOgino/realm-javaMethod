@@ -1,0 +1,11 @@
+    @Test
+    public void compileIgnoredMutableRealmInteger() throws IOException {
+        RealmSyntheticTestClass javaFileObject = createCounterTestClass()
+                .annotation("Ignore")
+                .builder().build();
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(javaFileObject))
+                .processedWith(new RealmProcessor())
+                .compilesWithoutError();
+    }
+

@@ -7,12 +7,13 @@
      * @param callback callback for specific Realm type behaviors.
      * @param cause which triggers this migration.
      * @throws FileNotFoundException if the Realm file doesn't exist.
-     * @throws IllegalArgumentException if the provided configuration is a {@link SyncConfiguration}.
+     * @throws IllegalArgumentException if the provided configuration is a {@code SyncConfiguration}.
      */
-    protected static void migrateRealm(final RealmConfiguration configuration, final RealmMigration migration,
-            final MigrationCallback callback, final RealmMigrationNeededException cause)
+    protected static void migrateRealm(final RealmConfiguration configuration, @Nullable final RealmMigration migration,
+            final MigrationCallback callback, @Nullable final RealmMigrationNeededException cause)
             throws FileNotFoundException {
 
+        //noinspection ConstantConditions
         if (configuration == null) {
             throw new IllegalArgumentException("RealmConfiguration must be provided");
         }
