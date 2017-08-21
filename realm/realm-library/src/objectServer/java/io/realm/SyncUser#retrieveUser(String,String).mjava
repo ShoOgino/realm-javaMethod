@@ -25,7 +25,7 @@
         }
 
         AuthenticationServer authServer = SyncManager.getAuthServer();
-        LookupUserIdResponse response = authServer.retrieveUser(getSyncUser().getUserToken(), provider, providerId, getAuthenticationUrl());
+        LookupUserIdResponse response = authServer.retrieveUser(refreshToken, provider, providerId, getAuthenticationUrl());
         if (!response.isValid()) {
             // the endpoint returns a 404 if it can't honor the query, either because
             // - provider is not valid
@@ -42,11 +42,9 @@
             if (syncUser != null) {
                 return syncUser;
             } else {
-                // build an SynUser without a token
+                // build a SynUser without a token
                 Token refreshToken = new Token(null, response.getUserId(), null, 0, null, response.isAdmin());
-                ObjectServerUser objectServerUser = new ObjectServerUser(refreshToken, getAuthenticationUrl());
-                objectServerUser.localLogout();
-                return new SyncUser(objectServerUser);
+                return new SyncUser(refreshToken, getAuthenticationUrl());
             }
         }
     }

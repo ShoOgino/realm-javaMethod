@@ -22,7 +22,7 @@
         ScheduledFuture<?> task = REFRESH_TOKENS_EXECUTOR.schedule(new Runnable() {
             @Override
             public void run() {
-                if (!isClosed && !Thread.currentThread().isInterrupted()) {
+                if (!isClosed && !Thread.currentThread().isInterrupted() && !refreshTokenTask.isCancelled()) {
                     refreshAccessToken(authServer);
                 }
             }

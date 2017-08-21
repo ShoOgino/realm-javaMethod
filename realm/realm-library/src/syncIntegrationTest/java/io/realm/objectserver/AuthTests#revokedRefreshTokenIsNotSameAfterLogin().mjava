@@ -1,0 +1,19 @@
+    @Test
+    public void revokedRefreshTokenIsNotSameAfterLogin() throws InterruptedException {
+        final String uniqueName = UUID.randomUUID().toString();
+
+        SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", true);
+        SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
+        Token revokedRefreshToken = user.getAccessToken();
+
+        user.logout();
+
+        credentials = SyncCredentials.usernamePassword(uniqueName, "password", false);
+        SyncUser loggedInUser = SyncUser.login(credentials, Constants.AUTH_URL);
+
+        // still comparing the same user
+        Assert.assertEquals(revokedRefreshToken.identity(), loggedInUser.getAccessToken().identity());
+        // different tokens
+        assertNotEquals(revokedRefreshToken.value(), loggedInUser.getAccessToken().value());
+    }
+

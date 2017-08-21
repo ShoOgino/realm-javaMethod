@@ -1,5 +1,5 @@
-    @Test(timeout=3000)
-    public void getState_active() {
+    @Test
+    public void getState_loggedOut() {
         SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
         SyncConfiguration syncConfiguration = configFactory
                 .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
@@ -8,11 +8,10 @@
 
         SyncSession session = SyncManager.getSession(syncConfiguration);
 
-        // make sure the `access_token` is acquired. otherwise we can still be
-        // in WAITING_FOR_ACCESS_TOKEN state
-        while(session.getState() != SyncSession.State.ACTIVE) {
-            SystemClock.sleep(200);
-        }
+        user.logout();
+
+        SyncSession.State state = session.getState();
+        assertEquals(SyncSession.State.INACTIVE, state);
 
         realm.close();
     }
