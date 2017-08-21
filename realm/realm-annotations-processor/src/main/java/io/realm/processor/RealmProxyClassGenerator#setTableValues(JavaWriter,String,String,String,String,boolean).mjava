@@ -20,6 +20,17 @@
             }
             writer.endControlFlow();
 
+        } else if ("io.realm.MutableRealmInteger".equals(fieldType)) {
+            writer
+                    .emitStatement("Long %s = ((%s) object).%s().get()", getter, interfaceName, getter)
+                    .beginControlFlow("if (%s != null)", getter)
+                    .emitStatement("Table.nativeSetLong(tableNativePtr, columnInfo.%sIndex, rowIndex, %s.longValue(), false)", fieldName, getter);
+            if (isUpdate) {
+                writer.nextControlFlow("else")
+                        .emitStatement("Table.nativeSetNull(tableNativePtr, columnInfo.%sIndex, rowIndex, false)", fieldName);
+            }
+            writer.endControlFlow();
+
         } else if ("double".equals(fieldType)) {
             writer.emitStatement("Table.nativeSetDouble(tableNativePtr, columnInfo.%sIndex, rowIndex, ((%s) object).%s(), false)", fieldName, interfaceName, getter);
 

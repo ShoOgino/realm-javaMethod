@@ -1,0 +1,42 @@
+    /**
+     * Given a Realm Object Server authentication provider and a provider identifier for a user (for example, a username), look up and return user information for that user.
+     *
+     * @param providerUserIdentity The username or identity of the user as issued by the authentication provider.
+     *                             In most cases this is different from the Realm Object Server-issued identity.
+     * @param provider The authentication provider {@link io.realm.SyncCredentials.IdentityProvider} that manages the user whose information is desired.
+     *
+     * @return {@code SyncUser} associated with the given identity provider and providerId, or {@code null} in case
+     * of an {@code invalid} provider or {@code providerId}.
+     * @throws ObjectServerError in case of an error.
+     */
+    public SyncUserInfo retrieveInfoForUser(final String providerUserIdentity, final String provider) throws ObjectServerError {
+        if (Util.isEmptyString(providerUserIdentity)) {
+            throw new IllegalArgumentException("'providerUserIdentity' cannot be empty.");
+        }
+
+        if (Util.isEmptyString(provider)) {
+            throw new IllegalArgumentException("'provider' cannot be empty.");
+        }
+
+        if (!isAdmin()) {
+            throw new IllegalArgumentException("SyncUser needs to be admin in order to lookup other users ID.");
+        }
+
+        AuthenticationServer authServer = SyncManager.getAuthServer();
+        LookupUserIdResponse response = authServer.retrieveUser(refreshToken, provider, providerUserIdentity, getAuthenticationUrl());
+        if (!response.isValid()) {
+            // the endpoint returns a 404 if it can't honor the query, either because
+            // - provider is not valid
+            // - provider_id is not valid
+            // - token used is not an admin one
+            // in this case we should return null instead of throwing
+            if (response.getError().getErrorCode() == ErrorCode.NOT_FOUND) {
+                return null;
+            } else {
+                throw response.getError();
+            }
+        } else {
+            return SyncUserInfo.fromLookupUserIdResponse(response);
+        }
+    }
+

@@ -1,0 +1,24 @@
+    /**
+     * Assure that a MutableRealmInteger acquired from an unmanaged object is not affected by changes in the Realm.
+     */
+    @Test
+    public void copyFromIsNotLive() {
+        realm.beginTransaction();
+        realm.createObject(MutableRealmIntegerTypes.class).getColumnNullableMutableRealmInteger().set(42L);
+        realm.commitTransaction();
+
+        MutableRealmIntegerTypes obj = realm.where(MutableRealmIntegerTypes.class).findFirst();
+        MutableRealmInteger managedRI = obj.getColumnNullableMutableRealmInteger();
+        MutableRealmInteger unmanagedRI = realm.copyFromRealm(obj).getColumnNullableMutableRealmInteger();
+
+        realm.beginTransaction();
+        MutableRealmInteger ri = realm.where(MutableRealmIntegerTypes.class).findFirst().getColumnNullableMutableRealmInteger();
+        ri.set(37);
+        ri.increment(17);
+        ri.decrement(7);
+        realm.commitTransaction();
+
+        assertEquals(Long.valueOf(42L), unmanagedRI.get());
+        assertEquals(Long.valueOf(47L), managedRI.get());
+    }
+

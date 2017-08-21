@@ -1,4 +1,4 @@
-    // using a logout user should throw
+    // using a logout user should not throw
     @Test
     public void usingConfigurationWithInvalidUserShouldThrow() {
         String username = UUID.randomUUID().toString();
@@ -10,10 +10,7 @@
         user.logout();
         assertFalse(user.isValid());
 
-        try {
-            Realm.getInstance(configuration);
-            fail("SyncUser is not longer valid, it should not be possible to get a Realm instance");
-        } catch (IllegalStateException expected) {
-        }
+        Realm instance = Realm.getInstance(configuration);
+        instance.close();
     }
 

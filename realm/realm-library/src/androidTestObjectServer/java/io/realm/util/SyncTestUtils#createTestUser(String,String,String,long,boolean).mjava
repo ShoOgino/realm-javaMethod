@@ -1,0 +1,21 @@
+    public static SyncUser createTestUser(String userTokenValue, String userIdentifier, String authUrl, long expires, boolean isAdmin) {
+        Token userToken = new Token(userTokenValue, userIdentifier, null, expires, null, isAdmin);
+
+        JSONObject obj = new JSONObject();
+        try {
+            JSONObject realmDesc = new JSONObject();
+            realmDesc.put("uri", "realm://objectserver.realm.io/default");
+
+            obj.put("authUrl", authUrl);
+            obj.put("userToken", userToken.toJson());
+            SyncUser syncUser = SyncUser.fromJson(obj.toString());
+            // persist the user to the ObjectStore sync metadata, to simulate real login, otherwise SyncUser.isValid will
+            // "throw IllegalArgumentException: User not authenticated or authentication expired." since
+            // the call to  SyncManager.getUserStore().isActive(syncUser.getIdentity()) will return false
+            addToUserStore(syncUser);
+            return syncUser;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+

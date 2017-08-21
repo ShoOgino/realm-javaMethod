@@ -1,0 +1,16 @@
+    /**
+     * Be absolutely certain that we can actually compare two longs.
+     */
+    @Test
+    public void compareTo_unmanaged() {
+        MutableRealmInteger ri1 = MutableRealmInteger.valueOf(0);
+        MutableRealmInteger ri2 = MutableRealmInteger.valueOf(Long.MAX_VALUE);
+        assertEquals(-1, ri1.compareTo(ri2));
+
+        ri2.decrement(Long.MAX_VALUE);
+        assertEquals(0, ri1.compareTo(ri2));
+
+        ri2.decrement(Long.MAX_VALUE);
+        assertEquals(1, ri1.compareTo(ri2));
+    }
+

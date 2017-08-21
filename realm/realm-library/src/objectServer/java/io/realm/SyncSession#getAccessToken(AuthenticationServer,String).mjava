@@ -1,0 +1,51 @@
+    // Return the access token for the Realm this Session is connected to.
+    String getAccessToken(final AuthenticationServer authServer, String refreshToken) {
+        // check first if there's a valid access_token we can return immediately
+        if (getUser().isRealmAuthenticated(configuration)) {
+            Token accessToken = getUser().getAccessToken(configuration);
+            // start refreshing this token if a refresh is not going on
+            if (!onGoingAccessTokenQuery.getAndSet(true)) {
+                scheduleRefreshAccessToken(authServer, accessToken.expiresMs());
+            }
+            return accessToken.value();
+
+        } else {
+            // check and update if we received a new refresh_token
+            if (!Util.isEmptyString(refreshToken)) {
+                try {
+                    JSONObject refreshTokenJSON = new JSONObject(refreshToken);
+                    Token newRefreshToken = Token.from(refreshTokenJSON.getJSONObject("userToken"));
+                    if (newRefreshToken.hashCode() != getUser().getAccessToken().hashCode()) {
+                        RealmLog.debug("Session[%s]: Access token updated", configuration.getPath());
+                        getUser().setRefreshToken(newRefreshToken);
+                    }
+                } catch (JSONException e) {
+                    RealmLog.error(e,"Session[%s]: Can not parse the refresh_token into a valid JSONObject: ", configuration.getPath());
+                }
+            }
+            if (!onGoingAccessTokenQuery.getAndSet(true)) {
+                if (NetworkStateReceiver.isOnline(SyncObjectServerFacade.getApplicationContext())) {
+                    authenticateRealm(authServer);
+
+                } else {
+                    // Wait for connection to become available, before trying again.
+                    // The Session might potentially stay in this state for the lifetime of the application.
+                    // This is acceptable.
+                    networkListener = new NetworkStateReceiver.ConnectionListener() {
+                        @Override
+                        public void onChange(boolean connectionAvailable) {
+                            if (connectionAvailable) {
+                                if (!onGoingAccessTokenQuery.getAndSet(true)) {
+                                    authenticateRealm(authServer);
+                                }
+                                NetworkStateReceiver.removeListener(this);
+                            }
+                        }
+                    };
+                    NetworkStateReceiver.addListener(networkListener);
+                }
+            }
+        }
+        return null;
+    }
+
