@@ -8,7 +8,9 @@
      * @return {@code SyncUser} associated with the given identity provider and providerId, or {@code null} in case
      * of an {@code invalid} provider or {@code providerId}.
      * @throws ObjectServerError in case of an error.
+     * @deprecated as of release 3.6.0, replaced by {@link #retrieveInfoForUser(String, String)}}
      */
+    @Deprecated
     public SyncUser retrieveUser(final String provider, final String providerId) throws ObjectServerError {
         if (Util.isEmptyString(provider)) {
             throw new IllegalArgumentException("Not-null 'provider' required.");
@@ -23,7 +25,7 @@
         }
 
         AuthenticationServer authServer = SyncManager.getAuthServer();
-        LookupUserIdResponse response = authServer.retrieveUser(getSyncUser().getUserToken(), provider, providerId, getAuthenticationUrl());
+        LookupUserIdResponse response = authServer.retrieveUser(refreshToken, provider, providerId, getAuthenticationUrl());
         if (!response.isValid()) {
             // the endpoint returns a 404 if it can't honor the query, either because
             // - provider is not valid
@@ -40,11 +42,9 @@
             if (syncUser != null) {
                 return syncUser;
             } else {
-                // build an SynUser without a token
+                // build a SynUser without a token
                 Token refreshToken = new Token(null, response.getUserId(), null, 0, null, response.isAdmin());
-                ObjectServerUser objectServerUser = new ObjectServerUser(refreshToken, getAuthenticationUrl());
-                objectServerUser.localLogout();
-                return new SyncUser(objectServerUser);
+                return new SyncUser(refreshToken, getAuthenticationUrl());
             }
         }
     }

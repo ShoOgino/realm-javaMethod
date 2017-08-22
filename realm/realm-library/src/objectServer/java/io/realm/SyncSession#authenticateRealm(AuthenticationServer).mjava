@@ -23,16 +23,9 @@
             protected void onSuccess(AuthenticateResponse response) {
                 RealmLog.debug("Session[%s]: Access token acquired", configuration.getPath());
                 if (!isClosed && !Thread.currentThread().isInterrupted()) {
-                    ObjectServerUser.AccessDescription desc = new ObjectServerUser.AccessDescription(
-                            response.getAccessToken(),
-                            configuration.getPath(),
-                            configuration.shouldDeleteRealmOnLogout()
-                    );
                     URI realmUrl = configuration.getServerUrl();
-                    getUser().getSyncUser().addRealm(realmUrl, desc);
-                    String token = getUser().getSyncUser().getAccessToken(realmUrl).value();
-                    // schedule a token refresh before it expires
-                    if (nativeRefreshAccessToken(configuration.getPath(), token, realmUrl.toString())) {
+                    getUser().addRealm(configuration, response.getAccessToken());
+                    if (nativeRefreshAccessToken(configuration.getPath(), response.getAccessToken().value(), realmUrl.toString())) {
                         scheduleRefreshAccessToken(authServer, response.getAccessToken().expiresMs());
 
                     } else {

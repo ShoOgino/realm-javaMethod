@@ -1,0 +1,16 @@
+    @Test
+    public void getState_throwOnClosedSession() {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        SyncConfiguration syncConfiguration = configFactory
+                .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .build();
+        Realm realm = Realm.getInstance(syncConfiguration);
+
+        SyncSession session = SyncManager.getSession(syncConfiguration);
+        realm.close();
+        user.logout();
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage("Could not find session, Realm was probably closed");
+        session.getState();
+    }
+
