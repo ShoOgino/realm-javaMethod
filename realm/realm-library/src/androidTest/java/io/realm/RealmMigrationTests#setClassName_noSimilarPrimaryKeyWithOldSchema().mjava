@@ -27,8 +27,15 @@
                 .migration(migration)
                 .build();
         Realm realm = Realm.getInstance(realmConfig);
+        realm.close();
 
-        assertTrue(realm.getSchema().get(MigrationClassRenamed.CLASS_NAME).hasPrimaryKey());
-        assertFalse(realm.getSchema().get(MigrationPrimaryKey.CLASS_NAME).hasPrimaryKey());
+        // We cannot access 'MigrationPrimaryKey' from a typed Realm since it is not part of the pre-defined schema.
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(realmConfig);
+        try {
+            assertTrue(dynamicRealm.getSchema().get(MigrationClassRenamed.CLASS_NAME).hasPrimaryKey());
+            assertFalse(dynamicRealm.getSchema().get(MigrationPrimaryKey.CLASS_NAME).hasPrimaryKey());
+        } finally {
+            dynamicRealm.close();
+        }
     }
 

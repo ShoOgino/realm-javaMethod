@@ -25,9 +25,16 @@
                 .schema(MigrationClassRenamed.class)
                 .migration(migration)
                 .build();
+        // Trigger migration
         Realm realm = Realm.getInstance(realmConfig);
+        realm.close();
 
-        assertTrue(realm.getSchema().get(MigrationClassRenamed.CLASS_NAME).hasPrimaryKey());
-        assertFalse(realm.getSchema().get(MigrationPrimaryKey.CLASS_NAME).hasPrimaryKey());
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(realmConfig);
+        try {
+            assertTrue(dynamicRealm.getSchema().get(MigrationClassRenamed.CLASS_NAME).hasPrimaryKey());
+            assertFalse(dynamicRealm.getSchema().get(MigrationPrimaryKey.CLASS_NAME).hasPrimaryKey());
+        } finally {
+            dynamicRealm.close();
+        }
     }
 

@@ -1,0 +1,28 @@
+    @Test
+    public void createColumnInfo_noDuplicateIndexInIndexFields() {
+        RealmProxyMediator mediator = realm.getConfiguration().getSchemaMediator();
+        CatRealmProxy.CatColumnInfo columnInfo = (CatRealmProxy.CatColumnInfo) mediator.createColumnInfo(Cat.class, realm.sharedRealm.getSchemaInfo());
+
+        final Set<Long> indexSet = new HashSet<Long>();
+        int indexCount = 0;
+
+        indexSet.add(columnInfo.nameIndex);
+        indexCount++;
+        indexSet.add(columnInfo.ageIndex);
+        indexCount++;
+        indexSet.add(columnInfo.heightIndex);
+        indexCount++;
+        indexSet.add(columnInfo.weightIndex);
+        indexCount++;
+        indexSet.add(columnInfo.hasTailIndex);
+        indexCount++;
+        indexSet.add(columnInfo.birthdayIndex);
+        indexCount++;
+        indexSet.add(columnInfo.ownerIndex);
+        indexCount++;
+        indexSet.add(columnInfo.scaredOfDogIndex);
+        indexCount++;
+
+        assertEquals(indexCount, indexSet.size());
+    }
+

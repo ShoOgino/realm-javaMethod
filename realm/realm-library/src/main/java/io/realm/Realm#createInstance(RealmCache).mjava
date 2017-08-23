@@ -5,16 +5,6 @@
      * @return a {@link Realm} instance.
      */
     static Realm createInstance(RealmCache cache) {
-        RealmConfiguration configuration = cache.getConfiguration();
-        try {
-            return createAndValidateFromCache(cache);
-
-        } catch (RealmMigrationNeededException e) {
-            if (configuration.shouldDeleteRealmIfMigrationNeeded()) {
-                deleteRealm(configuration);
-            }
-
-            return createAndValidateFromCache(cache);
-        }
+        return new Realm(cache);
     }
 
