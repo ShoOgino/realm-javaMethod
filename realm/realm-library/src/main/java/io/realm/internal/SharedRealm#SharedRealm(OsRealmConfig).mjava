@@ -1,0 +1,15 @@
+    private SharedRealm(OsRealmConfig osRealmConfig) {
+        Capabilities capabilities = new AndroidCapabilities();
+        RealmNotifier realmNotifier = new AndroidRealmNotifier(this, capabilities);
+
+        this.nativePtr = nativeGetSharedRealm(osRealmConfig.getNativePtr(), realmNotifier);
+        this.osRealmConfig = osRealmConfig;
+        this.schemaInfo = new OsSchemaInfo(nativeGetSchemaInfo(nativePtr), this);
+        this.context = osRealmConfig.getContext();
+        this.context.addReference(this);
+
+        this.capabilities = capabilities;
+        this.realmNotifier = realmNotifier;
+        nativeSetAutoRefresh(nativePtr, capabilities.canDeliverNotification());
+    }
+

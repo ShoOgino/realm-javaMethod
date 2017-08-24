@@ -1,0 +1,33 @@
+    // Create a realm instance without associating it to any RealmCache.
+    BaseRealm(final RealmConfiguration configuration, @Nullable OsSchemaInfo schemaInfo) {
+        this.threadId = Thread.currentThread().getId();
+        this.configuration = configuration;
+        this.realmCache = null;
+
+        SharedRealm.MigrationCallback migrationCallback = null;
+        if (schemaInfo != null && configuration.getMigration() != null) {
+            migrationCallback = createMigrationCallback(configuration.getMigration());
+        }
+
+        SharedRealm.InitializationCallback initializationCallback = null;
+        final Realm.Transaction initialDataTransaction = configuration.getInitialDataTransaction();
+        if (initialDataTransaction != null) {
+            initializationCallback = new SharedRealm.InitializationCallback() {
+                @Override
+                public void onInit(SharedRealm sharedRealm) {
+                    initialDataTransaction.execute(Realm.createInstance(sharedRealm));
+                }
+            };
+        }
+
+        OsRealmConfig.Builder configBuilder = new OsRealmConfig.Builder(configuration)
+                .autoUpdateNotification(true)
+                .migrationCallback(migrationCallback)
+                .schemaInfo(schemaInfo)
+                .initializationCallback(initializationCallback);
+        this.sharedRealm = SharedRealm.getInstance(configBuilder);
+        this.shouldCloseSharedRealm = true;
+
+        sharedRealm.registerSchemaChangedCallback(schemaChangedCallback);
+    }
+

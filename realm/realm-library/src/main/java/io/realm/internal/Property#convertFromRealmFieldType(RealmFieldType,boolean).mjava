@@ -1,0 +1,42 @@
+    private static int convertFromRealmFieldType(RealmFieldType fieldType, boolean isRequired) {
+        int type;
+        switch (fieldType) {
+            case OBJECT:
+                type = TYPE_OBJECT | TYPE_NULLABLE;
+                return type;
+            case LIST:
+                type = TYPE_OBJECT | TYPE_ARRAY;
+                return type;
+            case LINKING_OBJECTS:
+                type = TYPE_LINKING_OBJECTS | TYPE_ARRAY;
+                return type;
+            case INTEGER:
+                type = TYPE_INT;
+                break;
+            case BOOLEAN:
+                type = TYPE_BOOL;
+                break;
+            case STRING:
+                type = TYPE_STRING;
+                break;
+            case BINARY:
+                type = TYPE_DATA;
+                break;
+            case DATE:
+                type = TYPE_DATE;
+                break;
+            case FLOAT:
+                type = TYPE_FLOAT;
+                break;
+            case DOUBLE:
+                type = TYPE_DOUBLE;
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        String.format(Locale.US, "Unsupported filed type: '%s'.", fieldType.name()));
+
+        }
+        int requiredFlag = isRequired ? TYPE_REQUIRED : TYPE_NULLABLE;
+        return type | requiredFlag;
+    }
+

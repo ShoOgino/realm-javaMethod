@@ -1,0 +1,62 @@
+    private OsRealmConfig(final RealmConfiguration config,
+                          boolean autoUpdateNotification,
+                          @Nullable OsSchemaInfo schemaInfo,
+                          @Nullable SharedRealm.MigrationCallback migrationCallback,
+                          @Nullable SharedRealm.InitializationCallback initializationCallback) {
+        this.realmConfiguration = config;
+        this.nativePtr = nativeCreate(config.getPath(), false, true);
+        NativeContext.dummyContext.addReference(this);
+
+        // Retrieve Sync settings first. We need syncRealmUrl to identify if this is a SyncConfig
+        Object[] syncUserConf = ObjectServerFacade.getSyncFacadeIfPossible().getUserAndServerUrl(realmConfiguration);
+        String syncUserIdentifier = (String) syncUserConf[0];
+        String syncRealmUrl = (String) syncUserConf[1];
+        String syncRealmAuthUrl = (String) syncUserConf[2];
+        String syncRefreshToken = (String) syncUserConf[3];
+        boolean syncClientValidateSsl = (Boolean.TRUE.equals(syncUserConf[4]));
+        String syncSslTrustCertificatePath = (String) syncUserConf[5];
+
+        // Set encryption key
+        byte[] key = config.getEncryptionKey();
+        if (key != null) {
+            nativeSetEncryptionKey(nativePtr, key);
+        }
+
+        // Set durability
+        nativeSetInMemory(nativePtr, config.getDurability() == Durability.MEM_ONLY);
+
+        // Set auto update notification
+        nativeEnableChangeNotification(nativePtr, autoUpdateNotification);
+
+        // Set schema related params.
+        SchemaMode schemaMode = SchemaMode.SCHEMA_MODE_MANUAL;
+        if (config.isReadOnly()) {
+            schemaMode = SchemaMode.SCHEMA_MODE_READONLY;
+        } else if (syncRealmUrl != null) {
+            schemaMode = SchemaMode.SCHEMA_MODE_ADDITIVE;
+        } else if (config.shouldDeleteRealmIfMigrationNeeded()) {
+            schemaMode = SchemaMode.SCHEMA_MODE_RESET_FILE;
+        }
+        final long schemaVersion = config.getSchemaVersion();
+        final long nativeSchemaPtr = schemaInfo == null ? 0 : schemaInfo.getNativePtr();
+        nativeSetSchemaConfig(nativePtr, schemaMode.getNativeValue(), schemaVersion, nativeSchemaPtr, migrationCallback);
+
+        // Compact on launch
+        CompactOnLaunchCallback compactOnLaunchCallback = config.getCompactOnLaunchCallback();
+        if (compactOnLaunchCallback != null) {
+            nativeSetCompactOnLaunchCallback(nativePtr, compactOnLaunchCallback);
+        }
+
+        // Initial data transaction
+        if (initializationCallback != null) {
+            nativeSetInitializationCallback(nativePtr, initializationCallback);
+        }
+
+        // Set sync config
+        if (syncRealmUrl != null) {
+            nativeCreateAndSetSyncConfig(nativePtr, syncRealmUrl, syncRealmAuthUrl, syncUserIdentifier,
+                    syncRefreshToken);
+            nativeSetSyncConfigSslSettings(nativePtr, syncClientValidateSsl, syncSslTrustCertificatePath);
+        }
+    }
+

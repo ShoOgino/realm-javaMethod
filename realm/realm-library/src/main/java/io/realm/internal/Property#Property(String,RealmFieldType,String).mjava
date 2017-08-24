@@ -1,5 +1,5 @@
     Property(String name, RealmFieldType type, String linkedClassName) {
-        this.nativePtr = nativeCreateProperty(name, type.getNativeValue(), linkedClassName);
-        NativeContext.dummyContext.addReference(this);
+        // Ignore the isRequired when creating the linking property.
+        this(nativeCreatePersistedLinkProperty(name, convertFromRealmFieldType(type, false), linkedClassName));
     }
 

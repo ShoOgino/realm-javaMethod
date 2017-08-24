@@ -1,0 +1,10 @@
+    @Override
+    public ColumnInfo createColumnInfo(Class<? extends RealmModel> clazz, OsSchemaInfo schemaInfo) {
+        checkClass(clazz);
+
+        if (clazz.equals(some.test.AllTypes.class)) {
+            return io.realm.AllTypesRealmProxy.createColumnInfo(schemaInfo);
+        }
+        throw getMissingProxyClassException(clazz);
+    }
+

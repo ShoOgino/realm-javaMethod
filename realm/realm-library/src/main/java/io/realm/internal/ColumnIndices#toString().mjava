@@ -1,15 +1,11 @@
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("ColumnIndices[");
-        buf.append(schemaVersion).append(",");
-        buf.append(mutable).append(",");
-        if (classes != null) {
-            boolean commaNeeded = false;
-            for (Map.Entry<String, ColumnInfo> entry : classesByName.entrySet()) {
-                if (commaNeeded) { buf.append(","); }
-                buf.append(entry.getKey()).append("->").append(entry.getValue());
-                commaNeeded = true;
-            }
+        boolean commaNeeded = false;
+        for (Map.Entry<Class<? extends RealmModel>, ColumnInfo> entry : classToColumnInfoMap.entrySet()) {
+            if (commaNeeded) { buf.append(","); }
+            buf.append(entry.getKey().getSimpleName()).append("->").append(entry.getValue());
+            commaNeeded = true;
         }
         return buf.append("]").toString();
     }
