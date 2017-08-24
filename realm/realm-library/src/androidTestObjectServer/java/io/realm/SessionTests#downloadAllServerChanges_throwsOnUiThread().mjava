@@ -1,0 +1,13 @@
+    @Test
+    @UiThreadTest
+    public void downloadAllServerChanges_throwsOnUiThread() throws InterruptedException {
+        SyncUser user = createTestUser();
+        Realm realm = Realm.getInstance(configuration);
+        try {
+            SyncManager.getSession(configuration).downloadAllServerChanges();
+        } catch (IllegalStateException ignored) {
+        } finally {
+            realm.close();
+        }
+    }
+

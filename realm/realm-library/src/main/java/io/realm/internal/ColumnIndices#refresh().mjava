@@ -1,0 +1,10 @@
+    /**
+     * Refreshes all the existing {@link ColumnInfo} in the cache.
+     */
+    public void refresh() {
+        for (Map.Entry<Class<? extends RealmModel>, ColumnInfo> entry : classToColumnInfoMap.entrySet()) {
+            ColumnInfo newColumnInfo = mediator.createColumnInfo(entry.getKey(), osSchemaInfo);
+            entry.getValue().copyFrom(newColumnInfo);
+        }
+    }
+

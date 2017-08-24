@@ -26,9 +26,8 @@
             realm = Realm.getInstance(realmConfig);
             fail();
         } catch (RealmMigrationNeededException e) {
-            if (!e.getMessage().equals("Primary Key defined for field chars was removed.")) {
-                fail(e.toString());
-            }
+            assertThat(e.getMessage(),
+                    CoreMatchers.containsString("Primary Key for class 'StringOnly' has been removed."));
         } finally {
             if (realm != null) {
                 realm.close();

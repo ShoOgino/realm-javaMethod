@@ -1,10 +1,17 @@
     /**
-     * Returns the {@link ColumnInfo} for the passed class or ({@code null} if there is no such class).
+     * Returns the {@link ColumnInfo} for the passed class.
      *
      * @param clazz the class for which to get the ColumnInfo.
-     * @return the corresponding {@link ColumnInfo} object, or {@code null} if not found.
+     * @return the corresponding {@link ColumnInfo} object.
+     * @throws io.realm.exceptions.RealmException if the class cannot be found in the schema.
      */
+    @Nonnull
     public ColumnInfo getColumnInfo(Class<? extends RealmModel> clazz) {
-        return classes.get(clazz);
+        ColumnInfo columnInfo = classToColumnInfoMap.get(clazz);
+        if (columnInfo == null) {
+            columnInfo = mediator.createColumnInfo(clazz, osSchemaInfo);
+            classToColumnInfoMap.put(clazz, columnInfo);
+        }
+        return columnInfo;
     }
 

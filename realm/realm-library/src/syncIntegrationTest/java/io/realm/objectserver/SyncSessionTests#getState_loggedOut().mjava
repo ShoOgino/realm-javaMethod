@@ -1,0 +1,18 @@
+    @Test
+    public void getState_loggedOut() {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        SyncConfiguration syncConfiguration = configFactory
+                .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .build();
+        Realm realm = Realm.getInstance(syncConfiguration);
+
+        SyncSession session = SyncManager.getSession(syncConfiguration);
+
+        user.logout();
+
+        SyncSession.State state = session.getState();
+        assertEquals(SyncSession.State.INACTIVE, state);
+
+        realm.close();
+    }
+

@@ -1,0 +1,9 @@
+    private static SharedRealm.MigrationCallback createMigrationCallback(final RealmMigration migration) {
+        return new SharedRealm.MigrationCallback() {
+            @Override
+            public void onMigrationNeeded(SharedRealm sharedRealm, long oldVersion, long newVersion) {
+                migration.migrate(DynamicRealm.createInstance(sharedRealm), oldVersion, newVersion);
+            }
+        };
+    }
+

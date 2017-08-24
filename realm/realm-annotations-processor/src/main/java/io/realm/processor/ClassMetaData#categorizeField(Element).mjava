@@ -29,12 +29,18 @@
             if (!categorizePrimaryKeyField(field)) { return false; }
         }
 
-        // Check @LinkingObjects last since it is not allowed to be either @Index, @Required or @PrimaryKey
+        // @LinkingObjects cannot be @PrimaryKey or @Index.
         if (field.getAnnotation(LinkingObjects.class) != null) {
+            // Do not add backlinks to fields list.
             return categorizeBacklinkField(field);
         }
 
-        // Standard field that appear valid (more fine grained checks might fail later).
+        // Similarly, a MutableRealmInteger cannot be a @PrimaryKey or @LinkingObject.
+        if (Utils.isMutableRealmInteger(field)) {
+            if (!categorizeMutableRealmIntegerField(field)) { return false; }
+        }
+
+        // Standard field that appears to be valid (more fine grained checks might fail later).
         fields.add(field);
 
         return true;

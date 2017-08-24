@@ -1,0 +1,11 @@
+    @Test
+    public void compileStaticMutableRealmInteger() throws IOException {
+        RealmSyntheticTestClass javaFileObject = createCounterTestClass()
+                .modifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+                .builder().build();
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(javaFileObject))
+                .processedWith(new RealmProcessor())
+                .compilesWithoutError();
+    }
+

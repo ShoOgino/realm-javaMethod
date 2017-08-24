@@ -1,8 +1,10 @@
     // Used by RealmList/RealmResults
     // Invariant: if dynamicClassName != null -> clazz == DynamicRealmObject
     // TODO: Remove this after RealmList is backed by OS Results.
-    <E extends RealmModel> E get(Class<E> clazz, String dynamicClassName, long rowIndex) {
+    <E extends RealmModel> E get(@Nullable Class<E> clazz, @Nullable String dynamicClassName, long rowIndex) {
         final boolean isDynamicRealmObject = dynamicClassName != null;
+        // 'clazz' is non-null when 'dynamicClassName' is null.
+        //noinspection ConstantConditions
         final Table table = isDynamicRealmObject ? getSchema().getTable(dynamicClassName) : getSchema().getTable(clazz);
 
         E result;

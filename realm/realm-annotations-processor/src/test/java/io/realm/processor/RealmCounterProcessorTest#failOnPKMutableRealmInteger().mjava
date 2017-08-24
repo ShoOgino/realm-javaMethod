@@ -1,0 +1,12 @@
+    @Test
+    public void failOnPKMutableRealmInteger() throws IOException {
+        RealmSyntheticTestClass javaFileObject = createCounterTestClass()
+                .annotation("PrimaryKey")
+                .builder().build();
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(javaFileObject))
+                .processedWith(new RealmProcessor())
+                .failsToCompile()
+                .withErrorContaining("cannot be used as primary key");
+    }
+
