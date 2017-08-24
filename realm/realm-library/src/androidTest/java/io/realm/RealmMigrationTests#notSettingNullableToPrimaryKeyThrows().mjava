@@ -19,13 +19,12 @@
                 realm.close();
                 fail();
             } catch (RealmMigrationNeededException expected) {
+                String pkFieldName = "id";
                 if (clazz == PrimaryKeyAsString.class) {
-                    assertEquals("@PrimaryKey field 'name' does not support null values in the existing Realm file. Migrate using RealmObjectSchema.setNullable(), or mark the field as @Required.",
-                            expected.getMessage());
-                } else {
-                    assertEquals("@PrimaryKey field 'id' does not support null values in the existing Realm file. Migrate using RealmObjectSchema.setNullable(), or mark the field as @Required.",
-                            expected.getMessage());
+                    pkFieldName = "name";
                 }
+                assertThat(expected.getMessage(), CoreMatchers.containsString(String.format(Locale.US,
+                        "Property '%s.%s' has been made optional", clazz.getSimpleName(), pkFieldName)));
             }
         }
     }

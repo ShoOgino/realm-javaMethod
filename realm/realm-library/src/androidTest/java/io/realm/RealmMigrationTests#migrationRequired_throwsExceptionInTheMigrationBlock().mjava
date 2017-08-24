@@ -1,0 +1,41 @@
+    @Test
+    public void migrationRequired_throwsExceptionInTheMigrationBlock() {
+        final RuntimeException exception = new RuntimeException("TEST");
+
+        RealmMigration migration = new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                // The transaction should be canceled and this model should not be created.
+                RealmObjectSchema objectSchema = realm.getSchema().create(StringOnly.CLASS_NAME);
+                objectSchema.addField(StringOnly.FIELD_CHARS, String.class);
+                throw exception;
+            }
+        };
+        RealmConfiguration config = configFactory.createConfigurationBuilder()
+                .migration(migration)
+                .schemaVersion(1)
+                .schema(StringOnly.class)
+                .build();
+        createEmptyRealmVersion0(config);
+
+        Realm realm = null;
+        try {
+            realm = Realm.getInstance(config);
+            fail();
+        } catch (RuntimeException expected) {
+            assertSame(exception, expected);
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+        }
+
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(config);
+        try {
+            assertEquals(0, dynamicRealm.getVersion());
+            assertNull(dynamicRealm.getSchema().get(StringOnly.CLASS_NAME));
+        } finally {
+            dynamicRealm.close();
+        }
+    }
+

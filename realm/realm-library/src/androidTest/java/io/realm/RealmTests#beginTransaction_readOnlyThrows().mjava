@@ -11,7 +11,8 @@
             realm.beginTransaction();
             fail();
         } catch (IllegalStateException e) {
-            assertTrue(e.getMessage().startsWith("Write transactions cannot be used "));
+            assertThat(e.getMessage(),
+                    CoreMatchers.containsString("Can't perform transactions on read-only Realms."));
         } finally {
             realm.close();
         }

@@ -1,0 +1,14 @@
+    private void emitCreateColumnInfoMethod(JavaWriter writer) throws IOException {
+        writer.beginMethod(
+                columnInfoClassName(),        // Return type
+                "createColumnInfo",              // Method name
+                EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
+                "OsSchemaInfo", "schemaInfo"); // Argument type & argument name
+
+        // create an instance of ColumnInfo
+        writer.emitStatement("return new %1$s(schemaInfo)", columnInfoClassName());
+
+        writer.endMethod();
+        writer.emitEmptyLine();
+    }
+

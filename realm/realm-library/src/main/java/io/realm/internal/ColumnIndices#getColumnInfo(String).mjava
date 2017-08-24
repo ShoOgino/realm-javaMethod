@@ -1,11 +1,27 @@
     /**
-     * Returns the {@link ColumnInfo} for the passed class ({@code null} if there is no such class).
+     * Returns the {@link ColumnInfo} for the passed class name.
      *
-     * @param className the simple name of the class for which to get the ColumnInfo.
-     * @return the corresponding {@link ColumnInfo} object, or {@code null} if not found.
+     * @param simpleClassName the simple name of the class for which to get the ColumnInfo.
+     * @return the corresponding {@link ColumnInfo} object.
+     * @throws io.realm.exceptions.RealmException if the class cannot be found in the schema.
      */
-    @Nullable
-    public ColumnInfo getColumnInfo(String className) {
-        return classesByName.get(className);
+    @Nonnull
+    public ColumnInfo getColumnInfo(String simpleClassName) {
+        ColumnInfo columnInfo = simpleClassNameToColumnInfoMap.get(simpleClassName);
+        if (columnInfo == null) {
+            Set<Class<? extends RealmModel>> modelClasses = mediator.getModelClasses();
+            for (Class<? extends RealmModel> modelClass : modelClasses) {
+                if (modelClass.getSimpleName().equals(simpleClassName)) {
+                    columnInfo = getColumnInfo(modelClass);
+                    simpleClassNameToColumnInfoMap.put(simpleClassName, columnInfo);
+                    break;
+                }
+            }
+        }
+        if (columnInfo == null) {
+            throw new RealmException(
+                    String.format(Locale.US, "'%s' doesn't exist in current schema.", simpleClassName));
+        }
+        return columnInfo;
     }
 

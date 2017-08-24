@@ -5,25 +5,6 @@
      * @return a {@link Realm} instance.
      */
     static Realm createInstance(RealmCache cache) {
-        RealmConfiguration configuration = cache.getConfiguration();
-        try {
-            return createAndValidateFromCache(cache);
-
-        } catch (RealmMigrationNeededException e) {
-            if (configuration.shouldDeleteRealmIfMigrationNeeded()) {
-                deleteRealm(configuration);
-            } else {
-                try {
-                    if (configuration.getMigration() != null) {
-                        migrateRealm(configuration, e);
-                    }
-                } catch (FileNotFoundException fileNotFoundException) {
-                    // Should never happen.
-                    throw new RealmFileException(RealmFileException.Kind.NOT_FOUND, fileNotFoundException);
-                }
-            }
-
-            return createAndValidateFromCache(cache);
-        }
+        return new Realm(cache);
     }
 

@@ -14,16 +14,18 @@
         // constructor #1
         writer.beginConstructor(
                 EnumSet.noneOf(Modifier.class),
-                "SharedRealm", "realm", "Table", "table");
+                "OsSchemaInfo", "schemaInfo");
         writer.emitStatement("super(%s)", metadata.getFields().size());
+        writer.emitStatement("OsObjectSchemaInfo objectSchemaInfo = schemaInfo.getObjectSchemaInfo(\"%1$s\")",
+                simpleClassName);
         for (VariableElement field : metadata.getFields()) {
             writer.emitStatement(
-                    "this.%1$sIndex = addColumnDetails(table, \"%1$s\", %2$s)",
-                    field.getSimpleName().toString(), getRealmTypeChecked(field).getRealmType());
+                    "this.%1$sIndex = addColumnDetails(\"%1$s\", objectSchemaInfo)",
+                    field.getSimpleName().toString());
         }
         for (Backlink backlink : metadata.getBacklinkFields()) {
             writer.emitStatement(
-                    "addBacklinkDetails(realm, \"%s\", \"%s\", \"%s\")",
+                    "addBacklinkDetails(schemaInfo, \"%s\", \"%s\", \"%s\")",
                     backlink.getTargetField(), Utils.stripPackage(backlink.getSourceClass()), backlink.getSourceField());
         }
         writer.endConstructor()
