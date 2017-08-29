@@ -1,7 +1,7 @@
     @Test
     public void conflictingFieldName_readAndUpdate() {
         final ConflictingFieldName unmanaged = new ConflictingFieldName();
-        unmanaged.setRealm("realm");
+        unmanaged.setRealmString("realm");
         unmanaged.setRow("row");
         unmanaged.setIsCompleted("isCompleted");
         unmanaged.setListeners("listeners");
@@ -17,7 +17,7 @@
 
         // Tests those values are persisted.
         final ConflictingFieldName managed = realm.where(ConflictingFieldName.class).findFirst();
-        assertEquals("realm", managed.getRealm());
+        assertEquals("realm", managed.getRealmString());
         assertEquals("row", managed.getRow());
         assertEquals("isCompleted", managed.getIsCompleted());
         assertEquals("listeners", managed.getListeners());
@@ -28,7 +28,7 @@
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                managed.setRealm("realm_updated");
+                managed.setRealmString("realm_updated");
                 managed.setRow("row_updated");
                 managed.setIsCompleted("isCompleted_updated");
                 managed.setListeners("listeners_updated");
@@ -37,7 +37,7 @@
             }
         });
 
-        assertEquals("realm_updated", managed.getRealm());
+        assertEquals("realm_updated", managed.getRealmString());
         assertEquals("row_updated", managed.getRow());
         assertEquals("isCompleted_updated", managed.getIsCompleted());
         assertEquals("listeners_updated", managed.getListeners());
