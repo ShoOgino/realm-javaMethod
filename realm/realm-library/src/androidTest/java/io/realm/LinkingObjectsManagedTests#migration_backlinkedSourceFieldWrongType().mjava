@@ -1,39 +1,44 @@
     /**
      * Table validation should fail if the backlinked column points to a field of the wrong type.
-     * This test is built in almost exactly the way as was `migration_backlinkedSourceFieldDoesntExist`
-     * The realm `backlinks-sourceFieldWrongType.realm` was constructed with classes `BacklinksWrongTypeTarget`
-     * and `BacklinksWrongTypeSource`.  Again, these two classes are nearly identical in their counterparts
-     * `BacklinkSource` and `BacklinkTarget` except for their names.  Unlike `BacklinkSource`,
-     * `BacklinksWrongTypeSource` has two fields, `child` and `childId`. The first is exactly as it is in
-     * `BacklinkSource`, the second is of type `Integer`.  To construct `backlinks-wrong-type-target.jar`
-     * I reversed the names of the two fields in `BacklinkSource`, and made then adjusted `parents` in
-     * `BacklinkTarget` to point to `childId`.
-     * All of the proxies in in the two jars should correctly validate their tables.  The backlink validation
-     * for `BacklinksWrongTypeTarget` should notice, though, that its `parents` field points to an object
-     * of the wrong type, `Integer`, instead of `BacklinksWrongTypeSource`.
      */
-    @Ignore("Need to rebuild the test library")
     @Test
     public void migration_backlinkedSourceFieldWrongType() {
         final String realmName = "backlinks-sourceFieldWrongType.realm";
 
         RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                 .name(realmName)
-                .modules(new BacklinksWrongTypeSourceModule(), new BacklinksWrongTypeTargetModule())
+                .schema(BacklinksTarget.class, BacklinksSource.class)
                 .build();
 
-        try {
-            configFactory.copyRealmFromAssets(context, realmName, realmName);
+        // Mock the schema info so the only difference compared with the original schema is that BacklinksSource.child
+        // type is changed to BacklinksSource from BacklinksTarget.
+        OsObjectSchemaInfo targetSchemaInfo = new OsObjectSchemaInfo.Builder("BacklinksTarget")
+                .addPersistedProperty("id", RealmFieldType.INTEGER, !Property.PRIMARY_KEY, !Property.INDEXED, Property.REQUIRED)
+                .addComputedLinkProperty("parents", "BacklinksSource", "child")
+                .build();
+        OsObjectSchemaInfo sourceSchemaInfo = new OsObjectSchemaInfo.Builder("BacklinksSource")
+                .addPersistedProperty("name", RealmFieldType.STRING, !Property.PRIMARY_KEY, !Property.INDEXED, !Property.REQUIRED)
+                .addPersistedLinkProperty("child", RealmFieldType.OBJECT,
+                        "BacklinksSource"/*"BacklinksTarget" is the original value*/)
+                .build();
+        Map<Class<? extends RealmModel>, OsObjectSchemaInfo> infoMap =
+                new HashMap<Class<? extends RealmModel>, OsObjectSchemaInfo>();
+        infoMap.put(BacklinksTarget.class, targetSchemaInfo);
+        infoMap.put(BacklinksSource.class, sourceSchemaInfo);
 
-            Realm localRealm = Realm.getInstance(realmConfig);
+        RealmProxyMediator mediator = spy(realmConfig.getSchemaMediator());
+        when(mediator.getExpectedObjectSchemaInfoMap()).thenReturn(infoMap);
+        RealmConfiguration spyConfig = spy(realmConfig);
+        when(spyConfig.getSchemaMediator()).thenReturn(mediator);
+
+        try {
+            Realm localRealm = Realm.getInstance(spyConfig);
             localRealm.close();
-            fail("A migration should have been required");
-        } catch (IOException e) {
-            fail("Failed copying realm");
-        } catch (RealmMigrationNeededException expected) {
-            assertTrue(expected.getMessage().contains("is not a RealmObject type"));
-        } finally {
-            Realm.deleteRealm(realmConfig);
+            fail();
+        } catch (IllegalStateException expected) {
+            assertThat(expected.getMessage(), CoreMatchers.containsString(
+                    "Property 'BacklinksSource.child' declared as origin of linking objects property 'BacklinksTarget.parents' links to type 'BacklinksSource'"
+            ));
         }
     }
 

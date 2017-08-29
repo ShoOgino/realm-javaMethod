@@ -1,42 +1,42 @@
     /**
-     * Table validation should fail if the backlinked column points to a non-existent field in the source class.
-     * This test is quite a chore to construct!
-     * The realm `backlinks-missingSourceField.realm` was constructed with classes `BacklinksMissingFieldTarget`
-     * and `BacklinksMissingFieldSource`.  They are identical in their definitions to `BacklinkSource` and
-     * `BacklinkTarget` except for their names.  The library `backlinks-missing-field-source.jar` contains
-     * the class `BacklinksMissingFieldSource` and all of its annotation generated code.  The library
-     * `backlinks-missing-field-target.jar` however, contains a version of `BacklinksMissingFieldTarget` that
-     * was compiled with its backlink field referring to a field in `BacklinksMissingFieldSource`, called
-     * `xxxchild`.  Clearly, in order to compile successfully, the definition of `BacklinksMissingFieldSource`
-     * had to be changed accordingly.  The modified version, however, is *NOT* the version that is in
-     * `backlinks-missing-field-source.jar`!
-     * So, now, the proxy in `backlinks-missing-field-source.jar` will correctly validate the its table
-     * (it generated it!). Similarly, the proxy in `backlinks-missing-field-target.jar` will successfully
-     * validate its table.  If we have been living clean lives, though, the validator for
-     * `BacklinksMissingFieldTarget` should notice that there is no field named `BacklinksMissingFieldSource.xxxchild`.
+     * Schema validation should fail if the backlinked column points to a non-existent field in the source class.
      */
-    @Ignore("Need to rebuild the test library")
     @Test
-    public void migration_backlinkedSourceFieldDoesntExist() {
+    public void migration_backlinkedSourceFieldDoesntExist() throws ClassNotFoundException {
         final String realmName = "backlinks-missingSourceField.realm";
-
         RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                 .name(realmName)
-                .modules(new BacklinksMissingFieldSourceModule(), new BacklinksMissingFieldTargetModule())
+                .schema(BacklinksTarget.class, BacklinksSource.class)
                 .build();
 
-        try {
-            configFactory.copyRealmFromAssets(context, realmName, realmName);
+        // Mock the schema info so the only difference compared with the original schema is that the LinkingObject field
+        // points to BacklinksSource.childNotExist.
+        OsObjectSchemaInfo targetSchemaInfo = new OsObjectSchemaInfo.Builder("BacklinksTarget")
+                .addPersistedProperty("id", RealmFieldType.INTEGER, !Property.PRIMARY_KEY, !Property.INDEXED, Property.REQUIRED)
+                .addComputedLinkProperty("parents", "BacklinksSource", "childNotExist" /*"child" is the original value*/)
+                .build();
+        OsObjectSchemaInfo sourceSchemaInfo = new OsObjectSchemaInfo.Builder("BacklinksSource")
+                .addPersistedProperty("name", RealmFieldType.STRING, !Property.PRIMARY_KEY, !Property.INDEXED, !Property.REQUIRED)
+                .addPersistedLinkProperty("child", RealmFieldType.OBJECT, "BacklinksTarget")
+                .build();
+        Map<Class<? extends RealmModel>, OsObjectSchemaInfo> infoMap =
+                new HashMap<Class<? extends RealmModel>, OsObjectSchemaInfo>();
+        infoMap.put(BacklinksTarget.class, targetSchemaInfo);
+        infoMap.put(BacklinksSource.class, sourceSchemaInfo);
 
-            Realm localRealm = Realm.getInstance(realmConfig);
+        RealmProxyMediator mediator = spy(realmConfig.getSchemaMediator());
+        when(mediator.getExpectedObjectSchemaInfoMap()).thenReturn(infoMap);
+        RealmConfiguration spyConfig = spy(realmConfig);
+        when(spyConfig.getSchemaMediator()).thenReturn(mediator);
+
+        try {
+            Realm localRealm = Realm.getInstance(spyConfig);
             localRealm.close();
-            fail("A migration should have been required");
-        } catch (IOException e) {
-            fail("Failed copying realm");
-        } catch (RealmMigrationNeededException expected) {
-            assertTrue(expected.getMessage().contains("Cannot find source field"));
-        } finally {
-            Realm.deleteRealm(realmConfig);
+            fail();
+        } catch (IllegalStateException expected) {
+            assertThat(expected.getMessage(), CoreMatchers.containsString(
+                    "Property 'BacklinksSource.childNotExist' declared as origin of linking objects property 'BacklinksTarget.parents' does not exist"
+            ));
         }
     }
 

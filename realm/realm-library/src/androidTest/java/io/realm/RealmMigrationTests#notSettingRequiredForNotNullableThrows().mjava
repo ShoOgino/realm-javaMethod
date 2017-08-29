@@ -46,6 +46,7 @@
             @SuppressWarnings("unchecked")
             RealmConfiguration realmConfig = configFactory.createConfigurationBuilder()
                     .schemaVersion(1)
+                    .name(field)
                     .schema(NullTypes.class)
                     .migration(migration)
                     .build();
@@ -59,10 +60,8 @@
                 realm = Realm.getInstance(realmConfig);
                 fail("Failed on " + field);
             } catch (RealmMigrationNeededException e) {
-                assertEquals("Field '" + field + "' does support null values in the existing Realm file." +
-                        " Remove @Required or @PrimaryKey from field '" + field + "' " +
-                        "or migrate using RealmObjectSchema.setNullable().",
-                        e.getMessage());
+                assertThat(e.getMessage(), CoreMatchers.containsString(
+                        String.format(Locale.US, "Property 'NullTypes.%s' has been made required", field)));
             }
         }
     }

@@ -1,16 +1,11 @@
     /**
-     * Construct a {@code OsSchemaInfo} object from a given {@code OsObjectSchemaInfo} list.
+     * Constructs a {@code OsSchemaInfo} object from a given {@code OsObjectSchemaInfo} list.
      *
      * @param objectSchemaInfoList all the object schemas should be contained in this {@code OsObjectSchemaInfo}.
      */
     public OsSchemaInfo(java.util.Collection<OsObjectSchemaInfo> objectSchemaInfoList) {
-        long[] schemaNativePointers = new long[objectSchemaInfoList.size()];
-        int i = 0;
-        for (OsObjectSchemaInfo info : objectSchemaInfoList) {
-            schemaNativePointers[i] = info.getNativePtr();
-            i++;
-        }
-        this.nativePtr = nativeCreateFromList(schemaNativePointers);
+        this.nativePtr = nativeCreateFromList(convertObjectSchemaInfoListToNativePointerArray(objectSchemaInfoList));
         NativeContext.dummyContext.addReference(this);
+        this.sharedRealm = null;
     }
 

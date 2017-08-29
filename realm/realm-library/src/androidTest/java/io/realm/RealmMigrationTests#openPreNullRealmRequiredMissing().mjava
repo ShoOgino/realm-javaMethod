@@ -22,8 +22,8 @@
             realm.close();
             fail();
         } catch (RealmMigrationNeededException e) {
-            assertEquals("Field 'chars' is required. Either set @Required to field 'chars' or migrate using RealmObjectSchema.setNullable().",
-                    e.getMessage());
+            assertThat(e.getMessage(), CoreMatchers.containsString(
+                    "Property 'StringOnly.chars' has been made optional"));
         }
     }
 

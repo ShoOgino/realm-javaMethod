@@ -1,0 +1,22 @@
+    @Test
+    public void createColumnInfo_noDuplicateIndexInIndicesMap() {
+        RealmProxyMediator mediator = realm.getConfiguration().getSchemaMediator();
+        CatRealmProxy.CatColumnInfo columnInfo;
+        columnInfo = (CatRealmProxy.CatColumnInfo) mediator.createColumnInfo(Cat.class, realm.sharedRealm.getSchemaInfo());
+
+        final Set<Long> indexSet = new HashSet<Long>();
+        int indexCount = 0;
+
+        // Gets index for each field and then put into set.
+        for (Field field : Cat.class.getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            indexSet.add(columnInfo.getColumnIndex(field.getName()));
+            indexCount++;
+        }
+
+        assertEquals("if no duplicates, size of set equals to field count.",
+                indexCount, indexSet.size());
+    }
+

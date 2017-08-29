@@ -28,9 +28,8 @@
             realm = Realm.getInstance(realmConfig);
             fail();
         } catch (RealmMigrationNeededException e) {
-            if (!e.getMessage().equals("Primary key not defined for field 'id' in existing Realm file. @PrimaryKey was added.")) {
-                fail(e.toString());
-            }
+            assertThat(e.getMessage(), CoreMatchers.containsString(
+                    "Primary Key for class 'AnnotationTypes' has been added"));
         } finally {
             if (realm != null) {
                 realm.close();
