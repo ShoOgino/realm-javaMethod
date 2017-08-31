@@ -39,15 +39,17 @@
         }
         final long schemaVersion = config.getSchemaVersion();
         final long nativeSchemaPtr = schemaInfo == null ? 0 : schemaInfo.getNativePtr();
+        this.migrationCallback = migrationCallback;
         nativeSetSchemaConfig(nativePtr, schemaMode.getNativeValue(), schemaVersion, nativeSchemaPtr, migrationCallback);
 
         // Compact on launch
-        CompactOnLaunchCallback compactOnLaunchCallback = config.getCompactOnLaunchCallback();
+        this.compactOnLaunchCallback = config.getCompactOnLaunchCallback();
         if (compactOnLaunchCallback != null) {
             nativeSetCompactOnLaunchCallback(nativePtr, compactOnLaunchCallback);
         }
 
         // Initial data transaction
+        this.initializationCallback = initializationCallback;
         if (initializationCallback != null) {
             nativeSetInitializationCallback(nativePtr, initializationCallback);
         }
