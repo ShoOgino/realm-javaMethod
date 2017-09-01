@@ -1,0 +1,20 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void getPermissionManger_instanceUniqueToUser() {
+        SyncUser user1 = createNamedTestUser("user1");
+        SyncUser user2 = createNamedTestUser("user2");
+        PermissionManager pm1 = user1.getPermissionManager();
+        PermissionManager pm2 = user2.getPermissionManager();
+
+        try {
+            assertFalse(pm1 == pm2);
+            assertFalse(pm1.equals(pm2));
+            looperThread.testComplete();
+        } finally {
+            pm1.close();
+            pm2.close();
+            user1.logout();
+            user2.logout();
+        }
+    }
+

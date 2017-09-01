@@ -1,0 +1,22 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void getDefaultPermissions_closed() throws IOException {
+        PermissionManager pm = user.getPermissionManager();
+        looperThread.closeAfterTest(pm);
+        pm.close();
+
+        pm.getDefaultPermissions(new PermissionManager.PermissionsCallback() {
+            @Override
+            public void onSuccess(RealmResults<Permission> permissions) {
+                fail();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                assertEquals(ErrorCode.UNKNOWN, error.getErrorCode());
+                assertEquals(IllegalStateException.class, error.getException().getClass());
+                looperThread.testComplete();
+            }
+        });
+    }
+

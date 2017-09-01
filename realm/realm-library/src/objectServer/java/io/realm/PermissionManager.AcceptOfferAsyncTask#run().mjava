@@ -1,0 +1,67 @@
+        @Override
+        public void run() {
+            if (checkAndReportInvalidState()) {
+                return;
+            }
+
+            // Save response object. It will be synchronized to the server where it will be processed.
+            Realm.Transaction transaction = new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    if (checkAndReportInvalidState()) { return; }
+                    realm.insertOrUpdate(unmanagedResponse);
+                }
+            };
+
+            // If the response was successfully written to Realm, we need to wait for it to be processed.
+            // Register a ChangeListener on the object and wait for the proper response code, which can then be
+            // converted to a proper response to the user.
+            Realm.Transaction.OnSuccess onSuccess = new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+                    if (checkAndReportInvalidState()) { return; }
+
+                    // Find PermissionOffer object we just added
+                    // Wait for it to be processed
+                    managedResponse = managementRealm.where(PermissionOfferResponse.class).equalTo("id", responseId).findFirstAsync();
+                    RealmObject.addChangeListener(managedResponse, new RealmChangeListener<PermissionOfferResponse>() {
+                        @Override
+                        public void onChange(final PermissionOfferResponse response) {
+                            if (checkAndReportInvalidState()) {
+                                RealmObject.removeChangeListener(managedResponse, this);
+                                return;
+                            }
+                            handleServerStatusChanges(response, new Runnable() {
+                                @Override
+                                public void run() {
+                                    grantedPermissionResults = permissionRealm.where(Permission.class).equalTo("path", response.getPath()).findAllAsync();
+                                    grantedPermissionResults.addChangeListener(new RealmChangeListener<RealmResults<Permission>>() {
+                                        @Override
+                                        public void onChange(RealmResults<Permission> permissions) {
+                                            if (!permissions.isEmpty()) {
+                                                grantedPermissionResults.removeChangeListener(this);
+                                                notifyCallbackWithSuccess(managedResponse.getRealmUrl(), permissions.first());
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            };
+
+            // Critical error: The PermissionChange could not be written to the Realm.
+            // Report it back to the user.
+            Realm.Transaction.OnError onError = new Realm.Transaction.OnError() {
+                @Override
+                public void onError(Throwable error) {
+                    if (checkAndReportInvalidState()) { return; }
+                    notifyCallbackWithError(new ObjectServerError(ErrorCode.UNKNOWN, error));
+                }
+            };
+
+            // Run
+            transactionTask = managementRealm.executeTransactionAsync(transaction, onSuccess, onError);
+        }
+

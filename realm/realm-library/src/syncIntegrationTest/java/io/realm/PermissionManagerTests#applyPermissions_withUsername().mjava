@@ -1,0 +1,41 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void applyPermissions_withUsername() {
+        String user1Username = TestHelper.getRandomEmail();
+        String user2Username = TestHelper.getRandomEmail();
+        final SyncUser user1 = UserFactory.createUser(user1Username);
+        final SyncUser user2 = UserFactory.createUser(user2Username);
+        PermissionManager pm1 = user1.getPermissionManager();
+        looperThread.closeAfterTest(pm1);
+
+        // Create request for giving `user2` WRITE permissions to `user1`'s Realm.
+        UserCondition condition = UserCondition.username(user2Username);
+        AccessLevel accessLevel = AccessLevel.WRITE;
+        String url = createRemoteRealm(user1, "test");
+        PermissionRequest request = new PermissionRequest(condition, url, accessLevel);
+
+        pm1.applyPermissions(request, new PermissionManager.ApplyPermissionsCallback() {
+            @Override
+            public void onSuccess() {
+                PermissionManager pm2 = user2.getPermissionManager();
+                looperThread.closeAfterTest(pm2);
+                pm2.getPermissions(new PermissionManager.PermissionsCallback() {
+                    @Override
+                    public void onSuccess(RealmResults<Permission> permissions) {
+                        assertPermissionPresent(permissions, user2, user1.getIdentity() + "/test", AccessLevel.WRITE);
+                    }
+
+                    @Override
+                    public void onError(ObjectServerError error) {
+                        fail(error.toString());
+                    }
+                });
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail(error.toString());
+            }
+        });
+    }
+

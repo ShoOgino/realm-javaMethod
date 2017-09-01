@@ -1,0 +1,29 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void applyPermissions_nonAdminUserFails() {
+        SyncUser user2 = UserFactory.createUniqueUser();
+        String otherUsersUrl = createRemoteRealm(user2, "test");
+
+        PermissionManager pm = user.getPermissionManager();
+        looperThread.closeAfterTest(pm);
+
+        // Create request for setting permissions on another users Realm,
+        // i.e. user making the request do not have manage rights.
+        UserCondition condition = UserCondition.userId(user.getIdentity());
+        AccessLevel accessLevel = AccessLevel.WRITE;
+        PermissionRequest request = new PermissionRequest(condition, otherUsersUrl, accessLevel);
+
+        pm.applyPermissions(request, new PermissionManager.ApplyPermissionsCallback() {
+            @Override
+            public void onSuccess() {
+                fail();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                assertEquals(ErrorCode.ACCESS_DENIED, error.getErrorCode());
+                looperThread.testComplete();
+            }
+        });
+    }
+

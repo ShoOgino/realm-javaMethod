@@ -1,0 +1,23 @@
+    /**
+     * Creates an empty remote Realm on ROS owned by the provided user
+     */
+    private String createRemoteRealm(SyncUser user, String realmName) {
+        String url = Constants.AUTH_SERVER_URL + "~/" + realmName;
+        SyncConfiguration config = new SyncConfiguration.Builder(user, url).build();
+
+        Realm realm = Realm.getInstance(config);
+        SyncSession session = SyncManager.getSession(config);
+        final CountDownLatch uploadLatch = new CountDownLatch(1);
+        session.addUploadProgressListener(ProgressMode.CURRENT_CHANGES, new ProgressListener() {
+            @Override
+            public void onChange(Progress progress) {
+                if (progress.isTransferComplete()) {
+                    uploadLatch.countDown();
+                }
+            }
+        });
+        TestHelper.awaitOrFail(uploadLatch);
+        realm.close();
+        return config.getServerUrl().toString();
+    }
+

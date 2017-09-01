@@ -1,0 +1,14 @@
+    @After
+    public void after() {
+        if (!looperThread.isRuleUsed() || looperThread.isTestComplete()) {
+            UserFactory.logoutAllUsers();
+        } else {
+            looperThread.runAfterTest(new Runnable() {
+                @Override
+                public void run() {
+                    UserFactory.logoutAllUsers();
+                }
+            });
+        }
+    }
+

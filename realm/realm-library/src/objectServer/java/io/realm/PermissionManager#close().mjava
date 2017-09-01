@@ -1,0 +1,49 @@
+    /**
+     * Closes the PermissionManager as well as any underlying Realms.
+     * Any active tasks in progress will be canceled.
+     */
+    @Override
+    public void close() {
+        checkIfValidThread();
+
+        // Multiple instances open, just decrement the reference count
+        synchronized (cacheLock) {
+            Cache cache = PermissionManager.cache.get(user.getIdentity()).get();
+            if (cache.instanceCounter > 1) {
+                cache.instanceCounter--;
+                return;
+            }
+
+            // Only one instance open. Do a full close
+            cache.instanceCounter = 0;
+            cache.pm = null;
+        }
+        delayedTasks.clear();
+
+        // If Realms are still being opened, abort that task
+        if (managementRealmOpenTask != null) {
+            managementRealmOpenTask.cancel();
+            managementRealmOpenTask = null;
+        }
+        if (permissionRealmOpenTask != null) {
+            permissionRealmOpenTask.cancel();
+            permissionRealmOpenTask = null;
+        }
+        if (defaultPermissionRealmOpenTask != null) {
+            defaultPermissionRealmOpenTask.cancel();
+            defaultPermissionRealmOpenTask = null;
+        }
+
+        // If Realms are opened. Close them.
+        if (managementRealm != null) {
+            managementRealm.close();
+        }
+        if (permissionRealm != null) {
+            permissionRealm.close();
+        }
+        if (defaultPermissionRealm != null) {
+            defaultPermissionRealm.close();
+        }
+        closed = true;
+    }
+

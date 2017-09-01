@@ -1,0 +1,13 @@
+        // Combine the text based error message from two ObjectServerErrrors.
+        private String combineErrorMessage(Map<String, ObjectServerError> errors) {
+            boolean multipleErrors = errors.size() > 1;
+            StringBuilder errorMsg = new StringBuilder(multipleErrors ? "Multiple errors occurred: " : "Error occurred in Realm: ");
+            for (Map.Entry<String, ObjectServerError> entry : errors.entrySet()) {
+                errorMsg.append('\n');
+                errorMsg.append(entry.getKey());
+                errorMsg.append('\n');
+                errorMsg.append(entry.getValue().toString());
+            }
+            return errorMsg.toString();
+        }
+

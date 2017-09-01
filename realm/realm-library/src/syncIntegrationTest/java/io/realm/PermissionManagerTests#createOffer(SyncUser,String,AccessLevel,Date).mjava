@@ -1,0 +1,40 @@
+    /**
+     * Creates a offer for a newly created Realm.
+     *
+     * @param user User that should create the offer
+     * @param realmName Realm to create
+     * @param level accessLevel to offer
+     * @param expires when the offer expires
+     */
+    private String createOffer(final SyncUser user, final String realmName, final AccessLevel level, final Date expires) {
+        final CountDownLatch offerReady = new CountDownLatch(1);
+        final AtomicReference<String> offer = new AtomicReference<>(null);
+        final HandlerThread ht = new HandlerThread("OfferThread");
+        ht.start();
+        Handler handler = new Handler(ht.getLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                String url = createRemoteRealm(user, realmName);
+                final PermissionManager pm = user.getPermissionManager();
+                pm.makeOffer(new PermissionOffer(url, level, expires), new PermissionManager.MakeOfferCallback() {
+                    @Override
+                    public void onSuccess(String offerToken) {
+                        offer.set(offerToken);
+                        pm.close();
+                        offerReady.countDown();
+                    }
+
+                    @Override
+                    public void onError(ObjectServerError error) {
+                        pm.close();
+                        fail(error.toString());
+                    }
+                });
+            }
+        });
+        TestHelper.awaitOrFail(offerReady);
+        ht.quit();
+        return offer.get();
+    }
+

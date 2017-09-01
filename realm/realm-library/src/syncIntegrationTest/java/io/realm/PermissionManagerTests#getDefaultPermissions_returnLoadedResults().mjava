@@ -1,0 +1,20 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void getDefaultPermissions_returnLoadedResults() {
+        PermissionManager pm = user.getPermissionManager();
+        looperThread.closeAfterTest(pm);
+        pm.getDefaultPermissions(new PermissionManager.PermissionsCallback() {
+            @Override
+            public void onSuccess(RealmResults<Permission> permissions) {
+                assertTrue(permissions.isLoaded());
+                assertInitialPermissions(permissions);
+                looperThread.testComplete();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail(error.toString());
+            }
+        });
+    }
+

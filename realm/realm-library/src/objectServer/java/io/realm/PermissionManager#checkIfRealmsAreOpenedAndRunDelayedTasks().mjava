@@ -1,0 +1,11 @@
+    private void checkIfRealmsAreOpenedAndRunDelayedTasks() {
+        synchronized (errorLock) {
+            if ((permissionRealm != null || permissionRealmError != null)
+                && (defaultPermissionRealm != null || defaultPermissionRealmError != null)
+                && (managementRealm != null || managementRealmError != null)) {
+                openInProgress = false;
+                runDelayedTasks();
+            }
+        }
+    }
+

@@ -1,0 +1,57 @@
+    /**
+     * Creates a PermissionManager for the given user.
+     *
+     * This class is thread confined, so thread safety is not a concern since all internal
+     * communication is routed through the original Handler thread.
+     *
+     * @param user user to create manager for.
+     */
+    private PermissionManager(SyncUser user) {
+        this.user = user;
+        threadId = Thread.currentThread().getId();
+        managementRealmConfig = new SyncConfiguration.Builder(
+                user, getRealmUrl(RealmType.MANAGEMENT_REALM, user.getAuthenticationUrl()))
+                .errorHandler(new SyncSession.ErrorHandler() {
+                    @Override
+                    public void onError(SyncSession session, ObjectServerError error) {
+                        synchronized (errorLock) {
+                            managementRealmError = error;
+                        }
+                    }
+                })
+                .modules(new ManagementModule())
+                .build();
+
+        permissionRealmConfig = new SyncConfiguration.Builder(
+                user, getRealmUrl(RealmType.PERMISSION_REALM, user.getAuthenticationUrl()))
+                .errorHandler(new SyncSession.ErrorHandler() {
+                    @Override
+                    public void onError(SyncSession session, ObjectServerError error) {
+                        synchronized (errorLock) {
+                            permissionRealmError = error;
+                        }
+                    }
+                })
+                .modules(new PermissionModule())
+                .waitForInitialRemoteData()
+                // FIXME: Something is seriously wrong with the Permission Realm. It doesn't seem to
+                // exist on the server. Making it impossible to mark it read only
+                // .readOnly()
+                .build();
+
+        defaultPermissionRealmConfig = new SyncConfiguration.Builder(
+                user, getRealmUrl(RealmType.DEFAULT_PERMISSION_REALM, user.getAuthenticationUrl()))
+                .errorHandler(new SyncSession.ErrorHandler() {
+                    @Override
+                    public void onError(SyncSession session, ObjectServerError error) {
+                        synchronized (errorLock) {
+                            defaultPermissionRealmError = error;
+                        }
+                    }
+                })
+                .modules(new PermissionModule())
+                .waitForInitialRemoteData()
+                .readOnly()
+                .build();
+    }
+

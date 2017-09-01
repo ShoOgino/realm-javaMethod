@@ -34,11 +34,7 @@
         user1ManagementRealm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                boolean readPermission = true;
-                boolean readWritePermission = true;
-                boolean managePermission = false;
-                Date expiresAt = null;
-                PermissionOffer offer = new PermissionOffer(user1RealmUrl, readPermission, readWritePermission, managePermission, expiresAt);
+                PermissionOffer offer = new PermissionOffer(user1RealmUrl, AccessLevel.WRITE, null);
                 offerId.set(offer.getId());
                 realm.copyToRealm(offer);
             }
@@ -55,7 +51,7 @@
                     @Override
                     public void onChange(RealmResults<PermissionOffer> offers) {
                         final PermissionOffer offer = offers.first(null);
-                        if (offer != null && offer.isSuccessful() && offer.getToken() != null) {
+                        if (offer != null && offer.isOfferCreated() && offer.getToken() != null) {
                             // 5. User2 uses the token to accept the offer
                             final String offerToken = offer.getToken();
                             final AtomicReference<String> offerResponseId = new AtomicReference<String>();

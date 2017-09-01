@@ -1,0 +1,17 @@
+    /**
+     * Accepts a permission offer sent by another user. Once this offer is accepted successfully, the permissions
+     * described by the token will be granted.
+     *
+     * @param offerToken token representing the permission offer.
+     * @param callback with the permission details that were accepted.
+     * @return {@link RealmAsyncTask} that can be used to cancel the task if needed.
+     */
+    public RealmAsyncTask acceptOffer(String offerToken, AcceptOfferCallback callback) {
+        checkIfValidThread();
+        checkCallbackNotNull(callback);
+        if (Util.isEmptyString(offerToken)) {
+            throw new IllegalArgumentException("Non-empty 'offerToken' required.");
+        }
+        return addTask(new AcceptOfferAsyncTask(this, offerToken, callback));
+    }
+

@@ -1,0 +1,17 @@
+    /**
+     * Creates a custom permission condition.
+     * This will apply the permissions based on a key/value combination in the user's metadata.
+     *
+     * @param key key to use.
+     * @param value value for that field to match.
+     */
+    public static UserCondition keyValue(String key, String value) {
+        if (Util.isEmptyString(key)) {
+            throw new IllegalArgumentException("Non-empty 'key' required.");
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("Non-null 'value' required.");
+        }
+        return new UserCondition(MatcherType.METADATA, key, value);
+    }
+

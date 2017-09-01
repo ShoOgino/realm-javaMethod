@@ -1,0 +1,10 @@
+        protected final void notifyCallbackWithError(ObjectServerError e) {
+            RealmLog.debug("Error happened in PermissionManager for %s: %s",
+                    permissionManager.user.getIdentity(), e.toString());
+            try {
+                callback.onError(e);
+            } finally {
+                permissionManager.activeTasks.remove(this);
+            }
+        }
+

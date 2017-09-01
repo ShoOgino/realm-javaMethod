@@ -1,0 +1,45 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void getPermissions_updatedWithNewRealms() {
+        PermissionManager pm = user.getPermissionManager();
+        looperThread.closeAfterTest(pm);
+        pm.getPermissions(new PermissionManager.PermissionsCallback() {
+            @Override
+            public void onSuccess(RealmResults<Permission> permissions) {
+                assertTrue(permissions.isLoaded());
+                assertInitialPermissions(permissions);
+
+                // Create new Realm, which should create a new Permission entry
+                SyncConfiguration config2 = new SyncConfiguration.Builder(user, Constants.USER_REALM_2)
+                        .errorHandler(new SyncSession.ErrorHandler() {
+                            @Override
+                            public void onError(SyncSession session, ObjectServerError error) {
+                                fail(error.toString());
+                            }
+                        })
+                        .build();
+                final Realm secondRealm = Realm.getInstance(config2);
+                looperThread.closeAfterTest(secondRealm);
+                // Wait for the permission Result to report the new Realms
+                looperThread.keepStrongReference(permissions);
+                permissions.addChangeListener(new RealmChangeListener<RealmResults<Permission>>() {
+                    @Override
+                    public void onChange(RealmResults<Permission> permissions) {
+                        Permission p = permissions.where().endsWith("path", "tests2").findFirst();
+                        if (p != null) {
+                            assertTrue(p.mayRead());
+                            assertTrue(p.mayWrite());
+                            assertTrue(p.mayManage());
+                            looperThread.testComplete();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail("Could not open Realm: " + error.toString());
+            }
+        });
+    }
+

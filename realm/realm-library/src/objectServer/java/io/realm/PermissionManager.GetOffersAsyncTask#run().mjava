@@ -1,0 +1,24 @@
+        @Override
+        public void run() {
+            if (checkAndReportInvalidState()) { return; }
+            if (offers != null) {
+                notifyCallbackWithSuccess(offers);
+            } else {
+                // We only want offers that have been created.
+                loadingOffers = managementRealm.where(PermissionOffer.class)
+                        .equalTo("statusCode", 0)
+                        .findAllAsync();
+                loadingOffers.addChangeListener(new RealmChangeListener<RealmResults<PermissionOffer>>() {
+                    @Override
+                    public void onChange(RealmResults<PermissionOffer> loadedOffers) {
+                        loadedOffers.removeChangeListener(this);
+                        if (checkAndReportInvalidState()) { return; }
+                        if (offers == null) {
+                            offers = loadedOffers;
+                        }
+                        notifyCallbackWithSuccess(offers);
+                    }
+                });
+            }
+        }
+

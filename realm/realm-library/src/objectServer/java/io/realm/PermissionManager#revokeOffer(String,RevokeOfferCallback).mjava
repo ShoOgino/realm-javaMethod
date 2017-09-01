@@ -1,0 +1,14 @@
+    /**
+     * Revokes an existing offer. This will prevent any other users from accepting it. Users that already accepted it,
+     * will not be affected. Revocation cannot happen until the device has talked to the server. The callback will
+     * not be notified until this has happened.
+     *
+     * @param offerToken token that should be revoked.
+     * @return {@link RealmAsyncTask} that can be used to cancel the task if needed.
+     */
+    public RealmAsyncTask revokeOffer(String offerToken, RevokeOfferCallback callback) {
+        checkIfValidThread();
+        checkCallbackNotNull(callback);
+        return addTask(new RevokeOfferAsyncTask(this, offerToken, callback));
+    }
+
