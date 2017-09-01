@@ -1,8 +1,8 @@
-    private Pair<Long, Long> populateTestRealmAndCompactOnLaunch(CompactOnLaunchCallback compactOnLaunch, int objects) {
+    private Pair<Long, Long> populateTestRealmAndCompactOnLaunch(CompactOnLaunchCallback compactOnLaunch, int sizeInMB) {
         final String REALM_NAME = "test.realm";
         RealmConfiguration realmConfig = configFactory.createConfiguration(REALM_NAME);
         Realm realm = Realm.getInstance(realmConfig);
-        populateTestRealm(realm, objects);
+        populateTestRealmForCompact(realm, sizeInMB);
         realm.beginTransaction();
         realm.deleteAll();
         realm.commitTransaction();

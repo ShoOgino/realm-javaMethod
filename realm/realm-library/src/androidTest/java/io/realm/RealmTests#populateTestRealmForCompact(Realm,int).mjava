@@ -1,0 +1,9 @@
+    private void populateTestRealmForCompact(Realm realm, int sizeInMB) {
+        byte[] oneMBData = new byte[1024 * 1024];
+        realm.beginTransaction();
+        for (int i = 0; i < sizeInMB; i++) {
+            realm.createObject(AllTypes.class).setColumnBinary(oneMBData);
+        }
+        realm.commitTransaction();
+    }
+
