@@ -1,0 +1,19 @@
+    @Test
+    public void getRealm_closedObjectThrows() {
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        dynamicRealm.refresh();
+        final DynamicRealmObject object = dynamicRealm.where(AllTypes.CLASS_NAME).findFirst();
+        dynamicRealm.close();
+        dynamicRealm = null;
+
+        try {
+            object.getDynamicRealm();
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals(BaseRealm.CLOSED_REALM_MESSAGE, e.getMessage());
+        }
+    }
+
