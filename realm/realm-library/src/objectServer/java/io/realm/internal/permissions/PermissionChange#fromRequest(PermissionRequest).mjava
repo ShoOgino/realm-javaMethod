@@ -1,0 +1,28 @@
+    /**
+     * Maps between a PermissionRequest and a PermissionChange object.
+     *
+     * @param request request to map to a PermissionChange.
+     */
+    public static PermissionChange fromRequest(PermissionRequest request) {
+        // PRE-CONDITION: All input are verified to be valid from the perspective of the Client.
+        UserCondition condition = request.getCondition();
+        AccessLevel level = request.getAccessLevel();
+        String realmUrl = request.getUrl();
+
+        String userId = "";
+        String metadataKey = null;
+        String metadataValue = null;
+        switch (condition.getType()) {
+            case USER_ID:
+                userId = condition.getValue();
+                break;
+            case METADATA:
+                metadataKey = condition.getKey();
+                metadataValue = condition.getValue();
+                break;
+        }
+
+        return new PermissionChange(realmUrl, userId, metadataKey, metadataValue, level.mayRead(), level.mayWrite(),
+                level.mayManage());
+    }
+

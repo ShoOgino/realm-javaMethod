@@ -4,6 +4,9 @@
         if (annotation == null) {
             return base;
         }
+        synchronized (lock) {
+            ruleBeingUsed = true;
+        }
         return new RunInLooperThreadStatement(annotation, base);
     }
 

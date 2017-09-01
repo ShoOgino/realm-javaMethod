@@ -1,0 +1,13 @@
+    /**
+     * Retrieves the list of permissions for all Realms available to this user.
+     *
+     * @param callback callback notified when the permissions are ready. The returned {@link RealmResults} is a fully
+     * live query result, that will be auto-updated like any other {@link RealmResults}.
+     * @return {@link RealmAsyncTask} that can be used to cancel the task if needed.
+     */
+    public RealmAsyncTask getPermissions(PermissionsCallback callback) {
+        checkIfValidThread();
+        checkCallbackNotNull(callback);
+        return addTask(new GetPermissionsAsyncTask(this, callback));
+    }
+

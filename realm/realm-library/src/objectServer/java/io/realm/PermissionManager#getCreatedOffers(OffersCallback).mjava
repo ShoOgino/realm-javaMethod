@@ -1,0 +1,13 @@
+    /**
+     * Returns the list of offers created by this user. These offers can be revoked again by calling
+     * {@link #revokeOffer(String, RevokeOfferCallback)} or sent to other users by sending the
+     * {@link PermissionOffer#getToken()}.
+     *
+     * @return {@link RealmAsyncTask} that can be used to cancel the task if needed.
+     */
+    public RealmAsyncTask getCreatedOffers(OffersCallback callback) {
+        checkIfValidThread();
+        checkCallbackNotNull(callback);
+        return addTask(new GetOffersAsyncTask(this, callback));
+    }
+

@@ -1,0 +1,23 @@
+        /**
+         * Handle the status change from ROS and either call error or success callbacks.
+         */
+        protected void handleServerStatusChanges(BasePermissionApi obj, Runnable onSuccessDelegate) {
+            Integer statusCode = obj.getStatusCode();
+            if (statusCode != null) {
+                RealmObject.removeAllChangeListeners(obj);
+                if (statusCode > 0) {
+                    ErrorCode errorCode = ErrorCode.fromInt(statusCode);
+                    String errorMsg = obj.getStatusMessage();
+                    ObjectServerError error = new ObjectServerError(errorCode, errorMsg);
+                    notifyCallbackWithError(error);
+                } else if (statusCode == 0) {
+                    onSuccessDelegate.run();
+                } else {
+                    ErrorCode errorCode = ErrorCode.UNKNOWN;
+                    String errorMsg = "Illegal status code: " + statusCode;
+                    ObjectServerError error = new ObjectServerError(errorCode, errorMsg);
+                    notifyCallbackWithError(error);
+                }
+            }
+        }
+

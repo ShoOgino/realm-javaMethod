@@ -1,0 +1,31 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void permissionManagerAsyncTask_handleTwoErrorsSameErrorCode() throws NoSuchFieldException, IllegalAccessException {
+        PermissionManager pm = user.getPermissionManager();
+        looperThread.closeAfterTest(pm);
+
+        // Simulate error in the permission Realm
+        setRealmError(pm, "managementRealmError", new ObjectServerError(ErrorCode.CONNECTION_CLOSED, "Boom1"));
+
+        // Simulate error in the management Realm
+        setRealmError(pm, "permissionRealmError", new ObjectServerError(ErrorCode.CONNECTION_CLOSED, "Boom2"));
+
+        PermissionManager.ApplyPermissionsCallback callback = new PermissionManager.ApplyPermissionsCallback() {
+            @Override
+            public void onSuccess() {
+                fail();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                assertEquals(ErrorCode.CONNECTION_CLOSED, error.getErrorCode());
+                assertTrue(error.toString().contains("Boom1"));
+                assertTrue(error.toString().contains("Boom2"));
+                looperThread.testComplete();
+            }
+        };
+
+        // Create dummy task that can trigger the error reporting
+        runTask(pm, callback);
+    }
+

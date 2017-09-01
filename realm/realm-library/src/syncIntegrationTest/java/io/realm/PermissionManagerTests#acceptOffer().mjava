@@ -1,0 +1,27 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void acceptOffer() {
+        final String offerToken = createOffer(user, "test", AccessLevel.WRITE, null);
+
+        final SyncUser user2 = UserFactory.createUniqueUser();
+        final PermissionManager pm = user2.getPermissionManager();
+        looperThread.closeAfterTest(pm);
+
+        pm.acceptOffer(offerToken, new PermissionManager.AcceptOfferCallback() {
+            @Override
+            public void onSuccess(String url, Permission permission) {
+                assertEquals("/" + user.getIdentity() + "/test", permission.getPath());
+                assertTrue(permission.mayRead());
+                assertTrue(permission.mayWrite());
+                assertFalse(permission.mayManage());
+                assertEquals(user2.getIdentity(), permission.getUserId());
+                looperThread.testComplete();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail(error.toString());
+            }
+        });
+    }
+

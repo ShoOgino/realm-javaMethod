@@ -1,0 +1,54 @@
+    // Open all underlying Realms asynchronously. Once they are all ready, all tasks added in the meantime are
+    // started. Any error will be reported through the `Callback.onError` callback if the Realms failed to open
+    // correctly.
+    private void openRealms() {
+        if (!openInProgress) {
+            openInProgress = true;
+            managementRealmOpenTask = Realm.getInstanceAsync(managementRealmConfig, new Realm.Callback() {
+                @Override
+                public void onSuccess(Realm realm) {
+                    managementRealm = realm;
+                    checkIfRealmsAreOpenedAndRunDelayedTasks();
+                }
+
+                @Override
+                public void onError(Throwable exception) {
+                    synchronized (errorLock) {
+                        managementRealmError = new ObjectServerError(ErrorCode.UNKNOWN, exception);
+                        checkIfRealmsAreOpenedAndRunDelayedTasks();
+                    }
+                }
+            });
+            permissionRealmOpenTask = Realm.getInstanceAsync(permissionRealmConfig, new Realm.Callback() {
+                @Override
+                public void onSuccess(Realm realm) {
+                    permissionRealm = realm;
+                    checkIfRealmsAreOpenedAndRunDelayedTasks();
+                }
+
+                @Override
+                public void onError(Throwable exception) {
+                    synchronized (errorLock) {
+                        permissionRealmError = new ObjectServerError(ErrorCode.UNKNOWN, exception);
+                        checkIfRealmsAreOpenedAndRunDelayedTasks();
+                    }
+                }
+            });
+            defaultPermissionRealmOpenTask = Realm.getInstanceAsync(defaultPermissionRealmConfig, new Realm.Callback() {
+                @Override
+                public void onSuccess(Realm realm) {
+                    defaultPermissionRealm = realm;
+                    checkIfRealmsAreOpenedAndRunDelayedTasks();
+                }
+
+                @Override
+                public void onError(Throwable exception) {
+                    synchronized (errorLock) {
+                        defaultPermissionRealmError = new ObjectServerError(ErrorCode.UNKNOWN, exception);
+                        checkIfRealmsAreOpenedAndRunDelayedTasks();
+                    }
+                }
+            });
+        }
+    }
+
