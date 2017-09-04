@@ -20,10 +20,10 @@
         checkValidObject(object);
         E oldObject;
         if (isManaged()) {
-            checkValidView();
+            checkValidRealm();
             RealmObjectProxy proxy = (RealmObjectProxy) copyToRealmIfNeeded(object);
             oldObject = get(location);
-            view.set(location, proxy.realmGet$proxyState().getRow$realm().getIndex());
+            osList.setRow(location, proxy.realmGet$proxyState().getRow$realm().getIndex());
             return oldObject;
         } else {
             oldObject = unmanagedList.set(location, object);

@@ -49,13 +49,13 @@
                         .emitStatement("RealmList<%s> %sList = ((%s) object).%s()",
                                 genericType, fieldName, interfaceName, getter)
                         .beginControlFlow("if (%sList != null)", fieldName)
-                        .emitStatement("long %1$sNativeLinkViewPtr = Table.nativeGetLinkView(tableNativePtr, columnInfo.%1$sIndex, rowIndex)", fieldName)
+                        .emitStatement("OsList %1$sOsList = new OsList(table.getUncheckedRow(rowIndex), columnInfo.%1$sIndex)", fieldName)
                         .beginControlFlow("for (%1$s %2$sItem : %2$sList)", genericType, fieldName)
                         .emitStatement("Long cacheItemIndex%1$s = cache.get(%1$sItem)", fieldName)
                         .beginControlFlow("if (cacheItemIndex%s == null)", fieldName)
                         .emitStatement("cacheItemIndex%1$s = %2$s.insert(realm, %1$sItem, cache)", fieldName, Utils.getProxyClassSimpleName(field))
                         .endControlFlow()
-                        .emitStatement("LinkView.nativeAdd(%1$sNativeLinkViewPtr, cacheItemIndex%1$s)", fieldName)
+                        .emitStatement("%1$sOsList.addRow(cacheItemIndex%1$s)", fieldName)
                         .endControlFlow()
                         .endControlFlow();
 

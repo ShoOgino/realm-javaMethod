@@ -17,9 +17,9 @@
     public boolean add(E object) {
         checkValidObject(object);
         if (isManaged()) {
-            checkValidView();
+            checkValidRealm();
             RealmObjectProxy proxy = (RealmObjectProxy) copyToRealmIfNeeded(object);
-            view.add(proxy.realmGet$proxyState().getRow$realm().getIndex());
+            osList.addRow(proxy.realmGet$proxyState().getRow$realm().getIndex());
         } else {
             unmanagedList.add(object);
         }
