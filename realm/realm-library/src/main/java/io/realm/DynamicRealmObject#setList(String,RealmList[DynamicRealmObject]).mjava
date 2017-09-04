@@ -16,8 +16,8 @@
         }
 
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        LinkView links = proxyState.getRow$realm().getLinkList(columnIndex);
-        Table linkTargetTable = links.getTargetTable();
+        OsList osList = proxyState.getRow$realm().getLinkList(columnIndex);
+        Table linkTargetTable = osList.getTargetTable();
         //noinspection ConstantConditions
         @Nonnull
         final String linkTargetTableName = linkTargetTable.getClassName();
@@ -57,9 +57,9 @@
             indices[i] = obj.realmGet$proxyState().getRow$realm().getIndex();
         }
 
-        links.clear();
+        osList.removeAll();
         for (int i = 0; i < listLength; i++) {
-            links.add(indices[i]);
+            osList.addRow(indices[i]);
         }
     }
 

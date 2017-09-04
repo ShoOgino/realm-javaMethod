@@ -1,0 +1,11 @@
+    public OsList(UncheckedRow row, long columnIndex) {
+        SharedRealm sharedRealm = row.getTable().getSharedRealm();
+        long[] ptrs = nativeCreate(sharedRealm.getNativePtr(), row.getNativePtr(), columnIndex);
+
+        this.nativePtr = ptrs[0];
+        this.context = sharedRealm.context;
+        context.addReference(this);
+
+        targetTable = new Table(sharedRealm, ptrs[1]);
+    }
+

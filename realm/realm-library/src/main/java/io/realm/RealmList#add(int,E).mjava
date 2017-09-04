@@ -20,12 +20,12 @@
     public void add(int location, E object) {
         checkValidObject(object);
         if (isManaged()) {
-            checkValidView();
+            checkValidRealm();
             if (location < 0 || location > size()) {
                 throw new IndexOutOfBoundsException("Invalid index " + location + ", size is " + size());
             }
             RealmObjectProxy proxy = (RealmObjectProxy) copyToRealmIfNeeded(object);
-            view.insert(location, proxy.realmGet$proxyState().getRow$realm().getIndex());
+            osList.insertRow(location, proxy.realmGet$proxyState().getRow$realm().getIndex());
         } else {
             unmanagedList.add(location, object);
         }

@@ -6,7 +6,7 @@
             dogs.deleteAllFromRealm();
             fail("removeAllFromRealm should be called in a transaction.");
         } catch (IllegalStateException e) {
-            assertEquals("Changing Realm data can only be done from inside a write transaction.", e.getMessage());
+            assertThat(e.getMessage(), CoreMatchers.containsString("Must be in a write transaction "));
         }
     }
 
