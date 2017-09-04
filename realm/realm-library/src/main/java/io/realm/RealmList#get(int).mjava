@@ -9,9 +9,8 @@
     @Override
     public E get(int location) {
         if (isManaged()) {
-            checkValidView();
-            long rowIndex = view.getTargetRowIndex(location);
-            return realm.get(clazz, className, rowIndex);
+            checkValidRealm();
+            return realm.get(clazz, className, osList.getUncheckedRow(location));
         } else {
             return unmanagedList.get(location);
         }

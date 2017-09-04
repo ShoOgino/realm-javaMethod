@@ -10,11 +10,11 @@
 
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
         try {
-            LinkView linkView = proxyState.getRow$realm().getLinkList(columnIndex);
+            OsList osList = proxyState.getRow$realm().getLinkList(columnIndex);
             //noinspection ConstantConditions
             @Nonnull
-            String className = linkView.getTargetTable().getClassName();
-            return new RealmList<>(className, linkView, proxyState.getRealm$realm());
+            String className = osList.getTargetTable().getClassName();
+            return new RealmList<>(className, osList, proxyState.getRealm$realm());
         } catch (IllegalArgumentException e) {
             checkFieldType(fieldName, columnIndex, RealmFieldType.LIST);
             throw e;
