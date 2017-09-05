@@ -1,38 +1,34 @@
     @Override
     protected void onStart() {
         super.onStart();
-        user = SyncUser.currentUser();
-        if (user != null) {
-            // Create a RealmConfiguration for our user
-            SyncConfiguration config = new SyncConfiguration.Builder(user, REALM_URL)
-                    .initialData(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            realm.createObject(CRDTCounter.class, 1);
-                        }
-                    })
-                    .build();
+        user = getLoggedInUser();
+        if (user == null) { return; }
 
-            // This will automatically sync all changes in the background for as long as the Realm is open
-            realm = Realm.getInstance(config);
-
-            counter = realm.where(CRDTCounter.class).findFirstAsync();
-            counter.addChangeListener(new RealmChangeListener<CRDTCounter>() {
-                @Override
-                public void onChange(CRDTCounter counter) {
-                    if (counter.isValid()) {
-                        counterView.setText(String.format(Locale.US, "%d", counter.getCount()));
-                    } else {
-                        counterView.setText("-");
+        // Create a RealmConfiguration for our user
+        SyncConfiguration config = new SyncConfiguration.Builder(user, REALM_URL)
+                .initialData(new Realm.Transaction() {
+                    @Override
+                    public void execute(@Nonnull Realm realm) {
+                        realm.createObject(CRDTCounter.class, user.getIdentity());
                     }
-                }
-            });
-            counterView.setText("0");
+                })
+                .build();
 
-            // Setup progress listeners for indeterminate progress bars
-            session = SyncManager.getSession(config);
-            session.addDownloadProgressListener(ProgressMode.INDEFINITELY, downloadListener);
-            session.addUploadProgressListener(ProgressMode.INDEFINITELY, uploadListener);
-        }
+        // This will automatically sync all changes in the background for as long as the Realm is open
+        realm = Realm.getInstance(config);
+
+        counterView.setText("-");
+        CRDTCounter counter = realm.where(CRDTCounter.class).equalTo("name", user.getIdentity()).findFirstAsync();
+        counter.addChangeListener(new RealmChangeListener<CRDTCounter>() {
+            @Override
+            public void onChange(@Nonnull CRDTCounter counter) {
+                counterView.setText((!counter.isValid()) ? "-" : String.format(Locale.US, "%d", counter.getCount()));
+            }
+        });
+
+        // Setup progress listeners for indeterminate progress bars
+        session = SyncManager.getSession(config);
+        session.addDownloadProgressListener(ProgressMode.INDEFINITELY, downloadListener);
+        session.addUploadProgressListener(ProgressMode.INDEFINITELY, uploadListener);
     }
 
