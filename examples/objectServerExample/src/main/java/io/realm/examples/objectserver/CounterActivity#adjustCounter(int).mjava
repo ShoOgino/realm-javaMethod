@@ -1,11 +1,13 @@
     private void adjustCounter(final int adjustment) {
         // A synchronized Realm can get written to at any point in time, so doing synchronous writes on the UI
-        // thread is HIGHLY discouraged as it might block longer than intended. Only use async transactions.
+        // thread is HIGHLY discouraged as it might block longer than intended. Use only async transactions.
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
-            public void execute(Realm realm) {
+            public void execute(@Nonnull Realm realm) {
                 CRDTCounter counter = realm.where(CRDTCounter.class).findFirst();
-                counter.add(adjustment);
+                if (counter != null) {
+                    counter.incrementCounter(adjustment);
+                }
             }
         });
     }

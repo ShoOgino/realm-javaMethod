@@ -16,16 +16,15 @@
         String password = this.password.getText().toString();
 
         SyncCredentials creds = SyncCredentials.usernamePassword(username, password, createUser);
-        String authUrl = "http://" + BuildConfig.OBJECT_SERVER_IP + ":9080/auth";
         SyncUser.Callback callback = new SyncUser.Callback() {
             @Override
-            public void onSuccess(SyncUser user) {
+            public void onSuccess(@Nonnull SyncUser user) {
                 progressDialog.dismiss();
                 onLoginSuccess();
             }
 
             @Override
-            public void onError(ObjectServerError error) {
+            public void onError(@Nonnull ObjectServerError error) {
                 progressDialog.dismiss();
                 String errorMsg;
                 switch (error.getErrorCode()) {
@@ -42,6 +41,6 @@
             }
         };
 
-        SyncUser.loginAsync(creds, authUrl, callback);
+        SyncUser.loginAsync(creds, REALM_AUTH_URL, callback);
     }
 
