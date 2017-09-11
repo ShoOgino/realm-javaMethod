@@ -21,5 +21,11 @@
         } else {
             assertEquals(0, collection.size());
         }
+        if (isRealmList(collectionClass)) {
+            // The parent object was not deleted
+            assertEquals(1, realm.where(AllJavaTypes.class).count());
+        } else {
+            assertEquals(0, realm.where(AllJavaTypes.class).count());
+        }
     }
 

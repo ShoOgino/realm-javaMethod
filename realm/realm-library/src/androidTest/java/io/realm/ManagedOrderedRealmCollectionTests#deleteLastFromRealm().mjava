@@ -2,6 +2,7 @@
     public void deleteLastFromRealm() {
         assertEquals(TEST_SIZE - 1, collection.last().getFieldLong());
         realm.beginTransaction();
+        AllJavaTypes allJavaTypes = collection.last();
         assertTrue(collection.deleteLastFromRealm());
         realm.commitTransaction();
         if (isSnapshot(collectionClass)) {
@@ -11,5 +12,7 @@
             assertEquals(TEST_SIZE - 1, collection.size());
             assertEquals(TEST_SIZE - 2, collection.last().getFieldLong());
         }
+        assertFalse(allJavaTypes.isValid());
+        assertEquals(TEST_SIZE - 1, realm.where(AllJavaTypes.class).count());
     }
 

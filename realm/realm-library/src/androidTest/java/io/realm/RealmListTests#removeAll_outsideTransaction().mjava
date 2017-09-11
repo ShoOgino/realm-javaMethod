@@ -1,0 +1,8 @@
+    @Test
+    public void removeAll_outsideTransaction() {
+        List<Dog> objectsToRemove = Collections.singletonList(collection.get(0));
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage(CoreMatchers.containsString("Objects can only be removed from inside a write transaction"));
+        collection.removeAll(objectsToRemove);
+    }
+
