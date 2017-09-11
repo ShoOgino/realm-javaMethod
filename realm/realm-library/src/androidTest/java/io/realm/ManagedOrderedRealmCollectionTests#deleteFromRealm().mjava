@@ -2,15 +2,25 @@
     public void deleteFromRealm() {
         OrderedRealmCollection<Dog> collection = createNonCyclicCollection(realm, collectionClass);
         assertEquals(1, collection.get(1).getAge());
-        realm.beginTransaction();
-        collection.deleteFromRealm(0);
-        realm.commitTransaction();
-        if (isSnapshot(collectionClass)) {
-            assertEquals(TEST_SIZE, collection.size());
-            assertFalse(collection.get(0).isValid());
-        } else {
-            assertEquals(TEST_SIZE - 1, collection.size());
-            assertEquals(2, collection.get(1).getAge());
+
+        int[] indexToDelete = {TEST_SIZE/2, TEST_SIZE - 2, 0};
+        int currentSize = TEST_SIZE;
+
+        for (int i = 0; i < indexToDelete.length; i++) {
+            int index = indexToDelete[i];
+            realm.beginTransaction();
+            Dog dog = collection.get(index);
+            collection.deleteFromRealm(index);
+            realm.commitTransaction();
+            if (isSnapshot(collectionClass)) {
+                assertEquals(TEST_SIZE, collection.size());
+                assertFalse(collection.get(index).isValid());
+            } else {
+                assertEquals(currentSize- 1, collection.size());
+            }
+            assertFalse(dog.isValid());
+            assertEquals(currentSize- 1, realm.where(Dog.class).count());
+            currentSize -= 1;
         }
     }
 

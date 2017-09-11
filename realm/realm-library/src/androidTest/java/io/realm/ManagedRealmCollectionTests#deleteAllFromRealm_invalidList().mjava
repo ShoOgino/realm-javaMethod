@@ -1,10 +1,9 @@
     @Test
     public void deleteAllFromRealm_invalidList() {
         realm.close();
-        try {
-            collection.deleteAllFromRealm();
-            fail();
-        } catch (IllegalStateException ignored) {
-        }
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage(CoreMatchers.containsString(
+                "This Realm instance has already been closed, making it unusable."));
+        collection.deleteAllFromRealm();
     }
 

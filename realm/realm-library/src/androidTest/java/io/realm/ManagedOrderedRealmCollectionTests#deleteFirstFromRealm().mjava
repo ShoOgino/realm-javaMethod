@@ -4,6 +4,7 @@
         assertEquals(0, collection.get(0).getAge());
 
         realm.beginTransaction();
+        Dog dog = collection.first();
         assertTrue(collection.deleteFirstFromRealm());
         realm.commitTransaction();
         if (isSnapshot(collectionClass)) {
@@ -13,5 +14,7 @@
             assertEquals(TEST_SIZE - 1, collection.size());
             assertEquals(1, collection.get(0).getAge());
         }
+        assertFalse(dog.isValid());
+        assertEquals(TEST_SIZE - 1, realm.where(Dog.class).count());
     }
 
