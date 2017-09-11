@@ -1,17 +1,17 @@
     /**
-     * Returns an RxJava Observable that monitors changes to this RealmObject. It will emit the current object when
+     * Returns an RxJava Flowable that monitors changes to this RealmObject. It will emit the current object when
      * subscribed to. Object updates will continuously be emitted as the RealmObject is updated -
      * {@code onComplete} will never be called.
      * <p>
-     * When chaining a RealmObject observable use {@code obj.<MyRealmObjectClass>asObservable()} to pass on
+     * When chaining a RealmObject observable use {@code obj.<MyRealmObjectClass>asFlowable()} to pass on
      * type information, otherwise the type of the following observables will be {@code RealmObject}.
      * <p>
-     * If you would like the {@code asObservable()} to stop emitting items you can instruct RxJava to
+     * If you would like the {@code asFlowable()} to stop emitting items you can instruct RxJava to
      * emit only the first item by using the {@code first()} operator:
      * <p>
      * <pre>
      * {@code
-     * obj.asObservable()
+     * obj.asFlowable()
      *      .filter(obj -> obj.isLoaded())
      *      .first()
      *      .subscribe( ... ) // You only get the object once
@@ -23,7 +23,7 @@
      * @throws UnsupportedOperationException if the required RxJava framework is not on the classpath.
      * @see <a href="https://realm.io/docs/java/latest/#rxjava">RxJava and Realm</a>
      */
-    public static <E extends RealmModel> Observable<E> asObservable(E object) {
+    public static <E extends RealmModel> Flowable<E> asFlowable(E object) {
         if (object instanceof RealmObjectProxy) {
             RealmObjectProxy proxy = (RealmObjectProxy) object;
             BaseRealm realm = proxy.realmGet$proxyState().getRealm$realm();
@@ -33,7 +33,7 @@
                 DynamicRealm dynamicRealm = (DynamicRealm) realm;
                 DynamicRealmObject dynamicObject = (DynamicRealmObject) object;
                 @SuppressWarnings("unchecked")
-                Observable<E> observable = (Observable<E>) realm.configuration.getRxFactory().from(dynamicRealm, dynamicObject);
+                Flowable<E> observable = (Flowable<E>) realm.configuration.getRxFactory().from(dynamicRealm, dynamicObject);
                 return observable;
             } else {
                 throw new UnsupportedOperationException(realm.getClass() + " does not support RxJava." +

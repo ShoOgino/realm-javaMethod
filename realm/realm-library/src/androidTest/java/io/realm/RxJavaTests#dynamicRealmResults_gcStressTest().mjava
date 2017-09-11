@@ -2,6 +2,7 @@
     // waiting for results from the async API's.
     @Test
     @RunTestInLooperThread
+    @SuppressWarnings("CheckReturnValue")
     public void dynamicRealmResults_gcStressTest() {
         final int TEST_SIZE = 50;
         final AtomicLong innerCounter = new AtomicLong();
@@ -15,17 +16,17 @@
 
         for (int i = 0; i < TEST_SIZE; i++) {
             // Doesn't keep a reference to the Observable.
-            realm.where(AllTypes.CLASS_NAME).equalTo(AllTypes.FIELD_LONG, i).findAllAsync().asObservable()
-                    .filter(new Func1<RealmResults<DynamicRealmObject>, Boolean>() {
+            realm.where(AllTypes.CLASS_NAME).equalTo(AllTypes.FIELD_LONG, i).findAllAsync().asFlowable()
+                    .filter(new Predicate<RealmResults<DynamicRealmObject>>() {
                         @Override
-                        public Boolean call(RealmResults<DynamicRealmObject> results) {
+                        public boolean test(RealmResults<DynamicRealmObject> results) throws Exception {
                             return results.isLoaded();
                         }
                     })
                     .take(1) // Unsubscribes from Realm.
-                    .subscribe(new Action1<RealmResults<DynamicRealmObject>>() {
+                    .subscribe(new Consumer<RealmResults<DynamicRealmObject>>() {
                         @Override
-                        public void call(RealmResults<DynamicRealmObject> result) {
+                        public void accept(RealmResults<DynamicRealmObject> dynamicRealmObjects) throws Exception {
                             // Not guaranteed, but can result in the GC of other RealmResults waiting for a result.
                             Runtime.getRuntime().gc();
                             if (innerCounter.incrementAndGet() == TEST_SIZE) {
@@ -33,9 +34,9 @@
                                 looperThread.testComplete();
                             }
                         }
-                    }, new Action1<Throwable>() {
+                    }, new Consumer<Throwable>() {
                         @Override
-                        public void call(Throwable throwable) {
+                        public void accept(Throwable throwable) throws Exception {
                             fail(throwable.toString());
                         }
                     });

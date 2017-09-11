@@ -1,0 +1,26 @@
+    /**
+     * Returns the changeset describing the update.
+     * <p>
+     * This will be {@code null} the first time the stream emits the collection as well as when a asynchronous query
+     * is loaded for the first time.
+     * <p>
+     * <pre>
+     * {@code
+     * // Example
+     * realm.where(Person.class).findAllAsync().asChangesetObservable()
+     *   .subscribe(new Consumer<CollectionChange>() {
+     *    \@Override
+     *     public void accept(CollectionChange item) throws Exception {
+     *       item.getChangeset(); // Will return null the first two times
+     *   }
+     * });
+     * }
+     * </pre>
+     *
+     * @return the changeset describing how the collection was updated.
+     */
+    @Nullable
+    public OrderedCollectionChangeSet getChangeset() {
+        return changeset;
+    }
+

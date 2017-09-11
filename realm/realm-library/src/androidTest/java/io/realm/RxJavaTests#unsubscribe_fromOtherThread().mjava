@@ -3,9 +3,9 @@
     public void unsubscribe_fromOtherThread() {
         final CountDownLatch unsubscribeCompleted = new CountDownLatch(1);
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        final Subscription subscription = realm.asObservable().subscribe(new Action1<Realm>() {
+        final Disposable subscription = realm.asFlowable().subscribe(new Consumer<Realm>() {
             @Override
-            public void call(Realm rxRealm) {
+            public void accept(Realm rxRealm) throws Exception {
                 assertTrue(rxRealm == realm);
                 subscribedNotified.set(true);
             }
@@ -16,7 +16,7 @@
             @Override
             public void run() {
                 try {
-                    subscription.unsubscribe();
+                    subscription.dispose();
                     fail();
                 } catch (IllegalStateException ignored) {
                 } finally {
@@ -26,7 +26,7 @@
         }).start();
         TestHelper.awaitOrFail(unsubscribeCompleted);
         assertEquals(1, realm.sharedRealm.realmNotifier.getListenersListSize());
-        // We cannot call subscription.unsubscribe() again, so manually close the extra Realm instance opened by
+        // We cannot call subscription.dispose() again, so manually close the extra Realm instance opened by
         // the Observable.
         realm.close();
     }

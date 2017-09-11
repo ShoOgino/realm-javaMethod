@@ -1,0 +1,22 @@
+    @Test
+    @UiThreadTest
+    public void dynamicRealmObject_emitChangesetOnSubscribe() {
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
+        dynamicRealm.beginTransaction();
+        final DynamicRealmObject obj = dynamicRealm.createObject(AllTypes.CLASS_NAME);
+        dynamicRealm.commitTransaction();
+
+        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
+        subscription = obj.asChangesetObservable().subscribe(new Consumer<ObjectChange<RealmObject>>() {
+            @Override
+            public void accept(ObjectChange<RealmObject> change) throws Exception {
+                assertTrue(change.getObject() == obj);
+                assertNull(change.getChangeset());
+                subscribedNotified.set(true);
+            }
+        });
+        assertTrue(subscribedNotified.get());
+        subscription.dispose();
+        dynamicRealm.close();
+    }
+

@@ -1,36 +1,37 @@
     @Override
-    public Observable<RealmResults<DynamicRealmObject>> from(DynamicRealm realm, final RealmResults<DynamicRealmObject> results) {
+    public Flowable<RealmResults<DynamicRealmObject>> from(DynamicRealm realm, final RealmResults<DynamicRealmObject> results) {
         final RealmConfiguration realmConfig = realm.getConfiguration();
-        return Observable.create(new Observable.OnSubscribe<RealmResults<DynamicRealmObject>>() {
+        return Flowable.create(new FlowableOnSubscribe<RealmResults<DynamicRealmObject>>() {
             @Override
-            public void call(final Subscriber<? super RealmResults<DynamicRealmObject>> subscriber) {
+            public void subscribe(final FlowableEmitter<RealmResults<DynamicRealmObject>> emitter) throws Exception {
                 // Gets instance to make sure that the Realm is open for as long as the
                 // Observable is subscribed to it.
                 final DynamicRealm observableRealm = DynamicRealm.getInstance(realmConfig);
                 resultsRefs.get().acquireReference(results);
-
                 final RealmChangeListener<RealmResults<DynamicRealmObject>> listener = new RealmChangeListener<RealmResults<DynamicRealmObject>>() {
                     @Override
-                    public void onChange(RealmResults<DynamicRealmObject> result) {
-                        if (!subscriber.isUnsubscribed()) {
-                            subscriber.onNext(results);
+                    public void onChange(RealmResults<DynamicRealmObject> results) {
+                        if (!emitter.isCancelled()) {
+                            emitter.onNext(results);
                         }
                     }
                 };
                 results.addChangeListener(listener);
-                subscriber.add(Subscriptions.create(new Action0() {
+
+                // Cleanup when stream is disposed
+                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
                     @Override
-                    public void call() {
+                    public void run() {
                         results.removeChangeListener(listener);
                         observableRealm.close();
                         resultsRefs.get().releaseReference(results);
                     }
                 }));
 
-                // Immediately calls onNext with the current value, as due to Realm's auto-update, it will be the latest
-                // value.
-                subscriber.onNext(results);
+                // Emit current value immediately
+                emitter.onNext(results);
+
             }
-        });
+        }, BACK_PRESSURE_STRATEGY);
     }
 

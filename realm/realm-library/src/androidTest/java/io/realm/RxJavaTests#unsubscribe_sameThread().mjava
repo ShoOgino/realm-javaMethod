@@ -2,15 +2,15 @@
     @UiThreadTest
     public void unsubscribe_sameThread() {
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        subscription = realm.asObservable().subscribe(new Action1<Realm>() {
+        subscription = realm.asFlowable().subscribe(new Consumer<Realm>() {
             @Override
-            public void call(Realm rxRealm) {
+            public void accept(Realm rxRealm) throws Exception {
                 assertTrue(rxRealm == realm);
                 subscribedNotified.set(true);
             }
         });
         assertEquals(1, realm.sharedRealm.realmNotifier.getListenersListSize());
-        subscription.unsubscribe();
+        subscription.dispose();
         assertEquals(0, realm.sharedRealm.realmNotifier.getListenersListSize());
     }
 
