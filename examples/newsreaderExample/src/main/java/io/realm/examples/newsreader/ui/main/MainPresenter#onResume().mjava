@@ -1,13 +1,6 @@
     @Override
     public void onResume() {
-        loaderSubscription = model.isNetworkUsed()
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean networkInUse) {
-                        view.showNetworkLoading(networkInUse);
-                    }
-                });
-
+        loaderDisposable = model.isNetworkUsed().subscribe(networkInUse -> view.showNetworkLoading(networkInUse));
         sectionSelected(model.getCurrentSectionKey());
     }
 

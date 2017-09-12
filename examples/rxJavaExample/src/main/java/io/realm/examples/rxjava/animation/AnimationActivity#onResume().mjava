@@ -5,27 +5,14 @@
         // Load all persons and start inserting them with 1 sec. intervals.
         // All RealmObject access has to be done on the same thread `findAllAsync` was called on.
         // Warning: This example doesn't handle back pressure well.
-        subscription = realm.where(Person.class).findAllAsync().asObservable()
-                .flatMap(new Func1<RealmResults<Person>, Observable<Person>>() {
-                    @Override
-                    public Observable<Person> call(RealmResults<Person> persons) {
-                        return Observable.from(persons);
-                    }
-                })
-                .zipWith(Observable.interval(1, TimeUnit.SECONDS), new Func2<Person, Long, Person>() {
-                    @Override
-                    public Person call(Person person, Long tick) {
-                        return person;
-                    }
-                })
+        disposable = realm.where(Person.class).findAllAsync().asFlowable()
+                .flatMap(persons -> Flowable.fromIterable(persons))
+                .zipWith(Flowable.interval(1, TimeUnit.SECONDS), (person, tick) -> person)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Person>() {
-                    @Override
-                    public void call(Person person) {
-                        TextView personView = new TextView(AnimationActivity.this);
-                        personView.setText(person.getName());
-                        container.addView(personView);
-                    }
+                .subscribe(person -> {
+                    TextView personView = new TextView(AnimationActivity.this);
+                    personView.setText(person.getName());
+                    container.addView(personView);
                 });
     }
 
