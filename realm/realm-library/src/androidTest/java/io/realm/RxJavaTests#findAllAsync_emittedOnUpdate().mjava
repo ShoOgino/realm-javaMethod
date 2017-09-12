@@ -3,9 +3,9 @@
     public void findAllAsync_emittedOnUpdate() {
         final AtomicInteger subscriberCalled = new AtomicInteger(0);
         Realm realm = looperThread.getRealm();
-        subscription = realm.where(AllTypes.class).findAllAsync().asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
+        subscription = realm.where(AllTypes.class).findAllAsync().asFlowable().subscribe(new Consumer<RealmResults<AllTypes>>() {
             @Override
-            public void call(RealmResults<AllTypes> rxResults) {
+            public void accept(RealmResults<AllTypes> allTypes) throws Exception {
                 if (subscriberCalled.incrementAndGet() == 2) {
                     looperThread.testComplete();
                 }

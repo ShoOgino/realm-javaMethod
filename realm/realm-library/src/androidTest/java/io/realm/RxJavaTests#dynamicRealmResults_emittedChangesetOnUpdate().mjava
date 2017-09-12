@@ -1,0 +1,25 @@
+    @Test
+    @RunTestInLooperThread
+    public void dynamicRealmResults_emittedChangesetOnUpdate() {
+        final AtomicInteger subscriberCalled = new AtomicInteger(0);
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.getConfiguration());
+        looperThread.closeAfterTest(dynamicRealm);
+        dynamicRealm.beginTransaction();
+        RealmResults<DynamicRealmObject> results = dynamicRealm.where(AllTypes.CLASS_NAME).findAll();
+        dynamicRealm.commitTransaction();
+
+        subscription = results.asChangesetObservable().subscribe(new Consumer<CollectionChange<RealmResults<DynamicRealmObject>>>() {
+            @Override
+            public void accept(CollectionChange<RealmResults<DynamicRealmObject>> change) throws Exception {
+                if (subscriberCalled.incrementAndGet() == 2) {
+                    assertEquals(1, change.getChangeset().getInsertions().length);
+                    looperThread.testComplete();
+                }
+            }
+        });
+
+        dynamicRealm.beginTransaction();
+        dynamicRealm.createObject(AllTypes.CLASS_NAME);
+        dynamicRealm.commitTransaction();
+    }
+

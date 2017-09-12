@@ -7,9 +7,9 @@
         RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
         realm.commitTransaction();
 
-        subscription = results.asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
+        subscription = results.asFlowable().subscribe(new Consumer<RealmResults<AllTypes>>() {
             @Override
-            public void call(RealmResults<AllTypes> allTypes) {
+            public void accept(RealmResults<AllTypes> allTypes) throws Exception {
                 if (subscriberCalled.incrementAndGet() == 2) {
                     looperThread.testComplete();
                 }

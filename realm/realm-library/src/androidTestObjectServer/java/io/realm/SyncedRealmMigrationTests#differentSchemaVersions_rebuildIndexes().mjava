@@ -20,10 +20,10 @@
         dynamicRealm.close();
 
         Realm realm = Realm.getInstance(config); // Opening at different schema version (42) should rebuild indexes
-        RealmObjectSchema indexedFieldsSchema = realm.getSchema().get(className);
         try {
-            // FIXME: Object Store doesn't add index to it. Is it expected?
-            assertFalse(indexedFieldsSchema.hasIndex(IndexedFields.FIELD_INDEXED_STRING));
+            RealmObjectSchema indexedFieldsSchema = realm.getSchema().get(className);
+            assertNotNull(indexedFieldsSchema);
+            assertTrue(indexedFieldsSchema.hasIndex(IndexedFields.FIELD_INDEXED_STRING));
             assertFalse(indexedFieldsSchema.hasIndex(IndexedFields.FIELD_NON_INDEXED_STRING));
         } finally {
             realm.close();
