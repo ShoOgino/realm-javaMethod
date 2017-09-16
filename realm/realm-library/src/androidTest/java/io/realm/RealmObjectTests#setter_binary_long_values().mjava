@@ -1,0 +1,20 @@
+    @Test
+    public void setter_binary_long_values() {
+        byte[] longBinary = new byte[Table.MAX_BINARY_SIZE];
+        byte[] tooLongBinary = new byte[Table.MAX_BINARY_SIZE + 1];
+
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnBinary(longBinary);
+        realm.commitTransaction();
+        assertEquals(longBinary.length, allTypes.getColumnBinary().length);
+
+        realm.beginTransaction();
+        try {
+            allTypes.setColumnBinary(tooLongBinary);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertThat(expected.getMessage(), CoreMatchers.containsString("which exceeds the max binary size"));
+        }
+    }
+
