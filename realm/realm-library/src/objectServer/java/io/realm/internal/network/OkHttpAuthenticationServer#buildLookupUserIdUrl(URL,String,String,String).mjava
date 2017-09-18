@@ -1,10 +1,8 @@
     private static URL buildLookupUserIdUrl(URL authenticationUrl, String action, String provider, String providerId) {
         String authURL = authenticationUrl.toExternalForm();
-        // we need the base URL without the '/auth' part
-        String baseUrlString = authURL.substring(0, authURL.indexOf(authenticationUrl.getPath()));
+        String separator = authURL.endsWith("/") ? "" : "/";
         try {
-            String separator = baseUrlString.endsWith("/") ? "" : "/";
-            return new URL(baseUrlString + separator + action + "/" + provider + "/accounts/" + providerId);
+            return new URL(authURL + separator + action + "/" + providerId);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
