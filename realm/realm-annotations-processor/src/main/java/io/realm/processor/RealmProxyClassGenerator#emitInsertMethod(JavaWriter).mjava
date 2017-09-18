@@ -18,7 +18,7 @@
                 columnInfoClassName(), columnInfoClassName(), qualifiedClassName);
 
         if (metadata.hasPrimaryKey()) {
-            writer.emitStatement("long pkColumnIndex = table.getPrimaryKey()");
+            writer.emitStatement("long pkColumnIndex = %s", fieldIndexVariableReference(metadata.getPrimaryKey()));
         }
         addPrimaryKeyCheckIfNeeded(metadata, true, writer);
 
