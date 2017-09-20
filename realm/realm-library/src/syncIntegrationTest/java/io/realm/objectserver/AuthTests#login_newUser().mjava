@@ -1,7 +1,8 @@
     @Test
     @RunTestInLooperThread
     public void login_newUser() {
-        SyncCredentials credentials = SyncCredentials.usernamePassword("myUser", "password", true);
+        String userId = UUID.randomUUID().toString();
+        SyncCredentials credentials = SyncCredentials.usernamePassword(userId, "password", true);
         SyncUser.loginAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback() {
             @Override
             public void onSuccess(SyncUser user) {
