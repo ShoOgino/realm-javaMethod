@@ -13,18 +13,17 @@
             throw new IllegalArgumentException("Class already exists: " + className);
         }
         // in case this table has a primary key, we need to transfer it after renaming the table.
-        String oldTableName = null;
-        String pkField = null;
-        if (table.hasPrimaryKey()) {
-            oldTableName = table.getName();
-            pkField = getPrimaryKey();
-            table.setPrimaryKey(null);
-        }
         //noinspection ConstantConditions
-        realm.sharedRealm.renameTable(table.getName(), internalTableName);
-        if (pkField != null && !pkField.isEmpty()) {
+        @Nonnull String oldTableName = table.getName();
+        @Nonnull String oldClassName = table.getClassName();
+        String pkField = OsObjectStore.getPrimaryKeyForObject(realm.sharedRealm, oldClassName);
+        if (pkField != null) {
+            OsObjectStore.setPrimaryKeyForObject(realm.sharedRealm, oldClassName, null);
+        }
+        realm.sharedRealm.renameTable(oldTableName, internalTableName);
+        if (pkField != null) {
             try {
-                table.setPrimaryKey(pkField);
+                OsObjectStore.setPrimaryKeyForObject(realm.sharedRealm, className, pkField);
             } catch (Exception e) {
                 // revert the table name back when something goes wrong
                 //noinspection ConstantConditions

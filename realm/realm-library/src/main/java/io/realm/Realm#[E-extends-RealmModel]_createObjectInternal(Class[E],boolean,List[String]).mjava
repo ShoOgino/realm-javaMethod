@@ -14,7 +14,8 @@
             List<String> excludeFields) {
         Table table = schema.getTable(clazz);
         // Checks and throws the exception earlier for a better exception message.
-        if (table.hasPrimaryKey()) {
+        if (OsObjectStore.getPrimaryKeyForObject(
+                sharedRealm, configuration.getSchemaMediator().getSimpleClassName(clazz)) != null) {
             throw new RealmException(String.format(Locale.US, "'%s' has a primary key, use" +
                     " 'createObject(Class<E>, Object)' instead.", table.getClassName()));
         }

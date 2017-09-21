@@ -5,34 +5,20 @@
      * @param columnIndex the column index to be renamed.
      * @param newName a new name replacing the old column name.
      * @throws IllegalArgumentException if {@code newFieldName} is an empty string, or exceeds field name length limit.
-     * @throws IllegalStateException if a PrimaryKey column name could not be found in the meta table, but {@link #getPrimaryKey()} returns an index.
      */
-    @Override
     public void renameColumn(long columnIndex, String newName) {
         verifyColumnName(newName);
         // Gets the old column name. We'll assume that the old column name is *NOT* an empty string.
         final String oldName = nativeGetColumnName(nativePtr, columnIndex);
-        // Also old pk index. Once a column name changes, there is no way you can find the column name
-        // by old name.
-        final long oldPkColumnIndex = getPrimaryKey();
+        final String pkName = OsObjectStore.getPrimaryKeyForObject(sharedRealm, getClassName());
 
         // Then let's try to rename a column. If an error occurs for some reasons, we'll throw.
         nativeRenameColumn(nativePtr, columnIndex, newName);
 
         // Renames a primary key. At this point, renaming the column name should have been fine.
-        if (oldPkColumnIndex == columnIndex) {
+        if (oldName.equals(pkName)) {
             try {
-                Table pkTable = getPrimaryKeyTable();
-                if (pkTable == null) {
-                    throw new IllegalStateException(
-                            "Table is not created from a SharedRealm, primary key is not available");
-                }
-                long pkRowIndex = pkTable.findFirstString(PRIMARY_KEY_CLASS_COLUMN_INDEX, getClassName());
-                if (pkRowIndex != NO_MATCH) {
-                    nativeSetString(pkTable.nativePtr, PRIMARY_KEY_FIELD_COLUMN_INDEX, pkRowIndex, newName, false);
-                } else {
-                    throw new IllegalStateException("Non-existent PrimaryKey column cannot be renamed");
-                }
+                OsObjectStore.setPrimaryKeyForObject(sharedRealm, getClassName(), newName);
             } catch (Exception e) {
                 // We failed to rename the pk meta table. roll back the column name, not pk meta table
                 // then rethrow.
