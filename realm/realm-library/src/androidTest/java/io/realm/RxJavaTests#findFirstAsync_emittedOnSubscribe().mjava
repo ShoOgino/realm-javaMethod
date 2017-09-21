@@ -7,14 +7,14 @@
 
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         final AllTypes asyncObj = realm.where(AllTypes.class).findFirstAsync();
-        subscription = asyncObj.<AllTypes>asObservable().subscribe(new Action1<AllTypes>() {
+        subscription = asyncObj.<AllTypes>asFlowable().subscribe(new Consumer<AllTypes>() {
             @Override
-            public void call(AllTypes rxObject) {
+            public void accept(AllTypes rxObject) throws Exception {
                 assertTrue(rxObject == asyncObj);
                 subscribedNotified.set(true);
             }
         });
         assertTrue(subscribedNotified.get());
-        subscription.unsubscribe();
+        subscription.dispose();
     }
 

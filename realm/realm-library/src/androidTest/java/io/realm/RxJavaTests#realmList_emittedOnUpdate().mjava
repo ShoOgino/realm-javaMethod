@@ -7,9 +7,9 @@
         final RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
         realm.commitTransaction();
 
-        subscription = list.asObservable().subscribe(new Action1<RealmList<Dog>>() {
+        subscription = list.asFlowable().subscribe(new Consumer<RealmList<Dog>>() {
             @Override
-            public void call(RealmList<Dog> dogs) {
+            public void accept(RealmList<Dog> dogs) throws Exception {
                 if (subscriberCalled.incrementAndGet() == 2) {
                     assertEquals(1, list.size());
                     looperThread.testComplete();

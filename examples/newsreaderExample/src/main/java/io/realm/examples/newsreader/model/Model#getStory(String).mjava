@@ -1,19 +1,13 @@
     /**
      * Returns the story with the given Id
      */
-    public Observable<NYTimesStory> getStory(@NonNull final String storyId) {
+    public Flowable<NYTimesStory> getStory(@NonNull final String storyId) {
         // Repository is only responsible for loading the data
         // Any validation is done by the model
         // See http://blog.danlew.net/2015/12/08/error-handling-in-rxjava/
         if (TextUtils.isEmpty(storyId)) {
             throw new IllegalArgumentException("Invalid storyId: " + storyId);
         }
-        return repository.loadStory(storyId)
-                .filter(new Func1<NYTimesStory, Boolean>() {
-                    @Override
-                    public Boolean call(NYTimesStory story) {
-                        return story.isValid();
-                    }
-                });
+        return repository.loadStory(storyId).filter(story -> story.isValid());
     }
 

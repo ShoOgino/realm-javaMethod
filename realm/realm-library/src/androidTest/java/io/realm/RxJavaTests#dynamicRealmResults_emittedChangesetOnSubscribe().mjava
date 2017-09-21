@@ -1,0 +1,19 @@
+    @Test
+    @UiThreadTest
+    public void dynamicRealmResults_emittedChangesetOnSubscribe() {
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
+        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
+        final RealmResults<DynamicRealmObject> results = dynamicRealm.where(AllTypes.CLASS_NAME).findAll();
+        subscription = results.asChangesetObservable().subscribe(new Consumer<CollectionChange<RealmResults<DynamicRealmObject>>>() {
+            @Override
+            public void accept(CollectionChange<RealmResults<DynamicRealmObject>> change) throws Exception {
+                assertEquals(results, change.getCollection());
+                assertNull(change.getChangeset());
+                subscribedNotified.set(true);
+            }
+        });
+        assertTrue(subscribedNotified.get());
+        dynamicRealm.close();
+        subscription.dispose();
+    }
+

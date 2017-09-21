@@ -11,11 +11,11 @@
      */
     public void executeClientReset()  {
         synchronized (Realm.class) {
-            if (Realm.getGlobalInstanceCount(configuration) > 0) {
+            if (Realm.getGlobalInstanceCount(originalConfiguration) > 0) {
                 throw new IllegalStateException("Realm has not been fully closed. Client Reset cannot run before all " +
                         "instances have been closed.");
             }
-            nativeExecuteClientReset(configuration.getPath());
+            nativeExecuteClientReset(originalConfiguration.getPath());
         }
     }
 

@@ -17,10 +17,9 @@
             @Override
             public void onSuccess(SyncUserInfo userInfo) {
                 assertNotNull(userInfo);
-                assertEquals(SyncCredentials.IdentityProvider.USERNAME_PASSWORD, userInfo.getProvider());
-                assertEquals(username, userInfo.getProviderUserIdentity());
                 assertEquals(identity, userInfo.getIdentity());
                 assertFalse(userInfo.isAdmin());
+                assertTrue(userInfo.getMetadata().isEmpty());
 
                 looperThread.testComplete();
             }
