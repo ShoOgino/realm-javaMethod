@@ -13,8 +13,10 @@
                 for (SyncUser user : users.values()) {
                     user.logout();
                 }
-                SystemClock.sleep(2000); // Remove when https://github.com/realm/ros/issues/304 is fixed
+                // FIXME https://github.com/realm/ros/issues/338
+                SystemClock.sleep(2000);
                 allUsersLoggedOut.countDown();
+
             }
         });
         TestHelper.awaitOrFail(allUsersLoggedOut);
