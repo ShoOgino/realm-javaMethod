@@ -28,13 +28,17 @@
         } catch (IllegalStateException ignored) {
             // Column has no search index.
         }
+        sharedRealm.commitTransaction();
 
         assertFalse(pkTable.hasSearchIndex(classColumn));
 
         Table.migratePrimaryKeyTableIfNeeded(sharedRealm);
         assertTrue(pkTable.hasSearchIndex(classColumn));
+
+        sharedRealm.beginTransaction();
         // Now it works.
         table2.addSearchIndex(column2);
-        sharedRealm.cancelTransaction();
+        OsObjectStore.setPrimaryKeyForObject(sharedRealm, "TestTable2", "PKColumn");
+        sharedRealm.commitTransaction();
     }
 
