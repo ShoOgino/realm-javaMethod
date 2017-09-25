@@ -38,9 +38,11 @@
         credentials = SyncCredentials.usernamePassword(uniqueName, "password", false);
         SyncUser.login(credentials, Constants.AUTH_URL);
 
-        // reviving the sessions
-        assertEquals(SyncSession.State.WAITING_FOR_ACCESS_TOKEN, session1.getState());
-        assertEquals(SyncSession.State.WAITING_FOR_ACCESS_TOKEN, session2.getState());
+        // reviving the sessions. The state could be changed concurrently.
+        assertTrue(session1.getState() == SyncSession.State.WAITING_FOR_ACCESS_TOKEN ||
+                session1.getState() == SyncSession.State.ACTIVE);
+        assertTrue(session2.getState() == SyncSession.State.WAITING_FOR_ACCESS_TOKEN ||
+                session2.getState() == SyncSession.State.ACTIVE);
 
         realm1.close();
         realm2.close();
