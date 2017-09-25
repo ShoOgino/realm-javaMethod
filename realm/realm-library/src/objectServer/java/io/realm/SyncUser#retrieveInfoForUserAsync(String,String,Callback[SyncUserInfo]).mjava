@@ -11,7 +11,7 @@
      * as this method is called on.
      * @return representation of the async task that can be used to cancel it if needed.
      */
-    public RealmAsyncTask retrieveInfoForUserAsync(final String providerUserIdentity, final String provider, final RequestCallback<SyncUserInfo> callback) {
+    public RealmAsyncTask retrieveInfoForUserAsync(final String providerUserIdentity, final String provider, final Callback<SyncUserInfo> callback) {
         checkLooperThread("Asynchronously retrieving user is only possible from looper threads.");
         //noinspection ConstantConditions
         if (callback == null) {
@@ -19,12 +19,8 @@
         }
 
         return new Request<SyncUserInfo>(SyncManager.NETWORK_POOL_EXECUTOR, callback) {
-            // TODO remove this override on next major release when we remove the deprecated Callback
             @Override
-            public SyncUser run() {return null;}
-
-            @Override
-            public SyncUserInfo execute() throws ObjectServerError {
+            public SyncUserInfo run() throws ObjectServerError {
                 return retrieveInfoForUser(providerUserIdentity, provider);
             }
         }.start();

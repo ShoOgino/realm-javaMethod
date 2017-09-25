@@ -3,7 +3,7 @@
     public void login_newUser() {
         String userId = UUID.randomUUID().toString();
         SyncCredentials credentials = SyncCredentials.usernamePassword(userId, "password", true);
-        SyncUser.loginAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback() {
+        SyncUser.loginAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback<SyncUser>() {
             @Override
             public void onSuccess(SyncUser user) {
                 assertFalse(user.isAdmin());

@@ -5,7 +5,7 @@
 
         final SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", true);
         SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
-        final Token revokedRefreshToken = user.getAccessToken();
+        final Token revokedRefreshToken = SyncTestUtils.getRefreshToken(user);
 
         SyncManager.addAuthenticationListener(new AuthenticationListener() {
             @Override
@@ -19,11 +19,12 @@
                 SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", false);
                 SyncUser loggedInUser = SyncUser.login(credentials, Constants.AUTH_URL);
 
+                Token token = SyncTestUtils.getRefreshToken(loggedInUser);
                 // still comparing the same user
-                assertEquals(revokedRefreshToken.identity(), loggedInUser.getAccessToken().identity());
+                assertEquals(revokedRefreshToken.identity(), token.identity());
 
                 // different tokens
-                assertNotEquals(revokedRefreshToken.value(), loggedInUser.getAccessToken().value());
+                assertNotEquals(revokedRefreshToken.value(), token.value());
                 SyncManager.removeAuthenticationListener(this);
                 userLoggedInAgain.countDown();
             }
