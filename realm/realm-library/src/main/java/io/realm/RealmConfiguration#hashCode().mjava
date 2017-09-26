@@ -1,19 +1,20 @@
     @Override
     public int hashCode() {
-        int result = realmDirectory.hashCode();
-        result = 31 * result + realmFileName.hashCode();
+        int result = realmDirectory != null ? realmDirectory.hashCode() : 0;
+        result = 31 * result + (realmFileName != null ? realmFileName.hashCode() : 0);
         result = 31 * result + canonicalPath.hashCode();
-        result = 31 * result + (key != null ? Arrays.hashCode(key) : 0);
-        result = 31 * result + (int) schemaVersion;
+        result = 31 * result + (assetFilePath != null ? assetFilePath.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(key);
+        result = 31 * result + (int) (schemaVersion ^ (schemaVersion >>> 32));
         result = 31 * result + (migration != null ? migration.hashCode() : 0);
         result = 31 * result + (deleteRealmIfMigrationNeeded ? 1 : 0);
-        result = 31 * result + schemaMediator.hashCode();
         result = 31 * result + durability.hashCode();
+        result = 31 * result + schemaMediator.hashCode();
         result = 31 * result + (rxObservableFactory != null ? rxObservableFactory.hashCode() : 0);
         result = 31 * result + (initialDataTransaction != null ? initialDataTransaction.hashCode() : 0);
         result = 31 * result + (readOnly ? 1 : 0);
         result = 31 * result + (compactOnLaunch != null ? compactOnLaunch.hashCode() : 0);
-
+        result = 31 * result + (isRecoveryConfiguration ? 1 : 0);
         return result;
     }
 

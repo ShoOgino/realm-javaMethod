@@ -1,15 +1,12 @@
     private void sectionSelected(@NonNull String sectionKey) {
         model.selectSection(sectionKey);
-        if (listDataSubscription != null) {
-            listDataSubscription.unsubscribe();
+        if (listDataDisposable != null) {
+            listDataDisposable.dispose();
         }
-        listDataSubscription = model.getSelectedNewsFeed()
-                .subscribe(new Action1<RealmResults<NYTimesStory>>() {
-                    @Override
-                    public void call(RealmResults<NYTimesStory> stories) {
-                        storiesData = stories;
-                        view.showList(stories);
-                    }
+        listDataDisposable = model.getSelectedNewsFeed()
+                .subscribe(stories -> {
+                    storiesData = stories;
+                    view.showList(stories);
                 });
     }
 

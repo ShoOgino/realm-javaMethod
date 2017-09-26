@@ -8,11 +8,12 @@
     public DynamicRealmObject createObject(String className) {
         checkIfValid();
         Table table = schema.getTable(className);
+        String pkField = OsObjectStore.getPrimaryKeyForObject(sharedRealm, className);
         // Check and throw the exception earlier for a better exception message.
-        if (table.hasPrimaryKey()) {
+        if (pkField != null) {
             throw new RealmException(String.format(Locale.US,
-                    "'%s' has a primary key, use" +
-                    " 'createObject(String, Object)' instead.", className));
+                    "'%s' has a primary key field '%s', use  'createObject(String, Object)' instead.",
+                    className, pkField));
         }
 
         return new DynamicRealmObject(this, CheckedRow.getFromRow(OsObject.create(table)));

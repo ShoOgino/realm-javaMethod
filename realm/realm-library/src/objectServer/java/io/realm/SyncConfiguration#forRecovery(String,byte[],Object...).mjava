@@ -1,0 +1,29 @@
+    /**
+     * Returns a {@link RealmConfiguration} appropriate to open a read-only, non-synced Realm to recover any pending changes.
+     * This is useful when trying to open a backup/recovery Realm (after a client reset).
+     *
+     * @param canonicalPath the absolute path to the Realm file defined by this configuration.
+     * @param encryptionKey the key used to encrypt/decrypt the Realm file.
+     * @param modules if specified it will restricts Realm schema to the provided module.
+     * @return RealmConfiguration that can be used offline
+     */
+    public static RealmConfiguration forRecovery(String canonicalPath, @Nullable byte[] encryptionKey, @Nullable Object... modules) {
+        HashSet<Object> validatedModules = new HashSet<>();
+        if (modules != null && modules.length > 0) {
+            for (Object module : modules) {
+                if (!module.getClass().isAnnotationPresent(RealmModule.class)) {
+                    throw new IllegalArgumentException(module.getClass().getCanonicalName() + " is not a RealmModule. " +
+                            "Add @RealmModule to the class definition.");
+                }
+                validatedModules.add(module);
+            }
+        } else {
+            if (Realm.getDefaultModule() != null) {
+                validatedModules.add(Realm.getDefaultModule());
+            }
+        }
+
+        RealmProxyMediator schemaMediator = createSchemaMediator(validatedModules, Collections.<Class<? extends RealmModel>>emptySet());
+        return forRecovery(canonicalPath, encryptionKey, schemaMediator);
+    }
+

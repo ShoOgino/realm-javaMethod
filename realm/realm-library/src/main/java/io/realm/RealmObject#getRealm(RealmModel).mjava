@@ -1,0 +1,30 @@
+    /**
+     * returns {@link Realm} instance where the {@code model} belongs.
+     * <p>
+     * You <b>must not</b> call {@link Realm#close()} against returned instance.
+     *
+     * @param model an {@link RealmModel} instance other than {@link DynamicRealmObject}.
+     * @return {@link Realm} instance where the {@code model} belongs or {@code null} if the {@code model} is unmanaged.
+     * @throws IllegalArgumentException if the {@code model} is {@code null}.
+     * @throws IllegalStateException if the {@code model}  is an instance of {@link DynamicRealmObject}
+     * or this object was already deleted or the corresponding {@link Realm} was already closed.
+     */
+    public static Realm getRealm(RealmModel model) {
+        if (model == null) {
+            throw new IllegalArgumentException(MSG_NULL_OBJECT);
+        }
+        if (model instanceof DynamicRealmObject) {
+            throw new IllegalStateException(MSG_DYNAMIC_OBJECT);
+        }
+        if (!(model instanceof RealmObjectProxy)) {
+            return null;
+        }
+        final BaseRealm realm = ((RealmObjectProxy) model).realmGet$proxyState().getRealm$realm();
+        realm.checkIfValid();
+        if (!RealmObject.isValid(model)) {
+            throw new IllegalStateException(MSG_DELETED_OBJECT);
+        }
+
+        return (Realm) realm;
+    }
+

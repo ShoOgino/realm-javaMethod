@@ -39,7 +39,8 @@
 
         // At this point the object can only be a typed object, so the backing Realm cannot be a DynamicRealm.
         Realm realm = (Realm) this.realm;
-        if (realm.getTable(object.getClass()).hasPrimaryKey()) {
+        if (OsObjectStore.getPrimaryKeyForObject(realm.getSharedRealm(),
+                realm.getConfiguration().getSchemaMediator().getSimpleClassName(object.getClass())) != null) {
             return realm.copyToRealmOrUpdate(object);
         } else {
             return realm.copyToRealm(object);

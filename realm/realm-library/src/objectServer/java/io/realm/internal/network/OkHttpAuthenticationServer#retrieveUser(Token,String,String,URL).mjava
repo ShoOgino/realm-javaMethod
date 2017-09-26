@@ -1,7 +1,10 @@
     @Override
     public LookupUserIdResponse retrieveUser(Token adminToken, String provider, String providerId, URL authenticationUrl) {
         try {
-            return lookupUserId(buildLookupUserIdUrl(authenticationUrl, ACTION_LOOKUP_USER_ID, provider, providerId), adminToken.value());
+            String action = ACTION_LOOKUP_USER_ID
+                .replace(":provider:", provider)
+                .replace(":providerId:", providerId);
+            return lookupUserId(buildActionUrl(authenticationUrl, action), adminToken.value());
         } catch (Exception e) {
             return LookupUserIdResponse.from(e);
         }

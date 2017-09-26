@@ -15,7 +15,7 @@
                 try {
                     JSONObject refreshTokenJSON = new JSONObject(refreshToken);
                     Token newRefreshToken = Token.from(refreshTokenJSON.getJSONObject("userToken"));
-                    if (newRefreshToken.hashCode() != getUser().getAccessToken().hashCode()) {
+                    if (newRefreshToken.hashCode() != getUser().getRefreshToken().hashCode()) {
                         RealmLog.debug("Session[%s]: Access token updated", configuration.getPath());
                         getUser().setRefreshToken(newRefreshToken);
                     }

@@ -1,30 +1,33 @@
     @Override
-    public Observable<Realm> from(Realm realm) {
+    public Flowable<Realm> from(Realm realm) {
         final RealmConfiguration realmConfig = realm.getConfiguration();
-        return Observable.create(new Observable.OnSubscribe<Realm>() {
+        return Flowable.create(new FlowableOnSubscribe <Realm>() {
             @Override
-            public void call(final Subscriber<? super Realm> subscriber) {
-                // Gets instance to make sure that the Realm is open for as long as the
-                // Observable is subscribed to it.
+            public void subscribe(final FlowableEmitter<Realm> emitter) throws Exception {
+                // Instance is cached by Realm, so no need to keep strong reference
                 final Realm observableRealm = Realm.getInstance(realmConfig);
                 final RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
                     @Override
                     public void onChange(Realm realm) {
-                        if (!subscriber.isUnsubscribed()) {
-                            subscriber.onNext(observableRealm);
+                        if (!emitter.isCancelled()) {
+                            emitter.onNext(realm);
                         }
                     }
                 };
                 observableRealm.addChangeListener(listener);
-                subscriber.add(Subscriptions.create(new Action0() {
+
+                // Cleanup when stream is disposed
+                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
                     @Override
-                    public void call() {
+                    public void run() {
                         observableRealm.removeChangeListener(listener);
                         observableRealm.close();
                     }
                 }));
-                subscriber.onNext(observableRealm);
+
+                // Emit current value immediately
+                emitter.onNext(observableRealm);
             }
-        });
+        }, BACK_PRESSURE_STRATEGY);
     }
 

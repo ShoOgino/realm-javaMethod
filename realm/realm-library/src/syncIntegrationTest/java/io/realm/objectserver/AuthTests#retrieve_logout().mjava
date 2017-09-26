@@ -1,6 +1,7 @@
     // retrieving a logged out user
     @Test
     @RunTestInLooperThread
+    @Ignore("Wait for https://github.com/realm/ros/issues/333")
     public void retrieve_logout() {
         final SyncUser adminUser = UserFactory.createAdminUser(Constants.AUTH_URL);
 
@@ -34,10 +35,9 @@
                         SyncUserInfo userInfo = adminUser.retrieveInfoForUser(username, SyncCredentials.IdentityProvider.USERNAME_PASSWORD);
 
                         assertNotNull(userInfo);
-                        assertEquals(SyncCredentials.IdentityProvider.USERNAME_PASSWORD, userInfo.getProvider());
-                        assertEquals(username, userInfo.getProviderUserIdentity());
                         assertEquals(identity, userInfo.getIdentity());
                         assertFalse(userInfo.isAdmin());
+                        assertTrue(userInfo.getMetadata().isEmpty());
 
                         looperThread.testComplete();
                     }

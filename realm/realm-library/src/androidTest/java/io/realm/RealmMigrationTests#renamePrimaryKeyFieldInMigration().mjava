@@ -18,12 +18,8 @@
         Realm realm = Realm.getInstance(realmConfig);
 
         Table table = realm.getSchema().getTable(MigrationFieldRenamed.class);
-        assertTrue(table.hasPrimaryKey());
         assertEquals(MigrationFieldRenamed.DEFAULT_FIELDS_COUNT, table.getColumnCount());
-        assertEquals(MigrationFieldRenamed.DEFAULT_PRIMARY_INDEX, table.getPrimaryKey());
-
-        RealmObjectSchema objectSchema = realm.getSchema().get(MigrationFieldRenamed.CLASS_NAME);
-        assertFalse(objectSchema.hasField(MigrationPrimaryKey.FIELD_PRIMARY));
-        assertEquals(MigrationFieldRenamed.FIELD_PRIMARY, objectSchema.getPrimaryKey());
+        assertPKField(realm, MigrationFieldRenamed.CLASS_NAME, MigrationFieldRenamed.FIELD_PRIMARY,
+                MigrationFieldRenamed.DEFAULT_PRIMARY_INDEX);
     }
 

@@ -1,0 +1,36 @@
+    @Override
+    public Observable<ObjectChange<DynamicRealmObject>> changesetsFrom(DynamicRealm realm, final DynamicRealmObject object) {
+        final RealmConfiguration realmConfig = realm.getConfiguration();
+        return Observable.create(new ObservableOnSubscribe<ObjectChange<DynamicRealmObject>>() {
+            @Override
+            public void subscribe(final ObservableEmitter<ObjectChange<DynamicRealmObject>> emitter) throws Exception {
+                // Gets instance to make sure that the Realm is open for as long as the
+                // Observable is subscribed to it.
+                final DynamicRealm observableRealm = DynamicRealm.getInstance(realmConfig);
+                objectRefs.get().acquireReference(object);
+                final RealmObjectChangeListener<DynamicRealmObject> listener = new RealmObjectChangeListener<DynamicRealmObject>() {
+                    @Override
+                    public void onChange(DynamicRealmObject obj, ObjectChangeSet changeSet) {
+                        if (!emitter.isDisposed()) {
+                            emitter.onNext(new ObjectChange<>(obj, changeSet));
+                        }
+                    }
+                };
+                object.addChangeListener(listener);
+
+                // Cleanup when stream is disposed
+                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        object.removeChangeListener(listener);
+                        observableRealm.close();
+                        objectRefs.get().releaseReference(object);
+                    }
+                }));
+
+                // Emit current value immediately
+                emitter.onNext(new ObjectChange<>(object, null));
+            }
+        });
+    }
+

@@ -5,13 +5,11 @@
      * @param rowIndex 0 based index value of the cell row.
      * @param value a String value to set in the cell.
      */
-    public void setString(long columnIndex, long rowIndex, String value, boolean isDefault) {
+    public void setString(long columnIndex, long rowIndex, @Nullable String value, boolean isDefault) {
         checkImmutable();
         if (value == null) {
-            checkDuplicatedNullForPrimaryKeyValue(columnIndex, rowIndex);
             nativeSetNull(nativePtr, columnIndex, rowIndex, isDefault);
         } else {
-            checkStringValueIsLegal(columnIndex, rowIndex, value);
             nativeSetString(nativePtr, columnIndex, rowIndex, value, isDefault);
         }
     }

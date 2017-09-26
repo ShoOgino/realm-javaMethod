@@ -1,0 +1,45 @@
+    @Test
+    public void modifyPrimaryKeyFieldTypeFromStringToInt() {
+        RealmMigration migration = new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                RealmObjectSchema objectSchema  = realm.getSchema().get(PrimaryKeyAsInteger.CLASS_NAME);
+                assertNotNull(objectSchema);
+                assertEquals(PrimaryKeyAsInteger.FIELD_NAME, objectSchema.getPrimaryKey());
+                objectSchema.removePrimaryKey().addPrimaryKey(PrimaryKeyAsInteger.FIELD_ID);
+            }
+        };
+
+        RealmConfiguration configuration = configFactory.createConfigurationBuilder()
+                .schema(PrimaryKeyAsInteger.class)
+                .schemaVersion(1)
+                .migration(migration)
+                .build();
+
+        // Create the schema and set the String field as primary key
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(configuration);
+        dynamicRealm.beginTransaction();
+        RealmSchema schema = dynamicRealm.getSchema();
+        schema.create(PrimaryKeyAsInteger.CLASS_NAME)
+                .addField(PrimaryKeyAsInteger.FIELD_ID, int.class)
+                .addField(PrimaryKeyAsInteger.FIELD_NAME, String.class, FieldAttribute.PRIMARY_KEY);
+        dynamicRealm.createObject(PrimaryKeyAsInteger.CLASS_NAME, "string0")
+                .setInt(PrimaryKeyAsInteger.FIELD_ID, 0);
+        dynamicRealm.createObject(PrimaryKeyAsInteger.CLASS_NAME, "string1")
+                .setInt(PrimaryKeyAsInteger.FIELD_ID, 1);
+        dynamicRealm.setVersion(0);
+        dynamicRealm.commitTransaction();
+
+        // Run migration
+        realm = Realm.getInstance(configuration);
+
+        RealmObjectSchema objectSchema = realm.getSchema().get(PrimaryKeyAsInteger.CLASS_NAME);
+        assertNotNull(objectSchema);
+        assertEquals(PrimaryKeyAsInteger.FIELD_ID, objectSchema.getPrimaryKey());
+        RealmResults<PrimaryKeyAsInteger> results = realm.where(PrimaryKeyAsInteger.class)
+                .findAllSorted(PrimaryKeyAsInteger.FIELD_ID);
+        assertEquals(2, results.size());
+        assertEquals(0, results.get(0).getId());
+        assertEquals(1, results.get(1).getId());
+    }
+

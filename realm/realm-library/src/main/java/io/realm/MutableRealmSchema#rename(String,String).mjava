@@ -11,11 +11,9 @@
         }
 
         // Checks if there is a primary key defined for the old class.
-        Table oldTable = getTable(oldClassName);
-        String pkField = null;
-        if (oldTable.hasPrimaryKey()) {
-            pkField = oldTable.getColumnName(oldTable.getPrimaryKey());
-            oldTable.setPrimaryKey(null);
+        String pkField = OsObjectStore.getPrimaryKeyForObject(realm.sharedRealm, oldClassName);
+        if (pkField != null) {
+            OsObjectStore.setPrimaryKeyForObject(realm.sharedRealm, oldClassName, null);
         }
 
         realm.getSharedRealm().renameTable(oldInternalName, newInternalName);
@@ -23,7 +21,7 @@
 
         // Sets the primary key for the new class if necessary.
         if (pkField != null) {
-            table.setPrimaryKey(pkField);
+            OsObjectStore.setPrimaryKeyForObject(realm.sharedRealm, newClassName, pkField);
         }
 
         RealmObjectSchema objectSchema = removeFromClassNameToSchemaMap(oldInternalName);

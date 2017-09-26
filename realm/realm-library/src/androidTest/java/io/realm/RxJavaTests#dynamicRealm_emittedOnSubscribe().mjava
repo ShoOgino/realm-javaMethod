@@ -3,21 +3,22 @@
     public void dynamicRealm_emittedOnSubscribe() {
         final DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        subscription = dynamicRealm.asObservable().subscribe(new Action1<DynamicRealm>() {
+        subscription = dynamicRealm.asFlowable().subscribe(new Consumer<DynamicRealm>() {
             @Override
-            public void call(DynamicRealm rxRealm) {
+            public void accept(DynamicRealm rxRealm) throws Exception {
                 assertTrue(rxRealm == dynamicRealm);
                 subscribedNotified.set(true);
             }
-        }, new Action1<Throwable>() {
+        }, new Consumer<Throwable>() {
             @Override
-            public void call(Throwable throwable) {
+            public void accept(Throwable throwable) throws Exception {
                 throwable.printStackTrace();
+                fail();
             }
         });
 
         assertTrue(subscribedNotified.get());
         dynamicRealm.close();
-        subscription.unsubscribe();
+        subscription.dispose();
     }
 

@@ -7,7 +7,7 @@
      * @see #addPrimaryKey(String)
      */
     public boolean isPrimaryKey(String fieldName) {
-        long columnIndex = getColumnIndex(fieldName);
-        return columnIndex == table.getPrimaryKey();
+        checkFieldExists(fieldName);
+        return fieldName.equals(OsObjectStore.getPrimaryKeyForObject(realm.sharedRealm, getClassName()));
     }
 
