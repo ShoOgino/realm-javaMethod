@@ -4,11 +4,13 @@
         Boolean isAdmin;
         String message;
         Map<String, String> metadata;
+        Map<String, String> accounts;
         try {
             JSONObject obj = new JSONObject(serverResponse);
             userId = obj.getString(JSON_FIELD_USER_ID);
             isAdmin = obj.getBoolean(JSON_FIELD_USER_IS_ADMIN);
-            metadata = jsonToMap(obj.getJSONObject(JSON_FIELD_METADATA));
+            metadata = jsonToMap(obj.getJSONArray(JSON_FIELD_METADATA), "key", "value");
+            accounts = jsonToMap(obj.getJSONArray(JSON_FIELD_ACCOUNTS), "provider", "provider_id");
             error = null;
 
             message = String.format(Locale.US, "Identity %s; Path %b", userId, isAdmin);
@@ -17,6 +19,7 @@
             userId = null;
             isAdmin = null;
             metadata = new HashMap<>();
+            accounts = new HashMap<>();
             error = new ObjectServerError(ErrorCode.JSON_EXCEPTION, e);
             message = String.format(Locale.US, "Error %s", error.getErrorMessage());
         }
@@ -26,5 +29,6 @@
         this.userId = userId;
         this.isAdmin = isAdmin;
         this.metadata = metadata;
+        this.accounts = accounts;
     }
 

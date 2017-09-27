@@ -1,5 +1,4 @@
     @Test
-    @Ignore("Wait for https://github.com/realm/ros/issues/333")
     public void retrieve() {
         final SyncUser adminUser = UserFactory.createAdminUser(Constants.AUTH_URL);
 
@@ -17,5 +16,6 @@
         assertEquals(identity, userInfo.getIdentity());
         assertFalse(userInfo.isAdmin());
         assertTrue(userInfo.getMetadata().isEmpty());
+        assertEquals(username, userInfo.getAccounts().get(SyncCredentials.IdentityProvider.USERNAME_PASSWORD));
     }
 

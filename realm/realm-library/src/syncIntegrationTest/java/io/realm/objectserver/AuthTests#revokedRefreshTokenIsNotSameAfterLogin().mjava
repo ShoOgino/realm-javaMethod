@@ -1,4 +1,5 @@
     @Test
+    @Ignore("See https://github.com/realm/ros/issues/360")
     public void revokedRefreshTokenIsNotSameAfterLogin() throws InterruptedException {
         final CountDownLatch userLoggedInAgain = new CountDownLatch(1);
         final String uniqueName = UUID.randomUUID().toString();
@@ -15,7 +16,6 @@
 
             @Override
             public void loggedOut(SyncUser user) {
-                SystemClock.sleep(1000); // Remove once https://github.com/realm/ros/issues/304 is fixed
                 SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", false);
                 SyncUser loggedInUser = SyncUser.login(credentials, Constants.AUTH_URL);
 
