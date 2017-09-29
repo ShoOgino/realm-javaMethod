@@ -1,0 +1,14 @@
+    private Request.Builder newAuthRequest(URL url, String authToken) {
+        Request.Builder builder = new Request.Builder()
+                .url(url)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json");
+
+        // Only add Authorization header for those API's that require it.
+        if (!Util.isEmptyString(authToken)) {
+            builder.addHeader("Authorization", authToken);
+        }
+
+        return builder;
+    }
+

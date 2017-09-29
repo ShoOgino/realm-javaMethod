@@ -43,7 +43,7 @@
                 // access the Realm from an different path on the device (using admin user), then monitor
                 // when the offline commits get synchronized
                 SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
-                SyncCredentials credentialsAdmin = SyncCredentials.accessToken(admin.getAccessToken().value(), "custom-admin-user");
+                SyncCredentials credentialsAdmin = SyncCredentials.accessToken(SyncTestUtils.getRefreshToken(admin).value(), "custom-admin-user");
                 SyncUser adminUser = SyncUser.login(credentialsAdmin, Constants.AUTH_URL);
 
                 SyncConfiguration adminConfig = configurationFactory.createSyncConfigurationBuilder(adminUser, syncConfiguration.getServerUrl().toString())

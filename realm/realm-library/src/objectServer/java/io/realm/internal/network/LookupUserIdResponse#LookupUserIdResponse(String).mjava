@@ -1,45 +1,34 @@
     private LookupUserIdResponse(String serverResponse) {
         ObjectServerError error;
-        String provider;
-        String providerId;
         String userId;
         Boolean isAdmin;
         String message;
+        Map<String, String> metadata;
+        Map<String, String> accounts;
         try {
             JSONObject obj = new JSONObject(serverResponse);
-            provider = obj.getString(JSON_FIELD_PROVIDER);
-            providerId = obj.getString(JSON_FIELD_PROVIDER_ID);
-            JSONObject jsonUser = obj.getJSONObject(JSON_FIELD_USER);
-            if (jsonUser != null) {
-                userId = jsonUser.optString(JSON_FIELD_USER_ID, null);
-                // can not use optBoolean since `null` is not permitted as default value
-                // (we need it for the Boolean boxed type)
-                isAdmin = jsonUser.has(JSON_FIELD_USER_IS_ADMIN) ? jsonUser.getBoolean(JSON_FIELD_USER_IS_ADMIN) : null;
-                error = null;
+            userId = obj.getString(JSON_FIELD_USER_ID);
+            isAdmin = obj.getBoolean(JSON_FIELD_USER_IS_ADMIN);
+            metadata = jsonToMap(obj.getJSONArray(JSON_FIELD_METADATA), "key", "value");
+            accounts = jsonToMap(obj.getJSONArray(JSON_FIELD_ACCOUNTS), "provider", "provider_id");
+            error = null;
 
-                message = String.format(Locale.US, "Identity %s; Path %b", userId, isAdmin);
-
-            } else {
-                userId = null;
-                isAdmin = null;
-                error = null;
-                message = "user = null";
-            }
+            message = String.format(Locale.US, "Identity %s; Path %b", userId, isAdmin);
 
         } catch (JSONException e) {
-            provider = null;
-            providerId = null;
             userId = null;
             isAdmin = null;
+            metadata = new HashMap<>();
+            accounts = new HashMap<>();
             error = new ObjectServerError(ErrorCode.JSON_EXCEPTION, e);
             message = String.format(Locale.US, "Error %s", error.getErrorMessage());
         }
 
         RealmLog.debug("LookupUserIdResponse. " + message);
         setError(error);
-        this.providerId = providerId;
-        this.provider = provider;
         this.userId = userId;
         this.isAdmin = isAdmin;
+        this.metadata = metadata;
+        this.accounts = accounts;
     }
 

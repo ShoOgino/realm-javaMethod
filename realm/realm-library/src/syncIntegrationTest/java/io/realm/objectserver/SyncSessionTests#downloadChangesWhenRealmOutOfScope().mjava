@@ -1,5 +1,6 @@
     // A Realm that was opened before a user logged out should be able to resume downloading if the user logs back in.
     @Test
+    @Ignore("until https://github.com/realm/realm-java/issues/5294 is fixed")
     public void downloadChangesWhenRealmOutOfScope() throws InterruptedException {
         final String uniqueName = UUID.randomUUID().toString();
         SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", true);
@@ -37,7 +38,7 @@
             public void run() {
                 // using an admin user to open the Realm on different path on the device then some commits
                 SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
-                SyncCredentials credentialsAdmin = SyncCredentials.accessToken(admin.getAccessToken().value(), "custom-admin-user");
+                SyncCredentials credentialsAdmin = SyncCredentials.accessToken(SyncTestUtils.getRefreshToken(admin).value(), "custom-admin-user");
                 SyncUser adminUser = SyncUser.login(credentialsAdmin, Constants.AUTH_URL);
 
                 SyncConfiguration adminConfig = configurationFactory.createSyncConfigurationBuilder(adminUser, syncConfiguration.getServerUrl().toString())

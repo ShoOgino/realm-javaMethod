@@ -26,7 +26,9 @@
                 .emitStatement("%s obj = null", qualifiedClassName)
                 .beginControlFlow("if (update)")
                     .emitStatement("Table table = realm.getTable(%s.class)", qualifiedClassName)
-                    .emitStatement("long pkColumnIndex = table.getPrimaryKey()")
+                    .emitStatement("%s columnInfo = (%s) realm.getSchema().getColumnInfo(%s.class)",
+                        columnInfoClassName(), columnInfoClassName(), qualifiedClassName)
+                    .emitStatement("long pkColumnIndex = %s", fieldIndexVariableReference(metadata.getPrimaryKey()))
                     .emitStatement("long rowIndex = Table.NO_MATCH");
             if (metadata.isNullable(metadata.getPrimaryKey())) {
                 writer

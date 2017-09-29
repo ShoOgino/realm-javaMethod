@@ -5,9 +5,10 @@
      * @throws IllegalStateException if the class doesn't have a primary key defined.
      */
     public String getPrimaryKey() {
-        if (!table.hasPrimaryKey()) {
+        String pkField = OsObjectStore.getPrimaryKeyForObject(realm.sharedRealm, getClassName());
+        if (pkField == null) {
             throw new IllegalStateException(getClassName() + " doesn't have a primary key.");
         }
-        return table.getColumnName(table.getPrimaryKey());
+        return pkField;
     }
 

@@ -1,0 +1,12 @@
+    @Test
+    public void getDynamicRealm() {
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class);
+        realm.commitTransaction();
+
+        dynamicRealm.refresh();
+        final DynamicRealmObject object = dynamicRealm.where(AllTypes.CLASS_NAME).findFirst();
+
+        assertSame(dynamicRealm, object.getDynamicRealm());
+    }
+

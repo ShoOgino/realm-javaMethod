@@ -1,33 +1,33 @@
     @Override
-    public Observable<DynamicRealm> from(DynamicRealm realm) {
+    public Flowable<DynamicRealm> from(DynamicRealm realm) {
         final RealmConfiguration realmConfig = realm.getConfiguration();
-        return Observable.create(new Observable.OnSubscribe<DynamicRealm>() {
+        return Flowable.create(new FlowableOnSubscribe<DynamicRealm>() {
             @Override
-            public void call(final Subscriber<? super DynamicRealm> subscriber) {
-                // Gets instance to make sure that the Realm is open for as long as the
-                // Observable is subscribed to it.
+            public void subscribe(final FlowableEmitter<DynamicRealm> emitter) throws Exception {
+                // Instance is cached by Realm, so no need to keep strong reference
                 final DynamicRealm observableRealm = DynamicRealm.getInstance(realmConfig);
                 final RealmChangeListener<DynamicRealm> listener = new RealmChangeListener<DynamicRealm>() {
                     @Override
                     public void onChange(DynamicRealm realm) {
-                        if (!subscriber.isUnsubscribed()) {
-                            subscriber.onNext(observableRealm);
+                        if (!emitter.isCancelled()) {
+                            emitter.onNext(realm);
                         }
                     }
                 };
                 observableRealm.addChangeListener(listener);
-                subscriber.add(Subscriptions.create(new Action0() {
+
+                // Cleanup when stream is disposed
+                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
                     @Override
-                    public void call() {
+                    public void run() {
                         observableRealm.removeChangeListener(listener);
                         observableRealm.close();
                     }
                 }));
 
-                // Immediately calls onNext with the current value, as due to Realm's auto-update, it will be the latest
-                // value.
-                subscriber.onNext(observableRealm);
+                // Emit current value immediately
+                emitter.onNext(observableRealm);
             }
-        });
+        }, BACK_PRESSURE_STRATEGY);
     }
 

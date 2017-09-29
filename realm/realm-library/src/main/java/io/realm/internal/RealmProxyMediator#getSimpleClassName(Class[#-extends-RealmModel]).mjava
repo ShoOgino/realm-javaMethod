@@ -1,0 +1,12 @@
+    /**
+     * Returns the name that Realm should use for all its internal tables. This is the un-obfuscated simple name of the
+     * class.
+     *
+     * @param clazz the {@link RealmObject} class reference.
+     * @return the simple name of an RealmObject class (before it has been obfuscated).
+     */
+    public String getSimpleClassName(Class<? extends RealmModel> clazz) {
+        Class<? extends RealmModel> originalClass = Util.getOriginalModelClass(clazz);
+        return Table.getClassNameForTable(getTableName(originalClass));
+    }
+

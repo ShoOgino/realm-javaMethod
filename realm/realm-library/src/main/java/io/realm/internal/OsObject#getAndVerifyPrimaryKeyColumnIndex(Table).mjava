@@ -1,8 +1,8 @@
     private static long getAndVerifyPrimaryKeyColumnIndex(Table table) {
-        long primaryKeyColumnIndex = table.getPrimaryKey();
-        if (primaryKeyColumnIndex == Table.NO_PRIMARY_KEY) {
+        String pkField = OsObjectStore.getPrimaryKeyForObject(table.getSharedRealm(), table.getClassName());
+        if (pkField == null) {
             throw new IllegalStateException(table.getName() + " has no primary key defined.");
         }
-        return primaryKeyColumnIndex;
+        return table.getColumnIndex(pkField);
     }
 

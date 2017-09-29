@@ -1,11 +1,11 @@
     @Test
     public void primaryKey_isIndexed() {
         Table table = realm.getTable(PrimaryKeyAsString.class);
-        assertTrue(table.hasPrimaryKey());
+        assertNotNull(OsObjectStore.getPrimaryKeyForObject(realm.getSharedRealm(), PrimaryKeyAsString.CLASS_NAME));
         assertTrue(table.hasSearchIndex(table.getColumnIndex("name")));
 
         table = realm.getTable(PrimaryKeyAsLong.class);
-        assertTrue(table.hasPrimaryKey());
+        assertNotNull(OsObjectStore.getPrimaryKeyForObject(realm.getSharedRealm(), PrimaryKeyAsLong.CLASS_NAME));
         assertTrue(table.hasSearchIndex(table.getColumnIndex("id")));
     }
 

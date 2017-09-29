@@ -19,9 +19,8 @@
         Realm realm = Realm.getInstance(realmConfig);
         Table table = realm.getSchema().getTable(MigrationPosteriorIndexOnly.class);
 
-        assertTrue(table.hasPrimaryKey());
         assertEquals(MigrationPosteriorIndexOnly.DEFAULT_FIELDS_COUNT, table.getColumnCount());
-        assertEquals(MigrationPosteriorIndexOnly.DEFAULT_PRIMARY_INDEX, table.getPrimaryKey());
-        assertEquals(MigrationPosteriorIndexOnly.FIELD_PRIMARY, table.getColumnName(table.getPrimaryKey()));
+        assertPKField(realm, MigrationPosteriorIndexOnly.CLASS_NAME, MigrationPosteriorIndexOnly.FIELD_PRIMARY
+                , MigrationPosteriorIndexOnly.DEFAULT_PRIMARY_INDEX);
     }
 

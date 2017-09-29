@@ -7,7 +7,7 @@
             RealmResults<IOSAllTypes> result = realm.where(IOSAllTypes.class).findAllSorted("id", Sort.ASCENDING);
             // Verifies metadata.
             Table table = realm.getTable(IOSAllTypes.class);
-            assertTrue(table.hasPrimaryKey());
+            assertEquals("id", OsObjectStore.getPrimaryKeyForObject(realm.getSharedRealm(), IOSAllTypes.CLASS_NAME));
             assertTrue(table.hasSearchIndex(table.getColumnIndex("id")));
             // Iterative check.
             for (int i = 0; i < 10; i++) {

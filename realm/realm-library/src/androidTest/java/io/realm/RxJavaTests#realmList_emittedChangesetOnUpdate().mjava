@@ -1,0 +1,25 @@
+    @Test
+    @RunTestInLooperThread
+    public void realmList_emittedChangesetOnUpdate() {
+        final AtomicInteger subscriberCalled = new AtomicInteger(0);
+        Realm realm = looperThread.getRealm();
+        realm.beginTransaction();
+        final RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
+        realm.commitTransaction();
+
+        subscription = list.asChangesetObservable().subscribe(new Consumer<CollectionChange<RealmList<Dog>>>() {
+            @Override
+            public void accept(CollectionChange<RealmList<Dog>> change) throws Exception {
+                if (subscriberCalled.incrementAndGet() == 2) {
+                    assertEquals(1, list.size());
+                    assertEquals(1, change.getChangeset().getInsertions().length);
+                    looperThread.testComplete();
+                }
+            }
+        });
+
+        realm.beginTransaction();
+        list.add(new Dog());
+        realm.commitTransaction();
+    }
+

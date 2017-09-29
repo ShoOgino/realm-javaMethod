@@ -3,9 +3,9 @@
     public void realm_emittedOnUpdate() {
         final AtomicInteger subscriberCalled = new AtomicInteger(0);
         Realm realm = looperThread.getRealm();
-        subscription = realm.asObservable().subscribe(new Action1<Realm>() {
+        subscription = realm.asFlowable().subscribe(new Consumer<Realm>() {
             @Override
-            public void call(Realm rxRealm) {
+            public void accept(Realm realm) throws Exception {
                 if (subscriberCalled.incrementAndGet() == 2) {
                     looperThread.testComplete();
                 }

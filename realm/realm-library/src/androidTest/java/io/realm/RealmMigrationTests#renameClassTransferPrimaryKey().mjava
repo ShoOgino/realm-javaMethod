@@ -18,10 +18,9 @@
         Realm realm = Realm.getInstance(realmConfig);
 
         Table table = realm.getSchema().getTable(MigrationClassRenamed.class);
-        assertTrue(table.hasPrimaryKey());
         assertEquals(MigrationClassRenamed.DEFAULT_FIELDS_COUNT, table.getColumnCount());
-        assertEquals(MigrationClassRenamed.DEFAULT_PRIMARY_INDEX, table.getPrimaryKey());
-        assertEquals(MigrationClassRenamed.FIELD_PRIMARY, table.getColumnName(table.getPrimaryKey()));
+        assertPKField(realm, MigrationClassRenamed.CLASS_NAME, MigrationClassRenamed.FIELD_PRIMARY,
+                MigrationClassRenamed.DEFAULT_PRIMARY_INDEX);
         // Old schema does not exist.
         assertNull(realm.getSchema().get(MigrationPrimaryKey.CLASS_NAME));
     }

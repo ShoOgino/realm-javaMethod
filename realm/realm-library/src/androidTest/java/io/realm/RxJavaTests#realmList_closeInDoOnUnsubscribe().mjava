@@ -5,19 +5,19 @@
         RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
         realm.commitTransaction();
 
-        Observable<RealmList<Dog>> observable = list.asObservable().doOnUnsubscribe(new Action0() {
+        Flowable<RealmList<Dog>> observable = list.asFlowable().doOnCancel(new Action() {
             @Override
-            public void call() {
+            public void run() throws Exception {
                 realm.close();
             }
         });
-        subscription = observable.subscribe(new Action1<RealmList<Dog>>() {
+        subscription = observable.subscribe(new Consumer<RealmList<Dog>>() {
             @Override
-            public void call(RealmList<Dog> dogs) {
+            public void accept(RealmList<Dog> ignored) throws Exception {
             }
         });
 
-        subscription.unsubscribe();
+        subscription.dispose();
         assertTrue(realm.isClosed());
     }
 

@@ -1,0 +1,64 @@
+    // make sure the backup file Realm is encrypted with the same key as the original synced Realm.
+    @Test
+    @RunTestInLooperThread
+    public void errorHandler_useClientResetEncrypted() {
+        SyncUser user = createTestUser();
+        String url = "realm://objectserver.realm.io/default";
+        final byte[] randomKey = TestHelper.getRandomKey();
+        final SyncConfiguration config = configFactory.createSyncConfigurationBuilder(user, url)
+                .encryptionKey(randomKey)
+                .errorHandler(new SyncSession.ErrorHandler() {
+                    @Override
+                    public void onError(SyncSession session, ObjectServerError error) {
+                        if (error.getErrorCode() != ErrorCode.CLIENT_RESET) {
+                            fail("Wrong error " + error.toString());
+                            return;
+                        }
+
+                        final ClientResetRequiredError handler = (ClientResetRequiredError) error;
+                        // Execute Client Reset
+                        looperThread.closeTestRealms();
+                        handler.executeClientReset();
+
+                        RealmConfiguration backupRealmConfiguration = handler.getBackupRealmConfiguration();
+
+                        // can open encrypted backup Realm
+                        Realm backupEncryptedRealm = Realm.getInstance(backupRealmConfiguration);
+                        assertEquals(1, backupEncryptedRealm.where(StringOnly.class).count());
+                        RealmResults<StringOnly> allSorted = backupEncryptedRealm.where(StringOnly.class).findAll();
+                        assertEquals("Foo", allSorted.get(0).getChars());
+                        backupEncryptedRealm.close();
+
+                        String backupFile = handler.getBackupFile().getAbsolutePath();
+                        // build a conf to open a DynamicRealm
+                        backupRealmConfiguration = SyncConfiguration.forRecovery(backupFile, randomKey, new StringOnlyModule());
+                        backupEncryptedRealm = Realm.getInstance(backupRealmConfiguration);
+                        assertEquals(1, backupEncryptedRealm.where(StringOnly.class).count());
+                        allSorted = backupEncryptedRealm.where(StringOnly.class).findAll();
+                        assertEquals("Foo", allSorted.get(0).getChars());
+                        backupEncryptedRealm.close();
+
+                        // using wrong key throw
+                        try {
+                            Realm.getInstance(SyncConfiguration.forRecovery(backupFile, TestHelper.getRandomKey(), new StringOnlyModule()));
+                            fail("Expected to throw when using wrong encryption key");
+                        } catch (RealmFileException expected) {
+                        }
+
+                        looperThread.testComplete();
+                    }
+                })
+                .modules(new StringOnlyModule())
+                .build();
+
+        Realm realm = Realm.getInstance(config);
+        realm.beginTransaction();
+        realm.createObject(StringOnly.class).setChars("Foo");
+        realm.commitTransaction();
+
+        looperThread.addTestRealm(realm);
+
+        // Trigger error
+        SyncManager.simulateClientReset(SyncManager.getSession(config));
+    }
+

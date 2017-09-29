@@ -11,7 +11,7 @@
         writer.emitStatement("%s columnInfo = (%s) realm.getSchema().getColumnInfo(%s.class)",
                 columnInfoClassName(), columnInfoClassName(), qualifiedClassName);
         if (metadata.hasPrimaryKey()) {
-            writer.emitStatement("long pkColumnIndex = table.getPrimaryKey()");
+            writer.emitStatement("long pkColumnIndex = %s", fieldIndexVariableReference(metadata.getPrimaryKey()));
         }
         writer.emitStatement("%s object = null", qualifiedClassName);
 

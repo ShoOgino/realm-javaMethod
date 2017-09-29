@@ -1,0 +1,17 @@
+    // Assume arrays of key/value irrespectively of what they are named.
+    // Throws if this is not the case
+    private static Map<String, String> jsonToMap(JSONArray array, String keyName, String valueName) throws JSONException {
+        Map<String, String> map = new HashMap<>();
+        if (array == null) {
+            return map;
+        }
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject obj = array.getJSONObject(i);
+            if (obj.length() != 2) {
+                throw new IllegalStateException("Array object not a key/value object. Has " + obj.length() + " fields");
+            }
+            map.put(obj.getString(keyName), obj.getString(valueName));
+        }
+        return map;
+    }
+

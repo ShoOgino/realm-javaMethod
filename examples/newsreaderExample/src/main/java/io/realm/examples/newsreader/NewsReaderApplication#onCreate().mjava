@@ -4,13 +4,7 @@
         context = this;
 
         initializeTimber();
-        RxJavaPlugins.getInstance().registerErrorHandler(new RxJavaErrorHandler() {
-            @Override
-            public void handleError(Throwable e) {
-                super.handleError(e);
-                Timber.e(e.toString());
-            }
-        });
+        RxJavaPlugins.setErrorHandler(throwable -> Timber.e(throwable.toString()));
 
         // Configure default configuration for Realm
         Realm.init(this);

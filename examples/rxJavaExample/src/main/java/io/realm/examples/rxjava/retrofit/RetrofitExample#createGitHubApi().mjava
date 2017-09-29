@@ -1,17 +1,28 @@
-    private GithubApi createGitHubApi() {
+    private GitHubApi createGitHubApi() {
 
-        RestAdapter.Builder builder = new RestAdapter.Builder().setEndpoint("https://api.github.com/");
+        Retrofit.Builder builder = new Retrofit.Builder()
+                .baseUrl("https://api.github.com/")
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+                .addConverterFactory(JacksonConverterFactory.create());
 
-        final String githubToken = ""; // Set GitHub OAuth token to avoid throttling if example is used a lot
-        if (!isEmpty(githubToken)) {
-            builder.setRequestInterceptor(new RequestInterceptor() {
-                @Override
-                public void intercept(RequestFacade request) {
-                    request.addHeader("Authorization", format("token %s", githubToken));
-                }
+        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
+
+        final String gitHubToken = ""; // Set GitHub OAuth token to avoid throttling if example is used a lot
+
+        if (!isEmpty(gitHubToken)) {
+            httpClientBuilder.addInterceptor(chain -> {
+                Request originalRequest = chain.request();
+                Request modifiedRequest = originalRequest
+                        .newBuilder()
+                        .header("Authorization", format("token %s", gitHubToken))
+                        .method(originalRequest.method(), originalRequest.body())
+                        .build();
+                return chain.proceed(modifiedRequest);
             });
         }
 
-        return builder.build().create(GithubApi.class);
+        OkHttpClient httpClient = httpClientBuilder.build();
+        builder.client(httpClient);
+        return builder.build().create(GitHubApi.class);
     }
 
