@@ -6,30 +6,44 @@
      */
     public boolean isValid(Object obj) {
         switch (nativeValue) {
-            case 0:
+            case CORE_TYPE_VALUE_INTEGER:
                 return (obj instanceof Long || obj instanceof Integer || obj instanceof Short || obj instanceof Byte);
-            case 1:
+            case CORE_TYPE_VALUE_BOOLEAN:
                 return (obj instanceof Boolean);
-            case 2:
+            case CORE_TYPE_VALUE_STRING:
                 return (obj instanceof String);
-            case 4:
+            case CORE_TYPE_VALUE_BINARY:
                 return (obj instanceof byte[] || obj instanceof ByteBuffer);
-            case 5:
+            case CORE_TYPE_VALUE_UNSUPPORTED_TABLE:
                 //noinspection ConstantConditions
                 return (obj == null || obj instanceof Object[][]);
-            case 7:
+            case CORE_TYPE_VALUE_UNSUPPORTED_DATE:
                 return (obj instanceof java.util.Date); // The unused DateTime.
-            case 8:
+            case CORE_TYPE_VALUE_DATE:
                 return (obj instanceof java.util.Date);
-            case 9:
+            case CORE_TYPE_VALUE_FLOAT:
                 return (obj instanceof Float);
-            case 10:
+            case CORE_TYPE_VALUE_DOUBLE:
                 return (obj instanceof Double);
-            case 12:
+            case CORE_TYPE_VALUE_OBJECT:
                 return false;
-            case 13:
+            case CORE_TYPE_VALUE_LIST:
                 return false;
-            case 14:
+            case CORE_TYPE_VALUE_LINKING_OBJECTS:
+                return false;
+            case CORE_TYPE_VALUE_INTEGER + LIST_OFFSET:
+                return false;
+            case CORE_TYPE_VALUE_BOOLEAN + LIST_OFFSET:
+                return false;
+            case CORE_TYPE_VALUE_STRING + LIST_OFFSET:
+                return false;
+            case CORE_TYPE_VALUE_BINARY + LIST_OFFSET:
+                return false;
+            case CORE_TYPE_VALUE_DATE + LIST_OFFSET:
+                return false;
+            case CORE_TYPE_VALUE_FLOAT + LIST_OFFSET:
+                return false;
+            case CORE_TYPE_VALUE_DOUBLE + LIST_OFFSET:
                 return false;
             default:
                 throw new RuntimeException("Unsupported Realm type:  " + this);

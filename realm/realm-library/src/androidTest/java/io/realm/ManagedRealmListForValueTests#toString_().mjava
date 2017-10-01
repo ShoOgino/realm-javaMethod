@@ -1,0 +1,23 @@
+    @Test
+    public void toString_() {
+        final StringBuilder sb = new StringBuilder("RealmList<").append(listType.getValueTypeName()).append(">@[");
+        final String separator = ",";
+        for (int i = 0; i < NON_NULL_TEST_SIZE; i++) {
+            final Object value = generateValue(listType, i);
+
+            if (value instanceof byte[]) {
+                sb.append("byte[").append(((byte[]) value).length).append("]");
+            } else {
+                sb.append(value);
+            }
+            sb.append(separator);
+            if (isTypeNullable) {
+                sb.append("null").append(separator);
+            }
+        }
+        sb.setLength(sb.length() - separator.length());
+        sb.append("]");
+
+        assertEquals(sb.toString(), list.toString());
+    }
+

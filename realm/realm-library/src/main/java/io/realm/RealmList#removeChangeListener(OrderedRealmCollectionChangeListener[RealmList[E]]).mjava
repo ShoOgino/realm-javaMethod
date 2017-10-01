@@ -8,6 +8,10 @@
      */
     public void removeChangeListener(OrderedRealmCollectionChangeListener<RealmList<E>> listener) {
         checkForAddRemoveListener(listener, true);
-        collection.removeListener(this, listener);
+        if (osListOperator.forRealmModel()) {
+            getOrCreateOsResultsForListener().removeListener(this, listener);
+        } else {
+            osListOperator.getOsList().removeListener(this, listener);
+        }
     }
 

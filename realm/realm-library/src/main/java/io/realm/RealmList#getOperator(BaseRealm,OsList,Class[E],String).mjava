@@ -1,0 +1,34 @@
+    private ManagedListOperator<E> getOperator(BaseRealm realm, OsList osList, @Nullable Class<E> clazz, @Nullable String className) {
+        if (clazz == null || isClassForRealmModel(clazz)) {
+            return new RealmModelListOperator<>(realm, osList, clazz, className);
+        }
+        if (clazz == String.class) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new StringListOperator(realm, osList, (Class<String>) clazz);
+        }
+        if (clazz == Long.class || clazz == Integer.class || clazz == Short.class || clazz == Byte.class) {
+            return new LongListOperator<>(realm, osList, clazz);
+        }
+        if (clazz == Boolean.class) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new BooleanListOperator(realm, osList, (Class<Boolean>) clazz);
+        }
+        if (clazz == byte[].class) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new BinaryListOperator(realm, osList, (Class<byte[]>) clazz);
+        }
+        if (clazz == Double.class) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new DoubleListOperator(realm, osList, (Class<Double>) clazz);
+        }
+        if (clazz == Float.class) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new FloatListOperator(realm, osList, (Class<Float>) clazz);
+        }
+        if (clazz == Date.class) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new DateListOperator(realm, osList, (Class<Date>) clazz);
+        }
+        throw new IllegalArgumentException("Unexpected value class: " + clazz.getName());
+    }
+

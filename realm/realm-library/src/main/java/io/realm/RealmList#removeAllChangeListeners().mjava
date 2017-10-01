@@ -6,6 +6,10 @@
      */
     public void removeAllChangeListeners() {
         checkForAddRemoveListener(null, false);
-        collection.removeAllListeners();
+        if (osListOperator.forRealmModel()) {
+            getOrCreateOsResultsForListener().removeAllListeners();
+        } else {
+            osListOperator.getOsList().removeAllListeners();
+        }
     }
 

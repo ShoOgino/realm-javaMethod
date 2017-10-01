@@ -1,0 +1,43 @@
+    @Test
+    public void add_insert_set_get_Date() {
+        long index = testObjectSchemaInfo.getProperty("dateList").getColumnIndex();
+        OsList osList = new OsList(row, index);
+
+        Date date42 = new Date(42);
+        Date date24 = new Date(24);
+
+        osList.addDate(null);
+        Date value = (Date) osList.getValue(0);
+        assertNull(value);
+
+        osList.addDate(date42);
+        value = (Date) osList.getValue(1);
+        assertNotNull(value);
+        assertEquals(date42, value);
+
+        osList.insertDate(0, null);
+        value = (Date) osList.getValue(0);
+        assertNull(value);
+
+        osList.insertDate(0, date24);
+        value = (Date) osList.getValue(0);
+        assertNotNull(value);
+        assertEquals(date24, value);
+
+        osList.insertNull(0);
+        value = (Date) osList.getValue(0);
+        assertNull(value);
+
+        osList.addNull();
+        assertNull(osList.getValue(5));
+
+        osList.setDate(5, date42);
+        value = (Date) osList.getValue(5);
+        assertNotNull(value);
+        assertEquals(date42, value);
+
+        osList.setDate(5, null);
+        value = (Date) osList.getValue(5);
+        assertNull(value);
+    }
+

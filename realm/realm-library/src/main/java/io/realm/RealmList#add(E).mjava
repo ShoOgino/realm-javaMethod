@@ -14,12 +14,10 @@
      * @throws IllegalStateException if Realm instance has been closed or parent object has been removed.
      */
     @Override
-    public boolean add(E object) {
-        checkValidObject(object);
+    public boolean add(@Nullable E object) {
         if (isManaged()) {
             checkValidRealm();
-            RealmObjectProxy proxy = (RealmObjectProxy) copyToRealmIfNeeded(object);
-            osList.addRow(proxy.realmGet$proxyState().getRow$realm().getIndex());
+            osListOperator.append(object);
         } else {
             unmanagedList.add(object);
         }

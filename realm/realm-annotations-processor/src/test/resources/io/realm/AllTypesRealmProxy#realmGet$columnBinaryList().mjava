@@ -1,0 +1,13 @@
+    @Override
+    public RealmList<byte[]> realmGet$columnBinaryList() {
+        proxyState.getRealm$realm().checkIfValid();
+        // use the cached value if available
+        if (columnBinaryListRealmList != null) {
+            return columnBinaryListRealmList;
+        } else {
+            OsList osList = proxyState.getRow$realm().getValueList(columnInfo.columnBinaryListIndex, RealmFieldType.BINARY_LIST);
+            columnBinaryListRealmList = new RealmList<byte[]>(byte[].class, osList, proxyState.getRealm$realm());
+            return columnBinaryListRealmList;
+        }
+    }
+

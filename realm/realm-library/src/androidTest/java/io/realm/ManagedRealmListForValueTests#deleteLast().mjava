@@ -1,0 +1,23 @@
+    @Test
+    public void deleteLast() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                assertTrue(list.deleteLastFromRealm());
+            }
+        });
+
+        assertEquals(isTypeNullable ? (NULLABLE_TEST_SIZE - 1) : (NON_NULL_TEST_SIZE - 1), list.size());
+        for (int i = 0; i < list.size(); i++) {
+            if (isTypeNullable) {
+                if (i % 2 == 1) {
+                    assertNull(list.get(i));
+                } else {
+                    assertValueEquals(generateValue(listType, i / 2), list.get(i));
+                }
+            } else {
+                assertValueEquals(generateValue(listType, i), list.get(i));
+            }
+        }
+    }
+

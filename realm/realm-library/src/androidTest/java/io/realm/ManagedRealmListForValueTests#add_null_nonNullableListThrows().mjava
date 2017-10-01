@@ -1,0 +1,17 @@
+    @Test
+    public void add_null_nonNullableListThrows() {
+        if (isTypeNullable) {
+            return;
+        }
+
+        realm.beginTransaction();
+        final int initialSize = list.size();
+        try {
+            thrown.expect(IllegalArgumentException.class);
+            //noinspection unchecked
+            list.add(null);
+        } finally {
+            assertEquals(initialSize, list.size());
+        }
+    }
+

@@ -1,0 +1,26 @@
+    @Test
+    public void add_insert_set_null_required_Binary() {
+        long index = testObjectSchemaInfo.getProperty("requiredBinaryList").getColumnIndex();
+        OsList osList = new OsList(row, index);
+
+        addNull_insertNull_setNull_requiredList(osList);
+
+        try {
+            osList.insertBinary(0, null);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        try {
+            osList.addBinary(null);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        try {
+            osList.setBinary(0, null);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

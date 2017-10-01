@@ -1,0 +1,28 @@
+    @Test
+    public void toArray() {
+        final Object[] expected = new Object[typeIsNullable ? NULLABLE_TEST_SIZE : NON_NULL_TEST_SIZE];
+        for (int i = 0; i < NON_NULL_TEST_SIZE; i++) {
+            if (typeIsNullable) {
+                expected[i * 2] = generateValue(listType, i);
+                expected[i * 2 + 1] = null;
+            } else {
+                expected[i] = generateValue(listType, i);
+            }
+        }
+
+        if (listType != BINARY_LIST) {
+            assertArrayEquals(expected, list.toArray());
+        } else {
+            final Object[] array = list.toArray();
+            assertEquals(expected.length, array.length);
+            for (int i = 0; i < expected.length; i++) {
+                if (expected[i] == null) {
+                    assertNull(array[i]);
+                } else {
+                    assertTrue(array[i] instanceof byte[]);
+                    assertArrayEquals((byte[]) expected[i], (byte[]) array[i]);
+                }
+            }
+        }
+    }
+

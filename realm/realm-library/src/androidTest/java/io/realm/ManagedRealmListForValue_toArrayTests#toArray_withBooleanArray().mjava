@@ -1,0 +1,24 @@
+    @Test
+    public void toArray_withBooleanArray() {
+        if (listType != BOOLEAN_LIST) {
+            thrown.expect(ArrayStoreException.class);
+            list.toArray(new Boolean[0]);
+            // should not reach here
+            return;
+        }
+
+        final Boolean[] expected = new Boolean[typeIsNullable ? NULLABLE_TEST_SIZE : NON_NULL_TEST_SIZE];
+        for (int i = 0; i < NON_NULL_TEST_SIZE; i++) {
+            if (typeIsNullable) {
+                expected[i * 2] = (Boolean) generateValue(BOOLEAN_LIST, i);
+                expected[i * 2 + 1] = null;
+            } else {
+                expected[i] = (Boolean) generateValue(BOOLEAN_LIST, i);
+            }
+        }
+
+        final Object[] returnedArray = list.toArray(new Boolean[0]);
+        assertEquals(Boolean.class, returnedArray.getClass().getComponentType());
+        assertArrayEquals(expected, returnedArray);
+    }
+

@@ -1,0 +1,27 @@
+    @Nullable
+    @Override
+    public T get(int index) {
+        final Long value = (Long) osList.getValue(index);
+        if (value == null) {
+            return null;
+        }
+        if (clazz == Long.class) {
+            //noinspection unchecked
+            return (T) value;
+        }
+        if (clazz == Integer.class) {
+            //noinspection unchecked,UnnecessaryBoxing,ConstantConditions
+            return clazz.cast(Integer.valueOf(value.intValue()));
+        }
+        if (clazz == Short.class) {
+            //noinspection unchecked,UnnecessaryBoxing,ConstantConditions
+            return clazz.cast(Short.valueOf(value.shortValue()));
+        }
+        if (clazz == Byte.class) {
+            //noinspection unchecked,UnnecessaryBoxing,ConstantConditions
+            return clazz.cast(Byte.valueOf(value.byteValue()));
+        }
+        //noinspection ConstantConditions
+        throw new IllegalStateException("Unexpected element type: " + clazz.getName());
+    }
+

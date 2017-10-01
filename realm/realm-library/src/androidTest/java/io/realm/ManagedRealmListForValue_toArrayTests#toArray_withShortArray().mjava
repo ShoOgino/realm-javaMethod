@@ -1,0 +1,23 @@
+    @Test
+    public void toArray_withShortArray() {
+        if (listType != SHORT_LIST) {
+            thrown.expect(ArrayStoreException.class);
+            list.toArray(new Short[0]);
+            // should not reach here
+            return;
+        }
+
+        final Short[] expected = new Short[typeIsNullable ? NULLABLE_TEST_SIZE : NON_NULL_TEST_SIZE];
+        for (int i = 0; i < NON_NULL_TEST_SIZE; i++) {
+            if (typeIsNullable) {
+                expected[i * 2] = (Short) generateValue(SHORT_LIST, i);
+                expected[i * 2 + 1] = null;
+            } else {
+                expected[i] = (Short) generateValue(SHORT_LIST, i);
+            }
+        }
+        final Object[] returnedArray = list.toArray(new Short[0]);
+        assertEquals(Short.class, returnedArray.getClass().getComponentType());
+        assertArrayEquals(expected, returnedArray);
+    }
+

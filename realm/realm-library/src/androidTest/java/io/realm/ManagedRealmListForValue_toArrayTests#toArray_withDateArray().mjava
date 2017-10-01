@@ -1,0 +1,23 @@
+    @Test
+    public void toArray_withDateArray() {
+        if (listType != DATE_LIST) {
+            thrown.expect(ArrayStoreException.class);
+            list.toArray(new Date[0]);
+            // should not reach here
+            return;
+        }
+
+        final Date[] expected = new Date[typeIsNullable ? NULLABLE_TEST_SIZE : NON_NULL_TEST_SIZE];
+        for (int i = 0; i < NON_NULL_TEST_SIZE; i++) {
+            if (typeIsNullable) {
+                expected[i * 2] = (Date) generateValue(DATE_LIST, i);
+                expected[i * 2 + 1] = null;
+            } else {
+                expected[i] = (Date) generateValue(DATE_LIST, i);
+            }
+        }
+        final Object[] returnedArray = list.toArray(new Date[0]);
+        assertEquals(Date.class, returnedArray.getClass().getComponentType());
+        assertArrayEquals(expected, returnedArray);
+    }
+

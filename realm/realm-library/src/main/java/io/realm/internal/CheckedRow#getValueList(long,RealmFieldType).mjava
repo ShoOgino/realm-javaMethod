@@ -1,0 +1,11 @@
+    @Override
+    public OsList getValueList(long columnIndex, RealmFieldType fieldType) {
+        final RealmFieldType actualFieldType = getTable().getColumnType(columnIndex);
+        if (fieldType != actualFieldType) {
+            throw new IllegalArgumentException(
+                    String.format(Locale.US, "The type of field '%1$s' is not 'RealmFieldType.%2$s'.",
+                            getTable().getColumnName(columnIndex), fieldType.name()));
+        }
+        return super.getValueList(columnIndex, fieldType);
+    }
+

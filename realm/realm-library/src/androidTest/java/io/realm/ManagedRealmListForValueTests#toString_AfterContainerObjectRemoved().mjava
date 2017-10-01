@@ -1,0 +1,11 @@
+    @Test
+    public void toString_AfterContainerObjectRemoved() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                object.deleteFromRealm();
+            }
+        });
+        assertEquals("RealmList<" + listType.getValueTypeName() + ">@[invalid]", list.toString());
+    }
+

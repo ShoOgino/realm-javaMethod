@@ -1,5 +1,10 @@
         @Override
         protected E convertRowToObject(UncheckedRow row) {
-            return realm.get(classSpec, className, row);
+            if (forValues) {
+                // TODO implement this
+                return null;
+            }
+            //noinspection unchecked
+            return (E) realm.get((Class<? extends RealmObject>) classSpec, className, row);
         }
 

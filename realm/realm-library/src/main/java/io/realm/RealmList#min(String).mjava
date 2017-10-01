@@ -4,10 +4,7 @@
     @Override
     @Nullable
     public Number min(String fieldName) {
-        if (isManaged()) {
-            return this.where().min(fieldName);
-        } else {
-            throw new UnsupportedOperationException(ONLY_IN_MANAGED_MODE_MESSAGE);
-        }
+        // where() throws if not managed
+        return where().min(fieldName);
     }
 

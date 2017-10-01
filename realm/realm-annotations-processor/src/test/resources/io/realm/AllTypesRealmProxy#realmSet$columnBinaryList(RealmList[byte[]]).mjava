@@ -1,0 +1,26 @@
+    @Override
+    public void realmSet$columnBinaryList(RealmList<byte[]> value) {
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+            if (proxyState.getExcludeFields$realm().contains("columnBinaryList")) {
+                return;
+            }
+        }
+
+        proxyState.getRealm$realm().checkIfValid();
+        OsList osList = proxyState.getRow$realm().getValueList(columnInfo.columnBinaryListIndex, RealmFieldType.BINARY_LIST);
+        osList.removeAll();
+        if (value == null) {
+            return;
+        }
+        for (byte[] item : value) {
+            if (item == null) {
+                osList.addNull();
+            } else {
+                osList.addBinary(item);
+            }
+        }
+    }
+

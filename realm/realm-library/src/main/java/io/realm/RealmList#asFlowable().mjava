@@ -28,10 +28,8 @@
         if (realm instanceof Realm) {
             return realm.configuration.getRxFactory().from((Realm) realm, this);
         } else if (realm instanceof DynamicRealm) {
-            DynamicRealm dynamicRealm = (DynamicRealm) realm;
-            RealmList<DynamicRealmObject> dynamicList = (RealmList<DynamicRealmObject>) this;
             @SuppressWarnings("UnnecessaryLocalVariable")
-            Flowable results = realm.configuration.getRxFactory().from(dynamicRealm, dynamicList);
+            Flowable<RealmList<E>> results = realm.configuration.getRxFactory().from((DynamicRealm) realm, this);
             return results;
         } else {
             throw new UnsupportedOperationException(realm.getClass() + " does not support RxJava2.");

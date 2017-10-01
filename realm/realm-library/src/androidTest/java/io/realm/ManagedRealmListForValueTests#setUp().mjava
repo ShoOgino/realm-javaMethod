@@ -1,0 +1,104 @@
+    @SuppressWarnings("unchecked")
+    @Before
+    public void setUp() throws Exception {
+        final RealmConfiguration.Builder configurationBuilder = configFactory.createConfigurationBuilder();
+        configurationBuilder.schema(NullTypes.class);
+        RealmConfiguration realmConfig = configurationBuilder.build();
+
+        realm = Realm.getInstance(realmConfig);
+
+        realm.beginTransaction();
+        object = realm.createObject(NullTypes.class, 0);
+        for (ListType type : ListType.values()) {
+            for (int i = 0; i < NON_NULL_TEST_SIZE; i++) {
+                switch (type) {
+                    case STRING_LIST: {
+                        final RealmList nonnull = object.getFieldStringListNotNull();
+                        nonnull.add(generateValue(STRING_LIST, i));
+                        final RealmList nullable = object.getFieldStringListNull();
+                        nullable.add("" + i);
+                        nullable.add(null);
+                    }
+                    break;
+                    case BOOLEAN_LIST: {
+                        final RealmList nonnull = object.getFieldBooleanListNotNull();
+                        nonnull.add(generateValue(BOOLEAN_LIST, i));
+                        final RealmList nullable = object.getFieldBooleanListNull();
+                        nullable.add(nonnull.last());
+                        nullable.add(null);
+                    }
+                    break;
+                    case BINARY_LIST: {
+                        final RealmList nonnull = object.getFieldBinaryListNotNull();
+                        nonnull.add(generateValue(BINARY_LIST, i));
+                        final RealmList nullable = object.getFieldBinaryListNull();
+                        nullable.add(nonnull.last());
+                        nullable.add(null);
+                    }
+                    break;
+                    case LONG_LIST: {
+                        final RealmList nonnull = object.getFieldLongListNotNull();
+                        nonnull.add(generateValue(LONG_LIST, i));
+                        final RealmList nullable = object.getFieldLongListNull();
+                        nullable.add(nonnull.last());
+                        nullable.add(null);
+                    }
+                    break;
+                    case INTEGER_LIST: {
+                        final RealmList nonnull = object.getFieldIntegerListNotNull();
+                        nonnull.add(generateValue(INTEGER_LIST, i));
+                        final RealmList nullable = object.getFieldIntegerListNull();
+                        nullable.add(nonnull.last());
+                        nullable.add(null);
+                    }
+                    break;
+                    case SHORT_LIST: {
+                        final RealmList nonnull = object.getFieldShortListNotNull();
+                        nonnull.add(generateValue(SHORT_LIST, i));
+                        final RealmList nullable = object.getFieldShortListNull();
+                        nullable.add(nonnull.last());
+                        nullable.add(null);
+                    }
+                    break;
+                    case BYTE_LIST: {
+                        final RealmList nonnull = object.getFieldByteListNotNull();
+                        nonnull.add(generateValue(BYTE_LIST, i));
+                        final RealmList nullable = object.getFieldByteListNull();
+                        nullable.add(nonnull.last());
+                        nullable.add(null);
+                    }
+                    break;
+                    case DOUBLE_LIST: {
+                        final RealmList nonnull = object.getFieldDoubleListNotNull();
+                        nonnull.add(generateValue(DOUBLE_LIST, i));
+                        final RealmList nullable = object.getFieldDoubleListNull();
+                        nullable.add(nonnull.last());
+                        nullable.add(null);
+                    }
+                    break;
+                    case FLOAT_LIST: {
+                        final RealmList nonnull = object.getFieldFloatListNotNull();
+                        nonnull.add(generateValue(FLOAT_LIST, i));
+                        final RealmList nullable = object.getFieldFloatListNull();
+                        nullable.add(nonnull.last());
+                        nullable.add(null);
+                    }
+                    break;
+                    case DATE_LIST: {
+                        final RealmList nonnull = object.getFieldDateListNotNull();
+                        nonnull.add(generateValue(DATE_LIST, i));
+                        final RealmList nullable = object.getFieldDateListNull();
+                        nullable.add(nonnull.last());
+                        nullable.add(null);
+                    }
+                    break;
+                    default:
+                        throw new AssertionError("unexpected value type: " + listType.name());
+                }
+            }
+        }
+        realm.commitTransaction();
+
+        list = getListFor(object, listType, isTypeNullable);
+    }
+

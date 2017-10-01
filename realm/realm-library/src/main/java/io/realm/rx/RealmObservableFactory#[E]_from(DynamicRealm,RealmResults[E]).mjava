@@ -1,0 +1,37 @@
+    @Override
+    public <E> Flowable<RealmResults<E>> from(DynamicRealm realm, final RealmResults<E> results) {
+        final RealmConfiguration realmConfig = realm.getConfiguration();
+        return Flowable.create(new FlowableOnSubscribe<RealmResults<E>>() {
+            @Override
+            public void subscribe(final FlowableEmitter<RealmResults<E>> emitter) throws Exception {
+                // Gets instance to make sure that the Realm is open for as long as the
+                // Observable is subscribed to it.
+                final DynamicRealm observableRealm = DynamicRealm.getInstance(realmConfig);
+                resultsRefs.get().acquireReference(results);
+                final RealmChangeListener<RealmResults<E>> listener = new RealmChangeListener<RealmResults<E>>() {
+                    @Override
+                    public void onChange(RealmResults<E> results) {
+                        if (!emitter.isCancelled()) {
+                            emitter.onNext(results);
+                        }
+                    }
+                };
+                results.addChangeListener(listener);
+
+                // Cleanup when stream is disposed
+                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        results.removeChangeListener(listener);
+                        observableRealm.close();
+                        resultsRefs.get().releaseReference(results);
+                    }
+                }));
+
+                // Emit current value immediately
+                emitter.onNext(results);
+
+            }
+        }, BACK_PRESSURE_STRATEGY);
+    }
+

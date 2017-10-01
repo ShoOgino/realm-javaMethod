@@ -1,0 +1,23 @@
+    @Test
+    public void toArray_withFloatArray() {
+        if (listType != FLOAT_LIST) {
+            thrown.expect(ArrayStoreException.class);
+            list.toArray(new Float[0]);
+            // should not reach here
+            return;
+        }
+
+        final Float[] expected = new Float[typeIsNullable ? NULLABLE_TEST_SIZE : NON_NULL_TEST_SIZE];
+        for (int i = 0; i < NON_NULL_TEST_SIZE; i++) {
+            if (typeIsNullable) {
+                expected[i * 2] = (Float) generateValue(FLOAT_LIST, i);
+                expected[i * 2 + 1] = null;
+            } else {
+                expected[i] = (Float) generateValue(FLOAT_LIST, i);
+            }
+        }
+        final Object[] returnedArray = list.toArray(new Float[0]);
+        assertEquals(Float.class, returnedArray.getClass().getComponentType());
+        assertArrayEquals(expected, returnedArray);
+    }
+

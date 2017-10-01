@@ -1,0 +1,13 @@
+    @Test
+    public void remove_first() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                final Object removed = list.remove(0);
+                assertValueEquals(generateValue(listType, 0), removed);
+            }
+        });
+
+        assertEquals((isTypeNullable ? NULLABLE_TEST_SIZE : NON_NULL_TEST_SIZE) - 1, list.size());
+    }
+

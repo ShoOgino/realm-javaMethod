@@ -1,0 +1,105 @@
+    /**
+     * ModelList, ValueList
+     */
+    //@formatter:off
+    private void emitRealmList(
+            JavaWriter writer,
+            final VariableElement field,
+            String fieldName,
+            String fieldTypeCanonicalName,
+            final TypeMirror elementTypeMirror) throws IOException {
+        final String genericType = Utils.getGenericTypeQualifiedName(field);
+        final boolean forRealmModel = Utils.isRealmModel(elementTypeMirror);
+
+        // Getter
+        writer.emitAnnotation("Override");
+        writer.beginMethod(fieldTypeCanonicalName, metadata.getInternalGetter(fieldName), EnumSet.of(Modifier.PUBLIC))
+                .emitStatement("proxyState.getRealm$realm().checkIfValid()")
+                .emitSingleLineComment("use the cached value if available")
+                .beginControlFlow("if (" + fieldName + "RealmList != null)")
+                .emitStatement("return " + fieldName + "RealmList")
+                .nextControlFlow("else");
+                if (Utils.isRealmModelList(field)) {
+                    writer.emitStatement("OsList osList = proxyState.getRow$realm().getModelList(%s)",
+                            fieldIndexVariableReference(field));
+                } else {
+                    writer.emitStatement("OsList osList = proxyState.getRow$realm().getValueList(%1$s, RealmFieldType.%2$s)",
+                            fieldIndexVariableReference(field), Utils.getValueListFieldType(field).name());
+                }
+                writer.emitStatement(fieldName + "RealmList = new RealmList<%s>(%s.class, osList, proxyState.getRealm$realm())",
+                        genericType, genericType)
+                .emitStatement("return " + fieldName + "RealmList")
+                .endControlFlow()
+                .endMethod()
+                .emitEmptyLine();
+
+        // Setter
+        writer.emitAnnotation("Override");
+        writer.beginMethod("void", metadata.getInternalSetter(fieldName), EnumSet.of(Modifier.PUBLIC), fieldTypeCanonicalName, "value");
+        emitCodeForUnderConstruction(writer, metadata.isPrimaryKey(field), new CodeEmitter() {
+            @Override
+            public void emit(JavaWriter writer) throws IOException {
+                // check excludeFields
+                writer.beginControlFlow("if (proxyState.getExcludeFields$realm().contains(\"%1$s\"))",
+                        field.getSimpleName().toString())
+                        .emitStatement("return")
+                        .endControlFlow();
+
+                if (!forRealmModel) {
+                    return;
+                }
+
+                writer.emitSingleLineComment("if the list contains unmanaged RealmObjects, convert them to managed.")
+                        .beginControlFlow("if (value != null && !value.isManaged())")
+                        .emitStatement("final Realm realm = (Realm) proxyState.getRealm$realm()")
+                        .emitStatement("final RealmList<%1$s> original = value", genericType)
+                        .emitStatement("value = new RealmList<%1$s>()", genericType)
+                        .beginControlFlow("for (%1$s item : original)", genericType)
+                        .beginControlFlow("if (item == null || RealmObject.isManaged(item))")
+                        .emitStatement("value.add(item)")
+                        .nextControlFlow("else")
+                        .emitStatement("value.add(realm.copyToRealm(item))")
+                        .endControlFlow()
+                        .endControlFlow()
+                        .endControlFlow();
+
+                // LinkView currently does not support default value feature. Just fallback to normal code.
+            }
+        });
+        writer.emitStatement("proxyState.getRealm$realm().checkIfValid()");
+                if (Utils.isRealmModelList(field)) {
+                    writer.emitStatement("OsList osList = proxyState.getRow$realm().getModelList(%s)",
+                            fieldIndexVariableReference(field));
+                } else {
+                    writer.emitStatement("OsList osList = proxyState.getRow$realm().getValueList(%1$s, RealmFieldType.%2$s)",
+                            fieldIndexVariableReference(field), Utils.getValueListFieldType(field).name());
+                }
+                writer.emitStatement("osList.removeAll()")
+                .beginControlFlow("if (value == null)")
+                .emitStatement("return")
+                .endControlFlow();
+
+        if (forRealmModel) {
+            writer.beginControlFlow("for (RealmModel linkedObject : value)")
+                    .beginControlFlow("if (!(RealmObject.isManaged(linkedObject) && RealmObject.isValid(linkedObject)))")
+                    .emitStatement("throw new IllegalArgumentException(\"Each element of 'value' must be a valid managed object.\")")
+                    .endControlFlow()
+                    .beginControlFlow("if (((RealmObjectProxy) linkedObject).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm())")
+                    .emitStatement("throw new IllegalArgumentException(\"Each element of 'value' must belong to the same Realm.\")")
+                    .endControlFlow()
+                    .emitStatement("osList.addRow(((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getIndex())")
+                    .endControlFlow();
+        } else {
+            writer.beginControlFlow("for (%1$s item : value)", genericType)
+                    .beginControlFlow("if (item == null)")
+                    .emitStatement(metadata.isElementNullable(field) ? "osList.addNull()" : "throw new IllegalArgumentException(\"Storing 'null' into " + fieldName + "' is not allowed by the schema.\")")
+                    .nextControlFlow("else")
+                    .emitStatement(getStatementForAppendingValueToOsList("osList", "item", elementTypeMirror))
+                    .endControlFlow()
+                    .endControlFlow();
+        }
+        writer.endMethod();
+
+    }
+    //@formatter:on
+

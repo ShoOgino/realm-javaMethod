@@ -1,0 +1,52 @@
+    @Test
+    @RunTestInLooperThread
+    public void changeListener_forDeleteAll() {
+        Realm realm = looperThread.getRealm();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                object = realm.createObject(NullTypes.class, 1000);
+                list = getListFor(object, listType, isTypeNullable);
+
+                // add 3 elements as an initial data
+                //noinspection unchecked
+                list.add(generateValue(listType, 0));
+                //noinspection unchecked
+                list.add(generateValue(listType, 100));
+                //noinspection unchecked
+                list.add(generateValue(listType, 200));
+            }
+        });
+
+        final AtomicInteger listenerCalledCount = new AtomicInteger(0);
+        //noinspection unchecked
+        list.addChangeListener(new RealmChangeListener<RealmList<Object>>() {
+            @Override
+            public void onChange(RealmList<Object> element) {
+                assertEquals(0, listenerCalledCount.getAndIncrement());
+            }
+        });
+        //noinspection unchecked
+        list.addChangeListener(new OrderedRealmCollectionChangeListener<RealmList<Object>>() {
+            @Override
+            public void onChange(RealmList<Object> collection, @Nullable OrderedCollectionChangeSet changes) {
+                assertNotNull(changes);
+                assertEquals(0, changes.getInsertions().length);
+                assertEquals(3, changes.getDeletions().length);
+                assertEquals(0, changes.getChanges().length);
+                assertEquals(1, changes.getDeletionRanges().length);
+                assertEquals(0, changes.getDeletionRanges()[0].startIndex);
+                assertEquals(3, changes.getDeletionRanges()[0].length);
+                assertEquals(1, listenerCalledCount.getAndIncrement());
+            }
+        });
+
+        realm.beginTransaction();
+        //noinspection unchecked
+        list.deleteAllFromRealm();
+        realm.commitTransaction();
+
+        assertEquals(2, listenerCalledCount.get());
+        looperThread.testComplete();
+    }
+

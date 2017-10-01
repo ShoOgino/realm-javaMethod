@@ -1,0 +1,41 @@
+    @Override
+    public void realmSet$columnRealmList(RealmList<some.test.AllTypes> value) {
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+            if (proxyState.getExcludeFields$realm().contains("columnRealmList")) {
+                return;
+            }
+            // if the list contains unmanaged RealmObjects, convert them to managed.
+            if (value != null && !value.isManaged()) {
+                final Realm realm = (Realm) proxyState.getRealm$realm();
+                final RealmList<some.test.AllTypes> original = value;
+                value = new RealmList<some.test.AllTypes>();
+                for (some.test.AllTypes item : original) {
+                    if (item == null || RealmObject.isManaged(item)) {
+                        value.add(item);
+                    } else {
+                        value.add(realm.copyToRealm(item));
+                    }
+                }
+            }
+        }
+
+        proxyState.getRealm$realm().checkIfValid();
+        OsList osList = proxyState.getRow$realm().getModelList(columnInfo.columnRealmListIndex);
+        osList.removeAll();
+        if (value == null) {
+            return;
+        }
+        for (RealmModel linkedObject : value) {
+            if (!(RealmObject.isManaged(linkedObject) && RealmObject.isValid(linkedObject))) {
+                throw new IllegalArgumentException("Each element of 'value' must be a valid managed object.");
+            }
+            if (((RealmObjectProxy) linkedObject).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm()) {
+                throw new IllegalArgumentException("Each element of 'value' must belong to the same Realm.");
+            }
+            osList.addRow(((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getIndex());
+        }
+    }
+

@@ -12,22 +12,18 @@
      * </ol>
      *
      * @param location the index at which to insert.
-     * @param object the object to add.
+     * @param element the element to add.
      * @throws IllegalStateException if Realm instance has been closed or container object has been removed.
      * @throws IndexOutOfBoundsException if {@code location < 0 || location > size()}.
      */
     @Override
-    public void add(int location, E object) {
-        checkValidObject(object);
+    public void add(int location, @Nullable E element) {
+        //noinspection ConstantConditions
         if (isManaged()) {
             checkValidRealm();
-            if (location < 0 || location > size()) {
-                throw new IndexOutOfBoundsException("Invalid index " + location + ", size is " + size());
-            }
-            RealmObjectProxy proxy = (RealmObjectProxy) copyToRealmIfNeeded(object);
-            osList.insertRow(location, proxy.realmGet$proxyState().getRow$realm().getIndex());
+            osListOperator.insert(location, element);
         } else {
-            unmanagedList.add(location, object);
+            unmanagedList.add(location, element);
         }
         modCount++;
     }

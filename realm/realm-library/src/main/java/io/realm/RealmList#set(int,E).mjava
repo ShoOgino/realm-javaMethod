@@ -16,15 +16,11 @@
      * @throws IndexOutOfBoundsException if {@code location < 0 || location >= size()}.
      */
     @Override
-    public E set(int location, E object) {
-        checkValidObject(object);
+    public E set(int location, @Nullable E object) {
         E oldObject;
         if (isManaged()) {
             checkValidRealm();
-            RealmObjectProxy proxy = (RealmObjectProxy) copyToRealmIfNeeded(object);
-            oldObject = get(location);
-            osList.setRow(location, proxy.realmGet$proxyState().getRow$realm().getIndex());
-            return oldObject;
+            oldObject = osListOperator.set(location, object);
         } else {
             oldObject = unmanagedList.set(location, object);
         }

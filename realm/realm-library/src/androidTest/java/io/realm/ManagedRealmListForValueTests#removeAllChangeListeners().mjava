@@ -1,0 +1,49 @@
+    @Test
+    @RunTestInLooperThread
+    public void removeAllChangeListeners() {
+        Realm realm = looperThread.getRealm();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                object = realm.createObject(NullTypes.class, 1000);
+                list = getListFor(object, listType, isTypeNullable);
+            }
+        });
+
+        //noinspection unchecked
+        list.addChangeListener(new RealmChangeListener<RealmList<Object>>() {
+            @Override
+            public void onChange(RealmList<Object> element) {
+                fail();
+            }
+        });
+        //noinspection unchecked
+        list.addChangeListener(new OrderedRealmCollectionChangeListener<RealmList<Object>>() {
+            @Override
+            public void onChange(RealmList<Object> collection, @Nullable OrderedCollectionChangeSet changes) {
+                fail();
+            }
+        });
+
+        list.removeAllChangeListeners();
+
+        final AtomicInteger listenerCalledCount = new AtomicInteger(0);
+        // This one is added after removal, so it should be triggered.
+        //noinspection unchecked
+        list.addChangeListener(new RealmChangeListener<RealmList<Object>>() {
+            @Override
+            public void onChange(RealmList<Object> element) {
+                listenerCalledCount.incrementAndGet();
+                looperThread.testComplete();
+            }
+        });
+
+        // This should trigger the listener if there is any.
+        realm.beginTransaction();
+        //noinspection unchecked
+        list.add(generateValue(listType, 500));
+        realm.commitTransaction();
+
+        assertEquals(1, listenerCalledCount.get());
+    }
+

@@ -35,7 +35,7 @@
                         .endControlFlow()
                         // No need to throw exception here if the field is not nullable. A exception will be thrown in setter.
                         .endControlFlow();
-            } else if (Utils.isRealmList(field)) {
+            } else if (Utils.isRealmModelList(field)) {
                 final String genericType = Utils.getGenericTypeQualifiedName(field);
                 writer
                         .emitStatement("RealmList<%s> %sList = realmObjectSource.%s()", genericType, fieldName, getter)
@@ -55,6 +55,8 @@
                         .endControlFlow()
                         .endControlFlow();
 
+            } else if (Utils.isRealmValueList(field)) {
+                writer.emitStatement("realmObjectTarget.%s(realmObjectSource.%s())", setter, getter);
             } else if (Utils.isMutableRealmInteger(field)) {
                 writer.emitStatement("realmObjectTarget.%s().set(realmObjectSource.%s().get())", getter, getter);
             } else {

@@ -1,0 +1,40 @@
+    @Test
+    public void add_insert_get_String() {
+        long index = testObjectSchemaInfo.getProperty("stringList").getColumnIndex();
+        OsList osList = new OsList(row, index);
+
+        osList.addString(null);
+        String value = (String) osList.getValue(0);
+        assertNull(value);
+
+        osList.addString("42");
+        value = (String) osList.getValue(1);
+        assertNotNull(value);
+        assertEquals("42", value);
+
+        osList.insertString(0, null);
+        value = (String) osList.getValue(0);
+        assertNull(value);
+
+        osList.insertString(0, "24");
+        value = (String) osList.getValue(0);
+        assertNotNull(value);
+        assertEquals("24", value);
+
+        osList.insertNull(0);
+        value = (String) osList.getValue(0);
+        assertNull(value);
+
+        osList.addNull();
+        assertNull(osList.getValue(5));
+
+        osList.setString(5, "24");
+        value = (String) osList.getValue(5);
+        assertNotNull(value);
+        assertEquals("24", value);
+
+        osList.setString(5, null);
+        value = (String) osList.getValue(5);
+        assertNull(value);
+    }
+
