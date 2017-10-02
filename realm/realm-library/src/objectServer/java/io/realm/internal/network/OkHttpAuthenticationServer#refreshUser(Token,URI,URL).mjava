@@ -1,7 +1,7 @@
     @Override
     public AuthenticateResponse refreshUser(Token userToken, URI serverUrl, URL authenticationUrl) {
         try {
-            String requestBody = AuthenticateRequest.userRefresh(userToken, serverUrl).toJson();
+            String requestBody = AuthenticateRequest.userRefresh(userToken, serverUrl.getPath()).toJson();
             return authenticate(authenticationUrl, requestBody);
         } catch (Exception e) {
             return AuthenticateResponse.from(e);
