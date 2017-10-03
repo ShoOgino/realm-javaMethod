@@ -8,6 +8,7 @@
                 @Override
                 public void onSuccess(Realm realm) {
                     managementRealm = realm;
+                    managementRealmOpenTask = null;
                     checkIfRealmsAreOpenedAndRunDelayedTasks();
                 }
 
@@ -15,6 +16,7 @@
                 public void onError(Throwable exception) {
                     synchronized (errorLock) {
                         managementRealmError = new ObjectServerError(ErrorCode.UNKNOWN, exception);
+                        managementRealmOpenTask = null;
                         checkIfRealmsAreOpenedAndRunDelayedTasks();
                     }
                 }
@@ -23,6 +25,7 @@
                 @Override
                 public void onSuccess(Realm realm) {
                     permissionRealm = realm;
+                    permissionRealmOpenTask = null;
                     checkIfRealmsAreOpenedAndRunDelayedTasks();
                 }
 
@@ -30,25 +33,28 @@
                 public void onError(Throwable exception) {
                     synchronized (errorLock) {
                         permissionRealmError = new ObjectServerError(ErrorCode.UNKNOWN, exception);
+                        permissionRealmOpenTask = null;
                         checkIfRealmsAreOpenedAndRunDelayedTasks();
                     }
                 }
             });
-            defaultPermissionRealmOpenTask = Realm.getInstanceAsync(defaultPermissionRealmConfig, new Realm.Callback() {
-                @Override
-                public void onSuccess(Realm realm) {
-                    defaultPermissionRealm = realm;
-                    checkIfRealmsAreOpenedAndRunDelayedTasks();
-                }
-
-                @Override
-                public void onError(Throwable exception) {
-                    synchronized (errorLock) {
-                        defaultPermissionRealmError = new ObjectServerError(ErrorCode.UNKNOWN, exception);
-                        checkIfRealmsAreOpenedAndRunDelayedTasks();
-                    }
-                }
-            });
+//            defaultPermissionRealmOpenTask = Realm.getInstanceAsync(defaultPermissionRealmConfig, new Realm.Callback() {
+//                @Override
+//                public void onSuccess(Realm realm) {
+//                    defaultPermissionRealm = realm;
+//                    defaultPermissionRealmOpenTask = null;
+//                    checkIfRealmsAreOpenedAndRunDelayedTasks();
+//                }
+//
+//                @Override
+//                public void onError(Throwable exception) {
+//                    synchronized (errorLock) {
+//                        defaultPermissionRealmError = new ObjectServerError(ErrorCode.UNKNOWN, exception);
+//                        defaultPermissionRealmOpenTask = null;
+//                        checkIfRealmsAreOpenedAndRunDelayedTasks();
+//                    }
+//                }
+//            });
         }
     }
 

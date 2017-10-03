@@ -1,6 +1,6 @@
-    @Ignore("Until https://github.com/realm/realm-object-server/issues/1671 has been solved")
     @Test
     @RunTestInLooperThread(emulateMainThread = true)
+    @Ignore("See https://github.com/realm/ros/issues/437")
     public void getPermissions_updatedWithNewRealms_stressTest() {
         final PermissionManager pm = user.getPermissionManager();
         looperThread.closeAfterTest(pm);
@@ -21,6 +21,7 @@
                 permissions.addChangeListener(new RealmChangeListener<RealmResults<Permission>>() {
                     @Override
                     public void onChange(RealmResults<Permission> permissions) {
+                        RealmLog.error(Arrays.toString(permissions.toArray()));  // FIXME Debug output for CI. Remove before release.
                         Permission p = permissions.where().endsWith("path", "test9").findFirst();
                         if (p != null) {
                             assertTrue(p.mayRead());

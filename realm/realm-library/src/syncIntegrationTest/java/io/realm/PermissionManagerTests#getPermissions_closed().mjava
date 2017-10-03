@@ -4,18 +4,14 @@
         PermissionManager pm = user.getPermissionManager();
         pm.close();
 
+        thrown.expect(IllegalStateException.class);
         pm.getPermissions(new PermissionManager.PermissionsCallback() {
             @Override
             public void onSuccess(RealmResults<Permission> permissions) {
                 fail();
             }
-
             @Override
-            public void onError(ObjectServerError error) {
-                assertEquals(ErrorCode.UNKNOWN, error.getErrorCode());
-                assertEquals(IllegalStateException.class, error.getException().getClass());
-                looperThread.testComplete();
-            }
+            public void onError(ObjectServerError error) { fail(); }
         });
     }
 

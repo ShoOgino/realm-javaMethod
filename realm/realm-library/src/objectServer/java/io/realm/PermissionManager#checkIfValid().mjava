@@ -1,8 +1,12 @@
-    private void checkIfValidThread() {
+    private void checkIfValid() {
         // Checks if we are in thread that created the PermissionManager.
         if (threadId != Thread.currentThread().getId()) {
             throw new IllegalStateException("PermissionManager was accessed from the wrong thread. It can only be " +
                                             "accessed on the thread it was created on.");
+        }
+
+        if (closed) {
+            throw new IllegalStateException("PermissionManager has been closed. No further actions are possible.");
         }
     }
 

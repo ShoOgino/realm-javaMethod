@@ -20,6 +20,7 @@
                     }
                 })
                 .modules(new ManagementModule())
+                .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
                 .build();
 
         permissionRealmConfig = new SyncConfiguration.Builder(
@@ -34,24 +35,24 @@
                 })
                 .modules(new PermissionModule())
                 .waitForInitialRemoteData()
-                // FIXME: Something is seriously wrong with the Permission Realm. It doesn't seem to
-                // exist on the server. Making it impossible to mark it read only
-                // .readOnly()
+                .readOnly()
+                .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
                 .build();
 
-        defaultPermissionRealmConfig = new SyncConfiguration.Builder(
-                user, getRealmUrl(RealmType.DEFAULT_PERMISSION_REALM, user.getAuthenticationUrl()))
-                .errorHandler(new SyncSession.ErrorHandler() {
-                    @Override
-                    public void onError(SyncSession session, ObjectServerError error) {
-                        synchronized (errorLock) {
-                            defaultPermissionRealmError = error;
-                        }
-                    }
-                })
-                .modules(new PermissionModule())
-                .waitForInitialRemoteData()
-                .readOnly()
-                .build();
+//        defaultPermissionRealmConfig = new SyncConfiguration.Builder(
+//                user, getRealmUrl(RealmType.DEFAULT_PERMISSION_REALM, user.getAuthenticationUrl()))
+//                .errorHandler(new SyncSession.ErrorHandler() {
+//                    @Override
+//                    public void onError(SyncSession session, ObjectServerError error) {
+//                        synchronized (errorLock) {
+//                            defaultPermissionRealmError = error;
+//                        }
+//                    }
+//                })
+//                .modules(new PermissionModule())
+//                .waitForInitialRemoteData()
+//                .readOnly()
+//                .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
+//                .build();
     }
 

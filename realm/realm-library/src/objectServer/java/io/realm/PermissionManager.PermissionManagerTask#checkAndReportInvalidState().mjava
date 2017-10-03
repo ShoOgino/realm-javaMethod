@@ -38,14 +38,14 @@
                 // Only hold lock while making a safe copy of current error state
                 managementErrorHappened = (permissionManager.managementRealmError != null);
                 permissionErrorHappened = (permissionManager.permissionRealmError != null);
-                defaultPermissionErrorHappened = (permissionManager.defaultPermissionRealmError != null);
+//                defaultPermissionErrorHappened = (permissionManager.defaultPermissionRealmError != null);
                 managementError = permissionManager.managementRealmError;
                 permissionError = permissionManager.permissionRealmError;
-                defaultPermissionError = permissionManager.defaultPermissionRealmError;
+//                defaultPermissionError = permissionManager.defaultPermissionRealmError;
             }
 
             // Everything seems valid
-            if (!permissionErrorHappened && !managementErrorHappened && !defaultPermissionErrorHappened) {
+            if (!permissionErrorHappened && !managementErrorHappened) {// && !defaultPermissionErrorHappened) {
                 return false;
             }
 
@@ -73,12 +73,12 @@
                 permissionManager.clientReset = true;
             }
 
-            if (defaultPermissionErrorHappened && defaultPermissionError instanceof ClientResetRequiredError) {
-                ClientResetRequiredError cr = (ClientResetRequiredError) defaultPermissionError;
-                permissionManager.defaultPermissionRealm.close();
-                cr.executeClientReset();
-                permissionManager.clientReset = true;
-            }
+//            if (defaultPermissionErrorHappened && defaultPermissionError instanceof ClientResetRequiredError) {
+//                ClientResetRequiredError cr = (ClientResetRequiredError) defaultPermissionError;
+//                permissionManager.defaultPermissionRealm.close();
+//                cr.executeClientReset();
+//                permissionManager.clientReset = true;
+//            }
 
             // Handle errors
             Map<String, ObjectServerError> errors = new LinkedHashMap<>();
@@ -87,7 +87,7 @@
             } else {
                 if (managementErrorHappened) { errors.put("Management Realm", managementError); }
                 if (permissionErrorHappened) { errors.put("Permission Realm", permissionError); }
-                if (defaultPermissionErrorHappened) { errors.put("Default Permission Realm", defaultPermissionError); }
+//                if (defaultPermissionErrorHappened) { errors.put("Default Permission Realm", defaultPermissionError); }
             }
             notifyCallbackWithError(combineRealmErrors(errors)); // This will remove the task from the task list
 

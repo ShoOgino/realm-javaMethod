@@ -2,7 +2,6 @@
     @RunTestInLooperThread(emulateMainThread = true)
     public void getPermissions_noLongerValidWhenPermissionManagerIsClosed() {
         final PermissionManager pm = user.getPermissionManager();
-        looperThread.closeAfterTest(pm);
         pm.getPermissions(new PermissionManager.PermissionsCallback() {
             @Override
             public void onSuccess(RealmResults<Permission> permissions) {
@@ -14,6 +13,7 @@
 
             @Override
             public void onError(ObjectServerError error) {
+                pm.close();
                 fail(error.toString());
             }
         });
