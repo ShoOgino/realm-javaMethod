@@ -9,8 +9,7 @@
             String fieldName = fieldType.name();
             switch (fieldType) {
                 case OBJECT:
-                case LIST:
-                    // Skip always nullable fields.
+                    // Skip always nullable fields
                     break;
                 default:
                     // Skip not-nullable fields .
@@ -38,6 +37,54 @@
                         assertEquals(0, object.getInt(fieldName));
                     }
                     break;
+            }
+        }
+        for (FieldListType fieldType : FieldListType.values()) {
+            switch(fieldType) {
+                case LIST:
+                    // Skip always non-nullable fields.
+                    break;
+                case STRING_LIST:
+                    checkListValueConversionToDefaultValue(String.class, "");
+                    break;
+                case SHORT_LIST:
+                    checkListValueConversionToDefaultValue(Short.class, (short) 0);
+                    break;
+                case INT_LIST:
+                    checkListValueConversionToDefaultValue(Integer.class, 0);
+                    break;
+                case LONG_LIST:
+                    checkListValueConversionToDefaultValue(Long.class, 0L);
+                    break;
+                case BYTE_LIST:
+                    checkListValueConversionToDefaultValue(Byte.class, (byte) 0);
+                    break;
+                case BOOLEAN_LIST:
+                    checkListValueConversionToDefaultValue(Boolean.class, false);
+                    break;
+                case FLOAT_LIST:
+                    checkListValueConversionToDefaultValue(Float.class, 0.0F);
+                    break;
+                case DOUBLE_LIST:
+                    checkListValueConversionToDefaultValue(Double.class, 0.0D);
+                    break;
+                case BLOB_LIST:
+                    checkListValueConversionToDefaultValue(byte[].class, new byte[0]);
+                    break;
+                case DATE_LIST:
+                    checkListValueConversionToDefaultValue(Date.class, new Date(0));
+                    break;
+                case PRIMITIVE_INT_LIST:
+                case PRIMITIVE_LONG_LIST:
+                case PRIMITIVE_BYTE_LIST:
+                case PRIMITIVE_BOOLEAN_LIST:
+                case PRIMITIVE_FLOAT_LIST:
+                case PRIMITIVE_DOUBLE_LIST:
+                case PRIMITIVE_SHORT_LIST:
+                    // Skip not-nullable fields
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown type: " + fieldType);
             }
         }
     }

@@ -24,20 +24,28 @@
             }
             return;
         }
+        String fieldName = "foo";
         for (FieldType fieldType : FieldType.values()) {
-            String fieldName = "foo";
             switch (fieldType) {
                 case OBJECT:
                     schema.addRealmObjectField(fieldName, DOG_SCHEMA);
                     checkAddedAndRemovable(fieldName);
                     break;
+                default:
+                    // All simple fields
+                    schema.addField(fieldName, fieldType.getType());
+                    checkAddedAndRemovable(fieldName);
+            }
+        }
+        for (FieldListType fieldType : FieldListType.values()) {
+            switch (fieldType) {
                 case LIST:
                     schema.addRealmListField(fieldName, DOG_SCHEMA);
                     checkAddedAndRemovable(fieldName);
                     break;
                 default:
-                    // All simple fields
-                    schema.addField(fieldName, fieldType.getType());
+                    // All primitive lists
+                    schema.addRealmListField(fieldName, fieldType.getType());
                     checkAddedAndRemovable(fieldName);
             }
         }

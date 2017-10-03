@@ -1,5 +1,7 @@
     /**
      * Returns the {@link RealmList} of {@link DynamicRealmObject}s being linked from the given field.
+     * <p>
+     * If the list contains primitive types, use {@link #getList(String, Class)} instead.
      *
      * @param fieldName the name of the field.
      * @return the {@link RealmList} data for this field.
@@ -10,7 +12,7 @@
 
         long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
         try {
-            OsList osList = proxyState.getRow$realm().getList(columnIndex);
+            OsList osList = proxyState.getRow$realm().getModelList(columnIndex);
             //noinspection ConstantConditions
             @Nonnull
             String className = osList.getTargetTable().getClassName();

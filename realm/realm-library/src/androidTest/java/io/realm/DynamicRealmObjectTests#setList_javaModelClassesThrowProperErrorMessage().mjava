@@ -1,0 +1,11 @@
+    @Test
+    public void setList_javaModelClassesThrowProperErrorMessage() {
+        dynamicRealm.beginTransaction();
+        try {
+            dObjDynamic.setList(AllJavaTypes.FIELD_LIST, new RealmList<>(typedObj));
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("RealmList must contain `DynamicRealmObject's, not Java model classes."));
+        }
+    }
+

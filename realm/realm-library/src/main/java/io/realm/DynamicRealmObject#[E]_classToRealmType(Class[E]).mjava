@@ -1,0 +1,23 @@
+    private <E> RealmFieldType classToRealmType(Class<E> primitiveType) {
+        if (primitiveType.equals(Integer.class)
+                || primitiveType.equals(Long.class)
+                || primitiveType.equals(Short.class)
+                || primitiveType.equals(Byte.class)) {
+            return RealmFieldType.INTEGER_LIST;
+        } else if (primitiveType.equals(Boolean.class)) {
+            return RealmFieldType.BOOLEAN_LIST;
+        } else if (primitiveType.equals(String.class)) {
+            return RealmFieldType.STRING_LIST;
+        } else if (primitiveType.equals(byte[].class)) {
+            return RealmFieldType.BINARY_LIST;
+        } else if (primitiveType.equals(Date.class)) {
+            return RealmFieldType.DATE_LIST;
+        } else if (primitiveType.equals(Float.class)) {
+            return RealmFieldType.FLOAT_LIST;
+        } else if (primitiveType.equals(Double.class)) {
+            return RealmFieldType.DOUBLE_LIST;
+        } else {
+            throw new IllegalArgumentException("Unsupported element type. Only primitive types supported. Yours was: " + primitiveType);
+        }
+    }
+

@@ -1,12 +1,12 @@
     @Test
-    public void setRemoveRequired() {
+    public void setRequired_trueAndFalse() {
         if (type == ObjectSchemaType.IMMUTABLE) {
             thrown.expect(UnsupportedOperationException.class);
             schema.setRequired("test", true);
             return;
         }
+        String fieldName = "foo";
         for (FieldType fieldType : FieldType.values()) {
-            String fieldName = "foo";
             switch (fieldType) {
                 case OBJECT:
                     // Objects are always nullable and cannot be configured otherwise.
@@ -18,6 +18,17 @@
                     } catch (IllegalArgumentException ignored) {
                     }
                     break;
+                default:
+                    // All simple types.
+                    schema.addField(fieldName, fieldType.getType());
+                    assertEquals(!fieldType.isNullable(), schema.isRequired(fieldName));
+                    schema.setRequired(fieldName, fieldType.isNullable());
+                    assertEquals(fieldType.isNullable(), schema.isRequired(fieldName));
+            }
+            schema.removeField(fieldName);
+        }
+        for (FieldListType fieldType : FieldListType.values()) {
+            switch (fieldType) {
                 case LIST:
                     // Lists are always non-nullable and cannot be configured otherwise.
                     schema.addRealmListField(fieldName, schema);
@@ -29,8 +40,8 @@
                     }
                     break;
                 default:
-                    // All simple types.
-                    schema.addField(fieldName, fieldType.getType());
+                    // All simple list types.
+                    schema.addRealmListField(fieldName, fieldType.getType());
                     assertEquals(!fieldType.isNullable(), schema.isRequired(fieldName));
                     schema.setRequired(fieldName, fieldType.isNullable());
                     assertEquals(fieldType.isNullable(), schema.isRequired(fieldName));
