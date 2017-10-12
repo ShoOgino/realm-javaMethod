@@ -7,8 +7,10 @@
          * @return this {@code OsObjectSchemaInfo}.
          */
         public Builder addPersistedValueListProperty(String name, RealmFieldType type, boolean isRequired) {
-            final Property property = new Property(name, type, !Property.PRIMARY_KEY, !Property.INDEXED, isRequired);
-            persistedPropertyList.add(property);
+            long propertyPtr = Property.nativeCreatePersistedProperty(name,
+                    Property.convertFromRealmFieldType(type, isRequired), !Property.PRIMARY_KEY, !Property.INDEXED);
+            persistedPropertyPtrArray[persistedPropertyPtrCurPos] = propertyPtr;
+            persistedPropertyPtrCurPos++;
             return this;
         }
 

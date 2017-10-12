@@ -10,8 +10,10 @@
          */
         public Builder addPersistedProperty(String name, RealmFieldType type, boolean isPrimaryKey, boolean isIndexed,
                 boolean isRequired) {
-            final Property property = new Property(name, type, isPrimaryKey, isIndexed, isRequired);
-            persistedPropertyList.add(property);
+            long propertyPtr = Property.nativeCreatePersistedProperty(name,
+                    Property.convertFromRealmFieldType(type, isRequired), isPrimaryKey, isIndexed);
+            persistedPropertyPtrArray[persistedPropertyPtrCurPos] = propertyPtr;
+            persistedPropertyPtrCurPos++;
             return this;
         }
 

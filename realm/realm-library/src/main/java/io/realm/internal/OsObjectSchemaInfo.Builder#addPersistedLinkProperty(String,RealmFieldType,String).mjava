@@ -8,8 +8,10 @@
          * @return this {@code OsObjectSchemaInfo.Builder}.
          */
         public Builder addPersistedLinkProperty(String name, RealmFieldType type, String linkedClassName) {
-            final Property property = new Property(name, type, linkedClassName);
-            persistedPropertyList.add(property);
+            long propertyPtr = Property.nativeCreatePersistedLinkProperty(name,
+                    Property.convertFromRealmFieldType(type, false), linkedClassName);
+            persistedPropertyPtrArray[persistedPropertyPtrCurPos] = propertyPtr;
+            persistedPropertyPtrCurPos++;
             return this;
         }
 

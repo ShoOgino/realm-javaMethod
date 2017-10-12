@@ -9,8 +9,9 @@
          * @return this {@code OsObjectSchemaInfo.Builder}.
          */
         public Builder addComputedLinkProperty(String name, String targetClassname, String targetFieldName) {
-            final Property property = new Property(name, targetClassname, targetFieldName);
-            computedPropertyList.add(property);
+            long propertyPtr = Property.nativeCreateComputedLinkProperty(name, targetClassname, targetFieldName);
+            computedPropertyPtrArray[computedPropertyPtrCurPos] = propertyPtr;
+            computedPropertyPtrCurPos++;
             return this;
         }
 
