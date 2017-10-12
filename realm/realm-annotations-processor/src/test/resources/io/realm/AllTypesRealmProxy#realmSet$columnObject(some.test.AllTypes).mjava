@@ -16,12 +16,7 @@
                 row.nullifyLink(columnInfo.columnObjectIndex);
                 return;
             }
-            if (!RealmObject.isValid(value)) {
-                throw new IllegalArgumentException("'value' is not a valid managed object.");
-            }
-            if (((RealmObjectProxy) value).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm()) {
-                throw new IllegalArgumentException("'value' belongs to a different Realm.");
-            }
+            proxyState.checkValidObject(value);
             row.getTable().setLink(columnInfo.columnObjectIndex, row.getIndex(), ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getIndex(), true);
             return;
         }
@@ -31,12 +26,7 @@
             proxyState.getRow$realm().nullifyLink(columnInfo.columnObjectIndex);
             return;
         }
-        if (!(RealmObject.isManaged(value) && RealmObject.isValid(value))) {
-            throw new IllegalArgumentException("'value' is not a valid managed object.");
-        }
-        if (((RealmObjectProxy) value).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm()) {
-            throw new IllegalArgumentException("'value' belongs to a different Realm.");
-        }
+        proxyState.checkValidObject(value);
         proxyState.getRow$realm().setLink(columnInfo.columnObjectIndex, ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getIndex());
     }
 

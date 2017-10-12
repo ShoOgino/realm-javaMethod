@@ -59,15 +59,28 @@
             }
 
             OsList columnRealmListOsList = new OsList(table.getUncheckedRow(rowIndex), columnInfo.columnRealmListIndex);
-            columnRealmListOsList.removeAll();
             RealmList<some.test.AllTypes> columnRealmListList = ((AllTypesRealmProxyInterface) object).realmGet$columnRealmList();
-            if (columnRealmListList != null) {
-                for (some.test.AllTypes columnRealmListItem : columnRealmListList) {
+            if (columnRealmListList != null && columnRealmListList.size() == columnRealmListOsList.size()) {
+                // For lists of equal lengths, we need to set each element directly as clearing the receiver list can be wrong if the input and target list are the same.
+                int objectCount = columnRealmListList.size();
+                for (int i = 0; i < objectCount; i++) {
+                    some.test.AllTypes columnRealmListItem = columnRealmListList.get(i);
                     Long cacheItemIndexcolumnRealmList = cache.get(columnRealmListItem);
                     if (cacheItemIndexcolumnRealmList == null) {
                         cacheItemIndexcolumnRealmList = AllTypesRealmProxy.insertOrUpdate(realm, columnRealmListItem, cache);
                     }
-                    columnRealmListOsList.addRow(cacheItemIndexcolumnRealmList);
+                    columnRealmListOsList.setRow(i, cacheItemIndexcolumnRealmList);
+                }
+            } else {
+                columnRealmListOsList.removeAll();
+                if (columnRealmListList != null) {
+                    for (some.test.AllTypes columnRealmListItem : columnRealmListList) {
+                        Long cacheItemIndexcolumnRealmList = cache.get(columnRealmListItem);
+                        if (cacheItemIndexcolumnRealmList == null) {
+                            cacheItemIndexcolumnRealmList = AllTypesRealmProxy.insertOrUpdate(realm, columnRealmListItem, cache);
+                        }
+                        columnRealmListOsList.addRow(cacheItemIndexcolumnRealmList);
+                    }
                 }
             }
 

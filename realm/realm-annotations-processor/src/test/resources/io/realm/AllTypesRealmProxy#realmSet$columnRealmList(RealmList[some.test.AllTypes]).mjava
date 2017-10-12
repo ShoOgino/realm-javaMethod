@@ -24,18 +24,25 @@
 
         proxyState.getRealm$realm().checkIfValid();
         OsList osList = proxyState.getRow$realm().getModelList(columnInfo.columnRealmListIndex);
-        osList.removeAll();
-        if (value == null) {
-            return;
-        }
-        for (RealmModel linkedObject : value) {
-            if (!(RealmObject.isManaged(linkedObject) && RealmObject.isValid(linkedObject))) {
-                throw new IllegalArgumentException("Each element of 'value' must be a valid managed object.");
+        // For lists of equal lengths, we need to set each element directly as clearing the receiver list can be wrong if the input and target list are the same.
+        if (value != null && value.size() == osList.size()) {
+            int objects = value.size();
+            for (int i = 0; i < objects; i++) {
+                some.test.AllTypes linkedObject = value.get(i);
+                proxyState.checkValidObject(linkedObject);
+                osList.setRow(i, ((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getIndex());
             }
-            if (((RealmObjectProxy) linkedObject).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm()) {
-                throw new IllegalArgumentException("Each element of 'value' must belong to the same Realm.");
+        } else {
+            osList.removeAll();
+            if (value == null) {
+                return;
             }
-            osList.addRow(((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getIndex());
+            int objects = value.size();
+            for (int i = 0; i < objects; i++) {
+                some.test.AllTypes linkedObject = value.get(i);
+                proxyState.checkValidObject(linkedObject);
+                osList.addRow(((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getIndex());
+            }
         }
     }
 
