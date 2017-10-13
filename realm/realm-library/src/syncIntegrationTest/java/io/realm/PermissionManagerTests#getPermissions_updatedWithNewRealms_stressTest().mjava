@@ -1,7 +1,7 @@
     @Test
     @RunTestInLooperThread(emulateMainThread = true)
-    @Ignore("See https://github.com/realm/ros/issues/437")
     public void getPermissions_updatedWithNewRealms_stressTest() {
+        final int TEST_SIZE = 10;
         final PermissionManager pm = user.getPermissionManager();
         looperThread.closeAfterTest(pm);
         pm.getPermissions(new PermissionManager.PermissionsCallback() {
@@ -10,8 +10,8 @@
                 assertTrue(permissions.isLoaded());
                 assertInitialPermissions(permissions);
 
-                for (int i = 0; i < 10; i++) {
-                    SyncConfiguration configNew = new SyncConfiguration.Builder(user, "realm://127.0.0.1:9080/~/test" + i).build();
+                for (int i = 0; i < TEST_SIZE; i++) {
+                    SyncConfiguration configNew = new SyncConfiguration.Builder(user, "realm://" + Constants.HOST + "/~/test" + i).build();
                     Realm newRealm = Realm.getInstance(configNew);
                     looperThread.closeAfterTest(newRealm);
                 }
@@ -21,8 +21,8 @@
                 permissions.addChangeListener(new RealmChangeListener<RealmResults<Permission>>() {
                     @Override
                     public void onChange(RealmResults<Permission> permissions) {
-                        RealmLog.error(Arrays.toString(permissions.toArray()));  // FIXME Debug output for CI. Remove before release.
-                        Permission p = permissions.where().endsWith("path", "test9").findFirst();
+                        RealmLog.error(String.format("Size: %s, Permissions: %s", permissions.size(), Arrays.toString(permissions.toArray())));
+                        Permission p = permissions.where().endsWith("path", "test" + (TEST_SIZE - 1)).findFirst();
                         if (p != null) {
                             assertTrue(p.mayRead());
                             assertTrue(p.mayWrite());

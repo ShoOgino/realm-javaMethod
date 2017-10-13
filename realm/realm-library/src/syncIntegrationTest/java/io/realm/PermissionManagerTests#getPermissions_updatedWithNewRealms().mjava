@@ -1,8 +1,7 @@
     @Test
     @RunTestInLooperThread(emulateMainThread = true)
-    @Ignore("See https://github.com/realm/ros/issues/437")
     public void getPermissions_updatedWithNewRealms() {
-        PermissionManager pm = user.getPermissionManager();
+        final PermissionManager pm = user.getPermissionManager();
         looperThread.closeAfterTest(pm);
         pm.getPermissions(new PermissionManager.PermissionsCallback() {
             @Override
@@ -26,6 +25,7 @@
                 permissions.addChangeListener(new RealmChangeListener<RealmResults<Permission>>() {
                     @Override
                     public void onChange(RealmResults<Permission> permissions) {
+                        RealmLog.error(String.format("2ndCallback: Size: %s, Permissions: %s", permissions.size(), Arrays.toString(permissions.toArray())));
                         Permission p = permissions.where().endsWith("path", "tests2").findFirst();
                         if (p != null) {
                             assertTrue(p.mayRead());
