@@ -50,7 +50,7 @@
                         dObj.set(AllJavaTypes.FIELD_OBJECT, dObj);
                         assertEquals(dObj, dObj.get(AllJavaTypes.FIELD_OBJECT));
                         break;
-                    case LIST:
+                    case LIST: {
                         RealmList<DynamicRealmObject> newList = new RealmList<DynamicRealmObject>();
                         newList.add(dObj);
                         dObj.set(AllJavaTypes.FIELD_LIST, newList);
@@ -58,6 +58,63 @@
                         assertEquals(1, list.size());
                         assertEquals(dObj, list.get(0));
                         break;
+                    }
+                    case LIST_INTEGER: {
+                        RealmList<Integer> newList = new RealmList<>(null, 1);
+                        dObj.set(AllJavaTypes.FIELD_INTEGER_LIST, newList);
+                        RealmList<Integer> list = dObj.getList(AllJavaTypes.FIELD_INTEGER_LIST, Integer.class);
+                        assertEquals(2, list.size());
+                        assertArrayEquals(newList.toArray(), list.toArray());
+                        break;
+                    }
+                    case LIST_STRING: {
+                        RealmList<String> newList = new RealmList<>(null, "Foo");
+                        dObj.set(AllJavaTypes.FIELD_STRING_LIST, newList);
+                        RealmList<String> list = dObj.getList(AllJavaTypes.FIELD_STRING_LIST, String.class);
+                        assertEquals(2, list.size());
+                        assertArrayEquals(newList.toArray(), list.toArray());
+                        break;
+                    }
+                    case LIST_BOOLEAN: {
+                        RealmList<Boolean> newList = new RealmList<>(null, true);
+                        dObj.set(AllJavaTypes.FIELD_BOOLEAN_LIST, newList);
+                        RealmList<Boolean> list = dObj.getList(AllJavaTypes.FIELD_BOOLEAN_LIST, Boolean.class);
+                        assertEquals(2, list.size());
+                        assertArrayEquals(newList.toArray(), list.toArray());
+                        break;
+                    }
+                    case LIST_FLOAT: {
+                        RealmList<Float> newList = new RealmList<>(null, 1.23F);
+                        dObj.set(AllJavaTypes.FIELD_FLOAT_LIST, newList);
+                        RealmList<Float> list = dObj.getList(AllJavaTypes.FIELD_FLOAT_LIST, Float.class);
+                        assertEquals(2, list.size());
+                        assertArrayEquals(newList.toArray(), list.toArray());
+                        break;
+                    }
+                    case LIST_DOUBLE: {
+                        RealmList<Double> newList = new RealmList<>(null, 1.24D);
+                        dObj.set(AllJavaTypes.FIELD_DOUBLE_LIST, newList);
+                        RealmList<Double> list = dObj.getList(AllJavaTypes.FIELD_DOUBLE_LIST, Double.class);
+                        assertEquals(2, list.size());
+                        assertArrayEquals(newList.toArray(), list.toArray());
+                        break;
+                    }
+                    case LIST_BINARY: {
+                        RealmList<byte[]> newList = new RealmList<>(null, new byte[] {1, 2, 3});
+                        dObj.set(AllJavaTypes.FIELD_BINARY_LIST, newList);
+                        RealmList<byte[]> list = dObj.getList(AllJavaTypes.FIELD_BINARY_LIST, byte[].class);
+                        assertEquals(2, list.size());
+                        assertArrayEquals(newList.toArray(), list.toArray());
+                        break;
+                    }
+                    case LIST_DATE: {
+                        RealmList<Date> newList = new RealmList<>(null, new Date(1000));
+                        dObj.set(AllJavaTypes.FIELD_DATE_LIST, newList);
+                        RealmList<Date> list = dObj.getList(AllJavaTypes.FIELD_DATE_LIST, Date.class);
+                        assertEquals(2, list.size());
+                        assertArrayEquals(newList.toArray(), list.toArray());
+                        break;
+                    }
                     default:
                         fail();
                 }

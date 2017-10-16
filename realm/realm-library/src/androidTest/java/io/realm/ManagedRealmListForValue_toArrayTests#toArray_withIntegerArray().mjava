@@ -1,0 +1,23 @@
+    @Test
+    public void toArray_withIntegerArray() {
+        if (listType != INTEGER_LIST) {
+            thrown.expect(ArrayStoreException.class);
+            list.toArray(new Integer[0]);
+            // should not reach here
+            return;
+        }
+
+        final Integer[] expected = new Integer[typeIsNullable ? NULLABLE_TEST_SIZE : NON_NULL_TEST_SIZE];
+        for (int i = 0; i < NON_NULL_TEST_SIZE; i++) {
+            if (typeIsNullable) {
+                expected[i * 2] = (Integer) generateValue(INTEGER_LIST, i);
+                expected[i * 2 + 1] = null;
+            } else {
+                expected[i] = (Integer) generateValue(INTEGER_LIST, i);
+            }
+        }
+        final Object[] returnedArray = list.toArray(new Integer[0]);
+        assertEquals(Integer.class, returnedArray.getClass().getComponentType());
+        assertArrayEquals(expected, returnedArray);
+    }
+

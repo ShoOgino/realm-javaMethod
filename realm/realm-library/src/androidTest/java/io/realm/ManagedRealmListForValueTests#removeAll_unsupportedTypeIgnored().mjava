@@ -1,0 +1,19 @@
+    @Test
+    public void removeAll_unsupportedTypeIgnored() {
+        final int initialSize = list.size();
+
+        final List<Object> unsupportedValues = Arrays.<Object>asList(
+                new int[] {0},
+                new StringBuilder("0")
+        );
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                //noinspection unchecked
+                assertFalse(list.removeAll(unsupportedValues));
+            }
+        });
+
+        assertEquals(initialSize, list.size());
+    }
+

@@ -1,0 +1,36 @@
+    @Override
+    public <E> Observable<CollectionChange<RealmList<E>>> changesetsFrom(Realm realm, final RealmList<E> list) {
+        final RealmConfiguration realmConfig = realm.getConfiguration();
+        return Observable.create(new ObservableOnSubscribe<CollectionChange<RealmList<E>>>() {
+            @Override
+            public void subscribe(final ObservableEmitter<CollectionChange<RealmList<E>>> emitter) throws Exception {
+                // Gets instance to make sure that the Realm is open for as long as the
+                // Observable is subscribed to it.
+                final Realm observableRealm = Realm.getInstance(realmConfig);
+                listRefs.get().acquireReference(list);
+                final OrderedRealmCollectionChangeListener<RealmList<E>> listener = new OrderedRealmCollectionChangeListener<RealmList<E>>() {
+                    @Override
+                    public void onChange(RealmList<E> results, OrderedCollectionChangeSet changeSet) {
+                        if (!emitter.isDisposed()) {
+                            emitter.onNext(new CollectionChange<>(results, changeSet));
+                        }
+                    }
+                };
+                list.addChangeListener(listener);
+
+                // Cleanup when stream is disposed
+                emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        list.removeChangeListener(listener);
+                        observableRealm.close();
+                        listRefs.get().releaseReference(list);
+                    }
+                }));
+
+                // Emit current value immediately
+                emitter.onNext(new CollectionChange<>(list, null));
+            }
+        });
+    }
+

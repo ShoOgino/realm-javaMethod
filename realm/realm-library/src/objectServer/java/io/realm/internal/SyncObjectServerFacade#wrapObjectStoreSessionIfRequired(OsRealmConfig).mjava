@@ -1,0 +1,8 @@
+    @Override
+    public void wrapObjectStoreSessionIfRequired(OsRealmConfig config) {
+        if (config.getRealmConfiguration() instanceof SyncConfiguration) {
+            SyncSession session = SyncManager.getSession((SyncConfiguration) config.getRealmConfiguration());
+            session.setResolvedRealmURI(config.getResolvedRealmURI());
+        }
+    }
+

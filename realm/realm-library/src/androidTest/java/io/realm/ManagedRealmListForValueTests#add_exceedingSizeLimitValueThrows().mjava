@@ -1,0 +1,42 @@
+    @Test
+    public void add_exceedingSizeLimitValueThrows() {
+        if (listType != STRING_LIST && listType != BINARY_LIST) {
+            return;
+        }
+
+        final int sizeLimit;
+        switch (listType) {
+            case STRING_LIST:
+                sizeLimit = Table.MAX_STRING_SIZE;
+                break;
+            case BINARY_LIST:
+                sizeLimit = Table.MAX_BINARY_SIZE;
+                break;
+            default:
+                throw new AssertionError("Unexpected list type: " + listType.name());
+        }
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                //noinspection unchecked
+                list.add(generateHugeValue(listType, sizeLimit));
+            }
+        });
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                final long sizeBeforeException = list.size();
+                thrown.expect(IllegalArgumentException.class);
+                try {
+                    //noinspection unchecked
+                    list.add(generateHugeValue(listType, sizeLimit + 1));
+                } finally {
+                    // FIXME This assertion fails now. Code will be fixed in master branch first.
+                    assertEquals(sizeBeforeException, list.size());
+                }
+            }
+        });
+    }
+

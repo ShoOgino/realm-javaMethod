@@ -6,8 +6,15 @@
      * @throws IndexOutOfBoundsException if {@code location < 0 || location >= size()}.
      */
     @Override
+    @Nullable
     public E get(int location) {
         realm.checkIfValid();
-        return realm.get(classSpec, className, collection.getUncheckedRow(location));
+        if (forValues) {
+            // TODO implement this
+            return null;
+        }
+
+        //noinspection unchecked
+        return (E) realm.get((Class<? extends RealmModel>) classSpec, className, collection.getUncheckedRow(location));
     }
 

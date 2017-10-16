@@ -1,7 +1,7 @@
     @Test
     public void userRefresh() throws URISyntaxException, JSONException {
-        Token t = SyncTestUtils.createTestUser().getAccessToken();
-        AuthenticateRequest request = AuthenticateRequest.userRefresh(t, new URI("realm://objectserver/" + t.identity() + "/default"));
+        Token t = SyncTestUtils.createTestUser().getRefreshToken();
+        AuthenticateRequest request = AuthenticateRequest.userRefresh(t, new URI("realm://objectserver/" + t.identity() + "/default").getPath());
 
         JSONObject obj = new JSONObject(request.toJson());
         assertTrue(obj.has("path"));

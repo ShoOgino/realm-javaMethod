@@ -3,15 +3,15 @@
     public void realmResults_emittedOnSubscribe() {
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         final RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
-        subscription = results.asObservable().subscribe(new Action1<RealmResults<AllTypes>>() {
+        subscription = results.asFlowable().subscribe(new Consumer<RealmResults<AllTypes>>() {
             @Override
             @SuppressWarnings("ReferenceEquality")
-            public void call(RealmResults<AllTypes> rxResults) {
+            public void accept(RealmResults<AllTypes> rxResults) throws Exception {
                 assertTrue(rxResults == results);
                 subscribedNotified.set(true);
             }
         });
         assertTrue(subscribedNotified.get());
-        subscription.unsubscribe();
+        subscription.dispose();
     }
 

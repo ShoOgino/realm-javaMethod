@@ -1,0 +1,40 @@
+    @Test
+    public void schemaInformationOfPrimitiveLists() {
+        Map<String, RealmFieldType> fieldNameToType = new HashMap<>();
+        fieldNameToType.put(NullTypes.FIELD_STRING_LIST_NULL, RealmFieldType.STRING_LIST);
+        fieldNameToType.put(NullTypes.FIELD_STRING_LIST_NOT_NULL, RealmFieldType.STRING_LIST);
+        fieldNameToType.put(NullTypes.FIELD_BINARY_LIST_NULL, RealmFieldType.BINARY_LIST);
+        fieldNameToType.put(NullTypes.FIELD_BINARY_LIST_NOT_NULL, RealmFieldType.BINARY_LIST);
+        fieldNameToType.put(NullTypes.FIELD_BOOLEAN_LIST_NULL, RealmFieldType.BOOLEAN_LIST);
+        fieldNameToType.put(NullTypes.FIELD_BOOLEAN_LIST_NOT_NULL, RealmFieldType.BOOLEAN_LIST);
+        fieldNameToType.put(NullTypes.FIELD_DATE_LIST_NULL, RealmFieldType.DATE_LIST);
+        fieldNameToType.put(NullTypes.FIELD_DATE_LIST_NOT_NULL, RealmFieldType.DATE_LIST);
+        fieldNameToType.put(NullTypes.FIELD_DOUBLE_LIST_NULL, RealmFieldType.DOUBLE_LIST);
+        fieldNameToType.put(NullTypes.FIELD_DOUBLE_LIST_NOT_NULL, RealmFieldType.DOUBLE_LIST);
+        fieldNameToType.put(NullTypes.FIELD_FLOAT_LIST_NULL, RealmFieldType.FLOAT_LIST);
+        fieldNameToType.put(NullTypes.FIELD_FLOAT_LIST_NOT_NULL, RealmFieldType.FLOAT_LIST);
+        fieldNameToType.put(NullTypes.FIELD_LONG_LIST_NULL, RealmFieldType.INTEGER_LIST);
+        fieldNameToType.put(NullTypes.FIELD_LONG_LIST_NOT_NULL, RealmFieldType.INTEGER_LIST);
+        fieldNameToType.put(NullTypes.FIELD_INTEGER_LIST_NULL, RealmFieldType.INTEGER_LIST);
+        fieldNameToType.put(NullTypes.FIELD_INTEGER_LIST_NOT_NULL, RealmFieldType.INTEGER_LIST);
+        fieldNameToType.put(NullTypes.FIELD_SHORT_LIST_NULL, RealmFieldType.INTEGER_LIST);
+        fieldNameToType.put(NullTypes.FIELD_SHORT_LIST_NOT_NULL, RealmFieldType.INTEGER_LIST);
+        fieldNameToType.put(NullTypes.FIELD_BYTE_LIST_NULL, RealmFieldType.INTEGER_LIST);
+        fieldNameToType.put(NullTypes.FIELD_BYTE_LIST_NOT_NULL, RealmFieldType.INTEGER_LIST);
+
+        final RealmObjectSchema objectSchema = realmSchema.get(NullTypes.CLASS_NAME);
+        assertNotNull(objectSchema);
+
+        for (Map.Entry<String, RealmFieldType> entry : fieldNameToType.entrySet()) {
+            final String fieldName = entry.getKey();
+            final RealmFieldType expectedType = entry.getValue();
+
+            assertEquals(expectedType, objectSchema.getFieldType(fieldName));
+            assertEquals("isNullable('" + fieldName + "')",
+                    !fieldName.endsWith("NotNull"), objectSchema.isNullable(fieldName));
+            assertEquals("isRequired('" + fieldName + "')",
+                    fieldName.endsWith("NotNull"), objectSchema.isRequired(fieldName));
+            assertFalse(objectSchema.isPrimaryKey(fieldName));
+        }
+    }
+

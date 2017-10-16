@@ -6,17 +6,8 @@
         Response response = client.newCall(request).execute();
         if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
-        Headers responseHeaders = response.headers();
-        for (int i = 0; i < responseHeaders.size(); i++) {
-            Log.d(TAG, responseHeaders.name(i) + ": " + responseHeaders.value(i));
-        }
-
-        Log.d(TAG, response.body().string());
-
-        // FIXME: Server ready checking should be done in the control server side!
-        if (!waitAuthServerReady()) {
-            stopSyncServer();
-            throw new RuntimeException("Auth server cannot be started.");
-        }
+        // Work around race condition between starting ROS and logging in first user
+        // See https://github.com/realm/ros/issues/389
+        SystemClock.sleep(2000);
     }
 

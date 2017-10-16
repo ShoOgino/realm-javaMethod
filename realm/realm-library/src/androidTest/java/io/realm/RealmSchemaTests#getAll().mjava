@@ -1,15 +1,17 @@
     @Test
     public void getAll() {
         Set<RealmObjectSchema> objectSchemas = realmSchema.getAll();
-        assertEquals(6, objectSchemas.size());
+        assertEquals(7, objectSchemas.size());
 
-        List<String> expectedTables = Arrays.asList(
-                AllJavaTypes.CLASS_NAME, "Owner", "Cat", "Dog", "DogPrimaryKey", "PrimaryKeyAsString");
+        List<String> expectedTables = new ArrayList<>(Arrays.asList(
+                AllJavaTypes.CLASS_NAME, "Owner", "Cat", "Dog", "DogPrimaryKey", "PrimaryKeyAsString", NullTypes.CLASS_NAME));
         for (RealmObjectSchema objectSchema : objectSchemas) {
             assertThat(objectSchema, CoreMatchers.instanceOf(type.objectSchemaClass));
-            if (!expectedTables.contains(objectSchema.getClassName())) {
-                fail(objectSchema.getClassName() + " was not found");
+            if (!expectedTables.remove(objectSchema.getClassName())) {
+                fail(objectSchema.getClassName() + " is not expected");
             }
         }
+        assertTrue("expected class is not contained in schema: " + (expectedTables.isEmpty() ? "" : expectedTables.get(0)),
+                expectedTables.isEmpty());
     }
 

@@ -26,7 +26,9 @@
                 .emitStatement("%s obj = null", qualifiedClassName)
                 .beginControlFlow("if (update)")
                     .emitStatement("Table table = realm.getTable(%s.class)", qualifiedClassName)
-                    .emitStatement("long pkColumnIndex = table.getPrimaryKey()")
+                    .emitStatement("%s columnInfo = (%s) realm.getSchema().getColumnInfo(%s.class)",
+                        columnInfoClassName(), columnInfoClassName(), qualifiedClassName)
+                    .emitStatement("long pkColumnIndex = %s", fieldIndexVariableReference(metadata.getPrimaryKey()))
                     .emitStatement("long rowIndex = Table.NO_MATCH");
             if (metadata.isNullable(metadata.getPrimaryKey())) {
                 writer
@@ -89,7 +91,7 @@
                         writer
                 );
 
-            } else if (Utils.isRealmList(field)) {
+            } else if (Utils.isRealmModelList(field)) {
                 RealmJsonTypeHelper.emitFillRealmListWithJsonValue(
                         "objProxy",
                         metadata.getInternalGetter(fieldName),
@@ -99,6 +101,10 @@
                         Utils.getProxyClassSimpleName(field),
                         writer);
 
+            } else if (Utils.isRealmValueList(field)) {
+                // FIXME need to implement logic for value list fields.
+                writer.emitSingleLineComment(String.format(Locale.ENGLISH,
+                        "TODO implement logic for value list %1$s.", field.getSimpleName()));
             } else if (Utils.isMutableRealmInteger(field)) {
                 RealmJsonTypeHelper.emitFillJavaTypeWithJsonValue(
                         "objProxy",

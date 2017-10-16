@@ -9,6 +9,9 @@
     public RealmQuery<E> where() {
         if (isManaged()) {
             checkValidRealm();
+            if (!osListOperator.forRealmModel()) {
+                throw new UnsupportedOperationException(ALLOWED_ONLY_FOR_REALM_MODEL_ELEMENT_MESSAGE);
+            }
             return RealmQuery.createQueryFromList(this);
         } else {
             throw new UnsupportedOperationException(ONLY_IN_MANAGED_MODE_MESSAGE);

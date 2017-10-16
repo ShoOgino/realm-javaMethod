@@ -25,12 +25,7 @@
         AuthenticationServer authServer = SyncManager.getAuthServer();
         LookupUserIdResponse response = authServer.retrieveUser(refreshToken, provider, providerUserIdentity, getAuthenticationUrl());
         if (!response.isValid()) {
-            // the endpoint returns a 404 if it can't honor the query, either because
-            // - provider is not valid
-            // - provider_id is not valid
-            // - token used is not an admin one
-            // in this case we should return null instead of throwing
-            if (response.getError().getErrorCode() == ErrorCode.NOT_FOUND) {
+            if (response.getError().getErrorCode() == ErrorCode.UNKNOWN_ACCOUNT) {
                 return null;
             } else {
                 throw response.getError();

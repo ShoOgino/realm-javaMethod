@@ -1,43 +1,23 @@
     /**
      * Shows how to to be careful when using `distinct()`
      */
-    private Subscription testDistinct() {
-        Observable<Person> personObserver = realm.asObservable().map(new Func1<Realm, Person>() {
-            @Override
-            public Person call(Realm realm) {
-                return realm.where(Person.class).findAllSorted("name").get(0);
-            }
-        });
+    private void testDistinct() {
+        Flowable<Person> personFlowable =
+                realm.asFlowable().map(realm -> realm.where(Person.class).findAllSorted("name").get(0));
 
         // distinct() and distinctUntilChanged() uses standard equals with older objects stored in a HashMap.
         // Realm objects auto-update which means the objects stored will also auto-update.
         // This makes comparing against older objects impossible (even if the new object has changed) because the
         // cached object will also have changed.
         // Use a keySelector function to work around this.
-        Subscription distinctItemTest = personObserver
+        Disposable distinctDisposable = personFlowable
                 .distinct() // Because old == new. This will only allow the first version of the "Chris" object to pass.
-                .subscribe(new Action1<Person>() {
-                    @Override
-                    public void call(Person p) {
-                        showStatus("distinct(): " + p.getName() + ":" + p.getAge());
-                    }
-                });
+                .subscribe(person -> showStatus("distinct(): " + person.getName() + ":" + person.getAge()));
+        compositeDisposable.add(distinctDisposable);
 
-        Subscription distinctKeySelectorItemTest = personObserver
-                .distinct(new Func1<Person, Integer>() { // Use a keySelector function instead
-                    @Override
-                    public Integer call(Person p) {
-                        return p.getAge();
-                    }
-                })
-                .subscribe(new Action1<Person>() {
-                    @Override
-                    public void call(Person p) {
-                        showStatus("distinct(keySelector): " + p.getName() + ":" + p.getAge());
-                    }
-                });
-
-
-        return new CompositeSubscription(distinctItemTest, distinctKeySelectorItemTest);
+        Disposable distinctKeySelectorDisposable = personFlowable
+                .distinct(person -> person.getAge())
+                .subscribe(person -> showStatus("distinct(keySelector): " + person.getName() + ":" + person.getAge()));
+        compositeDisposable.add(distinctKeySelectorDisposable);
     }
 

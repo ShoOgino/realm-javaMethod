@@ -1,0 +1,26 @@
+    @Test
+    public void add_insert_set_null_required_String() {
+        long index = testObjectSchemaInfo.getProperty("requiredStringList").getColumnIndex();
+        OsList osList = new OsList(row, index);
+
+        addNull_insertNull_setNull_requiredList(osList);
+
+        try {
+            osList.insertString(0, null);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        try {
+            osList.addString(null);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        try {
+            osList.setString(0, null);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+

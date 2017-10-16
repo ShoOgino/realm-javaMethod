@@ -1,9 +1,19 @@
     private RealmQuery(RealmResults<E> queryResults, Class<E> clazz) {
         this.realm = queryResults.realm;
         this.clazz = clazz;
-        this.schema = realm.getSchema().getSchemaForClass(clazz);
-        this.table = queryResults.getTable();
-        this.osList = null;
-        this.query = queryResults.getCollection().where();
+        this.forValues = !isClassForRealmModel(clazz);
+        if (forValues) {
+            // TODO implement this
+            this.schema = null;
+            this.table = null;
+            this.osList = null;
+            this.query = null;
+        } else {
+            //noinspection unchecked
+            this.schema = realm.getSchema().getSchemaForClass((Class<? extends RealmModel>) clazz);
+            this.table = queryResults.getTable();
+            this.osList = null;
+            this.query = queryResults.getCollection().where();
+        }
     }
 

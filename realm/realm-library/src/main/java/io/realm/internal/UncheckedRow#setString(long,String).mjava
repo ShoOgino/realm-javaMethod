@@ -8,10 +8,8 @@
     public void setString(long columnIndex, @Nullable String value) {
         parent.checkImmutable();
         if (value == null) {
-            getTable().checkDuplicatedNullForPrimaryKeyValue(columnIndex, getIndex());
             nativeSetNull(nativePtr, columnIndex);
         } else {
-            getTable().checkStringValueIsLegal(columnIndex, getIndex(), value);
             nativeSetString(nativePtr, columnIndex, value);
         }
     }

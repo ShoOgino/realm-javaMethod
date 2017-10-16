@@ -1,0 +1,23 @@
+    @Test
+    public void toArray_withLongArray() {
+        if (listType != LONG_LIST) {
+            thrown.expect(ArrayStoreException.class);
+            list.toArray(new Long[0]);
+            // should not reach here
+            return;
+        }
+
+        final Long[] expected = new Long[typeIsNullable ? NULLABLE_TEST_SIZE : NON_NULL_TEST_SIZE];
+        for (int i = 0; i < NON_NULL_TEST_SIZE; i++) {
+            if (typeIsNullable) {
+                expected[i * 2] = (Long) generateValue(LONG_LIST, i);
+                expected[i * 2 + 1] = null;
+            } else {
+                expected[i] = (Long) generateValue(LONG_LIST, i);
+            }
+        }
+        final Object[] returnedArray = list.toArray(new Long[0]);
+        assertEquals(Long.class, returnedArray.getClass().getComponentType());
+        assertArrayEquals(expected, returnedArray);
+    }
+

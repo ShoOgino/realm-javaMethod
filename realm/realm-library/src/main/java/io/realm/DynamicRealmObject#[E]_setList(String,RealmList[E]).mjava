@@ -1,0 +1,49 @@
+    /**
+     * Sets the reference to a {@link RealmList} on the given field.
+     *
+     * @param fieldName field name.
+     * @param list list of objects. Must either be primitive types or {@link DynamicRealmObject}s.
+     * @throws IllegalArgumentException if field name doesn't exist, it is not a list field, the objects in the
+     * list doesn't match the expected type or any Realm object in the list belongs to a different Realm.
+     */
+    public <E> void setList(String fieldName, RealmList<E> list) {
+        proxyState.getRealm$realm().checkIfValid();
+
+        //noinspection ConstantConditions
+        if (list == null) {
+            throw new IllegalArgumentException("Non-null 'list' required");
+        }
+
+        // Find type of list in Realm
+        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        final RealmFieldType columnType = proxyState.getRow$realm().getColumnType(columnIndex);
+
+        switch (columnType) {
+            case LIST:
+                // Due to type erasure it is not possible to check the generic parameter,
+                // instead we try to see if the first element is of the wrong type in order
+                // to throw a better error message.
+                // Primitive types are checked inside `setModelList`
+                if (!list.isEmpty()) {
+                    E element = list.first();
+                    if (!(element instanceof DynamicRealmObject) && RealmModel.class.isAssignableFrom(element.getClass())) {
+                        throw new IllegalArgumentException("RealmList must contain `DynamicRealmObject's, not Java model classes.");
+                    }
+                }
+                //noinspection unchecked
+                setModelList(fieldName, (RealmList<DynamicRealmObject>) list);
+                break;
+            case INTEGER_LIST:
+            case BOOLEAN_LIST:
+            case STRING_LIST:
+            case BINARY_LIST:
+            case DATE_LIST:
+            case FLOAT_LIST:
+            case DOUBLE_LIST:
+                setValueList(fieldName, list, columnType);
+                break;
+            default:
+                throw new IllegalArgumentException(String.format("Field '%s' is not a list but a %s", fieldName, columnType));
+        }
+    }
+

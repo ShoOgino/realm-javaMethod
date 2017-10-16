@@ -1,12 +1,17 @@
+        /**
+         * Creates {@link OsObjectSchemaInfo} object from this builder. After calling, this {@code Builder} becomes
+         * invalid. All the property pointers will be freed.
+         *
+         * @return a newly created {@link OsObjectSchemaInfo}.
+         */
         public OsObjectSchemaInfo build() {
+            if (persistedPropertyPtrCurPos == -1 || computedPropertyPtrCurPos == -1) {
+                throw new IllegalStateException("'OsObjectSchemaInfo.build()' has been called before on this object.");
+            }
             OsObjectSchemaInfo info = new OsObjectSchemaInfo(className);
-            for (Property property : persistedPropertyList) {
-                nativeAddProperty(info.nativePtr, property.getNativePtr(), false);
-            }
-            for (Property property : computedPropertyList) {
-                nativeAddProperty(info.nativePtr, property.getNativePtr(), true);
-            }
-
+            nativeAddProperties(info.nativePtr, persistedPropertyPtrArray, computedPropertyPtrArray);
+            persistedPropertyPtrCurPos = -1;
+            computedPropertyPtrCurPos = -1;
             return info;
         }
 

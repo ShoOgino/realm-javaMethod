@@ -1,0 +1,31 @@
+    // Checks that null values in a value list are correctly converted to default values
+    // when field is set to required.
+    private <E> void checkListValueConversionToDefaultValue(Class<E> type, Object defaultValue) {
+        schema.addRealmListField("foo", type);
+        DynamicRealmObject obj = ((DynamicRealm) realm).createObject(schema.getClassName());
+        RealmList<E> list = new RealmList<>();
+        list.add(null);
+        obj.setList("foo", list);
+        assertNull(obj.getList("foo", type).first());
+
+        // Convert from nullable to required
+        schema.setRequired("foo", true);
+        if (defaultValue instanceof byte[]) {
+            assertArrayEquals((byte[]) defaultValue, (byte[]) obj.getList("foo", type).first());
+        } else {
+            assertEquals(defaultValue, obj.getList("foo", type).first());
+        }
+
+        // Convert back again
+        schema.setRequired("foo", false);
+        if (defaultValue instanceof byte[]) {
+            //noinspection ConstantConditions
+            assertArrayEquals((byte[]) defaultValue, (byte[]) obj.getList("foo", type).first());
+        } else {
+            assertEquals(defaultValue, obj.getList("foo", type).first());
+        }
+
+        // Cleanup
+        schema.removeField("foo");
+    }
+

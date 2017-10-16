@@ -1,0 +1,32 @@
+    // Special test for making sure that binary data in all forms are transformed correctly
+    // when moving between nullable and required states.
+    @Test
+    public void binaryData_nullabilityConversions() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            return;
+        }
+        schema.addRealmListField("foo", byte[].class);
+
+        DynamicRealmObject obj = ((DynamicRealm) realm).createObject(schema.getClassName());
+        RealmList<byte[]> list = obj.getList("foo", byte[].class);
+        assertTrue(list.size() == 0);
+
+        // Initial content (nullable)
+        list.add(null);
+        list.add(new byte[] {1, 2, 3});
+        assertNull(list.get(0));
+        assertArrayEquals(new byte[] {1, 2, 3}, list.get(1));
+
+        // Transform to required
+        schema.setRequired("foo", true);
+        list = obj.getList("foo", byte[].class);
+        assertEquals(0, list.get(0).length);
+        assertArrayEquals(new byte[] {1, 2, 3}, list.get(1));
+
+        // Transform back to nullable
+        schema.setRequired("foo", false);
+        list = obj.getList("foo", byte[].class);
+        assertEquals(0, list.get(0).length);
+        assertArrayEquals(new byte[] {1, 2, 3}, list.get(1));
+    }
+

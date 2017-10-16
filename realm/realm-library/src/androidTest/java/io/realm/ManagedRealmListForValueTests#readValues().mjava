@@ -1,0 +1,59 @@
+    @Test
+    public void readValues() {
+        for (int i = 0; i < NON_NULL_TEST_SIZE; i++) {
+            switch (listType) {
+                case STRING_LIST: {
+                    assertEquals(generateValue(STRING_LIST, i), list.get(isTypeNullable ? (i * 2) : i));
+                }
+                break;
+                case BOOLEAN_LIST: {
+                    assertEquals(generateValue(BOOLEAN_LIST, i), list.get(isTypeNullable ? (i * 2) : i));
+                }
+                break;
+                case BINARY_LIST: {
+                    assertArrayEquals((byte[]) generateValue(BINARY_LIST, i), (byte[]) list.get(isTypeNullable ? (i * 2) : i));
+                }
+                break;
+                case LONG_LIST: {
+                    //noinspection UnnecessaryBoxing
+                    assertEquals(generateValue(LONG_LIST, i), list.get(isTypeNullable ? (i * 2) : i));
+                }
+                break;
+                case INTEGER_LIST: {
+                    //noinspection UnnecessaryBoxing
+                    assertEquals(generateValue(INTEGER_LIST, i), list.get(isTypeNullable ? (i * 2) : i));
+                }
+                break;
+                case SHORT_LIST: {
+                    //noinspection UnnecessaryBoxing
+                    assertEquals(generateValue(SHORT_LIST, i), list.get(isTypeNullable ? (i * 2) : i));
+                }
+                break;
+                case BYTE_LIST: {
+                    //noinspection UnnecessaryBoxing
+                    assertEquals(generateValue(BYTE_LIST, i), list.get(isTypeNullable ? (i * 2) : i));
+                }
+                break;
+                case DOUBLE_LIST: {
+                    //noinspection UnnecessaryBoxing
+                    assertEquals(generateValue(DOUBLE_LIST, i), list.get(isTypeNullable ? (i * 2) : i));
+                }
+                break;
+                case FLOAT_LIST: {
+                    //noinspection UnnecessaryBoxing
+                    assertEquals(generateValue(FLOAT_LIST, i), list.get(isTypeNullable ? (i * 2) : i));
+                }
+                break;
+                case DATE_LIST: {
+                    assertEquals(generateValue(DATE_LIST, i), list.get(isTypeNullable ? (i * 2) : i));
+                }
+                break;
+                default:
+                    throw new AssertionError("unexpected value type: " + listType.name());
+            }
+            if (isTypeNullable) {
+                assertNull(list.get(i * 2 + 1));
+            }
+        }
+    }
+

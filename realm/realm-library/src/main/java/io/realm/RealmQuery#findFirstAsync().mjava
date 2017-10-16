@@ -11,6 +11,10 @@
     public E findFirstAsync() {
         realm.checkIfValid();
 
+        if (forValues) {
+            throw new UnsupportedOperationException("findFirstAsync() available only when type parameter 'E' is implementing RealmModel.");
+        }
+
         realm.sharedRealm.capabilities.checkCanDeliverNotification(ASYNC_QUERY_WRONG_THREAD_MESSAGE);
         Row row;
         if (realm.isInTransaction()) {
@@ -31,8 +35,11 @@
             //noinspection unchecked
             result = (E) new DynamicRealmObject(realm, row);
         } else {
-            result = realm.getConfiguration().getSchemaMediator().newInstance(
-                    clazz, realm, row, realm.getSchema().getColumnInfo(clazz),
+            //noinspection unchecked
+            final Class<? extends RealmModel> modelClass = (Class<? extends RealmModel>) clazz;
+            //noinspection unchecked
+            result = (E) realm.getConfiguration().getSchemaMediator().newInstance(
+                    modelClass, realm, row, realm.getSchema().getColumnInfo(modelClass),
                     false, Collections.<String>emptyList());
         }
 

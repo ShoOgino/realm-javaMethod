@@ -1,0 +1,31 @@
+    @Test
+    public void setPrimaryKey_trueAndFalse() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            try {
+                schema.addPrimaryKey("test");
+                fail();
+            } catch (UnsupportedOperationException ignore){
+
+            }
+            try {
+                schema.removePrimaryKey();
+                fail();
+            } catch (UnsupportedOperationException ignore){
+            }
+            return;
+        }
+        for (PrimaryKeyFieldType fieldType : PrimaryKeyFieldType.values()) {
+            String fieldName = "foo";
+            schema.addField(fieldName, fieldType.getType());
+            schema.addPrimaryKey(fieldName);
+            assertTrue(schema.hasPrimaryKey());
+            assertTrue(schema.isPrimaryKey(fieldName));
+            assertTrue(schema.hasIndex(fieldName));
+            schema.removePrimaryKey();
+            assertFalse(schema.hasPrimaryKey());
+            assertFalse(schema.isPrimaryKey(fieldName));
+            assertFalse(schema.hasIndex(fieldName));
+            schema.removeField(fieldName);
+        }
+    }
+

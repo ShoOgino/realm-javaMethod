@@ -1,8 +1,9 @@
     @Test
     @RunTestInLooperThread
     public void login_newUser() {
-        SyncCredentials credentials = SyncCredentials.usernamePassword("myUser", "password", true);
-        SyncUser.loginAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback() {
+        String userId = UUID.randomUUID().toString();
+        SyncCredentials credentials = SyncCredentials.usernamePassword(userId, "password", true);
+        SyncUser.loginAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback<SyncUser>() {
             @Override
             public void onSuccess(SyncUser user) {
                 assertFalse(user.isAdmin());

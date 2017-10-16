@@ -3,7 +3,7 @@
         super.onCreate(savedInstanceState);
         Realm.init(getApplicationContext());
         setContentView(R.layout.activity_example);
-        rootLayout = ((LinearLayout) findViewById(R.id.container));
+        rootLayout = findViewById(R.id.container);
         rootLayout.removeAllViews();
 
         // Open the default Realm for the UI thread.
@@ -32,13 +32,11 @@
 
         foo.execute();
 
-        findViewById(R.id.clean_up).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.setEnabled(false);
-                cleanUp();
-                v.setEnabled(true);
-            }
+        findViewById(R.id.clean_up).setOnClickListener(view -> {
+            view.setEnabled(false);
+            Log.d("TAG", "clean up");
+            cleanUp();
+            view.setEnabled(true);
         });
     }
 

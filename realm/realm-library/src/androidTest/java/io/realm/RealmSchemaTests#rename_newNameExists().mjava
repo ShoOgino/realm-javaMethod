@@ -1,0 +1,11 @@
+    @Test
+    public void rename_newNameExists() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(
+                CoreMatchers.containsString("Cat cannot be renamed because the new class already exists"));
+        realmSchema.rename("Cat", "Dog");
+    }
+

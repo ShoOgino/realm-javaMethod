@@ -4,7 +4,7 @@
      */
     @Override
     public void close() {
-        checkIfValidThread();
+        checkIfValid();
 
         // Multiple instances open, just decrement the reference count
         synchronized (cacheLock) {
@@ -18,6 +18,7 @@
             cache.instanceCounter = 0;
             cache.pm = null;
         }
+        closed = true;
         delayedTasks.clear();
 
         // If Realms are still being opened, abort that task
@@ -38,12 +39,12 @@
         if (managementRealm != null) {
             managementRealm.close();
         }
+
         if (permissionRealm != null) {
             permissionRealm.close();
         }
         if (defaultPermissionRealm != null) {
             defaultPermissionRealm.close();
         }
-        closed = true;
     }
 

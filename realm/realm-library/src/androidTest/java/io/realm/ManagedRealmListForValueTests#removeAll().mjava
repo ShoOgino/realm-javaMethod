@@ -1,0 +1,32 @@
+    @Test
+    public void removeAll() {
+        final List<Object> toBeRemoved = Arrays.asList(
+                null,
+                generateValue(listType, 2),
+                generateValue(listType, 4));
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                if (!isTypeNullable && listType == BINARY_LIST) {
+                    //noinspection unchecked
+                    assertFalse(list.removeAll(toBeRemoved)); // since 'equals()' never return true against binary array.
+                } else {
+                    //noinspection unchecked
+                    assertTrue(list.removeAll(toBeRemoved));
+                }
+            }
+        });
+
+        switch (listType) {
+            case BINARY_LIST:
+                assertEquals(NON_NULL_TEST_SIZE, list.size());
+                break;
+            case BOOLEAN_LIST:
+                assertEquals(NON_NULL_TEST_SIZE / 2, list.size());
+                break;
+            default:
+                assertEquals(NON_NULL_TEST_SIZE - 2, list.size());
+                break;
+        }
+    }
+

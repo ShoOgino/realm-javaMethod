@@ -1,0 +1,13 @@
+    @Test
+    public void move_outOfBoundsHigherThrows() {
+        realm.beginTransaction();
+        try {
+            list.move(list.size() - 1, list.size());
+            fail("Indexes >= size() should throw an exception");
+        } catch (IndexOutOfBoundsException ignored) {
+            ignored.printStackTrace();
+        } finally {
+            realm.cancelTransaction();
+        }
+    }
+

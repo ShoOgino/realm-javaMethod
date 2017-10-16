@@ -8,7 +8,13 @@
     public E findFirst() {
         realm.checkIfValid();
 
+        if (forValues) {
+            // TODO implement this;
+            return null;
+        }
+
         long tableRowIndex = getSourceRowIndexForFirstObject();
-        return (tableRowIndex < 0) ? null : realm.get(clazz, className, tableRowIndex);
+        //noinspection unchecked
+        return (tableRowIndex < 0) ? null : (E) realm.get((Class<? extends RealmModel>) clazz, className, tableRowIndex);
     }
 

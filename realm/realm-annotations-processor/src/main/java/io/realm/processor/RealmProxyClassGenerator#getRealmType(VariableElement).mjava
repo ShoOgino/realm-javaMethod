@@ -10,8 +10,15 @@
         if (Utils.isRealmModel(field)) {
             return Constants.RealmFieldType.OBJECT;
         }
-        if (Utils.isRealmList(field)) {
+        if (Utils.isRealmModelList(field)) {
             return Constants.RealmFieldType.LIST;
+        }
+        if (Utils.isRealmValueList(field)) {
+            final Constants.RealmFieldType fieldType = Utils.getValueListFieldType(field);
+            if (fieldType == null) {
+                return Constants.RealmFieldType.NOTYPE;
+            }
+            return fieldType;
         }
         return Constants.RealmFieldType.NOTYPE;
     }

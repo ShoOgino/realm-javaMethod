@@ -1,0 +1,28 @@
+    /**
+     * Returns the {@link RealmList} containing only primitive values.
+     *
+     * <p>
+     * If the list contains references to other Realm objects, use {@link #getList(String)} instead.
+     *
+     * @param fieldName the name of the field.
+     * @param primitiveType the type of elements in the list. Only primitive types are supported.
+     * @return the {@link RealmList} data for this field.
+     * @throws IllegalArgumentException if field name doesn't exist or it doesn't contain a list of primitive objects.
+     */
+    public <E> RealmList<E> getList(String fieldName, Class<E> primitiveType) {
+        proxyState.getRealm$realm().checkIfValid();
+
+        if (primitiveType == null) {
+            throw new IllegalArgumentException("Non-null 'primitiveType' required.");
+        }
+        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        RealmFieldType realmType = classToRealmType(primitiveType);
+        try {
+            OsList osList = proxyState.getRow$realm().getValueList(columnIndex, realmType);
+            return new RealmList<>(primitiveType, osList, proxyState.getRealm$realm());
+        } catch (IllegalArgumentException e) {
+            checkFieldType(fieldName, columnIndex, realmType);
+            throw e;
+        }
+    }
+

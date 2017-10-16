@@ -4,16 +4,16 @@
         final DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
         final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         final RealmResults<DynamicRealmObject> results = dynamicRealm.where(AllTypes.CLASS_NAME).findAll();
-        subscription = results.asObservable().subscribe(new Action1<RealmResults<DynamicRealmObject>>() {
+        subscription = results.asFlowable().subscribe(new Consumer<RealmResults<DynamicRealmObject>>() {
             @Override
             @SuppressWarnings("ReferenceEquality")
-            public void call(RealmResults<DynamicRealmObject> rxResults) {
+            public void accept(RealmResults<DynamicRealmObject> rxResults) throws Exception {
                 assertTrue(rxResults == results);
                 subscribedNotified.set(true);
             }
         });
         assertTrue(subscribedNotified.get());
         dynamicRealm.close();
-        subscription.unsubscribe();
+        subscription.dispose();
     }
 

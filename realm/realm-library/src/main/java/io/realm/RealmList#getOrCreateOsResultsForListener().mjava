@@ -1,0 +1,14 @@
+    // TODO: Object Store is not able to merge change set for links list. Luckily since we were still using LinkView
+    // when ship the fine grain notifications, the listener on RealmList is actually added to a OS Results which is
+    // created from the link view. OS Results is computing the change set by comparing the old/new collection. So it
+    // will give the right results if you remove all elements from a RealmList then add all them back and add one more
+    // new element. By right results it means the change set only include one insertion. But if the listener is on the
+    // OS List, the change set will include all ranges of th list. So we keep the old behaviour for
+    // RealmList<RealmModel> for now. See https://github.com/realm/realm-object-store/issues/541
+    private io.realm.internal.Collection getOrCreateOsResultsForListener() {
+        if (osResults == null) {
+            this.osResults = new io.realm.internal.Collection(realm.sharedRealm, osListOperator.getOsList(), null);
+        }
+        return osResults;
+    }
+

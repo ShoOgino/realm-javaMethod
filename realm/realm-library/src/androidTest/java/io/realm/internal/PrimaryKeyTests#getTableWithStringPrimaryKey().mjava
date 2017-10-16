@@ -1,10 +1,11 @@
     private Table getTableWithStringPrimaryKey() {
         sharedRealm = SharedRealm.getInstance(config);
         sharedRealm.beginTransaction();
-        Table t = sharedRealm.createTable("TestTable");
+        OsObjectStore.setSchemaVersion(sharedRealm,0); // Create meta table
+        Table t = sharedRealm.createTable(Table.getTableNameForClass("TestTable"));
         long column = t.addColumn(RealmFieldType.STRING, "colName", true);
         t.addSearchIndex(column);
-        t.setPrimaryKey("colName");
+        OsObjectStore.setPrimaryKeyForObject(sharedRealm, "TestTable", "colName");
         return t;
     }
 

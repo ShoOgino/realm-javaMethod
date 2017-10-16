@@ -2,6 +2,7 @@
     // waiting for results from the async API's.
     @Test
     @RunTestInLooperThread
+    @SuppressWarnings("CheckReturnValue")
     public void realmResults_gcStressTest() {
         final int TEST_SIZE = 50;
         final AtomicLong innerCounter = new AtomicLong();
@@ -15,26 +16,26 @@
 
         for (int i = 0; i < TEST_SIZE; i++) {
             // Doesn't keep a reference to the Observable.
-            realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, i).findAllAsync().asObservable()
-                    .filter(new Func1<RealmResults<AllTypes>, Boolean>() {
+            realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, i).findAllAsync().asFlowable()
+                    .filter(new Predicate<RealmResults<AllTypes>>() {
                         @Override
-                        public Boolean call(RealmResults<AllTypes> results) {
+                        public boolean test(RealmResults<AllTypes> results) throws Exception {
                             return results.isLoaded();
                         }
                     })
                     .take(1) // Unsubscribes from Realm.
-                    .subscribe(new Action1<RealmResults<AllTypes>>() {
+                    .subscribe(new Consumer<RealmResults<AllTypes>>() {
                         @Override
-                        public void call(RealmResults<AllTypes> result) {
+                        public void accept(RealmResults<AllTypes> allTypes) throws Exception {
                             // Not guaranteed, but can result in the GC of other RealmResults waiting for a result.
                             Runtime.getRuntime().gc();
                             if (innerCounter.incrementAndGet() == TEST_SIZE) {
                                 looperThread.testComplete();
                             }
                         }
-                    }, new Action1<Throwable>() {
+                    }, new Consumer<Throwable>() {
                         @Override
-                        public void call(Throwable throwable) {
+                        public void accept(Throwable throwable) throws Exception {
                             fail(throwable.toString());
                         }
                     });

@@ -1,0 +1,33 @@
+    @Test
+    public void mutableMethodsCalled_notInTransaction() {
+        if (type == SchemaType.IMMUTABLE) {
+            return;
+        }
+
+        realm.cancelTransaction();
+
+        try {
+            realmSchema.create("Foo");
+        } catch (IllegalStateException expected) {
+            assertThat(expected.getMessage(), CoreMatchers.containsString("transaction"));
+        }
+
+        try {
+            realmSchema.createWithPrimaryKeyField("Foo", "PK", String.class);
+        } catch (IllegalStateException expected) {
+            assertThat(expected.getMessage(), CoreMatchers.containsString("transaction"));
+        }
+
+        try {
+            realmSchema.remove("Cat");
+        } catch (IllegalStateException expected) {
+            assertThat(expected.getMessage(), CoreMatchers.containsString("transaction"));
+        }
+
+        try {
+            realmSchema.rename("Cat", "Foo1");
+        } catch (IllegalStateException expected) {
+            assertThat(expected.getMessage(), CoreMatchers.containsString("transaction"));
+        }
+    }
+

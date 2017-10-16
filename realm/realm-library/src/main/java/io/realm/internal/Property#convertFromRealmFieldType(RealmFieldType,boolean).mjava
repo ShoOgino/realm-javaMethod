@@ -1,4 +1,4 @@
-    private static int convertFromRealmFieldType(RealmFieldType fieldType, boolean isRequired) {
+    static int convertFromRealmFieldType(RealmFieldType fieldType, boolean isRequired) {
         int type;
         switch (fieldType) {
             case OBJECT:
@@ -30,6 +30,28 @@
                 break;
             case DOUBLE:
                 type = TYPE_DOUBLE;
+                break;
+            case INTEGER_LIST:
+                //noinspection PointlessBitwiseExpression
+                type = TYPE_INT | TYPE_ARRAY;
+                break;
+            case BOOLEAN_LIST:
+                type = TYPE_BOOL | TYPE_ARRAY;
+                break;
+            case STRING_LIST:
+                type = TYPE_STRING | TYPE_ARRAY;
+                break;
+            case BINARY_LIST:
+                type = TYPE_DATA | TYPE_ARRAY;
+                break;
+            case DATE_LIST:
+                type = TYPE_DATE | TYPE_ARRAY;
+                break;
+            case FLOAT_LIST:
+                type = TYPE_FLOAT | TYPE_ARRAY;
+                break;
+            case DOUBLE_LIST:
+                type = TYPE_DOUBLE | TYPE_ARRAY;
                 break;
             default:
                 throw new IllegalArgumentException(

@@ -1,0 +1,15 @@
+    /**
+     * Creates an Observable for a {@link RealmResults}. It should emit the initial RealmResult when subscribed to and
+     * on each subsequent update of the RealmResults it should emit the RealmResults + the {@link OrderedCollectionChangeSet}
+     * that describes the update.
+     * <p>
+     * Changeset observables do not support backpressure as a changeset depends on the state of the previous
+     * changeset. Handling backpressure should therefor be left to users.
+     *
+     * @param results {@link RealmResults} to listen to changes for.
+     * @param realm {@link Realm} instance results are coming from.
+     * @param <E> type of RealmObject
+     * @return Rx observable that emit all updates + their changeset.
+     */
+    <E> Observable<CollectionChange<RealmResults<E>>> changesetsFrom(Realm realm, RealmResults<E> results);
+

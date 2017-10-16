@@ -11,8 +11,8 @@
             protected AuthenticateResponse execute() {
                 if (!isClosed && !Thread.currentThread().isInterrupted()) {
                     return authServer.loginToRealm(
-                            getUser().getAccessToken(), //refresh token in fact
-                            configuration.getServerUrl(),
+                            getUser().getRefreshToken(), //refresh token in fact
+                            resolvedRealmURI,
                             getUser().getAuthenticationUrl()
                     );
                 }
@@ -40,7 +40,12 @@
                 onGoingAccessTokenQuery.set(false);
                 RealmLog.debug("Session[%s]: Failed to get access token (%s)", configuration.getPath(),
                         response.getError().getErrorCode());
-                if (!isClosed && !Thread.currentThread().isInterrupted()) {
+                if (!isClosed
+                        && !Thread.currentThread().isInterrupted()
+                        // We might be interrupted while negotiating an access token with the Realm Object Server
+                        // This will result in a InterruptedIOException from OkHttp. We should ignore this as
+                        // well.
+                        && !(response.getError().getException() instanceof InterruptedIOException)) {
                     errorHandler.onError(SyncSession.this, response.getError());
                 }
             }

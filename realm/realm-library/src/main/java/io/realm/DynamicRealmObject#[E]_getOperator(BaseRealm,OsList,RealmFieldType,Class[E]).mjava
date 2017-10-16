@@ -1,0 +1,31 @@
+    private <E> ManagedListOperator<E> getOperator(BaseRealm realm, OsList osList, RealmFieldType valueListType, Class<E> valueClass) {
+        if (valueListType == RealmFieldType.STRING_LIST) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new StringListOperator(realm, osList, (Class<String>) valueClass);
+        }
+        if (valueListType == RealmFieldType.INTEGER_LIST) {
+            return new LongListOperator<>(realm, osList, valueClass);
+        }
+        if (valueListType == RealmFieldType.BOOLEAN_LIST) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new BooleanListOperator(realm, osList, (Class<Boolean>) valueClass);
+        }
+        if (valueListType == RealmFieldType.BINARY_LIST) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new BinaryListOperator(realm, osList, (Class<byte[]>) valueClass);
+        }
+        if (valueListType == RealmFieldType.DOUBLE_LIST) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new DoubleListOperator(realm, osList, (Class<Double>) valueClass);
+        }
+        if (valueListType == RealmFieldType.FLOAT_LIST) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new FloatListOperator(realm, osList, (Class<Float>) valueClass);
+        }
+        if (valueListType == RealmFieldType.DATE_LIST) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new DateListOperator(realm, osList, (Class<Date>) valueClass);
+        }
+        throw new IllegalArgumentException("Unexpected list type: " + valueListType.name());
+    }
+

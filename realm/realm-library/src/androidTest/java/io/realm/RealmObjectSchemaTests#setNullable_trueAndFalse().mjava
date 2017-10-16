@@ -1,0 +1,52 @@
+    @Test
+    public void setNullable_trueAndFalse() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            thrown.expect(UnsupportedOperationException.class);
+            schema.setNullable("test", true);
+            return;
+        }
+        String fieldName = "foo";
+        for (FieldType fieldType : FieldType.values()) {
+            switch (fieldType) {
+                case OBJECT:
+                    // Objects are always nullable and cannot be changed.
+                    schema.addRealmObjectField(fieldName, schema);
+                    assertTrue(schema.isNullable(fieldName));
+                    try {
+                        schema.setNullable(fieldName, false);
+                        fail();
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                    break;
+                default:
+                    // All simple types.
+                    schema.addField(fieldName, fieldType.getType());
+                    assertEquals(fieldType.isNullable(), schema.isNullable(fieldName));
+                    schema.setNullable(fieldName, !fieldType.isNullable());
+                    assertEquals(!fieldType.isNullable(), schema.isNullable(fieldName));
+            }
+            schema.removeField(fieldName);
+        }
+        for (FieldListType fieldType : FieldListType.values()) {
+            switch (fieldType) {
+                case LIST:
+                    // Lists are not nullable and cannot be configured to be so.
+                    schema.addRealmListField(fieldName, schema);
+                    assertFalse(schema.isNullable(fieldName));
+                    try {
+                        schema.setNullable(fieldName, true);
+                        fail();
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                    break;
+                default:
+                    // All simple list types.
+                    schema.addRealmListField(fieldName, fieldType.getType());
+                    assertEquals("Type: " + fieldType, fieldType.isNullable(), schema.isNullable(fieldName));
+                    schema.setNullable(fieldName, !fieldType.isNullable());
+                    assertEquals("Type: " + fieldType, !fieldType.isNullable(), schema.isNullable(fieldName));
+            }
+            schema.removeField(fieldName);
+        }
+    }
+

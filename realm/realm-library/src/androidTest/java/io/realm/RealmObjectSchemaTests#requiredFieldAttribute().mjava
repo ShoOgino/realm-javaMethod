@@ -3,15 +3,28 @@
         if (type == ObjectSchemaType.IMMUTABLE) {
             return;
         }
+        String fieldName = "foo";
         for (FieldType fieldType : FieldType.values()) {
-            String fieldName = "foo";
             switch (fieldType) {
                 case OBJECT: continue; // Not possible.
-                case LIST: continue; // Not possible.
                 default:
                     // All simple types
                     schema.addField(fieldName, fieldType.getType(), FieldAttribute.REQUIRED);
                     assertTrue(schema.isRequired(fieldName));
+                    schema.removeField(fieldName);
+            }
+        }
+        for (FieldListType fieldType : FieldListType.values()) {
+            switch(fieldType) {
+                case LIST:
+                    continue; // Not possible.
+                default:
+                    // All simple list types
+                    schema.addRealmListField(fieldName, fieldType.getType());
+                    if (fieldType.isNullable()) {
+                        schema.setRequired(fieldName, true);
+                    }
+                    assertTrue(fieldName + " should be required", schema.isRequired(fieldName));
                     schema.removeField(fieldName);
             }
         }

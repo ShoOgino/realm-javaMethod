@@ -1,29 +1,83 @@
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        if (isManaged()) {
-            // 'clazz' is non-null when 'dynamicClassName' is null.
-            //noinspection ConstantConditions
-            sb.append(className != null ? className : realm.getSchema().getSchemaForClass(clazz).getClassName());
-        } else {
-            sb.append(getClass().getSimpleName());
-        }
-        sb.append("@[");
-        if (isManaged() && !isAttached()) {
-            sb.append("invalid");
-        } else {
-            for (int i = 0; i < size(); i++) {
-                if (isManaged()) {
-                    sb.append(((RealmObjectProxy) get(i)).realmGet$proxyState().getRow$realm().getIndex());
+        final String separator = ",";
+        final StringBuilder sb = new StringBuilder();
+
+        if (!isManaged()) {
+            // Build String for unmanaged RealmList
+
+            // Unmanaged RealmList does not know actual element type.
+            sb.append("RealmList<?>@[");
+            // Print list values
+            final int size = size();
+            for (int i = 0; i < size; i++) {
+                final E value = get(i);
+                if (value instanceof RealmModel) {
+                    sb.append(System.identityHashCode(value));
                 } else {
-                    sb.append(System.identityHashCode(get(i)));
+                    if (value instanceof byte[]) {
+                        sb.append("byte[").append(((byte[]) value).length).append("]");
+                    } else {
+                        sb.append(value);
+                    }
                 }
-                if (i < size() - 1) {
-                    sb.append(',');
+                sb.append(separator);
+            }
+            if (0 < size()) {
+                sb.setLength(sb.length() - separator.length());
+            }
+            sb.append("]");
+        } else {
+            // Build String for managed RealmList
+
+            // Determines type of List
+            sb.append("RealmList<");
+            if (className != null) {
+                sb.append(className);
+            } else {
+                // 'clazz' is non-null when 'dynamicClassName' is null.
+                //noinspection ConstantConditions,unchecked
+                if (isClassForRealmModel(clazz)) {
+                    //noinspection ConstantConditions,unchecked
+                    sb.append(realm.getSchema().getSchemaForClass((Class<RealmModel>) clazz).getClassName());
+                } else {
+                    if (clazz == byte[].class) {
+                        sb.append(clazz.getSimpleName());
+                    } else {
+                        sb.append(clazz.getName());
+                    }
                 }
             }
+            sb.append(">@[");
+
+            //Print list values
+            if (!isAttached()) {
+                sb.append("invalid");
+            } else if (isClassForRealmModel(clazz)) {
+                for (int i = 0; i < size(); i++) {
+                    //noinspection ConstantConditions
+                    sb.append(((RealmObjectProxy) get(i)).realmGet$proxyState().getRow$realm().getIndex());
+                    sb.append(separator);
+                }
+                if (0 < size()) {
+                    sb.setLength(sb.length() - separator.length());
+                }
+            } else {
+                for (int i = 0; i < size(); i++) {
+                    final E value = get(i);
+                    if (value instanceof byte[]) {
+                        sb.append("byte[").append(((byte[]) value).length).append("]");
+                    } else {
+                        sb.append(value);
+                    }
+                    sb.append(separator);
+                }
+                if (0 < size()) {
+                    sb.setLength(sb.length() - separator.length());
+                }
+            }
+            sb.append("]");
         }
-        sb.append("]");
         return sb.toString();
     }
 

@@ -1,0 +1,26 @@
+    @Override
+    public void realmSet$columnFloatList(RealmList<Float> value) {
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+            if (proxyState.getExcludeFields$realm().contains("columnFloatList")) {
+                return;
+            }
+        }
+
+        proxyState.getRealm$realm().checkIfValid();
+        OsList osList = proxyState.getRow$realm().getValueList(columnInfo.columnFloatListIndex, RealmFieldType.FLOAT_LIST);
+        osList.removeAll();
+        if (value == null) {
+            return;
+        }
+        for (java.lang.Float item : value) {
+            if (item == null) {
+                osList.addNull();
+            } else {
+                osList.addFloat(item.floatValue());
+            }
+        }
+    }
+

@@ -6,10 +6,19 @@
      * @throws IllegalArgumentException if value isn't valid.
      */
     public static RealmFieldType fromNativeValue(int value) {
-        if (0 <= value && value < typeList.length) {
-            RealmFieldType e = typeList[value];
+        if (0 <= value && value < basicTypes.length) {
+            RealmFieldType e = basicTypes[value];
             if (e != null) {
                 return e;
+            }
+        }
+        if (LIST_OFFSET <= value) {
+            final int elementValue = value - LIST_OFFSET;
+            if (elementValue < listTypes.length) {
+                RealmFieldType e = listTypes[elementValue];
+                if (e != null) {
+                    return e;
+                }
             }
         }
         throw new IllegalArgumentException("Invalid native Realm type: " + value);

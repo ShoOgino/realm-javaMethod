@@ -1,0 +1,22 @@
+    @Test
+    public void setter_string_long_values() {
+        byte[] tooLongBinary = new byte[Table.MAX_STRING_SIZE + 1];
+        Arrays.fill(tooLongBinary, (byte) 'a');
+        String longString = new String(tooLongBinary, 0, Table.MAX_STRING_SIZE, Charset.forName("US-ASCII"));
+        String tooLongString = new String(tooLongBinary, 0, Table.MAX_STRING_SIZE + 1, Charset.forName("US-ASCII"));
+
+        realm.beginTransaction();
+        AllTypes allTypes = realm.createObject(AllTypes.class);
+        allTypes.setColumnString(longString);
+        realm.commitTransaction();
+        assertEquals(longString.length(), allTypes.getColumnString().length());
+
+        realm.beginTransaction();
+        try {
+            allTypes.setColumnString(tooLongString);
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertThat(expected.getMessage(), CoreMatchers.containsString("which exceeds the max string length"));
+        }
+    }
+

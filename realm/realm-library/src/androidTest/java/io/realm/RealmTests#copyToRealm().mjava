@@ -17,6 +17,14 @@
         allTypes.setColumnRealmObject(dog);
         allTypes.setColumnRealmList(list);
 
+        allTypes.setColumnStringList(new RealmList<String>("1"));
+        allTypes.setColumnBinaryList(new RealmList<byte[]>(new byte[] {1}));
+        allTypes.setColumnBooleanList(new RealmList<Boolean>(true));
+        allTypes.setColumnLongList(new RealmList<Long>(1L));
+        allTypes.setColumnDoubleList(new RealmList<Double>(1D));
+        allTypes.setColumnFloatList(new RealmList<Float>(1F));
+        allTypes.setColumnDateList(new RealmList<Date>(new Date(1L)));
+
         realm.beginTransaction();
         AllTypes realmTypes = realm.copyToRealm(allTypes);
         realm.commitTransaction();
@@ -31,6 +39,21 @@
         assertArrayEquals(allTypes.getColumnBinary(), realmTypes.getColumnBinary());
         assertEquals(allTypes.getColumnRealmObject().getName(), dog.getName());
         assertEquals(list.size(), realmTypes.getColumnRealmList().size());
+        //noinspection ConstantConditions
         assertEquals(list.get(0).getName(), realmTypes.getColumnRealmList().get(0).getName());
+        assertEquals(1, realmTypes.getColumnStringList().size());
+        assertEquals("1", realmTypes.getColumnStringList().get(0));
+        assertEquals(1, realmTypes.getColumnBooleanList().size());
+        assertEquals(true, realmTypes.getColumnBooleanList().get(0));
+        assertEquals(1, realmTypes.getColumnBinaryList().size());
+        assertArrayEquals(new byte[] {1}, realmTypes.getColumnBinaryList().get(0));
+        assertEquals(1, realmTypes.getColumnLongList().size());
+        assertEquals((Long) 1L, realmTypes.getColumnLongList().get(0));
+        assertEquals(1, realmTypes.getColumnDoubleList().size());
+        assertEquals((Double) 1D, realmTypes.getColumnDoubleList().get(0));
+        assertEquals(1, realmTypes.getColumnFloatList().size());
+        assertEquals((Float) 1F, realmTypes.getColumnFloatList().get(0));
+        assertEquals(1, realmTypes.getColumnDateList().size());
+        assertEquals(new Date(1), realmTypes.getColumnDateList().get(0));
     }
 

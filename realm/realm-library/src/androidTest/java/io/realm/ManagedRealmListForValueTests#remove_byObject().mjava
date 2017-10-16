@@ -1,0 +1,19 @@
+    @Test
+    public void remove_byObject() {
+        final Object value = list.get(0);
+        final int initialSize = list.size();
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                if (listType == BINARY_LIST) {
+                    assertFalse(list.remove(value));  // since 'equals()' never return true against binary array.
+                } else {
+                    assertTrue(list.remove(value));
+                }
+            }
+        });
+
+        assertEquals((listType == BINARY_LIST) ? initialSize : (initialSize - 1), list.size());
+    }
+

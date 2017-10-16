@@ -1,0 +1,52 @@
+    @Test
+    public void setRequired_trueAndFalse() {
+        if (type == ObjectSchemaType.IMMUTABLE) {
+            thrown.expect(UnsupportedOperationException.class);
+            schema.setRequired("test", true);
+            return;
+        }
+        String fieldName = "foo";
+        for (FieldType fieldType : FieldType.values()) {
+            switch (fieldType) {
+                case OBJECT:
+                    // Objects are always nullable and cannot be configured otherwise.
+                    schema.addRealmObjectField(fieldName, schema);
+                    assertFalse(schema.isRequired((fieldName)));
+                    try {
+                        schema.setRequired(fieldName, false);
+                        fail();
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                    break;
+                default:
+                    // All simple types.
+                    schema.addField(fieldName, fieldType.getType());
+                    assertEquals(!fieldType.isNullable(), schema.isRequired(fieldName));
+                    schema.setRequired(fieldName, fieldType.isNullable());
+                    assertEquals(fieldType.isNullable(), schema.isRequired(fieldName));
+            }
+            schema.removeField(fieldName);
+        }
+        for (FieldListType fieldType : FieldListType.values()) {
+            switch (fieldType) {
+                case LIST:
+                    // Lists are always non-nullable and cannot be configured otherwise.
+                    schema.addRealmListField(fieldName, schema);
+                    assertTrue(schema.isRequired((fieldName)));
+                    try {
+                        schema.setRequired(fieldName, true);
+                        fail();
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                    break;
+                default:
+                    // All simple list types.
+                    schema.addRealmListField(fieldName, fieldType.getType());
+                    assertEquals(!fieldType.isNullable(), schema.isRequired(fieldName));
+                    schema.setRequired(fieldName, fieldType.isNullable());
+                    assertEquals(fieldType.isNullable(), schema.isRequired(fieldName));
+            }
+            schema.removeField(fieldName);
+        }
+    }
+

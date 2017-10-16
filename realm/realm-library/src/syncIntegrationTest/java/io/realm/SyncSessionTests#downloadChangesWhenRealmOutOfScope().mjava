@@ -1,0 +1,74 @@
+    // A Realm that was opened before a user logged out should be able to resume downloading if the user logs back in.
+    @Test
+    public void downloadChangesWhenRealmOutOfScope() throws InterruptedException {
+        final String uniqueName = UUID.randomUUID().toString();
+        SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", true);
+        SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
+
+        final SyncConfiguration syncConfiguration = configFactory
+                .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .modules(new StringOnlyModule())
+                .build();
+        Realm realm = Realm.getInstance(syncConfiguration);
+
+        realm.beginTransaction();
+        realm.createObject(StringOnly.class).setChars("1");
+        realm.commitTransaction();
+
+        SyncSession session = SyncManager.getSession(syncConfiguration);
+        session.uploadAllLocalChanges();
+
+        // Log out the user.
+        user.logout();
+
+        // Log the user back in.
+        credentials = SyncCredentials.usernamePassword(uniqueName, "password", false);
+        SyncUser.login(credentials, Constants.AUTH_URL);
+
+        // now let the admin upload some commits
+        final CountDownLatch backgroundUpload = new CountDownLatch(1);
+
+        final HandlerThread handlerThread = new HandlerThread("HandlerThread");
+        handlerThread.start();
+        Looper looper = handlerThread.getLooper();
+        Handler handler = new Handler(looper);
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                // using an admin user to open the Realm on different path on the device then some commits
+                SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
+                SyncCredentials credentialsAdmin = SyncCredentials.accessToken(SyncTestUtils.getRefreshToken(admin).value(), "custom-admin-user");
+                SyncUser adminUser = SyncUser.login(credentialsAdmin, Constants.AUTH_URL);
+
+                SyncConfiguration adminConfig = configurationFactory.createSyncConfigurationBuilder(adminUser, syncConfiguration.getServerUrl().toString())
+                        .modules(new StringOnlyModule())
+                        .waitForInitialRemoteData()
+                        .build();
+
+                final Realm adminRealm = Realm.getInstance(adminConfig);
+                adminRealm.beginTransaction();
+                adminRealm.createObject(StringOnly.class).setChars("2");
+                adminRealm.createObject(StringOnly.class).setChars("3");
+                adminRealm.commitTransaction();
+
+                try {
+                    SyncManager.getSession(adminConfig).uploadAllLocalChanges();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    fail(e.getMessage());
+                }
+                adminRealm.close();
+
+                backgroundUpload.countDown();
+                handlerThread.quit();
+            }
+        });
+
+        TestHelper.awaitOrFail(backgroundUpload, 60);
+        // Resume downloading
+        session.downloadAllServerChanges();
+        realm.refresh();//FIXME not calling refresh will still point to the previous version of the Realm count == 1
+        assertEquals(3, realm.where(StringOnly.class).count());
+        realm.close();
+    }
+

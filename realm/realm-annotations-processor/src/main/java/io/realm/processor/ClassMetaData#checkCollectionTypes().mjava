@@ -1,0 +1,16 @@
+    private boolean checkCollectionTypes() {
+        for (VariableElement field : fields) {
+            if (Utils.isRealmList(field)) {
+                if (!checkRealmListType(field)) {
+                    return false;
+                }
+            } else if (Utils.isRealmResults(field)) {
+                if (!checkRealmResultsType(field)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+

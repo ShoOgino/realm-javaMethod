@@ -28,6 +28,17 @@
             list.add(listItem);
             obj.setFieldList(list);
 
+            obj.setFieldStringList(new RealmList<>("2", "3"));
+            obj.setFieldBooleanList(new RealmList<>(true, false));
+            obj.setFieldBinaryList(new RealmList<>(new byte[] {2}, new byte[] {3}));
+            obj.setFieldLongList(new RealmList<>(2L, 3L));
+            obj.setFieldIntegerList(new RealmList<>(2, 3));
+            obj.setFieldShortList(new RealmList<>((short) 2, (short) 3));
+            obj.setFieldByteList(new RealmList<>((byte) 2, (byte) 3));
+            obj.setFieldDoubleList(new RealmList<>(2D, 3D));
+            obj.setFieldFloatList(new RealmList<>(2F, 3F));
+            obj.setFieldDateList(new RealmList<>(new Date(2L), new Date(3L)));
+
             managedObj = realm.copyToRealm(obj);
         }
         realm.commitTransaction();
@@ -46,9 +57,41 @@
         assertEquals(managedObj.getFieldDouble(), copy.getFieldDouble(), 0D);
         assertEquals(managedObj.isFieldBoolean(), copy.isFieldBoolean());
         assertEquals(managedObj.getFieldDate(), copy.getFieldDate());
-        assertTrue(Arrays.equals(managedObj.getFieldBinary(), copy.getFieldBinary()));
+        assertArrayEquals(managedObj.getFieldBinary(), copy.getFieldBinary());
         assertEquals(managedObj.getFieldObject().getFieldInt(), copy.getFieldObject().getFieldInt());
         assertEquals(1, copy.getFieldList().size());
+        //noinspection ConstantConditions
         assertEquals(managedObj.getFieldList().first().getFieldInt(), copy.getFieldList().first().getFieldInt());
+
+        assertEquals(2, managedObj.getFieldStringList().size());
+        assertEquals("2", managedObj.getFieldStringList().get(0));
+        assertEquals("3", managedObj.getFieldStringList().get(1));
+        assertEquals(2, managedObj.getFieldBooleanList().size());
+        assertEquals(true, managedObj.getFieldBooleanList().get(0));
+        assertEquals(false, managedObj.getFieldBooleanList().get(1));
+        assertEquals(2, managedObj.getFieldBinaryList().size());
+        assertArrayEquals(new byte[] {2}, managedObj.getFieldBinaryList().get(0));
+        assertArrayEquals(new byte[] {3}, managedObj.getFieldBinaryList().get(1));
+        assertEquals(2, managedObj.getFieldLongList().size());
+        assertEquals((Long) 2L, managedObj.getFieldLongList().get(0));
+        assertEquals((Long) 3L, managedObj.getFieldLongList().get(1));
+        assertEquals(2, managedObj.getFieldIntegerList().size());
+        assertEquals((Integer) 2, managedObj.getFieldIntegerList().get(0));
+        assertEquals((Integer) 3, managedObj.getFieldIntegerList().get(1));
+        assertEquals(2, managedObj.getFieldShortList().size());
+        assertEquals((Short) (short) 2, managedObj.getFieldShortList().get(0));
+        assertEquals((Short) (short) 3, managedObj.getFieldShortList().get(1));
+        assertEquals(2, managedObj.getFieldByteList().size());
+        assertEquals((Byte) (byte) 2, managedObj.getFieldByteList().get(0));
+        assertEquals((Byte) (byte) 3, managedObj.getFieldByteList().get(1));
+        assertEquals(2, managedObj.getFieldDoubleList().size());
+        assertEquals((Double) 2D, managedObj.getFieldDoubleList().get(0));
+        assertEquals((Double) 3D, managedObj.getFieldDoubleList().get(1));
+        assertEquals(2, managedObj.getFieldFloatList().size());
+        assertEquals((Float) 2F, managedObj.getFieldFloatList().get(0));
+        assertEquals((Float) 3F, managedObj.getFieldFloatList().get(1));
+        assertEquals(2, managedObj.getFieldDateList().size());
+        assertEquals(new Date(2L), managedObj.getFieldDateList().get(0));
+        assertEquals(new Date(3L), managedObj.getFieldDateList().get(1));
     }
 

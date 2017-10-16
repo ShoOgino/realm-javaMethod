@@ -1,0 +1,49 @@
+    private void setModelList(String fieldName, RealmList<DynamicRealmObject> list) {
+        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        OsList osList = proxyState.getRow$realm().getModelList(columnIndex);
+        Table linkTargetTable = osList.getTargetTable();
+        //noinspection ConstantConditions
+        @Nonnull
+        final String linkTargetTableName = linkTargetTable.getClassName();
+
+        boolean typeValidated;
+        if (list.className == null && list.clazz == null) {
+            // Unmanaged lists don't know anything about the types they contain. They might even hold objects of
+            // multiple types :(, so we have to check each item in the list.
+            typeValidated = false;
+        } else {
+            String listType = list.className != null ? list.className
+                    : proxyState.getRealm$realm().getSchema().getTable(list.clazz).getClassName();
+            if (!linkTargetTableName.equals(listType)) {
+                throw new IllegalArgumentException(String.format(Locale.US,
+                        "The elements in the list are not the proper type. " +
+                                "Was %s expected %s.", listType, linkTargetTableName));
+            }
+            typeValidated = true;
+        }
+
+        final int listLength = list.size();
+        final long[] indices = new long[listLength];
+
+        for (int i = 0; i < listLength; i++) {
+            RealmObjectProxy obj = list.get(i);
+            if (obj.realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm()) {
+                throw new IllegalArgumentException("Each element in 'list' must belong to the same Realm instance.");
+            }
+            if (!typeValidated && !linkTargetTable.hasSameSchema(obj.realmGet$proxyState().getRow$realm().getTable())) {
+                throw new IllegalArgumentException(String.format(Locale.US,
+                        "Element at index %d is not the proper type. " +
+                                "Was '%s' expected '%s'.",
+                        i,
+                        obj.realmGet$proxyState().getRow$realm().getTable().getClassName(),
+                        linkTargetTableName));
+            }
+            indices[i] = obj.realmGet$proxyState().getRow$realm().getIndex();
+        }
+
+        osList.removeAll();
+        for (int i = 0; i < listLength; i++) {
+            osList.addRow(indices[i]);
+        }
+    }
+

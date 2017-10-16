@@ -7,10 +7,11 @@
      * @throws IndexOutOfBoundsException if {@code location < 0 || location >= size()}.
      */
     @Override
+    @Nullable
     public E get(int location) {
         if (isManaged()) {
             checkValidRealm();
-            return realm.get(clazz, className, osList.getUncheckedRow(location));
+            return osListOperator.get(location);
         } else {
             return unmanagedList.get(location);
         }

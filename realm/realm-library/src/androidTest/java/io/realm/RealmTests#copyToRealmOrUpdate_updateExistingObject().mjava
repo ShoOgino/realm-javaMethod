@@ -14,6 +14,13 @@
                 obj.setColumnRealmObject(new DogPrimaryKey(1, "Dog1"));
                 obj.setColumnRealmList(new RealmList<DogPrimaryKey>(new DogPrimaryKey(2, "Dog2")));
                 obj.setColumnBoxedBoolean(true);
+                obj.setColumnStringList(new RealmList<>("1"));
+                obj.setColumnBooleanList(new RealmList<>(false));
+                obj.setColumnBinaryList(new RealmList<>(new byte[] {1}));
+                obj.setColumnLongList(new RealmList<>(1L));
+                obj.setColumnDoubleList(new RealmList<>(1D));
+                obj.setColumnFloatList(new RealmList<>(1F));
+                obj.setColumnDateList(new RealmList<>(new Date(1L)));
                 realm.copyToRealm(obj);
 
                 AllTypesPrimaryKey obj2 = new AllTypesPrimaryKey();
@@ -27,6 +34,13 @@
                 obj2.setColumnRealmObject(new DogPrimaryKey(3, "Dog3"));
                 obj2.setColumnRealmList(new RealmList<DogPrimaryKey>(new DogPrimaryKey(4, "Dog4")));
                 obj2.setColumnBoxedBoolean(false);
+                obj2.setColumnStringList(new RealmList<>("2", "3"));
+                obj2.setColumnBooleanList(new RealmList<>(true, false));
+                obj2.setColumnBinaryList(new RealmList<>(new byte[] {2}, new byte[] {3}));
+                obj2.setColumnLongList(new RealmList<>(2L, 3L));
+                obj2.setColumnDoubleList(new RealmList<>(2D, 3D));
+                obj2.setColumnFloatList(new RealmList<>(2F, 3F));
+                obj2.setColumnDateList(new RealmList<>(new Date(2L), new Date(3L)));
                 realm.copyToRealmOrUpdate(obj2);
             }
         });
@@ -46,5 +60,26 @@
         assertEquals(1, obj.getColumnRealmList().size());
         assertEquals("Dog4", obj.getColumnRealmList().get(0).getName());
         assertFalse(obj.getColumnBoxedBoolean());
+        assertEquals(2, obj.getColumnStringList().size());
+        assertEquals("2", obj.getColumnStringList().get(0));
+        assertEquals("3", obj.getColumnStringList().get(1));
+        assertEquals(2, obj.getColumnBooleanList().size());
+        assertEquals(true, obj.getColumnBooleanList().get(0));
+        assertEquals(false, obj.getColumnBooleanList().get(1));
+        assertEquals(2, obj.getColumnBinaryList().size());
+        assertArrayEquals(new byte[] {2}, obj.getColumnBinaryList().get(0));
+        assertArrayEquals(new byte[] {3}, obj.getColumnBinaryList().get(1));
+        assertEquals(2, obj.getColumnLongList().size());
+        assertEquals((Long) 2L, obj.getColumnLongList().get(0));
+        assertEquals((Long) 3L, obj.getColumnLongList().get(1));
+        assertEquals(2, obj.getColumnDoubleList().size());
+        assertEquals((Double) 2D, obj.getColumnDoubleList().get(0));
+        assertEquals((Double) 3D, obj.getColumnDoubleList().get(1));
+        assertEquals(2, obj.getColumnFloatList().size());
+        assertEquals((Float) 2F, obj.getColumnFloatList().get(0));
+        assertEquals((Float) 3F, obj.getColumnFloatList().get(1));
+        assertEquals(2, obj.getColumnDateList().size());
+        assertEquals(new Date(2L), obj.getColumnDateList().get(0));
+        assertEquals(new Date(3L), obj.getColumnDateList().get(1));
     }
 

@@ -5,15 +5,16 @@
         final AllTypes obj = realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
-        Observable<CyclicType> obs = obj.asObservable();
-        obs.subscribe(new Action1<CyclicType>() {
+        Flowable<CyclicType> obs = obj.asFlowable();
+        @SuppressWarnings("unused")
+        Disposable subscription = obs.subscribe(new Consumer<CyclicType>() {
             @Override
-            public void call(CyclicType cyclicType) {
+            public void accept(CyclicType cyclicType) throws Exception {
                 fail();
             }
-        }, new Action1<Throwable>() {
+        }, new Consumer<Throwable>() {
             @Override
-            public void call(Throwable ignored) {
+            public void accept(Throwable ignored) throws Exception {
             }
         });
     }

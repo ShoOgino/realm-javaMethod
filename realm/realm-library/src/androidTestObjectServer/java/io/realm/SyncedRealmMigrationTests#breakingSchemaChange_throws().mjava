@@ -6,19 +6,19 @@
                 .build();
 
         // Setup initial Realm schema (with a different primary key)
-        DynamicRealm dynamicRealm = DynamicRealm.getInstance(config);
-        RealmSchema schema = dynamicRealm.getSchema();
-        dynamicRealm.beginTransaction();
-        schema.create(PrimaryKeyAsString.class.getSimpleName())
-                .addField(PrimaryKeyAsString.FIELD_PRIMARY_KEY, String.class)
-                .addField(PrimaryKeyAsString.FIELD_ID, long.class, FieldAttribute.PRIMARY_KEY);
-        dynamicRealm.commitTransaction();
-        dynamicRealm.close();
+        OsObjectSchemaInfo expectedObjectSchema = new OsObjectSchemaInfo.Builder(PrimaryKeyAsString.CLASS_NAME, 2, 0)
+                .addPersistedProperty(PrimaryKeyAsString.FIELD_PRIMARY_KEY, RealmFieldType.STRING, false, true, false)
+                .addPersistedProperty(PrimaryKeyAsString.FIELD_ID, RealmFieldType.INTEGER, true, true, true)
+                .build();
+        List<OsObjectSchemaInfo> list = new ArrayList<OsObjectSchemaInfo>();
+        list.add(expectedObjectSchema);
+        OsSchemaInfo schemaInfo = new OsSchemaInfo(list);
+        OsRealmConfig.Builder configBuilder = new OsRealmConfig.Builder(config).schemaInfo(schemaInfo);
+        SharedRealm.getInstance(configBuilder).close();
 
-        try {
-            Realm.getInstance(config);
-            fail();
-        } catch (IllegalStateException ignored) {
-        }
+        thrown.expectMessage(
+                CoreMatchers.containsString("The following changes cannot be made in additive-only schema mode:"));
+        thrown.expect(IllegalStateException.class);
+        Realm.getInstance(config);
     }
 

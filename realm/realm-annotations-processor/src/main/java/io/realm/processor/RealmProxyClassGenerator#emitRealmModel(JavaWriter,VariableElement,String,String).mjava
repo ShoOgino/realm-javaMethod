@@ -42,12 +42,7 @@
                         .emitStatement("row.nullifyLink(%s)", fieldIndexVariableReference(field))
                         .emitStatement("return")
                         .endControlFlow();
-                writer.beginControlFlow("if (!RealmObject.isValid(value))")
-                        .emitStatement("throw new IllegalArgumentException(\"'value' is not a valid managed object.\")")
-                        .endControlFlow();
-                writer.beginControlFlow("if (((RealmObjectProxy) value).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm())")
-                        .emitStatement("throw new IllegalArgumentException(\"'value' belongs to a different Realm.\")")
-                        .endControlFlow();
+                writer.emitStatement("proxyState.checkValidObject(value)");
                 writer.emitStatement("row.getTable().setLink(%s, row.getIndex(), ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getIndex(), true)",
                         fieldIndexVariableReference(field));
                 writer.emitStatement("return");
@@ -58,12 +53,7 @@
                 .emitStatement("proxyState.getRow$realm().nullifyLink(%s)", fieldIndexVariableReference(field))
                 .emitStatement("return")
                 .endControlFlow()
-                .beginControlFlow("if (!(RealmObject.isManaged(value) && RealmObject.isValid(value)))")
-                .emitStatement("throw new IllegalArgumentException(\"'value' is not a valid managed object.\")")
-                .endControlFlow()
-                .beginControlFlow("if (((RealmObjectProxy) value).realmGet$proxyState().getRealm$realm() != proxyState.getRealm$realm())")
-                .emitStatement("throw new IllegalArgumentException(\"'value' belongs to a different Realm.\")")
-                .endControlFlow()
+                .emitStatement("proxyState.checkValidObject(value)")
                 .emitStatement("proxyState.getRow$realm().setLink(%s, ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getIndex())", fieldIndexVariableReference(field))
                 .endMethod();
     }

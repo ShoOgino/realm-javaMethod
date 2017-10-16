@@ -1,0 +1,13 @@
+    private static Object generateHugeValue(ListType listType, int size) {
+        final byte[] bytes = new byte[size];
+        switch (listType) {
+            case STRING_LIST:
+                Arrays.fill(bytes, (byte) 'a');
+                return new String(bytes, Charset.forName("US-ASCII"));
+            case BINARY_LIST:
+                return bytes;
+            default:
+                throw new AssertionError("'generateHugeValue' does not support this type: " + listType.name());
+        }
+    }
+

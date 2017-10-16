@@ -35,7 +35,7 @@
                         writer
                 );
 
-            } else if (Utils.isRealmList(field)) {
+            } else if (Utils.isRealmModelList(field)) {
                 RealmJsonTypeHelper.emitFillRealmListFromStream(
                         "objProxy",
                         metadata.getInternalGetter(fieldName),
@@ -44,6 +44,9 @@
                         Utils.getProxyClassSimpleName(field),
                         writer);
 
+            } else if (Utils.isRealmValueList(field)) {
+                // FIXME need to implement logic for value list fields.
+                writer.emitSingleLineComment("TODO implement logic for value list.");
             } else if (Utils.isMutableRealmInteger(field)) {
                 RealmJsonTypeHelper.emitFillJavaTypeFromStream(
                         "objProxy",

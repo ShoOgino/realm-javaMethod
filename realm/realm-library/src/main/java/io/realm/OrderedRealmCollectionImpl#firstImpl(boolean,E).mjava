@@ -2,8 +2,14 @@
     private E firstImpl(boolean shouldThrow, @Nullable E defaultValue) {
         UncheckedRow row = collection.firstUncheckedRow();
 
+        if (forValues) {
+            // TODO implement this
+            return null;
+        }
+
         if (row != null) {
-            return realm.get(classSpec, className, row);
+            //noinspection unchecked
+            return (E) realm.get((Class<? extends RealmModel>) classSpec, className, row);
         } else {
             if (shouldThrow) {
                 throw new IndexOutOfBoundsException("No results were found.");

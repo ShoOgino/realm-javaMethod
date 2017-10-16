@@ -38,7 +38,7 @@
                         .emitSingleLineComment("Deep copy of %s", fieldName)
                         .emitStatement("unmanagedCopy.%s(%s.createDetachedCopy(realmSource.%s(), currentDepth + 1, maxDepth, cache))",
                                 setter, Utils.getProxyClassSimpleName(field), getter);
-            } else if (Utils.isRealmList(field)) {
+            } else if (Utils.isRealmModelList(field)) {
                 writer
                         .emitEmptyLine()
                         .emitSingleLineComment("Deep copy of %s", fieldName)
@@ -57,6 +57,11 @@
                         .emitStatement("unmanaged%sList.add(item)", fieldName)
                         .endControlFlow()
                         .endControlFlow();
+            } else if (Utils.isRealmValueList(field)) {
+                writer
+                        .emitEmptyLine()
+                        .emitStatement("unmanagedCopy.%1$s(new RealmList<%2$s>())", setter, Utils.getGenericTypeQualifiedName(field))
+                        .emitStatement("unmanagedCopy.%1$s().addAll(realmSource.%1$s())", getter);
             } else if (Utils.isMutableRealmInteger(field)) {
                 // If the user initializes the unmanaged MutableRealmInteger to null, this will fail mysteriously.
                 writer.emitStatement("unmanagedCopy.%s().set(realmSource.%s().get())", getter, getter);
@@ -65,6 +70,7 @@
             }
         }
 
+        writer.emitEmptyLine();
         writer.emitStatement("return unmanagedObject");
         writer.endMethod();
         writer.emitEmptyLine();

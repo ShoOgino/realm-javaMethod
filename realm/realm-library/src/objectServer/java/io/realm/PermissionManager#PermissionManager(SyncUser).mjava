@@ -20,6 +20,7 @@
                     }
                 })
                 .modules(new ManagementModule())
+                .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
                 .build();
 
         permissionRealmConfig = new SyncConfiguration.Builder(
@@ -27,6 +28,7 @@
                 .errorHandler(new SyncSession.ErrorHandler() {
                     @Override
                     public void onError(SyncSession session, ObjectServerError error) {
+                        RealmLog.error("Error in __permission:\n" + error.toString());
                         synchronized (errorLock) {
                             permissionRealmError = error;
                         }
@@ -34,9 +36,8 @@
                 })
                 .modules(new PermissionModule())
                 .waitForInitialRemoteData()
-                // FIXME: Something is seriously wrong with the Permission Realm. It doesn't seem to
-                // exist on the server. Making it impossible to mark it read only
-                // .readOnly()
+                .readOnly()
+                .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
                 .build();
 
         defaultPermissionRealmConfig = new SyncConfiguration.Builder(
@@ -44,6 +45,7 @@
                 .errorHandler(new SyncSession.ErrorHandler() {
                     @Override
                     public void onError(SyncSession session, ObjectServerError error) {
+                        RealmLog.error("Error in __wildcardpermissions:\n" + error.toString());
                         synchronized (errorLock) {
                             defaultPermissionRealmError = error;
                         }
@@ -51,9 +53,8 @@
                 })
                 .modules(new PermissionModule())
                 .waitForInitialRemoteData()
-                // FIXME: Something is seriously wrong with the Permission Realm. It doesn't seem to
-                // exist on the server. Making it impossible to mark it read only
-                //.readOnly()
+                .readOnly()
+                .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
                 .build();
     }
 

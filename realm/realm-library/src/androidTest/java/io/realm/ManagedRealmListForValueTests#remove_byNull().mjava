@@ -1,0 +1,18 @@
+    @Test
+    public void remove_byNull() {
+        final int initialSize = list.size();
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                if (isTypeNullable) {
+                    assertTrue(list.remove(null));
+                } else {
+                    assertFalse(list.remove(null));
+                }
+            }
+        });
+
+        assertEquals(isTypeNullable ? (initialSize - 1) : initialSize, list.size());
+    }
+

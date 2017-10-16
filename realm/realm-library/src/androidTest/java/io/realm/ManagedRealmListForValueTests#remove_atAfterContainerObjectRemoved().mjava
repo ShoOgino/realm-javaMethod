@@ -1,0 +1,13 @@
+    @Test
+    public void remove_atAfterContainerObjectRemoved() {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                object.deleteFromRealm();
+            }
+        });
+
+        thrown.expect(IllegalStateException.class);
+        list.remove(0);
+    }
+
