@@ -1,6 +1,5 @@
     @Test
     @RunTestInLooperThread(emulateMainThread = true)
-    @Ignore("See https://github.com/realm/ros/issues/520")
     public void getDefaultPermissions_returnLoadedResults() {
         PermissionManager pm = user.getPermissionManager();
         looperThread.closeAfterTest(pm);
@@ -8,7 +7,7 @@
             @Override
             public void onSuccess(RealmResults<Permission> permissions) {
                 assertTrue(permissions.isLoaded());
-                assertInitialPermissions(permissions);
+                assertInitialDefaultPermissions(permissions);
                 looperThread.testComplete();
             }
 

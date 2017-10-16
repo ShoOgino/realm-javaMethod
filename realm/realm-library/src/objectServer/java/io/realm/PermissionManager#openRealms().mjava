@@ -38,23 +38,23 @@
                     }
                 }
             });
-//            defaultPermissionRealmOpenTask = Realm.getInstanceAsync(defaultPermissionRealmConfig, new Realm.Callback() {
-//                @Override
-//                public void onSuccess(Realm realm) {
-//                    defaultPermissionRealm = realm;
-//                    defaultPermissionRealmOpenTask = null;
-//                    checkIfRealmsAreOpenedAndRunDelayedTasks();
-//                }
-//
-//                @Override
-//                public void onError(Throwable exception) {
-//                    synchronized (errorLock) {
-//                        defaultPermissionRealmError = new ObjectServerError(ErrorCode.UNKNOWN, exception);
-//                        defaultPermissionRealmOpenTask = null;
-//                        checkIfRealmsAreOpenedAndRunDelayedTasks();
-//                    }
-//                }
-//            });
+            defaultPermissionRealmOpenTask = Realm.getInstanceAsync(defaultPermissionRealmConfig, new Realm.Callback() {
+                @Override
+                public void onSuccess(Realm realm) {
+                    defaultPermissionRealm = realm;
+                    defaultPermissionRealmOpenTask = null;
+                    checkIfRealmsAreOpenedAndRunDelayedTasks();
+                }
+
+                @Override
+                public void onError(Throwable exception) {
+                    synchronized (errorLock) {
+                        defaultPermissionRealmError = new ObjectServerError(ErrorCode.UNKNOWN, exception);
+                        defaultPermissionRealmOpenTask = null;
+                        checkIfRealmsAreOpenedAndRunDelayedTasks();
+                    }
+                }
+            });
         }
     }
 

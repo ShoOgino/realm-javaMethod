@@ -40,20 +40,21 @@
                 .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
                 .build();
 
-//        defaultPermissionRealmConfig = new SyncConfiguration.Builder(
-//                user, getRealmUrl(RealmType.DEFAULT_PERMISSION_REALM, user.getAuthenticationUrl()))
-//                .errorHandler(new SyncSession.ErrorHandler() {
-//                    @Override
-//                    public void onError(SyncSession session, ObjectServerError error) {
-//                        synchronized (errorLock) {
-//                            defaultPermissionRealmError = error;
-//                        }
-//                    }
-//                })
-//                .modules(new PermissionModule())
-//                .waitForInitialRemoteData()
-//                .readOnly()
-//                .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
-//                .build();
+        defaultPermissionRealmConfig = new SyncConfiguration.Builder(
+                user, getRealmUrl(RealmType.DEFAULT_PERMISSION_REALM, user.getAuthenticationUrl()))
+                .errorHandler(new SyncSession.ErrorHandler() {
+                    @Override
+                    public void onError(SyncSession session, ObjectServerError error) {
+                        RealmLog.error("Error in __wildcardpermissions:\n" + error.toString());
+                        synchronized (errorLock) {
+                            defaultPermissionRealmError = error;
+                        }
+                    }
+                })
+                .modules(new PermissionModule())
+                .waitForInitialRemoteData()
+                .readOnly()
+                .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
+                .build();
     }
 
