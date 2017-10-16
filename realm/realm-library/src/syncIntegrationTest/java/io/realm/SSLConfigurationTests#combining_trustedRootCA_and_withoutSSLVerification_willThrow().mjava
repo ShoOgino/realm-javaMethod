@@ -5,6 +5,7 @@
         SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
 
         TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
+        int originalLevel = RealmLog.getLevel();
         RealmLog.add(testLogger);
         RealmLog.setLevel(LogLevel.WARN);
 
@@ -16,5 +17,7 @@
 
         assertEquals("SSL Verification is disabled, the provided server certificate will not be used.",
                 testLogger.message);
+        RealmLog.remove(testLogger);
+        RealmLog.setLevel(originalLevel);
     }
 
