@@ -1,6 +1,7 @@
     public void copyRealmFromAssets(Context context, String realmPath, RealmConfiguration config) throws IOException {
-        // Deletes the existing file before copy
-        Realm.deleteRealm(config);
+        if (new File(config.getPath()).exists()) {
+            throw new IllegalStateException(String.format(Locale.ENGLISH, "%s exists!", config.getPath()));
+        }
 
         File outFile = new File(config.getRealmDirectory(), config.getRealmFileName());
 

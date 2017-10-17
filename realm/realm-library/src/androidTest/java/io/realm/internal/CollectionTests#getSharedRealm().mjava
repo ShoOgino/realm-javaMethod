@@ -1,10 +1,5 @@
     private SharedRealm getSharedRealm() {
-        OsRealmConfig.Builder configBuilder = new OsRealmConfig.Builder(config)
-                .autoUpdateNotification(true);
-        SharedRealm sharedRealm = SharedRealm.getInstance(configBuilder);
-        sharedRealm.beginTransaction();
-        OsObjectStore.setSchemaVersion(sharedRealm, OsObjectStore.SCHEMA_NOT_VERSIONED);
-        sharedRealm.commitTransaction();
-        return sharedRealm;
+        RealmConfiguration config = configFactory.createConfiguration();
+        return getSharedRealm(config);
     }
 

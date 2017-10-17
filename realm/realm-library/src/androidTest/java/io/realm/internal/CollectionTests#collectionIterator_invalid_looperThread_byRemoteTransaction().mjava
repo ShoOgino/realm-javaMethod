@@ -1,7 +1,8 @@
     @Test
     @RunTestInLooperThread
     public void collectionIterator_invalid_looperThread_byRemoteTransaction() {
-        final SharedRealm sharedRealm = getSharedRealm();
+        final SharedRealm sharedRealm = getSharedRealmForLooper();
+        populateData(sharedRealm);
         Table table = getTable(sharedRealm);
         final Collection collection = new Collection(sharedRealm, table.where());
         final TestIterator iterator = new TestIterator(collection);
@@ -20,6 +21,6 @@
             }
         });
 
-        addRowAsync();
+        addRowAsync(sharedRealm);
     }
 

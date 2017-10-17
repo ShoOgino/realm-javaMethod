@@ -20,12 +20,12 @@
         SyncManager.getSession(configOld).uploadAllLocalChanges();
         realm.close();
         user.logout();
-        Realm.deleteRealm(configOld);
 
         // 2. Local state should now be completely reset. Open the Realm again with a new configuration which should
         // download the uploaded changes (pray it managed to do so within the time frame).
         user = SyncUser.login(SyncCredentials.usernamePassword(username, password, false), Constants.AUTH_URL);
         final SyncConfiguration configNew = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+                .name("newRealm")
                 .waitForInitialRemoteData()
                 .readOnly()
                 .schema(StringOnly.class)

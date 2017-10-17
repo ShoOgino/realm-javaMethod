@@ -1,0 +1,24 @@
+    @Test
+    public void callWithLock() {
+        RealmConfiguration config = configFactory.createConfiguration();
+
+        // Return false if there are opened SharedRealm instance
+        SharedRealm sharedRealm = SharedRealm.getInstance(config);
+        assertFalse(OsObjectStore.callWithLock(config, new Runnable() {
+            @Override
+            public void run() {
+                fail();
+            }
+        }));
+        sharedRealm.close();
+
+        final AtomicBoolean callbackCalled = new AtomicBoolean(false);
+        assertTrue(OsObjectStore.callWithLock(config, new Runnable() {
+            @Override
+            public void run() {
+                callbackCalled.set(true);
+            }
+        }));
+        assertTrue(callbackCalled.get());
+    }
+

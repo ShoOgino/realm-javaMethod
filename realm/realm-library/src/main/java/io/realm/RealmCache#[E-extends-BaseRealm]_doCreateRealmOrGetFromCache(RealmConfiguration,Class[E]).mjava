@@ -20,11 +20,12 @@
                         } catch (Throwable t) {
                             // If an error happened while downloading initial data, we need to reset the file so we can
                             // download it again on the next attempt.
-                            // Realm.deleteRealm() is under the same lock as this method and globalCount is still 0, so
-                            // this should be safe.
                             sharedRealm.close();
                             sharedRealm = null;
-                            Realm.deleteRealm(configuration);
+                            // FIXME: We don't have a way to ensure that the Realm instance on client thread has been
+                            //        closed for now.
+                            // https://github.com/realm/realm-java/issues/5416
+                            BaseRealm.deleteRealm(configuration);
                             throw t;
                         }
                     }

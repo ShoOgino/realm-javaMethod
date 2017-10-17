@@ -7,6 +7,7 @@
         // 1. Copy a valid Realm to the server (and pray it does it within 10 seconds)
         final SyncConfiguration configOld = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
                 .schema(StringOnly.class)
+                .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
                 .build();
         Realm realm = Realm.getInstance(configOld);
         realm.executeTransaction(new Realm.Transaction() {
@@ -20,12 +21,12 @@
         SyncManager.getSession(configOld).uploadAllLocalChanges();
         realm.close();
         user.logout();
-        Realm.deleteRealm(configOld);
 
-        // 2. Local state should now be completely reset. Open the Realm again with a new configuration which should
-        // download the uploaded changes (pray it managed to do so within the time frame).
+        // 2. Local state should now be completely reset. Open the same sync Realm but different local name again with
+        // a new configuration which should download the uploaded changes (pray it managed to do so within the time frame).
         user = SyncUser.login(SyncCredentials.usernamePassword(username, password), Constants.AUTH_URL);
         SyncConfiguration config = new SyncConfiguration.Builder(user, Constants.USER_REALM)
+                .name("newRealm")
                 .schema(StringOnly.class)
                 .waitForInitialRemoteData()
                 .build();

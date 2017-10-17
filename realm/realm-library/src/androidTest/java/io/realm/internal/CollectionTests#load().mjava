@@ -1,6 +1,9 @@
     @Test
     @RunTestInLooperThread
     public void load() {
+        final SharedRealm sharedRealm = getSharedRealmForLooper();
+        looperThread.closeAfterTest(sharedRealm);
+        populateData(sharedRealm);
         final Collection collection = new Collection(sharedRealm, table.where());
         collection.addListener(collection, new RealmChangeListener<Collection>() {
             @Override
