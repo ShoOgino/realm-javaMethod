@@ -1,19 +1,42 @@
+    /**
+     * To delete Realm and related temporary files. This must be called in
+     * {@link OsObjectStore#callWithLock(RealmConfiguration, Runnable)}'s callback.
+     *
+     * @return {@code true} if the realm file is deleted. Temporary file deletion failure will not impact the return
+     * value, instead, a warning will be logged.
+     */
     public static boolean deleteRealm(String canonicalPath, File realmFolder, String realmFileName) {
-        boolean realmDeleted = true;
         final String management = ".management";
         File managementFolder = new File(realmFolder, realmFileName + management);
+        File realmFile = new File(canonicalPath);
 
         // Deletes files in management directory and the directory.
         // There is no subfolders in the management directory.
         File[] files = managementFolder.listFiles();
         if (files != null) {
             for (File file : files) {
-                realmDeleted = realmDeleted && file.delete();
+                boolean deleteResult = file.delete();
+                if (!deleteResult) {
+                    RealmLog.warn( String.format(Locale.ENGLISH,"Realm temporary file at %s cannot be deleted",
+                            file.getAbsolutePath()));
+                }
             }
         }
-        realmDeleted = realmDeleted && managementFolder.delete();
+        if (managementFolder.exists() && !managementFolder.delete()) {
+            RealmLog.warn( String.format(Locale.ENGLISH,"Realm temporary folder at %s cannot be deleted",
+                    managementFolder.getAbsolutePath()));
+        }
 
-        // Deletes specific files in root directory.
-        return realmDeleted && deletes(canonicalPath, realmFolder, realmFileName);
+        boolean realmDeleted;
+        if (realmFile.exists()) {
+            realmDeleted = realmFile.delete();
+            if (!realmDeleted) {
+                RealmLog.warn(String.format(Locale.ENGLISH,"Realm file at %s cannot be deleted",
+                        realmFile.getAbsolutePath()));
+            }
+        } else {
+            realmDeleted = true;
+        }
+        return realmDeleted;
     }
 

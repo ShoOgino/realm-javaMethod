@@ -10,7 +10,9 @@
         try {
             realm = Realm.getInstance(config);
             fail();
-        } catch (IllegalStateException ignored) {
+        } catch (IllegalStateException expected) {
+            assertThat(expected.getMessage(), CoreMatchers.containsString(
+                    "downloadAllServerChanges() cannot be called from the main thread."));
         } finally {
             if (realm != null) {
                 realm.close();

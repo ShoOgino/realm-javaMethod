@@ -1,7 +1,8 @@
     @Test
     @RunTestInLooperThread
     public void addListener_queryNotReturned() {
-        final SharedRealm sharedRealm = getSharedRealm();
+        final SharedRealm sharedRealm = getSharedRealmForLooper();
+        populateData(sharedRealm);
         Table table = getTable(sharedRealm);
 
         final Collection collection = new Collection(sharedRealm, table.where());
@@ -16,6 +17,6 @@
             }
         });
 
-        addRowAsync();
+        addRowAsync(sharedRealm);
     }
 
