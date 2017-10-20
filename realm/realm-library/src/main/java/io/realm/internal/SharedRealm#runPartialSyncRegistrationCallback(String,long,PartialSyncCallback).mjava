@@ -1,12 +1,13 @@
     /**
      * Called from JNI when the partial sync callback is invoked from the ObjectStore.
-     * @param error if the partial sync query failed to register.
+     *
+     * @param error            if the partial sync query failed to register.
      * @param nativeResultsPtr pointer to the {@code Results} of the partial sync query.
-     * @param callback the callback registered from the user to notify the success/error of the partial sync query.
+     * @param callback         the callback registered from the user to notify the success/error of the partial sync query.
      */
     @SuppressWarnings("unused")
     private void runPartialSyncRegistrationCallback(@Nullable String error, long nativeResultsPtr,
-                                                           PartialSyncCallback callback) {
+                                                    PartialSyncCallback callback) {
         if (error != null) {
             callback.onError(new RealmException(error));
         } else {
