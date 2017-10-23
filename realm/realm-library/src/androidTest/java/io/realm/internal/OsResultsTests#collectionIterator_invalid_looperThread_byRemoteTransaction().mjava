@@ -1,0 +1,26 @@
+    @Test
+    @RunTestInLooperThread
+    public void collectionIterator_invalid_looperThread_byRemoteTransaction() {
+        final SharedRealm sharedRealm = getSharedRealmForLooper();
+        populateData(sharedRealm);
+        Table table = getTable(sharedRealm);
+        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        final TestIterator iterator = new TestIterator(osResults);
+        looperThread.keepStrongReference(osResults);
+        assertFalse(iterator.isDetached(sharedRealm));
+        osResults.addListener(osResults, new RealmChangeListener<OsResults>() {
+            @Override
+            public void onChange(OsResults element) {
+                try {
+                    iterator.checkValid();
+                    fail();
+                } catch (ConcurrentModificationException ignored) {
+                }
+                sharedRealm.close();
+                looperThread.testComplete();
+            }
+        });
+
+        addRowAsync(sharedRealm);
+    }
+

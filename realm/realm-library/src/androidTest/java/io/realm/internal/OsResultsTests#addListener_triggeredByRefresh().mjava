@@ -1,0 +1,21 @@
+    // Local commit will trigger the listener first when beginTransaction gets called then again when call refresh.
+    @Test
+    public void addListener_triggeredByRefresh() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        OsResults osResults = new OsResults(sharedRealm, table.where());
+        osResults.size();
+        osResults.addListener(osResults, new RealmChangeListener<OsResults>() {
+            @Override
+            public void onChange(OsResults element) {
+                assertEquals(1, latch.getCount());
+                latch.countDown();
+            }
+        });
+
+        addRowAsync(sharedRealm);
+
+        sharedRealm.waitForChange();
+        sharedRealm.refresh();
+        TestHelper.awaitOrFail(latch);
+    }
+

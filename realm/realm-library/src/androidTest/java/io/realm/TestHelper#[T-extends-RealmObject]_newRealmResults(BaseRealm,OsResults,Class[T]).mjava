@@ -1,0 +1,29 @@
+    /**
+     * Creates a {@link RealmResults} instance.
+     * This helper method is useful to create a mocked {@link RealmResults}.
+     *
+     * @param realm a {@link Realm} or a {@link DynamicRealm} instance.
+     * @param osResults a {@link OsResults} instance.
+     * @param tableClass a Class of Table.
+     * @return a created {@link RealmResults} instance.
+     */
+    public static <T extends RealmObject> RealmResults<T> newRealmResults(
+            BaseRealm realm, OsResults osResults, Class<T> tableClass) {
+        //noinspection TryWithIdenticalCatches
+        try {
+            final Constructor<RealmResults> c = RealmResults.class.getDeclaredConstructor(
+                    BaseRealm.class, OsResults.class, Class.class);
+            c.setAccessible(true);
+            //noinspection unchecked
+            return c.newInstance(realm, osResults, tableClass);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+

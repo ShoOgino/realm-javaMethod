@@ -1,0 +1,27 @@
+    @Test
+    public void addListener_shouldBeCalledWhenRefreshAfterLocalCommit() {
+        final CountDownLatch latch = new CountDownLatch(2);
+        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        assertEquals(4, osResults.size()); // See `populateData()`
+        osResults.addListener(osResults, new RealmChangeListener<OsResults>() {
+            @Override
+            public void onChange(OsResults element) {
+                if (latch.getCount() == 2) {
+                    // triggered by beginTransaction
+                    assertEquals(4, osResults.size());
+                } else if (latch.getCount() == 1) {
+                    // triggered by refresh
+                    assertEquals(5, osResults.size());
+                } else {
+                    fail();
+                }
+                latch.countDown();
+            }
+        });
+        sharedRealm.beginTransaction();
+        OsObject.createRow(table);
+        sharedRealm.commitTransaction();
+        sharedRealm.refresh();
+        TestHelper.awaitOrFail(latch);
+    }
+

@@ -1,0 +1,22 @@
+    // 1. Create a results and add listener.
+    // 2. Query results should be returned in the next loop.
+    @Test
+    @RunTestInLooperThread
+    public void addListener_shouldBeCalledToReturnTheQueryResults() {
+        final SharedRealm sharedRealm = getSharedRealmForLooper();
+        populateData(sharedRealm);
+        Table table = getTable(sharedRealm);
+
+        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        looperThread.keepStrongReference(osResults);
+        osResults.addListener(osResults, new RealmChangeListener<OsResults>() {
+            @Override
+            public void onChange(OsResults osResults1) {
+                assertEquals(osResults, osResults1);
+                assertEquals(4, osResults1.size());
+                sharedRealm.close();
+                looperThread.testComplete();
+            }
+        });
+    }
+

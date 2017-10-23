@@ -1,7 +1,7 @@
     public PendingRow(SharedRealm sharedRealm, TableQuery query, @Nullable SortDescriptor sortDescriptor,
             final boolean returnCheckedRow) {
         this.sharedRealm = sharedRealm;
-        pendingCollection = new Collection(sharedRealm, query, sortDescriptor, null);
+        pendingOsResults = new OsResults(sharedRealm, query, sortDescriptor, null);
 
         listener = new RealmChangeListener<PendingRow>() {
             @Override
@@ -9,7 +9,7 @@
                 notifyFrontEnd();
             }
         };
-        pendingCollection.addListener(this, listener);
+        pendingOsResults.addListener(this, listener);
         this.returnCheckedRow = returnCheckedRow;
         sharedRealm.addPendingRow(this);
     }

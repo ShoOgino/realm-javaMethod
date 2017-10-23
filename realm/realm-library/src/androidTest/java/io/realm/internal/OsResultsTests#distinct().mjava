@@ -1,0 +1,16 @@
+    @Test
+    public void distinct() {
+        OsResults osResults = new OsResults(sharedRealm, table.where().lessThan(new long[] {2}, oneNullTable, 4));
+
+        SortDescriptor distinctDescriptor = SortDescriptor.getTestInstance(table, new long[] {2});
+        OsResults osResults2 = osResults.distinct(distinctDescriptor);
+
+        // A new native Results should be created.
+        assertTrue(osResults.getNativePtr() != osResults2.getNativePtr());
+        assertEquals(3, osResults.size());
+        assertEquals(2, osResults2.size());
+
+        assertEquals(3, osResults2.getUncheckedRow(0).getLong(2));
+        assertEquals(1, osResults2.getUncheckedRow(1).getLong(2));
+    }
+
