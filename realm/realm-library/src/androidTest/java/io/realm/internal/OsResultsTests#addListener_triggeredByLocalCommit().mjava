@@ -1,0 +1,34 @@
+    // Local commit will trigger the listener first when beginTransaction gets called then again when transaction
+    // committed.
+    @Test
+    @RunTestInLooperThread
+    public void addListener_triggeredByLocalCommit() {
+        final SharedRealm sharedRealm = getSharedRealmForLooper();
+        populateData(sharedRealm);
+        Table table = getTable(sharedRealm);
+        final AtomicInteger listenerCounter = new AtomicInteger(0);
+
+        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        looperThread.keepStrongReference(osResults);
+        osResults.addListener(osResults, new RealmChangeListener<OsResults>() {
+            @Override
+            public void onChange(OsResults osResults1) {
+                switch (listenerCounter.getAndIncrement()) {
+                    case 0:
+                        assertEquals(4, osResults1.size());
+                        break;
+                    case 1:
+                        assertEquals(5, osResults1.size());
+                        sharedRealm.close();
+                        break;
+                    default:
+                        fail();
+                        break;
+                }
+            }
+        });
+        addRow(sharedRealm);
+        assertEquals(2, listenerCounter.get());
+        looperThread.testComplete();
+    }
+

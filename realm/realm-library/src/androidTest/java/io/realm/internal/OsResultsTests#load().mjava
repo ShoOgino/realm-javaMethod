@@ -1,0 +1,18 @@
+    @Test
+    @RunTestInLooperThread
+    public void load() {
+        final SharedRealm sharedRealm = getSharedRealmForLooper();
+        looperThread.closeAfterTest(sharedRealm);
+        populateData(sharedRealm);
+        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        osResults.addListener(osResults, new RealmChangeListener<OsResults>() {
+            @Override
+            public void onChange(OsResults element) {
+                assertTrue(osResults.isLoaded());
+                looperThread.testComplete();
+            }
+        });
+        assertFalse(osResults.isLoaded());
+        osResults.load();
+    }
+

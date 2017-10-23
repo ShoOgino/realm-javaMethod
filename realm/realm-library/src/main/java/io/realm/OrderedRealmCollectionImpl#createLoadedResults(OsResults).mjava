@@ -1,0 +1,13 @@
+    RealmResults<E> createLoadedResults(OsResults newOsResults) {
+        RealmResults<E> results;
+        if (className != null) {
+            results = new RealmResults<E>(realm, newOsResults, className);
+        } else {
+            // 'classSpec' is non-null when 'className' is null.
+            //noinspection ConstantConditions
+            results = new RealmResults<E>(realm, newOsResults, classSpec);
+        }
+        results.load();
+        return results;
+    }
+

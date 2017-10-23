@@ -1,0 +1,13 @@
+    @Test
+    public void createSnapshot() {
+        OsResults osResults = new OsResults(sharedRealm, table.where());
+        OsResults snapshot = osResults.createSnapshot();
+        assertTrue(OsResults.Mode.TABLEVIEW == snapshot.getMode());
+        thrown.expect(IllegalStateException.class);
+        snapshot.addListener(snapshot, new RealmChangeListener<OsResults>() {
+            @Override
+            public void onChange(OsResults element) {
+            }
+        });
+    }
+

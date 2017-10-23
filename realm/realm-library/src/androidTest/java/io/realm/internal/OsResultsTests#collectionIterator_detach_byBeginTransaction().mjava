@@ -1,0 +1,11 @@
+    @Test
+    public void collectionIterator_detach_byBeginTransaction() {
+        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        TestIterator iterator = new TestIterator(osResults);
+        assertFalse(iterator.isDetached(sharedRealm));
+        sharedRealm.beginTransaction();
+        assertTrue(iterator.isDetached(sharedRealm));
+        sharedRealm.commitTransaction();
+        assertTrue(iterator.isDetached(sharedRealm));
+    }
+

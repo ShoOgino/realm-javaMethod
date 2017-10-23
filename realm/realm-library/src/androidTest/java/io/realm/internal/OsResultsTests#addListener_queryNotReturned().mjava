@@ -1,0 +1,22 @@
+    @Test
+    @RunTestInLooperThread
+    public void addListener_queryNotReturned() {
+        final SharedRealm sharedRealm = getSharedRealmForLooper();
+        populateData(sharedRealm);
+        Table table = getTable(sharedRealm);
+
+        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        looperThread.keepStrongReference(osResults);
+        osResults.addListener(osResults, new RealmChangeListener<OsResults>() {
+            @Override
+            public void onChange(OsResults osResults1) {
+                assertEquals(osResults, osResults1);
+                assertEquals(5, osResults1.size());
+                sharedRealm.close();
+                looperThread.testComplete();
+            }
+        });
+
+        addRowAsync(sharedRealm);
+    }
+

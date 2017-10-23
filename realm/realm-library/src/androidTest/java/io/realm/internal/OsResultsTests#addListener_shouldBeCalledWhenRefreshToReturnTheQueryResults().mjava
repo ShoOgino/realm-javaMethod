@@ -1,0 +1,22 @@
+    // 1. Create a results and add listener on a non-looper thread.
+    // 2. Query results should be returned when refresh() called.
+    @Test
+    public void addListener_shouldBeCalledWhenRefreshToReturnTheQueryResults() {
+        final AtomicBoolean onChangeCalled = new AtomicBoolean(false);
+        final SharedRealm sharedRealm = getSharedRealm();
+        Table table = getTable(sharedRealm);
+
+        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        osResults.addListener(osResults, new RealmChangeListener<OsResults>() {
+            @Override
+            public void onChange(OsResults osResults1) {
+                assertEquals(osResults, osResults1);
+                assertEquals(4, osResults1.size());
+                sharedRealm.close();
+                onChangeCalled.set(true);
+            }
+        });
+        sharedRealm.refresh();
+        assertTrue(onChangeCalled.get());
+    }
+
