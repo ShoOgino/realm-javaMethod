@@ -4,7 +4,11 @@
      * @return mapped {@link ErrorCode}.
      */
     public static ErrorCode fromException(Exception exception) {
-        // ConnectException is recoverable (with exponential backoff)
-        return (exception instanceof ConnectException) ? ErrorCode.IO_EXCEPTION : ErrorCode.UNKNOWN;
+        // IOException are recoverable (with exponential backoff)
+        if (exception instanceof IOException) {
+            return ErrorCode.IO_EXCEPTION;
+        } else {
+            return ErrorCode.UNKNOWN;
+        }
     }
 
