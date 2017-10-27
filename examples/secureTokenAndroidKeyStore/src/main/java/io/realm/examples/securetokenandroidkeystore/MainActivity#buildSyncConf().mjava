@@ -1,10 +1,20 @@
     // build SyncConfiguration with a user store to store encrypted Token.
     private void buildSyncConf() {
         // the rest of Sync logic ...
-        SyncUser user = createTestUser(Long.MAX_VALUE);
-        String url = "realm://objectserver.realm.io/default";
-        SyncConfiguration secureConfig = new SyncConfiguration.Builder(user, url).build();
-        Realm realm = Realm.getInstance(secureConfig);
-        // ...
+        SyncCredentials credentials = SyncCredentials.usernamePassword("username", "password");
+        final String urlAuth = "http://objectserver.realm.io:9080/auth";
+        final String url = "realm://objectserver.realm.io/default";
+
+        SyncUser.loginAsync(credentials, urlAuth, new SyncUser.Callback<SyncUser>() {
+            @Override
+            public void onSuccess(SyncUser user) {
+                SyncConfiguration secureConfig = new SyncConfiguration.Builder(user, url).build();
+                Realm realm = Realm.getInstance(secureConfig);
+                // ...
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {}
+        });
     }
 
