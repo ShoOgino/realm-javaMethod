@@ -1,0 +1,11 @@
+    // Create a realm instance directly from a OsSharedRealm instance. This instance doesn't have the ownership of the
+    // given OsSharedRealm instance. The OsSharedRealm instance should not be closed when close() called.
+    BaseRealm(OsSharedRealm sharedRealm) {
+        this.threadId = Thread.currentThread().getId();
+        this.configuration = sharedRealm.getConfiguration();
+        this.realmCache = null;
+
+        this.sharedRealm = sharedRealm;
+        this.shouldCloseSharedRealm = false;
+    }
+

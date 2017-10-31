@@ -1,0 +1,12 @@
+    @Override
+    public void close() {
+        if (realmNotifier != null) {
+            realmNotifier.close();
+        }
+        synchronized (context) {
+            nativeCloseSharedRealm(nativePtr);
+            // Don't reset the nativePtr since we still rely on Object Store to check if the given OsSharedRealm ptr
+            // is closed or not.
+        }
+    }
+

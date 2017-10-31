@@ -1,0 +1,15 @@
+    public OsResults(OsSharedRealm sharedRealm, TableQuery query,
+                     @Nullable SortDescriptor sortDescriptor, @Nullable SortDescriptor distinctDescriptor) {
+        query.validateQuery();
+
+        this.nativePtr = nativeCreateResults(sharedRealm.getNativePtr(), query.getNativePtr(),
+                sortDescriptor,
+                distinctDescriptor);
+
+        this.sharedRealm = sharedRealm;
+        this.context = sharedRealm.context;
+        this.table = query.getTable();
+        this.context.addReference(this);
+        this.loaded = false;
+    }
+

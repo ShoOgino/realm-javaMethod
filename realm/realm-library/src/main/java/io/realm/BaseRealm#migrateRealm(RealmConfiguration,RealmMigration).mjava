@@ -39,7 +39,7 @@
 
                 RealmProxyMediator mediator = configuration.getSchemaMediator();
                 OsSchemaInfo schemaInfo = new OsSchemaInfo(mediator.getExpectedObjectSchemaInfoMap().values());
-                SharedRealm.MigrationCallback migrationCallback = null;
+                OsSharedRealm.MigrationCallback migrationCallback = null;
                 final RealmMigration migrationToBeApplied = migration != null ? migration : configuration.getMigration();
                 if (migrationToBeApplied != null) {
                     migrationCallback = createMigrationCallback(migrationToBeApplied);
@@ -48,10 +48,10 @@
                         .autoUpdateNotification(false)
                         .schemaInfo(schemaInfo)
                         .migrationCallback(migrationCallback);
-                SharedRealm sharedRealm = null;
+                OsSharedRealm sharedRealm = null;
                 try {
                     sharedRealm =
-                            SharedRealm.getInstance(configBuilder);
+                            OsSharedRealm.getInstance(configBuilder);
                 } finally {
                     if (sharedRealm != null) {
                         sharedRealm.close();
