@@ -1,0 +1,10 @@
+    /**
+     * Creates a {@code ShareRealm} instance from the given {@link OsRealmConfig.Builder}.
+     */
+    public static OsSharedRealm getInstance(OsRealmConfig.Builder configBuilder) {
+        OsRealmConfig osRealmConfig = configBuilder.build();
+        ObjectServerFacade.getSyncFacadeIfPossible().wrapObjectStoreSessionIfRequired(osRealmConfig);
+
+        return new OsSharedRealm(osRealmConfig);
+    }
+

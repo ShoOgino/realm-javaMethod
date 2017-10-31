@@ -1,0 +1,20 @@
+    /**
+     * Creates a {@code OsSharedRealm} instance from a given Object Store's {@code OsSharedRealm} pointer. This is used to
+     * create {@code OsSharedRealm} from the callback functions. When this is called, there is another
+     * {@code OsSharedRealm} instance with the same {@link OsRealmConfig} which has been created before. Although they
+     * are different {@code shared_ptr}, they point to the same {@code SharedGroup} instance. The {@code context} has
+     * to be the same one to ensure core's destructor thread safety.
+     */
+    private OsSharedRealm(long nativeSharedRealmPtr, OsRealmConfig osRealmConfig) {
+        this.nativePtr = nativeSharedRealmPtr;
+        this.osRealmConfig = osRealmConfig;
+        this.schemaInfo = new OsSchemaInfo(nativeGetSchemaInfo(nativePtr), this);
+        this.context = osRealmConfig.getContext();
+        this.context.addReference(this);
+
+        this.capabilities = new AndroidCapabilities();
+        // This instance should never need notifications.
+        this.realmNotifier = null;
+        nativeSetAutoRefresh(nativePtr, false);
+    }
+

@@ -1,0 +1,18 @@
+    @Test
+    public void registerSchemaChangedCallback_refresh() {
+        final AtomicBoolean listenerCalled = new AtomicBoolean(false);
+
+        assertFalse(sharedRealm.hasTable("NewTable"));
+
+        sharedRealm.registerSchemaChangedCallback(new OsSharedRealm.SchemaChangedCallback() {
+            @Override
+            public void onSchemaChanged() {
+                assertTrue(sharedRealm.hasTable("NewTable"));
+                listenerCalled.set(true);
+            }
+        });
+        changeSchemaByAnotherRealm();
+        sharedRealm.refresh();
+        assertTrue(listenerCalled.get());
+    }
+

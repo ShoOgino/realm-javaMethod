@@ -9,11 +9,11 @@
 
         looperThread.getRealm().close();
 
-        SharedRealm sharedRealm = getSharedRealm(looperThread.getConfiguration());
+        OsSharedRealm sharedRealm = getSharedRealm(looperThread.getConfiguration());
         looperThread.keepStrongReference(sharedRealm);
-        sharedRealm.realmNotifier.addChangeListener(sharedRealm, new RealmChangeListener<SharedRealm>() {
+        sharedRealm.realmNotifier.addChangeListener(sharedRealm, new RealmChangeListener<OsSharedRealm>() {
             @Override
-            public void onChange(SharedRealm sharedRealm) {
+            public void onChange(OsSharedRealm sharedRealm) {
                 int commits = commitCounter.get();
                 int listenerCount = listenerCounter.addAndGet(1);
                 assertEquals(commits, listenerCount);

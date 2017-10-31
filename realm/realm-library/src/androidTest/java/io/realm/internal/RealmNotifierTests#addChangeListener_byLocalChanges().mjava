@@ -3,10 +3,10 @@
     @RunTestInLooperThread
     public void addChangeListener_byLocalChanges() {
         final AtomicBoolean commitReturns = new AtomicBoolean(false);
-        SharedRealm sharedRealm = getSharedRealm(looperThread.getConfiguration());
-        sharedRealm.realmNotifier.addChangeListener(sharedRealm, new RealmChangeListener<SharedRealm>() {
+        OsSharedRealm sharedRealm = getSharedRealm(looperThread.getConfiguration());
+        sharedRealm.realmNotifier.addChangeListener(sharedRealm, new RealmChangeListener<OsSharedRealm>() {
             @Override
-            public void onChange(SharedRealm sharedRealm) {
+            public void onChange(OsSharedRealm sharedRealm) {
                 // Transaction has been committed in core, but commitTransaction hasn't returned in java.
                 assertFalse(commitReturns.get());
                 looperThread.testComplete();

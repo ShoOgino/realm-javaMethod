@@ -1,0 +1,75 @@
+    private OsRealmConfig(final RealmConfiguration config,
+                          boolean autoUpdateNotification,
+                          @Nullable OsSchemaInfo schemaInfo,
+                          @Nullable OsSharedRealm.MigrationCallback migrationCallback,
+                          @Nullable OsSharedRealm.InitializationCallback initializationCallback) {
+        this.realmConfiguration = config;
+        this.nativePtr = nativeCreate(config.getPath(), false, true);
+        NativeContext.dummyContext.addReference(this);
+
+        // Retrieve Sync settings first. We need syncRealmUrl to identify if this is a SyncConfig
+        Object[] syncConfigurationOptions = ObjectServerFacade.getSyncFacadeIfPossible().getUserAndServerUrl(realmConfiguration);
+        String syncUserIdentifier = (String) syncConfigurationOptions[0];
+        String syncRealmUrl = (String) syncConfigurationOptions[1];
+        String syncRealmAuthUrl = (String) syncConfigurationOptions[2];
+        String syncRefreshToken = (String) syncConfigurationOptions[3];
+        boolean syncClientValidateSsl = (Boolean.TRUE.equals(syncConfigurationOptions[4]));
+        String syncSslTrustCertificatePath = (String) syncConfigurationOptions[5];
+        Byte sessionStopPolicy = (Byte) syncConfigurationOptions[6];
+        boolean isPartial = (Boolean.TRUE.equals(syncConfigurationOptions[7]));
+
+        // Set encryption key
+        byte[] key = config.getEncryptionKey();
+        if (key != null) {
+            nativeSetEncryptionKey(nativePtr, key);
+        }
+
+        // Set durability
+        nativeSetInMemory(nativePtr, config.getDurability() == Durability.MEM_ONLY);
+
+        // Set auto update notification
+        nativeEnableChangeNotification(nativePtr, autoUpdateNotification);
+
+        // Set schema related params.
+        SchemaMode schemaMode = SchemaMode.SCHEMA_MODE_MANUAL;
+        if (config.isRecoveryConfiguration()) {
+            schemaMode = SchemaMode.SCHEMA_MODE_IMMUTABLE;
+        } else if (config.isReadOnly()) {
+            schemaMode = SchemaMode.SCHEMA_MODE_READONLY;
+        } else if (syncRealmUrl != null) {
+            schemaMode = SchemaMode.SCHEMA_MODE_ADDITIVE;
+        } else if (config.shouldDeleteRealmIfMigrationNeeded()) {
+            schemaMode = SchemaMode.SCHEMA_MODE_RESET_FILE;
+        }
+        final long schemaVersion = config.getSchemaVersion();
+        final long nativeSchemaPtr = schemaInfo == null ? 0 : schemaInfo.getNativePtr();
+        this.migrationCallback = migrationCallback;
+        nativeSetSchemaConfig(nativePtr, schemaMode.getNativeValue(), schemaVersion, nativeSchemaPtr, migrationCallback);
+
+        // Compact on launch
+        this.compactOnLaunchCallback = config.getCompactOnLaunchCallback();
+        if (compactOnLaunchCallback != null) {
+            nativeSetCompactOnLaunchCallback(nativePtr, compactOnLaunchCallback);
+        }
+
+        // Initial data transaction
+        this.initializationCallback = initializationCallback;
+        if (initializationCallback != null) {
+            nativeSetInitializationCallback(nativePtr, initializationCallback);
+        }
+
+        URI resolvedRealmURI  = null;
+        // Set sync config
+        if (syncRealmUrl != null) {
+            String resolvedSyncRealmUrl = nativeCreateAndSetSyncConfig(nativePtr, syncRealmUrl, syncRealmAuthUrl, syncUserIdentifier,
+                    syncRefreshToken, isPartial, sessionStopPolicy);
+            try {
+                resolvedRealmURI = new URI(resolvedSyncRealmUrl);
+            } catch (URISyntaxException e) {
+                RealmLog.error(e, "Cannot create a URI from the Realm URL address");
+            }
+            nativeSetSyncConfigSslSettings(nativePtr, syncClientValidateSsl, syncSslTrustCertificatePath);
+        }
+        this.resolvedRealmURI = resolvedRealmURI;
+    }
+

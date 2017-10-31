@@ -4,17 +4,17 @@
         this.configuration = configuration;
         this.realmCache = null;
 
-        SharedRealm.MigrationCallback migrationCallback = null;
+        OsSharedRealm.MigrationCallback migrationCallback = null;
         if (schemaInfo != null && configuration.getMigration() != null) {
             migrationCallback = createMigrationCallback(configuration.getMigration());
         }
 
-        SharedRealm.InitializationCallback initializationCallback = null;
+        OsSharedRealm.InitializationCallback initializationCallback = null;
         final Realm.Transaction initialDataTransaction = configuration.getInitialDataTransaction();
         if (initialDataTransaction != null) {
-            initializationCallback = new SharedRealm.InitializationCallback() {
+            initializationCallback = new OsSharedRealm.InitializationCallback() {
                 @Override
-                public void onInit(SharedRealm sharedRealm) {
+                public void onInit(OsSharedRealm sharedRealm) {
                     initialDataTransaction.execute(Realm.createInstance(sharedRealm));
                 }
             };
@@ -25,7 +25,7 @@
                 .migrationCallback(migrationCallback)
                 .schemaInfo(schemaInfo)
                 .initializationCallback(initializationCallback);
-        this.sharedRealm = SharedRealm.getInstance(configBuilder);
+        this.sharedRealm = OsSharedRealm.getInstance(configBuilder);
         this.shouldCloseSharedRealm = true;
 
         sharedRealm.registerSchemaChangedCallback(schemaChangedCallback);
