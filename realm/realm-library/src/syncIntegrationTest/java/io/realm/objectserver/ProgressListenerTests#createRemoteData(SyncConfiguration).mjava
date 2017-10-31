@@ -1,17 +1,21 @@
     // Create remote data for a given user.
-    private URI createRemoteData(SyncUser user) {
-        final SyncConfiguration config = configFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
-                .name("remote")
-                .build();
+    private URI createRemoteData(final SyncConfiguration config) {
         final Realm realm = Realm.getInstance(config);
         final CountDownLatch changesUploaded = new CountDownLatch(1);
         final SyncSession session = SyncManager.getSession(config);
         final long beforeAdd = realm.where(AllTypes.class).count();
         writeSampleData(realm);
 
+        final long threadId = Thread.currentThread().getId();
+
         session.addUploadProgressListener(ProgressMode.INDEFINITELY, new ProgressListener() {
             @Override
             public void onChange(Progress progress) {
+                // FIXME: This check is to make sure before this method returns, all the uploads has been done.
+                // See https://github.com/realm/realm-object-store/issues/581#issuecomment-339353832
+                if (threadId == Thread.currentThread().getId()) {
+                    return;
+                }
                 if (progress.isTransferComplete()) {
                     Realm realm = Realm.getInstance(config);
                     final long afterAdd = realm.where(AllTypes.class).count();
