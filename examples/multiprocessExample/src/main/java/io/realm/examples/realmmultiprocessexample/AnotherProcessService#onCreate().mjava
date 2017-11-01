@@ -1,0 +1,19 @@
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        handler = new Handler(Looper.myLooper());
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                realm.copyToRealmOrUpdate(Utils.createStandaloneProcessInfo(AnotherProcessService.this));
+                realm.commitTransaction();
+                realm.close();
+                handler.postDelayed(this, 1000);
+            }
+        };
+        handler.postDelayed(runnable, 1000);
+    }
+
