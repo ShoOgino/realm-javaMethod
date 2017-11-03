@@ -1,0 +1,18 @@
+    public static void initialize(File tempDirectory) {
+        if (OsSharedRealm.temporaryDirectory != null) {
+            // already initialized
+            return;
+        }
+
+        String temporaryDirectoryPath = tempDirectory.getAbsolutePath();
+        if (!tempDirectory.isDirectory() && !tempDirectory.mkdirs() && !tempDirectory.isDirectory()) {
+            throw new IOException("failed to create temporary directory: " + temporaryDirectoryPath);
+        }
+
+        if (!temporaryDirectoryPath.endsWith("/")) {
+            temporaryDirectoryPath += "/";
+        }
+        nativeInit(temporaryDirectoryPath);
+        OsSharedRealm.temporaryDirectory = tempDirectory;
+    }
+

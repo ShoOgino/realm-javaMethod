@@ -1,7 +1,7 @@
     @Test
     public void migratePrimaryKeyTableIfNeeded_second() throws IOException {
         configFactory.copyRealmFromAssets(context, "0841_annotationtypes.realm", "default.realm");
-        sharedRealm = SharedRealm.getInstance(config);
+        sharedRealm = OsSharedRealm.getInstance(config);
         Table.migratePrimaryKeyTableIfNeeded(sharedRealm);
         Table t = sharedRealm.getTable("class_AnnotationTypes");
         assertEquals("id", OsObjectStore.getPrimaryKeyForObject(sharedRealm, "AnnotationTypes"));

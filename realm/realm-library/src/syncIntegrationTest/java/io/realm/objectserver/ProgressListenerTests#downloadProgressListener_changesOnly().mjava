@@ -2,7 +2,9 @@
     public void downloadProgressListener_changesOnly() {
         final CountDownLatch allChangesDownloaded = new CountDownLatch(1);
         SyncUser userWithData = UserFactory.createUniqueUser(Constants.AUTH_URL);
-        URI serverUrl = createRemoteData(userWithData);
+        SyncConfiguration userWithDataConfig = configFactory.createSyncConfigurationBuilder(userWithData, Constants.USER_REALM)
+                .build();
+        URI serverUrl = createRemoteData(userWithDataConfig);
         SyncUser adminUser = UserFactory.createAdminUser(Constants.AUTH_URL);
 
         final SyncConfiguration config = configFactory.createSyncConfigurationBuilder(adminUser, serverUrl.toString()).build();
@@ -13,9 +15,7 @@
             public void onChange(Progress progress) {
                 if (progress.isTransferComplete()) {
                     assertTransferComplete(progress, true);
-                    Realm realm = Realm.getInstance(config);
-                    assertEquals(TEST_SIZE, realm.where(AllTypes.class).count());
-                    realm.close();
+                    assertEquals(TEST_SIZE, getStoreTestDataSize(config));
                     allChangesDownloaded.countDown();
                 }
             }

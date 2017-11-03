@@ -1,0 +1,32 @@
+    private void populateData(OsSharedRealm sharedRealm) {
+        sharedRealm.beginTransaction();
+        table = sharedRealm.createTable(Table.getTableNameForClass("test_table"));
+        // Specify the column types and names
+        long columnIdx = table.addColumn(RealmFieldType.STRING, "firstName");
+        table.addSearchIndex(columnIdx);
+        table.addColumn(RealmFieldType.STRING, "lastName");
+        table.addColumn(RealmFieldType.INTEGER, "age");
+
+        // Add data to the table
+        long row = OsObject.createRow(table);
+        table.setString(0, row, "John", false);
+        table.setString(1, row, "Lee", false);
+        table.setLong(2, row, 4, false);
+
+        row = OsObject.createRow(table);
+        table.setString(0, row, "John", false);
+        table.setString(1, row, "Anderson", false);
+        table.setLong(2, row, 3, false);
+
+        row = OsObject.createRow(table);
+        table.setString(0, row, "Erik", false);
+        table.setString(1, row, "Lee", false);
+        table.setLong(2, row, 1, false);
+
+        row = OsObject.createRow(table);
+        table.setString(0, row, "Henry", false);
+        table.setString(1, row, "Anderson", false);
+        table.setLong(2, row, 1, false);
+        sharedRealm.commitTransaction();
+    }
+
