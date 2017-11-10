@@ -1,0 +1,13 @@
+    @Test
+    public void and_explicit() {
+        populateTestRealm(realm, 200);
+
+        RealmQuery<AllTypes> query = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_FLOAT, 31.2345f);
+        RealmResults<AllTypes> resultList = query.and().between(AllTypes.FIELD_LONG, 1, 10).findAll();
+        assertEquals(0, resultList.size());
+
+        query = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_FLOAT, 81.2345f);
+        resultList = query.and().between(AllTypes.FIELD_LONG, 1, 100).findAll();
+        assertEquals(1, resultList.size());
+    }
+
