@@ -1,0 +1,121 @@
+    /**
+     * Called by proxy to create a unmanaged {@link RealmList} according to the given {@link JsonReader}.
+     *
+     * @param elementClass the type of the {@link RealmList}.
+     * @param jsonReader the JSON stream to be parsed which may contain the data of the list to be set.
+     * @param <E> type of the {@link RealmList}.
+     * @throws IOException if it fails to parse JSON stream.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    static <E> RealmList<E> createRealmListWithJsonStream(Class<E> elementClass, JsonReader jsonReader) throws IOException {
+
+        if (jsonReader.peek() == null) {
+            jsonReader.skipValue();
+            return null;
+        }
+
+        jsonReader.beginArray();
+        RealmList realmList = new RealmList<E>();
+
+        if (elementClass == Boolean.class) {
+            while (jsonReader.hasNext()) {
+                if (jsonReader.peek() == JsonToken.NULL) {
+                    jsonReader.skipValue();
+                    realmList.add(null);
+                } else {
+                    realmList.add(jsonReader.nextBoolean());
+                }
+            }
+        } else if (elementClass == Float.class) {
+            while (jsonReader.hasNext()) {
+                if (jsonReader.peek() == JsonToken.NULL) {
+                    jsonReader.skipValue();
+                    realmList.add(null);
+                } else {
+                    realmList.add((float) jsonReader.nextDouble());
+                }
+            }
+        } else if (elementClass == Double.class) {
+            while (jsonReader.hasNext()) {
+                if (jsonReader.peek() == JsonToken.NULL) {
+                    jsonReader.skipValue();
+                    realmList.add(null);
+                } else {
+                    realmList.add(jsonReader.nextDouble());
+                }
+            }
+        } else if (elementClass == String.class) {
+            while (jsonReader.hasNext()) {
+                if (jsonReader.peek() == JsonToken.NULL) {
+                    jsonReader.skipValue();
+                    realmList.add(null);
+                } else {
+                    realmList.add(jsonReader.nextString());
+                }
+            }
+        } else if (elementClass == byte[].class) {
+            while (jsonReader.hasNext()) {
+                if (jsonReader.peek() == JsonToken.NULL) {
+                    jsonReader.skipValue();
+                    realmList.add(null);
+                } else {
+                    realmList.add(JsonUtils.stringToBytes(jsonReader.nextString()));
+                }
+            }
+        } else if (elementClass == Date.class) {
+            while (jsonReader.hasNext()) {
+                JsonToken token = jsonReader.peek();
+                if (token == JsonToken.NULL) {
+                    jsonReader.skipValue();
+                    realmList.add(null);
+                } else if (token == JsonToken.NUMBER) {
+                    realmList.add(new Date(jsonReader.nextLong()));
+                } else {
+                    realmList.add(JsonUtils.stringToDate(jsonReader.nextString()));
+                }
+            }
+        } else if (elementClass == Long.class) {
+            while (jsonReader.hasNext()) {
+                if (jsonReader.peek() == JsonToken.NULL) {
+                    jsonReader.skipValue();
+                    realmList.add(null);
+                } else {
+                    realmList.add(jsonReader.nextLong());
+                }
+            }
+        } else if (elementClass == Integer.class) {
+            while (jsonReader.hasNext()) {
+                if (jsonReader.peek() == JsonToken.NULL) {
+                    jsonReader.skipValue();
+                    realmList.add(null);
+                } else {
+                    realmList.add((int)jsonReader.nextLong());
+                }
+            }
+        } else if (elementClass == Short.class) {
+            while (jsonReader.hasNext()) {
+                if (jsonReader.peek() == JsonToken.NULL) {
+                    jsonReader.skipValue();
+                    realmList.add(null);
+                } else {
+                    realmList.add((short)jsonReader.nextLong());
+                }
+            }
+        } else if (elementClass == Byte.class) {
+            while (jsonReader.hasNext()) {
+                if (jsonReader.peek() == JsonToken.NULL) {
+                    jsonReader.skipValue();
+                    realmList.add(null);
+                } else {
+                    realmList.add((byte)jsonReader.nextLong());
+                }
+            }
+        } else {
+            throwWrongElementType(elementClass);
+        }
+
+        jsonReader.endArray();
+
+        return realmList;
+    }
+

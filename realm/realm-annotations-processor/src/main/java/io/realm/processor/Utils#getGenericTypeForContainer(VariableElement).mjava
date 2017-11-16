@@ -1,6 +1,6 @@
     // Note that, because subclassing subclasses of RealmObject is forbidden,
     // there is no need to deal with constructs like:  <code>RealmResults&lt;? extends Foos&lt;</code>.
-    public static DeclaredType getGenericTypeForContainer(VariableElement field) {
+    public static ReferenceType getGenericTypeForContainer(VariableElement field) {
         TypeMirror fieldType = field.asType();
         TypeKind kind = fieldType.getKind();
         if (kind != TypeKind.DECLARED) { return null; }
@@ -10,8 +10,9 @@
 
         fieldType = args.get(0);
         kind = fieldType.getKind();
-        if (kind != TypeKind.DECLARED) { return null; }
+        // We also support RealmList<byte[]>
+        if (kind != TypeKind.DECLARED && kind != TypeKind.ARRAY) { return null; }
 
-        return (DeclaredType) fieldType;
+        return (ReferenceType) fieldType;
     }
 
