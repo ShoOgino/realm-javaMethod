@@ -1,0 +1,12 @@
+    private static X509Certificate buildCertificateFromPEM(String pem) throws IOException, CertificateException {
+        InputStream stream = null;
+        try {
+            stream = new ByteArrayInputStream(pem.getBytes("UTF-8"));
+            return (X509Certificate) CERTIFICATE_FACTORY.generateCertificate(stream);
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+        }
+    }
+

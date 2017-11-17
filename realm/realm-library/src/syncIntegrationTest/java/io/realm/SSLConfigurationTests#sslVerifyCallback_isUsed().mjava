@@ -1,10 +1,14 @@
+    // IMPORTANT: Following test assume the root certificate is installed on the test device
+    //            certificate is located in <realm-java>/tools/sync_test_server/keys/android_test_certificate.crt
+    //            adb push <realm-java>/tools/sync_test_server/keys/android_test_certificate.crt /sdcard/
+    //            then import the certificate from the device (Settings/Security/Install from storage)
     @Test
-    public void withoutSSLVerification() throws InterruptedException {
+    public void sslVerifyCallback_isUsed() throws InterruptedException {
         String username = UUID.randomUUID().toString();
         String password = "password";
         SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
 
-        // 1. Copy a valid Realm to the server
+        // 1. Copy a valid Realm to the server using ssl_verify_path option
         //noinspection unchecked
         final SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
                 .schema(StringOnly.class)
@@ -24,13 +28,12 @@
         // download the uploaded changes.
         user = SyncUser.login(SyncCredentials.usernamePassword(username, password), Constants.AUTH_URL);
         //noinspection unchecked
-        SyncConfiguration syncConfigSSL = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
+        SyncConfiguration syncConfigSecure = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
                 .name("useSsl")
                 .schema(StringOnly.class)
                 .waitForInitialRemoteData()
-                .disableSSLVerification()
                 .build();
-        realm = Realm.getInstance(syncConfigSSL);
+        realm = Realm.getInstance(syncConfigSecure);
 
         RealmResults<StringOnly> all = realm.where(StringOnly.class).findAll();
         try {
