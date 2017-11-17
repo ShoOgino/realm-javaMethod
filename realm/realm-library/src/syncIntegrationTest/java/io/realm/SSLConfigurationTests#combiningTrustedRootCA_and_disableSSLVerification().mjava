@@ -1,22 +1,23 @@
     @Test
-    public void withoutSSLVerification() throws InterruptedException {
+    public void combiningTrustedRootCA_and_disableSSLVerification() throws InterruptedException {
         String username = UUID.randomUUID().toString();
         String password = "password";
         SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
 
-        // 1. Copy a valid Realm to the server
+        // 1. Copy a valid Realm to the server using ssl_verify_path option
         //noinspection unchecked
-        final SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+        final SyncConfiguration syncConfigWithCertificate = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
                 .schema(StringOnly.class)
+                .trustedRootCA("trusted_ca.pem")
                 .build();
-        Realm realm = Realm.getInstance(syncConfig);
+        Realm realm = Realm.getInstance(syncConfigWithCertificate);
 
         realm.beginTransaction();
         realm.createObject(StringOnly.class).setChars("Foo");
         realm.commitTransaction();
 
         // make sure the changes gets to the server
-        SyncManager.getSession(syncConfig).uploadAllLocalChanges();
+        SyncManager.getSession(syncConfigWithCertificate).uploadAllLocalChanges();
         realm.close();
         user.logout();
 
@@ -24,13 +25,13 @@
         // download the uploaded changes.
         user = SyncUser.login(SyncCredentials.usernamePassword(username, password), Constants.AUTH_URL);
         //noinspection unchecked
-        SyncConfiguration syncConfigSSL = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
+        SyncConfiguration syncConfigDisableSSL = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
                 .name("useSsl")
                 .schema(StringOnly.class)
                 .waitForInitialRemoteData()
                 .disableSSLVerification()
                 .build();
-        realm = Realm.getInstance(syncConfigSSL);
+        realm = Realm.getInstance(syncConfigDisableSSL);
 
         RealmResults<StringOnly> all = realm.where(StringOnly.class).findAll();
         try {

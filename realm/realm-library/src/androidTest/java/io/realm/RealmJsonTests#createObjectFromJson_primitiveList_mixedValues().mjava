@@ -1,0 +1,36 @@
+    @Test
+    public void createObjectFromJson_primitiveList_mixedValues() throws JSONException, IOException {
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_STRING_LIST, new String[] {"a", null, "bc"});
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_BOOLEAN_LIST, new Boolean[] {true, null, false});
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_DOUBLE_LIST, new Double[] {1.0d, null, 2.0d});
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_FLOAT_LIST, new Float[] {1.0f, null, 2.0f});
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_BYTE_LIST, new Byte[] {1, null, 2});
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_SHORT_LIST, new Short[] {1, null, 2});
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_INT_LIST, new Integer[] {1, null, 2});
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_LONG_LIST, new Long[] {1L, null, 2L});
+
+        // Date as integer
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_DATE_LIST,
+                new Integer[] {0, null, 1},
+                new Date[] {new Date(0), null, new Date(1)});
+        // Date as String
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_DATE_LIST,
+                new String [] {"/Date(1000)/", null, "/Date(2000)/"},
+                new Date[] {new Date(1000), null, new Date(2000)});
+        // Date as String timezone
+        // Oct 03 2015 14:45.33
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.setTimeZone(TimeZone.getTimeZone("Australia/West"));
+        cal.set(2015, Calendar.OCTOBER, 3, 14, 45, 33);
+        cal.set(Calendar.MILLISECOND, 376);
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_DATE_LIST,
+                new String [] {"/Date(1443854733376+0800)/", null},
+                new Date[] {cal.getTime(), null});
+
+
+        testPrimitiveListWithValues(PrimitiveListTypes.FIELD_BINARY_LIST,
+                new String[] {new String(Base64.encode(new byte[] {1, 2, 3}, Base64.DEFAULT), UTF_8),
+                        null, new String(Base64.encode(new byte[] {4, 5, 6}, Base64.DEFAULT), UTF_8)},
+                new byte[][] {new byte[]{1, 2, 3}, null, new byte[]{4, 5, 6}});
+    }
+

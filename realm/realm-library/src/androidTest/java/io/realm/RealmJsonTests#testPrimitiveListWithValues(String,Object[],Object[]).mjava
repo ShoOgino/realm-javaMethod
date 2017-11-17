@@ -1,0 +1,21 @@
+    private void testPrimitiveListWithValues(String fieldName, @Nullable Object[] valuesToSave, Object[] valuesToLoad)
+            throws JSONException, IOException {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = valuesToSave != null ? new JSONArray(valuesToSave) : null;
+        jsonObject.put(fieldName, jsonArray);
+
+        // Test from JSONObject
+        realm.beginTransaction();
+        PrimitiveListTypes primitiveListTypes = realm.createObjectFromJson(PrimitiveListTypes.class, jsonObject);
+        realm.commitTransaction();
+        assertNotNull(primitiveListTypes);
+        assertArrayEquals(valuesToLoad, primitiveListTypes.getList(fieldName).toArray());
+
+        // Test from JSONStream
+        realm.beginTransaction();
+        primitiveListTypes = realm.createObjectFromJson(PrimitiveListTypes.class, convertJsonObjectToStream(jsonObject));
+        realm.commitTransaction();
+        assertNotNull(primitiveListTypes);
+        assertArrayEquals(valuesToLoad, primitiveListTypes.getList(fieldName).toArray());
+    }
+
