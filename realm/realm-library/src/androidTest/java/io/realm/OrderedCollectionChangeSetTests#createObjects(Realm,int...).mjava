@@ -1,10 +1,25 @@
     // Creates Dogs objects with columnLong set to the value elements in indices array.
     private void createObjects(Realm realm, int... indices) {
         for (int index : indices) {
-            realm.createObject(Dog.class).setAge(index);
-        }
-        if (type == ObservablesType.REALM_LIST) {
-            reorderRealmList(realm);
+            Dog dog = realm.createObject(Dog.class);
+            dog.setAge(index);
+            if (type == ObservablesType.REALM_LIST) {
+                Owner owner = realm.where(Owner.class).findFirst();
+                assertNotNull(owner);
+                RealmList<Dog> dogs = owner.getDogs();
+                boolean added = false;
+                // Insert the newly created dog to the RealmList by the order of age.
+                for (int i = 0; i < dogs.size(); i++) {
+                    if (dog.getAge() <= dogs.get(i).getAge()) {
+                        dogs.add(i, dog);
+                        added = true;
+                        break;
+                    }
+                }
+                if (!added) {
+                    dogs.add(dog);
+                }
+            }
         }
     }
 
