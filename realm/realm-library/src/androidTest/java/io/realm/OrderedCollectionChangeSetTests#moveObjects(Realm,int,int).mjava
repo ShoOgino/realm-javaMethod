@@ -1,7 +1,39 @@
     private void moveObjects(Realm realm, int originAge, int newAge) {
-        realm.where(Dog.class).equalTo(Dog.FIELD_AGE, originAge).findFirst().setAge(newAge);
         if (type == ObservablesType.REALM_LIST) {
-            reorderRealmList(realm);
+            // For RealmList we need to:
+            // 1. Find the object by the original age and move it to the new place where it should be with the new age
+            //    set -- the RealmList is sorted by age.
+            // 2. Set the object's age with new value.
+            RealmList<Dog> dogs = realm.where(Owner.class).findFirst().getDogs();
+            int originIdx = -1;
+            int newIdx = -1;
+            for (int i = 0; i < dogs.size(); i++) {
+                Dog dog = dogs.get(i);
+                assertNotNull(dog);
+                if (dog.getAge() == originAge) {
+                    originIdx = i;
+                    break;
+                }
+            }
+            assertNotEquals(-1, originIdx);
+            for (int i = 0; i < dogs.size(); i++) {
+                if (i == originIdx) {
+                    // not precise code, but good enough for testing.
+                    continue;
+                }
+                if (newAge <= dogs.get(i).getAge()) {
+                    newIdx = i;
+                    break;
+                }
+            }
+            if (newIdx == -1) {
+                newIdx = dogs.size() - 1;
+            }
+            dogs.get(originIdx).setAge(newAge);
+            dogs.move(originIdx, newIdx);
+        } else {
+            // Since the RealmResults is sorted by age, just simply set the object's age with new value.
+            realm.where(Dog.class).equalTo(Dog.FIELD_AGE, originAge).findFirst().setAge(newAge);
         }
     }
 
