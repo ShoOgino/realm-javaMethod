@@ -1,9 +1,10 @@
-    public static OsResults createBacklinksCollection(OsSharedRealm realm, UncheckedRow row, Table srcTable, String srcFieldName) {
+    public static OsResults createForBacklinks(OsSharedRealm realm, UncheckedRow row, Table srcTable,
+                                               String srcFieldName) {
         long backlinksPtr = nativeCreateResultsFromBacklinks(
                 realm.getNativePtr(),
                 row.getNativePtr(),
                 srcTable.getNativePtr(),
                 srcTable.getColumnIndex(srcFieldName));
-        return new OsResults(realm, srcTable, backlinksPtr, true);
+        return new OsResults(realm, srcTable, backlinksPtr);
     }
 

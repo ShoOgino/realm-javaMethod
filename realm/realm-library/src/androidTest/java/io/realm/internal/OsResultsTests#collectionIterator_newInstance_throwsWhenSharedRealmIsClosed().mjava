@@ -1,6 +1,6 @@
     @Test
     public void collectionIterator_newInstance_throwsWhenSharedRealmIsClosed() {
-        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        final OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where());
         sharedRealm.close();
         thrown.expect(IllegalStateException.class);
         new TestIterator(osResults);

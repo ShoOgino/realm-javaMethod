@@ -8,7 +8,7 @@
         Table table = getTable(sharedRealm);
         final AtomicInteger listenerCounter = new AtomicInteger(0);
 
-        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        final OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where());
         looperThread.keepStrongReference(osResults);
         osResults.addListener(osResults, new RealmChangeListener<OsResults>() {
             @Override

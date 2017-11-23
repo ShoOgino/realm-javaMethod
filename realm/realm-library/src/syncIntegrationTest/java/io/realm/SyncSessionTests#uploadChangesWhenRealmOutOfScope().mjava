@@ -2,6 +2,7 @@
     // this test validate the behaviour of SyncSessionStopPolicy::AfterChangesUploaded
     @Test
     public void uploadChangesWhenRealmOutOfScope() throws InterruptedException {
+        final List<Object> strongRefs = new ArrayList<>();
         final String uniqueName = UUID.randomUUID().toString();
         SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", true);
         SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
@@ -44,6 +45,7 @@
                         .build();
                 final Realm adminRealm = Realm.getInstance(adminConfig);
                 RealmResults<StringOnly> all = adminRealm.where(StringOnly.class).findAll();
+                strongRefs.add(all);
                 RealmChangeListener<RealmResults<StringOnly>> realmChangeListener = new RealmChangeListener<RealmResults<StringOnly>>() {
                     @Override
                     public void onChange(RealmResults<StringOnly> stringOnlies) {
@@ -62,8 +64,8 @@
         });
 
         TestHelper.awaitOrFail(testCompleted, 60);
+        handlerThread.join();
 
         user.logout();
-        realm.close();
     }
 

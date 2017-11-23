@@ -3,7 +3,7 @@
             @Nullable SortDescriptor distinctDescriptor,
             boolean loadResults) {
         RealmResults<E> results;
-        OsResults osResults = new OsResults(realm.sharedRealm, query, sortDescriptor, distinctDescriptor);
+        OsResults osResults = OsResults.createFromQuery(realm.sharedRealm, query, sortDescriptor, distinctDescriptor);
         if (isDynamicQuery()) {
             results = new RealmResults<>(realm, osResults, className);
         } else {

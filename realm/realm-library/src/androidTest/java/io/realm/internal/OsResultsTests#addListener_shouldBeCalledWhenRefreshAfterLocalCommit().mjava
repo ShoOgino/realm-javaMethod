@@ -1,7 +1,7 @@
     @Test
     public void addListener_shouldBeCalledWhenRefreshAfterLocalCommit() {
         final CountDownLatch latch = new CountDownLatch(2);
-        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        final OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where());
         assertEquals(4, osResults.size()); // See `populateData()`
         osResults.addListener(osResults, new RealmChangeListener<OsResults>() {
             @Override
