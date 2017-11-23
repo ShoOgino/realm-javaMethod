@@ -3,13 +3,14 @@
         String username = UUID.randomUUID().toString();
         String password = "password";
         SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
-        SyncConfiguration config = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
+        //noinspection unchecked
+        SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
                 .schema(StringOnly.class)
-                .trustedRootCA("not_existing_file.pem")
+                .trustedRootCA("none_existing_file.pem")
                 .build();
 
         try {
-            Realm.getInstance(config);
+            Realm.getInstance(syncConfig);
             fail();
         } catch (RealmFileException ignored) {
         }

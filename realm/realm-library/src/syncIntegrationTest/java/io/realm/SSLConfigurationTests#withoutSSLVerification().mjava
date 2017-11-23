@@ -5,30 +5,32 @@
         SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
 
         // 1. Copy a valid Realm to the server
-        final SyncConfiguration configOld = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+        //noinspection unchecked
+        final SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
                 .schema(StringOnly.class)
                 .build();
-        Realm realm = Realm.getInstance(configOld);
+        Realm realm = Realm.getInstance(syncConfig);
 
         realm.beginTransaction();
         realm.createObject(StringOnly.class).setChars("Foo");
         realm.commitTransaction();
 
         // make sure the changes gets to the server
-        SystemClock.sleep(TimeUnit.SECONDS.toMillis(2));  // FIXME: Replace with Sync Progress Notifications once available.
+        SyncManager.getSession(syncConfig).uploadAllLocalChanges();
         realm.close();
         user.logout();
 
         // 2. Local state should now be completely reset. Open the Realm again with a new configuration which should
         // download the uploaded changes.
         user = SyncUser.login(SyncCredentials.usernamePassword(username, password), Constants.AUTH_URL);
-        SyncConfiguration config = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
+        //noinspection unchecked
+        SyncConfiguration syncConfigSSL = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
                 .name("useSsl")
                 .schema(StringOnly.class)
                 .waitForInitialRemoteData()
                 .disableSSLVerification()
                 .build();
-        realm = Realm.getInstance(config);
+        realm = Realm.getInstance(syncConfigSSL);
 
         RealmResults<StringOnly> all = realm.where(StringOnly.class).findAll();
         try {

@@ -1,0 +1,10 @@
+    public static OsResults createFromQuery(OsSharedRealm sharedRealm, TableQuery query,
+                                            @Nullable SortDescriptor sortDescriptor,
+                                            @Nullable SortDescriptor distinctDescriptor) {
+        query.validateQuery();
+        long ptr = nativeCreateResults(sharedRealm.getNativePtr(), query.getNativePtr(),
+                sortDescriptor,
+                distinctDescriptor);
+        return new OsResults(sharedRealm, query.getTable(), ptr);
+    }
+

@@ -4,7 +4,7 @@
         final OsSharedRealm sharedRealm = getSharedRealmForLooper();
         populateData(sharedRealm);
         Table table = getTable(sharedRealm);
-        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        final OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where());
         final TestIterator iterator = new TestIterator(osResults);
         looperThread.keepStrongReference(osResults);
         assertFalse(iterator.isDetached(sharedRealm));

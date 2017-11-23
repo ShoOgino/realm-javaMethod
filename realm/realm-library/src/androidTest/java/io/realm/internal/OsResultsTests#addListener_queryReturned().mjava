@@ -5,7 +5,7 @@
         populateData(sharedRealm);
         Table table = getTable(sharedRealm);
 
-        final OsResults osResults = new OsResults(sharedRealm, table.where());
+        final OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where());
         looperThread.keepStrongReference(osResults);
         assertEquals(4, osResults.size()); // Trigger the query to run.
         osResults.addListener(osResults, new RealmChangeListener<OsResults>() {

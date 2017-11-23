@@ -4,13 +4,25 @@
      */
     @SuppressWarnings("unused")
     private static synchronized void notifyErrorHandler(int errorCode, String errorMessage, @Nullable String path) {
-        for (SyncSession syncSession : sessions.values()) {
-            if (path == null || path.equals(syncSession.getConfiguration().getPath())) {
+        if (Util.isEmptyString(path)) {
+            // notify all sessions
+            for (SyncSession syncSession : sessions.values()) {
+                    try {
+                        syncSession.notifySessionError(errorCode, errorMessage);
+                    } catch (Exception exception) {
+                        RealmLog.error(exception);
+                    }
+                }
+        } else {
+            SyncSession syncSession = sessions.get(path);
+            if (syncSession != null) {
                 try {
                     syncSession.notifySessionError(errorCode, errorMessage);
                 } catch (Exception exception) {
                     RealmLog.error(exception);
                 }
+            } else {
+                RealmLog.warn("Cannot find the SyncSession corresponding to the path: " + path);
             }
         }
     }

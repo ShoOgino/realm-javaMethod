@@ -1,0 +1,93 @@
+    /**
+     * Called by proxy to set the managed {@link RealmList} according to the given {@link JSONObject}.
+     *
+     * @param realmList the managed {@link RealmList}.
+     * @param jsonObject the {@link JSONObject} which may contain the data of the list to be set.
+     * @param fieldName the field name of the {@link RealmList}.
+     * @param <E> type of the {@link RealmList}.
+     * @throws JSONException if it fails to parse JSON.
+     */
+    static <E> void setRealmListWithJsonObject(
+            RealmList<E> realmList, JSONObject jsonObject, String fieldName) throws JSONException {
+        if (!jsonObject.has(fieldName))  {
+            return;
+        }
+
+        OsList osList = realmList.getOsList();
+        if (jsonObject.isNull(fieldName)) {
+            osList.removeAll();
+            return;
+        }
+
+        JSONArray jsonArray = jsonObject.getJSONArray(fieldName);
+        osList.removeAll();
+        int arraySize = jsonArray.length();
+
+        if (realmList.clazz == Boolean.class) {
+            for (int i = 0; i < arraySize; i++) {
+                if (jsonArray.isNull(i)) {
+                    osList.addNull();
+                } else {
+                    osList.addBoolean(jsonArray.getBoolean(i));
+                }
+            }
+        } else if (realmList.clazz == Float.class) {
+            for (int i = 0; i < arraySize; i++) {
+                if (jsonArray.isNull(i)) {
+                    osList.addNull();
+                } else {
+                    osList.addFloat((float) jsonArray.getDouble(i));
+                }
+            }
+        } else if (realmList.clazz == Double.class) {
+            for (int i = 0; i < arraySize; i++) {
+                if (jsonArray.isNull(i)) {
+                    osList.addNull();
+                } else {
+                    osList.addDouble(jsonArray.getDouble(i));
+                }
+            }
+        } else if (realmList.clazz == String.class) {
+            for (int i = 0; i < arraySize; i++) {
+                if (jsonArray.isNull(i)) {
+                    osList.addNull();
+                } else {
+                    osList.addString(jsonArray.getString(i));
+                }
+            }
+        } else if (realmList.clazz == byte[].class) {
+            for (int i = 0; i < arraySize; i++) {
+                if (jsonArray.isNull(i)) {
+                    osList.addNull();
+                } else {
+                    osList.addBinary(JsonUtils.stringToBytes(jsonArray.getString(i)));
+                }
+            }
+        } else if (realmList.clazz == Date.class ) {
+            for (int i = 0; i < arraySize; i++) {
+                if (jsonArray.isNull(i)) {
+                   osList.addNull();
+                   continue;
+                }
+
+                Object timestamp = jsonArray.get(i);
+                if (timestamp instanceof String) {
+                    osList.addDate(JsonUtils.stringToDate((String) timestamp));
+                } else {
+                    osList.addDate(new Date(jsonArray.getLong(i)));
+                }
+            }
+        } else if (realmList.clazz == Long.class || realmList.clazz == Integer.class ||
+                realmList.clazz == Short.class || realmList.clazz == Byte.class) {
+            for (int i = 0; i < arraySize; i++) {
+                if (jsonArray.isNull(i)) {
+                    osList.addNull();
+                } else {
+                    osList.addLong(jsonArray.getLong(i));
+                }
+            }
+        } else {
+            throwWrongElementType(realmList.clazz);
+        }
+    }
+

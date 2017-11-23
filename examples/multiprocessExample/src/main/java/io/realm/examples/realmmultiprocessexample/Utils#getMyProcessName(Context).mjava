@@ -1,0 +1,19 @@
+    public static String getMyProcessName(Context context) {
+        String processName = "";
+        ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<RunningAppProcessInfo> infoList = am.getRunningAppProcesses();
+        if (infoList == null) {
+            throw new RuntimeException("getRunningAppProcesses() returns 'null'.");
+        }
+        for (RunningAppProcessInfo info : infoList) {
+            try {
+                if (info.pid == Process.myPid()) {
+                    processName = info.processName;
+                    break;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        return processName;
+    }
+
