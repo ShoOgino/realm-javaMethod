@@ -16,5 +16,17 @@
         // This instance should never need notifications.
         this.realmNotifier = null;
         nativeSetAutoRefresh(nativePtr, false);
+
+        boolean foundParentSharedRealm = false;
+        for (OsSharedRealm sharedRealm : sharedRealmsUnderConstruction) {
+            if (sharedRealm.context == osRealmConfig.getContext())  {
+                foundParentSharedRealm = true;
+                sharedRealm.tempSharedRealmsForCallback.add(this);
+                break;
+            }
+        }
+        if (!foundParentSharedRealm) {
+            throw new IllegalStateException("Cannot find the parent 'OsSharedRealm' which is under construction.");
+        }
     }
 
