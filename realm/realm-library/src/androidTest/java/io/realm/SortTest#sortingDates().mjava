@@ -4,7 +4,7 @@
 
         populateDates(realm, TEST_SIZE);
 
-        RealmResults<AllTypes> objectsAscending = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_DATE, Sort.ASCENDING);
+        RealmResults<AllTypes> objectsAscending = realm.where(AllTypes.class).sort(AllTypes.FIELD_DATE, Sort.ASCENDING).findAll();
         assertEquals(TEST_SIZE, objectsAscending.size());
         int i = 0;
         for (AllTypes allTypes : objectsAscending) {
@@ -12,7 +12,7 @@
             i++;
         }
 
-        RealmResults<AllTypes> objectsDescending = realm.where(AllTypes.class).findAllSorted(AllTypes.FIELD_DATE, Sort.DESCENDING);
+        RealmResults<AllTypes> objectsDescending = realm.where(AllTypes.class).sort(AllTypes.FIELD_DATE, Sort.DESCENDING).findAll();
         assertEquals(TEST_SIZE, objectsDescending.size());
         i = TEST_SIZE - 1;
         for (AllTypes allTypes : objectsDescending) {

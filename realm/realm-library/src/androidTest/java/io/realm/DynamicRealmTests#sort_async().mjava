@@ -1,10 +1,11 @@
     @Test
     @RunTestInLooperThread
-    public void findAllSortedAsync() {
+    public void sort_async() {
         final DynamicRealm dynamicRealm = initializeDynamicRealm();
         final RealmResults<DynamicRealmObject> allTypes = dynamicRealm.where(AllTypes.CLASS_NAME)
                 .between(AllTypes.FIELD_LONG, 0, 4)
-                .findAllSortedAsync(AllTypes.FIELD_STRING, Sort.DESCENDING);
+                .sort(AllTypes.FIELD_STRING, Sort.DESCENDING)
+                .findAllAsync();
         assertFalse(allTypes.isLoaded());
         assertEquals(0, allTypes.size());
 

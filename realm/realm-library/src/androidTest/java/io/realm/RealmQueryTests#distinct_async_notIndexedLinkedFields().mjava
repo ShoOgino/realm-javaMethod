@@ -1,10 +1,10 @@
     @Test
     @RunTestInLooperThread
-    public void distinctAsync_notIndexedLinkedFields() {
+    public void distinct_async_notIndexedLinkedFields() {
         populateForDistinctInvalidTypesLinked(realm);
 
         try {
-            realm.where(AllJavaTypes.class).distinctAsync(AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_BINARY);
+            realm.where(AllJavaTypes.class).distinctValues(AllJavaTypes.FIELD_OBJECT + "." + AllJavaTypes.FIELD_BINARY).findAllAsync();
         } catch (IllegalArgumentException ignored) {
         }
         looperThread.testComplete();

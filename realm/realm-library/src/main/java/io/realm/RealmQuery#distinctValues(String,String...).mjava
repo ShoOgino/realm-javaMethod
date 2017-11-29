@@ -1,0 +1,31 @@
+    /**
+     * BETA API: Will be renamed to {@code distinct} in next major release.
+     *
+     * Selects a distinct set of objects of a specific class. When multiple distinct fields are
+     * given, all unique combinations of values in the fields will be returned. In case of multiple
+     * matches, it is undefined which object is returned. Unless the result is sorted, then the
+     * first object will be returned.
+     *
+     * @param firstFieldName first field name to use when finding distinct objects.
+     * @param remainingFieldNames remaining field names when determining all unique combinations of field values.
+     * @throws IllegalArgumentException if field names is empty or {@code null}, does not exist,
+     * is an unsupported type, or points to a linked field.
+     * @throws IllegalStateException if distinct field names were already defined.
+     */
+    @Beta
+    public RealmQuery<E> distinctValues(String firstFieldName, String... remainingFieldNames) {
+        realm.checkIfValid();
+        if (distinctDescriptor != null) {
+            throw new IllegalStateException("Distinct fields have already been defined.");
+        }
+        if (remainingFieldNames.length == 0) {
+            distinctDescriptor = SortDescriptor.getInstanceForDistinct(getSchemaConnector(), table, firstFieldName);
+        } else {
+            String[] fieldNames = new String[1 + remainingFieldNames.length];
+            fieldNames[0] = firstFieldName;
+            System.arraycopy(remainingFieldNames, 0, fieldNames, 1, remainingFieldNames.length);
+            distinctDescriptor = SortDescriptor.getInstanceForDistinct(getSchemaConnector(), table, fieldNames);
+        }
+        return this;
+    }
+

@@ -7,7 +7,7 @@
         populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
 
         try {
-            realm.where(AnnotationIndexTypes.class).distinctAsync("doesNotExist");
+            realm.where(AnnotationIndexTypes.class).distinctValues("doesNotExist").findAllAsync();
             fail();
         } catch (IllegalArgumentException ignored) {
             looperThread.testComplete();

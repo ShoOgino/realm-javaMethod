@@ -22,7 +22,9 @@
         realm.insertOrUpdate(objects);
         realm.commitTransaction();
 
-        RealmResults<NoPrimaryKeyWithPrimaryKeyObjectRelation> all = realm.where(NoPrimaryKeyWithPrimaryKeyObjectRelation.class).findAllSorted("columnString", Sort.DESCENDING);
+        RealmResults<NoPrimaryKeyWithPrimaryKeyObjectRelation> all = realm.where(NoPrimaryKeyWithPrimaryKeyObjectRelation.class)
+                .sort("columnString", Sort.DESCENDING)
+                .findAll();
         assertEquals(2, all.size());
         assertEquals("B", all.get(0).getColumnString());
         assertEquals("A", all.get(1).getColumnString());

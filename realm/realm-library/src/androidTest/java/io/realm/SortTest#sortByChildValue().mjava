@@ -1,0 +1,10 @@
+    @Test
+    public void sortByChildValue() {
+        RealmResults<AllTypes> result = realm.where(AllTypes.class)
+                .sort(AllTypes.FIELD_REALMOBJECT + "." + Dog.FIELD_NAME, Sort.ASCENDING)
+                .findAll();
+
+        assertEquals("A", result.first().getColumnRealmObject().getName());
+        assertEquals("D", result.last().getColumnRealmObject().getName());
+    }
+

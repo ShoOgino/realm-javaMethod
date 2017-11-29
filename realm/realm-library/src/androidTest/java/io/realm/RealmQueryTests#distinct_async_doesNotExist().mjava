@@ -1,12 +1,12 @@
     @Test
     @RunTestInLooperThread
-    public void distinctAsync_doesNotExist() {
+    public void distinct_async_doesNotExist() {
         final long numberOfBlocks = 3;
         final long numberOfObjects = 3;
         populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
 
         try {
-            realm.where(AnnotationIndexTypes.class).distinctAsync("doesNotExist");
+            realm.where(AnnotationIndexTypes.class).distinctValues("doesNotExist").findAllAsync();
         } catch (IllegalArgumentException ignored) {
         }
         looperThread.testComplete();

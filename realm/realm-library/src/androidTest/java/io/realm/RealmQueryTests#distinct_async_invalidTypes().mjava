@@ -1,11 +1,11 @@
     @Test
     @RunTestInLooperThread
-    public void distinctAsync_invalidTypes() {
+    public void distinct_async_invalidTypes() {
         populateTestRealm(realm, TEST_DATA_SIZE);
 
         for (String field : new String[]{AllTypes.FIELD_REALMOBJECT, AllTypes.FIELD_REALMLIST, AllTypes.FIELD_DOUBLE, AllTypes.FIELD_FLOAT}) {
             try {
-                realm.where(AllTypes.class).distinctAsync(field);
+                realm.where(AllTypes.class).distinctValues(field).findAllAsync();
             } catch (IllegalArgumentException ignored) {
             }
         }
