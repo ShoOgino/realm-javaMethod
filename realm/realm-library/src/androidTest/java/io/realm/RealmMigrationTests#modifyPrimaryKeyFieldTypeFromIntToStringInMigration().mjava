@@ -36,7 +36,8 @@
         assertNotNull(objectSchema);
         assertEquals(PrimaryKeyAsString.FIELD_PRIMARY_KEY, objectSchema.getPrimaryKey());
         RealmResults<PrimaryKeyAsString> results = realm.where(PrimaryKeyAsString.class)
-                .findAllSorted(PrimaryKeyAsString.FIELD_ID);
+                .sort(PrimaryKeyAsString.FIELD_ID)
+                .findAll();
         assertEquals(2, results.size());
         assertEquals("string0", results.get(0).getName());
         assertEquals("string1", results.get(1).getName());

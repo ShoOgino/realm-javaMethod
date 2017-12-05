@@ -1,15 +1,16 @@
     @Test
     @RunTestInLooperThread
-    public void distinctAsync() throws Throwable {
-        Realm realm = looperThread.getRealm();
-        final long numberOfBlocks = 25;
-        final long numberOfObjects = 10; // Must be greater than 1
+    public void distinct_async() throws Throwable {
+        final AtomicInteger changeListenerCalled = new AtomicInteger(4);
+        final Realm realm = looperThread.getRealm();
+        final long numberOfBlocks = 3;
+        final long numberOfObjects = 3; // Must be greater than 1
         populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
 
-        final RealmResults<AnnotationIndexTypes> distinctBool = realm.where(AnnotationIndexTypes.class).distinctAsync("indexBoolean");
-        final RealmResults<AnnotationIndexTypes> distinctLong = realm.where(AnnotationIndexTypes.class).distinctAsync("indexLong");
-        final RealmResults<AnnotationIndexTypes> distinctDate = realm.where(AnnotationIndexTypes.class).distinctAsync("indexDate");
-        final RealmResults<AnnotationIndexTypes> distinctString = realm.where(AnnotationIndexTypes.class).distinctAsync("indexString");
+        final RealmResults<AnnotationIndexTypes> distinctBool = realm.where(AnnotationIndexTypes.class).distinctValues(AnnotationIndexTypes.FIELD_INDEX_BOOL).findAllAsync();
+        final RealmResults<AnnotationIndexTypes> distinctLong = realm.where(AnnotationIndexTypes.class).distinctValues(AnnotationIndexTypes.FIELD_INDEX_LONG).findAllAsync();
+        final RealmResults<AnnotationIndexTypes> distinctDate = realm.where(AnnotationIndexTypes.class).distinctValues(AnnotationIndexTypes.FIELD_INDEX_DATE).findAllAsync();
+        final RealmResults<AnnotationIndexTypes> distinctString = realm.where(AnnotationIndexTypes.class).distinctValues(AnnotationIndexTypes.FIELD_INDEX_STRING).findAllAsync();
 
         assertFalse(distinctBool.isLoaded());
         assertTrue(distinctBool.isValid());
@@ -27,11 +28,10 @@
         assertTrue(distinctString.isValid());
         assertTrue(distinctString.isEmpty());
 
-        final Runnable changeListenerDone = new Runnable() {
-            final AtomicInteger signalCallbackFinished = new AtomicInteger(4);
+        final Runnable endTest = new Runnable() {
             @Override
             public void run() {
-                if (signalCallbackFinished.decrementAndGet() == 0) {
+                if (changeListenerCalled.decrementAndGet() == 0) {
                     looperThread.testComplete();
                 }
             }
@@ -45,7 +45,7 @@
             @Override
             public void onChange(RealmResults<AnnotationIndexTypes> object) {
                 assertEquals(2, distinctBool.size());
-                changeListenerDone.run();
+                endTest.run();
             }
         });
 
@@ -53,7 +53,7 @@
             @Override
             public void onChange(RealmResults<AnnotationIndexTypes> object) {
                 assertEquals(numberOfBlocks, distinctLong.size());
-                changeListenerDone.run();
+                endTest.run();
             }
         });
 
@@ -61,7 +61,7 @@
             @Override
             public void onChange(RealmResults<AnnotationIndexTypes> object) {
                 assertEquals(numberOfBlocks, distinctDate.size());
-                changeListenerDone.run();
+                endTest.run();
             }
         });
 
@@ -69,7 +69,7 @@
             @Override
             public void onChange(RealmResults<AnnotationIndexTypes> object) {
                 assertEquals(numberOfBlocks, distinctString.size());
-                changeListenerDone.run();
+                endTest.run();
             }
         });
     }

@@ -15,7 +15,8 @@
         // Dog.weight has index 4 which is more than the total number of columns in Owner
         // This tests exposes a subtle error where the Owner table spec is used instead of Dog table spec.
         RealmResults<Dog> dogs = realm.where(Owner.class).findFirst().getDogs().where()
-                .findAllSorted("name", Sort.ASCENDING);
+                .sort("name", Sort.ASCENDING)
+                .findAll();
         Dog dog = dogs.where().equalTo("weight", 1d).findFirst();
         assertEquals(dog1, dog);
     }

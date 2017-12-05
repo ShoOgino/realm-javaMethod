@@ -1,7 +1,7 @@
     @Test
     public void copyFromRealm() {
         populateTestRealm();
-        AllTypes realmObject = realm.where(AllTypes.class).findAllSorted("columnLong").first();
+        AllTypes realmObject = realm.where(AllTypes.class).sort("columnLong").findAll().first();
         AllTypes unmanagedObject = realm.copyFromRealm(realmObject);
         assertArrayEquals(realmObject.getColumnBinary(), unmanagedObject.getColumnBinary());
         assertEquals(realmObject.getColumnString(), unmanagedObject.getColumnString());

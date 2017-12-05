@@ -1,10 +1,11 @@
     @Test
     @RunTestInLooperThread
-    public void findAllSortedAsync_onSubObjectField() {
+    public void sort_async_onSubObjectField() {
         Realm realm = looperThread.getRealm();
         populateTestRealm(realm, TEST_DATA_SIZE);
         RealmResults<AllTypes> results = realm.where(AllTypes.class)
-                .findAllSortedAsync(AllTypes.FIELD_REALMOBJECT + "." + Dog.FIELD_AGE);
+                .sort(AllTypes.FIELD_REALMOBJECT + "." + Dog.FIELD_AGE)
+                .findAllAsync();
         looperThread.keepStrongReference(results);
         results.addChangeListener(new RealmChangeListener<RealmResults<AllTypes>>() {
             @Override

@@ -1,0 +1,53 @@
+    @Test
+    public void sort_multiFailures() {
+        // Zero fields specified.
+        try {
+            realm.where(AllTypes.class).sort(new String[]{}, new Sort[]{}).findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // Number of fields and sorting orders don't match.
+        try {
+            realm.where(AllTypes.class)
+                    .sort(new String[]{AllTypes.FIELD_STRING},new Sort[]{Sort.ASCENDING, Sort.ASCENDING})
+                    .findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // Null is not allowed.
+        try {
+            realm.where(AllTypes.class)
+                    .sort((String[]) null, null)
+                    .findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+        try {
+            realm.where(AllTypes.class)
+                    .sort(new String[]{AllTypes.FIELD_STRING}, null)
+                    .findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // Non-existing field name.
+        try {
+            realm.where(AllTypes.class)
+                    .sort(new String[]{AllTypes.FIELD_STRING, "do-not-exist"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING})
+                    .findAll();
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // Defining sort multiple times
+        try {
+            realm.where(AllTypes.class)
+                    .sort(AllTypes.FIELD_STRING)
+                    .sort(AllTypes.FIELD_STRING);
+            fail();
+        } catch (IllegalStateException ignored) {
+        }
+    }
+

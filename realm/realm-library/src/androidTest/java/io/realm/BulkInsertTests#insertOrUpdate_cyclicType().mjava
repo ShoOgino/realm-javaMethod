@@ -9,7 +9,7 @@
         realm.insertOrUpdate(Arrays.asList(oneCyclicType, anotherCyclicType));
         realm.commitTransaction();
 
-        RealmResults<CyclicTypePrimaryKey> realmObjects = realm.where(CyclicTypePrimaryKey.class).findAllSorted("name");
+        RealmResults<CyclicTypePrimaryKey> realmObjects = realm.where(CyclicTypePrimaryKey.class).sort("name").findAll();
         assertNotNull(realmObjects);
         assertEquals(2, realmObjects.size());
         assertEquals("One", realmObjects.get(0).getName());

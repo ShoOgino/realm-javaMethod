@@ -5,11 +5,12 @@
         populateForDistinct(realm, numberOfBlocks, numberOfObjects, false);
 
         RealmResults<AnnotationIndexTypes> distinctBool = realm.where(AnnotationIndexTypes.class)
-                .distinct(AnnotationIndexTypes.FIELD_NOT_INDEX_BOOL);
+                .distinctValues(AnnotationIndexTypes.FIELD_NOT_INDEX_BOOL)
+                .findAll();
         assertEquals(2, distinctBool.size());
         for (String field : new String[]{AnnotationIndexTypes.FIELD_NOT_INDEX_LONG,
                 AnnotationIndexTypes.FIELD_NOT_INDEX_DATE, AnnotationIndexTypes.FIELD_NOT_INDEX_STRING}) {
-            RealmResults<AnnotationIndexTypes> distinct = realm.where(AnnotationIndexTypes.class).distinct(field);
+            RealmResults<AnnotationIndexTypes> distinct = realm.where(AnnotationIndexTypes.class).distinctValues(field).findAll();
             assertEquals(field, numberOfBlocks, distinct.size());
         }
     }
