@@ -5,23 +5,20 @@
         SyncUser user = createTestUser();
         String url = "realm://objectserver.realm.io/default";
         final SyncConfiguration config = configFactory.createSyncConfigurationBuilder(user, url)
-                .errorHandler(new SyncSession.ErrorHandler() {
-                    @Override
-                    public void onError(SyncSession session, ObjectServerError error) {
-                        if (error.getErrorCode() != ErrorCode.CLIENT_RESET) {
-                            fail("Wrong error " + error.toString());
-                            return;
-                        }
-
-                        final ClientResetRequiredError handler = (ClientResetRequiredError) error;
-                        String filePathFromError = handler.getOriginalFile().getAbsolutePath();
-                        String filePathFromConfig = session.getConfiguration().getPath();
-                        assertEquals(filePathFromError, filePathFromConfig);
-                        assertFalse(handler.getBackupFile().exists());
-                        assertTrue(handler.getOriginalFile().exists());
-
-                        looperThread.testComplete();
+                .errorHandler((session, error) -> {
+                    if (error.getErrorCode() != ErrorCode.CLIENT_RESET) {
+                        fail("Wrong error " + error.toString());
+                        return;
                     }
+
+                    final ClientResetRequiredError handler = (ClientResetRequiredError) error;
+                    String filePathFromError = handler.getOriginalFile().getAbsolutePath();
+                    String filePathFromConfig = session.getConfiguration().getPath();
+                    assertEquals(filePathFromError, filePathFromConfig);
+                    assertFalse(handler.getBackupFile().exists());
+                    assertTrue(handler.getOriginalFile().exists());
+
+                    looperThread.testComplete();
                 })
                 .build();
 

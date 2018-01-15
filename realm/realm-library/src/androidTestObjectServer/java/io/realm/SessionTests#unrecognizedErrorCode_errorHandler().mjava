@@ -1,0 +1,28 @@
+    @Test
+    @UiThreadTest
+    public void unrecognizedErrorCode_errorHandler() {
+        AtomicBoolean errorHandlerCalled = new AtomicBoolean(false);
+        configuration = new SyncConfiguration
+                .Builder(user, REALM_URI)
+                .errorHandler((session, error) -> {
+                    errorHandlerCalled.set(true);
+                    assertEquals(ErrorCode.UNKNOWN, error.getErrorCode());
+                    assertEquals(ErrorCode.Category.FATAL, error.getCategory());
+
+                })
+                .build();
+        Realm realm = Realm.getInstance(configuration);
+        SyncSession session = SyncManager.getSession(configuration);
+
+        TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
+        RealmLog.add(testLogger);
+
+        session.notifySessionError(3, "Unknown Error");
+        RealmLog.remove(testLogger);
+
+        assertTrue(errorHandlerCalled.get());
+        assertEquals("Unknown error code: 3", testLogger.message);
+
+        realm.close();
+    }
+
