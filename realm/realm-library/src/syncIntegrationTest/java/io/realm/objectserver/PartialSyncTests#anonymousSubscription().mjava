@@ -1,6 +1,6 @@
     @Test
     @RunTestInLooperThread
-    public void partialSync() throws InterruptedException {
+    public void anonymousSubscription() throws InterruptedException {
         SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
 
         final SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
@@ -14,46 +14,7 @@
                 .partialRealm()
                 .build();
 
-        // Create server data
-        Realm realm = Realm.getInstance(syncConfig);
-        realm.beginTransaction();
-        PartialSyncObjectA objectA = realm.createObject(PartialSyncObjectA.class);
-        objectA.setNumber(0);
-        objectA.setString("realm");
-        objectA = realm.createObject(PartialSyncObjectA.class);
-        objectA.setNumber(1);
-        objectA.setString("");
-        objectA = realm.createObject(PartialSyncObjectA.class);
-        objectA.setNumber(2);
-        objectA.setString("");
-        objectA = realm.createObject(PartialSyncObjectA.class);
-        objectA.setNumber(3);
-        objectA.setString("");
-        objectA = realm.createObject(PartialSyncObjectA.class);
-        objectA.setNumber(4);
-        objectA.setString("realm");
-        objectA = realm.createObject(PartialSyncObjectA.class);
-        objectA.setNumber(5);
-        objectA.setString("sync");
-        objectA = realm.createObject(PartialSyncObjectA.class);
-        objectA.setNumber(6);
-        objectA.setString("partial");
-        objectA = realm.createObject(PartialSyncObjectA.class);
-        objectA.setNumber(7);
-        objectA.setString("partial");
-        objectA = realm.createObject(PartialSyncObjectA.class);
-        objectA.setNumber(8);
-        objectA.setString("partial");
-        objectA = realm.createObject(PartialSyncObjectA.class);
-        objectA.setNumber(9);
-        objectA.setString("partial");
-
-        for (int i = 0; i < 10; i++) {
-            realm.createObject(PartialSyncObjectB.class).setNumber(i);
-        }
-        realm.commitTransaction();
-        SyncManager.getSession(syncConfig).uploadAllLocalChanges();
-        realm.close();
+        createServerData(syncConfig);
 
         // Download data in partial Realm
         final Realm partialSyncRealm = Realm.getInstance(partialSyncConfig);
