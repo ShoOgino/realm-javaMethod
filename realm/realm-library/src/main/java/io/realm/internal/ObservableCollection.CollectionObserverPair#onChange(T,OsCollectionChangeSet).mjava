@@ -1,7 +1,7 @@
-        public void onChange(T observer, @Nullable OrderedCollectionChangeSet changes) {
+        public void onChange(T observer, OsCollectionChangeSet changes) {
             if (listener instanceof OrderedRealmCollectionChangeListener) {
                 //noinspection unchecked
-                ((OrderedRealmCollectionChangeListener<T>) listener).onChange(observer, changes);
+                ((OrderedRealmCollectionChangeListener<T>) listener).onChange(observer, new StatefulCollectionChangeSet(changes));
             } else if (listener instanceof RealmChangeListener) {
                 //noinspection unchecked
                 ((RealmChangeListener<T>) listener).onChange(observer);

@@ -1,0 +1,35 @@
+    @Test
+    @RunTestInLooperThread
+    public void invalidQuery() {
+        AtomicInteger callbacks = new AtomicInteger(0);
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        final SyncConfiguration partialSyncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .partialRealm()
+                .build();
+
+        final Realm realm = Realm.getInstance(partialSyncConfig);
+        looperThread.closeAfterTest(realm);
+
+        // Backlinks not yet supported: https://github.com/realm/realm-core/pull/2947
+        RealmResults<AllJavaTypes> query = realm.where(AllJavaTypes.class).equalTo("objectParents.fieldString", "Foo").findAllAsync();
+        query.addChangeListener((results, changeSet) -> {
+            switch (callbacks.incrementAndGet()) {
+                case 1:
+                    assertEquals(OrderedCollectionChangeSet.State.INITIAL, changeSet.getState());
+                    break;
+
+                case 2:
+                    assertEquals(OrderedCollectionChangeSet.State.ERROR, OrderedCollectionChangeSet.State.ERROR);
+                    assertTrue(changeSet.getError() instanceof IllegalArgumentException);
+                    Throwable iae = changeSet.getError();
+                    assertTrue(iae.getMessage().contains("ERROR: realm::QueryParser: Key path resolution failed"));
+                    looperThread.testComplete();
+                    break;
+
+                default:
+                    fail("Unexpected state: " + changeSet.getState());
+            }
+        });
+        looperThread.keepStrongReference(query);
+    }
+
