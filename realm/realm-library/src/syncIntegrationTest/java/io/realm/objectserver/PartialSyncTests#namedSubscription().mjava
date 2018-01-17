@@ -1,0 +1,32 @@
+    @Test
+    @RunTestInLooperThread
+    public void namedSubscription() throws InterruptedException {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        createServerData(user, Constants.SYNC_SERVER_URL);
+
+        // Download data in partial Realm
+        final Realm partialSyncRealm = getPartialRealm(user);
+        looperThread.closeAfterTest(partialSyncRealm);
+        assertTrue(partialSyncRealm.isEmpty());
+
+        RealmResults<PartialSyncObjectA> results = partialSyncRealm.where(PartialSyncObjectA.class)
+                .greaterThan("number", 5)
+                .findAllAsync("my-subscription-id");
+        looperThread.keepStrongReference(results);
+
+        results.addChangeListener((partialSyncObjectAS, changeSet) -> {
+            if (changeSet.isCompleteResult()) {
+                if (results.size() == 4) {
+                    for (PartialSyncObjectA object : results) {
+                        assertThat(object.getNumber(), greaterThan(5));
+                        assertEquals("partial", object.getString());
+                    }
+                    // make sure the Realm contains only PartialSyncObjectA
+                    assertEquals(0, partialSyncRealm.where(PartialSyncObjectB.class).count());
+                    looperThread.testComplete();
+                }
+            }
+        });
+
+    }
+
