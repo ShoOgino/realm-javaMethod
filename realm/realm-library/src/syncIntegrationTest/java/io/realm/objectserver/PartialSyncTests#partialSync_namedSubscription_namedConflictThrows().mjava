@@ -2,13 +2,7 @@
     @RunTestInLooperThread
     public void partialSync_namedSubscription_namedConflictThrows() {
         SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
-        final SyncConfiguration partialSyncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
-                .name("partialSync")
-                .modules(new PartialSyncModule())
-                .partialRealm()
-                .build();
-
-        Realm realm = Realm.getInstance(partialSyncConfig);
+        Realm realm = getPartialRealm(user);
         looperThread.closeAfterTest(realm);
 
         RealmResults<PartialSyncObjectA> results1 = realm.where(PartialSyncObjectA.class)

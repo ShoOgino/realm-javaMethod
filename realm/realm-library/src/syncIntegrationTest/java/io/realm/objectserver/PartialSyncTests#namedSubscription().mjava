@@ -2,22 +2,10 @@
     @RunTestInLooperThread
     public void namedSubscription() throws InterruptedException {
         SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
-
-        final SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
-                .waitForInitialRemoteData()
-                .modules(new PartialSyncModule())
-                .build();
-
-        final SyncConfiguration partialSyncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
-                .name("partialSync")
-                .modules(new PartialSyncModule())
-                .partialRealm()
-                .build();
-
-        createServerData(syncConfig);
+        createServerData(user, Constants.SYNC_SERVER_URL);
 
         // Download data in partial Realm
-        final Realm partialSyncRealm = Realm.getInstance(partialSyncConfig);
+        final Realm partialSyncRealm = getPartialRealm(user);
         looperThread.closeAfterTest(partialSyncRealm);
         assertTrue(partialSyncRealm.isEmpty());
 

@@ -1,0 +1,9 @@
+    private Realm getPartialRealm(SyncUser user) {
+        final SyncConfiguration partialSyncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .name("partialSync")
+                .modules(new PartialSyncModule())
+                .partialRealm()
+                .build();
+        return Realm.getInstance(partialSyncConfig);
+    }
+

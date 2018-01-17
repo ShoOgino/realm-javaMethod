@@ -1,0 +1,21 @@
+    @Test
+    public void unsubscribeAsync_nonLooperThreadThrows() {
+        Realm realm = getPartialRealm();
+        Realm.UnsubscribeCallback callback = new Realm.UnsubscribeCallback() {
+            @Override
+            public void onSuccess(String subscriptionName) {
+            }
+
+            @Override
+            public void onError(String subscriptionName, Throwable error) {
+            }
+        };
+
+        try {
+            //noinspection ConstantConditions
+            realm.unsubscribeAsync("my-id", callback);
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+    }
+

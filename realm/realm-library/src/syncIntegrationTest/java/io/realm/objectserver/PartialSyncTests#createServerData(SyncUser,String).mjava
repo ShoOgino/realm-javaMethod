@@ -1,4 +1,9 @@
-    private void createServerData(SyncConfiguration syncConfig) throws InterruptedException {
+    private void createServerData(SyncUser user, String url) throws InterruptedException {
+        final SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, url)
+                .waitForInitialRemoteData()
+                .modules(new PartialSyncModule())
+                .build();
+
         // Create server data
         // Create server data
         Realm realm = Realm.getInstance(syncConfig);
@@ -34,7 +39,7 @@
         objectA.setNumber(9);
         objectA.setString("partial");
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < TEST_SIZE; i++) {
             realm.createObject(PartialSyncObjectB.class).setNumber(i);
         }
         realm.commitTransaction();
