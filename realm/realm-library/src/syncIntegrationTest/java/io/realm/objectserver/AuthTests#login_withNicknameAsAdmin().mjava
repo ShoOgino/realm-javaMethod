@@ -1,8 +1,7 @@
     @Test
     @RunTestInLooperThread
-    public void login_withAccessToken() {
-        SyncUser adminUser = UserFactory.createAdminUser(Constants.AUTH_URL);
-        SyncCredentials credentials = SyncCredentials.accessToken(SyncTestUtils.getRefreshToken(adminUser).value(), "custom-admin-user", adminUser.isAdmin());
+    public void login_withNicknameAsAdmin() {
+        SyncCredentials credentials = SyncCredentials.nickname("foo", true);
         SyncUser.loginAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback<SyncUser>() {
             @Override
             public void onSuccess(SyncUser user) {
@@ -13,6 +12,7 @@
 
                 final Realm realm = Realm.getInstance(config);
                 looperThread.addTestRealm(realm);
+                assertFalse(Util.isEmptyString(config.getUser().getIdentity()));
                 assertTrue(config.getUser().isValid());
                 looperThread.testComplete();
             }
