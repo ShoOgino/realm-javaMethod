@@ -3,6 +3,7 @@
     //            adb push <realm-java>/tools/sync_test_server/keys/android_test_certificate.crt /sdcard/
     //            then import the certificate from the device (Settings/Security/Install from storage)
     @Test
+    @RunTestInLooperThread
     public void sslVerifyCallback_isUsed() throws InterruptedException {
         String username = UUID.randomUUID().toString();
         String password = "password";
@@ -42,5 +43,6 @@
         } finally {
             realm.close();
         }
+        looperThread.testComplete();
     }
 
