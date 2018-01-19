@@ -1,0 +1,18 @@
+    /**
+     * @param backingChangeset Underlying changeset backing this.
+     */
+    public StatefulCollectionChangeSet(OsCollectionChangeSet backingChangeset) {
+        this.changeset = backingChangeset;
+
+        // Calculate the state here since object is immutable
+        boolean isInitial = backingChangeset.isFirstAsyncCallback();
+        remoteDataSynchronized = backingChangeset.isRemoteDataLoaded();
+
+        error = backingChangeset.getError();
+        if (error != null) {
+            state = State.ERROR;
+        } else {
+            state = (isInitial) ? State.INITIAL : State.UPDATE;
+        }
+    }
+

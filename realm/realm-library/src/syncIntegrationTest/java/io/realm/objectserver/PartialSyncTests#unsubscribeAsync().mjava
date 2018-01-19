@@ -1,0 +1,46 @@
+    @Test
+    @RunTestInLooperThread
+    public void unsubscribeAsync() throws InterruptedException {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        createServerData(user, Constants.SYNC_SERVER_URL);
+        Realm realm = getPartialRealm(user);
+        looperThread.closeAfterTest(realm);
+
+        final String subscriptionName = "my-objects";
+        RealmResults<PartialSyncObjectB> r = realm.where(PartialSyncObjectB.class)
+                .greaterThan("number", 0)
+                .findAllAsync(subscriptionName);
+
+        r.addChangeListener((results, changeSet) -> {
+            if (changeSet.isCompleteResult()) {
+                // 1. Partial sync downloaded all expected objects
+                assertEquals(TEST_SIZE - 1, results.size());
+                r.removeAllChangeListeners();
+
+                // 2. Attempt to remove them again
+                realm.unsubscribeAsync(subscriptionName, new Realm.UnsubscribeCallback() {
+                    @Override
+                    public void onSuccess(String subscriptionName) {
+                        assertEquals(subscriptionName, subscriptionName);
+
+                        // Use global Realm change listener to avoid re-subscribing
+                        realm.addChangeListener(new RealmChangeListener<Realm>() {
+                            @Override
+                            public void onChange(Realm realm) {
+                                // Eventually they should be removed
+                                if (realm.where(PartialSyncObjectB.class).count() == 0) {
+                                    looperThread.testComplete();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String subscriptionName, Throwable error) {
+                        fail(error.toString());
+                    }
+                });
+            }
+        });
+    }
+

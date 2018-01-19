@@ -1,22 +1,16 @@
     /**
-     * @deprecated Since 4.3.0, now use {@link RealmQuery#distinctValues(String)} then {@link RealmQuery#findAll()}
-     *
-     * Returns a distinct set of objects of a specific class. If the result is sorted, the first
-     * object will be returned in case of multiple occurrences, otherwise it is undefined which
-     * object is returned.
+     * Selects a distinct set of objects of a specific class. If the result is sorted, the first object will be
+     * returned in case of multiple occurrences, otherwise it is undefined which object is returned.
      * <p>
      * Adding {@link io.realm.annotations.Index} to the corresponding field will make this operation much faster.
      *
      * @param fieldName the field name.
-     * @return a non-null {@link RealmResults} containing the distinct objects.
      * @throws IllegalArgumentException if a field is {@code null}, does not exist, is an unsupported type, or points
      * to linked fields.
+     * @throws IllegalStateException if distinct field names were already defined.
      */
-    @Deprecated
-    public RealmResults<E> distinct(String fieldName) {
-        realm.checkIfValid();
-
-        SortDescriptor distinctDescriptor = SortDescriptor.getInstanceForDistinct(getSchemaConnector(), query.getTable(), fieldName);
-        return createRealmResults(query, null, distinctDescriptor, true);
+    @Beta
+    public RealmQuery<E> distinct(String fieldName) {
+        return distinct(fieldName, new String[]{});
     }
 

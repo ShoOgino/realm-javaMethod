@@ -1,0 +1,65 @@
+    /**
+     * Cancel a named subscription that was created by calling {@link RealmQuery#findAllAsync(String)}.
+     * If after this, some objects are no longer part of any active subscription they will be removed
+     * locally from the device (but not on the server).
+     *
+     * The effect of unsubscribing is not immediate. The local Realm must coordinate with the Object
+     * Server before this can happen. A successful callback just indicate that the request was
+     * succesfully enqueued and any data will be removed as soon as possible. When the data is
+     * actually removed locally, a standard change notification will be triggered and from the
+     * perspective of the device it will look like the data was deleted.
+     *
+     * @param subscriptionName name of the subscription to remove
+     * @param callback callback reporting back if the intent to unsubscribe was enqueued successfully or failed.
+     * @return a {@link RealmAsyncTask} representing a cancellable task.
+     * @throws IllegalArgumentException if no {@code subscriptionName} or {@code callback} was provided.
+     * @throws IllegalStateException if called on a non-looper thread.
+     * @throws UnsupportedOperationException if the Realm is not a partially synchronized Realm.
+     */
+    @Beta
+    public RealmAsyncTask unsubscribeAsync(String subscriptionName, Realm.UnsubscribeCallback callback) {
+        if (Util.isEmptyString(subscriptionName)) {
+            throw new IllegalArgumentException("Non-empty 'subscriptionName' required.");
+        }
+        //noinspection ConstantConditions
+        if (callback == null) {
+            throw new IllegalArgumentException("'callback' required.");
+        }
+        sharedRealm.capabilities.checkCanDeliverNotification("This method is only available from a Looper thread.");
+        if (!ObjectServerFacade.getSyncFacadeIfPossible().isPartialRealm(configuration)) {
+            throw new UnsupportedOperationException("Realm is not a partially synchronized Realm: " + configuration.getPath());
+        }
+
+        return executeTransactionAsync(new Transaction() {
+            @Override
+            public void execute(Realm realm) {
+
+                // Need to manually run a dynamic query here.
+                // TODO Add support for DynamicRealm.executeTransactionAsync()
+                Table table = realm.sharedRealm.getTable("class___ResultSets");
+                TableQuery query = table.where()
+                        .equalTo(new long[]{table.getColumnIndex("name")}, new long[]{NativeObject.NULLPTR}, subscriptionName);
+
+                OsResults result = OsResults.createFromQuery(realm.sharedRealm, query);
+                long count = result.size();
+                if (count == 0) {
+                    throw new IllegalArgumentException("No active subscription named '"+ subscriptionName +"' exists.");
+                }
+                if (count > 1) {
+                    RealmLog.warn("Multiple subscriptions named '" + subscriptionName +  "' exists. This should not be possible. They will all be deleted");
+                }
+                result.clear();
+            }
+        }, new Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                callback.onSuccess(subscriptionName);
+            }
+        }, new Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                callback.onError(subscriptionName, error);
+            }
+        });
+    }
+
