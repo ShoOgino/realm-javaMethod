@@ -1,10 +1,10 @@
     //@formatter:off
     private void emitCopyOrUpdateMethod(JavaWriter writer) throws IOException {
         writer.beginMethod(
-                qualifiedClassName, // Return type
+                qualifiedJavaClassName, // Return type
                 "copyOrUpdate", // Method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
-                "Realm", "realm", qualifiedClassName, "object", "boolean", "update", "Map<RealmModel,RealmObjectProxy>", "cache" // Argument type & argument name
+                "Realm", "realm", qualifiedJavaClassName, "object", "boolean", "update", "Map<RealmModel,RealmObjectProxy>", "cache" // Argument type & argument name
         );
 
         writer
@@ -25,7 +25,7 @@
 
         writer.emitStatement("RealmObjectProxy cachedRealmObject = cache.get(object)")
                 .beginControlFlow("if (cachedRealmObject != null)")
-                    .emitStatement("return (%s) cachedRealmObject", qualifiedClassName)
+                    .emitStatement("return (%s) cachedRealmObject", qualifiedJavaClassName)
                 .endControlFlow()
                 .emitEmptyLine();
 
@@ -33,12 +33,12 @@
             writer.emitStatement("return copy(realm, object, update, cache)");
         } else {
             writer
-                    .emitStatement("%s realmObject = null", qualifiedClassName)
+                    .emitStatement("%s realmObject = null", qualifiedJavaClassName)
                     .emitStatement("boolean canUpdate = update")
                     .beginControlFlow("if (canUpdate)")
-                    .emitStatement("Table table = realm.getTable(%s.class)", qualifiedClassName)
+                    .emitStatement("Table table = realm.getTable(%s.class)", qualifiedJavaClassName)
                     .emitStatement("%s columnInfo = (%s) realm.getSchema().getColumnInfo(%s.class)",
-                        columnInfoClassName(), columnInfoClassName(), qualifiedClassName)
+                        columnInfoClassName(), columnInfoClassName(), qualifiedJavaClassName)
                     .emitStatement("long pkColumnIndex = %s", fieldIndexVariableReference(metadata.getPrimaryKey()));
 
             String primaryKeyGetter = metadata.getPrimaryKeyGetter();
@@ -76,7 +76,7 @@
                         .beginControlFlow("try")
                             .emitStatement(
                                 "objectContext.set(realm, table.getUncheckedRow(rowIndex), realm.getSchema().getColumnInfo(%s.class), false, Collections.<String> emptyList())",
-                                qualifiedClassName)
+                                    qualifiedJavaClassName)
                             .emitStatement("realmObject = new %s()", qualifiedGeneratedClassName)
                             .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
                         .nextControlFlow("finally")

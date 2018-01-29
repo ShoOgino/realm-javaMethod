@@ -8,13 +8,8 @@
     private boolean validateBacklinks() {
         boolean allValid = true;
 
-        Map<String, ClassMetaData> realmClasses = new HashMap<String, ClassMetaData>(classesToValidate.size());
-        for (ClassMetaData classData : classesToValidate) {
-            realmClasses.put(classData.getFullyQualifiedClassName(), classData);
-        }
-
         for (Backlink backlink : backlinksToValidate) {
-            ClassMetaData clazz = realmClasses.get(backlink.getSourceClass());
+            ClassMetaData clazz = classCollection.getClassFromQualifiedName(backlink.getSourceClass());
 
             // If the class is not here it might be part of some other compilation unit.
             if (clazz == null) { continue; }

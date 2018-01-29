@@ -1,13 +1,13 @@
     private void emitCopyMethod(JavaWriter writer) throws IOException {
         writer.beginMethod(
-                qualifiedClassName, // Return type
+                qualifiedJavaClassName, // Return type
                 "copy", // Method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
-                "Realm", "realm", qualifiedClassName, "newObject", "boolean", "update", "Map<RealmModel,RealmObjectProxy>", "cache"); // Argument type & argument name
+                "Realm", "realm", qualifiedJavaClassName, "newObject", "boolean", "update", "Map<RealmModel,RealmObjectProxy>", "cache"); // Argument type & argument name
 
         writer.emitStatement("RealmObjectProxy cachedRealmObject = cache.get(newObject)");
         writer.beginControlFlow("if (cachedRealmObject != null)")
-                .emitStatement("return (%s) cachedRealmObject", qualifiedClassName)
+                .emitStatement("return (%s) cachedRealmObject", qualifiedJavaClassName)
                 .endControlFlow();
 
 
@@ -15,10 +15,10 @@
                 .emitSingleLineComment("rejecting default values to avoid creating unexpected objects from RealmModel/RealmList fields.");
         if (metadata.hasPrimaryKey()) {
             writer.emitStatement("%s realmObject = realm.createObjectInternal(%s.class, ((%s) newObject).%s(), false, Collections.<String>emptyList())",
-                    qualifiedClassName, qualifiedClassName, interfaceName, metadata.getPrimaryKeyGetter());
+                    qualifiedJavaClassName, qualifiedJavaClassName, interfaceName, metadata.getPrimaryKeyGetter());
         } else {
             writer.emitStatement("%s realmObject = realm.createObjectInternal(%s.class, false, Collections.<String>emptyList())",
-                    qualifiedClassName, qualifiedClassName);
+                    qualifiedJavaClassName, qualifiedJavaClassName);
         }
         writer.emitStatement("cache.put(newObject, (RealmObjectProxy) realmObject)");
 

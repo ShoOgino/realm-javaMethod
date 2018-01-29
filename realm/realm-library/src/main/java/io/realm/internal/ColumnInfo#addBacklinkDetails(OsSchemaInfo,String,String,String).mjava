@@ -4,12 +4,12 @@
      * Must be called from within the subclass constructor, to maintain the effectively-final contract.
      *
      * @param schemaInfo the {@link OsSchemaInfo} of the corresponding {@code Realm} instance.
-     * @param columnName The name of the backlink column.
+     * @param javaFieldName The name of the backlink column.
      * @param sourceTableName The name of the backlink source class.
-     * @param sourceColumnName The name of the backlink source field.
+     * @param sourceJavaFieldName The name of the backlink source field.
      */
-    protected final void addBacklinkDetails(OsSchemaInfo schemaInfo, String columnName, String sourceTableName, String sourceColumnName) {
-        long columnIndex = schemaInfo.getObjectSchemaInfo(sourceTableName).getProperty(sourceColumnName).getColumnIndex();
-        indicesMap.put(columnName, new ColumnDetails(columnIndex, RealmFieldType.LINKING_OBJECTS, sourceTableName));
+    protected final void addBacklinkDetails(OsSchemaInfo schemaInfo, String javaFieldName, String sourceTableName, String sourceJavaFieldName) {
+        long columnIndex = schemaInfo.getObjectSchemaInfo(sourceTableName).getProperty(sourceJavaFieldName).getColumnIndex();
+        indicesFromJavaFieldNames.put(javaFieldName, new ColumnDetails(columnIndex, RealmFieldType.LINKING_OBJECTS, sourceTableName));
     }
 

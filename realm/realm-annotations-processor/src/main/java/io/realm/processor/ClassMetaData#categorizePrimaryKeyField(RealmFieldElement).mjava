@@ -1,0 +1,30 @@
+    // The field has the @PrimaryKey annotation. It is only valid for
+    // String, short, int, long and must only be present one time
+    private boolean categorizePrimaryKeyField(RealmFieldElement fieldElement) {
+        if (primaryKey != null) {
+            Utils.error(String.format(Locale.US,
+                    "A class cannot have more than one @PrimaryKey. Both \"%s\" and \"%s\" are annotated as @PrimaryKey.",
+                    primaryKey.getSimpleName().toString(),
+                    fieldElement.getSimpleName().toString()));
+            return false;
+        }
+
+        TypeMirror fieldType = fieldElement.asType();
+        if (!isValidPrimaryKeyType(fieldType)) {
+            Utils.error(String.format(Locale.US,
+                    "Field \"%s\" with type \"%s\" cannot be used as primary key. See @PrimaryKey for legal types.",
+                    fieldElement.getSimpleName().toString(),
+                    fieldType));
+            return false;
+        }
+
+        primaryKey = fieldElement;
+
+        // Also add as index. All types of primary key can be indexed.
+        if (!indexedFields.contains(fieldElement)) {
+            indexedFields.add(fieldElement);
+        }
+
+        return true;
+    }
+

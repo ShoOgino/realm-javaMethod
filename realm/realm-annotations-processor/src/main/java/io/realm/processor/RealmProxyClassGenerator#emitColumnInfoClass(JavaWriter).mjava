@@ -17,16 +17,19 @@
                 "OsSchemaInfo", "schemaInfo");
         writer.emitStatement("super(%s)", metadata.getFields().size());
         writer.emitStatement("OsObjectSchemaInfo objectSchemaInfo = schemaInfo.getObjectSchemaInfo(\"%1$s\")",
-                simpleClassName);
-        for (VariableElement field : metadata.getFields()) {
+                internalClassName);
+        for (RealmFieldElement field : metadata.getFields()) {
             writer.emitStatement(
-                    "this.%1$sIndex = addColumnDetails(\"%1$s\", objectSchemaInfo)",
-                    field.getSimpleName().toString());
+                    "this.%1$sIndex = addColumnDetails(\"%1$s\", \"%2$s\", objectSchemaInfo)",
+                    field.getJavaName(),
+                    field.getInternalFieldName());
         }
         for (Backlink backlink : metadata.getBacklinkFields()) {
             writer.emitStatement(
                     "addBacklinkDetails(schemaInfo, \"%s\", \"%s\", \"%s\")",
-                    backlink.getTargetField(), Utils.stripPackage(backlink.getSourceClass()), backlink.getSourceField());
+                    backlink.getTargetField(),
+                    classCollection.getClassFromQualifiedName(backlink.getSourceClass()).getInternalClassName(),
+                    backlink.getSourceField());
         }
         writer.endConstructor()
                 .emitEmptyLine();

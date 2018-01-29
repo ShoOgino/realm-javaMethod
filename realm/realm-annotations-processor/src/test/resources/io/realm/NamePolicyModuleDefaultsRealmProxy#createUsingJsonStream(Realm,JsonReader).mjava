@@ -1,0 +1,32 @@
+    @SuppressWarnings("cast")
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static some.test.NamePolicyModuleDefaults createUsingJsonStream(Realm realm, JsonReader reader)
+            throws IOException {
+        final some.test.NamePolicyModuleDefaults obj = new some.test.NamePolicyModuleDefaults();
+        final NamePolicyModuleDefaultsRealmProxyInterface objProxy = (NamePolicyModuleDefaultsRealmProxyInterface) obj;
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (false) {
+            } else if (name.equals("firstName")) {
+                if (reader.peek() != JsonToken.NULL) {
+                    objProxy.realmSet$firstName((String) reader.nextString());
+                } else {
+                    reader.skipValue();
+                    objProxy.realmSet$firstName(null);
+                }
+            } else if (name.equals("lastName")) {
+                if (reader.peek() != JsonToken.NULL) {
+                    objProxy.realmSet$lastName((String) reader.nextString());
+                } else {
+                    reader.skipValue();
+                    objProxy.realmSet$lastName(null);
+                }
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+        return realm.copyToRealm(obj);
+    }
+

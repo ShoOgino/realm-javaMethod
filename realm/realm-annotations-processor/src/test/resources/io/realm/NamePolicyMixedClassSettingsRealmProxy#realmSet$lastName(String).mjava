@@ -1,0 +1,23 @@
+    @Override
+    public void realmSet$lastName(String value) {
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+            final Row row = proxyState.getRow$realm();
+            if (value == null) {
+                row.getTable().setNull(columnInfo.lastNameIndex, row.getIndex(), true);
+                return;
+            }
+            row.getTable().setString(columnInfo.lastNameIndex, row.getIndex(), value, true);
+            return;
+        }
+
+        proxyState.getRealm$realm().checkIfValid();
+        if (value == null) {
+            proxyState.getRow$realm().setNull(columnInfo.lastNameIndex);
+            return;
+        }
+        proxyState.getRow$realm().setString(columnInfo.lastNameIndex, value);
+    }
+

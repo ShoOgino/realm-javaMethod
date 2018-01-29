@@ -1,0 +1,17 @@
+    // Check the effect of setting both module class/field name policies, class name, field
+    // name policy and explicit names on fields (i.e = Specific class name + field name should win.
+    @Test
+    public void compareProcessedNamingPolicyClassFile() {
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(
+                    JavaFileObjects.forResource("some/test/NamePolicyModule.java"),
+                    JavaFileObjects.forResource("some/test/NamePolicyMixedClassSettings.java"),
+                    JavaFileObjects.forResource("some/test/NamePolicyFieldNameOnly.java"),
+                    JavaFileObjects.forResource("some/test/NamePolicyClassOnly.java")
+                ))
+                .processedWith(new RealmProcessor())
+                .compilesWithoutError()
+                .and()
+                .generatesSources(JavaFileObjects.forResource("io/realm/NamePolicyMixedClassSettingsRealmProxy.java"));
+    }
+
