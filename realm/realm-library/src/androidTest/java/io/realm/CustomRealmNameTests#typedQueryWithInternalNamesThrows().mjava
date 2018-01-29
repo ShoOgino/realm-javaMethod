@@ -1,0 +1,24 @@
+    @Test
+    public void typedQueryWithInternalNamesThrows() {
+
+        // Normal predicates
+        try {
+            realm.where(ClassWithPolicy.class).equalTo(ClassWithPolicy.FIELD_CAMEL_CASE, "");
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        // Sorting
+        try {
+            realm.where(ClassWithPolicy.class).sort(ClassWithPolicy.FIELD_CAMEL_CASE);
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        // Distinct
+        try {
+            realm.where(ClassWithPolicy.class).distinctValues(ClassWithPolicy.FIELD_CAMEL_CASE);
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        // Backlinks do not exist as internal fields that can be queried
+    }
+

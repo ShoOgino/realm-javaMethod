@@ -8,9 +8,9 @@
                 .beginControlFlow("if (!RealmObject.isValid(this))")
                 .emitStatement("return \"Invalid object\"")
                 .endControlFlow();
-        writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = proxy[\")", simpleClassName);
+        writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = proxy[\")", simpleJavaClassName);
 
-        Collection<VariableElement> fields = metadata.getFields();
+        Collection<RealmFieldElement> fields = metadata.getFields();
         int i = fields.size() - 1;
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();

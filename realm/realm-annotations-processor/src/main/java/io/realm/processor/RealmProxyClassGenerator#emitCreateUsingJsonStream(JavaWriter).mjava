@@ -4,7 +4,7 @@
         writer.emitAnnotation("SuppressWarnings", "\"cast\"");
         writer.emitAnnotation("TargetApi", "Build.VERSION_CODES.HONEYCOMB");
         writer.beginMethod(
-                qualifiedClassName,
+                qualifiedJavaClassName,
                 "createUsingJsonStream",
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
                 Arrays.asList("Realm", "realm", "JsonReader", "reader"),
@@ -13,13 +13,13 @@
         if (metadata.hasPrimaryKey()) {
             writer.emitStatement("boolean jsonHasPrimaryKey = false");
         }
-        writer.emitStatement("final %s obj = new %s()", qualifiedClassName, qualifiedClassName);
+        writer.emitStatement("final %s obj = new %s()", qualifiedJavaClassName, qualifiedJavaClassName);
         writer.emitStatement("final %1$s objProxy = (%1$s) obj", interfaceName);
         writer.emitStatement("reader.beginObject()");
         writer.beginControlFlow("while (reader.hasNext())");
         writer.emitStatement("String name = reader.nextName()");
         writer.beginControlFlow("if (false)");
-        Collection<VariableElement> fields = metadata.getFields();
+        Collection<RealmFieldElement> fields = metadata.getFields();
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
             String qualifiedFieldType = field.asType().toString();

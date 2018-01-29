@@ -1,0 +1,17 @@
+    //
+    // Query tests
+    //
+    // Mostly smoke test, as we only want to test that the query system correctly maps between
+    // Java field names and cores.
+    //
+    @Test
+    public void typedQueryWithJavaNames() {
+        RealmResults<ClassWithPolicy> results = realm.where(ClassWithPolicy.class)
+                .equalTo("camelCase", "foo") // Java name in model class
+                .equalTo("parents.PascalCase", 1) // Backlinks also uses java names
+                .sort("mHungarian") // Sorting uses Java names
+                .distinctValues("customName") // Distinct uses Java names
+                .findAll();
+        assertTrue(results.isEmpty());
+    }
+

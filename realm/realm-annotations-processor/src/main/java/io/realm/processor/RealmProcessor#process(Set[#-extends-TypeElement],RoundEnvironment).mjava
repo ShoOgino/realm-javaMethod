@@ -6,19 +6,22 @@
             RealmVersionChecker.getInstance(processingEnv).executeRealmVersionUpdate();
         }
 
-        if (roundEnv.errorRaised()) { return true; }
+        if (roundEnv.errorRaised()) { return ABORT; }
 
         if (!hasProcessedModules) {
             Utils.initialize(processingEnv);
+            TypeMirrors typeMirrors = new TypeMirrors(processingEnv);
 
-            if (!processAnnotations(roundEnv)) { return true; }
-
+            // Build up internal metadata while validating as much as possible
+            if (!preProcessModules(roundEnv)) { return ABORT; }
+            if (!processClassAnnotations(roundEnv, typeMirrors)) { return ABORT; }
+            if (!postProcessModules()) { return ABORT; }
+            if (!validateBacklinks()) { return ABORT; }
             hasProcessedModules = true;
-            if (!processModules(roundEnv)) { return true; }
-        }
 
-        if (roundEnv.processingOver()) {
-            if (!validateBacklinks()) { return true; }
+            // Create all files
+            if (!createProxyClassFiles(typeMirrors)) { return ABORT; }
+            if (!createModuleFiles(roundEnv)) { return ABORT; }
         }
 
         return CONSUME_ANNOTATIONS;

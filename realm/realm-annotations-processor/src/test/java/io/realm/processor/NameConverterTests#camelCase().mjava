@@ -1,0 +1,43 @@
+    @Test
+    public void camelCase() {
+        NameConverter converter = new CamelCaseConverter();
+        Map<String, String> values = new LinkedHashMap<String, String>() {{
+            // <JavaName, InternalName>
+            put("camelCase", "camelCase");
+            put("PascalCase", "pascalCase");
+            put("mHungarianNotation", "hungarianNotation");
+            put("_PascalCaseWithStartingSeparator", "pascalCaseWithStartingSeparator");
+            put("_camelCaseWithStartingSeparator", "camelCaseWithStartingSeparator");
+            put("ALL_CAPS_WITH_SEPARATOR", "allCapsWithSeparator");
+            put("ALLCAPS", "allcaps");
+            put("_ALL_CAPS_WITH_STARTING_SEPARATOR", "allCapsWithStartingSeparator");
+            put("alllower", "alllower");
+            put("all_lower_with_separator", "allLowerWithSeparator");
+
+            // $ Separator
+            put("$generatedNames", "generatedNames");
+            put("generatedNames$", "generatedNames");
+            put("generated$Names", "generatedNames");
+
+            // Non-ascii chars
+            put("πPi", "πPi");
+            put("NonAsciiÆøÅ", "nonAsciiÆøÅ");
+
+            // Multiple upper case letters
+            put("HTMLFile", "htmlFile");
+            put("aHTMLFile", "aHtmlFile");
+            put("_HTMLFile", "htmlFile");
+
+            // Emojiis are neither upper case nor lower case (Smiley)
+            put("\uD83D\uDE01", "\uD83D\uDE01");
+            put("m\uD83D\uDE01", "m\uD83D\uDE01");
+            put("M\uD83D\uDE01", "m\uD83D\uDE01");
+            put("\uD83D\uDE01Smiley", "\uD83D\uDE01smiley");
+            put("_\uD83D\uDE01smiley", "\uD83D\uDE01smiley");
+        }};
+
+        for (Map.Entry<String, String> entry : values.entrySet()) {
+            assertEquals(entry.getValue(), converter.convert(entry.getKey()));
+        }
+    }
+

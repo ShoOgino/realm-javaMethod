@@ -1,0 +1,44 @@
+    /**
+     * Builds all meta data structures that can be calculated before processing any model classes.
+     * Any errors or messages will be posted on the provided Messager.
+     *
+     * @return True if meta data was correctly created and processing of model classes can continue, false otherwise.
+     */
+    public boolean preProcess(Set<? extends Element> moduleClasses) {
+
+        // Tracks all module settings with `allClasses` enabled
+        Set<ModulePolicyInfo> globalModuleInfo = new HashSet<>();
+
+        // Tracks which modules a class was mentioned in by name using `classes = { ... }`
+        // <Qualified
+        Map<String, List<ModulePolicyInfo>> classSpecificModuleInfo = new HashMap<>();
+
+        // Check that modules are setup correctly
+        for (Element classElement : moduleClasses) {
+            String classSimpleName = classElement.getSimpleName().toString();
+
+            // Check that the annotation is only applied to a class
+            if (!classElement.getKind().equals(ElementKind.CLASS)) {
+                Utils.error("The RealmModule annotation can only be applied to classes", classElement);
+                return false;
+            }
+
+            // Check that allClasses and classes are not set at the same time
+            RealmModule moduleAnnoation = classElement.getAnnotation(RealmModule.class);
+            Utils.note("Processing module " + classSimpleName);
+            if (moduleAnnoation.allClasses() && hasCustomClassList(classElement)) {
+                Utils.error("Setting @RealmModule(allClasses=true) will override @RealmModule(classes={...}) in " + classSimpleName);
+                return false;
+            }
+
+            // Validate that naming policies are correctly configured.
+            if (!validateNamingPolicies(globalModuleInfo, classSpecificModuleInfo, (TypeElement) classElement, moduleAnnoation)) {
+                return false;
+            }
+
+            moduleAnnotations.put(((TypeElement) classElement).getQualifiedName().toString(), moduleAnnoation);
+        }
+
+        return true;
+    }
+
