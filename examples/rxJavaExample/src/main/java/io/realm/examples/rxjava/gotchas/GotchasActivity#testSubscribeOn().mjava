@@ -3,7 +3,7 @@
      */
     private void testSubscribeOn() {
         Disposable subscribeOnDisposable = realm.asFlowable()
-                .map(realm -> realm.where(Person.class).findAllSorted("name").get(0))
+                .map(realm -> realm.where(Person.class).sort("name").findAll().get(0))
                 // The Realm was created on the UI thread. Accessing it on `Schedulers.io()` will crash.
                 // Avoid using subscribeOn() and use Realms `findAllAsync*()` methods instead.
                 .subscribeOn(Schedulers.io()) //
@@ -14,7 +14,7 @@
         compositeDisposable.add(subscribeOnDisposable);
 
         // Use Realms Async API instead
-        Disposable asyncSubscribeOnDisposable = realm.where(Person.class).findAllSortedAsync("name").get(0).<Person>asFlowable()
+        Disposable asyncSubscribeOnDisposable = realm.where(Person.class).sort("name").findAllAsync().get(0).<Person>asFlowable()
                 .subscribe(
                         person -> showStatus("subscribeOn/async: " + person.getName() + ":" + person.getAge()),
                         throwable -> showStatus("subscribeOn/async: " +throwable.toString())

@@ -3,7 +3,7 @@
      */
     private void testDistinct() {
         Flowable<Person> personFlowable =
-                realm.asFlowable().map(realm -> realm.where(Person.class).findAllSorted("name").get(0));
+                realm.asFlowable().map(realm -> realm.where(Person.class).sort("name").findAll().get(0));
 
         // distinct() and distinctUntilChanged() uses standard equals with older objects stored in a HashMap.
         // Realm objects auto-update which means the objects stored will also auto-update.
