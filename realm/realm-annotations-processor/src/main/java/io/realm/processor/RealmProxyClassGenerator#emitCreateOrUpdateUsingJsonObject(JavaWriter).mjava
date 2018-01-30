@@ -1,7 +1,7 @@
     private void emitCreateOrUpdateUsingJsonObject(JavaWriter writer) throws IOException {
         writer.emitAnnotation("SuppressWarnings", "\"cast\"");
         writer.beginMethod(
-                qualifiedClassName,
+                qualifiedJavaClassName,
                 "createOrUpdateUsingJsonObject",
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC),
                 Arrays.asList("Realm", "realm", "JSONObject", "json", "boolean", "update"),
@@ -19,15 +19,15 @@
         if (!metadata.hasPrimaryKey()) {
             buildExcludeFieldsList(writer, metadata.getFields());
             writer.emitStatement("%s obj = realm.createObjectInternal(%s.class, true, excludeFields)",
-                    qualifiedClassName, qualifiedClassName);
+                    qualifiedJavaClassName, qualifiedJavaClassName);
         } else {
             String pkType = Utils.isString(metadata.getPrimaryKey()) ? "String" : "Long";
             writer
-                .emitStatement("%s obj = null", qualifiedClassName)
+                .emitStatement("%s obj = null", qualifiedJavaClassName)
                 .beginControlFlow("if (update)")
-                    .emitStatement("Table table = realm.getTable(%s.class)", qualifiedClassName)
+                    .emitStatement("Table table = realm.getTable(%s.class)", qualifiedJavaClassName)
                     .emitStatement("%s columnInfo = (%s) realm.getSchema().getColumnInfo(%s.class)",
-                        columnInfoClassName(), columnInfoClassName(), qualifiedClassName)
+                        columnInfoClassName(), columnInfoClassName(), qualifiedJavaClassName)
                     .emitStatement("long pkColumnIndex = %s", fieldIndexVariableReference(metadata.getPrimaryKey()))
                     .emitStatement("long rowIndex = Table.NO_MATCH");
             if (metadata.isNullable(metadata.getPrimaryKey())) {
@@ -53,7 +53,7 @@
                     .beginControlFlow("try")
                         .emitStatement(
                                 "objectContext.set(realm, table.getUncheckedRow(rowIndex), realm.getSchema().getColumnInfo(%s.class), false, Collections.<String> emptyList())",
-                                qualifiedClassName)
+                                qualifiedJavaClassName)
                         .emitStatement("obj = new %s()", qualifiedGeneratedClassName)
                     .nextControlFlow("finally")
                         .emitStatement("objectContext.clear()")
@@ -66,7 +66,7 @@
             String primaryKeyFieldType = metadata.getPrimaryKey().asType().toString();
             String primaryKeyFieldName = metadata.getPrimaryKey().getSimpleName().toString();
             RealmJsonTypeHelper.emitCreateObjectWithPrimaryKeyValue(
-                    qualifiedClassName, qualifiedGeneratedClassName, primaryKeyFieldType, primaryKeyFieldName, writer);
+                    qualifiedJavaClassName, qualifiedGeneratedClassName, primaryKeyFieldType, primaryKeyFieldName, writer);
             writer.endControlFlow();
         }
         //@formatter:on

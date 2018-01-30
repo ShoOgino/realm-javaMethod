@@ -1,13 +1,17 @@
     private boolean categorizeField(Element element) {
-        VariableElement field = (VariableElement) element;
+        VariableElement fieldRef = (VariableElement) element;
 
         // completely ignore any static fields
-        if (field.getModifiers().contains(Modifier.STATIC)) { return true; }
+        if (fieldRef.getModifiers().contains(Modifier.STATIC)) { return true; }
 
         // Ignore fields marked with @Ignore or if they are transient
-        if (field.getAnnotation(Ignore.class) != null || field.getModifiers().contains(Modifier.TRANSIENT)) {
+        if (fieldRef.getAnnotation(Ignore.class) != null || fieldRef.getModifiers().contains(Modifier.TRANSIENT)) {
             return true;
         }
+
+        // Determine name for field
+        String internalFieldName = getInternalFieldName(fieldRef, defaultFieldNameFormatter);
+        RealmFieldElement field = new RealmFieldElement(fieldRef, internalFieldName);
 
         if (field.getAnnotation(Index.class) != null) {
             if (!categorizeIndexField(element, field)) { return false; }
@@ -15,15 +19,27 @@
 
         // @Required annotation of RealmList field only affects its value type, not field itself.
         if (Utils.isRealmList(field)) {
+            boolean hasRequiredAnnotation = hasRequiredAnnotation(field);
+            final List<? extends TypeMirror> listGenericType = ((DeclaredType) field.asType()).getTypeArguments();
+            boolean containsRealmModelClasses = (!listGenericType.isEmpty() && Utils.isRealmModel(listGenericType.get(0)));
+
+            // @Required not allowed if the list contains Realm model classes
+            if (hasRequiredAnnotation && containsRealmModelClasses) {
+                Utils.error("@Required not allowed on RealmList's that contain other Realm model classes.");
+                return false;
+            }
+
+            // @Required thus only makes sense for RealmLists with primitive types
             // We only check @Required annotation. @org.jetbrains.annotations.NotNull annotation should not affect nullability of the list values.
-            if (!hasRequiredAnnotation(field)) {
-                final List<? extends TypeMirror> fieldTypeArguments = ((DeclaredType) field.asType()).getTypeArguments();
-                if (fieldTypeArguments.isEmpty() || !Utils.isRealmModel(fieldTypeArguments.get(0))) {
+            if (!hasRequiredAnnotation) {
+                if (!containsRealmModelClasses) {
                     nullableValueListFields.add(field);
                 }
             }
         } else if (isRequiredField(field)) {
-            categorizeRequiredField(element, field);
+            if (!checkBasicRequiredAnnotationUsage(element, field)) {
+                return false;
+            }
         } else {
             // The field doesn't have the @Required and @org.jetbrains.annotations.NotNull annotation.
             // Without @Required annotation, boxed types/RealmObject/Date/String/bytes should be added to

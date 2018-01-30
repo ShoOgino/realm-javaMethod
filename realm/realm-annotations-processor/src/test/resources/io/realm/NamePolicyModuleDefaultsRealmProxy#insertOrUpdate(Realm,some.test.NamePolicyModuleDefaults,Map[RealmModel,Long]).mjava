@@ -1,0 +1,24 @@
+    public static long insertOrUpdate(Realm realm, some.test.NamePolicyModuleDefaults object, Map<RealmModel,Long> cache) {
+        if (object instanceof RealmObjectProxy && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm().getPath().equals(realm.getPath())) {
+            return ((RealmObjectProxy) object).realmGet$proxyState().getRow$realm().getIndex();
+        }
+        Table table = realm.getTable(some.test.NamePolicyModuleDefaults.class);
+        long tableNativePtr = table.getNativePtr();
+        NamePolicyModuleDefaultsColumnInfo columnInfo = (NamePolicyModuleDefaultsColumnInfo) realm.getSchema().getColumnInfo(some.test.NamePolicyModuleDefaults.class);
+        long rowIndex = OsObject.createRow(table);
+        cache.put(object, rowIndex);
+        String realmGet$firstName = ((NamePolicyModuleDefaultsRealmProxyInterface) object).realmGet$firstName();
+        if (realmGet$firstName != null) {
+            Table.nativeSetString(tableNativePtr, columnInfo.firstNameIndex, rowIndex, realmGet$firstName, false);
+        } else {
+            Table.nativeSetNull(tableNativePtr, columnInfo.firstNameIndex, rowIndex, false);
+        }
+        String realmGet$lastName = ((NamePolicyModuleDefaultsRealmProxyInterface) object).realmGet$lastName();
+        if (realmGet$lastName != null) {
+            Table.nativeSetString(tableNativePtr, columnInfo.lastNameIndex, rowIndex, realmGet$lastName, false);
+        } else {
+            Table.nativeSetNull(tableNativePtr, columnInfo.lastNameIndex, rowIndex, false);
+        }
+        return rowIndex;
+    }
+

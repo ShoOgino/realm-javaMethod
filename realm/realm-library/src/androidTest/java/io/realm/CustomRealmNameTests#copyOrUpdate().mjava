@@ -1,0 +1,16 @@
+    //
+    // Realm tests
+    //
+    @Test
+    public void copyOrUpdate() {
+        realm.executeTransaction(r -> {
+            ClassWithPolicy obj = new ClassWithPolicy();
+            try {
+                r.copyToRealmOrUpdate(obj); // Verify that we correctly check that a primary key is missing
+                fail();
+            } catch (IllegalArgumentException e) {
+                assertTrue(e.getMessage().startsWith("A RealmObject with no @PrimaryKey cannot be updated"));
+            }
+        });
+    }
+

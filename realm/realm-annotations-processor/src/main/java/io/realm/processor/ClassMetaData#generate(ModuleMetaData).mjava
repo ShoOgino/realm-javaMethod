@@ -1,0 +1,60 @@
+    /**
+     * Builds the meta data structures for this class. Any errors or messages will be
+     * posted on the provided Messager.
+     *
+     * @param moduleMetaData pre-processed module meta data.
+     * @return True if meta data was correctly created and processing can continue, false otherwise.
+     */
+    public boolean generate(ModuleMetaData moduleMetaData) {
+        // Get the package of the class
+        Element enclosingElement = classType.getEnclosingElement();
+        if (!enclosingElement.getKind().equals(ElementKind.PACKAGE)) {
+            Utils.error("The RealmClass annotation does not support nested classes.", classType);
+            return false;
+        }
+
+        // Check if the @RealmClass is considered valid with respect to the type hierarchy
+        TypeElement parentElement = (TypeElement) Utils.getSuperClass(classType);
+        if (!parentElement.toString().equals("java.lang.Object") && !parentElement.toString().equals("io.realm.RealmObject")) {
+            Utils.error("Valid model classes must either extend RealmObject or implement RealmModel.", classType);
+            return false;
+        }
+
+        PackageElement packageElement = (PackageElement) enclosingElement;
+        packageName = packageElement.getQualifiedName().toString();
+
+        // Determine naming rules for this class
+        String qualifiedClassName = packageName + "." + javaClassName;
+        NameConverter moduleClassNameFormatter = moduleMetaData.getClassNameFormatter(qualifiedClassName);
+        defaultFieldNameFormatter = moduleMetaData.getFieldNameFormatter(qualifiedClassName);
+
+        RealmClass realmClassAnnotation = classType.getAnnotation(RealmClass.class);
+        // If name has been specifically set, it should override any module policy.
+        if (!realmClassAnnotation.name().equals("")) {
+            internalClassName = realmClassAnnotation.name();
+        } else {
+            internalClassName = moduleClassNameFormatter.convert(javaClassName);
+        }
+        if (internalClassName.length() > MAX_CLASSNAME_LENGTH) {
+            Utils.error(String.format(Locale.US, "Internal class name is too long. Class '%s' " +
+                    "is converted to '%s', which is longer than the maximum allowed of %d characters",
+                    javaClassName, internalClassName, 57));
+            return false;
+        }
+
+        // If field name policy has been explicitly set, override the module field name policy
+        if (realmClassAnnotation.fieldNamingPolicy() != RealmNamingPolicy.NO_POLICY) {
+            defaultFieldNameFormatter = Utils.getNameFormatter(realmClassAnnotation.fieldNamingPolicy());
+        }
+
+        // Categorize and check the rest of the file
+        if (!categorizeClassElements()) { return false; }
+        if (!checkCollectionTypes()) { return false; }
+        if (!checkReferenceTypes()) { return false; }
+        if (!checkDefaultConstructor()) { return false; }
+        if (!checkForFinalFields()) { return false; }
+        if (!checkForVolatileFields()) { return false; }
+
+        return true; // Meta data was successfully generated
+    }
+

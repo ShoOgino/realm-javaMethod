@@ -11,31 +11,32 @@
 
         writer.emitStatement(
                 "OsObjectSchemaInfo.Builder builder = new OsObjectSchemaInfo.Builder(\"%s\", %s, %s)",
-                this.simpleClassName, persistedFields, computedFields);
+                internalClassName, persistedFields, computedFields);
 
         // For each field generate corresponding table index constant
-        for (VariableElement field : metadata.getFields()) {
-            String fieldName = field.getSimpleName().toString();
+        for (RealmFieldElement field : metadata.getFields()) {
+            String fieldName = field.getInternalFieldName();
 
             Constants.RealmFieldType fieldType = getRealmTypeChecked(field);
             switch (fieldType) {
-                case NOTYPE:
+                case NOTYPE: {
                     // Perhaps this should fail quickly?
                     break;
-
-                case OBJECT:
+                }
+                case OBJECT: {
                     String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
+                    String internalClassName = classCollection.getClassFromSimpleName(fieldTypeSimpleName).getInternalClassName();
                     writer.emitStatement("builder.addPersistedLinkProperty(\"%s\", RealmFieldType.OBJECT, \"%s\")",
-                            fieldName, fieldTypeSimpleName);
+                            fieldName, internalClassName);
                     break;
-
-                case LIST:
-                    // only for model list.
+                }
+                case LIST: {
                     String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
+                    String internalClassName = classCollection.getClassFromSimpleName(genericTypeSimpleName).getInternalClassName(); // FIXME support for raw data
                     writer.emitStatement("builder.addPersistedLinkProperty(\"%s\", RealmFieldType.LIST, \"%s\")",
-                            fieldName, genericTypeSimpleName);
+                            fieldName, internalClassName);
                     break;
-
+                }
                 case INTEGER_LIST:
                 case BOOLEAN_LIST:
                 case STRING_LIST:
@@ -75,7 +76,7 @@
         }
         for (Backlink backlink: metadata.getBacklinkFields()) {
             writer.emitStatement("builder.addComputedLinkProperty(\"%s\", \"%s\", \"%s\")",
-                    backlink.getTargetField(), backlink.getSimpleSourceClass(), backlink.getSourceField());
+                    backlink.getTargetField(), classCollection.getClassFromSimpleName(backlink.getSimpleSourceClass()).getInternalClassName(), backlink.getSourceField());
         }
         writer.emitStatement("return builder.build()");
         writer.endMethod()

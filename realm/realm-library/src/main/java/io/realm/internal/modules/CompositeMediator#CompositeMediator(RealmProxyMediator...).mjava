@@ -4,7 +4,23 @@
         if (mediators != null) {
             for (RealmProxyMediator mediator : mediators) {
                 for (Class<? extends RealmModel> realmClass : mediator.getModelClasses()) {
+                    // Verify that the module doesn't contain conflicting definitions for the same
+                    // underlying internal name. Can only happen if we add a module from a library
+                    // and a module from the app at the same time.
+                    String newInternalName = mediator.getSimpleClassName(realmClass);
+                    Class existingClass = internalClassNames.get(newInternalName);
+                    if (existingClass != null && !existingClass.equals(realmClass)) {
+                         throw new IllegalStateException(String.format("It is not allowed for two different " +
+                                 "model classes to share the same internal name in Realm. The " +
+                                 "classes %s and %s are being included from the modules '%s' and '%s' " +
+                                 "and they share the same internal name '%s'.", existingClass, realmClass,
+                                 tempMediators.get(existingClass), mediator,
+                                 newInternalName));
+                    }
+
+                    // Store mapping between
                     tempMediators.put(realmClass, mediator);
+                    internalClassNames.put(newInternalName, realmClass);
                 }
             }
         }
