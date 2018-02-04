@@ -1,11 +1,10 @@
     @Test
     public void failOnLinkingObjectsWithInvalidFieldType() throws IOException {
-        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
-                // Backlinks must be RealmResults
+        RealmSyntheticTestClass targetClass = createBacklinkTestClass()
                 .type("BacklinkTarget")
                 .builder().build();
         ASSERT.about(javaSources())
-                .that(Arrays.asList(backlinksTarget, javaFileObject))
+                .that(Arrays.asList(sourceClass, targetClass))
                 .processedWith(new RealmProcessor())
                 .failsToCompile()
                 .withErrorContaining("Fields annotated with @LinkingObjects must be RealmResults");

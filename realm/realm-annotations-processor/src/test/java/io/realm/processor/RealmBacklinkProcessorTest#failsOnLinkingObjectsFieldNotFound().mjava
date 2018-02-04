@@ -1,12 +1,12 @@
     @Test
     public void failsOnLinkingObjectsFieldNotFound() throws IOException {
-        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
-                // The argument to the @LinkingObjects annotation must name a field in the target class
+        RealmSyntheticTestClass targetClass = createBacklinkTestClass()
+                // The argument to the @LinkingObjects annotation must name a field in the source class
                 .clearAnnotations()
                 .annotation("LinkingObjects(\"xxx\")")
                 .builder().build();
         ASSERT.about(javaSources())
-                .that(Arrays.asList(backlinksTarget, javaFileObject))
+                .that(Arrays.asList(sourceClass, targetClass))
                 .processedWith(new RealmProcessor())
                 .failsToCompile()
                 .withErrorContaining("does not exist in class");

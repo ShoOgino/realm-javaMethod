@@ -1,11 +1,11 @@
     @Test
     public void failsOnLinkingObjectsMissingGeneric() throws IOException {
-        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
+        RealmSyntheticTestClass targetClass = createBacklinkTestClass()
                 // No backlink generic param specified
                 .type("RealmResults")
                 .builder().build();
         ASSERT.about(javaSources())
-                .that(Arrays.asList(backlinksTarget, javaFileObject))
+                .that(Arrays.asList(sourceClass, targetClass))
                 .processedWith(new RealmProcessor())
                 .failsToCompile()
                 .withErrorContaining("must specify a generic type");

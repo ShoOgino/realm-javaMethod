@@ -1,0 +1,11 @@
+    @Test
+    public void compileBacklinkClassesWithSimpleNameConflicts() {
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(
+                        JavaFileObjects.forResource("some/test/BacklinkSelfReference.java"),
+                        JavaFileObjects.forResource("some/test/conflict/BacklinkSelfReference.java")
+                ))
+                .processedWith(new RealmProcessor())
+                .compilesWithoutError();
+    }
+

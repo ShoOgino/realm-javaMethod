@@ -1,12 +1,12 @@
-    public Backlink(ClassMetaData clazz, VariableElement backlink) {
-        if ((null == clazz) || (null == backlink)) {
-            throw new NullPointerException(String.format(Locale.US, "null parameter: %s, %s", clazz, backlink));
+    public Backlink(ClassMetaData clazz, VariableElement backlinkField) {
+        if ((null == clazz) || (null == backlinkField)) {
+            throw new NullPointerException(String.format(Locale.US, "null parameter: %s, %s", clazz, backlinkField));
         }
 
-        this.backlink = backlink;
+        this.backlinkField = backlinkField;
         this.targetClass = clazz.getFullyQualifiedClassName();
-        this.targetField = backlink.getSimpleName().toString();
-        this.sourceClass = Utils.getRealmResultsType(backlink);
-        this.sourceField = backlink.getAnnotation(LinkingObjects.class).value();
+        this.targetField = backlinkField.getSimpleName().toString();
+        this.sourceClass = Utils.getRealmResultsType(backlinkField);
+        this.sourceField = backlinkField.getAnnotation(LinkingObjects.class).value();
     }
 

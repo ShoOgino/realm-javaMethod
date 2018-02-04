@@ -1,9 +1,8 @@
     @Test
     public void compileSyntheticBacklinks() throws IOException {
-        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
-                .builder().build();
+        RealmSyntheticTestClass targetClass = createBacklinkTestClass().builder().build();
         ASSERT.about(javaSources())
-                .that(Arrays.asList(backlinksTarget, javaFileObject))
+                .that(Arrays.asList(sourceClass, targetClass))
                 .processedWith(new RealmProcessor())
                 .compilesWithoutError();
     }

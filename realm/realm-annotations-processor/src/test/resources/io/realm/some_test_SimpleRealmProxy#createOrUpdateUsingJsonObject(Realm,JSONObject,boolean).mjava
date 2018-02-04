@@ -1,0 +1,24 @@
+    @SuppressWarnings("cast")
+    public static some.test.Simple createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
+            throws JSONException {
+        final List<String> excludeFields = Collections.<String> emptyList();
+        some.test.Simple obj = realm.createObjectInternal(some.test.Simple.class, true, excludeFields);
+
+        final some_test_SimpleRealmProxyInterface objProxy = (some_test_SimpleRealmProxyInterface) obj;
+        if (json.has("name")) {
+            if (json.isNull("name")) {
+                objProxy.realmSet$name(null);
+            } else {
+                objProxy.realmSet$name((String) json.getString("name"));
+            }
+        }
+        if (json.has("age")) {
+            if (json.isNull("age")) {
+                throw new IllegalArgumentException("Trying to set non-nullable field 'age' to null.");
+            } else {
+                objProxy.realmSet$age((int) json.getInt("age"));
+            }
+        }
+        return obj;
+    }
+
