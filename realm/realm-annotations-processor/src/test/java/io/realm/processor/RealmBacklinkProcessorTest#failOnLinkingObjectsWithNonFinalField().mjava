@@ -1,11 +1,11 @@
     @Test
     public void failOnLinkingObjectsWithNonFinalField() throws IOException {
-        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
+        RealmSyntheticTestClass targetClass = createBacklinkTestClass()
                 // A field with a @LinkingObjects annotation must be final
                 .modifiers(Modifier.PUBLIC)
                 .builder().build();
         ASSERT.about(javaSources())
-                .that(Arrays.asList(backlinksTarget, javaFileObject))
+                .that(Arrays.asList(sourceClass, targetClass))
                 .processedWith(new RealmProcessor())
                 .failsToCompile()
                 .withErrorContaining("must be final");

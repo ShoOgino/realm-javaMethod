@@ -1,0 +1,25 @@
+    public static some.test.NamePolicyModuleDefaults createDetachedCopy(some.test.NamePolicyModuleDefaults realmObject, int currentDepth, int maxDepth, Map<RealmModel, CacheData<RealmModel>> cache) {
+        if (currentDepth > maxDepth || realmObject == null) {
+            return null;
+        }
+        CacheData<RealmModel> cachedObject = cache.get(realmObject);
+        some.test.NamePolicyModuleDefaults unmanagedObject;
+        if (cachedObject == null) {
+            unmanagedObject = new some.test.NamePolicyModuleDefaults();
+            cache.put(realmObject, new RealmObjectProxy.CacheData<RealmModel>(currentDepth, unmanagedObject));
+        } else {
+            // Reuse cached object or recreate it because it was encountered at a lower depth.
+            if (currentDepth >= cachedObject.minDepth) {
+                return (some.test.NamePolicyModuleDefaults) cachedObject.object;
+            }
+            unmanagedObject = (some.test.NamePolicyModuleDefaults) cachedObject.object;
+            cachedObject.minDepth = currentDepth;
+        }
+        some_test_NamePolicyModuleDefaultsRealmProxyInterface unmanagedCopy = (some_test_NamePolicyModuleDefaultsRealmProxyInterface) unmanagedObject;
+        some_test_NamePolicyModuleDefaultsRealmProxyInterface realmSource = (some_test_NamePolicyModuleDefaultsRealmProxyInterface) realmObject;
+        unmanagedCopy.realmSet$firstName(realmSource.realmGet$firstName());
+        unmanagedCopy.realmSet$lastName(realmSource.realmGet$lastName());
+
+        return unmanagedObject;
+    }
+
