@@ -5,6 +5,7 @@
         }
         clearScheduledAccessTokenRefresh();
 
+        onGoingAccessTokenQuery.set(true);
         // Authenticate in a background thread. This allows incremental backoff and retries in a safe manner.
         Future<?> task = SyncManager.NETWORK_POOL_EXECUTOR.submit(new ExponentialBackoffTask<AuthenticateResponse>() {
             @Override
