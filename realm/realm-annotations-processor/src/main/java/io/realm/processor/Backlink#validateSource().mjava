@@ -5,7 +5,7 @@
      */
     public boolean validateSource() {
         // A @LinkingObjects cannot be @Required
-        if (backlink.getAnnotation(Required.class) != null) {
+        if (backlinkField.getAnnotation(Required.class) != null) {
             Utils.error(String.format(
                     Locale.US,
                     "The @LinkingObjects field \"%s.%s\" cannot be @Required.",
@@ -35,13 +35,13 @@
         }
 
         // The annotated element must be a RealmResult
-        if (!Utils.isRealmResults(backlink)) {
+        if (!Utils.isRealmResults(backlinkField)) {
             Utils.error(String.format(
                     Locale.US,
                     "The field \"%s.%s\" is a \"%s\". Fields annotated with @LinkingObjects must be RealmResults.",
                     targetClass,
                     targetField,
-                    backlink.asType()));
+                    backlinkField.asType()));
             return false;
         }
 
@@ -55,7 +55,7 @@
         }
 
         // A @LinkingObjects field must be final
-        if (!backlink.getModifiers().contains(Modifier.FINAL)) {
+        if (!backlinkField.getModifiers().contains(Modifier.FINAL)) {
             Utils.error(String.format(
                     Locale.US,
                     "A @LinkingObjects field \"%s.%s\" must be final.",

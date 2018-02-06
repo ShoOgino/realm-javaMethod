@@ -1,0 +1,27 @@
+    public static some.test.Booleans createDetachedCopy(some.test.Booleans realmObject, int currentDepth, int maxDepth, Map<RealmModel, CacheData<RealmModel>> cache) {
+        if (currentDepth > maxDepth || realmObject == null) {
+            return null;
+        }
+        CacheData<RealmModel> cachedObject = cache.get(realmObject);
+        some.test.Booleans unmanagedObject;
+        if (cachedObject == null) {
+            unmanagedObject = new some.test.Booleans();
+            cache.put(realmObject, new RealmObjectProxy.CacheData<RealmModel>(currentDepth, unmanagedObject));
+        } else {
+            // Reuse cached object or recreate it because it was encountered at a lower depth.
+            if (currentDepth >= cachedObject.minDepth) {
+                return (some.test.Booleans) cachedObject.object;
+            }
+            unmanagedObject = (some.test.Booleans) cachedObject.object;
+            cachedObject.minDepth = currentDepth;
+        }
+        some_test_BooleansRealmProxyInterface unmanagedCopy = (some_test_BooleansRealmProxyInterface) unmanagedObject;
+        some_test_BooleansRealmProxyInterface realmSource = (some_test_BooleansRealmProxyInterface) realmObject;
+        unmanagedCopy.realmSet$done(realmSource.realmGet$done());
+        unmanagedCopy.realmSet$isReady(realmSource.realmGet$isReady());
+        unmanagedCopy.realmSet$mCompleted(realmSource.realmGet$mCompleted());
+        unmanagedCopy.realmSet$anotherBoolean(realmSource.realmGet$anotherBoolean());
+
+        return unmanagedObject;
+    }
+

@@ -1,0 +1,13 @@
+    // Check that trying to compile two modules with different policies using `allClasses = true` will fail.
+    @Test
+    public void compileModulesWithConflictingPoliciesForAllClassesFails() {
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(
+                        JavaFileObjects.forResource("some/test/NamePolicyConflictingModuleDefinitionsForAllClasses.java"),
+                        JavaFileObjects.forResource("some/test/Simple.java")
+                ))
+                .processedWith(new RealmProcessor())
+                .failsToCompile()
+                .withErrorContaining("disagree on the class naming policy");
+    }
+

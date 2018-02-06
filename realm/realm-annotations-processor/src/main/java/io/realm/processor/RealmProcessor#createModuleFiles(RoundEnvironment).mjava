@@ -1,0 +1,18 @@
+    private boolean createModuleFiles(RoundEnvironment roundEnv) {
+        // Create default module if needed
+        if (moduleMetaData.shouldCreateDefaultModule()) {
+            if (!createDefaultModule()) {
+                return false;
+            }
+        }
+
+        // Create RealmProxyMediators for all Realm modules
+        for (Map.Entry<String, Set<ClassMetaData>> module : moduleMetaData.getAllModules().entrySet()) {
+            if (!createMediator(Utils.stripPackage(module.getKey()), module.getValue())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+

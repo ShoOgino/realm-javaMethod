@@ -1,25 +1,25 @@
     //@formatter:off
     private void emitCreateDetachedCopyMethod(JavaWriter writer) throws IOException {
         writer.beginMethod(
-                qualifiedClassName, // Return type
+                qualifiedJavaClassName, // Return type
                 "createDetachedCopy", // Method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
-                qualifiedClassName, "realmObject", "int", "currentDepth", "int", "maxDepth", "Map<RealmModel, CacheData<RealmModel>>", "cache");
+                qualifiedJavaClassName, "realmObject", "int", "currentDepth", "int", "maxDepth", "Map<RealmModel, CacheData<RealmModel>>", "cache");
         writer
                 .beginControlFlow("if (currentDepth > maxDepth || realmObject == null)")
                 .emitStatement("return null")
                 .endControlFlow()
                 .emitStatement("CacheData<RealmModel> cachedObject = cache.get(realmObject)")
-                .emitStatement("%s unmanagedObject", qualifiedClassName)
+                .emitStatement("%s unmanagedObject", qualifiedJavaClassName)
                 .beginControlFlow("if (cachedObject == null)")
-                .emitStatement("unmanagedObject = new %s()", qualifiedClassName)
+                .emitStatement("unmanagedObject = new %s()", qualifiedJavaClassName)
                 .emitStatement("cache.put(realmObject, new RealmObjectProxy.CacheData<RealmModel>(currentDepth, unmanagedObject))")
                 .nextControlFlow("else")
                 .emitSingleLineComment("Reuse cached object or recreate it because it was encountered at a lower depth.")
                 .beginControlFlow("if (currentDepth >= cachedObject.minDepth)")
-                .emitStatement("return (%s) cachedObject.object", qualifiedClassName)
+                .emitStatement("return (%s) cachedObject.object", qualifiedJavaClassName)
                 .endControlFlow()
-                .emitStatement("unmanagedObject = (%s) cachedObject.object", qualifiedClassName)
+                .emitStatement("unmanagedObject = (%s) cachedObject.object", qualifiedJavaClassName)
                 .emitStatement("cachedObject.minDepth = currentDepth")
                 .endControlFlow();
 

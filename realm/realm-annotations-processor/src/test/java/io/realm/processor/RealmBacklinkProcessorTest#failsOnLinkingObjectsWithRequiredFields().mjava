@@ -1,13 +1,13 @@
     @Test
     public void failsOnLinkingObjectsWithRequiredFields() throws IOException {
-        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
+        RealmSyntheticTestClass targetClass = createBacklinkTestClass()
                 // A backlinked field may not be @Required
                 .annotation("Required")
                 .builder().build();
         ASSERT.about(javaSources())
-                .that(Arrays.asList(backlinksTarget, javaFileObject))
+                .that(Arrays.asList(sourceClass, targetClass))
                 .processedWith(new RealmProcessor())
                 .failsToCompile()
-                .withErrorContaining("cannot be @Required");
+                .withErrorContaining("The @LinkingObjects field ");
     }
 

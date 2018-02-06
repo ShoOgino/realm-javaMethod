@@ -1,0 +1,10 @@
+    // Check that field name policies on classes override those from modules
+    @Test
+    public void classFieldPolicy_overrideModuleFieldPolicy() {
+        assertTrue(realm.getSchema().contains(ClassWithPolicy.CLASS_NAME));
+        RealmObjectSchema classSchema = realm.getSchema().get(ClassWithPolicy.CLASS_NAME);
+        for (String field : ClassWithPolicy.ALL_FIELDS) {
+            assertTrue(field + " was not found.", classSchema.hasField(field));
+        }
+    }
+

@@ -1,12 +1,12 @@
     @Test
     public void failsOnLinkingObjectsWithFieldWrongType() throws IOException {
-        RealmSyntheticTestClass javaFileObject = createBacklinkTestClass()
+        RealmSyntheticTestClass targetClass = createBacklinkTestClass()
                 // The type of the field named in the @LinkingObjects annotation must match
-                // the generic type of the annotated field.  BacklinkTarget.child is a Backlink,
+                // the generic type of the annotated field.  BacklinkSource.child is a Backlink,
                 // not a Backlinks_WrongType.
-                .builder().name("Backlinks_WrongType").build();
+                .builder().name("BacklinkTarget_WrongType").build();
         ASSERT.about(javaSources())
-                .that(Arrays.asList(backlinksTarget, javaFileObject))
+                .that(Arrays.asList(sourceClass, targetClass))
                 .processedWith(new RealmProcessor())
                 .failsToCompile()
                 .withErrorContaining("instead of");

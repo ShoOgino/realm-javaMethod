@@ -8,23 +8,23 @@
                 .beginControlFlow("if (!RealmObject.isValid(this))")
                 .emitStatement("return \"Invalid object\"")
                 .endControlFlow();
-        writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = proxy[\")", simpleClassName);
+        writer.emitStatement("StringBuilder stringBuilder = new StringBuilder(\"%s = proxy[\")", simpleJavaClassName);
 
-        Collection<VariableElement> fields = metadata.getFields();
+        Collection<RealmFieldElement> fields = metadata.getFields();
         int i = fields.size() - 1;
         for (VariableElement field : fields) {
             String fieldName = field.getSimpleName().toString();
 
             writer.emitStatement("stringBuilder.append(\"{%s:\")", fieldName);
             if (Utils.isRealmModel(field)) {
-                String fieldTypeSimpleName = Utils.getFieldTypeSimpleName(field);
+                String fieldTypeSimpleName = Utils.stripPackage(Utils.getFieldTypeQualifiedName(field));
                 writer.emitStatement(
                         "stringBuilder.append(%s() != null ? \"%s\" : \"null\")",
                         metadata.getInternalGetter(fieldName),
                         fieldTypeSimpleName
                 );
             } else if (Utils.isRealmList(field)) {
-                String genericTypeSimpleName = Utils.getGenericTypeSimpleName(field);
+                String genericTypeSimpleName = Utils.stripPackage(Utils.getGenericTypeQualifiedName(field));
                 writer.emitStatement("stringBuilder.append(\"RealmList<%s>[\").append(%s().size()).append(\"]\")",
                         genericTypeSimpleName,
                         metadata.getInternalGetter(fieldName));

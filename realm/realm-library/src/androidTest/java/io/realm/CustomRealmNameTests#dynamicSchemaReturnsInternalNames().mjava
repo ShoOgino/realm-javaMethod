@@ -1,0 +1,11 @@
+    @Test
+    public void dynamicSchemaReturnsInternalNames() {
+        RealmSchema schema = realm.getSchema();
+        assertTrue(schema.contains(ClassWithPolicy.CLASS_NAME));
+        RealmObjectSchema classSchema = schema.get(ClassWithPolicy.CLASS_NAME);
+        assertEquals(ClassWithPolicy.ALL_FIELDS.size(), classSchema.getFieldNames().size());
+        for (String fieldName : ClassWithPolicy.ALL_FIELDS) {
+            assertTrue("Could not find: " + fieldName, classSchema.hasField(fieldName));
+        }
+    }
+
