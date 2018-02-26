@@ -4,6 +4,17 @@
                 .emitStatement("return \"%s\"", internalClassName)
                 .endMethod()
                 .emitEmptyLine();
+
+        // Helper class for the annotation processor so it can access the internal class name
+        // without needing to load the parent class (which we cannot do as it transitively loads
+        // native code, which cannot be loaded on the JVM).
+        writer.beginType(
+                "ClassNameHelper",                       // full qualified name of the item to generate
+                "class",                                                  // the type of the item
+                EnumSet.of(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)); // modifiers to apply
+        writer.emitField("String", "INTERNAL_CLASS_NAME", EnumSet.of(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL), "\""+ internalClassName+"\"");
+        writer.endType();
+        writer.emitEmptyLine();
     }
     //@formatter:on
 
