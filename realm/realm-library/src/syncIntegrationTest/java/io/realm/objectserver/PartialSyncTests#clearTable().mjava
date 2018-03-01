@@ -1,0 +1,24 @@
+    @Test
+    @RunTestInLooperThread
+    public void clearTable() throws InterruptedException {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        Realm realm = getPartialRealm(user);
+        looperThread.closeAfterTest(realm);
+
+        // Create test data and make sure it is uploaded to the server
+        RealmResults<PartialSyncObjectA> result = realm.where(PartialSyncObjectA.class).findAllAsync();
+        realm.executeTransaction(r -> {
+            r.createObject(PartialSyncObjectA.class).setString("ObjectA");
+        });
+        SyncTestUtils.syncRealm(realm);
+        assertEquals(1, result.size());
+
+        // Delete data and make sure it is accepted by the server
+        realm.executeTransaction(r -> {
+            r.delete(PartialSyncObjectA.class);
+        });
+        SyncTestUtils.syncRealm(realm);
+        assertTrue(result.isEmpty());
+        looperThread.testComplete();
+    }
+
