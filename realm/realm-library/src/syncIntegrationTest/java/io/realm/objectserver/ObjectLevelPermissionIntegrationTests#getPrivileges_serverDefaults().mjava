@@ -1,0 +1,47 @@
+    // Check default privileges after being online for the first time
+    @Test
+    @RunTestInLooperThread()
+    public void getPrivileges_serverDefaults() throws InterruptedException {
+        String realmUrl = Constants.GLOBAL_REALM + "_getPrivileges_serverDefaults";
+        List schemaModule = Arrays.asList(new ObjectLevelTestModule());
+        createWorldReadableRealm(realmUrl, schemaModule);
+
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, realmUrl)
+                .modules(schemaModule)
+                .partialRealm()
+                .build();
+
+        Realm realm = Realm.getInstance(syncConfig);
+
+        // Make sure that all objects are part of the Partial Sync transitive closure
+        realm.where(AllJavaTypes.class).findAllAsync("keep-AllJavaTypes");
+
+        // Create offline object
+        realm.beginTransaction();
+        AllJavaTypes obj = realm.createObject(AllJavaTypes.class, 0);
+        realm.commitTransaction();
+        assertEquals(1, realm.where(AllJavaTypes.class).count());
+
+        // Make sure that server permissions have been applied to local object
+        SyncManager.getSession(syncConfig).uploadAllLocalChanges();
+        SyncManager.getSession(syncConfig).downloadAllServerChanges();
+        realm.refresh();
+
+        // Check Realm privileges
+        RealmPrivileges realmPrivileges = realm.getPrivileges();
+        assertFullAccess(realmPrivileges);
+
+        // Check Class privileges
+        ClassPrivileges classPrivileges = realm.getPrivileges(AllJavaTypes.class);
+        assertFullAccess(classPrivileges);
+
+        // Check Object privileges
+        assertEquals(1, realm.where(AllJavaTypes.class).count());
+        ObjectPrivileges objectPrivileges = realm.getPrivileges(obj);
+        assertFullAccess(objectPrivileges);
+
+        realm.close();
+        looperThread.testComplete();
+    }
+

@@ -11,7 +11,9 @@
                 assertInitialPermissions(permissions);
 
                 for (int i = 0; i < TEST_SIZE; i++) {
-                    SyncConfiguration configNew = new SyncConfiguration.Builder(user, "realm://" + Constants.HOST + "/~/test" + i).build();
+                    SyncConfiguration configNew = new SyncConfiguration.Builder(user, "realm://" + Constants.HOST + "/~/test" + i)
+                            .schema(AllJavaTypes.class)
+                            .build();
                     Realm newRealm = Realm.getInstance(configNew);
                     looperThread.closeAfterTest(newRealm);
                 }

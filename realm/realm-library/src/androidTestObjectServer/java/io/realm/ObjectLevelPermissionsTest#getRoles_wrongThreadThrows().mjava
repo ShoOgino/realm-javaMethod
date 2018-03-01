@@ -1,0 +1,14 @@
+    @Test
+    public void getRoles_wrongThreadThrows() throws InterruptedException {
+        Thread t = new Thread(() -> {
+            try {
+                realm.getRoles();
+                fail();
+            } catch (IllegalStateException ignore) {
+            }
+        });
+        t.start();
+        t.join(TestHelper.STANDARD_WAIT_SECS * 1000);
+
+    }
+

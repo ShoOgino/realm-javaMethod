@@ -6,7 +6,7 @@
 
         SyncCredentials credentials = SyncCredentials.usernamePassword(username, password, true);
         SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
-        RealmConfiguration configuration = new SyncConfiguration.Builder(user, Constants.USER_REALM).build();
+        RealmConfiguration configuration = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM).build();
         user.logout();
         assertFalse(user.isValid());
         Realm instance = Realm.getInstance(configuration);

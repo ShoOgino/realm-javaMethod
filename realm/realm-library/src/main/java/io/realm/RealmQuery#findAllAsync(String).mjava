@@ -13,6 +13,9 @@
     public RealmResults<E> findAllAsync(String subscriptionName) {
         realm.checkIfValid();
         realm.checkIfPartialRealm();
+        if (osList != null) {
+            throw new IllegalStateException("Cannot create subscriptions for queries based on a 'RealmList'");
+        }
         if (Util.isEmptyString(subscriptionName)) {
             throw new IllegalArgumentException("Non-empty 'subscriptionName' required.");
         }

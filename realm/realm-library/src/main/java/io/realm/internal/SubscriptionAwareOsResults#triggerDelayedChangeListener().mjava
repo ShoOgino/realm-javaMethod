@@ -1,13 +1,22 @@
     private void triggerDelayedChangeListener() {
-        // Object Store compute the change set between the SharedGroup versions when the query created and the latest.
-        // So it is possible it deliver a non-empty change set for the first async query returns.
-        OsCollectionChangeSet changeset;
-        // Only parse on Subscription if it changed
+        // Only parse on the subscription if it actually changed
         OsSubscription subscription = (subscriptionChanged) ? this.subscription : null;
+
+        // In case no collection listener was triggered, only trigger the listener if non-relevant
+        // changes happened to the subscription. In our case this means we only care about the
+        // errors and a completed subscription
+        if (delayedNotificationPtr == 0
+                && subscription != null
+                && subscription.getState() != OsSubscription.SubscriptionState.ERROR
+                && subscription.getState() != OsSubscription.SubscriptionState.COMPLETE) {
+            return;
+        }
+
+        OsCollectionChangeSet changeset;
         if (delayedNotificationPtr == 0) {
-            changeset = new EmptyLoadChangeSet(subscription, true);
+            changeset = new EmptyLoadChangeSet(subscription, firstCallback, true);
         } else {
-            changeset = new OsCollectionChangeSet(delayedNotificationPtr, !isLoaded(), subscription, true);
+            changeset = new OsCollectionChangeSet(delayedNotificationPtr, firstCallback, subscription, true);
         }
 
         // Happens e.g. if a synchronous query is created, a change listener is added and then
@@ -17,6 +26,7 @@
             return;
         }
         loaded = true;
+        firstCallback = false;
         observerPairs.foreach(new Callback(changeset));
     }
 

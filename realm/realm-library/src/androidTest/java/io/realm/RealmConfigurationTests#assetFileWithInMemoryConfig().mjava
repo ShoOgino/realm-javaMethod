@@ -1,10 +1,10 @@
     @Test
     public void assetFileWithInMemoryConfig() {
         // Ensures that there is no data.
-        Realm.deleteRealm(new RealmConfiguration.Builder(context).build());
+        Realm.deleteRealm(configFactory.createConfigurationBuilder().build());
 
         try {
-            new RealmConfiguration.Builder(context).assetFile("asset_file.realm").inMemory().build();
+            configFactory.createConfigurationBuilder().assetFile("asset_file.realm").inMemory().build();
             fail();
         } catch (RealmException ignored) {
         }

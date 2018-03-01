@@ -1,0 +1,20 @@
+    @Test
+    public void getClassPermissions_wrongThreadThrows() throws InterruptedException {
+        Thread t = new Thread(() -> {
+            try {
+                realm.getPermissions(AllJavaTypes.class);
+                fail();
+            } catch (IllegalStateException ignore) {
+            }
+
+// FIXME: Disabled until support is enabled
+//            try {
+//                dynamicRealm.getPermissions(AllJavaTypes.CLASS_NAME);
+//                fail();
+//            } catch (IllegalStateException ignore) {
+//            }
+        });
+        t.start();
+        t.join(TestHelper.STANDARD_WAIT_SECS * 1000);
+    }
+

@@ -1,7 +1,7 @@
     @Test
     public void constructBuilder_versionEqualWhenSchemaChangesThrows() {
         // Creates initial Realm.
-        RealmConfiguration config = new RealmConfiguration.Builder(context)
+        RealmConfiguration config = configFactory.createConfigurationBuilder()
                 .directory(configFactory.getRoot())
                 .schemaVersion(42)
                 .schema(StringOnly.class)
@@ -10,7 +10,7 @@
 
         // Creates new instance with a configuration containing another schema.
         try {
-            config = new RealmConfiguration.Builder(context)
+            config = configFactory.createConfigurationBuilder()
                     .directory(configFactory.getRoot())
                     .schemaVersion(42)
                     .schema(StringAndInt.class)

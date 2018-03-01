@@ -7,6 +7,7 @@
         final byte[] randomKey = TestHelper.getRandomKey();
         final SyncConfiguration config = configFactory.createSyncConfigurationBuilder(user, url)
                 .encryptionKey(randomKey)
+                .modules(new StringOnlyModule())
                 .errorHandler((session, error) -> {
                     if (error.getErrorCode() != ErrorCode.CLIENT_RESET) {
                         fail("Wrong error " + error.toString());
@@ -45,7 +46,6 @@
 
                     looperThread.testComplete();
                 })
-                .modules(new StringOnlyModule())
                 .build();
 
         Realm realm = Realm.getInstance(config);

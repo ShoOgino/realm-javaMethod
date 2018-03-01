@@ -2,8 +2,7 @@
     @UiThreadTest
     public void unrecognizedErrorCode_errorHandler() {
         AtomicBoolean errorHandlerCalled = new AtomicBoolean(false);
-        configuration = new SyncConfiguration
-                .Builder(user, REALM_URI)
+        configuration = configFactory.createSyncConfigurationBuilder(user, REALM_URI)
                 .errorHandler((session, error) -> {
                     errorHandlerCalled.set(true);
                     assertEquals(ErrorCode.UNKNOWN, error.getErrorCode());

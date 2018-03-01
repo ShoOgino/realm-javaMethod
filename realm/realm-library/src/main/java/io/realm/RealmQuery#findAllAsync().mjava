@@ -16,7 +16,9 @@
 
         realm.sharedRealm.capabilities.checkCanDeliverNotification(ASYNC_QUERY_WRONG_THREAD_MESSAGE);
         SubscriptionAction subscriptionAction;
-        if (ObjectServerFacade.getSyncFacadeIfPossible().isPartialRealm(realm.getConfiguration())) {
+        
+        // Don't create subscriptions for list queries as they are always part of an object covered by another query.
+        if (realm.sharedRealm.isPartial() && osList == null) {
             subscriptionAction = SubscriptionAction.ANONYMOUS_SUBSCRIPTION;
         }  else {
             subscriptionAction = SubscriptionAction.NO_SUBSCRIPTION;
