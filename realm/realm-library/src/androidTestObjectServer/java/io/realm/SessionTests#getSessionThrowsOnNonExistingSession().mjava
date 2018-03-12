@@ -1,0 +1,17 @@
+    @Test
+    public void getSessionThrowsOnNonExistingSession() {
+        Realm realm = Realm.getInstance(configuration);
+        SyncSession session = SyncManager.getSession(configuration);
+        assertEquals(configuration, session.getConfiguration());
+
+        // Closing the Realm should remove the session
+        realm.close();
+        try {
+            SyncManager.getSession(configuration);
+            fail("getSession should throw an ISE");
+        } catch (IllegalStateException expected) {
+            assertThat(expected.getMessage(), CoreMatchers.containsString(
+                    "No SyncSession found using the path : "));
+        }
+    }
+

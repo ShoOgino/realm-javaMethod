@@ -1,17 +1,14 @@
     /**
-     * Gets any cached {@link SyncSession} for the given {@link SyncConfiguration} or create a new one if
-     * no one exists.
+     * Gets a cached {@link SyncSession} for the given {@link SyncConfiguration} or throw if no one exists yet.
+     *
+     * A session should exist after you open a Realm with a {@link SyncConfiguration}.
      *
      * @param syncConfiguration configuration object for the synchronized Realm.
      * @return the {@link SyncSession} for the specified Realm.
      * @throws IllegalArgumentException if syncConfiguration is {@code null}.
+     * @throws IllegalStateException if the session could not be found using the provided {@code SyncConfiguration}.
      */
-    public static synchronized SyncSession getSession(SyncConfiguration syncConfiguration) {
-        // This will not create a new native (Object Store) session, this will only associate a Realm's path
-        // with a SyncSession. Object Store's SyncManager is responsible of the life cycle (including creation)
-        // of the native session, the provided Java wrap, helps interact with the native session, when reporting error
-        // or requesting an access_token for example.
-
+    public static synchronized SyncSession getSession(SyncConfiguration syncConfiguration) throws IllegalStateException {
         //noinspection ConstantConditions
         if (syncConfiguration == null) {
             throw new IllegalArgumentException("A non-empty 'syncConfiguration' is required.");
@@ -19,12 +16,8 @@
 
         SyncSession session = sessions.get(syncConfiguration.getPath());
         if (session == null) {
-            session = new SyncSession(syncConfiguration);
-            sessions.put(syncConfiguration.getPath(), session);
-            if (sessions.size() == 1) {
-                RealmLog.debug("first session created add network listener");
-                NetworkStateReceiver.addListener(networkListener);
-            }
+            throw new IllegalStateException("No SyncSession found using the path : " + syncConfiguration.getPath()
+            + "\nplease ensure to call this method after you've open the Realm");
         }
 
         return session;
