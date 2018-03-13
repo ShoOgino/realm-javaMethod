@@ -1,0 +1,19 @@
+    @Test
+    public void getClassPermissions() {
+        // Typed RealmPermissions
+        ClassPermissions classPermissions = realm.getPermissions(AllJavaTypes.class);
+        assertEquals("AllJavaTypes", classPermissions.getName());
+        RealmList<Permission> list = classPermissions.getPermissions();
+        assertEquals(1, list.size());
+        assertEquals("everyone", list.first().getRole().getName());
+        assertFullAccess(list.first());
+
+        // FIXME: Dynamic RealmPermissions - Disabled until support is enabled
+//        classPermissions = dynamicRealm.getPermissions(AllJavaTypes.CLASS_NAME);
+//        assertEquals("AllJavaTypes", classPermissions.getName());
+//        list = classPermissions.getPermissions();
+//        assertEquals(1, list.size());
+//        assertEquals("everyone", list.first().getRole().getName());
+//        assertDefaultAccess(list.first());
+    }
+

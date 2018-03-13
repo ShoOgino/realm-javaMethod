@@ -1,0 +1,13 @@
+    @Test
+    public void getPrivileges_object_localDefaults() {
+        realm.beginTransaction();
+        AllJavaTypes obj = realm.createObject(AllJavaTypes.class, 0);
+        realm.commitTransaction();
+        assertFullAccess(realm.getPrivileges(obj));
+
+        dynamicRealm.beginTransaction();
+        DynamicRealmObject dynamicObject = dynamicRealm.createObject(AllJavaTypes.CLASS_NAME, 1);
+        dynamicRealm.commitTransaction();
+        assertFullAccess(dynamicRealm.getPrivileges(dynamicObject));
+    }
+

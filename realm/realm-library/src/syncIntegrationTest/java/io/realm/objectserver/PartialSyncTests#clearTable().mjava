@@ -1,0 +1,28 @@
+    @Test
+    @RunTestInLooperThread
+    public void clearTable() throws InterruptedException {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        Realm realm = getPartialRealm(user);
+        looperThread.closeAfterTest(realm);
+
+        // Create test data and make sure it is uploaded to the server
+        RealmResults<PartialSyncObjectA> result = realm.where(PartialSyncObjectA.class).findAllAsync();
+        realm.executeTransaction(r -> {
+            r.createObject(PartialSyncObjectA.class).setString("ObjectA");
+        });
+        SyncTestUtils.syncRealm(realm);
+        assertEquals(1, result.size());
+
+        // Delete data and make sure it is accepted by the server
+        realm.executeTransaction(r -> {
+            // TODO the API's that actual use the clearTable instruction have all been disabled for now
+            // and are throwing IllegalStateException (realm.delete(Class) and realm.deleteAll).
+            // Keep the test for time being, but use the recommend workaround for deleting objects
+            // instead.
+            r.where(PartialSyncObjectA.class).findAll().deleteAllFromRealm();
+        });
+        SyncTestUtils.syncRealm(realm);
+        assertTrue(result.isEmpty());
+        looperThread.testComplete();
+    }
+

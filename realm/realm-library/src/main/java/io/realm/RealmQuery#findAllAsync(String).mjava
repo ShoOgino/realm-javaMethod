@@ -1,0 +1,26 @@
+    /**
+     * Finds all objects that fulfill the query condition(s). This method is only available from a Looper thread.
+     * <p>
+     * This method is only available on partially synchronized Realms and will also create a named subscription
+     * that will synchronize all server data matching the query. Named subscriptions can be removed again by
+     * calling {@code Realm.unsubscribe(subscriptionName}.
+     *
+     * @return immediately an empty {@link RealmResults}. Users need to register a listener
+     * {@link io.realm.RealmResults#addChangeListener(RealmChangeListener)} to be notified when the query completes.
+     * @see io.realm.RealmResults
+     * @throws IllegalStateException If the Realm is a not a partially synchronized Realm.
+     */
+    public RealmResults<E> findAllAsync(String subscriptionName) {
+        realm.checkIfValid();
+        realm.checkIfPartialRealm();
+        if (osList != null) {
+            throw new IllegalStateException("Cannot create subscriptions for queries based on a 'RealmList'");
+        }
+        if (Util.isEmptyString(subscriptionName)) {
+            throw new IllegalArgumentException("Non-empty 'subscriptionName' required.");
+        }
+
+        realm.sharedRealm.capabilities.checkCanDeliverNotification(ASYNC_QUERY_WRONG_THREAD_MESSAGE);
+        return createRealmResults(query, sortDescriptor, distinctDescriptor, false, SubscriptionAction.create(subscriptionName));
+    }
+

@@ -12,7 +12,7 @@
 
         try {
             // We should not be able to build a configuration with an invalid/logged out user
-            new SyncConfiguration.Builder(user, Constants.USER_REALM).build();
+            configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM).build();
             fail("Invalid user, it should not be possible to create a SyncConfiguration");
         } catch (IllegalArgumentException expected) {
             // User not authenticated or authentication expired.
@@ -20,7 +20,7 @@
 
         try {
             // We should not be able to build a configuration with an invalid/logged out user
-            new SyncConfiguration.Builder(currentUser, Constants.USER_REALM).build();
+            configurationFactory.createSyncConfigurationBuilder(currentUser, Constants.USER_REALM).build();
             fail("Invalid currentUser, it should not be possible to create a SyncConfiguration");
         } catch (IllegalArgumentException expected) {
             // User not authenticated or authentication expired.

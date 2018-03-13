@@ -1,7 +1,7 @@
     @Test
     public void deleteRealmIfMigrationNeeded() {
         // Populates v0 of a Realm with an object.
-        RealmConfiguration config = new RealmConfiguration.Builder(context)
+        RealmConfiguration config = configFactory.createConfigurationBuilder()
                 .directory(configFactory.getRoot())
                 .schema(StringOnly.class)
                 .schemaVersion(0)
@@ -15,7 +15,7 @@
         realm.close();
 
         // Changes schema and verifies that Realm has been cleared.
-        config = new RealmConfiguration.Builder(context)
+        config = configFactory.createConfigurationBuilder()
                 .directory(configFactory.getRoot())
                 .schema(StringOnly.class, StringAndInt.class)
                 .schemaVersion(1)

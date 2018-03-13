@@ -1,6 +1,6 @@
     @Test
     public void constructBuilder_versionLessThanDiscVersionThrows() {
-        realm = Realm.getInstance(new RealmConfiguration.Builder(context)
+        realm = Realm.getInstance(configFactory.createConfigurationBuilder()
                 .directory(configFactory.getRoot())
                 .schemaVersion(42)
                 .build());
@@ -9,7 +9,7 @@
         int[] wrongVersions = new int[] { 0, 1, 41 };
         for (int version : wrongVersions) {
             try {
-                realm = Realm.getInstance(new RealmConfiguration.Builder(context)
+                realm = Realm.getInstance(configFactory.createConfigurationBuilder()
                         .directory(configFactory.getRoot())
                         .schemaVersion(version)
                         .build());

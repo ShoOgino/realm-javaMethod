@@ -1,0 +1,23 @@
+    @Test
+    @RunTestInLooperThread
+    public void unsubscribeAsync_nonExistingIdThrows() throws InterruptedException {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        Realm realm = getPartialRealm(user);
+        looperThread.closeAfterTest(realm);
+
+        realm.unsubscribeAsync("i-dont-exist", new Realm.UnsubscribeCallback() {
+            @Override
+            public void onSuccess(String subscriptionName) {
+                fail();
+            }
+
+            @Override
+            public void onError(String subscriptionName, Throwable error) {
+                assertEquals("i-dont-exist", subscriptionName);
+                assertTrue(error instanceof IllegalArgumentException);
+                assertTrue(error.getMessage().contains("No active subscription named"));
+                looperThread.testComplete();
+            }
+        });
+    }
+

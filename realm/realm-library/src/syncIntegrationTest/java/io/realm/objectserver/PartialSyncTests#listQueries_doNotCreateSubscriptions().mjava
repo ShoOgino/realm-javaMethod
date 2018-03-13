@@ -1,0 +1,31 @@
+    // List queries are operating on data that are always up to date as data in a list will
+    // always be fetched as part of another top-level subscription. Thus `remoteDataLoaded` is
+    // always true and no queries on them can fail.
+    @Test
+    @RunTestInLooperThread
+    public void listQueries_doNotCreateSubscriptions() {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        final SyncConfiguration partialSyncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .partialRealm()
+                .build();
+
+        final DynamicRealm dRealm = DynamicRealm.getInstance(partialSyncConfig);
+        final Realm realm = Realm.getInstance(partialSyncConfig);
+        looperThread.closeAfterTest(dRealm);
+        looperThread.closeAfterTest(realm);
+
+        realm.beginTransaction();
+        RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
+        list.add(new Dog("Fido"));
+        list.add(new Dog("Eido"));
+        realm.commitTransaction();
+
+        RealmResults<Dog> query = list.where().sort("name").findAllAsync();
+        query.addChangeListener((dogs, changeSet) -> {
+            assertEquals(OrderedCollectionChangeSet.State.INITIAL, changeSet.getState());
+            assertEquals(0, dRealm.where("__ResultSets").count());
+            looperThread.testComplete();
+        });
+        looperThread.keepStrongReference(query);
+    }
+
