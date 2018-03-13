@@ -2,7 +2,7 @@
     public void loginLogoutResumeSyncing() throws InterruptedException {
         String username = UUID.randomUUID().toString();
         String password = "password";
-        SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
+        SyncUser user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
 
         SyncConfiguration config = new SyncConfiguration.Builder(user, Constants.USER_REALM)
                 .schema(StringOnly.class)
@@ -13,11 +13,11 @@
         realm.createObject(StringOnly.class).setChars("Foo");
         realm.commitTransaction();
         SyncManager.getSession(config).uploadAllLocalChanges();
-        user.logout();
+        user.logOut();
         realm.close();
         assertTrue(Realm.deleteRealm(config));
 
-        user = SyncUser.login(SyncCredentials.usernamePassword(username, password, false), Constants.AUTH_URL);
+        user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password, false), Constants.AUTH_URL);
         SyncConfiguration config2 = new SyncConfiguration.Builder(user, Constants.USER_REALM)
                 .schema(StringOnly.class)
                 .build();

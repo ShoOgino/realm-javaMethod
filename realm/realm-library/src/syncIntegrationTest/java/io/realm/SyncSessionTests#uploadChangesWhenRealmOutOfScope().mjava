@@ -5,7 +5,7 @@
         final List<Object> strongRefs = new ArrayList<>();
         final String uniqueName = UUID.randomUUID().toString();
         SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", true);
-        SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
+        SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
 
         final char[] chars = new char[1_000_000];// 2MB
         Arrays.fill(chars, '.');
@@ -38,7 +38,7 @@
                 // using an admin user to open the Realm on different path on the device to monitor when all the uploads are done
                 SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
                 SyncCredentials credentialsAdmin = SyncCredentials.accessToken(SyncTestUtils.getRefreshToken(admin).value(), "custom-admin-user");
-                SyncUser adminUser = SyncUser.login(credentialsAdmin, Constants.AUTH_URL);
+                SyncUser adminUser = SyncUser.logIn(credentialsAdmin, Constants.AUTH_URL);
 
                 SyncConfiguration adminConfig = configurationFactory.createSyncConfigurationBuilder(adminUser, syncConfiguration.getServerUrl().toString())
                         .modules(new StringOnlyModule())
@@ -66,6 +66,6 @@
         TestHelper.awaitOrFail(testCompleted, 60);
         handlerThread.join();
 
-        user.logout();
+        user.logOut();
     }
 

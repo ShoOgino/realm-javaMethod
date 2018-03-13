@@ -4,7 +4,7 @@
         // STEP 1: open a synced Realm using a local encryption key
         String username = UUID.randomUUID().toString();
         String password = "password";
-        SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
+        SyncUser user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
 
         final byte[] randomKey = TestHelper.getRandomKey();
 
@@ -31,10 +31,10 @@
         SyncManager.getSession(configWithEncryption).uploadAllLocalChanges();
 
         realm.close();
-        user.logout();
+        user.logOut();
 
         // STEP 3: try to open again the Realm without the encryption key should fail
-        user = SyncUser.login(SyncCredentials.usernamePassword(username, password, false), Constants.AUTH_URL);
+        user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password, false), Constants.AUTH_URL);
         SyncConfiguration configWithoutEncryption = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
                 .modules(new StringOnlyModule())
                 .waitForInitialRemoteData()

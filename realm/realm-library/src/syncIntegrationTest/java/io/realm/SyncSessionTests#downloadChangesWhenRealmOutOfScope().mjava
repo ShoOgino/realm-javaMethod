@@ -3,7 +3,7 @@
     public void downloadChangesWhenRealmOutOfScope() throws InterruptedException {
         final String uniqueName = UUID.randomUUID().toString();
         SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", true);
-        SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
+        SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
 
         final SyncConfiguration syncConfiguration = configFactory
                 .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
@@ -19,11 +19,11 @@
         session.uploadAllLocalChanges();
 
         // Log out the user.
-        user.logout();
+        user.logOut();
 
         // Log the user back in.
         credentials = SyncCredentials.usernamePassword(uniqueName, "password", false);
-        SyncUser.login(credentials, Constants.AUTH_URL);
+        SyncUser.logIn(credentials, Constants.AUTH_URL);
 
         // now let the admin upload some commits
         final CountDownLatch backgroundUpload = new CountDownLatch(1);
@@ -38,7 +38,7 @@
                 // using an admin user to open the Realm on different path on the device then some commits
                 SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
                 SyncCredentials credentialsAdmin = SyncCredentials.accessToken(SyncTestUtils.getRefreshToken(admin).value(), "custom-admin-user");
-                SyncUser adminUser = SyncUser.login(credentialsAdmin, Constants.AUTH_URL);
+                SyncUser adminUser = SyncUser.logIn(credentialsAdmin, Constants.AUTH_URL);
 
                 SyncConfiguration adminConfig = configurationFactory.createSyncConfigurationBuilder(adminUser, syncConfiguration.getServerUrl().toString())
                         .modules(new StringOnlyModule())
