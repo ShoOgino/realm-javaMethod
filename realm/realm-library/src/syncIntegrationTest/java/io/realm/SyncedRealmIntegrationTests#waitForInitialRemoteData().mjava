@@ -1,0 +1,49 @@
+    @Test
+    public void waitForInitialRemoteData() throws InterruptedException {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+        SyncUser user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
+
+        // 1. Copy a valid Realm to the server (and pray it does it within 10 seconds)
+        final SyncConfiguration configOld = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+                .schema(StringOnly.class)
+                .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
+                .build();
+        Realm realm = Realm.getInstance(configOld);
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for (int i = 0; i < 10; i++) {
+                    realm.createObject(StringOnly.class).setChars("Foo" + i);
+                }
+            }
+        });
+        SyncManager.getSession(configOld).uploadAllLocalChanges();
+        realm.close();
+        user.logOut();
+
+        // 2. Local state should now be completely reset. Open the same sync Realm but different local name again with
+        // a new configuration which should download the uploaded changes (pray it managed to do so within the time frame).
+        user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password), Constants.AUTH_URL);
+        SyncConfiguration config = new SyncConfiguration.Builder(user, Constants.USER_REALM)
+                .name("newRealm")
+                .schema(StringOnly.class)
+                .waitForInitialRemoteData()
+                .build();
+
+        realm = Realm.getInstance(config);
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for (int i = 0; i < 10; i++) {
+                    realm.createObject(StringOnly.class).setChars("Foo 1" + i);
+                }
+            }
+        });
+        try {
+            assertEquals(20, realm.where(StringOnly.class).count());
+        } finally {
+            realm.close();
+        }
+    }
+

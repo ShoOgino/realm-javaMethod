@@ -1,0 +1,30 @@
+    SubscriptionAwareOsResults(OsSharedRealm sharedRealm, Table table, long nativePtr, String subscriptionName) {
+        super(sharedRealm, table, nativePtr);
+
+        this.firstCallback = true;
+        this.subscription = new OsSubscription(this, subscriptionName);
+        this.subscription.addChangeListener(new RealmChangeListener<OsSubscription>() {
+            @Override
+            public void onChange(OsSubscription o) {
+                subscriptionChanged = true;
+            }
+        });
+        RealmNotifier notifier = sharedRealm.realmNotifier;
+        notifier.addBeginSendingNotificationsCallback(new Runnable() {
+            @Override
+            public void run() {
+                subscriptionChanged = false;
+                collectionChanged = false;
+                delayedNotificationPtr = 0;
+            }
+        });
+        notifier.addFinishedSendingNotificationsCallback(new Runnable() {
+            @Override
+            public void run() {
+                if (collectionChanged || subscriptionChanged) {
+                    triggerDelayedChangeListener();
+                }
+            }
+        });
+    }
+

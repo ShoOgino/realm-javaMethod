@@ -1,0 +1,23 @@
+    /**
+     * Returns the privileges granted to the current user for the given object.
+     *
+     * @param object Realm object to get privileges for.
+     * @return the privileges granted the current user for the object.
+     * @throws IllegalArgumentException if the object is either null, unmanaged or not part of this Realm.
+     */
+    public ObjectPrivileges getPrivileges(RealmModel object) {
+        checkIfValid();
+        //noinspection ConstantConditions
+        if (object == null) {
+            throw new IllegalArgumentException("Non-null 'object' required.");
+        }
+        if (!RealmObject.isManaged(object)) {
+            throw new IllegalArgumentException("Only managed objects have privileges. This is a an unmanaged object: " + object.toString());
+        }
+        if (!((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm().getPath().equals(getPath())) {
+            throw new IllegalArgumentException("Object belongs to a different Realm.");
+        }
+        UncheckedRow row = (UncheckedRow) ((RealmObjectProxy) object).realmGet$proxyState().getRow$realm();
+        return new ObjectPrivileges(sharedRealm.getObjectPrivileges(row));
+    }
+

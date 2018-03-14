@@ -7,17 +7,17 @@
         // register the user the first time
         SyncCredentials credentials = SyncCredentials.usernamePassword(username, password, true);
 
-        SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
+        SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
         assertTrue(user.isValid());
-        user.logout();
+        user.logOut();
         assertFalse(user.isValid());
 
         // on subsequent logins, the user is already registered.
         credentials = credentials = SyncCredentials.usernamePassword(username, password, false);
         for (int i = 0; i < 3; i++) {
-            user = SyncUser.login(credentials, Constants.AUTH_URL);
+            user = SyncUser.logIn(credentials, Constants.AUTH_URL);
             assertTrue(user.isValid());
-            user.logout();
+            user.logOut();
             assertFalse(user.isValid());
         }
     }

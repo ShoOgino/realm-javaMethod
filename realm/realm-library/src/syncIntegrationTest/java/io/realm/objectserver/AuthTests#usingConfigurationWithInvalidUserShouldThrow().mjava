@@ -5,9 +5,9 @@
         String password = "password";
 
         SyncCredentials credentials = SyncCredentials.usernamePassword(username, password, true);
-        SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
-        RealmConfiguration configuration = new SyncConfiguration.Builder(user, Constants.USER_REALM).build();
-        user.logout();
+        SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
+        RealmConfiguration configuration = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM).build();
+        user.logOut();
         assertFalse(user.isValid());
         Realm instance = Realm.getInstance(configuration);
         instance.close();

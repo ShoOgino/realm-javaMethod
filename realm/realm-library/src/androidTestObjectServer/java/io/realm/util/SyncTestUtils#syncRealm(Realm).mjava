@@ -1,0 +1,14 @@
+    // Fully synchronize a Realm with the server by making sure that all changes are uploaded
+    // and downloaded again.
+    public static void syncRealm(Realm realm) {
+        SyncConfiguration config = (SyncConfiguration) realm.getConfiguration();
+        SyncSession session = SyncManager.getSession(config);
+        try {
+            session.uploadAllLocalChanges();
+            session.downloadAllServerChanges();
+        } catch (InterruptedException e) {
+            throw new AssertionError(e);
+        }
+        realm.refresh();
+    }
+

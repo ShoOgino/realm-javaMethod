@@ -3,7 +3,7 @@
     public void logBackResumeUpload() throws InterruptedException, NoSuchFieldException, IllegalAccessException {
         final String uniqueName = UUID.randomUUID().toString();
         SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", true);
-        SyncUser user = SyncUser.login(credentials, Constants.AUTH_URL);
+        SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
 
         final SyncConfiguration syncConfiguration = configFactory
                 .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
@@ -21,7 +21,7 @@
         final SyncSession session = SyncManager.getSession(syncConfiguration);
         session.uploadAllLocalChanges();
 
-        user.logout();
+        user.logOut();
 
         // add a commit while we're still offline
         realm.executeTransaction(new Realm.Transaction() {
@@ -44,7 +44,7 @@
                 // when the offline commits get synchronized
                 SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
                 SyncCredentials credentialsAdmin = SyncCredentials.accessToken(SyncTestUtils.getRefreshToken(admin).value(), "custom-admin-user");
-                SyncUser adminUser = SyncUser.login(credentialsAdmin, Constants.AUTH_URL);
+                SyncUser adminUser = SyncUser.logIn(credentialsAdmin, Constants.AUTH_URL);
 
                 SyncConfiguration adminConfig = configurationFactory.createSyncConfigurationBuilder(adminUser, syncConfiguration.getServerUrl().toString())
                         .modules(new StringOnlyModule())
@@ -72,7 +72,7 @@
                 // this login will re-activate the logged out user, and resume all it's pending sessions
                 // the OS will trigger bindSessionWithConfig with the new refresh_token, in order to obtain
                 // a new access_token.
-                SyncUser.login(credentials, Constants.AUTH_URL);
+                SyncUser.logIn(credentials, Constants.AUTH_URL);
             }
         });
 

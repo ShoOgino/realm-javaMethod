@@ -4,7 +4,7 @@
         // STEP 1: prepare a synced Realm for client A
         String username = UUID.randomUUID().toString();
         String password = "password";
-        SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
+        SyncUser user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
 
         final byte[] randomKey = TestHelper.getRandomKey();
 
@@ -34,7 +34,7 @@
         // STEP 3: prepare a synced Realm for client B (admin user)
         SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
         SyncCredentials credentials = SyncCredentials.accessToken(SyncTestUtils.getRefreshToken(admin).value(), "custom-admin-user");
-        SyncUser adminUser = SyncUser.login(credentials, Constants.AUTH_URL);
+        SyncUser adminUser = SyncUser.logIn(credentials, Constants.AUTH_URL);
 
         final byte[] adminRandomKey = TestHelper.getRandomKey();
 
@@ -79,9 +79,9 @@
         assertEquals("Hi Bob", allSortedAdmin.get(1).getChars());
 
         adminRealm.close();
-        adminUser.logout();
+        adminUser.logOut();
 
         realm.close();
-        user.logout();
+        user.logOut();
     }
 

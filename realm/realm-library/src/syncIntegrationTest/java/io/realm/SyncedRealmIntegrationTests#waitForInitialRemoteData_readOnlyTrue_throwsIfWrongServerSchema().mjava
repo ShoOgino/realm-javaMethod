@@ -1,0 +1,26 @@
+    @Test
+    public void waitForInitialRemoteData_readOnlyTrue_throwsIfWrongServerSchema() {
+        SyncCredentials credentials = SyncCredentials.usernamePassword(UUID.randomUUID().toString(), "password", true);
+        SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
+        final SyncConfiguration configNew = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+                .waitForInitialRemoteData()
+                .readOnly()
+                .schema(StringOnly.class)
+                .build();
+        assertFalse(configNew.realmExists());
+
+        Realm realm = null;
+        try {
+            // This will fail, because the server Realm is completely empty and the Client is not allowed to write the
+            // schema.
+            realm = Realm.getInstance(configNew);
+            fail();
+        } catch (RealmMigrationNeededException ignored) {
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+            user.logOut();
+        }
+    }
+

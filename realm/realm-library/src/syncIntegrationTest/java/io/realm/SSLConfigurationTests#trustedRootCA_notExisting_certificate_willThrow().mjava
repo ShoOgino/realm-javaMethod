@@ -1,8 +1,9 @@
     @Test
+    @RunTestInLooperThread
     public void trustedRootCA_notExisting_certificate_willThrow() {
         String username = UUID.randomUUID().toString();
         String password = "password";
-        SyncUser user = SyncUser.login(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
+        SyncUser user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
         //noinspection unchecked
         SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM_SECURE)
                 .schema(StringOnly.class)
@@ -14,5 +15,6 @@
             fail();
         } catch (RealmFileException ignored) {
         }
+        looperThread.testComplete();
     }
 

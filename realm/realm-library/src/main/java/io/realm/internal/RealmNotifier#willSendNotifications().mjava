@@ -1,0 +1,9 @@
+    // Called from JavaBindingContext::will_send_notifications
+    // This will be called before any change notifications are delivered when updating a
+    // Realm version. This will be triggered even if no change listeners are registered.
+    void willSendNotifications() {
+        for (int i = 0; i < startSendingNotificationsCallbacks.size(); i++) {
+            startSendingNotificationsCallbacks.get(i).run();
+        }
+    }
+

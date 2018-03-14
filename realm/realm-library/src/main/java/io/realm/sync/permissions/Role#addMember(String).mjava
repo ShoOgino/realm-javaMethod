@@ -1,0 +1,24 @@
+    /**
+     * Adds a member to this Role. Must be done from within a write transaction.
+     *
+     * @param userId userid of the SyncUser.
+     * @throws IllegalStateException if not in a write transaction.
+     * @throws IllegalArgumentException if {@code null} or empty {@code userId} is provided.
+     */
+    public void addMember(String userId) {
+        if (isManaged()) {
+            if (Util.isEmptyString(userId)) {
+                throw new IllegalArgumentException("Non-empty 'userId' required");
+            }
+            Realm realm = getRealm();
+            PermissionUser user = realm.where(PermissionUser.class).equalTo("id", userId).findFirst();
+            if (user == null) {
+                user = realm.createObject(PermissionUser.class, userId);
+            }
+            members.add(user);
+
+        } else {
+            throw new IllegalStateException("Can not add a member to a non managed Role");
+        }
+    }
+

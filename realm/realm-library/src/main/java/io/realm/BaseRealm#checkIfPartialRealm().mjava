@@ -1,0 +1,11 @@
+    protected void checkIfPartialRealm() {
+        boolean isPartialRealm = false;
+        if (configuration.isSyncConfiguration()) {
+            isPartialRealm = ObjectServerFacade.getSyncFacadeIfPossible().isPartialRealm(configuration);
+        }
+
+        if (!isPartialRealm) {
+            throw new IllegalStateException("This method is only available on partially synchronized Realms.");
+        }
+    }
+
