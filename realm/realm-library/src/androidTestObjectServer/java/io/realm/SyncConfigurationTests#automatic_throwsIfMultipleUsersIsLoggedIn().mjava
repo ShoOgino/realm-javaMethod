@@ -1,0 +1,12 @@
+    @Test
+    public void automatic_throwsIfMultipleUsersIsLoggedIn() {
+        SyncTestUtils.createTestUser();
+        SyncTestUtils.createTestUser();
+        try {
+            SyncConfiguration.automatic();
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("Current user is not valid if more that one valid, logged-in user exists.", e.getMessage());
+        }
+    }
+

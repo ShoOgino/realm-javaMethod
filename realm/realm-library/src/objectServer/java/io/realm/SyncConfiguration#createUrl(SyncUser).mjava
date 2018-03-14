@@ -1,0 +1,15 @@
+    // Infer the URL to the default Realm based on the server used to login the user
+    private static String createUrl(SyncUser user) {
+        URL url = user.getAuthenticationUrl();
+        String protocol = url.getProtocol();
+        String host = url.getHost();
+
+        if (protocol.equalsIgnoreCase("https")) {
+            protocol = "realms";
+        } else {
+            protocol = "realm";
+        }
+
+        return protocol + "://" + host + "/default";
+    }
+
