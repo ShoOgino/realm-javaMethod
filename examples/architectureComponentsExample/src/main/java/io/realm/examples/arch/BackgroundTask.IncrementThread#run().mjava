@@ -1,0 +1,19 @@
+        @Override
+        @SuppressLint("NewApi")
+        public void run() {
+            try (Realm realm = Realm.getDefaultInstance()) {
+                final RealmResults<Person> persons = realm.where(Person.class).findAll();
+                Realm.Transaction transaction = (Realm r) -> {
+                    for (Person person : persons) {
+                        person.setAge(person.getAge() + 1); // updates the Persons in the Realm.
+                    }
+                };
+
+                while (!isInterrupted()) {
+                    realm.executeTransaction(transaction);
+                    SystemClock.sleep(1000L);
+                }
+            }
+            Log.i(TAG, "Background job stopped.");
+        }
+

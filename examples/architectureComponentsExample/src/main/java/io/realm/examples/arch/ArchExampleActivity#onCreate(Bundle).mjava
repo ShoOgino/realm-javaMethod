@@ -1,0 +1,22 @@
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_arch_example);
+        setupViews();
+
+        backgroundTask = (BackgroundTask) getLastCustomNonConfigurationInstance();
+        if (backgroundTask == null) { // this could also live inside a ViewModel, a singleton job queue, etc.
+            backgroundTask = new BackgroundTask();
+            backgroundTask.start(); // this task will update items in Realm on a background thread.
+        }
+        updateJobButton();
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, PersonListFragment.create())
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
+

@@ -1,0 +1,12 @@
+    /**
+     * Starts observing the RealmObject, if it is still valid.
+     */
+    @Override
+    protected void onActive() {
+        super.onActive();
+        T object = getValue();
+        if (object != null && RealmObject.isValid(object)) {
+            RealmObject.addChangeListener(object, listener);
+        }
+    }
+
