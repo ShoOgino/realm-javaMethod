@@ -1,15 +1,18 @@
     @Override
     public View getView(int position, View currentView, ViewGroup parent) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        ViewHolder viewHolder;
+
         if (currentView == null) {
             currentView = inflater.inflate(R.layout.city_listitem, parent, false);
+            viewHolder = new ViewHolder(currentView);
+            currentView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder)currentView.getTag();
         }
 
         City city = cities.get(position);
-
-        if (city != null) {
-            ((TextView) currentView.findViewById(R.id.name)).setText(city.getName());
-            ((TextView) currentView.findViewById(R.id.votes)).setText(String.valueOf(city.getVotes()));
-        }
+        viewHolder.bind(city);
 
         return currentView;
     }

@@ -3,8 +3,19 @@
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_realm_example);
 
-        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder().build();
-        Realm.deleteRealm(realmConfiguration);
-        realm = Realm.getInstance(realmConfiguration);
+        Realm.deleteRealm(Realm.getDefaultConfiguration());
+
+        realm = Realm.getDefaultInstance();
+
+        gridView = findViewById(R.id.cities_list);
+
+        cities = realm.where(City.class).findAllAsync();
+        cities.addChangeListener(realmChangeListener);
+
+        adapter = new CityAdapter();
+        gridView.setAdapter(adapter);
+
+        // Load from file "cities.json" first time
+        loadCities();
     }
 
