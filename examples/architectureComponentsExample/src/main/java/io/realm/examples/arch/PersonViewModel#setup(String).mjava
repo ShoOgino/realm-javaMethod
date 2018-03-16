@@ -1,0 +1,8 @@
+    public void setup(String personName) {
+        Person person = realm.where(Person.class).equalTo("name", personName).findFirst();
+        if (person == null) {
+            throw new IllegalStateException("The person was not found, it shouldn't be deleted!");
+        }
+        livePerson = new LiveRealmObject<>(person);
+    }
+

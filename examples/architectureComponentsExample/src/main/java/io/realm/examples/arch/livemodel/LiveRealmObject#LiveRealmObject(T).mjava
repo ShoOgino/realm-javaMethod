@@ -1,0 +1,22 @@
+    /**
+     * Wraps the provided managed RealmObject as a LiveData.
+     *
+     * The provided object should not be null, should be managed, and should be valid.
+     *
+     * @param object the managed RealmModel to wrap as LiveData
+     */
+    @MainThread
+    public LiveRealmObject(@NonNull T object) {
+        //noinspection ConstantConditions
+        if (object == null) {
+            throw new IllegalArgumentException("The object cannot be null!");
+        }
+        if (!RealmObject.isManaged(object)) {
+            throw new IllegalArgumentException("LiveRealmObject only supports managed RealmModel instances!");
+        }
+        if (!RealmObject.isValid(object)) {
+            throw new IllegalArgumentException("The provided RealmObject is no longer valid, and therefore cannot be observed for changes.");
+        }
+        setValue(object);
+    }
+

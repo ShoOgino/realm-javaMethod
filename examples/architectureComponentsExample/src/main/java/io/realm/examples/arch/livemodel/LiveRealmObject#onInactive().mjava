@@ -1,0 +1,12 @@
+    /**
+     * Stops observing the RealmObject.
+     */
+    @Override
+    protected void onInactive() {
+        super.onInactive();
+        T object = getValue();
+        if (object != null && RealmObject.isValid(object)) {
+            RealmObject.removeChangeListener(object, listener);
+        }
+    }
+

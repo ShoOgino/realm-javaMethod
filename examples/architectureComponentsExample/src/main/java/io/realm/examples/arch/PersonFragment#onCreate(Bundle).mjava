@@ -1,0 +1,27 @@
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        @SuppressWarnings("ConstantConditions") final String personName = getArguments().getString(ARG_PERSON_NAME);
+        personViewModel = ViewModelProviders.of(this, new ViewModelProvider.Factory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                if (modelClass == PersonViewModel.class) {
+                    PersonViewModel personViewModel = new PersonViewModel();
+                    personViewModel.setup(personName); // we use a Factory to ensure `setup` is called before use.
+                    //noinspection unchecked
+                    return (T) personViewModel;
+                }
+                //noinspection ConstantConditions
+                return null;
+            }
+        }).get(PersonViewModel.class);
+
+        personViewModel.getPerson().observe(this, person -> {
+            if (person != null) { // null would mean the object was deleted.
+                name.setText(person.getName());
+                age.setText(String.valueOf(person.getAge()));
+            }
+        });
+    }
+

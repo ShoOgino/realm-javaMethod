@@ -1,0 +1,14 @@
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Fragments should start listening in `onCreate()`
+        // to ensure single observer instance, even if detached (for example in FragmentPagerAdapter).
+        personListViewModel = ViewModelProviders.of(this).get(PersonListViewModel.class);
+        personListViewModel.getPersons().observe(this, people -> {
+            personList = people;
+            if (adapter != null) {
+                adapter.updateItems(people);
+            }
+        });
+    }
+

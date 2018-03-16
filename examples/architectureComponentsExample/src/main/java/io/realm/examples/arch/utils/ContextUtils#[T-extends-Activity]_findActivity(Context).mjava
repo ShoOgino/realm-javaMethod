@@ -1,0 +1,24 @@
+    /**
+     * Finds the Activity inside the hierarchy of the provided Context.
+     *
+     * @param context the context
+     * @param <T> the expected type of the Activity
+     * @return the activity
+     *
+     * @throws IllegalArgumentException if the context has no Activity in its base context hierarchy
+     */
+    public static <T extends Activity> T findActivity(Context context) {
+        if (context instanceof Activity) {
+            //noinspection unchecked
+            return (T) context;
+        }
+        while (context != null && context instanceof ContextWrapper) {
+            context = ((ContextWrapper) context).getBaseContext();
+            if (context instanceof Activity) {
+                //noinspection unchecked
+                return (T) context;
+            }
+        }
+        throw new IllegalArgumentException("No activity found in context hierarchy.");
+    }
+
