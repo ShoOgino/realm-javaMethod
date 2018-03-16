@@ -1,16 +1,14 @@
-    private String complexQuery() {
+    private String complexQuery(Realm realm) {
         String status = "\n\nPerforming complex Query operation...";
-
-        Realm realm = Realm.getDefaultInstance();
         status += "\nNumber of persons: " + realm.where(Person.class).count();
 
         // Find all persons where age between 7 and 9 and name begins with "Person".
         RealmResults<Person> results = realm.where(Person.class)
                 .between("age", 7, 9)       // Notice implicit "and" operation
                 .beginsWith("name", "Person").findAll();
+
         status += "\nSize of result set: " + results.size();
 
-        realm.close();
         return status;
     }
 

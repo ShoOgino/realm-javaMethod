@@ -2,33 +2,31 @@
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_realm_basic_example);
-        rootLayout = ((LinearLayout) findViewById(R.id.container));
+        rootLayout = findViewById(R.id.container);
         rootLayout.removeAllViews();
 
-        // These operations are small enough that
-        // we can generally safely run them on the UI thread.
+        // Clear the Realm if the example was previously run.
+        Realm.deleteRealm(Realm.getDefaultConfiguration());
 
         // Create the Realm instance
         realm = Realm.getDefaultInstance();
 
+        // Asynchronous queries are evaluated on a background thread,
+        // and passed to the registered change listener when it's done.
+        // The change listener is also called on any future writes that change the result set.
+        persons = realm.where(Person.class).findAllAsync();
+
+        // The change listener will be notified when the data is loaded,
+        // or the Realm is written to from any threads (and the result set is modified).
+        persons.addChangeListener(realmChangeListener);
+
+        // These operations are small enough that
+        // we can generally safely run them on the UI thread.
         basicCRUD(realm);
         basicQuery(realm);
         basicLinkQuery(realm);
 
         // More complex operations can be executed on another thread.
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-                String info;
-                info = complexReadWrite();
-                info += complexQuery();
-                return info;
-            }
-
-            @Override
-            protected void onPostExecute(String result) {
-                showStatus(result);
-            }
-        }.execute();
+        new ComplexBackgroundOperations(this).execute();
     }
 
