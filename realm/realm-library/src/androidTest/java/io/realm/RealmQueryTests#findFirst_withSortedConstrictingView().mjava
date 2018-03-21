@@ -1,0 +1,16 @@
+    @Test
+    public void findFirst_withSortedConstrictingView() {
+        realm.beginTransaction();
+        realm.insert(new Dog("Milo"));
+        realm.insert(new Dog("Fido"));
+        realm.insert(new Dog("Bella"));
+        realm.commitTransaction();
+
+        RealmResults<Dog> dogs = realm.where(Dog.class)
+                .in("name", new String[] { "Fido", "Bella" })
+                .sort("name", Sort.ASCENDING)
+                .findAll();
+        Dog dog = dogs.where().findFirst();
+        assertEquals("Bella", dog.getName());
+    }
+
