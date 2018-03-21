@@ -1,0 +1,12 @@
+    @Test
+    public void findFirst_withSorting() {
+        realm.beginTransaction();
+        realm.insert(new Dog("Milo"));
+        realm.insert(new Dog("Fido"));
+        realm.insert(new Dog("Bella"));
+        realm.commitTransaction();
+
+        Dog dog = realm.where(Dog.class).sort("name").findFirst();
+        assertEquals("Bella", dog.getName());
+    }
+
