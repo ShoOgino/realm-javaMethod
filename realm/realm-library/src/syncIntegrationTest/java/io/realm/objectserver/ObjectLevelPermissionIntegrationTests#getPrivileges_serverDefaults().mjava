@@ -2,12 +2,9 @@
     @Test
     @RunTestInLooperThread()
     public void getPrivileges_serverDefaults() throws InterruptedException {
-        String realmUrl = Constants.GLOBAL_REALM + "_getPrivileges_serverDefaults";
         List schemaModule = Arrays.asList(new ObjectLevelTestModule());
-        createWorldReadableRealm(realmUrl, schemaModule);
-
         SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
-        SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, realmUrl)
+        SyncConfiguration syncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.DEFAULT_REALM)
                 .modules(schemaModule)
                 .partialRealm()
                 .build();

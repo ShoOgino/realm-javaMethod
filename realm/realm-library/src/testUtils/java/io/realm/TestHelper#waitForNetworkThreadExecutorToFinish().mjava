@@ -1,0 +1,26 @@
+    public static void waitForNetworkThreadExecutorToFinish() {
+        if (networkPoolExecutorField == null) {
+            return; // This build do not support Sync
+        }
+        try {
+            ThreadPoolExecutor pool = (ThreadPoolExecutor) networkPoolExecutorField.get(null);
+            // Since this method should only be called when exiting a test, it should be safe to just
+            // cancel all ongoing network requests and shut down the pool as soon as possible.
+            // When shut down we replace it with a new, now empty, pool that can be used by future
+            // tests
+            pool.shutdownNow();
+            try {
+                pool.awaitTermination(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                throw new AssertionError("NetworkPoolExecutor was not shut down in time:\n" + Util.getStackTrace(e));
+            } finally {
+                // Replace the executor, since the old one is now dead.
+                // The setup of this should mirror what is done in SyncManager.
+                networkPoolExecutorField.set(null, new ThreadPoolExecutor(
+                        10, 10, 0, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(100)));
+            }
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(Util.getStackTrace(e));
+        }
+    }
+

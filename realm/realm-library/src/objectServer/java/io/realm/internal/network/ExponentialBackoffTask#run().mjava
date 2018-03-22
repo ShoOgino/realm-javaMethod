@@ -1,13 +1,14 @@
     @Override
     public void run() {
         int attempt = 0;
-        while (true) {
+        while (!Thread.interrupted()) {
             attempt++;
             long sleep = calculateExponentialDelay(attempt - 1, TimeUnit.MINUTES.toMillis(5));
             if (sleep > 0) {
                 try {
                     Thread.sleep(sleep);
                 } catch (InterruptedException e) {
+                    RealmLog.debug("Incremental backoff was interrupted.");
                     return; // Abort if interrupted
                 }
             }
