@@ -2,7 +2,9 @@
     protected boolean shouldAbortTask(T response) {
         // Only retry in case of IO exceptions, since that might be network timeouts etc.
         // All other errors indicate a bigger problem, so just stop the task.
-        if (!response.isValid()) {
+        if (Thread.interrupted()) {
+            return true;
+        } else if (!response.isValid()) {
             return response.getError().getErrorCode() != ErrorCode.IO_EXCEPTION;
         } else {
             return false;

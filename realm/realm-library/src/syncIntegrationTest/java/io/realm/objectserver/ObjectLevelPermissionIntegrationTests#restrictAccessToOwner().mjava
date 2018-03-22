@@ -2,14 +2,12 @@
     @Test
     @RunTestInLooperThread()
     public void restrictAccessToOwner() throws InterruptedException {
-        String realmUrl = Constants.GLOBAL_REALM + "_restrictAccessToOwner";
         List schemaModules = Arrays.asList(new StringOnlyModule(), new OLPermissionModule(), new ObjectPermissionsModule());
-        createWorldReadableRealm(realmUrl, schemaModules);
 
         // connect with user1
         SyncUser user1 = UserFactory.createUniqueUser(Constants.AUTH_URL);
         SyncConfiguration user1SyncConfig = configurationFactory
-                .createSyncConfigurationBuilder(user1, realmUrl)
+                .createSyncConfigurationBuilder(user1, Constants.DEFAULT_REALM)
                 .modules(schemaModules)
                 .partialRealm()
                 .build();
@@ -40,7 +38,7 @@
 
         // Connect with admin user and verify that user1 object is visible (non-partial Realm)
         SyncUser adminUser = UserFactory.createNicknameUser(Constants.AUTH_URL, "admin2", true);
-        SyncConfiguration adminConfig = configurationFactory.createSyncConfigurationBuilder(adminUser, realmUrl)
+        SyncConfiguration adminConfig = configurationFactory.createSyncConfigurationBuilder(adminUser, Constants.DEFAULT_REALM)
                 .modules(schemaModules)
                 .waitForInitialRemoteData()
                 .build();
@@ -56,7 +54,7 @@
 
         // Connect with user 2 and verify that user1 object is not visible
         SyncUser user2 = UserFactory.createUniqueUser(Constants.AUTH_URL);
-        SyncConfiguration syncConfig2 = configurationFactory.createSyncConfigurationBuilder(user2, realmUrl)
+        SyncConfiguration syncConfig2 = configurationFactory.createSyncConfigurationBuilder(user2, Constants.DEFAULT_REALM)
                 .modules(schemaModules)
                 .partialRealm()
                 .build();
@@ -66,17 +64,10 @@
         looperThread.keepStrongReference(allAsync);
         // new object should not be visible for user2 partial sync
         allAsync.addChangeListener((permissionObjects2, changeSet) -> {
-            switch (changeSet.getState()) {
-                case INITIAL:
-                    assertEquals(0, permissionObjects2.size());
-                    break;
-                case UPDATE:
-                    assertEquals(0, permissionObjects2.size());
-                    looperThread.testComplete();
-                    break;
-                case ERROR:
-                    fail("Unexpected error callback");
-                    break;
+            RealmLog.info("State: " + changeSet.getState().toString() + ", complete: " + changeSet.isCompleteResult());
+            if (changeSet.isCompleteResult()) {
+                assertEquals(0, permissionObjects2.size());
+                looperThread.testComplete();
             }
         });
     }
