@@ -2,14 +2,14 @@
     @Test
     public void move_up() {
         Owner owner = realm.where(Owner.class).findFirst();
-        int oldIndex = TEST_SIZE / 2;
-        int newIndex = oldIndex + 1;
-        Dog dog = owner.getDogs().get(oldIndex);
+        Dog dog1 = owner.getDogs().get(0);
+        Dog dog2 = owner.getDogs().get(1);
         realm.beginTransaction();
-        owner.getDogs().move(oldIndex, newIndex); // This doesn't do anything as oldIndex is now empty so the index's above gets shifted to the left.
+        owner.getDogs().move(0, 1);
         realm.commitTransaction();
 
         assertEquals(TEST_SIZE, owner.getDogs().size());
-        assertEquals(newIndex, owner.getDogs().indexOf(dog));
+        assertEquals(1, owner.getDogs().indexOf(dog1));
+        assertEquals(0, owner.getDogs().indexOf(dog2));
     }
 
