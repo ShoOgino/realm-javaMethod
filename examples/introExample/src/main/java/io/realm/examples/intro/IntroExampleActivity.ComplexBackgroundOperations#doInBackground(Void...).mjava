@@ -1,0 +1,17 @@
+        @Override
+        protected String doInBackground(Void... voids) {
+            IntroExampleActivity activity = weakReference.get();
+            if (activity == null) {
+                return "";
+            }
+            // Open the default realm. Uses `try-with-resources` to automatically close Realm when done.
+            // All threads must use their own reference to the realm.
+            // Realm instances, RealmResults, and managed RealmObjects can not be transferred across threads.
+            try (Realm realm = Realm.getDefaultInstance()) {
+                String info;
+                info = activity.complexReadWrite(realm);
+                info += activity.complexQuery(realm);
+                return info;
+            }
+        }
+

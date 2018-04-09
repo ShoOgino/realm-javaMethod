@@ -1,19 +1,18 @@
     private void loadJsonFromStream() throws IOException {
         // Use streams if you are worried about the size of the JSON whether it was persisted on disk
         // or received from the network.
-        InputStream stream = getAssets().open("cities.json");
-
-        // Open a transaction to store items into the realm
-        realm.beginTransaction();
-        try {
-            realm.createAllFromJson(City.class, stream);
-            realm.commitTransaction();
-        } catch (IOException e) {
-            // Remember to cancel the transaction if anything goes wrong.
-            realm.cancelTransaction();
-        } finally {
-            if (stream != null) {
-                stream.close();
+        try(InputStream stream = getAssets().open("cities.json")) {
+            try {
+                // Open a transaction to store items into the realm
+                realm.beginTransaction();
+                realm.createAllFromJson(City.class, stream);
+                realm.commitTransaction();
+            } catch (IOException e) {
+                // Remember to cancel the transaction if anything goes wrong.
+                if(realm.isInTransaction()) {
+                    realm.cancelTransaction();
+                }
+                throw new RuntimeException(e);
             }
         }
     }

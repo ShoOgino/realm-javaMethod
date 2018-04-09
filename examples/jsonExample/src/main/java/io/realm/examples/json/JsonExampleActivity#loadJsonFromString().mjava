@@ -1,11 +1,6 @@
     private void loadJsonFromString() {
         final String json = "{ name: \"Aarhus\", votes: 99 }";
 
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.createObjectFromJson(City.class, json);
-            }
-        });
+        realm.executeTransaction(realm -> realm.createObjectFromJson(City.class, json));
     }
 

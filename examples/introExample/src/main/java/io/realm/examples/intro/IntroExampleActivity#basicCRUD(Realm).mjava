@@ -2,16 +2,16 @@
         showStatus("Perform basic Create/Read/Update/Delete (CRUD) operations...");
 
         // All writes must be wrapped in a transaction to facilitate safe multi threading
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                // Add a person
-                Person person = realm.createObject(Person.class);
-                person.setId(1);
-                person.setName("Young Person");
-                person.setAge(14);
+        realm.executeTransaction(r -> {
+            // Add a person. 
+            // RealmObjects with primary keys created with `createObject()` must specify the primary key value as an argument.
+            Person person = r.createObject(Person.class, 1);
+            person.setName("Young Person");
+            person.setAge(14);
 
-            }
+            // Even young people have at least one phone in this day and age.
+            // Please note that this is a RealmList that contains primitive values.
+            person.getPhoneNumbers().add("+1 123 4567");
         });
 
         // Find the first person (no query conditions) and read a field
@@ -19,21 +19,15 @@
         showStatus(person.getName() + ":" + person.getAge());
 
         // Update person in a transaction
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                person.setName("Senior Person");
-                person.setAge(99);
-                showStatus(person.getName() + " got older: " + person.getAge());
-            }
+        realm.executeTransaction(r -> {
+            // Managed objects can be modified inside transactions.
+            person.setName("Senior Person");
+            person.setAge(99);
+            showStatus(person.getName() + " got older: " + person.getAge());
         });
 
         // Delete all persons
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.delete(Person.class);
-            }
-        });
+        showStatus("Deleting all persons");
+        realm.executeTransaction(r -> r.delete(Person.class));
     }
 
