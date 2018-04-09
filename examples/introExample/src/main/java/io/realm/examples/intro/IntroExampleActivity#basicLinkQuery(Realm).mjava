@@ -1,5 +1,17 @@
     private void basicLinkQuery(Realm realm) {
         showStatus("\nPerforming basic Link Query operation...");
+
+        // Let's add a person with a cat so that the query returns something.
+        realm.executeTransaction(r -> {
+            Person catLady = realm.createObject(Person.class, 24);
+            catLady.setAge(52);
+            catLady.setName("Mary");
+
+            Cat tiger = realm.createObject(Cat.class);
+            tiger.name = "Tiger";
+            catLady.getCats().add(tiger);
+        });
+
         showStatus("Number of persons: " + realm.where(Person.class).count());
 
         RealmResults<Person> results = realm.where(Person.class).equalTo("cats.name", "Tiger").findAll();

@@ -3,12 +3,25 @@
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_realm_example);
 
-        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder().build();
+        // This is the GridView adapter
+        adapter = new CityAdapter();
+
+        //This is the GridView which will display the list of cities
+        gridView = findViewById(R.id.cities_list);
+        gridView.setAdapter(adapter);
+        gridView.setOnItemClickListener(GridViewExampleActivity.this);
 
         // Clear the realm from last time
-        Realm.deleteRealm(realmConfiguration);
+        //noinspection ConstantConditions
+        Realm.deleteRealm(Realm.getDefaultConfiguration());
 
         // Create a new empty instance of Realm
-        realm = Realm.getInstance(realmConfiguration);
+        realm = Realm.getDefaultInstance();
+
+        // Obtain the cities in the Realm with asynchronous query.
+        cities = realm.where(City.class).findAllAsync();
+
+        // The RealmChangeListener will be called when the results are asynchronously loaded, and available for use.
+        cities.addChangeListener(realmChangeListener);
     }
 

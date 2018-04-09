@@ -1,5 +1,15 @@
     private void basicQuery(Realm realm) {
         showStatus("\nPerforming basic Query operation...");
+
+        // Let's add a person so that the query returns something.
+        realm.executeTransaction(r -> {
+            Person oldPerson = new Person();
+            oldPerson.setId(99);
+            oldPerson.setAge(99);
+            oldPerson.setName("George");
+            realm.insertOrUpdate(oldPerson);
+        });
+
         showStatus("Number of persons: " + realm.where(Person.class).count());
 
         RealmResults<Person> results = realm.where(Person.class).equalTo("age", 99).findAll();

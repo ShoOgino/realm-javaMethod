@@ -1,0 +1,49 @@
+    private String complexReadWrite(Realm realm) {
+        String status = "\nPerforming complex Read/Write operation...";
+
+        // Add ten persons in one transaction
+        realm.executeTransaction(r -> {
+            Dog fido = r.createObject(Dog.class);
+            fido.name = "fido";
+            for (int i = 0; i < 10; i++) {
+                Person person = r.createObject(Person.class, i);
+                person.setName("Person no. " + i);
+                person.setAge(i);
+                person.setDog(fido);
+
+                // The field tempReference is annotated with @Ignore.
+                // This means setTempReference sets the Person tempReference
+                // field directly. The tempReference is NOT saved as part of
+                // the RealmObject:
+                person.setTempReference(42);
+
+                for (int j = 0; j < i; j++) {
+                    Cat cat = r.createObject(Cat.class);
+                    cat.name = "Cat_" + j;
+                    person.getCats().add(cat);
+                }
+            }
+        });
+
+        // Implicit read transactions allow you to access your objects
+        status += "\nNumber of persons: " + realm.where(Person.class).count();
+
+        // Iterate over all objects, with an iterator
+        for (Person person : realm.where(Person.class).findAll()) {
+            String dogName;
+            if (person.getDog() == null) {
+                dogName = "None";
+            } else {
+                dogName = person.getDog().name;
+            }
+            status += "\n" + person.getName() + ":" + person.getAge() + " : " + dogName + " : " + person.getCats().size();
+        }
+
+        // Sorting
+        RealmResults<Person> sortedPersons = realm.where(Person.class).sort("age", Sort.DESCENDING).findAll();
+        status += "\nSorting " + sortedPersons.last().getName() + " == " + realm.where(Person.class).findFirst()
+                .getName();
+
+        return status;
+    }
+

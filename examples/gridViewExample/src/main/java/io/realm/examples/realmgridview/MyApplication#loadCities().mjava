@@ -1,0 +1,19 @@
+    private List<City> loadCities() {
+        // In this case we're loading from local assets.
+        // NOTE: could alternatively easily load from network.
+        // However, that would need to happen on a background thread.
+        InputStream stream;
+        try {
+            stream = getAssets().open("cities.json");
+        } catch (IOException e) {
+            return null;
+        }
+
+        Gson gson = new GsonBuilder().create();
+
+        JsonElement json = new JsonParser().parse(new InputStreamReader(stream));
+
+        return gson.fromJson(json, new TypeToken<List<City>>() {
+        }.getType());
+    }
+

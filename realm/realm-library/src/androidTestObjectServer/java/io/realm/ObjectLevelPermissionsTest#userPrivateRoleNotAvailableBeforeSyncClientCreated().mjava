@@ -1,0 +1,13 @@
+    @Test
+    public void userPrivateRoleNotAvailableBeforeSyncClientCreated() {
+        realm.beginTransaction();
+        PermissionUser permissionUser = realm.createObject(PermissionUser.class, "id123");
+        realm.commitTransaction();
+
+        Role builtInRole = permissionUser.getPrivateRole();
+        assertNull(builtInRole);
+        permissionUser = realm.where(PermissionUser.class).equalTo("id", "id123").findFirst();
+        assertNull(permissionUser.getPrivateRole());
+        assertTrue(permissionUser.getRoles().isEmpty());
+    }
+
