@@ -1,15 +1,5 @@
     private void doTestForInInteger(String targetField) {
         populateNoPrimaryKeyNullTypesRows();
-        try {
-            realm.where(NoPrimaryKeyNullTypes.class).in(targetField, (Integer[]) null).findAll();
-            fail();
-        } catch (IllegalArgumentException ignored) {
-        }
-        try {
-            realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Integer[]{}).findAll();
-            fail();
-        } catch (IllegalArgumentException ignored) {
-        }
         RealmResults<NoPrimaryKeyNullTypes> resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Integer[]{11}).findAll();
         assertEquals(1, resultList.size());
         resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Integer[]{1}).findAll();
@@ -18,5 +8,11 @@
         assertEquals(4, resultList.size());
         resultList = realm.where(NoPrimaryKeyNullTypes.class).not().in(targetField, new Integer[]{1, 2, 4, 5}).findAll();
         assertEquals(196, resultList.size());
+
+        // Empty input always produces zero results
+        resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, (Integer[]) null).findAll();
+        assertTrue(resultList.isEmpty());
+        resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Integer[]{}).findAll();
+        assertTrue(resultList.isEmpty());
     }
 
