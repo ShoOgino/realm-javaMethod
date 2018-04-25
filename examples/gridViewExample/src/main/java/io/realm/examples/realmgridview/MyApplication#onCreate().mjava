@@ -2,5 +2,17 @@
     public void onCreate() {
         super.onCreate();
         Realm.init(this);
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+                .initialData(realm -> {
+                    // Load from file "cities.json" first time
+                    List<City> cities = loadCities();
+                    if (cities != null) {
+                        // Use insertOrUpdate() to convert the objects into proper RealmObjects managed by Realm.
+                        realm.insertOrUpdate(cities);
+                    }
+                })
+                .deleteRealmIfMigrationNeeded()
+                .build()
+        );
     }
 

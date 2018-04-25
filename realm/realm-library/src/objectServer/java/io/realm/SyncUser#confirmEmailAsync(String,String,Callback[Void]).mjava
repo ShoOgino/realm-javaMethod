@@ -1,0 +1,38 @@
+    /**
+     * Complete the email confirmation flow by using the confirmation token sent to the user's email as a one-time
+     * authorization token to confirm their email. This functionalit
+     * <p>
+     * This can only be used for users who authenticated with the {@link SyncCredentials.IdentityProvider#USERNAME_PASSWORD}
+     * provider, and passed a valid email address as a username.
+     * <p>
+     * By default, Realm Object Server will send a link to the user's email that will redirect to a webpage where
+     * they can enter their new password. If you wish to provide a native UX, you may wish to modify the password
+     * authentication provider to use a custom URL with deep linking, so you can open the app, extract the token,
+     * and navigate to a view that allows to confirm the email within the app.
+     *
+     * @param confirmationToken the token that was sent to the user's email address.
+     * @param authenticationUrl the url used to authenticate the user.
+     * @param callback callback when the server has confirmed the email or failed. The callback will always happen on the same thread
+     * as this method is called on.
+     * @return representation of the async task that can be used to cancel it if needed.
+     * @throws IllegalStateException if this method is called on a non-looper thread.
+     * @throws IllegalArgumentException if no {@code confirmationToken} was provided.
+     */
+    public static RealmAsyncTask confirmEmailAsync(final String confirmationToken,
+                                            final String authenticationUrl,
+                                            final Callback<Void> callback) {
+        checkLooperThread("Asynchronously confirming an email is only possible from looper threads.");
+        //noinspection ConstantConditions
+        if (callback == null) {
+            throw new IllegalArgumentException("Non-null 'callback' required.");
+        }
+
+        return new Request<Void>(SyncManager.NETWORK_POOL_EXECUTOR, callback) {
+            @Override
+            public Void run() {
+                confirmEmail(confirmationToken, authenticationUrl);
+                return null;
+            }
+        }.start();
+    }
+

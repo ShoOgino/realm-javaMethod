@@ -1,0 +1,10 @@
+    @Override
+    public UpdateAccountResponse requestEmailConfirmation(String email, URL authenticationUrl) {
+        try {
+            String requestBody = UpdateAccountRequest.requestEmailConfirmation(email).toJson();
+            return updateAccount(buildActionUrl(authenticationUrl, ACTION_UPDATE_ACCOUNT), requestBody);
+        } catch (Exception e) {
+            return UpdateAccountResponse.from(e);
+        }
+    }
+

@@ -1,0 +1,14 @@
+    @Test
+    public void userPrivateRole() {
+        RealmResults<PermissionUser> permissionUsers = realm.where(PermissionUser.class).findAll();
+        assertEquals(1, permissionUsers.size());
+
+        PermissionUser permissionUser = permissionUsers.get(0);
+        assertNotNull(permissionUser);
+        Role role = permissionUser.getPrivateRole();
+        assertNotNull(role);
+
+        assertEquals("__User:" + user.getIdentity(), role.getName());
+        assertTrue(role.hasMember(user.getIdentity()));
+    }
+

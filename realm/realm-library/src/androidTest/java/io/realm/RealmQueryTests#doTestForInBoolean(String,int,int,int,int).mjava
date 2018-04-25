@@ -1,15 +1,5 @@
     private void doTestForInBoolean(String targetField, int expected1, int expected2, int expected3, int expected4) {
         populateNoPrimaryKeyNullTypesRows();
-        try {
-            realm.where(NoPrimaryKeyNullTypes.class).in(targetField, (Boolean[]) null).findAll();
-            fail();
-        } catch (IllegalArgumentException ignored) {
-        }
-        try {
-            realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Boolean[]{}).findAll();
-            fail();
-        } catch (IllegalArgumentException ignored) {
-        }
         RealmResults<NoPrimaryKeyNullTypes> resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Boolean[]{false}).findAll();
         assertEquals(expected1, resultList.size());
         resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Boolean[]{true}).findAll();
@@ -18,5 +8,11 @@
         assertEquals(expected3, resultList.size());
         resultList = realm.where(NoPrimaryKeyNullTypes.class).not().in(targetField, new Boolean[]{true, false}).findAll();
         assertEquals(expected4, resultList.size());
+
+        // Empty input always produces zero results
+        resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, (Boolean[]) null).findAll();
+        assertTrue(resultList.isEmpty());
+        resultList = realm.where(NoPrimaryKeyNullTypes.class).in(targetField, new Boolean[]{}).findAll();
+        assertTrue(resultList.isEmpty());
     }
 

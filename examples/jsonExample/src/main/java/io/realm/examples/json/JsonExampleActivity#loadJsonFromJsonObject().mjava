@@ -4,11 +4,6 @@
         city.put("votes", "9");
         final JSONObject json = new JSONObject(city);
 
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.createObjectFromJson(City.class, json);
-            }
-        });
+        realm.executeTransaction(realm -> realm.createObjectFromJson(City.class, json));
     }
 

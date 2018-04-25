@@ -1,0 +1,25 @@
+    /**
+     * Request an email confirmation email to be sent to a user's email.
+     * This will not fail, even if the email doesn't belong to a Realm Object Server user.
+     * <p>
+     * This can only be used for users who authenticated with the {@link SyncCredentials.IdentityProvider#USERNAME_PASSWORD}
+     * provider, and passed a valid email address as a username.
+     *
+     * @param email the email that corresponds to the user's username.
+     * @param authenticationUrl the url used to authenticate the user.
+     * @throws IllegalStateException if this method is called on the UI thread.
+     * @throws IllegalArgumentException if no {@code email} was provided.
+     * @throws ObjectServerError if an error happened on the server.
+     */
+    public static void requestEmailConfirmation(String email, String authenticationUrl) throws ObjectServerError {
+        if (Util.isEmptyString(email)) {
+            throw new IllegalArgumentException("Not-null 'email' required.");
+        }
+        URL authUrl = getUrl(authenticationUrl);
+        AuthenticationServer authServer = SyncManager.getAuthServer();
+        UpdateAccountResponse response = authServer.requestEmailConfirmation(email, authUrl);
+        if (!response.isValid()) {
+            throw response.getError();
+        }
+    }
+
