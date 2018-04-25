@@ -4,6 +4,9 @@
      * @param columnIndex the column index.
      */
     public void convertColumnToNotNullable(long columnIndex) {
+        if (sharedRealm.isSyncRealm()) {
+            throw new IllegalStateException("This method is only available for non-synchronized Realms");
+        }
         nativeConvertColumnToNotNullable(nativePtr, columnIndex, isPrimaryKey(columnIndex));
     }
 
