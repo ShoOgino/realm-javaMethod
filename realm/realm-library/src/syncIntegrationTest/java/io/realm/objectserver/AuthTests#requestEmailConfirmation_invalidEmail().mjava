@@ -1,0 +1,18 @@
+    @Test
+    @RunTestInLooperThread
+    @Ignore("Depends on https://github.com/realm/realm-java/pull/5909")
+    public void requestEmailConfirmation_invalidEmail() {
+        SyncUser.requestEmailConfirmationAsync("unknown@realm.io", Constants.AUTH_URL, new SyncUser.Callback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                // Server will respond with SUCCESS if the email is incorrect (for security reasons).
+                looperThread.testComplete();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail(error.toString());
+            }
+        });
+    }
+
