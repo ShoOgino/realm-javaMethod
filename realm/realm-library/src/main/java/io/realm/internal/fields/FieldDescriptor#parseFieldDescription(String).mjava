@@ -9,9 +9,16 @@
         if (fieldDescription == null || fieldDescription.equals("")) {
             throw new IllegalArgumentException("Invalid query: field name is empty");
         }
-        if (fieldDescription.endsWith(".")) {
+
+        int lastDotIndex = fieldDescription.lastIndexOf(".");
+        if (lastDotIndex == fieldDescription.length() - 1) {
             throw new IllegalArgumentException("Invalid query: field name must not end with a period ('.')");
         }
-        return Arrays.asList(fieldDescription.split("\\."));
+
+        if (lastDotIndex > -1) {
+            return Arrays.asList(FIELD_SEPARATOR.split(fieldDescription));
+        } else {
+            return Collections.singletonList(fieldDescription);
+        }
     }
 
