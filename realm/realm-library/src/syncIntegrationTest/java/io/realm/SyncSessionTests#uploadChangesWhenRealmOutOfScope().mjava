@@ -13,6 +13,7 @@
 
         final SyncConfiguration syncConfiguration = configFactory
                 .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .fullSynchronization()
                 .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.AFTER_CHANGES_UPLOADED)
                 .modules(new StringOnlyModule())
                 .build();
@@ -39,6 +40,7 @@
                 SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
 
                 SyncConfiguration adminConfig = configurationFactory.createSyncConfigurationBuilder(admin, syncConfiguration.getServerUrl().toString())
+                        .fullSynchronization()
                         .modules(new StringOnlyModule())
                         .build();
                 final Realm adminRealm = Realm.getInstance(adminConfig);

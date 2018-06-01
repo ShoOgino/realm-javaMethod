@@ -7,13 +7,15 @@
      * @throws IllegalStateException if no user are logged in, or multiple users have. Only one should
      * be logged in when calling this method.
      * @return The constructed {@link SyncConfiguration}.
+     * @deprecated use {@link SyncUser#getDefaultConfiguration()} instead.
      */
+    @Deprecated
     @Beta
     public static SyncConfiguration automatic() {
         SyncUser user = SyncUser.current();
         if (user == null) {
             throw new IllegalStateException("No user was logged in.");
         }
-        return getDefaultConfig(user);
+        return user.getDefaultConfiguration();
     }
 

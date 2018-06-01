@@ -32,7 +32,7 @@
             String serverUrlInput = (String) test[1];
             String resolvedServerUrl = ((String) test[2]).replace("~", user.getIdentity());
 
-            SyncConfiguration config = new SyncConfiguration.Builder(user, serverUrlInput).build();
+            SyncConfiguration config = user.createConfiguration(serverUrlInput).build();
 
             assertEquals(String.format("Input '%s' did not resolve correctly.", serverUrlInput),
                     resolvedServerUrl, config.getServerUrl().toString());

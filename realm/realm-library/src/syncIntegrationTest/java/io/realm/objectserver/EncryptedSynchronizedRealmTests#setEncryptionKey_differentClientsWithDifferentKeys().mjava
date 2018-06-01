@@ -9,6 +9,7 @@
         final byte[] randomKey = TestHelper.getRandomKey();
 
         SyncConfiguration configWithEncryption = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+                .fullSynchronization()
                 .modules(new StringOnlyModule())
                 .waitForInitialRemoteData()
                 .errorHandler(new SyncSession.ErrorHandler() {
@@ -39,6 +40,7 @@
         final byte[] adminRandomKey = TestHelper.getRandomKey();
 
         SyncConfiguration adminConfigWithEncryption = configurationFactory.createSyncConfigurationBuilder(adminUser, configWithEncryption.getServerUrl().toString())
+                .fullSynchronization()
                 .modules(new StringOnlyModule())
                 .waitForInitialRemoteData()
                 .errorHandler(new SyncSession.ErrorHandler() {

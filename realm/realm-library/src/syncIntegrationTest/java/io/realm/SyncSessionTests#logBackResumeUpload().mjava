@@ -1,12 +1,13 @@
     // A Realm that was opened before a user logged out should be able to resume uploading if the user logs back in.
     @Test
-    public void logBackResumeUpload() throws InterruptedException, NoSuchFieldException, IllegalAccessException {
+    public void logBackResumeUpload() throws InterruptedException {
         final String uniqueName = UUID.randomUUID().toString();
         SyncCredentials credentials = SyncCredentials.usernamePassword(uniqueName, "password", true);
         SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
 
         final SyncConfiguration syncConfiguration = configFactory
                 .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .fullSynchronization()
                 .modules(new StringOnlyModule())
                 .waitForInitialRemoteData()
                 .build();
@@ -48,6 +49,7 @@
 
                 SyncConfiguration adminConfig = configurationFactory.createSyncConfigurationBuilder(adminUser, syncConfiguration.getServerUrl().toString())
                         .modules(new StringOnlyModule())
+                        .fullSynchronization()
                         .waitForInitialRemoteData()
                         .build();
                 final Realm adminRealm = Realm.getInstance(adminConfig);

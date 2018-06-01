@@ -2,7 +2,8 @@
     @UiThreadTest
     public void waitForInitialRemoteData_mainThreadThrows() {
         final SyncUser user = SyncTestUtils.createTestUser(Constants.AUTH_URL);
-        SyncConfiguration config = new SyncConfiguration.Builder(user, Constants.USER_REALM)
+        SyncConfiguration config = user.createConfiguration(Constants.USER_REALM)
+                .fullSynchronization()
                 .waitForInitialRemoteData()
                 .build();
 

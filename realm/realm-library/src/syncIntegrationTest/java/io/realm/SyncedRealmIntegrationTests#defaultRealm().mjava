@@ -2,7 +2,7 @@
     public void defaultRealm() throws InterruptedException {
         SyncCredentials credentials = SyncCredentials.nickname("test", false);
         SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
-        SyncConfiguration config = SyncConfiguration.automatic();
+        SyncConfiguration config = user.getDefaultConfiguration();
         Realm realm = Realm.getInstance(config);
         SyncManager.getSession(config).downloadAllServerChanges();
         realm.refresh();

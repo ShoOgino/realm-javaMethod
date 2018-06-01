@@ -6,13 +6,13 @@
         SyncCredentials credentials = SyncCredentials.usernamePassword(username, password, true);
         final SyncUser user = spy(SyncUser.logIn(credentials, Constants.AUTH_URL));
 
-        when(user.isValid()).thenReturn(true, false);
+        when(user.isValid()).thenReturn(true, true, false);
 
         final RealmConfiguration configuration = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM).build();
         Realm realm = Realm.getInstance(configuration);
 
         assertFalse(user.isValid());
-        verify(user, times(2)).isValid();
+        verify(user, times(3)).isValid();
 
         final CountDownLatch backgroundThread = new CountDownLatch(1);
         // Should not throw when using an expired refresh_token form a different thread

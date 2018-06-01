@@ -6,7 +6,9 @@
      *
      * @throws IllegalArgumentException if no user was provided or the user isn't valid.
      * @return The constructed {@link SyncConfiguration}.
+     * @deprecated use {@link SyncUser#getDefaultConfiguration()} instead.
      */
+    @Deprecated
     @Beta
     public static SyncConfiguration automatic(SyncUser user) {
         if (user == null) {
@@ -15,6 +17,6 @@
         if (!user.isValid()) {
             throw new IllegalArgumentException("User is no logger valid.  Log the user in again.");
         }
-        return getDefaultConfig(user);
+        return user.getDefaultConfiguration();
     }
 

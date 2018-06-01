@@ -1,5 +1,6 @@
         /**
-         * Creates an instance of the Builder for the SyncConfiguration.
+         * Creates an instance of the Builder for the SyncConfiguration. This SyncConfiguration
+         * will be for a fully synchronized Realm.
          * <p>
          * Opening a synchronized Realm requires a valid user and an unique URI that identifies that Realm. In URIs,
          * {@code /~/} can be used as a placeholder for a user ID in case the Realm should only be available to one
@@ -24,8 +25,11 @@
          *            assume the file is located on the same server returned by {@link SyncUser#getAuthenticationUrl()}.
          *
          * @see SyncUser#isValid()
+         * @deprecated Use {@link SyncUser#createConfiguration(String)} instead.
          */
+        @Deprecated
         public Builder(SyncUser user, String uri) {
             this(BaseRealm.applicationContext, user, uri);
+            fullSynchronization();
         }
 

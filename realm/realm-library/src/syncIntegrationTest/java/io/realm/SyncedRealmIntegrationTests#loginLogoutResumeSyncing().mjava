@@ -1,11 +1,13 @@
     @Test
+    @RunTestInLooperThread
     public void loginLogoutResumeSyncing() throws InterruptedException {
         String username = UUID.randomUUID().toString();
         String password = "password";
         SyncUser user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password, true), Constants.AUTH_URL);
 
-        SyncConfiguration config = new SyncConfiguration.Builder(user, Constants.USER_REALM)
+        SyncConfiguration config = user.createConfiguration(Constants.USER_REALM)
                 .schema(StringOnly.class)
+                .fullSynchronization()
                 .sessionStopPolicy(OsRealmConfig.SyncSessionStopPolicy.IMMEDIATELY)
                 .build();
 
@@ -30,7 +32,8 @@
         }
 
         user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password, false), Constants.AUTH_URL);
-        SyncConfiguration config2 = new SyncConfiguration.Builder(user, Constants.USER_REALM)
+        SyncConfiguration config2 = user.createConfiguration(Constants.USER_REALM)
+                .fullSynchronization()
                 .schema(StringOnly.class)
                 .build();
 
@@ -39,5 +42,6 @@
         realm2.refresh();
         assertEquals(1, realm2.where(StringOnly.class).count());
         realm2.close();
+        looperThread.testComplete();
     }
 
