@@ -1,0 +1,14 @@
+    @Test
+    public void getRealm_throwsIfDynamicRealm() {
+        DynamicRealm dRealm = DynamicRealm.getInstance(realm.getConfiguration());
+        DynamicRealmObject obj = dRealm.where(Owner.CLASS_NAME).findFirst();
+        RealmList<DynamicRealmObject> list = obj.getList("dogs");
+        try {
+            list.getRealm();
+            fail();
+        } catch (IllegalStateException ignore) {
+        } finally {
+            dRealm.close();
+        }
+    }
+

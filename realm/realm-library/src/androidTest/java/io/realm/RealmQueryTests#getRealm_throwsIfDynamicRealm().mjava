@@ -1,0 +1,12 @@
+    @Test
+    public void getRealm_throwsIfDynamicRealm() {
+        DynamicRealm dRealm = DynamicRealm.getInstance(realm.getConfiguration());
+        try {
+            dRealm.where(AllTypes.CLASS_NAME).getRealm();
+            fail();
+        } catch (IllegalStateException ignore) {
+        } finally {
+            dRealm.close();
+        }
+    }
+

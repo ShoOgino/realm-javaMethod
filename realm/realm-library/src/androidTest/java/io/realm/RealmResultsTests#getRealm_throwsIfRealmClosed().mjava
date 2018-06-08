@@ -1,0 +1,11 @@
+    @Test
+    public void getRealm_throwsIfRealmClosed() {
+        RealmResults<AllTypes> collection = realm.where(AllTypes.class).findAll();
+        realm.close();
+        try {
+            collection.getRealm();
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+    }
+
