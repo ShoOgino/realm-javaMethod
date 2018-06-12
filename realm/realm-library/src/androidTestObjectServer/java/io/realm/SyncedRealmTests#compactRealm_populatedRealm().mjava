@@ -1,0 +1,15 @@
+    @Test
+    public void compactRealm_populatedRealm() {
+        SyncConfiguration config = configFactory.createSyncConfigurationBuilder(SyncTestUtils.createTestUser(), Constants.DEFAULT_REALM).build();
+        realm = Realm.getInstance(config);
+        realm.executeTransaction(r -> {
+            for (int i = 0; i < 10; i++) {
+                r.insert(new AllJavaTypes(i));
+            }
+        });
+        realm.close();
+        assertTrue(Realm.compactRealm(config));
+        realm = Realm.getInstance(config);
+        assertEquals(10, realm.where(AllJavaTypes.class).count());
+    }
+
