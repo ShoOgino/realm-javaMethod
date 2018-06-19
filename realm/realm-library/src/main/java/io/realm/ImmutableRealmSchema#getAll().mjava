@@ -1,0 +1,14 @@
+    @Override
+    public Set<RealmObjectSchema> getAll() {
+        // Only return schema objects for classes defined by the schema in the RealmConfiguration
+        RealmProxyMediator schemaMediator = realm.getConfiguration().getSchemaMediator();
+        Set<Class<? extends RealmModel>> classes = schemaMediator.getModelClasses();
+        Set<RealmObjectSchema> schemas = new LinkedHashSet<>(classes.size());
+        for (Class<? extends RealmModel> clazz : classes) {
+            String className = schemaMediator.getSimpleClassName(clazz);
+            RealmObjectSchema objectSchema = get(className);
+            schemas.add(objectSchema);
+        }
+        return schemas;
+    }
+

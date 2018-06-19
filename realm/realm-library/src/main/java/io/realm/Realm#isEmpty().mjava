@@ -1,0 +1,14 @@
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEmpty() {
+        checkIfValid();
+        for (RealmObjectSchema clazz : schema.getAll()) {
+            if (!clazz.getClassName().startsWith("__") && clazz.getTable().size() > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
