@@ -1,0 +1,14 @@
+    // Verify that count correctly when using distinct.
+    // See https://github.com/realm/realm-java/issues/5958
+    @Test
+    public void distinctCount() {
+        realm.executeTransaction(r -> {
+            for (int i = 0; i < 5; i++) {
+                AllTypes obj = new AllTypes();
+                obj.setColumnString("Foo");
+                realm.copyToRealm(obj);
+            }
+        });
+        assertEquals(1, realm.where(AllTypes.class).distinct(AllTypes.FIELD_STRING).count());
+    }
+

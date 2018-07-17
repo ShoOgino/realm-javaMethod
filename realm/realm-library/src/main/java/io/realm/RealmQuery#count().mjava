@@ -6,7 +6,11 @@
      */
     public long count() {
         realm.checkIfValid();
-
-        return this.query.count();
+        // The fastest way of doing `count()` is going through `TableQuery.count()`. Unfortunately
+        // doing this does not correctly apply all side effects of queries (like subscriptions). Also
+        // some queries constructs, like doing distinct is not easily supported this way.
+        // In order to get the best of both worlds we thus need to create a Java RealmResults object
+        // and then directly access the `Results` class from Object Store.
+        return lazyFindAll().size();
     }
 
