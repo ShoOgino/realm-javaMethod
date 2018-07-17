@@ -19,8 +19,10 @@
         if (object instanceof RealmObjectProxy) {
             RealmObjectProxy proxy = (RealmObjectProxy) object;
             BaseRealm realm = proxy.realmGet$proxyState().getRealm$realm();
-            realm.checkIfValid();
-            realm.sharedRealm.capabilities.checkCanDeliverNotification(BaseRealm.LISTENER_NOT_ALLOWED_MESSAGE);
+            if (realm.isClosed()) {
+                RealmLog.warn("Calling removeChangeListener on a closed Realm %s, " +
+                        "make sure to close all listeners before closing the Realm.", realm.configuration.getPath());
+            }
             //noinspection unchecked
             proxy.realmGet$proxyState().removeChangeListener(listener);
         } else {

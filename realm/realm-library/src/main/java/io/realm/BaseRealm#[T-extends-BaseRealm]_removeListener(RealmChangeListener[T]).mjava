@@ -11,8 +11,10 @@
         if (listener == null) {
             throw new IllegalArgumentException("Listener should not be null");
         }
-        checkIfValid();
-        sharedRealm.capabilities.checkCanDeliverNotification(LISTENER_NOT_ALLOWED_MESSAGE);
+        if (isClosed()) {
+            RealmLog.warn("Calling removeChangeListener on a closed Realm %s, " +
+                    "make sure to close all listeners before closing the Realm.", configuration.getPath());
+        }
         //noinspection unchecked
         sharedRealm.realmNotifier.removeChangeListener((T) this, listener);
     }

@@ -5,8 +5,10 @@
      * @see io.realm.RealmChangeListener
      */
     protected void removeAllListeners() {
-        checkIfValid();
-        sharedRealm.capabilities.checkCanDeliverNotification("removeListener cannot be called on current thread.");
+        if (isClosed()) {
+            RealmLog.warn("Calling removeChangeListener on a closed Realm %s, " +
+                    "make sure to close all listeners before closing the Realm.", configuration.getPath());
+        }
         sharedRealm.realmNotifier.removeChangeListeners(this);
     }
 

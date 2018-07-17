@@ -1,0 +1,49 @@
+    @Test
+    @RunTestInLooperThread
+    public void removeListenerOnInvalidObjectShouldWarn() {
+        realm = Realm.getInstance(realmConfig);
+        RealmChangeListener<StringOnly> listener = realmModel -> {
+        };
+        RealmChangeListener<RealmResults<StringOnly>> listenerAll = realmModel -> {
+        };
+
+        realm.beginTransaction();
+        StringOnly stringOnly = realm.createObject(StringOnly.class);
+        realm.commitTransaction();
+
+        stringOnly.addChangeListener(listener);
+
+        RealmResults<StringOnly> all = realm.where(StringOnly.class).findAll();
+        all.addChangeListener(listenerAll);
+
+        realm.close();
+
+        // add a custom logger to capture expected warning message
+        TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
+        RealmLog.add(testLogger);
+
+        stringOnly.removeChangeListener(listener);
+        assertThat(testLogger.message, CoreMatchers.containsString(
+                "Calling removeChangeListener on a closed Realm " + realm.getPath() + ", make sure to close all listeners before closing the Realm."));
+
+        testLogger.message = "";
+        stringOnly.removeAllChangeListeners();
+        assertThat(testLogger.message, CoreMatchers.containsString(
+                "Calling removeChangeListener on a closed Realm " + realm.getPath() + ", make sure to close all listeners before closing the Realm."));
+
+
+        testLogger.message = "";
+        all.removeChangeListener(listenerAll);
+        assertThat(testLogger.message, CoreMatchers.containsString(
+                "Calling removeChangeListener on a closed Realm " + realm.getPath() + ", make sure to close all listeners before closing the Realm."));
+
+        testLogger.message = "";
+        all.removeAllChangeListeners();
+        assertThat(testLogger.message, CoreMatchers.containsString(
+                "Calling removeChangeListener on a closed Realm " + realm.getPath() + ", make sure to close all listeners before closing the Realm."));
+
+        RealmLog.remove(testLogger);
+
+        looperThread.testComplete();
+    }
+
