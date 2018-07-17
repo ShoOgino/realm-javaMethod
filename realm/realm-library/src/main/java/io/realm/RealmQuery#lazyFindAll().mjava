@@ -1,0 +1,18 @@
+    /**
+     * The same as {@link #findAll()} expect the RealmResult is not forcefully evaluated. This
+     * means this method will return a more "pure" wrapper around the Object Store Results class.
+     *
+     * This can be useful for internal usage where we still want to take advantage of optimizations
+     * and additional functionality provided by Object Store, but do not wish to trigger the query
+     * unless needed.
+     */
+    private OsResults lazyFindAll() {
+        realm.checkIfValid();
+        return createRealmResults(
+                query,
+                sortDescriptor,
+                distinctDescriptor,
+                false,
+                SubscriptionAction.NO_SUBSCRIPTION).osResults;
+    }
+
