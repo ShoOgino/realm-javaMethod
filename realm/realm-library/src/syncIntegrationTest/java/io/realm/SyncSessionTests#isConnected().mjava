@@ -1,0 +1,22 @@
+    @Test
+    @RunTestInLooperThread
+    public void isConnected() {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        SyncConfiguration syncConfiguration = configFactory
+                .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .build();
+        looperThread.closeAfterTest(Realm.getInstance(syncConfiguration));
+        SyncSession session = SyncManager.getSession(syncConfiguration);
+        if (session.isConnected()) {
+            looperThread.testComplete();
+        } else {
+            session.addConnectionChangeListener(((oldState, newState) -> {
+                if (newState == ConnectionState.CONNECTED) {
+                    assertEquals(session.getConnectionState(), ConnectionState.CONNECTED);
+                    assertTrue(session.isConnected());
+                    looperThread.testComplete();
+                }
+            }));
+        }
+    }
+

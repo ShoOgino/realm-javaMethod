@@ -8,13 +8,12 @@
      * @return the state of the session.
      * @see SyncSession.State
      */
-    @SuppressWarnings("unused")
     public State getState() {
         byte state = nativeGetState(configuration.getPath());
         if (state == -1) {
             // session was not found, probably the Realm was closed
             throw new IllegalStateException("Could not find session, Realm was probably closed");
         }
-        return State.fromByte(state);
+        return State.fromNativeValue(state);
     }
 
