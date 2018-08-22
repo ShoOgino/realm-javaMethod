@@ -5,7 +5,7 @@
         if (user == null) { return; }
 
         // Create a RealmConfiguration for our user
-        SyncConfiguration config = user.createConfiguration(REALM_URL)
+        SyncConfiguration config = user.createConfiguration(BuildConfig.REALM_URL)
                 .initialData(new Realm.Transaction() {
                     @Override
                     public void execute(@Nonnull Realm realm) {
@@ -18,11 +18,16 @@
         realm = Realm.getInstance(config);
 
         counterView.setText("-");
-        counter = realm.where(CRDTCounter.class).equalTo("name", user.getIdentity()).findFirstAsync();
-        counter.addChangeListener(new RealmChangeListener<CRDTCounter>() {
+        counters = realm.where(CRDTCounter.class).equalTo("name", user.getIdentity()).findAllAsync();
+        counters.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<CRDTCounter>>() {
             @Override
-            public void onChange(@Nonnull CRDTCounter counter) {
-                counterView.setText((!counter.isValid()) ? "-" : String.format(Locale.US, "%d", counter.getCount()));
+            public void onChange(RealmResults<CRDTCounter> counters, OrderedCollectionChangeSet changeSet) {
+                if (counters.isValid() && !counters.isEmpty()) {
+                    CRDTCounter counter = counters.first();
+                    counterView.setText(String.format(Locale.US, "%d", counter.getCount()));
+                } else {
+                    counterView.setText("-");
+                }
             }
         });
 
