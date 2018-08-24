@@ -26,7 +26,12 @@
             return new ArrayList<>(0);
         }
 
-        ArrayList<E> unmanagedObjects = new ArrayList<>();
+        ArrayList unmanagedObjects;
+        if (realmObjects instanceof Collection) {
+            unmanagedObjects = new ArrayList<>(((Collection) realmObjects).size());
+        } else {
+            unmanagedObjects = new ArrayList<>();
+        }
         Map<RealmModel, RealmObjectProxy.CacheData<RealmModel>> listCache = new HashMap<>();
         for (E object : realmObjects) {
             checkValidObjectForDetach(object);

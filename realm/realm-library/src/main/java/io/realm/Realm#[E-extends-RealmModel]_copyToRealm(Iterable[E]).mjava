@@ -16,8 +16,13 @@
         if (objects == null) {
             return new ArrayList<>();
         }
+        ArrayList realmObjects;
+        if (objects instanceof Collection) {
+            realmObjects = new ArrayList<>(((Collection) objects).size());
+        } else {
+            realmObjects = new ArrayList<>();
+        }
         Map<RealmModel, RealmObjectProxy> cache = new HashMap<>();
-        ArrayList<E> realmObjects = new ArrayList<>();
         for (E object : objects) {
             checkNotNullObject(object);
             realmObjects.add(copyOrUpdate(object, false, cache));
