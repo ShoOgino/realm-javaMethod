@@ -1,0 +1,13 @@
+    @Test
+    @RunTestInLooperThread
+    public void stopStartSession() {
+        getActiveSession(session -> {
+            assertEquals(SyncSession.State.ACTIVE, session.getState());
+            session.stop();
+            assertEquals(SyncSession.State.INACTIVE, session.getState());
+            session.start();
+            assertNotEquals(SyncSession.State.INACTIVE, session.getState());
+            looperThread.testComplete();
+        });
+    }
+

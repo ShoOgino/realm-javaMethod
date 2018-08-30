@@ -1,0 +1,9 @@
+    private SyncSession getSession() {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        SyncConfiguration syncConfiguration = configFactory
+                .createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .build();
+        looperThread.closeAfterTest(Realm.getInstance(syncConfiguration));
+        return SyncManager.getSession(syncConfiguration);
+    }
+
