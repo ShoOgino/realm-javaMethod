@@ -4,9 +4,28 @@
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Accept", "application/json");
 
+        // Add custom headers used by all hosts
+        for (Map.Entry<String, String> entry : customHeaders.get("").entrySet()) {
+            builder.addHeader(entry.getKey(), entry.getValue());
+        }
+
+        // add custom headers used by specific host (may override g
+        Map<String, String> customHeaders = this.customHeaders.get(url.getHost());
+        if (customHeaders != null) {
+            for (Map.Entry<String, String> entry : customHeaders.entrySet()) {
+                builder.addHeader(entry.getKey(), entry.getValue());
+            }
+        }
+
         // Only add Authorization header for those API's that require it.
+        // Use the defined custom authorization name if one is available for this host.
         if (!Util.isEmptyString(authToken)) {
-            builder.addHeader("Authorization", authToken);
+            String headerName = customAuthorizationHeaders.get(url.getHost());
+            if (headerName != null) {
+                builder.addHeader(headerName, authToken);
+            } else {
+                builder.addHeader(customAuthorizationHeaders.get(""), authToken);
+            }
         }
 
         return builder;

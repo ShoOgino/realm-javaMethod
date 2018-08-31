@@ -1,0 +1,8 @@
+    @Test
+    public void addCustomRequestHeader_ignoreCasingForHost() throws URISyntaxException {
+        SyncManager.addCustomRequestHeader("header1", "val1", "lOcAlHoSt");
+        SyncManager.addCustomRequestHeader("header2", "val2", "LOCALHOST");
+        Map<String, String> headers = SyncManager.getCustomRequestHeaders(new URI("http://localhost"));
+        assertEquals(2, headers.size());
+    }
+

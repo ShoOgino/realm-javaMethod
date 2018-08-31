@@ -1,0 +1,25 @@
+    /**
+     * Adds an extra HTTP header to append to every request to a Realm Object Server.
+     *
+     * @param headerName the name of the header.
+     * @param headerValue the value of header.
+     * @param host if this is provided, the this header will only be used on this particular host.
+     *             Example of valid values: "localhost", "127.0.0.1" and "myinstance.us1.cloud.realm.io".
+     * @throws IllegalArgumentException If an non-empty {@code headerName}, {@code headerValue} or {@code host} is provided.
+     */
+    public static synchronized void addCustomRequestHeader(String headerName, String headerValue, String host) {
+        checkNotEmpty(headerName, "headerName");
+        checkNotNull(headerValue, "headerValue");
+        checkNotEmpty(host, "host");
+
+        // Headers
+        host = host.toLowerCase(Locale.US);
+        authServer.addHeader(headerName, headerValue, host);
+        Map<String, String> headers = hostRestrictedCustomHeaders.get(host);
+        if (headers == null) {
+            headers = new LinkedHashMap<>();
+            hostRestrictedCustomHeaders.put(host, headers);
+        }
+        headers.put(headerName, headerValue);
+    }
+

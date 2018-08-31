@@ -1,0 +1,17 @@
+    /**
+     * Sets the name of the HTTP header used to send authorization data in when making requests to
+     * all Realm Object Servers used by the app. These servers must have been configured to expect a
+     * custom authorization header.
+     * <p>
+     * The default authorization header is named "Authorization".
+     *
+     * @param headerName name of the header.
+     * @throws IllegalArgumentException if a null or empty header is provided.
+     * @see <a href="https://docs.realm.io/platform/guides/learn-realm-sync-and-integrate-with-a-proxy#adding-a-custom-proxy">Adding a custom proxy</a>
+     */
+    public static synchronized void setAuthorizationHeaderName(String headerName) {
+        checkNotEmpty(headerName, "headerName");
+        authServer.setAuthorizationHeaderName(headerName, null);
+        globalAuthorizationHeaderName = headerName;
+    }
+

@@ -1,0 +1,14 @@
+    /**
+     * Adds an extra HTTP header to append to every request to a Realm Object Server.
+     *
+     * @param headerName the name of the header.
+     * @param headerValue the value of header.
+     * @throws IllegalArgumentException if a non-empty {@code headerName} is provided or a null {@code headerValue}.
+     */
+    public static synchronized void addCustomRequestHeader(String headerName, String headerValue) {
+        checkNotEmpty(headerName, "headerName");
+        checkNotNull(headerValue, "headerValue");
+        authServer.addHeader(headerName, headerValue, null);
+        globalCustomHeaders.put(headerName, headerValue);
+    }
+
