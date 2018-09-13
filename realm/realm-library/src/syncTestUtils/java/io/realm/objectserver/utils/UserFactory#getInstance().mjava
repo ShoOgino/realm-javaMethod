@@ -1,5 +1,6 @@
     public static synchronized UserFactory getInstance() {
         if (instance == null)  {
+            initFactory(false);
             Realm realm = Realm.getInstance(configuration);
             UserFactoryStore store = realm.where(UserFactoryStore.class).findFirst();
             if (store == null || store.getUserName() == null) {

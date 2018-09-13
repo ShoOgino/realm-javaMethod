@@ -1,0 +1,12 @@
+    // Verify that names using the default value() parameter on annotations are used correctly
+    @Test
+    public void valueParameterDefinedNamesInsteadOfExplicit() {
+        RealmSchema schema = realm.getSchema();
+        assertTrue(schema.contains(ClassWithValueDefinedNames.REALM_CLASS_NAME));
+        assertFalse(schema.contains(ClassWithValueDefinedNames.JAVA_CLASS_NAME));
+
+        RealmObjectSchema classSchema = schema.get(ClassWithValueDefinedNames.REALM_CLASS_NAME);
+        assertTrue(classSchema.hasField(ClassWithValueDefinedNames.REALM_FIELD_NAME));
+        assertFalse(classSchema.hasField(ClassWithValueDefinedNames.JAVA_FIELD_NAME));
+    }
+
