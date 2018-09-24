@@ -12,10 +12,8 @@
      */
     public RealmQuery<E> sort(String[] fieldNames, Sort[] sortOrders) {
         realm.checkIfValid();
-        if (sortDescriptor != null) {
-            throw new IllegalStateException("A sorting order was already defined.");
-        }
-        sortDescriptor = SortDescriptor.getInstanceForSort(getSchemaConnector(), query.getTable(), fieldNames, sortOrders);
+        QueryDescriptor sortDescriptor = QueryDescriptor.getInstanceForSort(getSchemaConnector(), query.getTable(), fieldNames, sortOrders);
+        queryDescriptors.appendSort(sortDescriptor);
         return this;
     }
 

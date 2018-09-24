@@ -1,0 +1,14 @@
+    @Test
+    public void getInstanceForSort_shouldThrowOnInvalidField() {
+        Set<RealmFieldType> types = getValidFieldTypes(QueryDescriptor.SORT_VALID_FIELD_TYPES);
+
+        for (RealmFieldType type : types) {
+            try {
+                QueryDescriptor.getInstanceForSort(null, table, type.name(), Sort.ASCENDING);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+                assertTrue(ignored.getMessage().contains("Sort is not supported"));
+            }
+        }
+    }
+

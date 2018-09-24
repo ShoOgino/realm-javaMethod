@@ -1,8 +1,9 @@
     @Test
     public void indexOf() {
-        SortDescriptor sortDescriptor = SortDescriptor.getTestInstance(table, new long[] {2});
+        DescriptorOrdering queryDescriptors = new DescriptorOrdering();
+        queryDescriptors.appendSort(QueryDescriptor.getTestInstance(table, new long[] {2}));
 
-        OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where(), sortDescriptor, null);
+        OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where(), queryDescriptors);
         UncheckedRow row = table.getUncheckedRow(0);
         assertEquals(3, osResults.indexOf(row));
     }

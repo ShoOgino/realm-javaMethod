@@ -1,7 +1,8 @@
     @Test
     public void constructor_withDistinct() {
-        SortDescriptor distinctDescriptor = SortDescriptor.getInstanceForDistinct(null, table, "firstName");
-        OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where(), null, distinctDescriptor);
+        DescriptorOrdering queryDescriptors = new DescriptorOrdering();
+        queryDescriptors.appendDistinct(QueryDescriptor.getInstanceForDistinct(null, table, "firstName"));
+        OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where(), queryDescriptors);
 
         assertEquals(3, osResults.size());
         assertEquals("John", osResults.getUncheckedRow(0).getString(0));

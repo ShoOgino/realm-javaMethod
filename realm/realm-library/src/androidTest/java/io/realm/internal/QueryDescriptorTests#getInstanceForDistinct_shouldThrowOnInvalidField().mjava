@@ -1,0 +1,14 @@
+    @Test
+    public void getInstanceForDistinct_shouldThrowOnInvalidField() {
+        Set<RealmFieldType> types = getValidFieldTypes(QueryDescriptor.DISTINCT_VALID_FIELD_TYPES);
+
+        for (RealmFieldType type : types) {
+            try {
+                QueryDescriptor.getInstanceForDistinct(null, table, type.name());
+                fail();
+            } catch (IllegalArgumentException ignored) {
+                assertTrue(ignored.getMessage().contains("Distinct is not supported"));
+            }
+        }
+    }
+

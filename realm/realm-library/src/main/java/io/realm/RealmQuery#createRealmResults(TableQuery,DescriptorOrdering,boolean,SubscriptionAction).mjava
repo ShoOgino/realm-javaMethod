@@ -1,0 +1,24 @@
+    private RealmResults<E> createRealmResults(TableQuery query,
+                                               DescriptorOrdering queryDescriptors,
+                                               boolean loadResults,
+                                               SubscriptionAction subscriptionAction) {
+        RealmResults<E> results;
+        OsResults osResults;
+        if (subscriptionAction.shouldCreateSubscriptions()) {
+            osResults = SubscriptionAwareOsResults.createFromQuery(realm.sharedRealm, query, queryDescriptors, subscriptionAction.getName());
+        } else {
+            osResults = OsResults.createFromQuery(realm.sharedRealm, query, queryDescriptors);
+        }
+
+        if (isDynamicQuery()) {
+            results = new RealmResults<>(realm, osResults, className);
+        } else {
+            results = new RealmResults<>(realm, osResults, clazz);
+        }
+        if (loadResults) {
+            results.load();
+        }
+
+        return results;
+    }
+

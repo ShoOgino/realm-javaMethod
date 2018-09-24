@@ -1,0 +1,6 @@
+    public static OsResults createFromQuery(OsSharedRealm sharedRealm, TableQuery query, DescriptorOrdering queryDescriptors) {
+        query.validateQuery();
+        long ptr = nativeCreateResults(sharedRealm.getNativePtr(), query.getNativePtr(), queryDescriptors.getNativePtr());
+        return new OsResults(sharedRealm, query.getTable(), ptr);
+    }
+

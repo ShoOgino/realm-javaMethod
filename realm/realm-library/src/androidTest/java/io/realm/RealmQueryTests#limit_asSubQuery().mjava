@@ -1,0 +1,24 @@
+    // Checks that https://github.com/realm/realm-object-store/pull/679/files#diff-c0354faf99b53cc5d3c9e6a58ed9ae85R610
+    // Do not apply to Realm Java as we do not lazy-execute queries.
+    @Test
+    public void limit_asSubQuery() {
+        realm.executeTransaction(r -> {
+            for (int i = 0; i < 10; i++) {
+                r.createObject(AllTypes.class).setColumnLong(i % 5);
+            }
+        });
+
+        RealmResults<AllTypes> results = realm.where(AllTypes.class)
+                .sort(AllTypes.FIELD_LONG, Sort.DESCENDING)
+                .findAll() // [4, 4, 3, 3, 2, 2, 1, 1, 0, 0]
+                .where()
+                .distinct(AllTypes.FIELD_LONG)
+                .findAll() // [4, 3, 2, 1, 0]
+                .where()
+                .limit(2) // [4, 3]
+                .findAll();
+        assertEquals(2, results.size());
+        assertEquals(4, results.first().getColumnLong());
+        assertEquals(3, results.last().getColumnLong());
+    }
+

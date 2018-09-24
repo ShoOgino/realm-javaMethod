@@ -1,0 +1,32 @@
+    // Checks that we can attach change listeners to queries involving `limit()` and that
+    // they do the right thing
+    @Test
+    @RunTestInLooperThread
+    public void limitedQueryResult_fromTable_simpleChangeListener() {
+        realm = looperThread.getRealm();
+        realm.executeTransaction(r -> {
+            for (int i = 0; i < 5; i++) {
+                r.createObject(AllTypes.class).setColumnLong(i % 5);
+            }
+        });
+        RealmResults<AllTypes> results = realm.where(AllTypes.class)
+                .sort(AllTypes.FIELD_LONG, Sort.DESCENDING) // [4, 4, 3, 3, 2, 2, 1, 1, 0, 0]
+                .distinct(AllTypes.FIELD_LONG) // [4, 3, 2, 1, 0]
+                .limit(2) // [4, 3]
+                .findAll();
+        looperThread.keepStrongReference(results);
+        results.addChangeListener((objects) -> {
+            assertEquals(2, objects.size());
+            assertEquals(5, objects.first().getColumnLong());
+            assertEquals(4, objects.last().getColumnLong());
+            looperThread.testComplete();
+        });
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.createObject(AllTypes.class).setColumnLong(5);
+            }
+        });
+    }
+
