@@ -1,10 +1,13 @@
     /**
      * Signal that the test has completed.
      * <p>
-     * Used on both the main and test threads.
-     * Valid after {@code before}.
+     * Can be used on both the main and test threads.
      */
     public void testComplete() {
-        signalTestCompleted.countDown();
+        // Close all resources and run any after test tasks
+        // Post as runnable to ensure that this code runs on the correct thread.
+        postRunnable(() -> {
+            closeTestResources();
+        });
     }
 

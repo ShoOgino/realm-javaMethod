@@ -1,10 +1,11 @@
     /**
      * Checks if the current test is considered completed or not.
+     *
      * It is completed if either {@link #testComplete()} was called or an uncaught exception was thrown.
      */
     public boolean isTestComplete() {
         synchronized (lock) {
-            return signalTestCompleted.getCount() == 0;
+            return signalTestCompleted.getCount() <= 0 || testCompletedButNotFullyTornDown;
         }
     }
 

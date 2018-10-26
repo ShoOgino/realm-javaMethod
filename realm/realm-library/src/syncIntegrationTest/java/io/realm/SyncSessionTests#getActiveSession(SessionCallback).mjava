@@ -1,17 +1,18 @@
     private void getActiveSession(SessionCallback callback) {
-        SyncSession session = getSession();
-        if (session.isConnected()) {
-            callback.onReady(session);
-        } else {
-            session.addConnectionChangeListener(new ConnectionListener() {
-                @Override
-                public void onChange(ConnectionState oldState, ConnectionState newState) {
-                    if (newState == ConnectionState.CONNECTED) {
-                        session.removeConnectionChangeListener(this);
-                        callback.onReady(session);
+        getSession(session -> {
+            if (session.isConnected()) {
+                callback.onReady(session);
+            } else {
+                session.addConnectionChangeListener(new ConnectionListener() {
+                    @Override
+                    public void onChange(ConnectionState oldState, ConnectionState newState) {
+                        if (newState == ConnectionState.CONNECTED) {
+                            session.removeConnectionChangeListener(this);
+                            callback.onReady(session);
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
+        });
     }
 

@@ -1,0 +1,13 @@
+    @After
+    public void tearDown() {
+        if (realm != null && !realm.isClosed()) {
+            realm.close();
+        }
+        if (dynamicRealm != null && !dynamicRealm.isClosed()) {
+            dynamicRealm.close();
+        }
+        for (SyncUser user : SyncUser.all().values()) {
+            user.logOut();
+        }
+    }
+

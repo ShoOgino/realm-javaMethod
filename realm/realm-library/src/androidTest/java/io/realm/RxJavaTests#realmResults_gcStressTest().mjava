@@ -15,30 +15,16 @@
         realm.commitTransaction();
 
         for (int i = 0; i < TEST_SIZE; i++) {
-            // Doesn't keep a reference to the Observable.
             realm.where(AllTypes.class).equalTo(AllTypes.FIELD_LONG, i).findAllAsync().asFlowable()
-                    .filter(new Predicate<RealmResults<AllTypes>>() {
-                        @Override
-                        public boolean test(RealmResults<AllTypes> results) throws Exception {
-                            return results.isLoaded();
-                        }
-                    })
+                    .filter(results -> results.isLoaded())
                     .take(1) // Unsubscribes from Realm.
-                    .subscribe(new Consumer<RealmResults<AllTypes>>() {
-                        @Override
-                        public void accept(RealmResults<AllTypes> allTypes) throws Exception {
-                            // Not guaranteed, but can result in the GC of other RealmResults waiting for a result.
-                            Runtime.getRuntime().gc();
-                            if (innerCounter.incrementAndGet() == TEST_SIZE) {
-                                looperThread.testComplete();
-                            }
+                    .subscribe(allTypes -> {
+                        // Not guaranteed, but can result in the GC of other RealmResults waiting for a result.
+                        Runtime.getRuntime().gc();
+                        if (innerCounter.incrementAndGet() == TEST_SIZE) {
+                            looperThread.testComplete();
                         }
-                    }, new Consumer<Throwable>() {
-                        @Override
-                        public void accept(Throwable throwable) throws Exception {
-                            fail(throwable.toString());
-                        }
-                    });
+                    }, throwable -> fail(throwable.toString()));
         }
     }
 

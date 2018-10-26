@@ -1,0 +1,19 @@
+    /**
+     * Internal logic for shutting down a test.
+     */
+    private void closeTestResources() {
+        testCompletedButNotFullyTornDown = true;
+        try {
+            closeResources();
+            closeRealms();
+            for (Runnable task : runAfterTestIsComplete) {
+                task.run();
+            }
+        } catch (Throwable t) {
+            throw new AssertionError("Failed to close test resources correctly", t);
+        } finally {
+            testCompletedButNotFullyTornDown = false;
+            signalTestCompleted.countDown();
+        }
+    }
+

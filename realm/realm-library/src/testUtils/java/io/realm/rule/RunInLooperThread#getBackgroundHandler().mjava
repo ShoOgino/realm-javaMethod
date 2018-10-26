@@ -5,8 +5,8 @@
             while (backgroundHandler == null) {
                 try {
                     lock.wait(WAIT_TIMEOUT_MS);
-                } catch (InterruptedException ignore) {
-                    break;
+                } catch (InterruptedException e) {
+                    throw new AssertionError("Could not acquire the test handler.", e);
                 }
             }
             return this.backgroundHandler;

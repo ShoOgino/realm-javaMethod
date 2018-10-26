@@ -1,7 +1,11 @@
     @Test
     @RunTestInLooperThread
     public void getInstanceAsync_nullCallbackShouldThrow() {
-        thrown.expect(IllegalArgumentException.class);
-        DynamicRealm.getInstanceAsync(defaultConfig, null);
+        try {
+            //noinspection ConstantConditions
+            DynamicRealm.getInstanceAsync(defaultConfig, null);
+        } catch (IllegalArgumentException ignored) {
+        }
+        looperThread.testComplete();
     }
 

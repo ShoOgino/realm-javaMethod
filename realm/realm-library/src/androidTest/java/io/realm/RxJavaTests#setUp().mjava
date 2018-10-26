@@ -2,5 +2,10 @@
     public void setUp() throws Exception {
         // For non-LooperThread tests.
         realm = Realm.getInstance(configFactory.createConfiguration());
+        looperThread.runAfterTest(() -> {
+            if (subscription != null && !subscription.isDisposed()) {
+                subscription.dispose();
+            }
+        });
     }
 

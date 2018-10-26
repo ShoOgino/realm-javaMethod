@@ -30,9 +30,12 @@
         // precondition
         assertFalse(target.isValid());
 
-        thrown.expect(IllegalStateException.class);
-        //noinspection ResultOfMethodCallIgnored
-        target.getParents();
-        fail();
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            target.getParents();
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+        looperThread.testComplete();
     }
 

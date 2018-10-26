@@ -1,0 +1,13 @@
+    @Test
+    public void subscribe_throwIfBasedOnList() {
+        realm = getPartialRealm();
+        realm.beginTransaction();
+        realm.createObject(AllTypes.class).getColumnRealmList().add(new Dog("fido"));
+        RealmQuery<Dog> query = realm.where(AllTypes.class).findFirst().getColumnRealmList().where();
+        try {
+            query.subscribe("sub");
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+    }
+

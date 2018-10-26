@@ -1,0 +1,30 @@
+    @Test
+    @RunTestInLooperThread
+    public void initialDataAndWaitForRemoteInitialData() throws InterruptedException {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        createServerData(user, Constants.SYNC_SERVER_URL);
+
+        // Create partial Realm that will wait for the subscriptions
+        final SyncConfiguration partialSyncConfig = configurationFactory.createSyncConfigurationBuilder(user, Constants.SYNC_SERVER_URL)
+                .name("partialSync")
+                .initialData(r -> {
+                    r.where(PartialSyncObjectA.class).greaterThan("number", 5).subscribe("my-sub");
+                })
+                .waitForInitialRemoteData()
+                .modules(new PartialSyncModule())
+                .build();
+        Realm realm = Realm.getInstance(partialSyncConfig);
+        looperThread.closeAfterTest(realm);
+
+        // Check the state of subscriptions. Sync automatically creates subscriptions for fine-grained permission classes.
+        assertEquals(6, realm.getSubscriptions().size());
+        assertTrue(realm.getSubscriptions().where().equalTo("status", 0).findAll().isEmpty());
+        Subscription sub = realm.getSubscription("my-sub");
+        assertEquals(Subscription.State.ACTIVE, sub.getState());
+
+        // Check that data is downloaded
+        assertFalse(realm.isEmpty());
+        assertEquals(4, realm.where(PartialSyncObjectA.class).findAll().size());
+        looperThread.testComplete();
+    }
+

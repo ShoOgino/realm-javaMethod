@@ -1,0 +1,22 @@
+    @Override
+    public void downloadInitialRemoteChanges(RealmConfiguration config) {
+        if (config instanceof SyncConfiguration) {
+            SyncConfiguration syncConfig = (SyncConfiguration) config;
+            if (syncConfig.shouldWaitForInitialRemoteData()) {
+                SyncSession session = SyncManager.getSession(syncConfig);
+                try {
+                    if (!syncConfig.isFullySynchronizedRealm()) {
+                        // For Query-based Realms we want to upload all our local changes
+                        // first since those might include subscriptions the server needs to process.
+                        // This means that once `downloadAllServerChanges` completes all
+                        // initial subscriptions will also have been downloaded.
+                        session.uploadAllLocalChanges();
+                    }
+                    session.downloadAllServerChanges();
+                } catch (InterruptedException e) {
+                    throw new DownloadingRealmInterruptedException(syncConfig, e);
+                }
+            }
+        }
+    }
+

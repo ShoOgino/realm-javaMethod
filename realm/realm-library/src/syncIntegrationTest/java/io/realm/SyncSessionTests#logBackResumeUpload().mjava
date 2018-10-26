@@ -61,9 +61,13 @@
                         if (stringOnlies.size() == 2) {
                             Assert.assertEquals("1", stringOnlies.get(0).getChars());
                             Assert.assertEquals("2", stringOnlies.get(1).getChars());
-                            adminRealm.close();
-                            testCompleted.countDown();
-                            handlerThread.quit();
+                            handler.post(() -> {
+                                // Closing a Realm from inside a listener doesn't seem to remove the
+                                // active session reference in Object Store
+                                adminRealm.close();
+                                testCompleted.countDown();
+                                handlerThread.quit();
+                            });
                         }
                     }
                 };
@@ -78,7 +82,7 @@
             }
         });
 
-        TestHelper.awaitOrFail(testCompleted, 60);
+        TestHelper.awaitOrFail(testCompleted);
         realm.close();
     }
 

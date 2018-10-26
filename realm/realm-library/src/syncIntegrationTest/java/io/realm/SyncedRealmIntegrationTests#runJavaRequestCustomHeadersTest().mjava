@@ -1,13 +1,19 @@
     private void runJavaRequestCustomHeadersTest() {
         SyncCredentials credentials = SyncCredentials.nickname("test", false);
 
+        AtomicBoolean headerSet = new AtomicBoolean(false);
         RealmLog.setLevel(LogLevel.ALL);
-        RealmLog.add((level, tag, throwable, message) -> {
+        RealmLogger logger = (level, tag, throwable, message) -> {
             if (level == LogLevel.TRACE
                     && message.contains("Foo: bar")
                     && message.contains("RealmAuth: ")) {
-                looperThread.testComplete();
-            }});
+                headerSet.set(true);
+            }
+        };
+        looperThread.runAfterTest(() -> {
+            RealmLog.remove(logger);
+        });
+        RealmLog.add(logger);
 
         SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
         try {
@@ -17,5 +23,8 @@
                 throw e;
             }
         }
+
+        assertTrue(headerSet.get());
+        looperThread.testComplete();
     }
 

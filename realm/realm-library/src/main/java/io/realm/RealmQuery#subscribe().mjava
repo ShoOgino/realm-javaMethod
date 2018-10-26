@@ -1,0 +1,19 @@
+    /**
+     * Creates an anonymous subscription from this query or returns the existing Subscription if
+     * one already existed.
+     *
+     * @return the subscription representing this query.
+     * @throws IllegalStateException if this method is not called inside a write transaction or if
+     * the query is on a {@link DynamicRealm}
+     */
+    @ObjectServer
+    @Beta
+    public Subscription subscribe() {
+        StringBuilder sb = new StringBuilder("[");
+        sb.append((table != null) ? table.getClassName() : "");
+        sb.append("] ");
+        sb.append(nativeSerializeQuery(query.getNativePtr(), queryDescriptors.getNativePtr()));
+        String name = sb.toString();
+        return subscribe(name);
+    }
+

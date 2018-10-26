@@ -1,0 +1,22 @@
+    /**
+     * Synchronize all initial subscriptions to disk (if needed).
+     *
+     * If activating the subscriptions fails for a new Realm file, the file will be deleted so a new
+     * attempt can be done later. Old Realm files will be left alone.
+     *
+     * This method is not threadsafe. Synchronization should happen outside it.
+     *
+     * @param realm Realm instance to synchronize instances for. It is safe to close this Realm if an exception is thrown.
+     * @param  {@code true} if the file existed on disk before trying to open the Realm.
+     */
+    private static void synchronizeInitialSubscriptionsIfNeeded(Realm realm, boolean realmFileIsBeingCreated) {
+        if (realmFileIsBeingCreated) {
+            try {
+                ObjectServerFacade.getSyncFacadeIfPossible().downloadInitialSubscriptions(realm);
+            } catch (Throwable t) {
+                realm.close();
+                deleteRealmFileOnDisk(realm.getConfiguration());
+            }
+        }
+    }
+

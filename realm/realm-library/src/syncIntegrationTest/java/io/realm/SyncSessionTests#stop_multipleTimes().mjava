@@ -1,11 +1,12 @@
     @Test
     @RunTestInLooperThread
     public void stop_multipleTimes() {
-        SyncSession session = getSession();
-        session.stop();
-        assertEquals(SyncSession.State.INACTIVE, session.getState());
-        session.stop();
-        assertEquals(SyncSession.State.INACTIVE, session.getState());
-        looperThread.testComplete();
+        getSession(session -> {
+            session.stop();
+            assertEquals(SyncSession.State.INACTIVE, session.getState());
+            session.stop();
+            assertEquals(SyncSession.State.INACTIVE, session.getState());
+            looperThread.testComplete();
+        });
     }
 

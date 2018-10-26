@@ -1,0 +1,11 @@
+    @Test
+    public void subscribe_throwIfOutsideWriteTransaction() {
+        realm = getPartialRealm();
+        RealmQuery<AllTypes> query = realm.where(AllTypes.class);
+        try {
+            query.subscribe("sub");
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+    }
+

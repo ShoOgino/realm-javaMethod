@@ -20,9 +20,12 @@
         // precondition
         assertFalse(targetAsync.isLoaded());
 
-        thrown.expect(IllegalStateException.class);
-        //noinspection ResultOfMethodCallIgnored
-        targetAsync.getParents();
-        fail();
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            targetAsync.getParents();
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+        looperThread.testComplete();
     }
 

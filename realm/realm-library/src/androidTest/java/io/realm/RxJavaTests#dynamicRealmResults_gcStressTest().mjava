@@ -7,6 +7,7 @@
         final int TEST_SIZE = 50;
         final AtomicLong innerCounter = new AtomicLong();
         final DynamicRealm realm = DynamicRealm.getInstance(looperThread.getConfiguration());
+        looperThread.closeAfterTest(realm);
 
         realm.beginTransaction();
         for (int i = 0; i < TEST_SIZE; i++) {
@@ -30,7 +31,6 @@
                             // Not guaranteed, but can result in the GC of other RealmResults waiting for a result.
                             Runtime.getRuntime().gc();
                             if (innerCounter.incrementAndGet() == TEST_SIZE) {
-                                realm.close();
                                 looperThread.testComplete();
                             }
                         }

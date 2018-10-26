@@ -1,0 +1,29 @@
+    /**
+     * Attempts to delete the underlying Realm. Any errors happening here will just be
+     * outputted to logcat instead of thrown as this method is only called from other exception
+     * handlers which have more important exceptions to show to the user.
+     *
+     * This method is not threadsafe. Synchronization should happen outside it.
+     */
+    private static void deleteRealmFileOnDisk(RealmConfiguration configuration) {
+        // FIXME: We don't have a way to ensure that the Realm instance on client thread has been closed for now.
+        // https://github.com/realm/realm-java/issues/5416
+        int attempts = 5;
+        boolean success = false;
+        while (attempts > 0 && !success) {
+            try {
+                success = BaseRealm.deleteRealm(configuration);
+            } catch (IllegalStateException e) {
+                attempts--;
+                RealmLog.warn("Sync server still holds a reference to the Realm. It cannot be deleted. Retrying " + attempts + " more times");
+                if (attempts > 0) {
+                    SystemClock.sleep(15);
+                }
+            }
+        }
+
+        if (!success) {
+            RealmLog.error("Failed to delete the underlying Realm file: " + configuration.getPath());
+        }
+    }
+
