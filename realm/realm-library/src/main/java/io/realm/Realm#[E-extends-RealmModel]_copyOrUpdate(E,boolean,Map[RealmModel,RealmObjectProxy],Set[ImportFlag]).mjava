@@ -1,0 +1,19 @@
+    @SuppressWarnings("unchecked")
+    private <E extends RealmModel> E copyOrUpdate(E object, boolean update, Map<RealmModel, RealmObjectProxy> cache, Set<ImportFlag> flags) {
+        checkIfValid();
+        if (!isInTransaction()) {
+            throw new IllegalStateException("`copyOrUpdate` can only be called inside a write transaction.");
+        }
+        try {
+            return configuration.getSchemaMediator().copyOrUpdate(this, object, update, cache, flags);
+        } catch (IllegalStateException e) {
+            // See https://github.com/realm/realm-java/issues/6262
+            // For now we convert the OS exception using pattern matching on the error message.
+            if (e.getMessage().startsWith("Attempting to create an object of type")) {
+                throw new RealmPrimaryKeyConstraintException(e.getMessage());
+            } else {
+                throw e;
+            }
+        }
+    }
+

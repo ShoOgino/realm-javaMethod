@@ -1,0 +1,36 @@
+    /**
+     * Updates a list of existing RealmObjects that is identified by their {@link io.realm.annotations.PrimaryKey} or
+     * creates a new copy if no existing object could be found. This is a deep copy or update i.e., all referenced
+     * objects will be either copied or updated.
+     * <p>
+     * Please note, copying an object will copy all field values. Any unset field in the objects and child objects will be
+     * set to their default value if not provided.
+     *
+     * @param objects a list of objects to update or copy into Realm.
+     * @param flags any flag that modifies the behaviour of inserting the data into the Realm.
+     * @return a list of all the new or updated RealmObjects.
+     * @throws java.lang.IllegalArgumentException if RealmObject is {@code null} or doesn't have a Primary key defined.
+     * @see #copyToRealm(Iterable, ImportFlag...)
+     */
+    public <E extends RealmModel> List<E> copyToRealmOrUpdate(Iterable<E> objects, ImportFlag... flags) {
+        //noinspection ConstantConditions
+        if (objects == null) {
+            return new ArrayList<>(0);
+        }
+
+        ArrayList realmObjects;
+        if (objects instanceof Collection) {
+            realmObjects = new ArrayList<>(((Collection) objects).size());
+        } else {
+            realmObjects = new ArrayList<>();
+        }
+        Map<RealmModel, RealmObjectProxy> cache = new HashMap<>();
+        Set<ImportFlag> importFlags = Util.toSet(flags);
+        for (E object : objects) {
+            checkNotNullObject(object);
+            realmObjects.add(copyOrUpdate(object, true, cache, importFlags));
+        }
+
+        return realmObjects;
+    }
+

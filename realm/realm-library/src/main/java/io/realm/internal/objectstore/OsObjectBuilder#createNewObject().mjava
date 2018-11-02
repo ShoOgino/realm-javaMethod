@@ -1,0 +1,11 @@
+    public UncheckedRow createNewObject() {
+        UncheckedRow row;
+        try {
+            long rowPtr = nativeCreateOrUpdate(sharedRealmPtr, tablePtr, builderPtr, false, false);
+            row = new UncheckedRow(context, table, rowPtr);
+        } finally {
+            nativeDestroyBuilder(builderPtr);
+        }
+        return row;
+    }
+

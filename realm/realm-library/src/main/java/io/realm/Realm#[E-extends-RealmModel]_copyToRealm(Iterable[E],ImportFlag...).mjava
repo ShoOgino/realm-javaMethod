@@ -1,0 +1,34 @@
+    /**
+     * Copies a collection of RealmObjects to the Realm instance and returns their copy. Any further changes to the
+     * original RealmObjects will not be reflected in the Realm copies. This is a deep copy i.e., all referenced objects
+     * will be copied. Objects already in this Realm will be ignored.
+     * <p>
+     * Please note, copying an object will copy all field values. Any unset field in the objects and child objects will be
+     * set to their default value if not provided.
+     *
+     * @param objects the RealmObjects to copy to the Realm.
+     * @param flags any flag that modifies the behaviour of inserting the data into the Realm.
+     * @return a list of the the converted RealmObjects that all has their properties managed by the Realm.
+     * @throws io.realm.exceptions.RealmException if any of the objects has already been added to Realm.
+     * @throws java.lang.IllegalArgumentException if any of the elements in the input collection is {@code null}.
+     */
+    public <E extends RealmModel> List<E> copyToRealm(Iterable<E> objects, ImportFlag... flags) {
+        //noinspection ConstantConditions
+        if (objects == null) {
+            return new ArrayList<>();
+        }
+        ArrayList realmObjects;
+        if (objects instanceof Collection) {
+            realmObjects = new ArrayList<>(((Collection) objects).size());
+        } else {
+            realmObjects = new ArrayList<>();
+        }
+        Map<RealmModel, RealmObjectProxy> cache = new HashMap<>();
+        for (E object : objects) {
+            checkNotNullObject(object);
+            realmObjects.add(copyOrUpdate(object, false, cache, Util.toSet(flags)));
+        }
+
+        return realmObjects;
+    }
+

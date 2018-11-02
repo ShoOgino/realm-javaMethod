@@ -4,7 +4,12 @@
                 qualifiedJavaClassName, // Return type
                 "copyOrUpdate", // Method name
                 EnumSet.of(Modifier.PUBLIC, Modifier.STATIC), // Modifiers
-                "Realm", "realm", qualifiedJavaClassName, "object", "boolean", "update", "Map<RealmModel,RealmObjectProxy>", "cache" // Argument type & argument name
+                "Realm", "realm", // Argument type & argument name
+                columnInfoClassName(), "columnInfo",
+                qualifiedJavaClassName, "object",
+                "boolean", "update",
+                "Map<RealmModel,RealmObjectProxy>", "cache",
+                "Set<ImportFlag>", "flags"
         );
 
         writer
@@ -30,15 +35,13 @@
                 .emitEmptyLine();
 
         if (!metadata.hasPrimaryKey()) {
-            writer.emitStatement("return copy(realm, object, update, cache)");
+            writer.emitStatement("return copy(realm, columnInfo, object, update, cache, flags)");
         } else {
             writer
                     .emitStatement("%s realmObject = null", qualifiedJavaClassName)
                     .emitStatement("boolean canUpdate = update")
                     .beginControlFlow("if (canUpdate)")
                     .emitStatement("Table table = realm.getTable(%s.class)", qualifiedJavaClassName)
-                    .emitStatement("%s columnInfo = (%s) realm.getSchema().getColumnInfo(%s.class)",
-                        columnInfoClassName(), columnInfoClassName(), qualifiedJavaClassName)
                     .emitStatement("long pkColumnIndex = %s", fieldIndexVariableReference(metadata.getPrimaryKey()));
 
             String primaryKeyGetter = metadata.getPrimaryKeyGetter();
@@ -74,9 +77,7 @@
                         .emitStatement("canUpdate = false")
                     .nextControlFlow("else")
                         .beginControlFlow("try")
-                            .emitStatement(
-                                "objectContext.set(realm, table.getUncheckedRow(rowIndex), realm.getSchema().getColumnInfo(%s.class), false, Collections.<String> emptyList())",
-                                    qualifiedJavaClassName)
+                            .emitStatement("objectContext.set(realm, table.getUncheckedRow(rowIndex), columnInfo, false, Collections.<String> emptyList())")
                             .emitStatement("realmObject = new %s()", qualifiedGeneratedClassName)
                             .emitStatement("cache.put(object, (RealmObjectProxy) realmObject)")
                         .nextControlFlow("finally")
@@ -88,7 +89,7 @@
 
             writer
                     .emitEmptyLine()
-                       .emitStatement("return (canUpdate) ? update(realm, realmObject, object, cache) : copy(realm, object, update, cache)");
+                       .emitStatement("return (canUpdate) ? update(realm, columnInfo, realmObject, object, cache, flags) : copy(realm, columnInfo, object, update, cache, flags)");
         }
 
         writer.endMethod()

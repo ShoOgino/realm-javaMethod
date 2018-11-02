@@ -1,5 +1,5 @@
     /**
-     * Inserts a list of an unmanaged RealmObjects. This is generally faster than {@link #copyToRealm(Iterable)} since it
+     * Inserts a list of an unmanaged RealmObjects. This is generally faster than {@link #copyToRealm(Iterable, ImportFlag...)} since it
      * doesn't return the inserted elements, and performs minimum allocations and checks.
      * After being inserted any changes to the original objects will not be persisted.
      * <p>
@@ -13,13 +13,13 @@
      * <li>Copying an object will copy all field values. Any unset field in the object and child objects will be set to their default value if not provided</li>
      * </ul>
      * <p>
-     * If you want the managed {@link RealmObject} returned, use {@link #copyToRealm(Iterable)}, otherwise if
+     * If you want the managed {@link RealmObject} returned, use {@link #copyToRealm(Iterable, ImportFlag...)}, otherwise if
      * you have a large number of object this method is generally faster.
      *
      * @param objects RealmObjects to insert.
      * @throws IllegalStateException if the corresponding Realm is closed, called from an incorrect thread or not in a
      * transaction.
-     * @see #copyToRealm(Iterable)
+     * @see #copyToRealm(Iterable, ImportFlag...)
      */
     public void insert(Collection<? extends RealmModel> objects) {
         checkIfValidAndInTransaction();

@@ -1,5 +1,5 @@
     /**
-     * Inserts an unmanaged RealmObject. This is generally faster than {@link #copyToRealm(RealmModel)} since it
+     * Inserts an unmanaged RealmObject. This is generally faster than {@link #copyToRealm(RealmModel, ImportFlag...)} since it
      * doesn't return the inserted elements, and performs minimum allocations and checks.
      * After being inserted any changes to the original object will not be persisted.
      * <p>
@@ -13,7 +13,7 @@
      * <li>Copying an object will copy all field values. Any unset field in the object and child objects will be set to their default value if not provided</li>
      * </ul>
      * <p>
-     * If you want the managed {@link RealmObject} returned, use {@link #copyToRealm(RealmModel)}, otherwise if
+     * If you want the managed {@link RealmObject} returned, use {@link #copyToRealm(RealmModel, ImportFlag...)}, otherwise if
      * you have a large number of object this method is generally faster.
      *
      * @param object RealmObjects to insert.
@@ -21,7 +21,7 @@
      * transaction.
      * @throws io.realm.exceptions.RealmPrimaryKeyConstraintException if two objects with the same primary key is
      * inserted or if a primary key value already exists in the Realm.
-     * @see #copyToRealm(RealmModel)
+     * @see #copyToRealm(RealmModel, ImportFlag...)
      */
     public void insert(RealmModel object) {
         checkIfValidAndInTransaction();

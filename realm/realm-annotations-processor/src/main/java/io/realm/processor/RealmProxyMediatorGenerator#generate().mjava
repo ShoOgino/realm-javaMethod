@@ -7,8 +7,7 @@
         writer.emitPackage(REALM_PACKAGE_NAME);
         writer.emitEmptyLine();
 
-        writer.emitImports(
-                "android.util.JsonReader",
+        List<String> imports  = new ArrayList<>(Arrays.asList("android.util.JsonReader",
                 "java.io.IOException",
                 "java.util.Collections",
                 "java.util.HashSet",
@@ -18,6 +17,7 @@
                 "java.util.Set",
                 "java.util.Iterator",
                 "java.util.Collection",
+                "io.realm.ImportFlag",
                 "io.realm.internal.ColumnInfo",
                 "io.realm.internal.RealmObjectProxy",
                 "io.realm.internal.RealmProxyMediator",
@@ -25,9 +25,9 @@
                 "io.realm.internal.OsSchemaInfo",
                 "io.realm.internal.OsObjectSchemaInfo",
                 "org.json.JSONException",
-                "org.json.JSONObject"
-        );
+                "org.json.JSONObject"));
 
+        writer.emitImports(imports);
         writer.emitEmptyLine();
 
         writer.emitAnnotation(RealmModule.class);
@@ -44,7 +44,7 @@
         emitGetSimpleClassNameMethod(writer);
         emitNewInstanceMethod(writer);
         emitGetClassModelList(writer);
-        emitCopyToRealmMethod(writer);
+        emitCopyOrUpdateMethod(writer);
         emitInsertObjectToRealmMethod(writer);
         emitInsertListToRealmMethod(writer);
         emitInsertOrUpdateObjectToRealmMethod(writer);

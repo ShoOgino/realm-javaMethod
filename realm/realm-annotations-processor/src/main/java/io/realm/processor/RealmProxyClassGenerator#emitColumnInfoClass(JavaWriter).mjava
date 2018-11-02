@@ -6,6 +6,7 @@
                 "ColumnInfo");                               // base class
 
         // fields
+        writer.emitField("long", "maxColumnIndexValue"); // Must not end with Index as it otherwise could conflict regular fields.
         for (VariableElement variableElement : metadata.getFields()) {
             writer.emitField("long", columnIndexVarName(variableElement));
         }
@@ -31,8 +32,10 @@
                     classCollection.getClassFromQualifiedName(backlink.getSourceClass()).getInternalClassName(),
                     backlink.getSourceField());
         }
-        writer.endConstructor()
-                .emitEmptyLine();
+        writer
+            .emitStatement("this.maxColumnIndexValue = objectSchemaInfo.getMaxColumnIndex()")
+            .endConstructor()
+            .emitEmptyLine();
 
         // constructor #2
         writer.beginConstructor(
@@ -66,6 +69,7 @@
         for (VariableElement variableElement : metadata.getFields()) {
             writer.emitStatement("dst.%1$s = src.%1$s", columnIndexVarName(variableElement));
         }
+        writer.emitStatement("dst.maxColumnIndexValue = src.maxColumnIndexValue");
         writer.endMethod();
 
         writer.endType();

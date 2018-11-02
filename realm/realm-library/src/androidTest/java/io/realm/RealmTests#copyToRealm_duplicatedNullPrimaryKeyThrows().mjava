@@ -29,10 +29,10 @@
                         break;
                     default:
                 }
-                fail("Null value as primary key already exists.");
+                fail("Null value as primary key already exists, but wasn't detected correctly");
             } catch (RealmPrimaryKeyConstraintException expected) {
                 assertTrue("Exception message is: " + expected.getMessage(),
-                        expected.getMessage().contains("Primary key value already exists: 'null' ."));
+                        expected.getMessage().contains("with an existing primary key value 'null'"));
             } finally {
                 realm.cancelTransaction();
             }

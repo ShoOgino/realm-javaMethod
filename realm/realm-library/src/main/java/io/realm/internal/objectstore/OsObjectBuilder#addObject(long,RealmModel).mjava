@@ -1,0 +1,10 @@
+    public void addObject(long columnIndex, RealmModel val) {
+        if (val == null) {
+            nativeAddNull(builderPtr, columnIndex);
+        } else {
+            RealmObjectProxy proxy = (RealmObjectProxy) val;
+            UncheckedRow row = (UncheckedRow) proxy.realmGet$proxyState().getRow$realm();
+            nativeAddObject(builderPtr, columnIndex, row.getNativePtr());
+        }
+    }
+
