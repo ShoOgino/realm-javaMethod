@@ -9,7 +9,7 @@
      *   \@Override
      *   public void onCreate() {
      *     super.onCreate();
-     *     Realm.init(this);
+     *     Realm.init(this, "MyApp/" + BuildConfig.VERSION_NAME);
      *   }
      * }
      * }
@@ -28,11 +28,19 @@
      * </pre>
      *
      * @param context the Application Context.
-     * @throws IllegalArgumentException if a {@code null} context is provided.
+     * @param userAgent optional user defined string that will be sent to the Realm Object Server
+     * as part of a {@code User-Agent} header when a session is established. This setting will not be
+     * used by non-synchronized Realms.
+     * @throws IllegalArgumentException if a {@code null} context or userAgent is provided.
      * @throws IllegalStateException if {@link Context#getFilesDir()} could not be found.
      * @see #getDefaultInstance()
      */
-    public static synchronized void init(Context context) {
-        initializeRealm(context, "");
+    @ObjectServer
+    public static synchronized void init(Context context, String userAgent) {
+        //noinspection ConstantConditions
+        if (userAgent == null) {
+            throw new IllegalArgumentException("Non-null 'userAgent' required.");
+        }
+        initializeRealm(context, userAgent);
     }
 
