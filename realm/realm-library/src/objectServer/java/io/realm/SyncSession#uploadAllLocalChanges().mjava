@@ -4,7 +4,7 @@
      * <p>
      * If the device is offline, this method might never return.
      * <p>
-     * This method cannot be called before the session has been started.
+     * This method cannot be called before the Realm has been opened.
      *
      * @throws IllegalStateException if called on the Android main thread.
      * @throws InterruptedException if the thread was interrupted while downloading was in progress.
@@ -19,7 +19,7 @@
         // In Java we cannot lock on the Session object either since it will prevent any attempt at modifying the
         // lifecycle while it is in a waiting state. Thus we use a specialised mutex.
         synchronized (waitForChangesMutex) {
-            waitForChanges(DIRECTION_UPLOAD);
+            waitForChanges(DIRECTION_UPLOAD, Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         }
     }
 

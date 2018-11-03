@@ -2,12 +2,16 @@
      * This method should only be called when guarded by the {@link #waitForChangesMutex}.
      * It will block into all changes have been either uploaded or downloaded depending on the chosen direction.
      *
-     * @param direction either {@link #DIRECTION_DOWNLOAD} or {@link #DIRECTION_UPLOAD}
+     * @param direction either {@link #DIRECTION_DOWNLOAD} or {@link #DIRECTION_UPLOAD}.
+     * @param timeout timeout parameter.
+     * @param unit timeout unit.
+     * @return {@code true} if the job completed before the timeout was hit, {@code false}
      */
-    private void waitForChanges(int direction) throws InterruptedException {
+    private boolean waitForChanges(int direction, long timeout, TimeUnit unit) throws InterruptedException {
         if (direction != DIRECTION_DOWNLOAD && direction != DIRECTION_UPLOAD) {
             throw new IllegalArgumentException("Unknown direction: " + direction);
         }
+        boolean result = false;
         if (!isClosed) {
             String realmPath = configuration.getPath();
             WaitForSessionWrapper wrapper = new WaitForSessionWrapper();
@@ -18,7 +22,7 @@
                     : nativeWaitForUploadCompletion(callbackId, realmPath);
             if (!listenerRegistered) {
                 waitingForServerChanges.set(null);
-                String errorMsg = "";
+                String errorMsg;
                 switch (direction) {
                     case DIRECTION_DOWNLOAD: errorMsg = "It was not possible to download all remote changes."; break;
                     case DIRECTION_UPLOAD: errorMsg = "It was not possible upload all local changes."; break;
@@ -29,7 +33,7 @@
                 throw new ObjectServerError(ErrorCode.UNKNOWN, errorMsg + " Has the SyncClient been started?");
             }
             try {
-                wrapper.waitForServerChanges();
+                result = wrapper.waitForServerChanges(timeout, unit);
             } catch(InterruptedException e) {
                 waitingForServerChanges.set(null); // Ignore any results being sent if the wait was interrupted.
                 throw e;
@@ -46,5 +50,6 @@
                 waitingForServerChanges.set(null);
             }
         }
+        return result;
     }
 

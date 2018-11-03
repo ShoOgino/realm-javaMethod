@@ -1,0 +1,11 @@
+        /**
+         * Block until the wait either completes, timeouts or is terminated for other reasons.
+         * Timeouts are only applied if `timeout` >= 0.
+         */
+        public boolean waitForServerChanges(long timeout, TimeUnit unit) throws InterruptedException {
+            if (!resultReceived) {
+                return waiter.await(timeout, unit);
+            }
+            return isSuccess();
+        }
+

@@ -9,10 +9,20 @@
          * <p>
          * This check is only enforced the first time a Realm is created. If you otherwise want to make sure a Realm
          * has the latest changes, use {@link SyncSession#downloadAllServerChanges()}.
+         *
+         * @param timeout how long to wait for the download to complete before an {@link io.realm.exceptions.DownloadingRealmInterruptedException} is thrown.
+         * @param unit the unit of time used to define the timeout.
          */
-        public Builder waitForInitialRemoteData() {
+        public Builder waitForInitialRemoteData(long timeout, TimeUnit unit) {
+            if (timeout < 0) {
+                throw new IllegalArgumentException("'timeout' must be >= 0. It was: " + timeout);
+            }
+            //noinspection ConstantConditions
+            if (unit == null) {
+                throw new IllegalArgumentException("Non-null 'unit' required");
+            }
             this.waitForServerChanges = true;
-            this.initialDataTimeoutMillis = Long.MAX_VALUE;
+            this.initialDataTimeoutMillis = unit.toMillis(timeout);
             return this;
         }
 

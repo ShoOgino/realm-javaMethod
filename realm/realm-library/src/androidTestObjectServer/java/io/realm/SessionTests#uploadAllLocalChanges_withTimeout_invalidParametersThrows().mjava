@@ -1,0 +1,22 @@
+    @Test
+    public void uploadAllLocalChanges_withTimeout_invalidParametersThrows() throws InterruptedException {
+        Realm realm = Realm.getInstance(configuration);
+        SyncSession session = SyncManager.getOrCreateSession(configuration, null);
+        try {
+            try {
+                session.uploadAllLocalChanges(-1, TimeUnit.SECONDS);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+
+            try {
+                //noinspection ConstantConditions
+                session.uploadAllLocalChanges(1, null);
+                fail();
+            } catch (IllegalArgumentException ignored) {
+            }
+        } finally {
+            realm.close();
+        }
+    }
+
