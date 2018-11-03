@@ -1,7 +1,7 @@
     // Make sure the encryption is local, i.e after deleting a synced Realm
     // re-open it again with no (or different) key, should be possible.
     @Test
-    public void setEncryptionKey_canReOpenRealmWithoutKey() {
+    public void setEncryptionKey_canReOpenRealmWithoutKey() throws InterruptedException {
 
         // STEP 1: open a synced Realm using a local encryption key
         String username = UUID.randomUUID().toString();
@@ -31,7 +31,7 @@
         realm.commitTransaction();
 
         // STEP 2:  make sure the changes gets to the server
-        SystemClock.sleep(TimeUnit.SECONDS.toMillis(2));  // FIXME: Replace with Sync Progress Notifications once available.
+        SyncManager.getSession(configWithEncryption).uploadAllLocalChanges();
         realm.close();
         user.logOut();
 
