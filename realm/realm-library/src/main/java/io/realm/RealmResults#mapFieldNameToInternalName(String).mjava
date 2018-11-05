@@ -1,0 +1,14 @@
+    private String mapFieldNameToInternalName(String fieldName) {
+        if (realm instanceof Realm) {
+            // We only need to map field names from typed Realms.
+            String className = osResults.getTable().getClassName();
+            String mappedFieldName = realm.getSchema().getColumnInfo(className).getInternalFieldName(fieldName);
+            if (mappedFieldName == null) {
+                throw new IllegalArgumentException(String.format("Field '%s' does not exists.", fieldName));
+            } else {
+                fieldName = mappedFieldName;
+            }
+        }
+        return fieldName;
+    }
+

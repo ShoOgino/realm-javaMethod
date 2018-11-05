@@ -1,0 +1,26 @@
+    @Test
+    public void setObject_wrongObjectTypeThrows() {
+        RealmResults<AllTypes> collection = realm.where(AllTypes.class).findAll();
+        realm.beginTransaction();
+        try {
+            collection.setObject(AllTypes.FIELD_REALMOBJECT, realm.createObject(AllTypes.class));
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue("Wrong error message: " + e.getMessage(), e.getMessage().equals("Type of object is wrong. Was 'AllTypes', expected 'Dog'"));
+        } finally {
+            realm.cancelTransaction();
+        }
+
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
+        RealmResults<DynamicRealmObject> dynamicCollection = dynamicRealm.where("AllTypes").findAll();
+        dynamicRealm.beginTransaction();
+        try {
+            dynamicCollection.setObject(AllTypes.FIELD_REALMOBJECT, dynamicRealm.createObject("AllTypes"));
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue("Wrong error message: " + e.getMessage(), e.getMessage().equals("Type of object is wrong. Was 'AllTypes', expected 'Dog'"));
+        } finally {
+            dynamicRealm.close();
+        }
+    }
+

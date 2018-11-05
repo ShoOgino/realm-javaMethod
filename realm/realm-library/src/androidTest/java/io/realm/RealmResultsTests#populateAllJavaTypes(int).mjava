@@ -1,0 +1,18 @@
+    private void populateAllJavaTypes(int objects) {
+        realm.beginTransaction();
+        realm.deleteAll();
+        for (int i = 0; i < objects; ++i) {
+            AllJavaTypes obj = realm.createObject(AllJavaTypes.class, i);
+            obj.setFieldBoolean((i % 2) == 0);
+            obj.setFieldBinary(new byte[]{1, 2, 3});
+            obj.setFieldDate(new Date(YEAR_MILLIS * (i - objects / 2)));
+            obj.setFieldDouble(Math.PI + i);
+            obj.setFieldFloat(1.234567f + i);
+            obj.setFieldString("test data " + i);
+            obj.setFieldLong(i);
+            obj.setFieldObject(obj);
+            obj.getFieldList().add(obj);
+        }
+        realm.commitTransaction();
+    }
+

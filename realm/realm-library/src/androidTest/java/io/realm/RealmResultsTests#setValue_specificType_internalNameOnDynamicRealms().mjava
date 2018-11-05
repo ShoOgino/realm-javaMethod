@@ -1,0 +1,154 @@
+    @Test
+    public void setValue_specificType_internalNameOnDynamicRealms() {
+        populateMappedAllJavaTypes(5);
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
+        dynamicRealm.beginTransaction();
+        try {
+            RealmResults<DynamicRealmObject> collection = dynamicRealm.where("MappedAllJavaTypes").findAll();
+            for (BulkSetMethods type : BulkSetMethods.values()) {
+                switch(type) {
+                    case STRING:
+                        collection.setString("field_string", "foo");
+                        assertElements(collection, obj -> assertEquals("foo", obj.getString("field_string")));
+                        break;
+                    case BOOLEAN:
+                        collection.setBoolean("field_boolean", true);
+                        assertElements(collection, obj -> assertTrue(obj.getBoolean("field_boolean")));
+                        break;
+                    case BYTE:
+                        collection.setByte("field_byte", (byte) 1);
+                        assertElements(collection, obj -> assertEquals((byte) 1, obj.getByte("field_byte")));
+                        break;
+                    case SHORT:
+                        collection.setShort("field_short", (short) 2);
+                        assertElements(collection, obj -> assertEquals((short) 2, obj.getShort("field_short")));
+                        break;
+                    case INTEGER:
+                        collection.setInt("field_int", 3);
+                        assertElements(collection, obj -> assertEquals(3, obj.getInt("field_int")));
+                        break;
+                    case LONG:
+                        collection.setLong("field_long", 4L);
+                        assertElements(collection, obj -> assertEquals(4L, obj.getLong("field_long")));
+                        break;
+                    case FLOAT:
+                        collection.setFloat("field_float", 1.23F);
+                        assertElements(collection, obj -> assertEquals(1.23F, obj.getFloat("field_float"), 0F));
+                        break;
+                    case DOUBLE:
+                        collection.setDouble("field_double", 1.234);
+                        assertElements(collection, obj -> assertEquals(1.234, obj.getDouble("field_double"), 0F));
+                        break;
+                    case BINARY:
+                        collection.setBlob("field_binary", new byte[]{1,2,3});
+                        assertElements(collection, obj -> assertArrayEquals(new byte[]{1,2,3}, obj.getBlob("field_binary")));
+                        break;
+                    case DATE:
+                        collection.setDate("field_date", new Date(1000));
+                        assertElements(collection, obj -> assertEquals(new Date(1000), obj.getDate("field_date")));
+                        break;
+                    case OBJECT: {
+                        DynamicRealmObject childObj = dynamicRealm.createObject("MappedAllJavaTypes", 42);
+                        collection.setObject("field_object", childObj);
+                        assertElements(collection, obj -> assertEquals(childObj, obj.getObject("field_object")));
+                        break;
+                    }
+                    case MODEL_LIST: {
+                        DynamicRealmObject childObj = dynamicRealm.createObject("MappedAllJavaTypes", 43);
+                        collection.setList("field_list", new RealmList<>(childObj));
+                        assertElements(collection, obj -> {
+                            RealmList<DynamicRealmObject> list = obj.getList("field_list");
+                            assertEquals(1, list.size());
+                            assertEquals(childObj, list.first());
+                        });
+                        break;
+                    }
+                    case STRING_VALUE_LIST:
+                        collection.setList("field_string_list", new RealmList<>("Foo"));
+                        assertElements(collection, obj -> {
+                            RealmList<String> list = obj.getList("field_string_list", String.class);
+                            assertEquals(1, list.size());
+                            assertEquals("Foo", list.first());
+                        });
+                        break;
+                    case BOOLEAN_VALUE_LIST:
+                        collection.setList("field_boolean_list", new RealmList<>(true));
+                        assertElements(collection, obj -> {
+                            RealmList<Boolean> list = obj.getList("field_boolean_list", Boolean.class);
+                            assertEquals(1, list.size());
+                            assertEquals(true, list.first());
+                        });
+                        break;
+                    case BYTE_VALUE_LIST:
+                        collection.setList("field_byte_list", new RealmList<>((byte)1));
+                        assertElements(collection, obj -> {
+                            RealmList<Byte> list = obj.getList("field_byte_list", Byte.class);
+                            assertEquals(1, list.size());
+                            assertEquals(Byte.valueOf((byte) 1), list.first());
+                        });
+                        break;
+                    case SHORT_VALUE_LIST:
+                        collection.setList("field_short_list", new RealmList<>((short)1));
+                        assertElements(collection, obj -> {
+                            RealmList<Short> list = obj.getList("field_short_list", Short.class);
+                            assertEquals(1, list.size());
+                            assertEquals(Short.valueOf((short) 1), list.first());
+                        });
+                        break;
+                    case INTEGER_VALUE_LIST:
+                        collection.setList("field_integer_list", new RealmList<>(1));
+                        assertElements(collection, obj -> {
+                            RealmList<Integer> list = obj.getList("field_integer_list", Integer.class);
+                            assertEquals(1, list.size());
+                            assertEquals(Integer.valueOf(1), list.first());
+                        });
+                        break;
+                    case LONG_VALUE_LIST:
+                        collection.setList("field_long_list", new RealmList<>(1L));
+                        assertElements(collection, obj -> {
+                            RealmList<Long> list = obj.getList("field_long_list", Long.class);
+                            assertEquals(1, list.size());
+                            assertEquals(Long.valueOf((byte) 1), list.first());
+                        });
+                        break;
+                    case FLOAT_VALUE_LIST:
+                        collection.setList("field_float_list", new RealmList<>(1.1F));
+                        assertElements(collection, obj -> {
+                            RealmList<Float> list = obj.getList("field_float_list", Float.class);
+                            assertEquals(1, list.size());
+                            assertEquals(1.1F, list.first(), 0F);
+                        });
+                        break;
+                    case DOUBLE_VALUE_LIST:
+                        collection.setList("field_double_list", new RealmList<>(1.1D));
+                        assertElements(collection, obj -> {
+                            RealmList<Double> list = obj.getList("field_double_list", Double.class);
+                            assertEquals(1, list.size());
+                            assertEquals(1.1D, list.first(), 0F);
+                        });
+                        break;
+                    case BINARY_VALUE_LIST:
+                        collection.setList("field_binary_list", new RealmList<>(new byte[] {1,2,3}));
+                        assertElements(collection, obj -> {
+                            RealmList<byte[]> list = obj.getList("field_binary_list", byte[].class);
+                            assertEquals(1, list.size());
+                            assertArrayEquals(new byte[] {1,2,3}, list.first());
+                        });
+                        break;
+                    case DATE_VALUE_LIST:
+                        collection.setList("field_date_list", new RealmList<>(new Date(1000)));
+                        assertElements(collection, obj -> {
+                            RealmList<Date> list = obj.getList("field_date_list", Date.class);
+                            assertEquals(1, list.size());
+                            assertEquals(new Date(1000), list.first());
+                        });
+                        break;
+                    default:
+                        fail("Unknown type: " + type);
+                }
+            }
+        } finally {
+            dynamicRealm.close();
+        }
+    }
+

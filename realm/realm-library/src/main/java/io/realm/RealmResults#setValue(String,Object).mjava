@@ -1,0 +1,95 @@
+    /**
+     * Updates the field given by {@code fieldName} in all objects inside the query result.
+     * <p>
+     * This method will automatically try to convert numbers and booleans that are given as
+     * {@code String} to their appropriate type. For example {@code "10"} will be converted to
+     * {@code 10} if the field type is {@link RealmFieldType#INTEGER}.
+     * <p>
+     * Using the typed setters like {@link #setInt(String, int)} will be faster than using
+     * this method.
+     *
+     * @param fieldName field to update
+     * @param value value to update with.
+     * @throws IllegalArgumentException if the field could not be found, could not be updated or
+     * the argument didn't match the field type or could not be converted to match the underlying
+     * field type.
+     */
+    public void setValue(String fieldName, @Nullable Object value) {
+        checkNonEmptyFieldName(fieldName);
+        realm.checkIfValidAndInTransaction();
+        fieldName = mapFieldNameToInternalName(fieldName);
+        boolean isString = (value instanceof String);
+        String strValue = isString ? (String) value : null;
+
+        String className = osResults.getTable().getClassName();
+        RealmObjectSchema schema = getRealm().getSchema().get(className);
+        if (!schema.hasField(fieldName)) {
+            throw new IllegalArgumentException(String.format("Field '%s' could not be found in class '%s'", fieldName, className));
+        }
+
+        // null values exit early
+        if (value == null) {
+            osResults.setNull(fieldName);
+            return;
+        }
+
+        // Does implicit conversion if needed.
+        RealmFieldType type = schema.getFieldType(fieldName);
+        if (isString && type != RealmFieldType.STRING) {
+            switch (type) {
+                case BOOLEAN:
+                    value = Boolean.parseBoolean(strValue);
+                    break;
+                case INTEGER:
+                    value = Long.parseLong(strValue);
+                    break;
+                case FLOAT:
+                    value = Float.parseFloat(strValue);
+                    break;
+                case DOUBLE:
+                    value = Double.parseDouble(strValue);
+                    break;
+                case DATE:
+                    value = JsonUtils.stringToDate(strValue);
+                    break;
+                default:
+                    throw new IllegalArgumentException(String.format(Locale.US,
+                            "Field %s is not a String field, " +
+                                    "and the provide value could not be automatically converted: %s. Use a typed" +
+                                    "setter instead", fieldName, value));
+            }
+        }
+
+        //noinspection ConstantConditions
+        Class<?> valueClass = value.getClass();
+        if (valueClass == Boolean.class) {
+            setBoolean(fieldName, (Boolean) value);
+        } else if (valueClass == Short.class) {
+            setShort(fieldName, (Short) value);
+        } else if (valueClass == Integer.class) {
+            setInt(fieldName, (Integer) value);
+        } else if (valueClass == Long.class) {
+            setLong(fieldName, (Long) value);
+        } else if (valueClass == Byte.class) {
+            setByte(fieldName, (Byte) value);
+        } else if (valueClass == Float.class) {
+            setFloat(fieldName, (Float) value);
+        } else if (valueClass == Double.class) {
+            setDouble(fieldName, (Double) value);
+        } else if (valueClass == String.class) {
+            //noinspection ConstantConditions
+            setString(fieldName, (String) value);
+        } else if (value instanceof Date) {
+            setDate(fieldName, (Date) value);
+        } else if (value instanceof byte[]) {
+            setBlob(fieldName, (byte[]) value);
+        } else if (value instanceof RealmModel) {
+            setObject(fieldName, (RealmModel) value);
+        } else if (valueClass == RealmList.class) {
+            RealmList<?> list = (RealmList<?>) value;
+            setList(fieldName, list);
+        } else {
+            throw new IllegalArgumentException("Value is of a type not supported: " + value.getClass());
+        }
+    }
+

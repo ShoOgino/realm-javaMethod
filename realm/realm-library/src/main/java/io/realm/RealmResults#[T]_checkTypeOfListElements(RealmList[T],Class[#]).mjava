@@ -1,0 +1,11 @@
+    private <T> void checkTypeOfListElements(RealmList<T> list, Class<?> clazz) {
+        if (!list.isEmpty()) {
+            T element = list.first();
+            Class<?> elementType = element.getClass();
+            if (!(clazz.isAssignableFrom(elementType))) {
+                throw new IllegalArgumentException(String.format("List contained the wrong type of elements. Elements of type '%s' was " +
+                        "expected, but the actual type is '%s'", clazz, elementType));
+            }
+        }
+    }
+

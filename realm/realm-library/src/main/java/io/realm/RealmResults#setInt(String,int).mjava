@@ -1,0 +1,15 @@
+    /**
+     * Sets the {@code int} value of the given field in all of the objects in the collection.
+     *
+     * @param fieldName name of the field to update.
+     * @param value new value for the field.
+     * @throws IllegalArgumentException if field name doesn't exist, is a primary key property or isn't an integer field.
+     */
+    public void setInt(String fieldName, int value) {
+        checkNonEmptyFieldName(fieldName);
+        fieldName = mapFieldNameToInternalName(fieldName);
+        checkType(fieldName, RealmFieldType.INTEGER);
+        realm.checkIfValidAndInTransaction();
+        osResults.setInt(fieldName, value);
+    }
+

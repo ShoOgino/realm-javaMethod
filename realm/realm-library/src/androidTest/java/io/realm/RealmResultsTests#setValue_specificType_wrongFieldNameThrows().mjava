@@ -1,0 +1,40 @@
+    @Test
+    public void setValue_specificType_wrongFieldNameThrows() {
+        populateAllJavaTypes(5);
+        RealmResults<AllTypes> collection = realm.where(AllTypes.class).findAll();
+        realm.beginTransaction();
+        for (BulkSetMethods type : BulkSetMethods.values()) {
+            try {
+                switch(type) {
+                    case STRING: collection.setString("foo", "bar"); break;
+                    case BOOLEAN: collection.setBoolean("foo", true); break;
+                    case BYTE: collection.setByte("foo", (byte) 1); break;
+                    case SHORT: collection.setShort("foo", (short) 2); break;
+                    case INTEGER: collection.setInt("foo", 3); break;
+                    case LONG: collection.setLong("foo", 4L); break;
+                    case FLOAT: collection.setFloat("foo", 1.23F); break;
+                    case DOUBLE: collection.setDouble("foo", 1.234); break;
+                    case BINARY: collection.setBlob("foo", new byte[]{1,2,3}); break;
+                    case DATE: collection.setDate("foo", new Date(1000)); break;
+                    case OBJECT: collection.setObject("foo", realm.createObject(AllTypes.class)); break;
+                    case MODEL_LIST: collection.setList("foo", new RealmList<>()); break;
+                    case STRING_VALUE_LIST: collection.setList("foo", new RealmList<>("Foo")); break;
+                    case BOOLEAN_VALUE_LIST: collection.setList("foo", new RealmList<>(true)); break;
+                    case BYTE_VALUE_LIST: collection.setList("foo", new RealmList<>((byte) 1)); break;
+                    case SHORT_VALUE_LIST: collection.setList("foo", new RealmList<>((short) 1)); break;
+                    case INTEGER_VALUE_LIST: collection.setList("foo", new RealmList<>(1)); break;
+                    case LONG_VALUE_LIST: collection.setList("foo", new RealmList<>(1L)); break;
+                    case FLOAT_VALUE_LIST: collection.setList("foo", new RealmList<>(1.1F)); break;
+                    case DOUBLE_VALUE_LIST: collection.setList("foo", new RealmList<>(1.1D)); break;
+                    case BINARY_VALUE_LIST: collection.setList("foo", new RealmList<>(new byte[] {})); break;
+                    case DATE_VALUE_LIST: collection.setList("foo", new RealmList<>(new Date())); break;
+                    default:
+                        fail("Unknown type: " + type);
+                }
+                fail(type + " should have thrown an exception");
+            } catch (IllegalArgumentException e) {
+                assertTrue(e.getMessage().contains("does not exist"));
+            }
+        }
+    }
+

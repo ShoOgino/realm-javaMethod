@@ -1,0 +1,15 @@
+    /**
+     * Sets the {@code String} value of the given field in all of the objects in the collection.
+     *
+     * @param fieldName name of the field to update.
+     * @param value new value for the field.
+     * @throws IllegalArgumentException if field name doesn't exist, is a primary key property or isn't a String field.
+     */
+    public void setString(String fieldName, @Nullable String value) {
+        checkNonEmptyFieldName(fieldName);
+        realm.checkIfValidAndInTransaction();
+        fieldName = mapFieldNameToInternalName(fieldName);
+        checkType(fieldName, RealmFieldType.STRING);
+        osResults.setString(fieldName, value);
+    }
+

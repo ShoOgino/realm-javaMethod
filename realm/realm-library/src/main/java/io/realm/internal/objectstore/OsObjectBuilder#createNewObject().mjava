@@ -1,10 +1,15 @@
+    /**
+     * Create a new object.
+     *
+     * The builder is automatically closed after calling this method.
+     */
     public UncheckedRow createNewObject() {
         UncheckedRow row;
         try {
             long rowPtr = nativeCreateOrUpdate(sharedRealmPtr, tablePtr, builderPtr, false, false);
             row = new UncheckedRow(context, table, rowPtr);
         } finally {
-            nativeDestroyBuilder(builderPtr);
+            close();
         }
         return row;
     }

@@ -1,8 +1,13 @@
+    /**
+     * Updates any existing object if it exists, otherwise creates a new one.
+     *
+     * The builder is automatically closed after calling this method.
+     */
     public void updateExistingObject() {
         try {
             nativeCreateOrUpdate(sharedRealmPtr, tablePtr, builderPtr, true, ignoreFieldsWithSameValue);
         } finally {
-            nativeDestroyBuilder(builderPtr);
+            close();
         }
     }
 

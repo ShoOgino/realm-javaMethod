@@ -1,0 +1,73 @@
+    @Test
+    public void setValue_implicitConversions() {
+        populateAllJavaTypes(5);
+        RealmResults<AllJavaTypes> collection = realm.where(AllJavaTypes.class).findAll();
+        realm.beginTransaction();
+        for (BulkSetMethods type : BulkSetMethods.values()) {
+            switch(type) {
+                case BOOLEAN:
+                    collection.setValue(AllJavaTypes.FIELD_BOOLEAN, "true");
+                    assertElements(collection, obj -> assertTrue(obj.isFieldBoolean()));
+                    collection.setValue(AllJavaTypes.FIELD_BOOLEAN, "FALSE");
+                    assertElements(collection, obj -> assertFalse(obj.isFieldBoolean()));
+                    collection.setValue(AllJavaTypes.FIELD_BOOLEAN, "True");
+                    assertElements(collection, obj -> assertTrue(obj.isFieldBoolean()));
+                    collection.setValue(AllJavaTypes.FIELD_BOOLEAN, "false");
+                    assertElements(collection, obj -> assertFalse(obj.isFieldBoolean()));
+                    collection.setValue(AllJavaTypes.FIELD_BOOLEAN, "TRUE");
+                    assertElements(collection, obj -> assertTrue(obj.isFieldBoolean()));
+                    break;
+                case BYTE:
+                    collection.setValue(AllJavaTypes.FIELD_BYTE, "1");
+                    assertElements(collection, obj -> assertEquals((byte)1, obj.getFieldByte()));
+                    break;
+                case SHORT:
+                    collection.setValue(AllJavaTypes.FIELD_SHORT, "2");
+                    assertElements(collection, obj -> assertEquals((short)2, obj.getFieldShort()));
+                    break;
+                case INTEGER:
+                    collection.setValue(AllJavaTypes.FIELD_INT, "3");
+                    assertElements(collection, obj -> assertEquals(3, obj.getFieldInt()));
+                    break;
+                case LONG:
+                    collection.setValue(AllJavaTypes.FIELD_LONG, Long.toString(Long.MAX_VALUE));
+                    assertElements(collection, obj -> assertEquals(Long.MAX_VALUE, obj.getFieldLong()));
+                    break;
+                case FLOAT:
+                    collection.setValue(AllJavaTypes.FIELD_FLOAT, "1.23F");
+                    assertElements(collection, obj -> assertEquals(1.23F, obj.getFieldFloat(), 0F));
+                    break;
+                case DOUBLE:
+                    collection.setValue(AllJavaTypes.FIELD_DOUBLE, "1.234");
+                    assertElements(collection, obj -> assertEquals(1.234, obj.getFieldDouble(), 0F));
+                    break;
+                case DATE:
+                    collection.setValue(AllJavaTypes.FIELD_DATE, "1000");
+                    assertElements(collection, obj -> assertEquals(new Date(1000), obj.getFieldDate()));
+                    collection.setValue(AllJavaTypes.FIELD_DATE, "/Date(2000+0000)/");
+                    assertElements(collection, obj -> assertEquals(new Date(2000), obj.getFieldDate()));
+                    break;
+
+                // These types do not offer any implicit conversion
+                case STRING:
+                case BINARY:
+                case OBJECT:
+                case MODEL_LIST:
+                case STRING_VALUE_LIST:
+                case BOOLEAN_VALUE_LIST:
+                case BYTE_VALUE_LIST:
+                case SHORT_VALUE_LIST:
+                case INTEGER_VALUE_LIST:
+                case LONG_VALUE_LIST:
+                case FLOAT_VALUE_LIST:
+                case DOUBLE_VALUE_LIST:
+                case BINARY_VALUE_LIST:
+                case DATE_VALUE_LIST:
+                    continue;
+
+                default:
+                    fail("Unknown type: " + type);
+            }
+        }
+    }
+

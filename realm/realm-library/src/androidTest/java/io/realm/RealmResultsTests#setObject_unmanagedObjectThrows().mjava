@@ -1,0 +1,12 @@
+    @Test
+    public void setObject_unmanagedObjectThrows() {
+        RealmResults<AllTypes> collection = realm.where(AllTypes.class).findAll();
+        realm.beginTransaction();
+        try {
+            collection.setObject(AllTypes.FIELD_REALMOBJECT, new Dog());
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue("Wrong error message: " + e.getMessage(), e.getMessage().contains("is not a valid, managed Realm object."));
+        }
+    }
+

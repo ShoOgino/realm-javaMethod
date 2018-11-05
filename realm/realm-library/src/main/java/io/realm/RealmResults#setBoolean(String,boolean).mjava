@@ -1,0 +1,15 @@
+    /**
+     * Sets the {@code boolean} value of the given field in all of the objects in the collection.
+     *
+     * @param fieldName name of the field to update.
+     * @param value new value for the field.
+     * @throws IllegalArgumentException if field name doesn't exist, is a primary key property or isn't a boolean field.
+     */
+    public void setBoolean(String fieldName, boolean value) {
+        checkNonEmptyFieldName(fieldName);
+        realm.checkIfValidAndInTransaction();
+        fieldName = mapFieldNameToInternalName(fieldName);
+        checkType(fieldName, RealmFieldType.BOOLEAN);
+        osResults.setBoolean(fieldName, value);
+    }
+

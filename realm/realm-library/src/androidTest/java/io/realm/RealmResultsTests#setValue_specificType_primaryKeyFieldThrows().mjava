@@ -1,0 +1,19 @@
+    @Test
+    public void setValue_specificType_primaryKeyFieldThrows() {
+        populateAllJavaTypes(5);
+        realm.beginTransaction();
+        try {
+            RealmResults<PrimaryKeyAsString> collection = realm.where(PrimaryKeyAsString.class).findAll();
+            collection.setString(PrimaryKeyAsString.FIELD_PRIMARY_KEY, "foo");
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+
+        try {
+            RealmResults<PrimaryKeyAsLong> collection = realm.where(PrimaryKeyAsLong.class).findAll();
+            collection.setLong(PrimaryKeyAsLong.FIELD_ID, 42);
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+    }
+

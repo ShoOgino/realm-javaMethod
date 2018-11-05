@@ -1,0 +1,16 @@
+    /**
+     * Sets a reference to another object on the given field in all of the objects in the collection.
+     *
+     * @param fieldName name of the field to update.
+     * @param value new object referenced by this field.
+     * @throws IllegalArgumentException if field name doesn't exist, is a primary key property or isn't an Object reference field.
+     */
+    public void setObject(String fieldName, @Nullable RealmModel value) {
+        checkNonEmptyFieldName(fieldName);
+        realm.checkIfValidAndInTransaction();
+        fieldName = mapFieldNameToInternalName(fieldName);
+        checkType(fieldName, RealmFieldType.OBJECT);
+        Row row = checkRealmObjectConstraints(fieldName, value);
+        osResults.setObject(fieldName, row);
+    }
+
