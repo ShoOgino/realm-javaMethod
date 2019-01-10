@@ -1,6 +1,9 @@
     public void setByteList(String fieldName, RealmList<Byte> list) {
-        addTypeSpecificList(fieldName, list, (builder, lst) -> {
-            builder.addByteList(0, lst);
+        addTypeSpecificList(fieldName, list, new AddListTypeDelegate<Byte>() {
+            @Override
+            public void addList(OsObjectBuilder builder, RealmList<Byte> list) {
+                builder.addByteList(0, list);
+            }
         });
     }
 

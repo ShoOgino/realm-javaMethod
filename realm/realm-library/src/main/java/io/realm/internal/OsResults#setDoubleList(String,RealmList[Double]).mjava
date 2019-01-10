@@ -1,6 +1,9 @@
     public void setDoubleList(String fieldName, RealmList<Double> list) {
-        addTypeSpecificList(fieldName, list, (builder, lst) -> {
-            builder.addDoubleList(0, lst);
+        addTypeSpecificList(fieldName, list, new AddListTypeDelegate<Double>() {
+            @Override
+            public void addList(OsObjectBuilder builder, RealmList<Double> list) {
+                builder.addDoubleList(0, list);
+            }
         });
     }
 
