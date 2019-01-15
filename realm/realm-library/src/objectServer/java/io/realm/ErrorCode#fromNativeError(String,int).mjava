@@ -1,0 +1,21 @@
+    /**
+     * Converts a native error to the appropriate Java equivalent
+     *
+     * @param type type of error. This is normally the C++ category.
+     * @param errorCode specific code within the type
+     *
+     * @return the Java error representing the native error. This method will never throw, so in case
+     * a Java error does not exists. {@link #UNKNOWN} will be returned.
+     */
+    public static ErrorCode fromNativeError(String type, int errorCode) {
+        ErrorCode[] errorCodes = values();
+        for (int i = 0; i < errorCodes.length; i++) {
+            ErrorCode error = errorCodes[i];
+            if (error.intValue() == errorCode && error.type.equals(type)) {
+                return error;
+            }
+        }
+        RealmLog.warn(String.format(Locale.US, "Unknown error code: '%s:%d'", type, errorCode));
+        return UNKNOWN;
+    }
+
