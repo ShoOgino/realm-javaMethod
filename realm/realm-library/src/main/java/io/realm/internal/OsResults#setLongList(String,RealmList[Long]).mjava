@@ -1,6 +1,9 @@
     public void setLongList(String fieldName, RealmList<Long> list) {
-        addTypeSpecificList(fieldName, list, (builder, lst) -> {
-            builder.addLongList(0, lst);
+        addTypeSpecificList(fieldName, list, new AddListTypeDelegate<Long>() {
+            @Override
+            public void addList(OsObjectBuilder builder, RealmList<Long> list) {
+                builder.addLongList(0, list);
+            }
         });
     }
 

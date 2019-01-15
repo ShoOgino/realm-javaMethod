@@ -1,6 +1,9 @@
     public void setStringList(String fieldName, RealmList<String> list) {
-        addTypeSpecificList(fieldName, list, (builder, lst) -> {
-            builder.addStringList(0, lst);
+        addTypeSpecificList(fieldName, list, new AddListTypeDelegate<String>() {
+            @Override
+            public void addList(OsObjectBuilder builder, RealmList<String> list) {
+                builder.addStringList(0, list);
+            }
         });
     }
 

@@ -1,6 +1,9 @@
     public void setBooleanList(String fieldName, RealmList<Boolean> list) {
-        addTypeSpecificList(fieldName, list, (builder, lst) -> {
-            builder.addBooleanList(0, lst);
+        addTypeSpecificList(fieldName, list, new AddListTypeDelegate<Boolean>() {
+            @Override
+            public void addList(OsObjectBuilder builder, RealmList<Boolean> list) {
+                builder.addBooleanList(0, list);
+            }
         });
     }
 

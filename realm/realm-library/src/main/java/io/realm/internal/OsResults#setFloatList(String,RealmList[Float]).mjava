@@ -1,6 +1,9 @@
     public void setFloatList(String fieldName, RealmList<Float> list) {
-        addTypeSpecificList(fieldName, list, (builder, lst) -> {
-            builder.addFloatList(0, lst);
+        addTypeSpecificList(fieldName, list, new AddListTypeDelegate<Float>() {
+            @Override
+            public void addList(OsObjectBuilder builder, RealmList<Float> list) {
+                builder.addFloatList(0, list);
+            }
         });
     }
 

@@ -1,6 +1,9 @@
     public void setIntegerList(String fieldName, RealmList<Integer> list) {
-        addTypeSpecificList(fieldName, list, (builder, lst) -> {
-            builder.addIntegerList(0, lst);
+        addTypeSpecificList(fieldName, list, new AddListTypeDelegate<Integer>() {
+            @Override
+            public void addList(OsObjectBuilder builder, RealmList<Integer> list) {
+                builder.addIntegerList(0, list);
+            }
         });
     }
 
