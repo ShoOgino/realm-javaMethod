@@ -10,11 +10,11 @@
 
         // Generates a different key and assigns it to the same variable.
         byte[] newKey = TestHelper.getRandomKey(67890);
-        MoreAsserts.assertNotEqual(key, newKey);
+        assertFalse(Arrays.equals(key, newKey));
         key = newKey;
-        MoreAsserts.assertEquals(key, newKey);
+        assertArrayEquals(key, newKey);
 
         // Ensures that the stored key did not change.
-        MoreAsserts.assertEquals(oldKey, config.getEncryptionKey());
+        assertArrayEquals(oldKey, config.getEncryptionKey());
     }
 
