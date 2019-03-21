@@ -1,8 +1,8 @@
-    SubscriptionAwareOsResults(OsSharedRealm sharedRealm, Table table, long nativePtr, String subscriptionName) {
+    SubscriptionAwareOsResults(OsSharedRealm sharedRealm, Table table, long nativePtr, SubscriptionAction subscriptionInfo) {
         super(sharedRealm, table, nativePtr);
 
         this.firstCallback = true;
-        this.subscription = new OsSubscription(this, subscriptionName);
+        this.subscription = new OsSubscription(this, subscriptionInfo);
         this.subscription.addChangeListener(new RealmChangeListener<OsSubscription>() {
             @Override
             public void onChange(OsSubscription o) {

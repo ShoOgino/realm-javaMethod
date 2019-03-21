@@ -1,0 +1,17 @@
+    /**
+     * Replaces the current query controlled by this subscription with a new query.
+     *
+     * @param query the query which should replace the current one.
+     */
+    public void setQuery(RealmQuery query) {
+        if (query == null) {
+            throw new IllegalArgumentException("Non-null 'query' required");
+        }
+        if (!query.getTypeQueried().equals(getQueryClassName())) {
+            throw new IllegalArgumentException(String.format("It is only allowed to replace a query with another query on the same type." +
+                    "Existing query: '%s'. New query: '%s'", getQueryClassName(), query.getTypeQueried()));
+        }
+        this.query = query.getDescription();
+        this.updatedAt = new Date();
+    }
+

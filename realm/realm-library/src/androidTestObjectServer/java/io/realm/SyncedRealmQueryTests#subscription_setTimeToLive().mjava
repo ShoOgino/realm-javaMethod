@@ -1,0 +1,21 @@
+    @Test
+    public void subscription_setTimeToLive() {
+        realm = getPartialRealm();
+        realm.beginTransaction();
+
+        Subscription sub = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_STRING, "foo").subscribe();
+        assertEquals(Long.MAX_VALUE, sub.getExpiresAt().getTime());
+        assertEquals(Long.MAX_VALUE, sub.getTimeToLive());
+
+        Date now = new Date();
+        Date now_plus_1_sec = new Date(now.getTime() + 1000);
+        Date now_plus_11_sec = new Date(now.getTime() + 11000);
+        SystemClock.sleep(2);
+        sub.setTimeToLive(10, TimeUnit.SECONDS);
+        assertEquals(10000, sub.getTimeToLive());
+        assertTrue(now.getTime() < sub.getUpdatedAt().getTime());
+        assertTrue(now.getTime() < sub.getExpiresAt().getTime());
+        assertTrue(sub.getUpdatedAt().getTime() < now_plus_1_sec.getTime());
+        assertTrue(sub.getExpiresAt().getTime() < now_plus_11_sec.getTime());
+    }
+

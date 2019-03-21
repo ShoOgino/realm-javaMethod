@@ -1,0 +1,29 @@
+    @RunTestInLooperThread
+    public void creatingSubscriptionsAlsoCleanupExpiredSubscriptions() {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        final Realm realm = getPartialRealm(user);
+        looperThread.closeAfterTest(realm);
+
+        RealmResults<PartialSyncObjectA> results = realm.where(PartialSyncObjectA.class).findAllAsync("sub1", 0, TimeUnit.MILLISECONDS);
+        results.addChangeListener((objects1, changeSet1) -> {
+            if (changeSet1.isCompleteResult()) {
+                results.removeAllChangeListeners();
+                assertEquals(1, realm.getSubscriptions().size());
+                final Subscription firstSub = realm.getSubscription("sub1");
+                SystemClock.sleep(2);
+
+                RealmResults<PartialSyncObjectB> results2 = realm.where(PartialSyncObjectB.class).findAllAsync("sub2");
+                results2.addChangeListener((objects2, changeSet2) -> {
+                    if (changeSet2.isCompleteResult()) {
+                        assertEquals(1, realm.getSubscriptions().size());
+                        assertEquals("sub2", realm.getSubscriptions().first().getName());
+                        assertFalse(firstSub.isValid());
+                        looperThread.testComplete();
+                    }
+                });
+                looperThread.keepStrongReference(results2);
+            }
+        });
+        looperThread.keepStrongReference(results);
+    }
+

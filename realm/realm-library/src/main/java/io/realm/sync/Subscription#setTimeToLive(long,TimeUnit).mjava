@@ -1,0 +1,26 @@
+    /**
+     * Sets the time-to-live in milliseconds for this subscription. This defines for how long Realm
+     * must keep the subscription alive after last being used.
+     *
+     * @param timeToLive for how long Realm must keep the subscription after last being used.
+     * @param timeUnit time unit for {@code timeToLive}.
+     * @throws IllegalArgumentException if a negative time-to-live or null timeUnit is provided.
+     */
+    public void setTimeToLive(long timeToLive, TimeUnit timeUnit) {
+        if (timeToLive < 0) {
+            throw new IllegalArgumentException("A negative time-to-live is not allowed: " + timeToLive);
+        }
+        if (timeUnit == null) {
+            throw new IllegalArgumentException("Non-null 'timeUnit' required.");
+        }
+        this.updatedAt = new Date(System.currentTimeMillis());
+        this.timeToLive = TimeUnit.MILLISECONDS.convert(timeToLive, timeUnit);
+        long expiryTime = this.updatedAt.getTime();
+        if (expiryTime + this.timeToLive < expiryTime) {
+            expiryTime = Long.MAX_VALUE; // Clamp overflow to max
+        } else {
+            expiryTime = expiryTime + this.timeToLive;
+        }
+        this.expiresAt = new Date(expiryTime);
+    }
+

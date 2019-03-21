@@ -1,10 +1,11 @@
     private OsRealmConfig(final RealmConfiguration config,
+                          String fifoFallbackDir,
                           boolean autoUpdateNotification,
                           @Nullable OsSchemaInfo schemaInfo,
                           @Nullable OsSharedRealm.MigrationCallback migrationCallback,
                           @Nullable OsSharedRealm.InitializationCallback initializationCallback) {
         this.realmConfiguration = config;
-        this.nativePtr = nativeCreate(config.getPath(), false, true);
+        this.nativePtr = nativeCreate(config.getPath(), fifoFallbackDir,false, true);
         NativeContext.dummyContext.addReference(this);
 
         // Retrieve Sync settings first. We need syncRealmUrl to identify if this is a SyncConfig

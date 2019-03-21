@@ -1,0 +1,19 @@
+    @Test
+    public void subscription_setTimeToLive_illegalValuesThrows() {
+        realm = getPartialRealm();
+        realm.beginTransaction();
+        Subscription sub = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_STRING, "foo").subscribe();
+        try {
+            sub.setTimeToLive(-1, TimeUnit.SECONDS);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("A negative time-to-live is not allowed"));
+        }
+        try {
+            sub.setTimeToLive(0, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Non-null 'timeUnit' required"));
+        }
+    }
+

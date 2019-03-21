@@ -1,18 +1,21 @@
     /**
-     * Finds all objects that fulfill the query condition(s). This method is only available from a Looper thread.
+     * Finds all objects that fulfil the query condition(s). This method is only available from a Looper thread.
      * <p>
      * This method is only available on query-based synchronized Realms and will also create a named subscription
      * that will synchronize all server data matching the query. Named subscriptions can be removed again by
      * calling {@code Realm.unsubscribe(subscriptionName}.
      *
      * @param subscriptionName name of the underlying subscription being created.
+     * @param update if an existing subscription exists with a different query. It will be replaced with this
+     *               one instead of an error being reported through {@link OrderedRealmCollectionChangeListener}.
      * @return immediately an empty {@link RealmResults}. Users need to register a listener
      * {@link io.realm.RealmResults#addChangeListener(RealmChangeListener)} to be notified when the query completes.
      * @see io.realm.RealmResults
      * @throws IllegalStateException If the Realm is a not a query-based synchronized Realm or the query is on a {@link RealmList}.
      */
     @ObjectServer
-    public RealmResults<E> findAllAsync(String subscriptionName) {
-        return findAllAsync(subscriptionName, Long.MAX_VALUE, TimeUnit.MILLISECONDS, false);
+    @Beta
+    public RealmResults<E> findAllAsync(String subscriptionName, boolean update) {
+        return findAllAsync(subscriptionName, Long.MAX_VALUE, TimeUnit.MILLISECONDS, update);
     }
 

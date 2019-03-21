@@ -1,0 +1,25 @@
+    @Test
+    @RunTestInLooperThread
+    public void namedSubscription_withTimeToLive() {
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        final Realm realm = getPartialRealm(user);
+        looperThread.closeAfterTest(realm);
+
+        RealmQuery<PartialSyncObjectA> query = realm.where(PartialSyncObjectA.class);
+        Date now = new Date();
+        Date now_plus_10_sec = new Date(now.getTime() + 10000);
+        RealmResults<PartialSyncObjectA> results = query.findAllAsync("test-ttl", 5, TimeUnit.SECONDS);
+        results.addChangeListener((objects, changeSet) -> {
+            if (changeSet.isCompleteResult()) {
+                results.removeAllChangeListeners();
+                final Subscription sub = realm.getSubscription("test-ttl");
+                // Fuzzy check of expiresAt since we don't control exactly when the Subscription is created.
+                assertTrue(now.getTime() <= sub.getExpiresAt().getTime());
+                assertTrue(sub.getExpiresAt().getTime() < now_plus_10_sec.getTime());
+                assertEquals(5000, sub.getTimeToLive());
+                looperThread.testComplete();
+            }
+        });
+        looperThread.keepStrongReference(results);
+    }
+

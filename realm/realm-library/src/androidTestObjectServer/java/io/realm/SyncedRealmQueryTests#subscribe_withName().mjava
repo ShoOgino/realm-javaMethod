@@ -1,10 +1,11 @@
     @Test
     public void subscribe_withName() {
+        String name = randomName();
         realm = getPartialRealm();
         realm.beginTransaction();
         RealmQuery<AllTypes> query = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_STRING, "foo");
-        Subscription sub = query.subscribe("sub");
-        assertEquals("sub", sub.getName());
+        Subscription sub = query.subscribe(name);
+        assertEquals(name, sub.getName());
         assertEquals(Subscription.State.PENDING, sub.getState());
         assertEquals("", sub.getErrorMessage());
         assertEquals(query.getDescription(), sub.getQueryDescription());

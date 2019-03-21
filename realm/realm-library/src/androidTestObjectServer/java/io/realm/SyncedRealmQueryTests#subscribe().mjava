@@ -3,11 +3,18 @@
         realm = getPartialRealm();
         realm.beginTransaction();
         RealmQuery<AllTypes> query = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_STRING, "foo");
+        Date now = new Date();
+        SystemClock.sleep(2);
         Subscription sub = query.subscribe();
         assertTrue(sub.getName().startsWith("[AllTypes] "));
         assertEquals(Subscription.State.PENDING, sub.getState());
         assertEquals("", sub.getErrorMessage());
         assertEquals(query.getDescription(), sub.getQueryDescription());
         assertEquals("AllTypes", sub.getQueryClassName());
+        assertTrue(now.getTime() < sub.getCreatedAt().getTime());
+        assertTrue(now.getTime() < sub.getUpdatedAt().getTime());
+        assertTrue(sub.getCreatedAt().getTime() == sub.getUpdatedAt().getTime());
+        assertEquals(Long.MAX_VALUE, sub.getTimeToLive());
+        assertEquals(new Date(Long.MAX_VALUE), sub.getExpiresAt());
     }
 
