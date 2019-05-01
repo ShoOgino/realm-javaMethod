@@ -1,0 +1,61 @@
+    @Test
+    @RunTestInLooperThread
+    public void includeLinkingObjects_differentTable() throws InterruptedException {
+        // Upload data
+        SyncUser admin = UserFactory.createAdminUser(Constants.AUTH_URL);
+        Realm realm1 = getPartialRealm(admin);
+        realm1.executeTransaction(realm -> {
+            BacklinksTarget child1 = new BacklinksTarget();
+            child1.setId(1);
+            BacklinksTarget child2 = new BacklinksTarget();
+            child2.setId(2);
+
+            BacklinksSource parent1 = new BacklinksSource();
+            parent1.setName("parent-1");
+            parent1.setChild(child1);
+            BacklinksSource parent2 = new BacklinksSource();
+            parent2.setName("parent-2");
+
+            realm.insert(parent1);
+            realm.insert(parent2);
+            realm.insert(child2);
+        });
+        SyncManager.getSession((SyncConfiguration) realm1.getConfiguration()).uploadAllLocalChanges();
+        realm1.close();
+
+        // Create subscription with includes
+        SyncUser user = UserFactory.createUniqueUser(Constants.AUTH_URL);
+        Realm realm2 = getPartialRealm(admin);
+        SyncSession session = SyncManager.getSession((SyncConfiguration) realm2.getConfiguration());
+        assertEquals(0, realm2.where(AllJavaTypes.class).count());
+        realm2.executeTransaction(realm -> {
+            Subscription sub = realm.where(BacklinksTarget.class)
+                    .equalTo(BacklinksTarget.FIELD_ID, 1)
+                    .subscribe("my-sub");
+            assertEquals("id == 1", sub.getQueryDescription());
+        });
+        session.uploadAllLocalChanges();
+        session.downloadAllServerChanges();
+        realm2.refresh();
+        assertEquals(1, realm2.where(BacklinksTarget.class).count());
+        assertEquals(0, realm2.where(BacklinksSource.class).count());
+
+        // Update subscription to include parent objects
+        realm2.executeTransaction(realm -> {
+            Subscription sub = realm.where(BacklinksTarget.class)
+                    .equalTo(BacklinksTarget.FIELD_ID, 1)
+                    .includeLinkingObjects(BacklinksTarget.FIELD_PARENTS)
+                    .subscribeOrUpdate("my-sub");
+            assertEquals("id == 1 INCLUDE(@links.class_BacklinksSource.child)", sub.getQueryDescription());
+        });
+        session.uploadAllLocalChanges();
+        session.downloadAllServerChanges();
+        realm2.refresh();
+        assertEquals(1, realm2.where(BacklinksTarget.class).count());
+        assertEquals(1, realm2.where(BacklinksSource.class).count());
+        realm2.close();
+        looperThread.postRunnable(() -> {
+            looperThread.testComplete();
+        });
+    }
+
