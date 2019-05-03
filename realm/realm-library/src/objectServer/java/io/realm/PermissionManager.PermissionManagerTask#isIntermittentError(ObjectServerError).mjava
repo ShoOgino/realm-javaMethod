@@ -1,0 +1,25 @@
+        private boolean isIntermittentError(@Nullable ObjectServerError error) {
+            // Unknown errors normally have a undefined category as well. All serious errors
+            // should already be covered by known categories, so expect unknown categories
+            // to be intermittent.
+            if (error == null || error.getErrorCode() == ErrorCode.UNKNOWN) {
+                return true;
+            }
+
+            switch (error.getErrorType()) {
+                case ErrorCode.Type.CONNECTION:
+                case ErrorCode.Type.HTTP:
+                case ErrorCode.Type.MISC:
+                case ErrorCode.Type.UNKNOWN:
+                    return true;
+
+                case ErrorCode.Type.AUTH:
+                case ErrorCode.Type.DEPRECATED:
+                case ErrorCode.Type.JAVA:
+                case ErrorCode.Type.PROTOCOL:
+                case ErrorCode.Type.SESSION:
+                default:
+                    return false;
+            }
+        }
+
