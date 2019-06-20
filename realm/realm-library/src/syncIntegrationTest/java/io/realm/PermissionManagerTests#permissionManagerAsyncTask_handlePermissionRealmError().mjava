@@ -7,7 +7,7 @@
         // Simulate error in the permission Realm
         Field permissionConfigField = pm.getClass().getDeclaredField("permissionRealmError");
         permissionConfigField.setAccessible(true);
-        final ObjectServerError error = new ObjectServerError(ErrorCode.UNKNOWN, "Boom");
+        final ObjectServerError error = new ObjectServerError(ErrorCode.WRONG_PROTOCOL_VERSION, "Boom");
         permissionConfigField.set(pm, error);
 
         PermissionManager.ApplyPermissionsCallback callback = new PermissionManager.ApplyPermissionsCallback() {
@@ -20,7 +20,7 @@
             public void onError(ObjectServerError error) {
                 assertTrue(error.getErrorMessage().startsWith("Error occurred in Realm"));
                 assertTrue(error.getErrorMessage().contains("Permission Realm"));
-                assertEquals(ErrorCode.UNKNOWN, error.getErrorCode());
+                assertEquals(ErrorCode.WRONG_PROTOCOL_VERSION, error.getErrorCode());
                 looperThread.testComplete();
             }
         };

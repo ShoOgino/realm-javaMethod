@@ -1,0 +1,24 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void permissionManagerAsyncTask_doNotReportIntermittentErrors() throws NoSuchFieldException, IllegalAccessException {
+        PermissionManager pm = user.getPermissionManager();
+        looperThread.closeAfterTest(pm);
+
+        // Simulate intermittent error in the management Realm that is possible to recover from
+        // These kind of errors should never reach the end user as we should recover automatically.
+        setRealmError(pm, "managementRealmError", new ObjectServerError(ErrorCode.UNKNOWN, "Boom1"));
+
+        pm.getPermissions(new PermissionManager.PermissionsCallback() {
+            @Override
+            public void onSuccess(RealmResults<Permission> permissions) {
+                assertEquals(3, permissions.size());
+                looperThread.testComplete();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail();
+            }
+        });
+    }
+

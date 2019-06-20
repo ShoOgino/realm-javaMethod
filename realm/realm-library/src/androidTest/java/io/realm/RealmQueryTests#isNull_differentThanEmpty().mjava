@@ -1,0 +1,30 @@
+    @Test
+    public void isNull_differentThanEmpty() {
+        // Make sure that isNull doesn't match empty string ""
+        realm.executeTransaction(r -> {
+            r.delete(NullTypes.class);
+            NullTypes obj = new NullTypes();
+            obj.setId(1);
+            obj.setFieldStringNull(null);
+            r.insert(obj);
+            obj = new NullTypes();
+            obj.setId(2);
+            obj.setFieldStringNull("");
+            r.insert(obj);
+            obj = new NullTypes();
+            obj.setId(3);
+            obj.setFieldStringNull("foo");
+            r.insert(obj);
+        });
+
+        assertEquals(3, realm.where(NullTypes.class).findAll().size());
+
+        RealmResults<NullTypes> results = realm.where(NullTypes.class).isNull(NullTypes.FIELD_STRING_NULL).findAll();
+        assertEquals(1, results.size());
+        assertNull(results.first().getFieldStringNull());
+
+        results = realm.where(NullTypes.class).isEmpty(NullTypes.FIELD_STRING_NULL).findAll();
+        assertEquals(1, results.size());
+        assertEquals("", results.first().getFieldStringNull());
+    }
+

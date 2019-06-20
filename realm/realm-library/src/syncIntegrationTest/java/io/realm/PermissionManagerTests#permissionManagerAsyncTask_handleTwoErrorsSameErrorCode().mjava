@@ -5,10 +5,10 @@
         looperThread.closeAfterTest(pm);
 
         // Simulate error in the permission Realm
-        setRealmError(pm, "managementRealmError", new ObjectServerError(ErrorCode.CONNECTION_CLOSED, "Boom1"));
+        setRealmError(pm, "managementRealmError", new ObjectServerError(ErrorCode.WRONG_PROTOCOL_VERSION, "Boom1"));
 
         // Simulate error in the management Realm
-        setRealmError(pm, "permissionRealmError", new ObjectServerError(ErrorCode.CONNECTION_CLOSED, "Boom2"));
+        setRealmError(pm, "permissionRealmError", new ObjectServerError(ErrorCode.WRONG_PROTOCOL_VERSION, "Boom2"));
 
         PermissionManager.ApplyPermissionsCallback callback = new PermissionManager.ApplyPermissionsCallback() {
             @Override
@@ -18,7 +18,7 @@
 
             @Override
             public void onError(ObjectServerError error) {
-                assertEquals(ErrorCode.CONNECTION_CLOSED, error.getErrorCode());
+                assertEquals(ErrorCode.WRONG_PROTOCOL_VERSION, error.getErrorCode());
                 assertTrue(error.toString().contains("Boom1"));
                 assertTrue(error.toString().contains("Boom2"));
                 looperThread.testComplete();

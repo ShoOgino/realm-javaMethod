@@ -1,0 +1,64 @@
+    @Test
+    public void asJSON_cycles() throws JSONException {
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT")); // Core return dates in UTC time
+        String now = sdf.format(date);
+
+        CyclicType oneCyclicType = new CyclicType();
+        oneCyclicType.setName("One");
+        oneCyclicType.setDate(date);
+
+        CyclicType anotherCyclicType = new CyclicType();
+        anotherCyclicType.setName("Two");
+        anotherCyclicType.setDate(date);
+
+        oneCyclicType.setObject(anotherCyclicType);
+        anotherCyclicType.setObject(oneCyclicType);
+
+        realm.beginTransaction();
+        realm.insert(Arrays.asList(oneCyclicType, anotherCyclicType));
+        realm.commitTransaction();
+
+        RealmResults<CyclicType> realmObjects = realm.where(CyclicType.class).sort(CyclicType.FIELD_NAME).findAll();
+        assertEquals(2, realmObjects.size());
+        String json = realmObjects.asJSON();
+        String expectedJSON = "[\n" +
+                "    {\n" +
+                "        \"id\": 0,\n" +
+                "        \"name\": \"One\",\n" +
+                "        \"date\": \"" + now + "\",\n" +
+                "        \"object\": [\n" +
+                "            {\n" +
+                "                \"id\": 0,\n" +
+                "                \"name\": \"Two\",\n" +
+                "                \"date\": \"" + now + "\",\n" +
+                "                \"object\": \"0\",\n" +
+                "                \"otherObject\": [],\n" +
+                "                \"objects\": []\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"otherObject\": [],\n" +
+                "        \"objects\": []\n" +
+                "    },\n" +
+                "    {\n" +
+                "        \"id\": 0,\n" +
+                "        \"name\": \"Two\",\n" +
+                "        \"date\": \"" + now + "\",\n" +
+                "        \"object\": [\n" +
+                "            {\n" +
+                "                \"id\": 0,\n" +
+                "                \"name\": \"One\",\n" +
+                "                \"date\": \"" + now + "\",\n" +
+                "                \"object\": \"1\",\n" +
+                "                \"otherObject\": [],\n" +
+                "                \"objects\": []\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"otherObject\": [],\n" +
+                "        \"objects\": []\n" +
+                "    }\n" +
+                "]";
+        JSONAssert.assertEquals(expectedJSON, json, false);
+    }
+
