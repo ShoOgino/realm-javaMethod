@@ -1,0 +1,16 @@
+    public void start(long timeOut, TimeUnit unit) throws InterruptedException {
+        this.nativePtr = start(config.getNativePtr());
+
+        try {
+            taskComplete.await(timeOut, unit);
+        } catch (InterruptedException e) {
+            cancel(nativePtr);
+            throw e;
+        }
+
+        String errorMessage = error.get();
+        if (errorMessage != null) {
+            throw new ObjectServerError(ErrorCode.UNKNOWN, errorMessage);
+        }
+    }
+

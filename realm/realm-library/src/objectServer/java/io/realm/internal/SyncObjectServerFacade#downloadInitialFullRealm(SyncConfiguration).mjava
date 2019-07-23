@@ -1,0 +1,9 @@
+    private void downloadInitialFullRealm(SyncConfiguration syncConfig) {
+        OsAsyncOpenTask task = new OsAsyncOpenTask(new OsRealmConfig.Builder(syncConfig).build());
+        try {
+            task.start(syncConfig.getInitialRemoteDataTimeout(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            throw new DownloadingRealmInterruptedException(syncConfig, e);
+        }
+    }
+
