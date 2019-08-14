@@ -1,0 +1,9 @@
+    @Test
+    public void copyToRealm_modelWithRenamedTargetFields() {
+        realm.beginTransaction();
+        BacklinkWithOverridenNames obj = new BacklinkWithOverridenNames(UUID.randomUUID().toString());
+        realm.copyToRealmOrUpdate(obj);
+        realm.commitTransaction();
+        assertEquals(1, realm.where(BacklinkWithOverridenNames.class).count());
+    }
+
