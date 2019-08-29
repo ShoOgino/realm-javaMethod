@@ -12,13 +12,13 @@
                 pm.getPermissions(new PermissionManager.PermissionsCallback() {
                     @Override
                     public void onSuccess(RealmResults<Permission> permissions) {
-                        fail();
+                        assertEquals(3, permissions.size());
+                        looperThread.testComplete();
                     }
 
                     @Override
                     public void onError(ObjectServerError error) {
-                        assertEquals(ErrorCode.CLIENT_RESET, error.getErrorCode());
-                        looperThread.testComplete();
+                        fail(error.toString());
                     }
                 });
             }

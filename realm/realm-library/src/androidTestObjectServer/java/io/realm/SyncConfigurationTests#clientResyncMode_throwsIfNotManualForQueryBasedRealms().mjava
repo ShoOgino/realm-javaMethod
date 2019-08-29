@@ -1,0 +1,14 @@
+    @Test
+    public void clientResyncMode_throwsIfNotManualForQueryBasedRealms() {
+        SyncUser user = createTestUser();
+        String url = "realm://objectserver.realm.io/default";
+        SyncConfiguration.Builder config = user.createConfiguration(url)
+                .clientResyncMode(ClientResyncMode.RECOVER_LOCAL_REALM);
+        try {
+            //noinspection ConstantConditions
+            config.build();
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+    }
+
