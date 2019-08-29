@@ -8,11 +8,13 @@
         ObjectServerError error;
         Token accessToken;
         Token refreshToken;
+        SyncWorker syncWorker;
         String debugMessage;
         try {
             JSONObject obj = new JSONObject(serverResponse);
             accessToken = obj.has(JSON_FIELD_ACCESS_TOKEN) ? Token.from(obj.getJSONObject(JSON_FIELD_ACCESS_TOKEN)) : null;
             refreshToken = obj.has(JSON_FIELD_REFRESH_TOKEN) ? Token.from(obj.getJSONObject(JSON_FIELD_REFRESH_TOKEN)) : null;
+            syncWorker = obj.has(JSON_FIELD_SYNC_WORKER) ? SyncWorker.from(obj.getJSONObject(JSON_FIELD_SYNC_WORKER)) : null;
             error = null;
             if (accessToken == null) {
                 debugMessage = "accessToken = null";
@@ -22,6 +24,7 @@
         } catch (JSONException ex) {
             accessToken = null;
             refreshToken = null;
+            syncWorker = null;
             String exceptionMessage = String.format(Locale.US, "Server response could not be parsed as JSON:%n%s", serverResponse);
             //noinspection ThrowableInstanceNeverThrown
             error = new ObjectServerError(ErrorCode.JSON_EXCEPTION, exceptionMessage, ex);
@@ -31,5 +34,6 @@
         setError(error);
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.syncWorker = syncWorker;
     }
 

@@ -17,6 +17,12 @@
                 synchronized (SyncSession.this) {
                     if (!isClosed && !Thread.currentThread().isInterrupted() && !refreshTokenNetworkRequest.isCancelled()) {
                         RealmLog.debug("Access Token refreshed successfully, Sync URL: " + configuration.getServerUrl());
+
+                        SyncWorker syncWorker = response.getSyncWorker();
+                        if (syncWorker != null) {
+                            nativeSetUrlPrefix(configuration.getPath(), syncWorker.path());
+                        }
+
                         URI realmUrl = configuration.getServerUrl();
                         if (nativeRefreshAccessToken(configuration.getPath(), response.getAccessToken().value(), realmUrl.toString())) {
                             // replace the user old access_token
