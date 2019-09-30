@@ -1,0 +1,22 @@
+    public void copyFileFromAssets(Context context, String assetPath, File outFile) throws IOException {
+        InputStream is = null;
+        FileOutputStream os = null;
+        try {
+            is = context.getAssets().open(assetPath);
+            os = new FileOutputStream(outFile);
+
+            byte[] buf = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = is.read(buf)) > -1) {
+                os.write(buf, 0, bytesRead);
+            }
+        } finally {
+            if (is != null) {
+                try { is.close(); } catch (IOException ignore) {}
+            }
+            if (os != null) {
+                try { os.close(); } catch (IOException ignore) {}
+            }
+        }
+    }
+
