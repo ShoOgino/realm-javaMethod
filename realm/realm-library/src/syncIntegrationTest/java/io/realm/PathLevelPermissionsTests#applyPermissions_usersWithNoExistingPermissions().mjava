@@ -1,0 +1,21 @@
+    @Test
+    @RunTestInLooperThread
+    public void applyPermissions_usersWithNoExistingPermissions() {
+        final SyncUser user1 = UserFactory.createUser("user1@realm.io");
+        final SyncUser user2 = UserFactory.createUser("user2@realm.io");
+
+        // Create request for giving all users with no existing permissions WRITE permissions to `user1`'s Realm.
+        UserCondition condition = UserCondition.noExistingPermissions();
+        AccessLevel accessLevel = AccessLevel.WRITE;
+        final String url = createRemoteRealm(user1, "test");
+        PermissionRequest request = new PermissionRequest(condition, url, accessLevel);
+
+        user1.applyPermissions(request);
+        List<Permission> user2Permissions = user2.retrieveGrantedPermissions();
+        assertPermissionPresent(user2Permissions, null, "/" + user1.getIdentity() + "/test", AccessLevel.WRITE);
+
+        // Remove wildcard permission to prevent them from interfering with other tests
+        user1.applyPermissions(new PermissionRequest(UserCondition.noExistingPermissions(), url, AccessLevel.NONE));
+
+    }
+

@@ -1,0 +1,22 @@
+    /**
+     * Helper method for creating the proper response. This method will set the appropriate error
+     * depending on any HTTP response codes or I/O errors.
+     *
+     * @param response the server response.
+     * @return the user lookup response.
+     */
+    static InvalidatePermissionsOfferResponse from(Response response) {
+        String serverResponse;
+        try {
+            serverResponse = response.body().string();
+        } catch (IOException e) {
+            ObjectServerError error = new ObjectServerError(ErrorCode.IO_EXCEPTION, e);
+            return new InvalidatePermissionsOfferResponse(error);
+        }
+        if (!response.isSuccessful()) {
+            return new InvalidatePermissionsOfferResponse(AuthServerResponse.createError(serverResponse, response.code()));
+        } else {
+            return new InvalidatePermissionsOfferResponse(serverResponse);
+        }
+    }
+

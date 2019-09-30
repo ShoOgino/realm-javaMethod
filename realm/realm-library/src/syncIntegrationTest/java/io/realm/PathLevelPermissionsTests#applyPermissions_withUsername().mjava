@@ -1,0 +1,20 @@
+    @Test
+    @RunTestInLooperThread
+    public void applyPermissions_withUsername() {
+        String user1Username = TestHelper.getRandomEmail();
+        String user2Username = TestHelper.getRandomEmail();
+        final SyncUser user1 = UserFactory.createUser(user1Username);
+        final SyncUser user2 = UserFactory.createUser(user2Username);
+
+        // Create request for giving `user2` WRITE permissions to `user1`'s Realm.
+        UserCondition condition = UserCondition.username(user2Username);
+        AccessLevel accessLevel = AccessLevel.WRITE;
+        String url = createRemoteRealm(user1, "test");
+        PermissionRequest request = new PermissionRequest(condition, url, accessLevel);
+
+        user1.applyPermissions(request);
+        List<Permission> user2Permissions = user2.retrieveGrantedPermissions();
+        assertPermissionPresent(user2Permissions, user2, user1.getIdentity() + "/test", AccessLevel.WRITE);
+        looperThread.testComplete();
+    }
+

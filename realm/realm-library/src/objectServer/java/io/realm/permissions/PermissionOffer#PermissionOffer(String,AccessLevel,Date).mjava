@@ -6,17 +6,10 @@
      * @param expiresAt the date and time when this offer expires. If {@code null} is provided the offer never expires.
      *
      *
-     * @see PermissionManager#revokeOffer(String, PermissionManager.RevokeOfferCallback)
+     * @see SyncUser#invalidatePermissionsOfferAsync(String, SyncUser.Callback)
      */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public PermissionOffer(String url, AccessLevel accessLevel, @Nullable Date expiresAt) {
-        validateUrl(url);
-        validateAccessLevel(accessLevel);
-        this.mayRead = accessLevel.mayRead();
-        this.mayWrite = accessLevel.mayWrite();
-        this.mayManage = accessLevel.mayManage();
-        this.realmUrl = url;
-        //noinspection ConstantConditions
-        this.expiresAt = (expiresAt != null) ? (Date) expiresAt.clone() : null;
+        this(url, accessLevel, expiresAt, new Date(), null, null);
     }
 

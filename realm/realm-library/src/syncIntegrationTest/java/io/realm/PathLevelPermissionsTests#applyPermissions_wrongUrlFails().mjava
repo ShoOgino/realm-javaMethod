@@ -1,0 +1,24 @@
+    @Test
+    @RunTestInLooperThread
+    public void applyPermissions_wrongUrlFails() {
+        String wrongUrl = createRemoteRealm(user, "test") + "-notexisting";
+
+        // Create request for setting permissions on another users Realm,
+        // i.e. user making the request do not have manage rights.
+        UserCondition condition = UserCondition.userId(user.getIdentity());
+        AccessLevel accessLevel = AccessLevel.WRITE;
+        PermissionRequest request = new PermissionRequest(condition, wrongUrl, accessLevel);
+        user.applyPermissionsAsync(request, new SyncUser.Callback<Void>() {
+            @Override
+            public void onSuccess(Void ignore) {
+                fail();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                assertEquals(ErrorCode.INVALID_PARAMETERS, error.getErrorCode());
+                looperThread.testComplete();
+            }
+        });
+    }
+

@@ -1,0 +1,20 @@
+    @Test
+    @RunTestInLooperThread
+    public void makeOffer() {
+        String url = createRemoteRealm(user, "test");
+
+        PermissionOffer offer = new PermissionOffer(url, AccessLevel.WRITE);
+        user.makePermissionsOfferAsync(offer, new SyncUser.Callback<String>() {
+            @Override
+            public void onSuccess(String token) {
+                assertNotNull(token);
+                looperThread.testComplete();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail(error.toString());
+            }
+        });
+    }
+

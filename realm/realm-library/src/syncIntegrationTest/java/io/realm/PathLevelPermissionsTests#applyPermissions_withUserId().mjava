@@ -1,0 +1,25 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void applyPermissions_withUserId() {
+        final SyncUser user2 = UserFactory.createUniqueUser();
+        String url = createRemoteRealm(user2, "test");
+
+        // Create request for giving `user` WRITE permissions to `user2`'s Realm.
+        UserCondition condition = UserCondition.userId(user.getIdentity());
+        AccessLevel accessLevel = AccessLevel.WRITE;
+        PermissionRequest request = new PermissionRequest(condition, url, accessLevel);
+
+        user2.applyPermissionsAsync(request, new SyncUser.Callback<Void>() {
+            @Override
+            public void onSuccess(Void ignore) {
+                List<Permission> permissions = user.retrieveGrantedPermissions();
+                assertPermissionPresent(permissions, user, "/test", AccessLevel.WRITE);
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail(error.toString());
+            }
+        });
+    }
+

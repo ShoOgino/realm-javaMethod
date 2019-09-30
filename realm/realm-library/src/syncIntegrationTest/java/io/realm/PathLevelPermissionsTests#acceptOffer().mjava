@@ -1,0 +1,19 @@
+    @Test
+    @RunTestInLooperThread
+    public void acceptOffer() {
+        final String offerToken = createOffer(user, "test", AccessLevel.WRITE, null);
+        final SyncUser user2 = UserFactory.createUniqueUser();
+        user2.acceptPermissionsOfferAsync(offerToken, new SyncUser.Callback<String>() {
+            @Override
+            public void onSuccess(String realmPath) {
+                assertEquals("/" + user.getIdentity() + "/test", realmPath);
+                looperThread.testComplete();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail(error.toString());
+            }
+        });
+    }
+

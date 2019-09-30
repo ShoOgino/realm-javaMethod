@@ -1,0 +1,20 @@
+    /**
+     * Retrieves the list of permissions granted to this user. The data is fetched directly from
+     * the Realm Object Server and requires a network connection.
+     *
+     * @param callback callback notified when list the permissions are ready.
+     * @return {@link RealmAsyncTask} that can be used to cancel the task if needed.
+     *
+     * @throws IllegalStateException if this method is called from a thread without a looper.
+     */
+    public RealmAsyncTask retrieveGrantedPermissionsAsync(Callback<List<Permission>> callback) {
+        checkLooperThread("Asynchronously retrieving permissions is only possible from looper threads.");
+        checkCallbackNotNull(callback);
+        return new Request<List<Permission>>(SyncManager.NETWORK_POOL_EXECUTOR, callback) {
+            @Override
+            public List<Permission> run() throws ObjectServerError {
+                return retrieveGrantedPermissions();
+            }
+        }.start();
+    }
+

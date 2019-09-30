@@ -1,0 +1,38 @@
+    /**
+     * Makes a permission offer to users. The offer is represented by an offer token and the permission changes
+     * described in the {@link PermissionOffer} do not take effect until the offer has been accepted by a user
+     * calling {@link #acceptPermissionsOfferAsync(String, Callback)}.
+     * <p>
+     * A permission offer can be used as a flexible way of sharing Realms with other users that might not be known at the time
+     * of making the offer as well as enabling sharing across other channels like e-mail. If a specific user should be
+     * granted access, using {@link #applyPermissionsAsync(PermissionRequest, Callback)} will be faster and quicker.
+     * <p>
+     * An offer can be accepted by multiple users.
+     *
+     * @return the path to the Realm affected by this permission.
+     * @throws android.os.NetworkOnMainThreadException if called from the UI thread.
+     * @see <a href="https://realm.io/docs/realm-object-server/#permissions">Permissions description</a> for general
+     * documentation.
+     * @see <a href="https://realm.io/docs/java/latest/#modifying-permissions">Modifying permissions</a> for a more
+     * high level description.
+     *
+     * @param offer the object description the kind of permissions that should be offered to other users.
+     * @param callback callback to be notified with the offer token once it is ready.
+     * @return {@link RealmAsyncTask} that can be used to cancel the task if needed.
+     * @throws IllegalStateException if this method is called from a Thread without a looper.
+     * @see <a href="https://realm.io/docs/realm-object-server/#permissions">Permissions description</a> for general
+     * documentation.
+     * @see <a href="https://realm.io/docs/java/latest/#modifying-permissions">Modifying permissions</a> for a more
+     * high level description.
+     */
+    public RealmAsyncTask makePermissionsOfferAsync(PermissionOffer offer, Callback<String> callback) {
+        checkLooperThread("Asynchronously making an offer is only possible from looper threads.");
+        checkCallbackNotNull(callback);
+        return new Request<String>(SyncManager.NETWORK_POOL_EXECUTOR, callback) {
+            @Override
+            public String run() throws ObjectServerError {
+                return makePermissionsOffer(offer);
+            }
+        }.start();
+    }
+

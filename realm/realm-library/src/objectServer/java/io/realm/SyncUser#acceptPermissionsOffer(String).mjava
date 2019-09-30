@@ -1,0 +1,28 @@
+    /**
+     * Accepts a permission offer sent by another user. Once this offer is accepted successfully, the permissions
+     * described by the token will be granted.
+     *
+     * @param offerToken token representing the permission offer.
+     * @return the path to the Realm affected by the offer.
+     * @throws ObjectServerError if an error happened while trying to accept the offer.
+     * @throws android.os.NetworkOnMainThreadException if called from the UI thread.
+     */
+    public String acceptPermissionsOffer(String offerToken) {
+        if (Util.isEmptyString(offerToken)) {
+            throw new IllegalArgumentException("Non-empty 'offerToken' required.");
+        }
+        ObjectServerError error;
+        try {
+            final RealmObjectServer server = SyncManager.getAuthServer();
+            AcceptPermissionsOfferResponse result = server.acceptOffer(offerToken, refreshToken, baseUrl);
+            if (!result.isValid()) {
+                error = result.getError();
+            } else {
+                return result.getPath();
+            }
+        } catch (Exception e) {
+            throw new ObjectServerError(ErrorCode.UNKNOWN, e);
+        }
+        throw error;
+    }
+

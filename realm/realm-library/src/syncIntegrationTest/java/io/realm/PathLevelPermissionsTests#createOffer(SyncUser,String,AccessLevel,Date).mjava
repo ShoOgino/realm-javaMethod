@@ -1,0 +1,13 @@
+    /**
+     * Creates an offer for a newly created Realm.
+     *
+     * @param user User that should create the offer
+     * @param realmName Realm to create
+     * @param level accessLevel to offer
+     * @param expires when the offer expires
+     */
+    private String createOffer(final SyncUser user, final String realmName, final AccessLevel level, final Date expires) {
+        String url = createRemoteRealm(user, realmName);
+        return user.makePermissionsOffer(new PermissionOffer(url, level, expires));
+    }
+

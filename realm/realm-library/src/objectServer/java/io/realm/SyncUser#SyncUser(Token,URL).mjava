@@ -1,6 +1,12 @@
     SyncUser(Token refreshToken, URL authenticationUrl) {
         this.identity = refreshToken.identity();
         this.authenticationUrl = authenticationUrl;
+        try {
+            this.baseUrl = new URL(authenticationUrl.getProtocol(), authenticationUrl.getHost(), authenticationUrl.getPort(), "");
+        } catch (MalformedURLException e) {
+            // Should never happen
+            throw new RuntimeException(e);
+        }
         this.refreshToken = refreshToken;
     }
 

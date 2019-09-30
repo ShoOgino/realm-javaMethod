@@ -24,7 +24,7 @@
             throw new IllegalArgumentException("SyncUser needs to be admin in order to lookup other users ID.");
         }
 
-        AuthenticationServer authServer = SyncManager.getAuthServer();
+        RealmObjectServer authServer = SyncManager.getAuthServer();
         LookupUserIdResponse response = authServer.retrieveUser(refreshToken, provider, providerUserIdentity, getAuthenticationUrl());
         if (!response.isValid()) {
             if (response.getError().getErrorCode() == ErrorCode.UNKNOWN_ACCOUNT) {

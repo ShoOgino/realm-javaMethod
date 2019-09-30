@@ -1,0 +1,20 @@
+    /**
+     * Invalidates an existing offer. This will prevent any other users from accepting it. Users that already accepted it,
+     * will not be affected.
+     *
+     * @param offerToken token that should be invalidated.
+     * @return {@link RealmAsyncTask} that can be used to cancel the task if needed.
+     * @throws IllegalStateException if this method is called from a thread without a looper.
+     */
+    public RealmAsyncTask invalidatePermissionsOfferAsync(String offerToken, SyncUser.Callback<Void> callback) {
+        checkLooperThread("Asynchronously accepting an permissions offer is only possible from looper threads.");
+        checkCallbackNotNull(callback);
+        return new Request<Void>(SyncManager.NETWORK_POOL_EXECUTOR, callback) {
+            @Override
+            public Void run() throws ObjectServerError {
+                invalidatePermissionsOffer(offerToken);
+                return null;
+            }
+        }.start();
+    }
+

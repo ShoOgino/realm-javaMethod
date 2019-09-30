@@ -1,0 +1,29 @@
+    @Test
+    @RunTestInLooperThread()
+    public void getPermissions_updatedWithNewRealms_stressTest() {
+        final int TEST_SIZE = 10;
+        List<Permission> permissions = user.retrieveGrantedPermissions();
+        assertInitialPermissions(permissions);
+
+        for (int i = 0; i < TEST_SIZE; i++) {
+            SyncConfiguration configNew = user.createConfiguration("realm://" + Constants.HOST + "/~/test" + i)
+                    .fullSynchronization()
+                    .schema(AllJavaTypes.class)
+                    .build();
+            Realm newRealm = Realm.getInstance(configNew);
+            looperThread.closeAfterTest(newRealm);
+        }
+
+        List<Permission> perms = permissions;
+        while(perms.size() < TEST_SIZE + 1) { // +1 is __wildcardpermissions
+            perms = user.retrieveGrantedPermissions();
+        }
+
+        Permission p = perms.get(TEST_SIZE);
+        assertTrue(p.getPath().endsWith("test" + (TEST_SIZE - 1)));
+        assertTrue(p.mayRead());
+        assertTrue(p.mayWrite());
+        assertTrue(p.mayManage());
+        looperThread.testComplete();
+    }
+

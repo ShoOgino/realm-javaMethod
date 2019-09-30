@@ -1,0 +1,21 @@
+    @Test
+    @RunTestInLooperThread(emulateMainThread = true)
+    public void revokeOffer() {
+        // createOffer validates that the offer is actually in the __management Realm.
+        final String offerToken = createOffer(user, "test", AccessLevel.WRITE, null);
+
+        user.invalidatePermissionsOfferAsync(offerToken, new SyncUser.Callback<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                List<PermissionOffer> offers = user.retrieveCreatedPermissionsOffers();
+                assertEquals(0, offers.size());
+                looperThread.testComplete();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                fail(error.toString());
+            }
+        });
+    }
+

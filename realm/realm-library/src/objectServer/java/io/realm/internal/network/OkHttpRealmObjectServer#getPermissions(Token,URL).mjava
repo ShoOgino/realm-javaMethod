@@ -1,0 +1,16 @@
+    @Override
+    public RetrievePermissionsResponse getPermissions(Token userToken, URL baseUrl) {
+        try {
+            URL url = buildActionUrl(baseUrl, ACTION_GET_PERMISSIONS);
+            RealmLog.debug("Network request (retrieveGrantedPermissions): " + url);
+            Request request = newAuthRequest(url, userToken.value())
+                    .get()
+                    .build();
+            Call call = client.newCall(request);
+            Response response = call.execute();
+            return RetrievePermissionsResponse.from(response);
+        } catch (Exception e) {
+            return RetrievePermissionsResponse.from(e);
+        }
+    }
+

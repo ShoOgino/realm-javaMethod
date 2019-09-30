@@ -1,0 +1,28 @@
+    /**
+     * Wait for a given permission to be present.
+     *
+     * @param permissions permission results.
+     * @param user user that is being granted the permission.
+     * @param urlSuffix the url suffix to listen for.
+     * @param accessLevel the expected access level for 'user'.
+     */
+    private void assertPermissionPresent(List<Permission> permissions, @Nullable final SyncUser user, String urlSuffix, final AccessLevel accessLevel) {
+        for (Permission p : permissions) {
+            if (p.getPath().endsWith(urlSuffix)) {
+                assertEquals(accessLevel.mayRead(), p.mayRead());
+                assertEquals(accessLevel.mayWrite(), p.mayWrite());
+                assertEquals(accessLevel.mayManage(), p.mayManage());
+                if (user != null) {
+                    // Specific permissions
+                    assertEquals(user.getIdentity(), p.getUserId());
+                } else {
+                    // Default permissions
+                    assertNull(p.getUserId());
+                }
+                looperThread.testComplete();
+                return;
+            }
+        }
+        throw new AssertionError("No matching permissions");
+    }
+
