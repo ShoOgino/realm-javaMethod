@@ -5,7 +5,7 @@
         Map<String, String> headers = SyncManager.getCustomRequestHeaders(new URI("http://localhost"));
         assertEquals(2, headers.size());
         Map.Entry<String, String> header = headers.entrySet().iterator().next();
-        assertEquals("header1", header.getKey());
-        assertEquals("val1", header.getValue());
+        String expected = header.getKey().equals("header1") ? "val1" : "val2";
+        assertEquals(expected, header.getValue());
     }
 
