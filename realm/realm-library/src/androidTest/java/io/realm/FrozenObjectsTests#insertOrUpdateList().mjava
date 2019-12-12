@@ -1,0 +1,25 @@
+    @Test
+    public void insertOrUpdateList() throws InterruptedException {
+        realm.executeTransaction(r -> {
+            r.createObject(AllJavaTypes.class, 42);
+            r.createObject(AllJavaTypes.class, 43);
+        });
+
+        // Create two Java objects pointing to the same underlying Realm object in order to verify
+        // that insertOrUpdate works correctly both for the same Java object but also for two
+        // different Java objects representing the same Realm Object.
+        AllJavaTypes frozenObject1 = realm.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_ID, 42).findFirst().freeze();
+        AllJavaTypes frozenObject2 = realm.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_ID, 42).findFirst().freeze();
+
+        Thread t = new Thread(() -> {
+            Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+            bgRealm.beginTransaction();
+            bgRealm.insertOrUpdate(Arrays.asList(frozenObject1, frozenObject1, frozenObject2));
+            bgRealm.commitTransaction();
+            assertEquals(2, bgRealm.where(AllJavaTypes.class).count());
+            bgRealm.close();
+        });
+        t.start();
+        t.join();
+    }
+

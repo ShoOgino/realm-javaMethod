@@ -1,22 +1,27 @@
     @Test
     public void setNulls() {
+        final AtomicLong colKey1 = new AtomicLong(-1);
+        final AtomicLong colKey2 = new AtomicLong(-1);
+        final AtomicLong colKey3 = new AtomicLong(-1);
+        final AtomicLong rowKey = new AtomicLong(-1);
         Table t = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
             @Override
             public void execute(Table t) {
-                t.addColumn(RealmFieldType.STRING, "");
-                t.addColumn(RealmFieldType.DATE, "");
-                t.addColumn(RealmFieldType.BINARY, "");
-                TestHelper.addRowWithValues(t, "String val", new Date(), new byte[] {1, 2, 3});
+                colKey1.set(t.addColumn(RealmFieldType.STRING, "col1"));
+                colKey2.set(t.addColumn(RealmFieldType.DATE, "col2"));
+                colKey3.set(t.addColumn(RealmFieldType.BINARY, "col3"));
+                rowKey.set(TestHelper.addRowWithValues(t, new long[]{colKey1.get(), colKey2.get(), colKey3.get()},
+                        new Object[]{"String val", new Date(), new byte[] {1, 2, 3}}));
             }
         });
 
         sharedRealm.beginTransaction();
         try {
-            t.setString(0, 0, null, false);
+            t.setString(colKey1.get(), rowKey.get(), null, false);
             fail("null string not allowed");
         } catch (IllegalArgumentException ignored) { }
         try {
-            t.setDate(1, 0, null, false);
+            t.setDate(colKey2.get(), rowKey.get(), null, false);
             fail("null Date not allowed");
         } catch (IllegalArgumentException ignored) { }
         sharedRealm.commitTransaction();

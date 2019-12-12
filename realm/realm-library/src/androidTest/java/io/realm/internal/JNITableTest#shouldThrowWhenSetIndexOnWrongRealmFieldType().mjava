@@ -1,21 +1,32 @@
     @Test
     public void shouldThrowWhenSetIndexOnWrongRealmFieldType() {
         Table t = TestHelper.createTableWithAllColumnTypes(sharedRealm);
-        for (long colIndex = 0; colIndex < t.getColumnCount(); colIndex++) {
+
+        long columnKey1 = t.getColumnKey("binary");
+        long columnKey2 = t.getColumnKey("boolean");
+        long columnKey3 = t.getColumnKey("date");
+        long columnKey4 = t.getColumnKey("double");
+        long columnKey5 = t.getColumnKey("float");
+        long columnKey6 = t.getColumnKey("long");
+        long columnKey7 = t.getColumnKey("string");
+
+        long[] columnsKeys = new long[]{columnKey1, columnKey2, columnKey3, columnKey4, columnKey5, columnKey6, columnKey7};
+
+        for (int i = 0; i < columnsKeys.length; i++) {
 
             // All types supported addSearchIndex and removeSearchIndex.
             boolean exceptionExpected = (
-                    t.getColumnType(colIndex) != RealmFieldType.STRING &&
-                            t.getColumnType(colIndex) != RealmFieldType.INTEGER &&
-                            t.getColumnType(colIndex) != RealmFieldType.BOOLEAN &&
-                            t.getColumnType(colIndex) != RealmFieldType.DATE);
+                    t.getColumnType(columnsKeys[i]) != RealmFieldType.STRING &&
+                            t.getColumnType(columnsKeys[i]) != RealmFieldType.INTEGER &&
+                            t.getColumnType(columnsKeys[i]) != RealmFieldType.BOOLEAN &&
+                            t.getColumnType(columnsKeys[i]) != RealmFieldType.DATE);
 
             // Tries to addSearchIndex().
             sharedRealm.beginTransaction();
             try {
-                t.addSearchIndex(colIndex);
+                t.addSearchIndex(columnsKeys[i]);
                 if (exceptionExpected) {
-                    fail("Expected exception for colIndex " + colIndex);
+                    fail("Expected exception for colIndex " + columnsKeys[i]);
                 }
             } catch (IllegalArgumentException ignored) {
             }
@@ -25,16 +36,16 @@
             sharedRealm.beginTransaction();
             try {
                 // Currently core will do nothing if the column doesn't have a search index.
-                t.removeSearchIndex(colIndex);
+                t.removeSearchIndex(columnsKeys[i]);
                 if (exceptionExpected) {
-                    fail("Expected exception for colIndex " + colIndex);
+                    fail("Expected exception for colIndex " + columnsKeys[i]);
                 }
             } catch (IllegalArgumentException ignored) {
             }
             sharedRealm.commitTransaction();
 
             // Tries to hasSearchIndex() for all columnTypes.
-            t.hasSearchIndex(colIndex);
+            t.hasSearchIndex(columnsKeys[i]);
         }
     }
 

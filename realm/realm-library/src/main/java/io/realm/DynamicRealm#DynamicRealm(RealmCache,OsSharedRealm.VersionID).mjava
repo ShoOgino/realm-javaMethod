@@ -1,0 +1,25 @@
+    private DynamicRealm(final RealmCache cache, OsSharedRealm.VersionID version) {
+        super(cache, null, version);
+        RealmCache.invokeWithGlobalRefCount(cache.getConfiguration(), new RealmCache.Callback() {
+            @Override
+            public void onResult(int count) {
+                if (count > 0)  {
+                    return;
+                }
+                if (cache.getConfiguration().isReadOnly()) {
+                    return;
+                }
+                if (OsObjectStore.getSchemaVersion(sharedRealm) != OsObjectStore.SCHEMA_NOT_VERSIONED) {
+                    return;
+                }
+                sharedRealm.beginTransaction();
+                if (OsObjectStore.getSchemaVersion(sharedRealm) == OsObjectStore.SCHEMA_NOT_VERSIONED) {
+                    // To initialize the meta table.
+                    OsObjectStore.setSchemaVersion(sharedRealm, OsObjectStore.SCHEMA_NOT_VERSIONED);
+                }
+                sharedRealm.commitTransaction();
+            }
+        });
+        this.schema = new MutableRealmSchema(this);
+    }
+

@@ -1,0 +1,32 @@
+    @Test
+    @RunTestInLooperThread
+    public void addingListChangeListenerThrows() {
+        realm.executeTransaction(r -> {
+            r.createObject(AllTypes.class);
+        });
+
+        Realm frozenRealm = realm.freeze();
+        AllTypes obj = frozenRealm.where(AllTypes.class).findFirst();
+        try {
+            obj.getColumnStringList().addChangeListener(new OrderedRealmCollectionChangeListener<RealmList<String>>() {
+                @Override
+                public void onChange(RealmList<String> strings, OrderedCollectionChangeSet changeSet) {
+                }
+            });
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+
+        try {
+            obj.getColumnRealmList().addChangeListener(new OrderedRealmCollectionChangeListener<RealmList<Dog>>() {
+                @Override
+                public void onChange(RealmList<Dog> dogs, OrderedCollectionChangeSet changeSet) {
+                }
+            });
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+        frozenRealm.close();
+        looperThread.testComplete();
+    }
+

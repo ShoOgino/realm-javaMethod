@@ -1,15 +1,10 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void realm_emittedOnSubscribe() {
-        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        subscription = realm.asFlowable().subscribe(new Consumer<Realm>() {
-            @Override
-            public void accept(Realm rxRealm) throws Exception {
-                assertTrue(rxRealm == realm);
-                subscribedNotified.set(true);
-            }
+        subscription = realm.asFlowable().subscribe(rxRealm -> {
+            assertTrue(rxRealm.isFrozen());
+            assertEquals(realm.getPath(), rxRealm.getPath());
+            disposeSuccessfulTest(realm);
         });
-        assertTrue(subscribedNotified.get());
-        subscription.dispose();
     }
 

@@ -1,0 +1,12 @@
+    @Test
+    public void frozenRealm_notEqualToFrozenRealmAtOtherVersion() {
+        realm.beginTransaction();
+        realm.commitTransaction();
+        Realm otherFrozenRealm = realm.freeze();
+        try {
+            assertNotEquals(frozenRealm, otherFrozenRealm);
+        } finally {
+            otherFrozenRealm.close();
+        }
+    }
+

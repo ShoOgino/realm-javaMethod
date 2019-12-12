@@ -9,9 +9,9 @@
     public void setObject(String fieldName, @Nullable DynamicRealmObject value) {
         proxyState.getRealm$realm().checkIfValid();
 
-        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
         if (value == null) {
-            proxyState.getRow$realm().nullifyLink(columnIndex);
+            proxyState.getRow$realm().nullifyLink(columnKey);
         } else {
             if (value.proxyState.getRealm$realm() == null || value.proxyState.getRow$realm() == null) {
                 throw new IllegalArgumentException("Cannot link to objects that are not part of the Realm.");
@@ -19,14 +19,14 @@
             if (proxyState.getRealm$realm() != value.proxyState.getRealm$realm()) {
                 throw new IllegalArgumentException("Cannot add an object from another Realm instance.");
             }
-            Table table = proxyState.getRow$realm().getTable().getLinkTarget(columnIndex);
+            Table table = proxyState.getRow$realm().getTable().getLinkTarget(columnKey);
             Table inputTable = value.proxyState.getRow$realm().getTable();
             if (!table.hasSameSchema(inputTable)) {
                 throw new IllegalArgumentException(String.format(Locale.US,
                         "Type of object is wrong. Was %s, expected %s",
                         inputTable.getName(), table.getName()));
             }
-            proxyState.getRow$realm().setLink(columnIndex, value.proxyState.getRow$realm().getIndex());
+            proxyState.getRow$realm().setLink(columnKey, value.proxyState.getRow$realm().getObjectKey());
         }
     }
 

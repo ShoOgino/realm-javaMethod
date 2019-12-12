@@ -1,20 +1,15 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void findFirstAsync_emittedOnSubscribe() {
         realm.beginTransaction();
-        realm.createObject(AllTypes.class);
+        realm.createObject(AllTypes.class).setColumnLong(42);
         realm.commitTransaction();
 
-        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         final AllTypes asyncObj = realm.where(AllTypes.class).findFirstAsync();
-        subscription = asyncObj.<AllTypes>asFlowable().subscribe(new Consumer<AllTypes>() {
-            @Override
-            public void accept(AllTypes rxObject) throws Exception {
-                assertTrue(rxObject == asyncObj);
-                subscribedNotified.set(true);
-            }
+        subscription = asyncObj.<AllTypes>asFlowable().subscribe(rxObject -> {
+            assertTrue(rxObject.isFrozen());
+            assertEquals(42, rxObject.getColumnLong());
+            disposeSuccessfulTest(realm);
         });
-        assertTrue(subscribedNotified.get());
-        subscription.dispose();
     }
 

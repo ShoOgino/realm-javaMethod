@@ -3,65 +3,72 @@
 
         Table table = TestHelper.createTableWithAllColumnTypes(sharedRealm);
 
+        long columnKey1 = table.getColumnKey("binary");
+        long columnKey2 = table.getColumnKey("boolean");
+        long columnKey3 = table.getColumnKey("date");
+        long columnKey4 = table.getColumnKey("double");
+        long columnKey5 = table.getColumnKey("float");
+        long columnKey6 = table.getColumnKey("long");
+        long columnKey7 = table.getColumnKey("string");
+        long[] columnKeys = new long[]{columnKey1, columnKey2, columnKey3, columnKey4, columnKey5, columnKey6, columnKey7};
+
         // Queries the table.
         TableQuery query = table.where();
 
         // Compares strings in non string columns.
-        for (int i = 0; i <= 6; i++) {
-            if (i != 6) {
-                try { query.equalTo(new long[]{i}, oneNullTable, "string");    fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.notEqualTo(new long[]{i}, oneNullTable, "string"); fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.beginsWith(new long[]{i}, oneNullTable, "string"); fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.endsWith(new long[]{i}, oneNullTable, "string");   fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.like(new long[]{i}, oneNullTable, "string");       fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.contains(new long[]{i}, oneNullTable, "string");   fail(); } catch(IllegalArgumentException ignore) {}
-            }
+        for (int i = 0; i < 6; i++) {
+                try { query.equalTo(new long[]{columnKeys[i]}, oneNullTable, "string");    fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.notEqualTo(new long[]{columnKeys[i]}, oneNullTable, "string"); fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.beginsWith(new long[]{columnKeys[i]}, oneNullTable, "string"); fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.endsWith(new long[]{columnKeys[i]}, oneNullTable, "string");   fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.like(new long[]{columnKeys[i]}, oneNullTable, "string");       fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.contains(new long[]{columnKeys[i]}, oneNullTable, "string");   fail(); } catch(IllegalArgumentException ignore) {}
         }
 
 
         // Compares integer in non integer columns.
         for (int i = 0; i <= 6; i++) {
             if (i != 5) {
-                try { query.equalTo(new long[]{i}, oneNullTable, 123);            fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.notEqualTo(new long[]{i}, oneNullTable, 123);         fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.lessThan(new long[]{i}, oneNullTable, 123);           fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.lessThanOrEqual(new long[]{i}, oneNullTable, 123);    fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.greaterThan(new long[]{i}, oneNullTable, 123);        fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.greaterThanOrEqual(new long[]{i}, oneNullTable, 123); fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.between(new long[]{i}, 123, 321);                     fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.equalTo(new long[]{columnKeys[i]}, oneNullTable, 123);            fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.notEqualTo(new long[]{columnKeys[i]}, oneNullTable, 123);         fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.lessThan(new long[]{columnKeys[i]}, oneNullTable, 123);           fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.lessThanOrEqual(new long[]{columnKeys[i]}, oneNullTable, 123);    fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.greaterThan(new long[]{columnKeys[i]}, oneNullTable, 123);        fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.greaterThanOrEqual(new long[]{columnKeys[i]}, oneNullTable, 123); fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.between(new long[]{columnKeys[i]}, 123, 321);                     fail(); } catch(IllegalArgumentException ignore) {}
             }
         }
 
         // Compares float in non float columns.
         for (int i = 0; i <= 6; i++) {
             if (i != 4) {
-                try { query.equalTo(new long[]{i}, oneNullTable, 123F);            fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.notEqualTo(new long[]{i}, oneNullTable, 123F);         fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.lessThan(new long[]{i}, oneNullTable, 123F);           fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.lessThanOrEqual(new long[]{i}, oneNullTable, 123F);    fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.greaterThan(new long[]{i}, oneNullTable, 123F);        fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.greaterThanOrEqual(new long[]{i}, oneNullTable, 123F); fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.between(new long[]{i}, 123F, 321F);                    fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.equalTo(new long[]{columnKeys[i]}, oneNullTable, 123F);            fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.notEqualTo(new long[]{columnKeys[i]}, oneNullTable, 123F);         fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.lessThan(new long[]{columnKeys[i]}, oneNullTable, 123F);           fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.lessThanOrEqual(new long[]{columnKeys[i]}, oneNullTable, 123F);    fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.greaterThan(new long[]{columnKeys[i]}, oneNullTable, 123F);        fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.greaterThanOrEqual(new long[]{columnKeys[i]}, oneNullTable, 123F); fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.between(new long[]{columnKeys[i]}, 123F, 321F);                    fail(); } catch(IllegalArgumentException ignore) {}
             }
         }
 
         // Compares double in non double columns.
         for (int i = 0; i <= 6; i++) {
             if (i != 3) {
-                try { query.equalTo(new long[]{i}, oneNullTable, 123D);                     fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.notEqualTo(new long[]{i}, oneNullTable, 123D);                  fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.lessThan(new long[]{i}, oneNullTable, 123D);                    fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.lessThanOrEqual(new long[]{i}, oneNullTable, 123D);             fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.greaterThan(new long[]{i}, oneNullTable, 123D);                 fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.greaterThanOrEqual(new long[]{i}, oneNullTable, 123D);          fail(); } catch(IllegalArgumentException ignore) {}
-                try { query.between(new long[]{i}, 123D, 321D);                             fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.equalTo(new long[]{columnKeys[i]}, oneNullTable, 123D);                     fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.notEqualTo(new long[]{columnKeys[i]}, oneNullTable, 123D);                  fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.lessThan(new long[]{columnKeys[i]}, oneNullTable, 123D);                    fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.lessThanOrEqual(new long[]{columnKeys[i]}, oneNullTable, 123D);             fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.greaterThan(new long[]{columnKeys[i]}, oneNullTable, 123D);                 fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.greaterThanOrEqual(new long[]{columnKeys[i]}, oneNullTable, 123D);          fail(); } catch(IllegalArgumentException ignore) {}
+                try { query.between(new long[]{columnKeys[i]}, 123D, 321D);                             fail(); } catch(IllegalArgumentException ignore) {}
             }
         }
 
         // Compares boolean in non boolean columns.
         for (int i = 0; i <= 6; i++) {
             if (i != 1) {
-              try { query.equalTo(new long[]{i}, oneNullTable, true);                       fail(); } catch(IllegalArgumentException ignore) {}
+              try { query.equalTo(new long[]{columnKeys[i]}, oneNullTable, true);                       fail(); } catch(IllegalArgumentException ignore) {}
             }
         }
 

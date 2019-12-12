@@ -1,9 +1,16 @@
     @Override
     public <E extends RealmModel> Flowable<E> from(final Realm realm, final E object) {
+        if (realm.isFrozen()) {
+            return Flowable.just(object);
+        }
         final RealmConfiguration realmConfig = realm.getConfiguration();
+        Scheduler scheduler = getScheduler();
         return Flowable.create(new FlowableOnSubscribe<E>() {
             @Override
-            public void subscribe(final FlowableEmitter<E> emitter) throws Exception {
+            public void subscribe(final FlowableEmitter<E> emitter) {
+                // If the Realm has been closed, just create an empty Observable because we assume it is going to be disposed shortly.
+                if (!RealmObject.isValid(object)) return;
+
                 // Gets instance to make sure that the Realm is open for as long as the
                 // Observable is subscribed to it.
                 final Realm observableRealm = Realm.getInstance(realmConfig);
@@ -12,7 +19,7 @@
                     @Override
                     public void onChange(E obj) {
                         if (!emitter.isCancelled()) {
-                            emitter.onNext(obj);
+                            emitter.onNext(returnFrozenObjects ? RealmObject.freeze(obj) : obj);
                         }
                     }
                 };
@@ -22,16 +29,18 @@
                 emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        RealmObject.removeChangeListener(object, listener);
-                        observableRealm.close();
+                        if (!observableRealm.isClosed()) {
+                            RealmObject.removeChangeListener(object, listener);
+                            observableRealm.close();
+                        }
                         objectRefs.get().releaseReference(object);
                     }
                 }));
 
                 // Emit current value immediately
-                emitter.onNext(object);
+                emitter.onNext(returnFrozenObjects ? RealmObject.freeze(object) : object);
 
             }
-        }, BACK_PRESSURE_STRATEGY);
+        }, BACK_PRESSURE_STRATEGY).subscribeOn(scheduler).unsubscribeOn(scheduler);
     }
 

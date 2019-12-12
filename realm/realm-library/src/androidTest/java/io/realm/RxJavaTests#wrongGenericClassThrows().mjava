@@ -1,21 +1,16 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void wrongGenericClassThrows() {
         realm.beginTransaction();
         final AllTypes obj = realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
         Flowable<CyclicType> obs = obj.asFlowable();
-        @SuppressWarnings("unused")
-        Disposable subscription = obs.subscribe(new Consumer<CyclicType>() {
-            @Override
-            public void accept(CyclicType cyclicType) throws Exception {
-                fail();
-            }
-        }, new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable ignored) throws Exception {
-            }
-        });
+        subscription = obs.subscribe(
+                cyclicType -> fail(),
+                ignoredError -> {
+                    disposeSuccessfulTest(realm);
+                }
+        );
     }
 

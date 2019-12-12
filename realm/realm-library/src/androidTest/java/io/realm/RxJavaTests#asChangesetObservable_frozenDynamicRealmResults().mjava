@@ -1,0 +1,14 @@
+    @Test
+    @RunTestInLooperThread
+    public void asChangesetObservable_frozenDynamicRealmResults() {
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.getConfiguration());
+        final RealmResults<DynamicRealmObject> frozenResults = dynamicRealm.where(AllTypes.CLASS_NAME).findAll().freeze();
+        subscription = frozenResults.asChangesetObservable().subscribe(change -> {
+            RealmResults<DynamicRealmObject> rxResults = change.getCollection();
+            assertTrue(rxResults.isFrozen());
+            assertEquals(frozenResults, rxResults);
+            assertNull(change.getChangeset());
+            disposeSuccessfulTest(dynamicRealm);
+        });
+    }
+

@@ -1,8 +1,8 @@
     @Test
     public void distinct() {
-        OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where().lessThan(new long[] {2}, oneNullTable, 4));
+        OsResults osResults = OsResults.createFromQuery(sharedRealm, table.where().lessThan(new long[] {colKey2}, oneNullTable, 4));
 
-        QueryDescriptor distinctDescriptor = QueryDescriptor.getTestInstance(table, new long[] {2});
+        QueryDescriptor distinctDescriptor = QueryDescriptor.getTestInstance(table, new long[] {colKey2});
         OsResults osResults2 = osResults.distinct(distinctDescriptor);
 
         // A new native Results should be created.
@@ -10,7 +10,7 @@
         assertEquals(3, osResults.size());
         assertEquals(2, osResults2.size());
 
-        assertEquals(3, osResults2.getUncheckedRow(0).getLong(2));
-        assertEquals(1, osResults2.getUncheckedRow(1).getLong(2));
+        assertEquals(3, osResults2.getUncheckedRow(0).getLong(colKey2));
+        assertEquals(1, osResults2.getUncheckedRow(1).getLong(colKey2));
     }
 

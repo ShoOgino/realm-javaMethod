@@ -8,11 +8,11 @@
     public byte[] getBlob(String fieldName) {
         proxyState.getRealm$realm().checkIfValid();
 
-        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
         try {
-            return proxyState.getRow$realm().getBinaryByteArray(columnIndex);
+            return proxyState.getRow$realm().getBinaryByteArray(columnKey);
         } catch (IllegalArgumentException e) {
-            checkFieldType(fieldName, columnIndex, RealmFieldType.BINARY);
+            checkFieldType(fieldName, columnKey, RealmFieldType.BINARY);
             throw e;
         }
     }

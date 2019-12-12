@@ -1,9 +1,16 @@
     @Override
     public Observable<ObjectChange<DynamicRealmObject>> changesetsFrom(DynamicRealm realm, final DynamicRealmObject object) {
+        if (realm.isFrozen()) {
+            return Observable.just(new ObjectChange<DynamicRealmObject>(object, null));
+        }
         final RealmConfiguration realmConfig = realm.getConfiguration();
+        Scheduler scheduler = getScheduler();
         return Observable.create(new ObservableOnSubscribe<ObjectChange<DynamicRealmObject>>() {
             @Override
-            public void subscribe(final ObservableEmitter<ObjectChange<DynamicRealmObject>> emitter) throws Exception {
+            public void subscribe(final ObservableEmitter<ObjectChange<DynamicRealmObject>> emitter) {
+                // If the Realm has been closed, just create an empty Observable because we assume it is going to be disposed shortly.
+                if (!RealmObject.isValid(object)) return;
+
                 // Gets instance to make sure that the Realm is open for as long as the
                 // Observable is subscribed to it.
                 final DynamicRealm observableRealm = DynamicRealm.getInstance(realmConfig);
@@ -12,7 +19,7 @@
                     @Override
                     public void onChange(DynamicRealmObject obj, ObjectChangeSet changeSet) {
                         if (!emitter.isDisposed()) {
-                            emitter.onNext(new ObjectChange<>(obj, changeSet));
+                            emitter.onNext(new ObjectChange<>(returnFrozenObjects ? RealmObject.freeze(obj) : obj, changeSet));
                         }
                     }
                 };
@@ -22,15 +29,17 @@
                 emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        object.removeChangeListener(listener);
-                        observableRealm.close();
+                        if (!observableRealm.isClosed()) {
+                            RealmObject.removeChangeListener(object, listener);
+                            observableRealm.close();
+                        }
                         objectRefs.get().releaseReference(object);
                     }
                 }));
 
                 // Emit current value immediately
-                emitter.onNext(new ObjectChange<>(object, null));
+                emitter.onNext(new ObjectChange<>(returnFrozenObjects ? RealmObject.freeze(object) : object, null));
             }
-        });
+        }).subscribeOn(scheduler).unsubscribeOn(scheduler);
     }
 

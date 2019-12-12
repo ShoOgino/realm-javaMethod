@@ -4,11 +4,10 @@
             return 0;
         }
 
-        // Access local ref count only, no need to by synchronized.
+        // Access local ref count only, no need to be synchronized.
         int totalRefCount = 0;
-        for (RefAndCount refAndCount : cache.refAndCountMap.values()) {
-            Integer localCount = refAndCount.localCount.get();
-            totalRefCount += (localCount != null) ? localCount : 0;
+        for (ReferenceCounter referenceCounter : cache.refAndCountMap.values()) {
+            totalRefCount += referenceCounter.getThreadLocalCount();
         }
         return totalRefCount;
     }

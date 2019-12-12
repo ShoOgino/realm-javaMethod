@@ -4,43 +4,23 @@
         Table table = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
             @Override
             public void execute(Table table) {
-                table.addColumn(RealmFieldType.STRING, "username");
-                table.addColumn(RealmFieldType.INTEGER, "score");
-                table.addColumn(RealmFieldType.BOOLEAN, "completed");
+                long colKey1 = table.addColumn(RealmFieldType.STRING, "username");
+                long colKey2 = table.addColumn(RealmFieldType.INTEGER, "score");
+                long colKey3 = table.addColumn(RealmFieldType.BOOLEAN, "completed");
 
                 // Inserts some values.
-                TestHelper.addRowWithValues(table, "Arnold", 420, false);    // 0
-                TestHelper.addRowWithValues(table, "Jane", 770, false);      // 1 *
-                TestHelper.addRowWithValues(table, "Erik", 600, false);      // 2
-                TestHelper.addRowWithValues(table, "Henry", 601, false);     // 3 *
-                TestHelper.addRowWithValues(table, "Bill", 564, true);       // 4
-                TestHelper.addRowWithValues(table, "Janet", 875, false);     // 5 *
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2, colKey3}, new Object[]{"Arnold", 420, false});    // 0
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2, colKey3}, new Object[]{"Jane", 770, false});      // 1 *
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2, colKey3}, new Object[]{"Erik", 600, false});      // 2
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2, colKey3}, new Object[]{"Henry", 601, false});     // 3 *
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2, colKey3}, new Object[]{"Bill", 564, true});       // 4
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2, colKey3}, new Object[]{"Janet", 875, false});     // 5 *
             }
         });
 
-        TableQuery query = table.where().greaterThan(new long[]{1}, oneNullTable, 600);
+        TableQuery query = table.where().greaterThan(new long[]{table.getColumnKey("score")}, oneNullTable, 600);
 
         // Finds first match.
         assertEquals(1, query.find());
-        assertEquals(1, query.find());
-        assertEquals(1, query.find(0));
-        assertEquals(1, query.find(1));
-        // Finds next.
-        assertEquals(3, query.find(2));
-        assertEquals(3, query.find(3));
-        // Finds next.
-        assertEquals(5, query.find(4));
-        assertEquals(5, query.find(5));
-
-        // Tests backwards.
-        assertEquals(5, query.find(4));
-        assertEquals(3, query.find(3));
-        assertEquals(3, query.find(2));
-        assertEquals(1, query.find(1));
-        assertEquals(1, query.find(0));
-
-        // Tests out of range.
-        assertEquals(-1, query.find(6));
-        try {  query.find(7);  fail("Exception expected");  } catch (ArrayIndexOutOfBoundsException ignore) {  }
     }
 

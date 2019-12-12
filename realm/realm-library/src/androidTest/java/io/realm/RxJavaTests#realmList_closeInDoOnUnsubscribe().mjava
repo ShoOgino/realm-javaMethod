@@ -1,23 +1,21 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void realmList_closeInDoOnUnsubscribe() {
         realm.beginTransaction();
         RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
         realm.commitTransaction();
 
-        Flowable<RealmList<Dog>> observable = list.asFlowable().doOnCancel(new Action() {
-            @Override
-            public void run() throws Exception {
-                realm.close();
-            }
-        });
-        subscription = observable.subscribe(new Consumer<RealmList<Dog>>() {
-            @Override
-            public void accept(RealmList<Dog> ignored) throws Exception {
-            }
-        });
+        Flowable<RealmList<Dog>> observable = list.asFlowable()
+                .doOnCancel(() -> realm.close())
+                .doFinally(() -> {
+                    looperThread.postRunnable(() -> {
+                        assertTrue(realm.isClosed());
+                        disposeSuccessfulTest(realm);
+                    });
+                });
 
-        subscription.dispose();
-        assertTrue(realm.isClosed());
+        subscription = observable.subscribe(ignored -> {
+            subscription.dispose();
+        });
     }
 

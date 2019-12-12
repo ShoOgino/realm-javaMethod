@@ -3,19 +3,22 @@
         init();
         TableQuery query = table.where();
 
-        long cnt = query.equalTo(new long[]{1}, oneNullTable, "D").count();
+        long colKey1 = table.getColumnKey("number");
+        long colKey2 = table.getColumnKey("name");
+
+        long cnt = query.equalTo(new long[]{colKey2}, oneNullTable, "D").count();
         assertEquals(2, cnt);
 
-        cnt = query.minimumInt(0);
+        cnt = query.minimumInt(colKey1);
         assertEquals(14, cnt);
 
-        cnt = query.maximumInt(0);
+        cnt = query.maximumInt(colKey1);
         assertEquals(16, cnt);
 
-        cnt = query.sumInt(0);
+        cnt = query.sumInt(colKey1);
         assertEquals(14+16, cnt);
 
-        double avg = query.averageInt(0);
+        double avg = query.averageInt(colKey1);
         assertEquals(15.0, avg, Double.MIN_NORMAL);
 
         // TODO: Add tests with all parameters

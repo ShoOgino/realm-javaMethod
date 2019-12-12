@@ -3,11 +3,11 @@
         realm.checkNotInSync(); // Destructive modifications are not permitted.
         checkLegalName(fieldName);
         checkFieldExists(fieldName);
-        long columnIndex = getColumnIndex(fieldName);
-        if (!table.hasSearchIndex(columnIndex)) {
+        long columnKey = getColumnKey(fieldName);
+        if (!table.hasSearchIndex(columnKey)) {
             throw new IllegalStateException("Field is not indexed: " + fieldName);
         }
-        table.removeSearchIndex(columnIndex);
+        table.removeSearchIndex(columnKey);
         return this;
     }
 

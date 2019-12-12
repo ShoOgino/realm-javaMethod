@@ -10,8 +10,8 @@
     public RealmQuery<E> beginsWith(String fieldName, String value, Case casing) {
         realm.checkIfValid();
 
-        FieldDescriptor fd = schema.getColumnIndices(fieldName, RealmFieldType.STRING);
-        this.query.beginsWith(fd.getColumnIndices(), fd.getNativeTablePointers(), value, casing);
+        FieldDescriptor fd = schema.getFieldDescriptors(fieldName, RealmFieldType.STRING);
+        this.query.beginsWith(fd.getColumnKeys(), fd.getNativeTablePointers(), value, casing);
         return this;
     }
 

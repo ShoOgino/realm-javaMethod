@@ -1,0 +1,19 @@
+    @Test
+    public void freezeLists() throws InterruptedException {
+        Realm realm = createDataForLiveRealm(DATA_SIZE);
+        AllTypes obj = realm.where(AllTypes.class).findFirst();
+        RealmList<Dog> frozenObjectList = obj.getColumnRealmList().freeze();
+        RealmList<String> frozenStringList = obj.getColumnStringList().freeze();
+        Thread t = new Thread(() -> {
+            assertEquals(5, frozenObjectList.size());
+            assertTrue(frozenObjectList.isFrozen());
+            assertEquals(1, frozenObjectList.where().equalTo(Dog.FIELD_NAME, "Dog 1").findAll().size());
+
+            assertEquals(3, frozenStringList.size());
+            assertTrue(frozenStringList.isFrozen());
+            assertEquals("Foo", frozenStringList.first());
+        });
+        t.start();
+        t.join();
+    }
+

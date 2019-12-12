@@ -9,11 +9,11 @@
     public RealmQuery<E> notEqualTo(String fieldName, @Nullable byte[] value) {
         realm.checkIfValid();
 
-        FieldDescriptor fd = schema.getColumnIndices(fieldName, RealmFieldType.BINARY);
+        FieldDescriptor fd = schema.getFieldDescriptors(fieldName, RealmFieldType.BINARY);
         if (value == null) {
-            this.query.isNotNull(fd.getColumnIndices(), fd.getNativeTablePointers());
+            this.query.isNotNull(fd.getColumnKeys(), fd.getNativeTablePointers());
         } else {
-            this.query.notEqualTo(fd.getColumnIndices(), fd.getNativeTablePointers(), value);
+            this.query.notEqualTo(fd.getColumnKeys(), fd.getNativeTablePointers(), value);
         }
         return this;
     }

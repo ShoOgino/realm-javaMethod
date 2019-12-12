@@ -1,0 +1,12 @@
+    @Test
+    public void canReadFrozenListsAcrossThreads() throws InterruptedException {
+        Realm frozenRealm = createDataForFrozenRealm(DATA_SIZE);
+        RealmList<Dog> list = frozenRealm.where(AllTypes.class).findFirst().getColumnRealmList();
+        Thread t = new Thread(() -> {
+            assertEquals(5, list.size());
+            assertTrue(list.isFrozen());
+        });
+        t.start();
+        t.join();
+    }
+

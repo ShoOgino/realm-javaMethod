@@ -1,0 +1,11 @@
+    @Test
+    @RunTestInLooperThread
+    public void asFlowable_frozenRealmResults() {
+        final RealmResults<AllTypes> frozenResults = realm.where(AllTypes.class).findAll().freeze();
+        subscription = frozenResults.asFlowable().subscribe(rxResults -> {
+            assertTrue(rxResults.isFrozen());
+            assertEquals(frozenResults, rxResults);
+            disposeSuccessfulTest(realm);
+        });
+    }
+

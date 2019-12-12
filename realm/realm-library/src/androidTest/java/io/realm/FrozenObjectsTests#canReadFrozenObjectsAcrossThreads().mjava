@@ -1,0 +1,13 @@
+    @Test
+    public void canReadFrozenObjectsAcrossThreads() throws InterruptedException {
+        Realm frozenRealm = createDataForFrozenRealm(DATA_SIZE);
+        AllTypes obj = frozenRealm.where(AllTypes.class).sort(AllTypes.FIELD_LONG).findFirst();
+        Thread t = new Thread(() -> {
+            assertEquals(0, obj.getColumnLong());
+            assertEquals("String 0", obj.getColumnString());
+            assertTrue(obj.isFrozen());
+        });
+        t.start();
+        t.join();
+    }
+

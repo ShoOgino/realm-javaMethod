@@ -9,10 +9,11 @@
                     String.format(Locale.ENGLISH, "Field '%s' has been already defined as primary key.",
                             currentPKField));
         }
-        long columnIndex = getColumnIndex(fieldName);
-        if (!table.hasSearchIndex(columnIndex)) {
+        long columnKey = getColumnKey(fieldName);
+        final RealmFieldType fieldType = getFieldType(fieldName);
+        if (fieldType != RealmFieldType.STRING && !table.hasSearchIndex(columnKey)) {
             // No exception will be thrown since adding PrimaryKey implies the column has an index.
-            table.addSearchIndex(columnIndex);
+            table.addSearchIndex(columnKey);
         }
         OsObjectStore.setPrimaryKeyForObject(realm.sharedRealm, getClassName(), fieldName);
         return this;

@@ -1,37 +1,19 @@
     @Test
     @RunTestInLooperThread
     public void findFirstAsync_emittedOnDelete() {
-        final AtomicInteger subscriberCalled = new AtomicInteger(0);
-        final Realm realm = looperThread.getRealm();
         realm.beginTransaction();
         realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
-        subscription = realm.where(AllTypes.class).findFirstAsync().<AllTypes>asFlowable().subscribe(new Consumer<AllTypes>() {
-            @Override
-            public void accept(AllTypes rxObject) throws Exception {
-                switch (subscriberCalled.incrementAndGet()) {
-                    case 1:
-                        assertFalse(rxObject.isLoaded());
-                        break;
-                    case 2:
-                        assertTrue(rxObject.isLoaded());
-                        assertTrue(rxObject.isValid());
-                        realm.executeTransactionAsync(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                realm.delete(AllTypes.class);
-                            }
-                        });
-                        break;
-                    case 3:
-                        assertTrue(rxObject.isLoaded());
-                        assertFalse(rxObject.isValid());
-                        looperThread.testComplete();
-                        break;
-                    default:
-                        fail();
-                }
+        subscription = realm.where(AllTypes.class).findFirstAsync().<AllTypes>asFlowable().subscribe(rxObject -> {
+            assertTrue(rxObject.isFrozen());
+            if (!rxObject.isLoaded()) {
+                //noinspection UnnecessaryReturnStatement
+                return;
+            } else if (rxObject.isValid()) {
+                realm.executeTransactionAsync(r -> r.delete(AllTypes.class));
+            } else if (!rxObject.isValid()) {
+                disposeSuccessfulTest(realm);
             }
         });
     }

@@ -9,13 +9,13 @@
     public DynamicRealmObject getObject(String fieldName) {
         proxyState.getRealm$realm().checkIfValid();
 
-        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        checkFieldType(fieldName, columnIndex, RealmFieldType.OBJECT);
-        if (proxyState.getRow$realm().isNullLink(columnIndex)) {
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
+        checkFieldType(fieldName, columnKey, RealmFieldType.OBJECT);
+        if (proxyState.getRow$realm().isNullLink(columnKey)) {
             return null;
         } else {
-            long linkRowIndex = proxyState.getRow$realm().getLink(columnIndex);
-            CheckedRow linkRow = proxyState.getRow$realm().getTable().getLinkTarget(columnIndex).getCheckedRow(linkRowIndex);
+            long linkObjectKey = proxyState.getRow$realm().getLink(columnKey);
+            CheckedRow linkRow = proxyState.getRow$realm().getTable().getLinkTarget(columnKey).getCheckedRow(linkObjectKey);
             return new DynamicRealmObject(proxyState.getRealm$realm(), linkRow);
         }
     }

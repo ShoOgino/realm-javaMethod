@@ -1,0 +1,9 @@
+    private void assertPKField(Realm realm, String className, String expectedName) {
+        String pkField = OsObjectStore.getPrimaryKeyForObject(realm.sharedRealm, className);
+        assertNotNull(pkField);
+        RealmObjectSchema objectSchema = realm.getSchema().get(className);
+        assertNotNull(objectSchema);
+        assertTrue(objectSchema.hasField(expectedName));
+        assertEquals(expectedName, pkField);
+    }
+

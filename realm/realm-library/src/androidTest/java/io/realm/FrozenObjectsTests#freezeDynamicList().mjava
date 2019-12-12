@@ -1,0 +1,21 @@
+    @Test
+    public void freezeDynamicList() throws InterruptedException {
+        Realm realm = createDataForLiveRealm(DATA_SIZE);
+        DynamicRealm dynRealm = DynamicRealm.getInstance(realm.getConfiguration());
+        DynamicRealmObject obj = dynRealm.where(AllTypes.CLASS_NAME).findFirst();
+        RealmList<DynamicRealmObject> frozenObjectList = obj.getList(AllTypes.FIELD_REALMLIST).freeze();
+        RealmList<String> frozenStringList = obj.getList(AllTypes.FIELD_STRING_LIST, String.class).freeze();
+        Thread t = new Thread(() -> {
+            assertEquals(5, frozenObjectList.size());
+            assertTrue(frozenObjectList.isFrozen());
+            assertEquals(1, frozenObjectList.where().equalTo(Dog.FIELD_NAME, "Dog 1").findAll().size());
+
+            assertEquals(3, frozenStringList.size());
+            assertTrue(frozenStringList.isFrozen());
+            assertEquals("Foo", frozenStringList.first());
+        });
+        t.start();
+        t.join();
+        dynRealm.close();
+    }
+

@@ -1,0 +1,15 @@
+    /**
+     * Returns whether or not this RealmObject is frozen.
+     *
+     * @return {@code true} if the RealmObject is frozen, {@code false} if it is not.
+     * @see #freeze()
+     */
+    public static <E extends RealmModel> boolean isFrozen(E object) {
+        if (object instanceof RealmObjectProxy) {
+            RealmObjectProxy proxy = (RealmObjectProxy) object;
+            return proxy.realmGet$proxyState().getRealm$realm().isFrozen();
+        } else {
+            return false;
+        }
+    }
+

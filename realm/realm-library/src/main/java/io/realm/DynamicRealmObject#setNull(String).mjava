@@ -8,13 +8,13 @@
     public void setNull(String fieldName) {
         proxyState.getRealm$realm().checkIfValid();
 
-        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        RealmFieldType type = proxyState.getRow$realm().getColumnType(columnIndex);
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
+        RealmFieldType type = proxyState.getRow$realm().getColumnType(columnKey);
         if (type == RealmFieldType.OBJECT) {
-            proxyState.getRow$realm().nullifyLink(columnIndex);
+            proxyState.getRow$realm().nullifyLink(columnKey);
         } else {
             checkIsPrimaryKey(fieldName);
-            proxyState.getRow$realm().setNull(columnIndex);
+            proxyState.getRow$realm().setNull(columnKey);
         }
     }
 

@@ -1,0 +1,19 @@
+    @Test
+    public void insertOrUpdate() throws InterruptedException {
+        realm.executeTransaction(r -> {
+            r.createObject(AllJavaTypes.class, 42);
+        });
+        AllJavaTypes frozenObject = realm.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_ID, 42).findFirst().freeze();
+
+        Thread t = new Thread(() -> {
+            Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+            bgRealm.beginTransaction();
+            bgRealm.insertOrUpdate(frozenObject);
+            bgRealm.commitTransaction();
+            assertEquals(1, bgRealm.where(AllJavaTypes.class).count());
+            bgRealm.close();
+        });
+        t.start();
+        t.join();
+    }
+

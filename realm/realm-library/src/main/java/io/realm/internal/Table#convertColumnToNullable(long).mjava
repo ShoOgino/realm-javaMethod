@@ -1,12 +1,12 @@
     /**
      * Converts a column to be nullable.
      *
-     * @param columnIndex the column index.
+     * @param columnKey the key for the column to convert.
      */
-    public void convertColumnToNullable(long columnIndex) {
+    public void convertColumnToNullable(long columnKey) {
         if (sharedRealm.isSyncRealm()) {
             throw new IllegalStateException("This method is only available for non-synchronized Realms");
         }
-        nativeConvertColumnToNullable(nativePtr, columnIndex, isPrimaryKey(columnIndex));
+        nativeConvertColumnToNullable(nativeTableRefPtr, columnKey, isPrimaryKey(columnKey));
     }
 

@@ -1,22 +1,17 @@
     @Test
     @RunTestInLooperThread
     public void findFirstAsync_emittedOnUpdate() {
-        final AtomicInteger subscriberCalled = new AtomicInteger(0);
-        Realm realm = looperThread.getRealm();
         realm.beginTransaction();
-        AllTypes obj = realm.createObject(AllTypes.class);
+        realm.createObject(AllTypes.class).setColumnLong(1);
         realm.commitTransaction();
-        subscription = realm.where(AllTypes.class).findFirstAsync().<AllTypes>asFlowable().subscribe(new Consumer<AllTypes>() {
-            @Override
-            public void accept(AllTypes rxObject) throws Exception {
-                if (subscriberCalled.incrementAndGet() == 2) {
-                    looperThread.testComplete();
-                }
+
+        subscription = realm.where(AllTypes.class).findFirstAsync().<AllTypes>asFlowable().subscribe(rxObject -> {
+            assertTrue(rxObject.isFrozen());
+            if (rxObject.getColumnLong() == 1) {
+                realm.executeTransaction(r -> realm.where(AllTypes.class).findFirst().setColumnLong(42));
+            } else if (rxObject.getColumnLong() == 42) {
+                disposeSuccessfulTest(realm);
             }
         });
-
-        realm.beginTransaction();
-        obj.setColumnLong(1);
-        realm.commitTransaction();
     }
 

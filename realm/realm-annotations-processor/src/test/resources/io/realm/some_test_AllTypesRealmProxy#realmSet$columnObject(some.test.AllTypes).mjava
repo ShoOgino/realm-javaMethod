@@ -13,20 +13,20 @@
             final Row row = proxyState.getRow$realm();
             if (value == null) {
                 // Table#nullifyLink() does not support default value. Just using Row.
-                row.nullifyLink(columnInfo.columnObjectIndex);
+                row.nullifyLink(columnInfo.columnObjectColKey);
                 return;
             }
             proxyState.checkValidObject(value);
-            row.getTable().setLink(columnInfo.columnObjectIndex, row.getIndex(), ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getIndex(), true);
+            row.getTable().setLink(columnInfo.columnObjectColKey, row.getObjectKey(), ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getObjectKey(), true);
             return;
         }
 
         proxyState.getRealm$realm().checkIfValid();
         if (value == null) {
-            proxyState.getRow$realm().nullifyLink(columnInfo.columnObjectIndex);
+            proxyState.getRow$realm().nullifyLink(columnInfo.columnObjectColKey);
             return;
         }
         proxyState.checkValidObject(value);
-        proxyState.getRow$realm().setLink(columnInfo.columnObjectIndex, ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getIndex());
+        proxyState.getRow$realm().setLink(columnInfo.columnObjectColKey, ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getObjectKey());
     }
 

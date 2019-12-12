@@ -6,98 +6,100 @@
         final Date distantPast = new Date(Long.MIN_VALUE);
         final Date distantFuture = new Date(Long.MAX_VALUE);
 
+        final AtomicLong columnKey = new AtomicLong(-1);
+
         Table table = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
             @Override
             public void execute(Table table) {
-                table.addColumn(RealmFieldType.DATE, "date");
+                columnKey.set(table.addColumn(RealmFieldType.DATE, "date"));
 
-                TestHelper.addRowWithValues(table, new Date(10000));
-                TestHelper.addRowWithValues(table, new Date(0));
-                TestHelper.addRowWithValues(table, new Date(1000));
-                TestHelper.addRowWithValues(table, future);
-                TestHelper.addRowWithValues(table, distantFuture);
-                TestHelper.addRowWithValues(table, past);
-                TestHelper.addRowWithValues(table, distantPast);
+                TestHelper.addRowWithValues(table, new long[]{columnKey.get()}, new Object[]{new Date(10000)});
+                TestHelper.addRowWithValues(table, new long[]{columnKey.get()}, new Object[]{new Date(0)});
+                TestHelper.addRowWithValues(table, new long[]{columnKey.get()}, new Object[]{new Date(1000)});
+                TestHelper.addRowWithValues(table, new long[]{columnKey.get()}, new Object[]{future});
+                TestHelper.addRowWithValues(table, new long[]{columnKey.get()}, new Object[]{distantFuture});
+                TestHelper.addRowWithValues(table, new long[]{columnKey.get()}, new Object[]{past});
+                TestHelper.addRowWithValues(table, new long[]{columnKey.get()}, new Object[]{distantPast});
             }
         });
 
-        assertEquals(1L, table.where().equalTo(new long[]{0}, oneNullTable, distantPast).count());
-        assertEquals(6L, table.where().notEqualTo(new long[]{0}, oneNullTable, distantPast).count());
-        assertEquals(0L, table.where().lessThan(new long[]{0}, oneNullTable, distantPast).count());
-        assertEquals(1L, table.where().lessThanOrEqual(new long[]{0}, oneNullTable, distantPast).count());
-        assertEquals(6L, table.where().greaterThan(new long[]{0}, oneNullTable, distantPast).count());
-        assertEquals(7L, table.where().greaterThanOrEqual(new long[]{0}, oneNullTable, distantPast).count());
+        assertEquals(1L, table.where().equalTo(new long[]{columnKey.get()}, oneNullTable, distantPast).count());
+        assertEquals(6L, table.where().notEqualTo(new long[]{columnKey.get()}, oneNullTable, distantPast).count());
+        assertEquals(0L, table.where().lessThan(new long[]{columnKey.get()}, oneNullTable, distantPast).count());
+        assertEquals(1L, table.where().lessThanOrEqual(new long[]{columnKey.get()}, oneNullTable, distantPast).count());
+        assertEquals(6L, table.where().greaterThan(new long[]{columnKey.get()}, oneNullTable, distantPast).count());
+        assertEquals(7L, table.where().greaterThanOrEqual(new long[]{columnKey.get()}, oneNullTable, distantPast).count());
 
-        assertEquals(1L, table.where().equalTo(new long[]{0}, oneNullTable, past).count());
-        assertEquals(6L, table.where().notEqualTo(new long[]{0}, oneNullTable, past).count());
-        assertEquals(1L, table.where().lessThan(new long[]{0}, oneNullTable, past).count());
-        assertEquals(2L, table.where().lessThanOrEqual(new long[]{0}, oneNullTable, past).count());
-        assertEquals(5L, table.where().greaterThan(new long[]{0}, oneNullTable, past).count());
-        assertEquals(6L, table.where().greaterThanOrEqual(new long[]{0}, oneNullTable, past).count());
+        assertEquals(1L, table.where().equalTo(new long[]{columnKey.get()}, oneNullTable, past).count());
+        assertEquals(6L, table.where().notEqualTo(new long[]{columnKey.get()}, oneNullTable, past).count());
+        assertEquals(1L, table.where().lessThan(new long[]{columnKey.get()}, oneNullTable, past).count());
+        assertEquals(2L, table.where().lessThanOrEqual(new long[]{columnKey.get()}, oneNullTable, past).count());
+        assertEquals(5L, table.where().greaterThan(new long[]{columnKey.get()}, oneNullTable, past).count());
+        assertEquals(6L, table.where().greaterThanOrEqual(new long[]{columnKey.get()}, oneNullTable, past).count());
 
-        assertEquals(1L, table.where().equalTo(new long[]{0}, oneNullTable, new Date(0)).count());
-        assertEquals(6L, table.where().notEqualTo(new long[]{0}, oneNullTable, new Date(0)).count());
-        assertEquals(2L, table.where().lessThan(new long[]{0}, oneNullTable, new Date(0)).count());
-        assertEquals(3L, table.where().lessThanOrEqual(new long[]{0}, oneNullTable, new Date(0)).count());
-        assertEquals(4L, table.where().greaterThan(new long[]{0}, oneNullTable, new Date(0)).count());
-        assertEquals(5L, table.where().greaterThanOrEqual(new long[]{0}, oneNullTable, new Date(0)).count());
+        assertEquals(1L, table.where().equalTo(new long[]{columnKey.get()}, oneNullTable, new Date(0)).count());
+        assertEquals(6L, table.where().notEqualTo(new long[]{columnKey.get()}, oneNullTable, new Date(0)).count());
+        assertEquals(2L, table.where().lessThan(new long[]{columnKey.get()}, oneNullTable, new Date(0)).count());
+        assertEquals(3L, table.where().lessThanOrEqual(new long[]{columnKey.get()}, oneNullTable, new Date(0)).count());
+        assertEquals(4L, table.where().greaterThan(new long[]{columnKey.get()}, oneNullTable, new Date(0)).count());
+        assertEquals(5L, table.where().greaterThanOrEqual(new long[]{columnKey.get()}, oneNullTable, new Date(0)).count());
 
-        assertEquals(1L, table.where().equalTo(new long[]{0}, oneNullTable, future).count());
-        assertEquals(6L, table.where().notEqualTo(new long[]{0}, oneNullTable, future).count());
-        assertEquals(5L, table.where().lessThan(new long[]{0}, oneNullTable, future).count());
-        assertEquals(6L, table.where().lessThanOrEqual(new long[]{0}, oneNullTable, future).count());
-        assertEquals(1L, table.where().greaterThan(new long[]{0}, oneNullTable, future).count());
-        assertEquals(2L, table.where().greaterThanOrEqual(new long[]{0}, oneNullTable, future).count());
+        assertEquals(1L, table.where().equalTo(new long[]{columnKey.get()}, oneNullTable, future).count());
+        assertEquals(6L, table.where().notEqualTo(new long[]{columnKey.get()}, oneNullTable, future).count());
+        assertEquals(5L, table.where().lessThan(new long[]{columnKey.get()}, oneNullTable, future).count());
+        assertEquals(6L, table.where().lessThanOrEqual(new long[]{columnKey.get()}, oneNullTable, future).count());
+        assertEquals(1L, table.where().greaterThan(new long[]{columnKey.get()}, oneNullTable, future).count());
+        assertEquals(2L, table.where().greaterThanOrEqual(new long[]{columnKey.get()}, oneNullTable, future).count());
 
-        assertEquals(1L, table.where().equalTo(new long[]{0}, oneNullTable, distantFuture).count());
-        assertEquals(6L, table.where().notEqualTo(new long[]{0}, oneNullTable, distantFuture).count());
-        assertEquals(6L, table.where().lessThan(new long[]{0}, oneNullTable, distantFuture).count());
-        assertEquals(7L, table.where().lessThanOrEqual(new long[]{0}, oneNullTable, distantFuture).count());
-        assertEquals(0L, table.where().greaterThan(new long[]{0}, oneNullTable, distantFuture).count());
-        assertEquals(1L, table.where().greaterThanOrEqual(new long[]{0}, oneNullTable, distantFuture).count());
+        assertEquals(1L, table.where().equalTo(new long[]{columnKey.get()}, oneNullTable, distantFuture).count());
+        assertEquals(6L, table.where().notEqualTo(new long[]{columnKey.get()}, oneNullTable, distantFuture).count());
+        assertEquals(6L, table.where().lessThan(new long[]{columnKey.get()}, oneNullTable, distantFuture).count());
+        assertEquals(7L, table.where().lessThanOrEqual(new long[]{columnKey.get()}, oneNullTable, distantFuture).count());
+        assertEquals(0L, table.where().greaterThan(new long[]{columnKey.get()}, oneNullTable, distantFuture).count());
+        assertEquals(1L, table.where().greaterThanOrEqual(new long[]{columnKey.get()}, oneNullTable, distantFuture).count());
 
         // between
 
-        assertEquals(1L, table.where().between(new long[]{0}, distantPast, distantPast).count());
-        assertEquals(2L, table.where().between(new long[]{0}, distantPast, past).count());
-        assertEquals(3L, table.where().between(new long[]{0}, distantPast, new Date(0)).count());
-        assertEquals(5L, table.where().between(new long[]{0}, distantPast, new Date(10000)).count());
-        assertEquals(6L, table.where().between(new long[]{0}, distantPast, future).count());
-        assertEquals(7L, table.where().between(new long[]{0}, distantPast, distantFuture).count());
+        assertEquals(1L, table.where().between(new long[]{columnKey.get()}, distantPast, distantPast).count());
+        assertEquals(2L, table.where().between(new long[]{columnKey.get()}, distantPast, past).count());
+        assertEquals(3L, table.where().between(new long[]{columnKey.get()}, distantPast, new Date(0)).count());
+        assertEquals(5L, table.where().between(new long[]{columnKey.get()}, distantPast, new Date(10000)).count());
+        assertEquals(6L, table.where().between(new long[]{columnKey.get()}, distantPast, future).count());
+        assertEquals(7L, table.where().between(new long[]{columnKey.get()}, distantPast, distantFuture).count());
 
-        assertEquals(0L, table.where().between(new long[]{0}, past, distantPast).count());
-        assertEquals(1L, table.where().between(new long[]{0}, past, past).count());
-        assertEquals(2L, table.where().between(new long[]{0}, past, new Date(0)).count());
-        assertEquals(4L, table.where().between(new long[]{0}, past, new Date(10000)).count());
-        assertEquals(5L, table.where().between(new long[]{0}, past, future).count());
-        assertEquals(6L, table.where().between(new long[]{0}, past, distantFuture).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, past, distantPast).count());
+        assertEquals(1L, table.where().between(new long[]{columnKey.get()}, past, past).count());
+        assertEquals(2L, table.where().between(new long[]{columnKey.get()}, past, new Date(0)).count());
+        assertEquals(4L, table.where().between(new long[]{columnKey.get()}, past, new Date(10000)).count());
+        assertEquals(5L, table.where().between(new long[]{columnKey.get()}, past, future).count());
+        assertEquals(6L, table.where().between(new long[]{columnKey.get()}, past, distantFuture).count());
 
-        assertEquals(0L, table.where().between(new long[]{0}, new Date(0), distantPast).count());
-        assertEquals(0L, table.where().between(new long[]{0}, new Date(0), past).count());
-        assertEquals(1L, table.where().between(new long[]{0}, new Date(0), new Date(0)).count());
-        assertEquals(3L, table.where().between(new long[]{0}, new Date(0), new Date(10000)).count());
-        assertEquals(4L, table.where().between(new long[]{0}, new Date(0), future).count());
-        assertEquals(5L, table.where().between(new long[]{0}, new Date(0), distantFuture).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, new Date(0), distantPast).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, new Date(0), past).count());
+        assertEquals(1L, table.where().between(new long[]{columnKey.get()}, new Date(0), new Date(0)).count());
+        assertEquals(3L, table.where().between(new long[]{columnKey.get()}, new Date(0), new Date(10000)).count());
+        assertEquals(4L, table.where().between(new long[]{columnKey.get()}, new Date(0), future).count());
+        assertEquals(5L, table.where().between(new long[]{columnKey.get()}, new Date(0), distantFuture).count());
 
-        assertEquals(0L, table.where().between(new long[]{0}, new Date(10000), distantPast).count());
-        assertEquals(0L, table.where().between(new long[]{0}, new Date(10000), past).count());
-        assertEquals(0L, table.where().between(new long[]{0}, new Date(10000), new Date(0)).count());
-        assertEquals(1L, table.where().between(new long[]{0}, new Date(10000), new Date(10000)).count());
-        assertEquals(2L, table.where().between(new long[]{0}, new Date(10000), future).count());
-        assertEquals(3L, table.where().between(new long[]{0}, new Date(10000), distantFuture).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, new Date(10000), distantPast).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, new Date(10000), past).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, new Date(10000), new Date(0)).count());
+        assertEquals(1L, table.where().between(new long[]{columnKey.get()}, new Date(10000), new Date(10000)).count());
+        assertEquals(2L, table.where().between(new long[]{columnKey.get()}, new Date(10000), future).count());
+        assertEquals(3L, table.where().between(new long[]{columnKey.get()}, new Date(10000), distantFuture).count());
 
-        assertEquals(0L, table.where().between(new long[]{0}, future, distantPast).count());
-        assertEquals(0L, table.where().between(new long[]{0}, future, past).count());
-        assertEquals(0L, table.where().between(new long[]{0}, future, new Date(0)).count());
-        assertEquals(0L, table.where().between(new long[]{0}, future, new Date(10000)).count());
-        assertEquals(1L, table.where().between(new long[]{0}, future, future).count());
-        assertEquals(2L, table.where().between(new long[]{0}, future, distantFuture).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, future, distantPast).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, future, past).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, future, new Date(0)).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, future, new Date(10000)).count());
+        assertEquals(1L, table.where().between(new long[]{columnKey.get()}, future, future).count());
+        assertEquals(2L, table.where().between(new long[]{columnKey.get()}, future, distantFuture).count());
 
-        assertEquals(0L, table.where().between(new long[]{0}, distantFuture, distantPast).count());
-        assertEquals(0L, table.where().between(new long[]{0}, distantFuture, past).count());
-        assertEquals(0L, table.where().between(new long[]{0}, distantFuture, new Date(0)).count());
-        assertEquals(0L, table.where().between(new long[]{0}, distantFuture, new Date(10000)).count());
-        assertEquals(0L, table.where().between(new long[]{0}, distantFuture, future).count());
-        assertEquals(1L, table.where().between(new long[]{0}, distantFuture, distantFuture).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, distantFuture, distantPast).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, distantFuture, past).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, distantFuture, new Date(0)).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, distantFuture, new Date(10000)).count());
+        assertEquals(0L, table.where().between(new long[]{columnKey.get()}, distantFuture, future).count());
+        assertEquals(1L, table.where().between(new long[]{columnKey.get()}, distantFuture, distantFuture).count());
     }
 

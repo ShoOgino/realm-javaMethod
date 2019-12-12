@@ -1,0 +1,17 @@
+    private void testOptionalPrimitiveListWithNullValue(String fieldName) throws JSONException, IOException {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray =new JSONArray();
+        jsonArray.put(null);
+        jsonObject.put(fieldName, jsonArray);
+
+        // Test from JSONObject
+        realm.beginTransaction();
+        realm.createObjectFromJson(PrimitiveListTypes.class, jsonObject);
+        realm.cancelTransaction();
+
+        // Test from JSONStream
+        realm.beginTransaction();
+        PrimitiveListTypes objectFromJson = realm.createObjectFromJson(PrimitiveListTypes.class, convertJsonObjectToStream(jsonObject));
+        realm.cancelTransaction();
+    }
+

@@ -1,23 +1,22 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void dynamicRealm_closeInDoOnUnsubscribe() {
         final DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
 
         Flowable<DynamicRealm> observable = dynamicRealm.asFlowable()
-                .doOnCancel(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        dynamicRealm.close();
-                    }
+                .doOnCancel(() -> {
+                    dynamicRealm.close();
+                })
+                .doFinally(() -> {
+                    assertFalse(dynamicRealm.isClosed());
+                    looperThread.postRunnable(() -> {
+                        assertTrue(dynamicRealm.isClosed());
+                        disposeSuccessfulTest(dynamicRealm);
+                    });
                 });
 
-        subscription = observable.subscribe(new Consumer<DynamicRealm>() {
-            @Override
-            public void accept(DynamicRealm ignored) throws Exception {
-            }
+        subscription = observable.subscribe(ignored -> {
+            subscription.dispose();
         });
-
-        subscription.dispose();
-        assertTrue(dynamicRealm.isClosed());
     }
 

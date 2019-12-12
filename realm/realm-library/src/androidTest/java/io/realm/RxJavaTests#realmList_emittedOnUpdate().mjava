@@ -1,24 +1,18 @@
     @Test
     @RunTestInLooperThread
     public void realmList_emittedOnUpdate() {
-        final AtomicInteger subscriberCalled = new AtomicInteger(0);
-        Realm realm = looperThread.getRealm();
         realm.beginTransaction();
         final RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
         realm.commitTransaction();
 
-        subscription = list.asFlowable().subscribe(new Consumer<RealmList<Dog>>() {
-            @Override
-            public void accept(RealmList<Dog> dogs) throws Exception {
-                if (subscriberCalled.incrementAndGet() == 2) {
-                    assertEquals(1, list.size());
-                    looperThread.testComplete();
-                }
+        subscription = list.asFlowable().subscribe(rxList -> {
+            assertTrue(rxList.isFrozen());
+            if (rxList.isEmpty()) {
+                realm.executeTransaction(r -> list.add(new Dog()));
+            } else {
+                assertEquals(1, list.size());
+                disposeSuccessfulTest(realm);
             }
         });
-
-        realm.beginTransaction();
-        list.add(new Dog());
-        realm.commitTransaction();
     }
 

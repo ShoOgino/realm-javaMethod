@@ -1,17 +1,10 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void realmResults_emittedOnSubscribe() {
-        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         final RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
-        subscription = results.asFlowable().subscribe(new Consumer<RealmResults<AllTypes>>() {
-            @Override
-            @SuppressWarnings("ReferenceEquality")
-            public void accept(RealmResults<AllTypes> rxResults) throws Exception {
-                assertTrue(rxResults == results);
-                subscribedNotified.set(true);
-            }
+        subscription = results.asFlowable().subscribe(rxResults -> {
+            assertTrue(rxResults.isFrozen());
+            disposeSuccessfulTest(realm);
         });
-        assertTrue(subscribedNotified.get());
-        subscription.dispose();
     }
 

@@ -1,0 +1,12 @@
+    @Test
+    public void freezeSnapshot() {
+        Realm realm = createDataForLiveRealm(DATA_SIZE);
+        RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
+        OrderedRealmCollectionSnapshot<AllTypes> snapshot = results.createSnapshot();
+        try {
+            snapshot.freeze();
+            fail();
+        } catch(UnsupportedOperationException ignored) {
+        }
+    }
+

@@ -1,0 +1,11 @@
+    @Test
+    @RunTestInLooperThread
+    public void asFlowable_frozenRealm() {
+        Realm frozenRealm = realm.freeze();
+        subscription = frozenRealm.asFlowable()
+                .subscribe(rxRealm -> {
+                    assertEquals(frozenRealm, rxRealm);
+                    disposeSuccessfulTest(realm);
+                });
+    }
+

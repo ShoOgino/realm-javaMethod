@@ -9,23 +9,23 @@
     public <E> E get(String fieldName) {
         proxyState.getRealm$realm().checkIfValid();
 
-        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        RealmFieldType type = proxyState.getRow$realm().getColumnType(columnIndex);
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
+        RealmFieldType type = proxyState.getRow$realm().getColumnType(columnKey);
         switch (type) {
             case BOOLEAN:
-                return (E) Boolean.valueOf(proxyState.getRow$realm().getBoolean(columnIndex));
+                return (E) Boolean.valueOf(proxyState.getRow$realm().getBoolean(columnKey));
             case INTEGER:
-                return (E) Long.valueOf(proxyState.getRow$realm().getLong(columnIndex));
+                return (E) Long.valueOf(proxyState.getRow$realm().getLong(columnKey));
             case FLOAT:
-                return (E) Float.valueOf(proxyState.getRow$realm().getFloat(columnIndex));
+                return (E) Float.valueOf(proxyState.getRow$realm().getFloat(columnKey));
             case DOUBLE:
-                return (E) Double.valueOf(proxyState.getRow$realm().getDouble(columnIndex));
+                return (E) Double.valueOf(proxyState.getRow$realm().getDouble(columnKey));
             case STRING:
-                return (E) proxyState.getRow$realm().getString(columnIndex);
+                return (E) proxyState.getRow$realm().getString(columnKey);
             case BINARY:
-                return (E) proxyState.getRow$realm().getBinaryByteArray(columnIndex);
+                return (E) proxyState.getRow$realm().getBinaryByteArray(columnKey);
             case DATE:
-                return (E) proxyState.getRow$realm().getDate(columnIndex);
+                return (E) proxyState.getRow$realm().getDate(columnKey);
             case OBJECT:
                 return (E) getObject(fieldName);
             case LIST:

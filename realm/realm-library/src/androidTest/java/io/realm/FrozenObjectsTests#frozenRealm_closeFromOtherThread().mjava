@@ -1,0 +1,11 @@
+    @Test
+    public void frozenRealm_closeFromOtherThread() throws InterruptedException {
+        assertFalse(frozenRealm.isClosed());
+        Thread t = new Thread(() -> {
+            frozenRealm.close();
+            assertTrue(frozenRealm.isClosed());
+        });
+        t.start();
+        t.join();
+    }
+

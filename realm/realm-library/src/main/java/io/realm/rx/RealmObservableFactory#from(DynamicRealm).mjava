@@ -1,6 +1,10 @@
     @Override
     public Flowable<DynamicRealm> from(DynamicRealm realm) {
+        if (realm.isFrozen()) {
+            return Flowable.just(realm);
+        }
         final RealmConfiguration realmConfig = realm.getConfiguration();
+        Scheduler scheduler = getScheduler();
         return Flowable.create(new FlowableOnSubscribe<DynamicRealm>() {
             @Override
             public void subscribe(final FlowableEmitter<DynamicRealm> emitter) throws Exception {
@@ -10,7 +14,7 @@
                     @Override
                     public void onChange(DynamicRealm realm) {
                         if (!emitter.isCancelled()) {
-                            emitter.onNext(realm);
+                            emitter.onNext(returnFrozenObjects ? realm.freeze() : realm);
                         }
                     }
                 };
@@ -20,14 +24,16 @@
                 emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        observableRealm.removeChangeListener(listener);
-                        observableRealm.close();
+                        if (!observableRealm.isClosed()) {
+                            observableRealm.removeChangeListener(listener);
+                            observableRealm.close();
+                        }
                     }
                 }));
 
                 // Emit current value immediately
-                emitter.onNext(observableRealm);
+                emitter.onNext(returnFrozenObjects ? observableRealm.freeze() : observableRealm);
             }
-        }, BACK_PRESSURE_STRATEGY);
+        }, BACK_PRESSURE_STRATEGY).subscribeOn(scheduler).unsubscribeOn(scheduler);
     }
 

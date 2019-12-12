@@ -1,0 +1,23 @@
+    @Test
+    public void realmObject_equals() throws InterruptedException {
+        realm = createDataForLiveRealm(DATA_SIZE);
+        AllTypes obj1 = realm.where(AllTypes.class).sort(AllTypes.FIELD_LONG).findFirst();
+        AllTypes obj2 = realm.where(AllTypes.class).sort(AllTypes.FIELD_LONG).findFirst();
+        AllTypes obj1Frozen = obj1.freeze();
+        AllTypes obj2Frozen = obj2.freeze();
+
+        assertEquals(obj1, obj2);
+        assertEquals(obj1Frozen, obj2Frozen);
+        assertFalse(obj1.equals(obj1Frozen));
+        Thread t = new Thread(() -> {
+            Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+            AllTypes bgObj1 = bgRealm.where(AllTypes.class).sort(AllTypes.FIELD_LONG).findFirst();
+            AllTypes bgObj1Frozen = bgObj1.freeze();
+            assertEquals(obj1Frozen, obj2Frozen);
+            assertEquals(obj1Frozen, bgObj1Frozen);
+            bgRealm.close();
+        });
+        t.start();
+        t.join();
+    }
+

@@ -4,27 +4,28 @@
      */
     @Test
     public void shouldTestSettingIndexOnMultipleColumns() {
-
+        long[] columnsKey = new long[5];
         // Creates a table only with String type columns
         Table t = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
             @Override
             public void execute(Table t) {
-                t.addColumn(RealmFieldType.STRING, "col1");
-                t.addColumn(RealmFieldType.STRING, "col2");
-                t.addColumn(RealmFieldType.STRING, "col3");
-                t.addColumn(RealmFieldType.STRING, "col4");
-                t.addColumn(RealmFieldType.STRING, "col5");
-                TestHelper.addRowWithValues(t, "row1", "row2", "row3", "row4", "row5");
-                TestHelper.addRowWithValues(t, "row1", "row2", "row3", "row4", "row5");
-                TestHelper.addRowWithValues(t, "row1", "row2", "row3", "row4", "row5");
-                TestHelper.addRowWithValues(t, "row1", "row2", "row3", "row4", "row5");
-                TestHelper.addRowWithValues(t, "row1", "row2", "row3", "row4", "row5");
+                columnsKey[0] = t.addColumn(RealmFieldType.STRING, "col1");
+                columnsKey[1] = t.addColumn(RealmFieldType.STRING, "col2");
+                columnsKey[2] = t.addColumn(RealmFieldType.STRING, "col3");
+                columnsKey[3] = t.addColumn(RealmFieldType.STRING, "col4");
+                columnsKey[4] = t.addColumn(RealmFieldType.STRING, "col5");
+
+                TestHelper.addRowWithValues(t, columnsKey, new Object[]{"row1", "row2", "row3", "row4", "row5"});
+                TestHelper.addRowWithValues(t, columnsKey, new Object[]{"row1", "row2", "row3", "row4", "row5"});
+                TestHelper.addRowWithValues(t, columnsKey, new Object[]{"row1", "row2", "row3", "row4", "row5"});
+                TestHelper.addRowWithValues(t, columnsKey, new Object[]{"row1", "row2", "row3", "row4", "row5"});
+                TestHelper.addRowWithValues(t, columnsKey, new Object[]{"row1", "row2", "row3", "row4", "row5"});
             }
         });
 
-        for (long c=0;c<t.getColumnCount();c++){
-            t.addSearchIndex(c);
-            assertEquals(true, t.hasSearchIndex(c));
+        for (int i = 0; i < columnsKey.length; i++) {
+            t.addSearchIndex(columnsKey[i]);
+            assertEquals(true, t.hasSearchIndex(columnsKey[i]));
         }
 
     }

@@ -1,0 +1,20 @@
+    private Realm createDataForLiveRealm(int dataSize) {
+        realm.executeTransaction(r -> {
+
+            RealmList<Dog> list = new RealmList<>();
+            for (int i = 0; i < 5; i++) {
+                list.add(r.copyToRealm(new Dog("Dog " + i)));
+            }
+            for (int i = 0; i < dataSize; i++) {
+                AllTypes obj = new AllTypes();
+                obj.setColumnString("String " + i);
+                obj.setColumnLong(i);
+                obj.setColumnRealmList(list);
+                obj.setColumnStringList(new RealmList<String>("Foo", "Bar", "Baz"));
+                obj.setColumnRealmObject(r.copyToRealm(new Dog("Dog 42")));
+                r.insert(obj);
+            }
+        });
+        return realm;
+    }
+

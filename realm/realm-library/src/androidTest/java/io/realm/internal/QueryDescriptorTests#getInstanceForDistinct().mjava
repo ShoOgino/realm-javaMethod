@@ -1,17 +1,25 @@
     @Test
     public void getInstanceForDistinct() {
-        for (RealmFieldType type : QueryDescriptor.DISTINCT_VALID_FIELD_TYPES) {
-            long column = table.addColumn(type, type.name());
-            table.addSearchIndex(column);
-        }
+        RealmFieldType[] types = new RealmFieldType[]{RealmFieldType.BOOLEAN,
+                RealmFieldType.INTEGER,
+                RealmFieldType.STRING,
+                RealmFieldType.DATE};
+        long columnKey1 = table.addColumn(RealmFieldType.BOOLEAN, RealmFieldType.BOOLEAN.name());
+        long columnKey2 = table.addColumn(RealmFieldType.INTEGER, RealmFieldType.INTEGER.name());
+        long columnKey3 = table.addColumn(RealmFieldType.STRING, RealmFieldType.STRING.name());
+        long columnKey4 = table.addColumn(RealmFieldType.DATE, RealmFieldType.DATE.name());
 
-        long i = 0;
-        for (RealmFieldType type : QueryDescriptor.DISTINCT_VALID_FIELD_TYPES) {
-            QueryDescriptor sortDescriptor = QueryDescriptor.getInstanceForDistinct(null, table, type.name());
-            assertEquals(1, sortDescriptor.getColumnIndices()[0].length);
-            assertEquals(i, sortDescriptor.getColumnIndices()[0][0]);
+        table.addSearchIndex(columnKey1);
+        table.addSearchIndex(columnKey2);
+        table.addSearchIndex(columnKey3);
+        table.addSearchIndex(columnKey4);
+        long[] columnsKey = new long[]{columnKey1, columnKey2, columnKey3, columnKey4};
+
+        for (int i = 0; i < columnsKey.length; i++) {
+            QueryDescriptor sortDescriptor = QueryDescriptor.getInstanceForDistinct(null, table, types[i].name());
+            assertEquals(1, sortDescriptor.getColumnKeys()[0].length);
+            assertEquals(columnsKey[i], sortDescriptor.getColumnKeys()[0][0]);
             assertNull(sortDescriptor.getAscendings());
-            i++;
         }
     }
 

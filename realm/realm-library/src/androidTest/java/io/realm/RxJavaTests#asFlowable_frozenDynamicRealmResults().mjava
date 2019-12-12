@@ -1,0 +1,12 @@
+    @Test
+    @RunTestInLooperThread
+    public void asFlowable_frozenDynamicRealmResults() {
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.getConfiguration());
+        final RealmResults<DynamicRealmObject> frozenResults = dynamicRealm.where(AllTypes.CLASS_NAME).findAll().freeze();
+        subscription = frozenResults.asFlowable().subscribe(rxResults -> {
+            assertTrue(rxResults.isFrozen());
+            assertEquals(frozenResults, rxResults);
+            disposeSuccessfulTest(dynamicRealm);
+        });
+    }
+

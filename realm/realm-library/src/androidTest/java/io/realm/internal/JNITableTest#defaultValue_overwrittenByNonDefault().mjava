@@ -1,69 +1,70 @@
     @Test
     public void defaultValue_overwrittenByNonDefault() {
-        final OsSharedRealm sharedRealm = OsSharedRealm.getInstance(configFactory.createConfiguration());
+        final OsSharedRealm sharedRealm = OsSharedRealm.getInstance(configFactory.createConfiguration(), OsSharedRealm.VersionID.LIVE);
         //noinspection TryFinallyCanBeTryWithResources
         try {
             sharedRealm.beginTransaction();
             final Table table = sharedRealm.createTable(Table.getTableNameForClass("DefaultValueTest"));
-            sharedRealm.commitTransaction();
+            long colKey1 = table.addColumn(RealmFieldType.STRING, RealmFieldType.STRING.name().toLowerCase(Locale.ENGLISH) + "Col");
+            long colKey2 = table.addColumn(RealmFieldType.INTEGER, RealmFieldType.INTEGER.name().toLowerCase(Locale.ENGLISH) + "Col");
+            long colKey3 = table.addColumn(RealmFieldType.BOOLEAN, RealmFieldType.BOOLEAN.name().toLowerCase(Locale.ENGLISH) + "Col");
+            long colKey4 = table.addColumn(RealmFieldType.BINARY, RealmFieldType.BINARY.name().toLowerCase(Locale.ENGLISH) + "Col");
+            long colKey5 = table.addColumn(RealmFieldType.DATE, RealmFieldType.DATE.name().toLowerCase(Locale.ENGLISH) + "Col");
+            long colKey6 = table.addColumn(RealmFieldType.FLOAT, RealmFieldType.FLOAT.name().toLowerCase(Locale.ENGLISH) + "Col");
+            long colKey7 = table.addColumn(RealmFieldType.DOUBLE, RealmFieldType.DOUBLE.name().toLowerCase(Locale.ENGLISH) + "Col");
+            long colKey8 = table.addColumnLink(RealmFieldType.OBJECT, RealmFieldType.OBJECT.name().toLowerCase(Locale.ENGLISH) + "Col", table);
 
-            List<Pair<RealmFieldType, Object>> columnInfoList = Arrays.asList(
-                    new Pair<RealmFieldType, Object>(RealmFieldType.STRING, new String[] {"string value1", "string value2"}),
-                    new Pair<RealmFieldType, Object>(RealmFieldType.INTEGER, new Long[] {100L, 102L}),
-                    new Pair<RealmFieldType, Object>(RealmFieldType.BOOLEAN, new Boolean[] {false, true}),
-                    new Pair<RealmFieldType, Object>(RealmFieldType.BINARY, new byte[][] {new byte[] {123}, new byte[] {-123}}),
-                    new Pair<RealmFieldType, Object>(RealmFieldType.DATE, new Date[] {new Date(123456), new Date(13579)}),
-                    new Pair<RealmFieldType, Object>(RealmFieldType.FLOAT, new Float[] {1.234F, 100F}),
-                    new Pair<RealmFieldType, Object>(RealmFieldType.DOUBLE, new Double[] {Math.PI, Math.E}),
-                    new Pair<RealmFieldType, Object>(RealmFieldType.OBJECT, new Long[] {0L, 1L})
-                    // FIXME: Currently, LIST does not support default value.
-                    // new CollectionChange<RealmFieldType, Object>(RealmFieldType.LIST, )
-            );
+            long[] columnKeys = new long[]{colKey1, colKey2, colKey3, colKey4, colKey5, colKey6, colKey7, colKey8};
+            Object[] datas = new Object[]{new String[] {"string value1", "string value2"},
+                    new Long[] {100L, 102L},
+                    new Boolean[] {false, true},
+                    new byte[][] {new byte[] {123}, new byte[] {-123}},
+                    new Date[] {new Date(123456), new Date(13579)},
+                    new Float[] {1.234F, 100F},
+                    new Double[] {Math.PI, Math.E},
+                    new Long[] {0L, 1L}
 
-            for (Pair<RealmFieldType, Object> columnInfo : columnInfoList) {
-                final RealmFieldType type = columnInfo.first;
-                if (type == RealmFieldType.OBJECT || type == RealmFieldType.LIST) {
-                    table.addColumnLink(type, type.name().toLowerCase(Locale.ENGLISH) + "Col", table);
-                } else {
-                    table.addColumn(type, type.name().toLowerCase(Locale.ENGLISH) + "Col");
-                }
-            }
-
-            sharedRealm.beginTransaction();
-            OsObject.createRow(table);
+            };
+            RealmFieldType[] types = new RealmFieldType[]{RealmFieldType.STRING,
+                    RealmFieldType.INTEGER,
+                    RealmFieldType.BOOLEAN,
+                    RealmFieldType.BINARY,
+                    RealmFieldType.DATE,
+                    RealmFieldType.FLOAT,
+                    RealmFieldType.DOUBLE,
+                    RealmFieldType.OBJECT};
+            long rowKey = OsObject.createRow(table);
             OsObject.createRow(table); // For link field update.
 
             // Sets as default.
-            ListIterator<Pair<RealmFieldType, Object>> it = columnInfoList.listIterator();
-            for (int columnIndex = 0; columnIndex < columnInfoList.size(); columnIndex++) {
-                Pair<RealmFieldType, Object> columnInfo = it.next();
-                final RealmFieldType type = columnInfo.first;
-                final Object value1 = ((Object[]) columnInfo.second)[0];
+            for (int i = 0; i< columnKeys.length; i++) {
+                final RealmFieldType type = types[i];
+                final Object value1 = ((Object[]) datas[i])[0];
 
                 switch (type) {
                     case STRING:
-                        table.setString(columnIndex, 0, (String) value1, true);
+                        table.setString(columnKeys[i], rowKey, (String) value1, true);
                         break;
                     case INTEGER:
-                        table.setLong(columnIndex, 0, (long) value1, true);
+                        table.setLong(columnKeys[i], rowKey, (long) value1, true);
                         break;
                     case BOOLEAN:
-                        table.setBoolean(columnIndex, 0, (boolean) value1, true);
+                        table.setBoolean(columnKeys[i], rowKey, (boolean) value1, true);
                         break;
                     case BINARY:
-                        table.setBinaryByteArray(columnIndex, 0, (byte[]) value1, true);
+                        table.setBinaryByteArray(columnKeys[i], rowKey, (byte[]) value1, true);
                         break;
                     case DATE:
-                        table.setDate(columnIndex, 0, (Date) value1, true);
+                        table.setDate(columnKeys[i], rowKey, (Date) value1, true);
                         break;
                     case FLOAT:
-                        table.setFloat(columnIndex, 0, (float) value1, true);
+                        table.setFloat(columnKeys[i], rowKey, (float) value1, true);
                         break;
                     case DOUBLE:
-                        table.setDouble(columnIndex, 0, (double) value1, true);
+                        table.setDouble(columnKeys[i], rowKey, (double) value1, true);
                         break;
                     case OBJECT:
-                        table.setLink(columnIndex, 0, (long) value1, true);
+                        table.setLink(columnKeys[i], rowKey, (long) value1, true);
                         break;
                     default:
                         throw new RuntimeException("unexpected field type: " + type);
@@ -73,44 +74,42 @@
 
             // Updates as non default.
             sharedRealm.beginTransaction();
-            it = columnInfoList.listIterator();
-            for (int columnIndex = 0; columnIndex < columnInfoList.size(); columnIndex++) {
-                Pair<RealmFieldType, Object> columnInfo = it.next();
-                final RealmFieldType type = columnInfo.first;
-                final Object value2 = ((Object[]) columnInfo.second)[1];
+            for (int i = 0; i< columnKeys.length; i++) {
+                final RealmFieldType type = types[i];
+                final Object value2 = ((Object[]) datas[i])[1];
 
                 switch (type) {
                     case STRING:
-                        table.setString(columnIndex, 0, (String) value2, false);
-                        assertEquals(value2, table.getString(columnIndex, 0));
+                        table.setString(columnKeys[i], rowKey, (String) value2, false);
+                        assertEquals(value2, table.getString(columnKeys[i], rowKey));
                         break;
                     case INTEGER:
-                        table.setLong(columnIndex, 0, (long) value2, false);
-                        assertEquals(value2, table.getLong(columnIndex, 0));
+                        table.setLong(columnKeys[i], rowKey, (long) value2, false);
+                        assertEquals(value2, table.getLong(columnKeys[i], rowKey));
                         break;
                     case BOOLEAN:
-                        table.setBoolean(columnIndex, 0, (boolean) value2, false);
-                        assertEquals(value2, table.getBoolean(columnIndex, 0));
+                        table.setBoolean(columnKeys[i], rowKey, (boolean) value2, false);
+                        assertEquals(value2, table.getBoolean(columnKeys[i], rowKey));
                         break;
                     case BINARY:
-                        table.setBinaryByteArray(columnIndex, 0, (byte[]) value2, false);
-                        assertTrue(Arrays.equals((byte[]) value2, table.getBinaryByteArray(columnIndex, 0)));
+                        table.setBinaryByteArray(columnKeys[i], rowKey, (byte[]) value2, false);
+                        assertTrue(Arrays.equals((byte[]) value2, table.getBinaryByteArray(columnKeys[i], rowKey)));
                         break;
                     case DATE:
-                        table.setDate(columnIndex, 0, (Date) value2, false);
-                        assertEquals(value2, table.getDate(columnIndex, 0));
+                        table.setDate(columnKeys[i], rowKey, (Date) value2, false);
+                        assertEquals(value2, table.getDate(columnKeys[i], rowKey));
                         break;
                     case FLOAT:
-                        table.setFloat(columnIndex, 0, (float) value2, false);
-                        assertEquals(value2, table.getFloat(columnIndex, 0));
+                        table.setFloat(columnKeys[i], rowKey, (float) value2, false);
+                        assertEquals(value2, table.getFloat(columnKeys[i], rowKey));
                         break;
                     case DOUBLE:
-                        table.setDouble(columnIndex, 0, (double) value2, false);
-                        assertEquals(value2, table.getDouble(columnIndex, 0));
+                        table.setDouble(columnKeys[i], rowKey, (double) value2, false);
+                        assertEquals(value2, table.getDouble(columnKeys[i], rowKey));
                         break;
                     case OBJECT:
-                        table.setLink(columnIndex, 0, (long) value2, false);
-                        assertEquals(value2, table.getLink(columnIndex, 0));
+                        table.setLink(columnKeys[i], 0, (long) value2, false);
+                        assertEquals(value2, table.getLink(columnKeys[i], rowKey));
                         break;
                     default:
                         throw new RuntimeException("unexpected field type: " + type);
@@ -119,36 +118,34 @@
             sharedRealm.commitTransaction();
 
             // Checks if the value was overwritten.
-            it = columnInfoList.listIterator();
-            for (int columnIndex = 0; columnIndex < columnInfoList.size(); columnIndex++) {
-                Pair<RealmFieldType, Object> columnInfo = it.next();
-                final RealmFieldType type = columnInfo.first;
-                final Object value2 = ((Object[]) columnInfo.second)[1];
+            for (int i = 0; i < columnKeys.length; i++) {
+                final RealmFieldType type = types[i];
+                final Object value2 = ((Object[]) datas[i])[1];
 
                 switch (type) {
                     case STRING:
-                        assertEquals(value2, table.getString(columnIndex, 0));
+                        assertEquals(value2, table.getString(columnKeys[i], rowKey));
                         break;
                     case INTEGER:
-                        assertEquals(value2, table.getLong(columnIndex, 0));
+                        assertEquals(value2, table.getLong(columnKeys[i], rowKey));
                         break;
                     case BOOLEAN:
-                        assertEquals(value2, table.getBoolean(columnIndex, 0));
+                        assertEquals(value2, table.getBoolean(columnKeys[i], rowKey));
                         break;
                     case BINARY:
-                        assertTrue(Arrays.equals((byte[]) value2, table.getBinaryByteArray(columnIndex, 0)));
+                        assertTrue(Arrays.equals((byte[]) value2, table.getBinaryByteArray(columnKeys[i], rowKey)));
                         break;
                     case DATE:
-                        assertEquals(value2, table.getDate(columnIndex, 0));
+                        assertEquals(value2, table.getDate(columnKeys[i], rowKey));
                         break;
                     case FLOAT:
-                        assertEquals(value2, table.getFloat(columnIndex, 0));
+                        assertEquals(value2, table.getFloat(columnKeys[i], rowKey));
                         break;
                     case DOUBLE:
-                        assertEquals(value2, table.getDouble(columnIndex, 0));
+                        assertEquals(value2, table.getDouble(columnKeys[i], rowKey));
                         break;
                     case OBJECT:
-                        assertEquals(value2, table.getLink(columnIndex, 0));
+                        assertEquals(value2, table.getLink(columnKeys[i], rowKey));
                         break;
                     default:
                         throw new RuntimeException("unexpected field type: " + type);

@@ -1,0 +1,8 @@
+    @Override
+    public Row freeze(OsSharedRealm frozenRealm) {
+        if (!isValid()) {
+            return InvalidRow.INSTANCE;
+        }
+        return new UncheckedRow(context, parent.freeze(frozenRealm), nativeFreeze(nativePtr, frozenRealm.getNativePtr()));
+    }
+

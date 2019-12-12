@@ -13,10 +13,10 @@
     public RealmQuery<E> isNull(String fieldName) {
         realm.checkIfValid();
 
-        FieldDescriptor fd = schema.getColumnIndices(fieldName);
+        FieldDescriptor fd = schema.getFieldDescriptors(fieldName);
 
         // Checks that fieldName has the correct type is done in C++.
-        this.query.isNull(fd.getColumnIndices(), fd.getNativeTablePointers());
+        this.query.isNull(fd.getColumnKeys(), fd.getNativeTablePointers());
         return this;
     }
 

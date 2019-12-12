@@ -1,0 +1,16 @@
+    @Test
+    @RunTestInLooperThread
+    public void addingResultsChangeListenerThrows() {
+        RealmResults<AllTypes> results = frozenRealm.where(AllTypes.class).findAll();
+        try {
+            results.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<AllTypes>>() {
+                @Override
+                public void onChange(RealmResults<AllTypes> allTypes, OrderedCollectionChangeSet changeSet) {
+                }
+            });
+            fail();
+        } catch (IllegalStateException ignore) {
+            looperThread.testComplete();
+        }
+    }
+

@@ -1,0 +1,7 @@
+    @Test
+    public void realmResults_returnsFrozenRealm() {
+        realm = createDataForLiveRealm(DATA_SIZE);
+        RealmList<Dog> list = realm.where(AllTypes.class).sort(AllTypes.FIELD_LONG).findFirst().getColumnRealmList().freeze();
+        assertTrue(list.getRealm().isFrozen());
+    }
+

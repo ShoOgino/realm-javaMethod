@@ -1,22 +1,18 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void realm_closeInDoOnUnsubscribe() {
         Flowable<Realm> observable = realm.asFlowable()
-                .doOnCancel(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        realm.close();
-                    }
+                .doOnCancel(() -> realm.close())
+                .doFinally(() -> {
+                    looperThread.postRunnable(() -> {
+                        assertTrue(realm.isClosed());
+                        disposeSuccessfulTest(realm);
+                    });
                 });
 
-        subscription = observable.subscribe(new Consumer<Realm>() {
-            @Override
-            public void accept(Realm realm) throws Exception {
-                assertEquals(2, Realm.getLocalInstanceCount(realm.getConfiguration()));
-            }
+        subscription = observable.subscribe(ignore -> {
+            assertEquals(3, Realm.getLocalInstanceCount(realm.getConfiguration()));
+            subscription.dispose();
         });
-
-        subscription.dispose();
-        assertTrue(realm.isClosed());
     }
 

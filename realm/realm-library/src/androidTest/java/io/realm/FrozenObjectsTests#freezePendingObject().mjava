@@ -1,0 +1,13 @@
+    @Test
+    @RunTestInLooperThread
+    public void freezePendingObject() {
+        Realm realm = createDataForLiveRealm(DATA_SIZE);
+        AllTypes obj = realm.where(AllTypes.class).sort(AllTypes.FIELD_LONG).findFirstAsync();
+
+        AllTypes frozenObj = obj.freeze();
+        assertFalse(frozenObj.isValid());
+        assertFalse(frozenObj.isLoaded());
+        assertTrue(frozenObj.isFrozen());
+        looperThread.testComplete();
+    }
+

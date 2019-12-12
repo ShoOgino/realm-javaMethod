@@ -8,11 +8,11 @@
     public boolean isNull(String fieldName) {
         proxyState.getRealm$realm().checkIfValid();
 
-        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        RealmFieldType type = proxyState.getRow$realm().getColumnType(columnIndex);
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
+        RealmFieldType type = proxyState.getRow$realm().getColumnType(columnKey);
         switch (type) {
             case OBJECT:
-                return proxyState.getRow$realm().isNullLink(columnIndex);
+                return proxyState.getRow$realm().isNullLink(columnKey);
             case BOOLEAN:
             case INTEGER:
             case FLOAT:
@@ -20,7 +20,7 @@
             case STRING:
             case BINARY:
             case DATE:
-                return proxyState.getRow$realm().isNull(columnIndex);
+                return proxyState.getRow$realm().isNull(columnKey);
             case LIST:
             case LINKING_OBJECTS:
             case INTEGER_LIST:

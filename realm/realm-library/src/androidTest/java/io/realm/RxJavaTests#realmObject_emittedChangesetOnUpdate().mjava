@@ -1,25 +1,22 @@
     @Test
     @RunTestInLooperThread
     public void realmObject_emittedChangesetOnUpdate() {
-        final AtomicInteger subscriberCalled = new AtomicInteger(0);
-        Realm realm = looperThread.getRealm();
         realm.beginTransaction();
         final AllTypes obj = realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
-        subscription = obj.asChangesetObservable().subscribe(new Consumer<ObjectChange<RealmObject>>() {
-            @Override
-            public void accept(ObjectChange<RealmObject> change) throws Exception {
-                if (subscriberCalled.incrementAndGet() == 2) {
-                    assertNotNull(change.getChangeset());
-                    assertTrue(change.getChangeset().isFieldChanged(AllTypes.FIELD_LONG));
-                    looperThread.testComplete();
-                }
+        subscription = obj.<AllTypes>asChangesetObservable().subscribe(change -> {
+            AllTypes rxObject = change.getObject();
+            assertTrue(rxObject.isFrozen());
+            if (rxObject.getColumnLong() == 0) {
+                realm.beginTransaction();
+                obj.setColumnLong(1);
+                realm.commitTransaction();
+            } else if (rxObject.getColumnLong() == 1) {
+                assertNotNull(change.getChangeset());
+                assertTrue(change.getChangeset().isFieldChanged(AllTypes.FIELD_LONG));
+                disposeSuccessfulTest(realm);
             }
         });
-
-        realm.beginTransaction();
-        obj.setColumnLong(1);
-        realm.commitTransaction();
     }
 

@@ -6,17 +6,17 @@
         if (update) {
             Table table = realm.getTable(some.test.AllTypes.class);
             AllTypesColumnInfo columnInfo = (AllTypesColumnInfo) realm.getSchema().getColumnInfo(some.test.AllTypes.class);
-            long pkColumnIndex = columnInfo.columnStringIndex;
-            long rowIndex = Table.NO_MATCH;
+            long pkColumnKey = columnInfo.columnStringColKey;
+            long colKey = Table.NO_MATCH;
             if (json.isNull("columnString")) {
-                rowIndex = table.findFirstNull(pkColumnIndex);
+                colKey = table.findFirstNull(pkColumnKey);
             } else {
-                rowIndex = table.findFirstString(pkColumnIndex, json.getString("columnString"));
+                colKey = table.findFirstString(pkColumnKey, json.getString("columnString"));
             }
-            if (rowIndex != Table.NO_MATCH) {
+            if (colKey != Table.NO_MATCH) {
                 final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get();
                 try {
-                    objectContext.set(realm, table.getUncheckedRow(rowIndex), realm.getSchema().getColumnInfo(some.test.AllTypes.class), false, Collections.<String> emptyList());
+                    objectContext.set(realm, table.getUncheckedRow(colKey), realm.getSchema().getColumnInfo(some.test.AllTypes.class), false, Collections.<String> emptyList());
                     obj = new io.realm.some_test_AllTypesRealmProxy();
                 } finally {
                     objectContext.clear();

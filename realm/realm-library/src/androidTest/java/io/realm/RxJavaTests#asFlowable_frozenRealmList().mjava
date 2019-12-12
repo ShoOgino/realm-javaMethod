@@ -1,0 +1,16 @@
+    @Test
+    @RunTestInLooperThread
+    public void asFlowable_frozenRealmList() {
+        realm.beginTransaction();
+        final RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
+        list.add(new Dog("dog"));
+        realm.commitTransaction();
+
+        RealmList<Dog> frozenList = list.freeze();
+        subscription = frozenList.asFlowable().subscribe(rxList -> {
+            assertTrue(rxList.isFrozen());
+            assertEquals(frozenList, rxList);
+            disposeSuccessfulTest(realm);
+        });
+    }
+

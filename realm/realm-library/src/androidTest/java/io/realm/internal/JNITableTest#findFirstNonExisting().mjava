@@ -1,14 +1,22 @@
     @Test
     public void findFirstNonExisting() {
         Table t = TestHelper.createTableWithAllColumnTypes(sharedRealm);
+        long colKey1 = t.getColumnKey("binary");
+        long colKey2 = t.getColumnKey("boolean");
+        long colKey3 = t.getColumnKey("date");
+        long colKey4 = t.getColumnKey("double");
+        long colKey5 = t.getColumnKey("float");
+        long colKey6 = t.getColumnKey("long");
+        long colKey7 = t.getColumnKey("string");
+
         sharedRealm.beginTransaction();
-        TestHelper.addRowWithValues(t, new byte[] {1, 2, 3}, true, new Date(1384423149761L), 4.5D, 5.7F, 100, "string");
+        TestHelper.addRowWithValues(t, new long[]{colKey1, colKey2, colKey3, colKey4, colKey5, colKey6, colKey7}, new Object[] {new byte[] {1, 2, 3}, true, new Date(1384423149761L), 4.5D, 5.7F, 100, "string"});
         sharedRealm.commitTransaction();
 
-        assertEquals(-1, t.findFirstBoolean(1, false));
-        assertEquals(-1, t.findFirstDate(2, new Date(138442314986L)));
-        assertEquals(-1, t.findFirstDouble(3, 1.0D));
-        assertEquals(-1, t.findFirstFloat(4, 1.0F));
-        assertEquals(-1, t.findFirstLong(5, 50));
+        assertEquals(-1, t.findFirstBoolean(colKey2, false));
+        assertEquals(-1, t.findFirstDate(colKey3, new Date(138442314986L)));
+        assertEquals(-1, t.findFirstDouble(colKey4, 1.0D));
+        assertEquals(-1, t.findFirstFloat(colKey5, 1.0F));
+        assertEquals(-1, t.findFirstLong(colKey6, 50));
     }
 

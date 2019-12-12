@@ -1,6 +1,6 @@
     private void setModelList(String fieldName, RealmList<DynamicRealmObject> list) {
-        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
-        OsList osList = proxyState.getRow$realm().getModelList(columnIndex);
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
+        OsList osList = proxyState.getRow$realm().getModelList(columnKey);
         Table linkTargetTable = osList.getTargetTable();
         //noinspection ConstantConditions
         @Nonnull
@@ -38,7 +38,7 @@
                         obj.realmGet$proxyState().getRow$realm().getTable().getClassName(),
                         linkTargetTableName));
             }
-            indices[i] = obj.realmGet$proxyState().getRow$realm().getIndex();
+            indices[i] = obj.realmGet$proxyState().getRow$realm().getObjectKey();
         }
 
         osList.removeAll();

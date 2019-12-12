@@ -2,13 +2,22 @@
     public void queryTestForNoMatches() {
         Table t = TestHelper.createTableWithAllColumnTypes(sharedRealm);
 
+        long columnKey1 = t.getColumnKey("binary");
+        long columnKey2 = t.getColumnKey("boolean");
+        long columnKey3 = t.getColumnKey("date");
+        long columnKey4 = t.getColumnKey("double");
+        long columnKey5 = t.getColumnKey("float");
+        long columnKey6 = t.getColumnKey("long");
+        long columnKey7 = t.getColumnKey("string");
+
+
         sharedRealm.beginTransaction();
-        TestHelper.addRowWithValues(t, new byte[]{1,2,3}, true, new Date(1384423149761L), 4.5d, 5.7f, 100, "string");
+        TestHelper.addRowWithValues(t, new long[]{columnKey1, columnKey2, columnKey3, columnKey4, columnKey5, columnKey6, columnKey7},
+                new Object[]{new byte[]{1,2,3}, true, new Date(1384423149761L), 4.5d, 5.7f, 100, "string"});
         sharedRealm.commitTransaction();
 
-        TableQuery q = t.where().greaterThan(new long[]{5}, oneNullTable, 1000); // No matches
+        TableQuery q = t.where().greaterThan(new long[]{columnKey6}, oneNullTable, 1000); // No matches
 
         assertEquals(-1, q.find());
-        assertEquals(-1, q.find(1));
     }
 
