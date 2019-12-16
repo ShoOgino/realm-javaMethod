@@ -1,0 +1,31 @@
+    private Runnable createTaskInHandlerThread(AsyncTaskRunner wrapper) {
+        return new Runnable() {
+            CountDownLatch successLatch = new CountDownLatch(1);
+            CountDownLatch closeLatch = new CountDownLatch(1);
+            volatile Handler handler;
+            volatile HandlerThread handlerThread;
+            AtomicReference<Realm> realm = new AtomicReference<>(null);
+            AsyncTaskRunner wrapperStrongRef = wrapper;
+
+            @Override
+            public void run() {
+                handlerThread = new HandlerThread("HandlerWorker: " + workerThreadId.incrementAndGet());
+                handlerThread.start();
+                Looper looper = handlerThread.getLooper();
+                handler = new Handler(looper);
+                handler.post(() -> {
+                    realm.set(Realm.getInstance(realmConfig));
+                    wrapperStrongRef.run(realm.get(), successLatch);
+                });
+
+                TestHelper.awaitOrFail(successLatch);
+                handler.post(() -> {
+                    realm.get().close();
+                    closeLatch.countDown();
+                });
+                TestHelper.awaitOrFail(closeLatch);
+                handlerThread.quitSafely();
+            }
+        };
+    }
+

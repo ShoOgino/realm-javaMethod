@@ -1,0 +1,14 @@
+    private Runnable createObjects(int objectsCount, boolean asyncTransaction) {
+        if (asyncTransaction) {
+            return createTaskInHandlerThread((realm, success) -> {
+                RealmLog.info("Creating objects (async): " + Thread.currentThread().getName());
+                realm.executeTransactionAsync(bgRealm -> populateTestRealm(bgRealm, objectsCount), success::countDown);
+            });
+        } else {
+            return createTaskInThread((realm) -> {
+                RealmLog.info("Creating objects: " + Thread.currentThread().getName());
+                populateTestRealm(realm, objectsCount);
+            });
+        }
+    }
+
