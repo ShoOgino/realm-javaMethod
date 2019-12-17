@@ -1,5 +1,4 @@
     @Test
-    @SuppressWarnings("ConstantOverflow")
     public void iOSDataTypesMaximumValues() throws IOException {
         for (String iosVersion : IOS_VERSIONS) {
             configFactory.copyRealmFromAssets(context,
@@ -9,13 +8,13 @@
             IOSAllTypes obj = realm.where(IOSAllTypes.class).findFirst();
             assertEquals(Short.MAX_VALUE, obj.getShortCol());
             assertEquals(Integer.MAX_VALUE, obj.getIntCol());
-            assertEquals(Integer.MAX_VALUE, obj.getLongCol());
+            assertEquals(Long.MAX_VALUE, obj.getLongCol());
             assertEquals(Long.MAX_VALUE, obj.getLongLongCol());
             assertEquals(Float.MAX_VALUE, obj.getFloatCol(), 0F);
             assertEquals(Double.MAX_VALUE, obj.getDoubleCol(), 0D);
             assertArrayEquals(new byte[0], obj.getByteCol());
             assertEquals("", obj.getStringCol());
-            assertEquals(Long.MIN_VALUE, obj.getDateCol().getTime());
+            assertEquals(Long.MAX_VALUE, obj.getDateCol().getTime());
         }
     }
 
