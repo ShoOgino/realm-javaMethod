@@ -1,0 +1,16 @@
+    @Before
+    public void setUp() {
+        originalLogLevel = RealmLog.getLevel();
+        RealmLog.setLevel(LogLevel.INFO);
+        long seed = System.currentTimeMillis();
+        RealmLog.info("Starting stress test with seed: " + seed);
+        random = new Random(seed);
+        RealmConfiguration.Builder builder = configFactory.createConfigurationBuilder();
+        if (useEncryption) {
+            builder.encryptionKey(TestHelper.getRandomKey(seed));
+        }
+        realmConfig = configFactory.createConfiguration();
+        Realm.deleteRealm(realmConfig);
+        executor = Executors.newFixedThreadPool(reuseThreads ? Math.max(random.nextInt(MAX_THREADS), 1) : MAX_THREADS);
+    }
+

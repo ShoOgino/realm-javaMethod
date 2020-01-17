@@ -1,0 +1,26 @@
+    private Runnable deleteObjects(boolean filterObjects, boolean asyncTransaction) {
+        TaskRunner delete = realm -> {
+            if (filterObjects) {
+                realm.where(AllTypes.class)
+                        .lessThan(AllTypes.FIELD_LONG, realm.where(AllTypes.class).count()/2)
+                        .equalTo(AllTypes.FIELD_BOOLEAN, true)
+                        .findAll()
+                        .deleteAllFromRealm();
+            } else {
+                realm.delete(AllTypes.class);
+            }
+        };
+
+        if (asyncTransaction) {
+            return createTaskInHandlerThread(((realm, success) -> {
+                RealmLog.info("Deleting objects (async): " + Thread.currentThread().getName());
+                realm.executeTransactionAsync(delete::run, success::countDown);
+            }));
+        } else {
+            return createTaskInThread((realm) -> {
+                RealmLog.info("Deleting objects: " + Thread.currentThread().getName());
+                realm.executeTransaction(delete::run);
+            });
+        }
+    }
+
