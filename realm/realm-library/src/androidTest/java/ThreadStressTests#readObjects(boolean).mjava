@@ -1,0 +1,36 @@
+    private Runnable readObjects(boolean asyncQuery) {
+        if (asyncQuery) {
+            return createTaskInHandlerThread(new AsyncTaskRunner() {
+                private RealmResults<AllTypes> liveResults;
+                @Override
+                public void run(Realm realm, CountDownLatch success) {
+                    RealmLog.info("Reading objects (async): " + Thread.currentThread().getName());
+                    liveResults = realm.where(AllTypes.class)
+                            .lessThan(AllTypes.FIELD_LONG, random.nextInt((int) realm.where(AllTypes.class).count() + 1))
+                            .equalTo(AllTypes.FIELD_BOOLEAN, random.nextBoolean())
+                            .findAllAsync();
+                    liveResults.addChangeListener((updatedResults, changeSet) -> {
+                        for (AllTypes result : updatedResults) {
+                            assertFalse(TextUtils.isEmpty(result.getColumnString()));
+                        }
+                        if (updatedResults.isLoaded()) {
+                            RealmLog.info("Query finished on: " + Thread.currentThread().getName());
+                            success.countDown();
+                        }
+                    });
+                }
+            });
+        } else {
+            return createTaskInThread((realm) -> {
+                RealmLog.info("Reading objects: " + Thread.currentThread().getName());
+                RealmResults<AllTypes> results = realm.where(AllTypes.class)
+                        .lessThan(AllTypes.FIELD_LONG, random.nextInt((int) realm.where(AllTypes.class).count() + 1))
+                        .equalTo(AllTypes.FIELD_BOOLEAN, random.nextBoolean())
+                        .findAll();
+                for (AllTypes result : results) {
+                    assertFalse(TextUtils.isEmpty(result.getColumnString()));
+                }
+            });
+        }
+    }
+

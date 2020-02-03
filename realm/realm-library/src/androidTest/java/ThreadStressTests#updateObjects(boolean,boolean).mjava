@@ -1,0 +1,29 @@
+    private Runnable updateObjects(boolean filterObjects, boolean asyncTransaction) {
+        TaskRunner update = realm -> {
+            RealmResults<AllTypes> results;
+            if (filterObjects) {
+                results = realm.where(AllTypes.class)
+                        .lessThan(AllTypes.FIELD_LONG, random.nextInt((int) realm.where(AllTypes.class).count() + 1))
+                        .equalTo(AllTypes.FIELD_BOOLEAN, random.nextBoolean())
+                        .findAll();
+            } else {
+                results = realm.where(AllTypes.class).findAll();
+            }
+
+            results.setString(AllTypes.FIELD_STRING, "Updated: " + Thread.currentThread().getName());
+            results.setBoolean(AllTypes.FIELD_BOOLEAN, random.nextBoolean());
+        };
+
+        if (asyncTransaction) {
+            return createTaskInHandlerThread(((realm, success) -> {
+                RealmLog.info("Updating objects (async): " + Thread.currentThread().getName());
+                realm.executeTransactionAsync(update::run, success::countDown);
+            }));
+        } else {
+            return createTaskInThread((realm) -> {
+                RealmLog.info("Updating objects: " + Thread.currentThread().getName());
+                realm.executeTransaction(update::run);
+            });
+        }
+    }
+
