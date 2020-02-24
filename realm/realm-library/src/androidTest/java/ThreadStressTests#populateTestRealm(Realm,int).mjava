@@ -1,0 +1,28 @@
+    private void populateTestRealm(Realm realm, int objects) {
+        boolean inTransaction = realm.isInTransaction();
+        if (!inTransaction) {
+            realm.beginTransaction();
+        }
+        realm.deleteAll();
+        for (int i = 0; i < objects; ++i) {
+            AllTypes allTypes = realm.createObject(AllTypes.class);
+            allTypes.setColumnLong(i);
+            allTypes.setColumnBoolean((i % 3) == 0);
+            allTypes.setColumnBinary(new byte[] {1, 2, 3});
+            allTypes.setColumnDate(new Date());
+            allTypes.setColumnDouble(Math.PI);
+            allTypes.setColumnFloat(1.234567F + i);
+
+            allTypes.setColumnString("test data " + i);
+            allTypes.setColumnLong(i);
+            NonLatinFieldNames nonLatinFieldNames = realm.createObject(NonLatinFieldNames.class);
+            nonLatinFieldNames.set델타(i);
+            nonLatinFieldNames.setΔέλτα(i);
+            nonLatinFieldNames.set베타(1.234567F + i);
+            nonLatinFieldNames.setΒήτα(1.234567F + i);
+        }
+        if (!inTransaction) {
+            realm.commitTransaction();
+        }
+    }
+
