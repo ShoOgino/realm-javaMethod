@@ -11,7 +11,6 @@
         final byte[] randomKey = TestHelper.getRandomKey();
 
         SyncConfiguration configWithEncryption = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
-                .fullSynchronization()
                 .modules(new StringOnlyModule())
                 .waitForInitialRemoteData()
                 .errorHandler(new SyncSession.ErrorHandler() {
@@ -39,7 +38,6 @@
         // fail
         user = SyncUser.logIn(SyncCredentials.usernamePassword(username, password, false), Constants.AUTH_URL);
         SyncConfiguration configWithoutEncryption = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
-                .fullSynchronization()
                 .name("newName")
                 .modules(new StringOnlyModule())
                 .waitForInitialRemoteData()

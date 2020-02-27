@@ -1,0 +1,19 @@
+    private RealmResults<E> createRealmResults(TableQuery query,
+                                               DescriptorOrdering queryDescriptors,
+                                               boolean loadResults) {
+        RealmResults<E> results;
+        OsResults osResults;
+        osResults = OsResults.createFromQuery(realm.sharedRealm, query, queryDescriptors);
+
+        if (isDynamicQuery()) {
+            results = new RealmResults<>(realm, osResults, className);
+        } else {
+            results = new RealmResults<>(realm, osResults, clazz);
+        }
+        if (loadResults) {
+            results.load();
+        }
+
+        return results;
+    }
+

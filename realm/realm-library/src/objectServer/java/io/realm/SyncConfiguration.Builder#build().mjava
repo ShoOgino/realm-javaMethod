@@ -32,10 +32,7 @@
             // Set the default Client Resync Mode based on the current type of Realm.
             // Eventually RECOVER_LOCAL_REALM should be the default for all types.
             if (clientResyncMode == null) {
-                clientResyncMode = (isPartial) ? ClientResyncMode.MANUAL : ClientResyncMode.RECOVER_LOCAL_REALM;
-            }
-            if (isPartial && clientResyncMode != ClientResyncMode.MANUAL) {
-                throw new IllegalStateException("Query-based sync only supports manual Client Resync. It was: " + clientResyncMode);
+                clientResyncMode = ClientResyncMode.RECOVER_LOCAL_REALM;
             }
 
             if (rxFactory == null && isRxJavaAvailable()) {
@@ -97,11 +94,6 @@
                 }
             }
 
-            // If query based sync is enabled, also add support for Object Level Permissions
-            if (isPartial) {
-                addModule(new ObjectPermissionsModule());
-            }
-
             return new SyncConfiguration(
                     // Realm Configuration options
                     realmFileDirectory,
@@ -130,7 +122,6 @@
                     waitForServerChanges,
                     initialDataTimeoutMillis,
                     sessionStopPolicy,
-                    isPartial,
                     compactOnLaunch,
                     syncUrlPrefix,
                     clientResyncMode
