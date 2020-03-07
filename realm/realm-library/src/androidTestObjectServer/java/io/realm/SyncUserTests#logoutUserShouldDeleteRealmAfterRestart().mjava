@@ -3,7 +3,7 @@
     public void logoutUserShouldDeleteRealmAfterRestart() throws InterruptedException {
         SyncManager.reset();
         BaseRealm.applicationContext = null; // Required for Realm.init() to work
-        Realm.init(InstrumentationRegistry.getTargetContext());
+        Realm.init(InstrumentationRegistry.getInstrumentation().getTargetContext());
 
         SyncUser user = createTestUser();
         SyncConfiguration syncConfiguration = user.createConfiguration("realm://127.0.0.1:9080/~/tests")
@@ -26,7 +26,7 @@
         // simulate an app restart
         SyncManager.reset();
         BaseRealm.applicationContext = null;
-        Realm.init(InstrumentationRegistry.getTargetContext());
+        Realm.init(InstrumentationRegistry.getInstrumentation().getTargetContext());
 
         //now the file should be deleted
         assertFalse(realmPath.exists());

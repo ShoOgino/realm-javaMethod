@@ -1,7 +1,7 @@
     @Before
     public void setUp() {
         BaseRealm.applicationContext = null;
-        Realm.init(InstrumentationRegistry.getTargetContext());
+        Realm.init(InstrumentationRegistry.getInstrumentation().getTargetContext());
         UserStore userStore = SyncManager.getUserStore();
         for (SyncUser syncUser : userStore.allUsers()) {
             userStore.remove(syncUser.getIdentity(), syncUser.getAuthenticationUrl().toString());
