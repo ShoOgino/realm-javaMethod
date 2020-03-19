@@ -1,10 +1,6 @@
     @After
     public void tearDown() {
         UserFactory.logoutAllUsers();
-        UserStore userStore = SyncManager.getUserStore();
-        for (SyncUser syncUser : userStore.allUsers()) {
-            userStore.remove(syncUser.getIdentity(), syncUser.getAuthenticationUrl().toString());
-        }
         SyncManager.reset();
         BaseRealm.applicationContext = null; // Required for Realm.init() to work
         Realm.init(InstrumentationRegistry.getInstrumentation().getTargetContext());

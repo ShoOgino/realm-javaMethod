@@ -1,0 +1,41 @@
+    @Override
+    public Response sendRequest(String method, String url, long timeoutMs, Map<String, String> headers, String body) {
+        try {
+            OkHttpClient client = getClient(timeoutMs);
+            okhttp3.Response response = null;
+            try {
+                Request.Builder builder = new Request.Builder().url(url);
+                switch(method) {
+                    case "get": builder.get(); break;
+                    case "delete": builder.delete(RequestBody.create(JSON, body)); break;
+                    case "patch": builder.patch(RequestBody.create(JSON, body)); break;
+                    case "post": builder.post(RequestBody.create(JSON, body)); break;
+                    case "put": builder.put(RequestBody.create(JSON, body)); break;
+                    default: throw new IllegalArgumentException("Unknown method type: "+ method);
+                }
+
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    builder.addHeader(entry.getKey(), entry.getValue());
+                }
+                Call call = client.newCall(builder.build());
+                response = call.execute();
+                ResponseBody responseBody = response.body();
+                String result = "";
+                if (responseBody != null) {
+                    result = responseBody.string();
+                }
+                return Response.httpResponse(response.code(), parseHeaders(response.headers()), result);
+            } catch (IOException ex) {
+                return Response.ioError(ex.toString());
+            } catch (Exception ex) {
+                return Response.unknownError(ex.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        } catch (Exception e) {
+            return Response.unknownError(e.toString());
+        }
+    }
+

@@ -1,0 +1,15 @@
+    /**
+     * FIXME
+     * Returns all currently logged in users
+     * @return
+     */
+    public Map<String, RealmUser> allUsers() {
+        long[] nativeUsers = nativeAllUsers(nativePtr);
+        HashMap<String, RealmUser> users = new HashMap<>(nativeUsers.length);
+        for (int i = 0; i < nativeUsers.length; i++) {
+            RealmUser user = new RealmUser(nativeUsers[i]);
+            users.put(user.getId(), user);
+        }
+        return users;
+    }
+

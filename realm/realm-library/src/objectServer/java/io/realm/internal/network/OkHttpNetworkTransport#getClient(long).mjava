@@ -1,0 +1,39 @@
+    // Lazily creates the client if not already created
+    // TODO: timeOuts are not expected to change between requests. So for now just use the timeout first send.
+    private synchronized OkHttpClient getClient(long timeoutMs) {
+        if (client == null) {
+            client = new OkHttpClient.Builder()
+                    .callTimeout(timeoutMs, TimeUnit.MILLISECONDS)
+                    .followRedirects(true)
+                    .addInterceptor(new Interceptor() {
+                        @Override
+                        public okhttp3.Response intercept(Chain chain) throws IOException {
+                            Request request = chain.request();
+                            if (RealmLog.getLevel() <= LogLevel.TRACE) {
+                                StringBuilder sb = new StringBuilder(request.method());
+                                sb.append(' ');
+                                sb.append(request.url());
+                                sb.append('\n');
+                                sb.append(request.headers());
+                                if (request.body() != null) {
+                                    // Stripped down version of https://github.com/square/okhttp/blob/master/okhttp-logging-interceptor/src/main/java/okhttp3/logging/HttpLoggingInterceptor.java
+                                    // We only expect request context to be JSON.
+                                    Buffer buffer = new Buffer();
+                                    request.body().writeTo(buffer);
+                                    sb.append(buffer.readString(UTF8));
+                                }
+                                RealmLog.trace("HTTP Request = \n%s", sb);
+                            }
+                            return chain.proceed(request);
+                        }
+                    })
+                    // using custom Connection Pool to evict idle connection after 5 seconds rather than 5 minutes (which is the default)
+                    // keeping idle connection on the pool will prevent the ROS to be stopped, since the HttpUtils#stopSyncServer query
+                    // will not return before the tests timeout (ex 10 seconds for AuthTests)
+                    .connectionPool(new ConnectionPool(5, 5, TimeUnit.SECONDS))
+                    .build();
+        }
+
+        return client;
+    }
+
