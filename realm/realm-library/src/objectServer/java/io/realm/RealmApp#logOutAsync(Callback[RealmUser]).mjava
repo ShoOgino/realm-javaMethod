@@ -1,0 +1,21 @@
+    /**
+     * Log the current user out of the Realm App asynchronously, destroying their server state, unregistering them from the
+     * SDK, and removing any synced Realms associated with them from on-disk storage on next app
+     * launch.
+     * <p>
+     * This method should be called whenever the application is committed to not using a user again.
+     * Failing to call this method may result in unused files and metadata needlessly taking up space.
+     * <p>
+     * Once the Realm App has confirmed the logout any registered {@link AuthenticationListener}
+     * will be notified and user credentials will be deleted from this device.
+     *
+     * @throws IllegalStateException if not called on a looper thread or no current user could be found.
+     */
+     public RealmAsyncTask logOutAsync(Callback<RealmUser> callback) {
+         RealmUser user = currentUser();
+         if (user == null) {
+             throw new IllegalStateException("No current user was found.");
+         }
+         return logOutAsync(user, callback);
+     }
+
