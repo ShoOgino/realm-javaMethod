@@ -1,10 +1,13 @@
     /**
-     * FIXME
-     * Returns all currently logged in users
-     * @return
+     * Returns all known users that are either {@link RealmUser.State#LOGGED_IN} or
+     * {@link RealmUser.State#LOGGED_OUT}.
+     * <p>
+     * Only users that at some point logged into this device will be returned.
+     *
+     * @return a map of user identifiers and users known locally.
      */
     public Map<String, RealmUser> allUsers() {
-        long[] nativeUsers = nativeAllUsers(nativePtr);
+        long[] nativeUsers = nativeGetAllUsers(nativePtr);
         HashMap<String, RealmUser> users = new HashMap<>(nativeUsers.length);
         for (int i = 0; i < nativeUsers.length; i++) {
             RealmUser user = new RealmUser(nativeUsers[i], this);

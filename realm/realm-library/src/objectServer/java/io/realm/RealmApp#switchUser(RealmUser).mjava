@@ -1,0 +1,12 @@
+    /**
+     * Switch current user. The current user is the user returned by {@link #currentUser()}.
+     *
+     * @param user the new current user.
+     * @throws IllegalArgumentException if the user is is not {@link RealmUser.State#LOGGED_IN}.
+     */
+    public RealmUser switchUser(RealmUser user) {
+        Util.checkNull(user, "user");
+        nativeSwitchUser(nativePtr, user.osUser.getNativePtr());
+        return user;
+    }
+
