@@ -14,8 +14,8 @@
         AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
         nativeRemoveUser(nativePtr, user.osUser.getNativePtr(), new OsJNIResultCallback<RealmUser>(success, error) {
             @Override
-            protected void mapSuccess(Object result, AtomicReference<RealmUser> success) {
-                success.set(user);
+            protected RealmUser mapSuccess(Object result) {
+                return user;
             }
         });
         return handleResult(success, error);

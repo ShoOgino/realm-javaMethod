@@ -1,0 +1,22 @@
+    /**
+     * Fetches all API keys associated with the user.
+     *
+     * @throws ObjectServer if the server failed to fetch the API keys.
+     */
+    public List<RealmUserApiKey> fetchAllApiKeys() throws ObjectServerError {
+        AtomicReference<List<RealmUserApiKey>> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        nativeCallFunction(TYPE_FETCH_ALL, user.getApp().nativePtr, user.osUser.getNativePtr(), null, new RealmApp.OsJNIResultCallback<List<RealmUserApiKey>>(success, error) {
+            @Override
+            protected List<RealmUserApiKey> mapSuccess(Object result) {
+                Object[] keyData = (Object[]) result;
+                List<RealmUserApiKey> list = new ArrayList<>();
+                for (int i = 0; i < keyData.length; i++) {
+                    list.add(createKeyFromNative((Object[]) keyData[i]));
+                }
+                return list;
+            }
+        });
+        return RealmApp.handleResult(success, error);
+    }
+

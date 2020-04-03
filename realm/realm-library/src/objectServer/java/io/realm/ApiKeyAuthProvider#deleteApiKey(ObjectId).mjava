@@ -1,0 +1,13 @@
+    /**
+     * Deletes a specific API key created by the user.
+     *
+     * @param id the id of the key to delete.
+     * @throws ObjectServer if the server failed to delete the API key.
+     */
+    public void deleteApiKey(ObjectId id) throws ObjectServerError {
+        Util.checkNull(id, "id");
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        nativeCallFunction(TYPE_DELETE, user.getApp().nativePtr, user.osUser.getNativePtr(), id.toHexString(), new RealmApp.OsJNIVoidResultCallback(error));
+        RealmApp.handleResult(null, error);
+    }
+

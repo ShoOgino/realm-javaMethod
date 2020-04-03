@@ -1,0 +1,19 @@
+    /**
+     * Fetches a specific user API key associated with the user.
+     *
+     * @param id the id of the key to fetch.
+     * @throws ObjectServer if the server failed to fetch the API key.
+     */
+    public RealmUserApiKey fetchApiKey(ObjectId id) throws ObjectServerError {
+        Util.checkNull(id, "id");
+        AtomicReference<RealmUserApiKey> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        nativeCallFunction(TYPE_FETCH_SINGLE, user.getApp().nativePtr, user.osUser.getNativePtr(), id.toHexString(), new RealmApp.OsJNIResultCallback<RealmUserApiKey>(success, error) {
+            @Override
+            protected RealmUserApiKey mapSuccess(Object result) {
+                return createKeyFromNative((Object[]) result);
+            }
+        });
+        return RealmApp.handleResult(success, error);
+    }
+

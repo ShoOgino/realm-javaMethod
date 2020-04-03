@@ -1,0 +1,25 @@
+    /**
+     * Creates a user API key that can be used to authenticate as the user.
+     * <p>
+     * The value of the key must be persisted at this time as this is the only time it is visible.
+     * <p>
+     * The key is enabled when created. It can be disabled by calling {@link #disableApiKey(ObjectId)}.
+     *
+     * @param name the name of the key
+     * @throws ObjectServer if the server failed to create the API key.
+     * @return the new API key for the user.
+     */
+    public RealmUserApiKey createApiKey(String name) throws ObjectServerError {
+        Util.checkEmpty(name, "name");
+        AtomicReference<RealmUserApiKey> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        RealmApp.OsJNIResultCallback<RealmUserApiKey> callback = new RealmApp.OsJNIResultCallback<RealmUserApiKey>(success, error) {
+            @Override
+            protected RealmUserApiKey mapSuccess(Object result) {
+                return createKeyFromNative((Object[]) result);
+            }
+        };
+        nativeCallFunction(TYPE_CREATE, user.getApp().nativePtr, user.osUser.getNativePtr(), name, callback);
+        return RealmApp.handleResult(success, error);
+    }
+
