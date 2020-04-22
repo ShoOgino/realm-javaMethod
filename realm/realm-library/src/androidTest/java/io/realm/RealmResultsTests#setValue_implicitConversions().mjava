@@ -47,6 +47,15 @@
                     collection.setValue(AllJavaTypes.FIELD_DATE, "/Date(2000+0000)/");
                     assertElements(collection, obj -> assertEquals(new Date(2000), obj.getFieldDate()));
                     break;
+                case DECIMAL128:
+                    collection.setValue(AllJavaTypes.FIELD_DECIMAL128, "1.234");
+                    assertElements(collection, obj -> assertEquals(Decimal128.parse("1.234"), obj.getFieldDecimal128()));
+                    break;
+                case OBJECT_ID:
+                    String hex = TestHelper.randomObjectIdHexString();
+                    collection.setValue(AllJavaTypes.FIELD_OBJECT_ID, new ObjectId(hex));
+                    assertElements(collection, obj -> assertEquals(new ObjectId(hex), obj.getFieldObjectId()));
+                    break;
 
                 // These types do not offer any implicit conversion
                 case STRING:
@@ -63,6 +72,8 @@
                 case DOUBLE_VALUE_LIST:
                 case BINARY_VALUE_LIST:
                 case DATE_VALUE_LIST:
+                case DECIMAL128_VALUE_LIST:
+                case OBJECT_ID_VALUE_LIST:
                     continue;
 
                 default:

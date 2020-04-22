@@ -1,0 +1,9 @@
+    public void setDecimal128(long columnKey, long rowKey, @Nullable Decimal128 value, boolean isDefault) {
+        checkImmutable();
+        if (value == null) {
+            nativeSetNull(nativeTableRefPtr, columnKey, rowKey, isDefault);
+        } else {
+            nativeSetDecimal128(nativeTableRefPtr, columnKey, rowKey, value.getLow(), value.getHigh(), isDefault);
+        }
+    }
+

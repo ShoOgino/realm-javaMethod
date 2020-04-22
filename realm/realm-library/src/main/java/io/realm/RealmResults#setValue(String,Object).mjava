@@ -52,6 +52,12 @@
                 case DATE:
                     value = JsonUtils.stringToDate(strValue);
                     break;
+                case DECIMAL128:
+                    value = Decimal128.parse(strValue);
+                    break;
+                case OBJECT_ID:
+                    value = new ObjectId(strValue);
+                    break;
                 default:
                     throw new IllegalArgumentException(String.format(Locale.US,
                             "Field %s is not a String field, " +
@@ -81,6 +87,10 @@
             setString(fieldName, (String) value);
         } else if (value instanceof Date) {
             setDate(fieldName, (Date) value);
+        } else if (value instanceof Decimal128) {
+            setDecimal128(fieldName, (Decimal128) value);
+        } else if (value instanceof ObjectId) {
+            setObjectId(fieldName, (ObjectId) value);
         } else if (value instanceof byte[]) {
             setBlob(fieldName, (byte[]) value);
         } else if (value instanceof RealmModel) {

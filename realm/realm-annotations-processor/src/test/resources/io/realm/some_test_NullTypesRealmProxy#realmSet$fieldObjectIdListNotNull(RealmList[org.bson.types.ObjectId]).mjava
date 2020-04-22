@@ -1,0 +1,26 @@
+    @Override
+    public void realmSet$fieldObjectIdListNotNull(RealmList<org.bson.types.ObjectId> value) {
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+            if (proxyState.getExcludeFields$realm().contains("fieldObjectIdListNotNull")) {
+                return;
+            }
+        }
+
+        proxyState.getRealm$realm().checkIfValid();
+        OsList osList = proxyState.getRow$realm().getValueList(columnInfo.fieldObjectIdListNotNullColKey, RealmFieldType.OBJECT_ID_LIST);
+        osList.removeAll();
+        if (value == null) {
+            return;
+        }
+        for (org.bson.types.ObjectId item : value) {
+            if (item == null) {
+                throw new IllegalArgumentException("Storing 'null' into fieldObjectIdListNotNull' is not allowed by the schema.");
+            } else {
+                osList.addObjectId(item);
+            }
+        }
+    }
+

@@ -1,0 +1,14 @@
+    @Test
+    public void createObjectFromJson_streamObjectIdAsString() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
+        InputStream in = TestHelper.loadJsonFromAssets(context, "objectid_as_string.json");
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, in);
+        realm.commitTransaction();
+        in.close();
+
+        AllTypes obj = realm.where(AllTypes.class).findFirst();
+        assertEquals(new ObjectId("789ABCDEF0123456789ABCDE"), obj.getColumnObjectId());
+    }
+

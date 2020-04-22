@@ -9,6 +9,8 @@
         allTypes.columnFloat = 1.234567f;
         allTypes.columnString = "test data";
         allTypes.columnByte = 0x2A;
+        allTypes.columnDecimal128 = new Decimal128(BigDecimal.TEN);
+        allTypes.columnObjectId = new ObjectId(TestHelper.generateObjectIdHexString(7));
 
         realm.beginTransaction();
         realm.insert(allTypes);
@@ -24,5 +26,7 @@
         assertEquals(allTypes.columnDouble, first.columnDouble, 0.0000001);
         assertEquals(allTypes.columnFloat, first.columnFloat, 0.0000001);
         assertEquals(allTypes.columnByte, first.columnByte);
+        assertEquals(allTypes.columnDecimal128, first.columnDecimal128);
+        assertEquals(allTypes.columnObjectId, first.columnObjectId);
     }
 

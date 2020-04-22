@@ -3,6 +3,8 @@
         realm.beginTransaction();
         AllTypes allTypes = realm.createObject(AllTypes.class);
         allTypes.setColumnString("Test");
+        allTypes.setColumnDecimal128(new Decimal128(new BigDecimal("12345")));
+        allTypes.setColumnObjectId(new ObjectId(TestHelper.randomObjectIdHexString()));
         realm.commitTransaction();
 
         RealmConfiguration realmConfig = configFactory.createConfiguration("other-realm");

@@ -15,5 +15,14 @@
             fail();
         } catch (IllegalStateException ignore) {
         }
+
+        try {
+            RealmResults<ObjectIdPrimaryKeyRequired> collection = realm.where(ObjectIdPrimaryKeyRequired.class).findAll();
+            collection.setObjectId("id", new ObjectId(TestHelper.randomObjectIdHexString()));
+            fail();
+        } catch (IllegalStateException ignore) {
+        }
+
+
     }
 

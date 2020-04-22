@@ -20,17 +20,17 @@
             Table table = realm.getTable(some.test.AllTypes.class);
             long pkColumnKey = columnInfo.columnStringColKey;
             String value = ((some_test_AllTypesRealmProxyInterface) object).realmGet$columnString();
-            long colKey = Table.NO_MATCH;
+            long objKey = Table.NO_MATCH;
             if (value == null) {
-                colKey = table.findFirstNull(pkColumnKey);
+                objKey = table.findFirstNull(pkColumnKey);
             } else {
-                colKey = table.findFirstString(pkColumnKey, value);
+                objKey = table.findFirstString(pkColumnKey, value);
             }
-            if (colKey == Table.NO_MATCH) {
+            if (objKey == Table.NO_MATCH) {
                 canUpdate = false;
             } else {
                 try {
-                    objectContext.set(realm, table.getUncheckedRow(colKey), columnInfo, false, Collections.<String> emptyList());
+                    objectContext.set(realm, table.getUncheckedRow(objKey), columnInfo, false, Collections.<String> emptyList());
                     realmObject = new io.realm.some_test_AllTypesRealmProxy();
                     cache.put(object, (RealmObjectProxy) realmObject);
                 } finally {

@@ -1,4 +1,4 @@
-    public <T extends RealmModel> void addObjectList(long columnIndex, RealmList<T> list) {
+    public <T extends RealmModel> void addObjectList(long columnKey, @Nullable RealmList<T> list) {
         // Null objects references are not allowed. So we can optimize the JNI boundary by
         // sending all object references in one long[] array.
         if (list != null) {
@@ -11,9 +11,9 @@
                     rowPointers[i] = ((UncheckedRow) item.realmGet$proxyState().getRow$realm()).getNativePtr();
                 }
             }
-            nativeAddObjectList(builderPtr, columnIndex, rowPointers);
+            nativeAddObjectList(builderPtr, columnKey, rowPointers);
         } else {
-            nativeAddObjectList(builderPtr, columnIndex, new long[0]);
+            nativeAddObjectList(builderPtr, columnKey, new long[0]);
         }
     }
 

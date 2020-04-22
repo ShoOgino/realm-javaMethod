@@ -1,0 +1,18 @@
+    /**
+     * Sets the {@code ObjectId} value of the given field.
+     *
+     * @param fieldName field name.
+     * @param value value to insert.
+     * @throws IllegalArgumentException if field name doesn't exist or field isn't a ObjectId field.
+     */
+    public void setObjectId(String fieldName, @Nullable ObjectId value) {
+        proxyState.getRealm$realm().checkIfValid();
+
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
+        if (value == null) {
+            proxyState.getRow$realm().setNull(columnKey);
+        } else {
+            proxyState.getRow$realm().setObjectId(columnKey, value);
+        }
+    }
+

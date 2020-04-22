@@ -46,6 +46,14 @@
                         dObj.set(AllJavaTypes.FIELD_DATE, new Date(1000));
                         assertEquals(new Date(1000), dObj.get(AllJavaTypes.FIELD_DATE));
                         break;
+                    case DECIMAL128:
+                        dObj.set(AllJavaTypes.FIELD_DECIMAL128, new Decimal128(BigDecimal.ONE));
+                        assertEquals(new Decimal128(BigDecimal.ONE), dObj.get(AllJavaTypes.FIELD_DECIMAL128));
+                        break;
+                    case OBJECT_ID:
+                        dObj.set(AllJavaTypes.FIELD_OBJECT_ID, new ObjectId(TestHelper.generateObjectIdHexString(7)));
+                        assertEquals(new ObjectId(TestHelper.generateObjectIdHexString(7)), dObj.get(AllJavaTypes.FIELD_OBJECT_ID));
+                        break;
                     case OBJECT:
                         dObj.set(AllJavaTypes.FIELD_OBJECT, dObj);
                         assertEquals(dObj, dObj.get(AllJavaTypes.FIELD_OBJECT));
@@ -111,6 +119,22 @@
                         RealmList<Date> newList = new RealmList<>(null, new Date(1000));
                         dObj.set(AllJavaTypes.FIELD_DATE_LIST, newList);
                         RealmList<Date> list = dObj.getList(AllJavaTypes.FIELD_DATE_LIST, Date.class);
+                        assertEquals(2, list.size());
+                        assertArrayEquals(newList.toArray(), list.toArray());
+                        break;
+                    }
+                    case LIST_DECIMAL128: {
+                        RealmList<Decimal128> newList = new RealmList<>(null, new Decimal128(BigDecimal.ONE));
+                        dObj.set(AllJavaTypes.FIELD_DECIMAL128_LIST, newList);
+                        RealmList<Decimal128> list = dObj.getList(AllJavaTypes.FIELD_DECIMAL128_LIST, Decimal128.class);
+                        assertEquals(2, list.size());
+                        assertArrayEquals(newList.toArray(), list.toArray());
+                        break;
+                    }
+                    case LIST_OBJECT_ID: {
+                        RealmList<ObjectId> newList = new RealmList<>(null, new ObjectId(TestHelper.generateObjectIdHexString(0)));
+                        dObj.set(AllJavaTypes.FIELD_OBJECT_ID_LIST, newList);
+                        RealmList<ObjectId> list = dObj.getList(AllJavaTypes.FIELD_OBJECT_ID_LIST, ObjectId.class);
                         assertEquals(2, list.size());
                         assertArrayEquals(newList.toArray(), list.toArray());
                         break;

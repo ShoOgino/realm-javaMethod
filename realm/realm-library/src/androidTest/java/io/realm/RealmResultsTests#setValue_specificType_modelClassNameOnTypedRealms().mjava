@@ -45,6 +45,15 @@
                     collection.setDate("fieldDate", new Date(1000));
                     assertElements(collection, obj -> assertEquals(new Date(1000), obj.fieldDate));
                     break;
+                case DECIMAL128:
+                    collection.setDecimal128("fieldDecimal128", new Decimal128(1000));
+                    assertElements(collection, obj -> assertEquals(new Decimal128(1000), obj.fieldDecimal128));
+                    break;
+                case OBJECT_ID:
+//                    String hex = TestHelper.randomObjectIdHexString();
+//                    collection.setObjectId("fieldObjectId", new ObjectId(hex));
+//                    assertElements(collection, obj -> assertEquals(new ObjectId(hex), obj.fieldObjectId));
+                    break;
                 case OBJECT: {
                     MappedAllJavaTypes childObj = realm.createObject(MappedAllJavaTypes.class, 42);
                     collection.setObject("fieldObject", childObj);
@@ -128,6 +137,21 @@
                     assertElements(collection, obj -> {
                         assertEquals(1, obj.fieldDateList.size());
                         assertEquals(new Date(1000), obj.fieldDateList.first());
+                    });
+                    break;
+                case DECIMAL128_VALUE_LIST:
+                    collection.setList("fieldDecimalList", new RealmList<>(new Decimal128(1000)));
+                    assertElements(collection, obj -> {
+                        assertEquals(1, obj.fieldDecimalList.size());
+                        assertEquals(new Decimal128(1000), obj.fieldDecimalList.first());
+                    });
+                    break;
+                case OBJECT_ID_VALUE_LIST:
+                    String hex = TestHelper.randomObjectIdHexString();
+                    collection.setList("fieldObjectIdList", new RealmList<>(new ObjectId(hex)));
+                    assertElements(collection, obj -> {
+                        assertEquals(1, obj.fieldObjectIdList.size());
+                        assertEquals(new ObjectId(hex), obj.fieldObjectIdList.first());
                     });
                     break;
                 default:

@@ -45,6 +45,20 @@
                     reader.skipValue();
                     throw new IllegalArgumentException("Trying to set non-nullable field 'columnBoolean' to null.");
                 }
+            } else if (name.equals("columnDecimal128")) {
+                if (reader.peek() == JsonToken.NULL) {
+                    reader.skipValue();
+                    objProxy.realmSet$columnDecimal128(null);
+                } else {
+                    objProxy.realmSet$columnDecimal128(org.bson.types.Decimal128.parse(reader.nextString()));
+                }
+            } else if (name.equals("columnObjectId")) {
+                if (reader.peek() == JsonToken.NULL) {
+                    reader.skipValue();
+                    objProxy.realmSet$columnObjectId(null);
+                } else {
+                    objProxy.realmSet$columnObjectId(new org.bson.types.ObjectId(reader.nextString()));
+                }
             } else if (name.equals("columnDate")) {
                 if (reader.peek() == JsonToken.NULL) {
                     reader.skipValue();
@@ -113,6 +127,10 @@
                 objProxy.realmSet$columnFloatList(ProxyUtils.createRealmListWithJsonStream(java.lang.Float.class, reader));
             } else if (name.equals("columnDateList")) {
                 objProxy.realmSet$columnDateList(ProxyUtils.createRealmListWithJsonStream(java.util.Date.class, reader));
+            } else if (name.equals("columnDecimal128List")) {
+                objProxy.realmSet$columnDecimal128List(ProxyUtils.createRealmListWithJsonStream(org.bson.types.Decimal128.class, reader));
+            } else if (name.equals("columnObjectIdList")) {
+                objProxy.realmSet$columnObjectIdList(ProxyUtils.createRealmListWithJsonStream(org.bson.types.ObjectId.class, reader));
             } else {
                 reader.skipValue();
             }

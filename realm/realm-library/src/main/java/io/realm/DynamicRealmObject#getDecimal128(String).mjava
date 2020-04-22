@@ -1,0 +1,19 @@
+    /**
+     * Returns the {@code Decimal128} value for a given field.
+     *
+     * @param fieldName the name of the field.
+     * @return the Decimal128 value.
+     * @throws IllegalArgumentException if field name doesn't exist or it doesn't contain Decimal128.
+     */
+    public Decimal128 getDecimal128(String fieldName) {
+        proxyState.getRealm$realm().checkIfValid();
+
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
+        checkFieldType(fieldName, columnKey, RealmFieldType.DECIMAL128);
+        if (proxyState.getRow$realm().isNull(columnKey)) {
+            return null;
+        } else {
+            return proxyState.getRow$realm().getDecimal128(columnKey);
+        }
+    }
+

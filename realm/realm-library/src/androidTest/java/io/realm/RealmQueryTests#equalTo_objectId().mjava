@@ -1,0 +1,9 @@
+    @Test
+    public void equalTo_objectId() {
+        populateTestRealm(realm, 10);
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).sort(AllTypes.FIELD_OBJECT_ID, Sort.ASCENDING).findAll();
+        for (int i = 0; i < 10; i++) {
+            assertEquals(new ObjectId(TestHelper.generateObjectIdHexString(i)), resultList.get(i).getColumnObjectId());
+        }
+    }
+

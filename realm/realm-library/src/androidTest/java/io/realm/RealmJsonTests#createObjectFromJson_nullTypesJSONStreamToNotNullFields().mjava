@@ -109,5 +109,25 @@
         } finally {
             realm.cancelTransaction();
         }
+        // 11 Decimal128
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(10)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+            assertTrue(ignored.getMessage().contains(NullTypes.FIELD_DECIMAL128_NOT_NULL));
+        } finally {
+            realm.cancelTransaction();
+        }
+        // 12 ObjectId
+        try {
+            realm.beginTransaction();
+            realm.createObjectFromJson(NoPrimaryKeyNullTypes.class, convertJsonObjectToStream(array.getJSONObject(11)));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+            assertTrue(ignored.getMessage().contains(NullTypes.FIELD_OBJECT_ID_NOT_NULL));
+        } finally {
+            realm.cancelTransaction();
+        }
     }
 

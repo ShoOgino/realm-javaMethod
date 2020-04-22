@@ -1,7 +1,7 @@
     @SuppressWarnings("cast")
     public static some.test.NullTypes createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
             throws JSONException {
-        final List<String> excludeFields = new ArrayList<String>(21);
+        final List<String> excludeFields = new ArrayList<String>(25);
         if (json.has("fieldObjectNull")) {
             excludeFields.add("fieldObjectNull");
         }
@@ -64,6 +64,18 @@
         }
         if (json.has("fieldDateListNull")) {
             excludeFields.add("fieldDateListNull");
+        }
+        if (json.has("fieldDecimal128ListNotNull")) {
+            excludeFields.add("fieldDecimal128ListNotNull");
+        }
+        if (json.has("fieldDecimal128ListNull")) {
+            excludeFields.add("fieldDecimal128ListNull");
+        }
+        if (json.has("fieldObjectIdListNotNull")) {
+            excludeFields.add("fieldObjectIdListNotNull");
+        }
+        if (json.has("fieldObjectIdListNull")) {
+            excludeFields.add("fieldObjectIdListNull");
         }
         some.test.NullTypes obj = realm.createObjectInternal(some.test.NullTypes.class, true, excludeFields);
 
@@ -218,6 +230,70 @@
                 }
             }
         }
+        if (json.has("fieldDecimal128NotNull")) {
+            if (json.isNull("fieldDecimal128NotNull")) {
+                objProxy.realmSet$fieldDecimal128NotNull(null);
+            } else {
+                Object decimal = json.get("fieldDecimal128NotNull");
+                if (decimal instanceof org.bson.types.Decimal128) {
+                    objProxy.realmSet$fieldDecimal128NotNull((org.bson.types.Decimal128) decimal);
+                } else if (decimal instanceof String) {
+                    objProxy.realmSet$fieldDecimal128NotNull(org.bson.types.Decimal128.parse((String)decimal));
+                } else if (decimal instanceof Integer) {
+                    objProxy.realmSet$fieldDecimal128NotNull(new org.bson.types.Decimal128((Integer)(decimal)));
+                } else if (decimal instanceof Long) {
+                    objProxy.realmSet$fieldDecimal128NotNull(new org.bson.types.Decimal128((Long)(decimal)));
+                } else if (decimal instanceof Double) {
+                    objProxy.realmSet$fieldDecimal128NotNull(new org.bson.types.Decimal128(new java.math.BigDecimal((Double)(decimal))));
+                } else {
+                    throw new UnsupportedOperationException(decimal.getClass() + " is not supported as a Decimal128 value");
+                }
+            }
+        }
+        if (json.has("fieldDecimal128Null")) {
+            if (json.isNull("fieldDecimal128Null")) {
+                objProxy.realmSet$fieldDecimal128Null(null);
+            } else {
+                Object decimal = json.get("fieldDecimal128Null");
+                if (decimal instanceof org.bson.types.Decimal128) {
+                    objProxy.realmSet$fieldDecimal128Null((org.bson.types.Decimal128) decimal);
+                } else if (decimal instanceof String) {
+                    objProxy.realmSet$fieldDecimal128Null(org.bson.types.Decimal128.parse((String)decimal));
+                } else if (decimal instanceof Integer) {
+                    objProxy.realmSet$fieldDecimal128Null(new org.bson.types.Decimal128((Integer)(decimal)));
+                } else if (decimal instanceof Long) {
+                    objProxy.realmSet$fieldDecimal128Null(new org.bson.types.Decimal128((Long)(decimal)));
+                } else if (decimal instanceof Double) {
+                    objProxy.realmSet$fieldDecimal128Null(new org.bson.types.Decimal128(new java.math.BigDecimal((Double)(decimal))));
+                } else {
+                    throw new UnsupportedOperationException(decimal.getClass() + " is not supported as a Decimal128 value");
+                }
+            }
+        }
+        if (json.has("fieldObjectIdNotNull")) {
+            if (json.isNull("fieldObjectIdNotNull")) {
+                objProxy.realmSet$fieldObjectIdNotNull(null);
+            } else {
+                Object id = json.get("fieldObjectIdNotNull");
+                if (id instanceof org.bson.types.ObjectId) {
+                    objProxy.realmSet$fieldObjectIdNotNull((org.bson.types.ObjectId) id);
+                } else {
+                    objProxy.realmSet$fieldObjectIdNotNull(new org.bson.types.ObjectId((String)id));
+                }
+            }
+        }
+        if (json.has("fieldObjectIdNull")) {
+            if (json.isNull("fieldObjectIdNull")) {
+                objProxy.realmSet$fieldObjectIdNull(null);
+            } else {
+                Object id = json.get("fieldObjectIdNull");
+                if (id instanceof org.bson.types.ObjectId) {
+                    objProxy.realmSet$fieldObjectIdNull((org.bson.types.ObjectId) id);
+                } else {
+                    objProxy.realmSet$fieldObjectIdNull(new org.bson.types.ObjectId((String)id));
+                }
+            }
+        }
         if (json.has("fieldObjectNull")) {
             if (json.isNull("fieldObjectNull")) {
                 objProxy.realmSet$fieldObjectNull(null);
@@ -246,6 +322,10 @@
         ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$fieldFloatListNull(), json, "fieldFloatListNull");
         ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$fieldDateListNotNull(), json, "fieldDateListNotNull");
         ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$fieldDateListNull(), json, "fieldDateListNull");
+        ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$fieldDecimal128ListNotNull(), json, "fieldDecimal128ListNotNull");
+        ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$fieldDecimal128ListNull(), json, "fieldDecimal128ListNull");
+        ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$fieldObjectIdListNotNull(), json, "fieldObjectIdListNotNull");
+        ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$fieldObjectIdListNull(), json, "fieldObjectIdListNull");
         return obj;
     }
 
