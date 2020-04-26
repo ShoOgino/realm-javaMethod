@@ -1,0 +1,26 @@
+    /**
+     * Removes a users credentials from this device. If the user was currently logged in, they
+     * will be logged out as part of the process. This is only a local change and does not
+     * affect the user state on the server.
+     *
+     * @return user that was removed.
+     * @throws ObjectServerError if called from the UI thread or if the user was logged in, but
+     * could not be logged out.
+     */
+    public RealmUser remove() throws ObjectServerError {
+        boolean loggedIn = isLoggedIn();
+        AtomicReference<RealmUser> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        nativeRemoveUser(app.nativePtr, osUser.getNativePtr(), new RealmApp.OsJNIResultCallback<RealmUser>(success, error) {
+            @Override
+            protected RealmUser mapSuccess(Object result) {
+                return RealmUser.this;
+            }
+        });
+        handleResult(success, error);
+        if (loggedIn) {
+            app.notifyUserLoggedOut(this);
+        }
+        return this;
+    }
+

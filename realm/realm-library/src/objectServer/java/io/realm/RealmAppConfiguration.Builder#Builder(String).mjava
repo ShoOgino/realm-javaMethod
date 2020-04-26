@@ -4,8 +4,16 @@
          * @param appId
          */
         public Builder(String appId) {
-            // FIXME: Null checks
-            this.context = Realm.applicationContext;
+            Util.checkEmpty(appId, "appId");
             this.appId = appId;
+            Context context = BaseRealm.applicationContext;
+            if (context == null) {
+                throw new IllegalStateException("Call `Realm.init(Context)` before calling this method.");
+            }
+            File rootDir = new File(context.getFilesDir(), "mongodb-realm");
+            if (!rootDir.exists() && !rootDir.mkdir()) {
+                throw new IllegalStateException("Could not create Sync root dir: " + rootDir.getAbsolutePath());
+            }
+            syncRootDir = rootDir;
         }
 

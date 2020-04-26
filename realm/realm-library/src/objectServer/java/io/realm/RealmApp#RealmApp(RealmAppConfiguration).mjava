@@ -5,11 +5,23 @@
     public RealmApp(RealmAppConfiguration config) {
         this.config = config;
         this.networkTransport = new OkHttpNetworkTransport();
-        this.nativePtr = nativeCreate(
-                config.getAppId(),
-                config.getBaseUrl(),
-                config.getAppName(),
-                config.getAppVersion(),
-                config.getRequestTimeoutMs());
+        networkTransport.setAuthorizationHeaderName(config.getAuthorizationHeaderName());
+        for (Map.Entry<String, String> entry : config.getCustomRequestHeaders().entrySet()) {
+            networkTransport.addCustomRequestHeader(entry.getKey(), entry.getValue());
+        }
+        this.syncManager = new RealmSync(this);
+        this.nativePtr = init(config);
+
+        // FIXME: Right now we only support one RealmApp. This class will throw a
+        // exception if you try to create it twice. This is a really hacky way to do this
+        // Figure out a better API that is always forward compatible
+        synchronized (RealmSync.class) {
+            if (CREATED) {
+                throw new IllegalStateException("Only one RealmApp is currently supported. " +
+                        "This restriction will be lifted soon. Instead, store the RealmApp" +
+                        "instance in a shared global variable.");
+            }
+            CREATED = true;
+        }
     }
 

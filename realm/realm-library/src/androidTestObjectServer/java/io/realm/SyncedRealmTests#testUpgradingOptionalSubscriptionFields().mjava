@@ -2,14 +2,14 @@
     @Test
     @Ignore("Going to be removed anyway")
     public void testUpgradingOptionalSubscriptionFields() throws IOException {
-        SyncUser user = SyncTestUtils.createTestUser();
+        RealmUser user = SyncTestUtils.createTestUser(app);
 
         // Put an older Realm at the location where Realm would otherwise create a new empty one.
         // This way, Realm will upgrade this file instead.
         // We don't need to synchronize data with the server, so any errors due to missing
         // server side files are ignored.
         // The file was created using Realm Java 5.10.0
-        SyncConfiguration config = configFactory.createSyncConfigurationBuilder(user, "realm://127.0.0.1:9080/optionalsubscriptionfields").build();
+        SyncConfiguration config = configFactory.createSyncConfigurationBuilder(user).build();
         File realmDir = config.getRealmDirectory();
         File oldRealmFile = new File(realmDir, "optionalsubscriptionfields");
         assertFalse(oldRealmFile.exists());

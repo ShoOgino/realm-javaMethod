@@ -2,7 +2,7 @@
     @UiThreadTest
     public void unrecognizedErrorCode_errorHandler() {
         AtomicBoolean errorHandlerCalled = new AtomicBoolean(false);
-        configuration = configFactory.createSyncConfigurationBuilder(user, REALM_URI)
+        configuration = configFactory.createSyncConfigurationBuilder(user)
                 .errorHandler((session, error) -> {
                     errorHandlerCalled.set(true);
                     assertEquals(ErrorCode.UNKNOWN, error.getErrorCode());
@@ -11,7 +11,7 @@
                 })
                 .build();
         Realm realm = Realm.getInstance(configuration);
-        SyncSession session = SyncManager.getOrCreateSession(configuration, null);
+        SyncSession session = app.getSync().getSession(configuration);
 
         TestHelper.TestLogger testLogger = new TestHelper.TestLogger();
         RealmLog.add(testLogger);

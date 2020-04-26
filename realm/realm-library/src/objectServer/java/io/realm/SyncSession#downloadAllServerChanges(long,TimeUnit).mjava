@@ -12,7 +12,7 @@
      * @return {@code true} if the data was downloaded before the timeout. {@code false} if the operation timed out or otherwise failed.
      */
     public boolean downloadAllServerChanges(long timeout, TimeUnit unit) throws InterruptedException {
-        checkIfNotOnMainThread("downloadAllServerChanges() cannot be called from the main thread.");
+        Util.checkNotOnMainThread("downloadAllServerChanges() cannot be called from the main thread.");
         checkTimeout(timeout, unit);
 
         // Blocking only happens at the Java layer. To prevent deadlocking the underlying SyncSession we register

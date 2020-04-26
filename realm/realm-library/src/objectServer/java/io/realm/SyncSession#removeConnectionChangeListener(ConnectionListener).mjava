@@ -5,7 +5,7 @@
      * @throws IllegalArgumentException if the listener is {@code null}.
      */
     public synchronized void removeConnectionChangeListener(ConnectionListener listener) {
-        checkNonNullListener(listener);
+        Util.checkNull(listener, "listener");
         connectionListeners.remove(listener);
         if (connectionListeners.isEmpty()) {
             nativeRemoveConnectionListener(nativeConnectionListenerToken, configuration.getPath());

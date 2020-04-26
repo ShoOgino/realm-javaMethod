@@ -1,0 +1,11 @@
+    private void notifyUserLoggedIn(RealmUser user) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (AuthenticationListener listener : authListeners) {
+                    listener.loggedIn(user);
+                }
+            }
+        });
+    }
+

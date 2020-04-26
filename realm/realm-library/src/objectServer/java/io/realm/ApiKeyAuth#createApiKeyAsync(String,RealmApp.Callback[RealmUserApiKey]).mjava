@@ -1,0 +1,22 @@
+    /**
+     * Asynchronously creates a user API key that can be used to authenticate as the user.
+     * <p>
+     * The value of the key must be persisted at this time as this is the only time it is visible.
+     * <p>
+     * The key is enabled when created. It can be disabled by calling {@link #disableApiKey(ObjectId)}.
+     *
+     * @param name the name of the key
+     * @param callback callback when key creation has completed or failed. The callback will always
+     * happen on the same thread as this method is called on.
+     * @throws IllegalStateException if called from a non-looper thread.
+     */
+    public RealmAsyncTask createApiKeyAsync(String name, RealmApp.Callback<RealmUserApiKey> callback) {
+        Util.checkLooperThread("Asynchronous creation of api keys are only possible from looper threads.");
+        return new RealmApp.Request<RealmUserApiKey>(NETWORK_POOL_EXECUTOR, callback) {
+            @Override
+            public RealmUserApiKey run() throws ObjectServerError {
+                return createApiKey(name);
+            }
+        }.start();
+    }
+

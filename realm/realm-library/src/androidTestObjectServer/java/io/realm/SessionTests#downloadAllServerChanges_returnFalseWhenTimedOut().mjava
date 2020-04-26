@@ -1,7 +1,7 @@
     @Test
     public void downloadAllServerChanges_returnFalseWhenTimedOut() throws InterruptedException {
         Realm realm = Realm.getInstance(configuration);
-        SyncSession session = SyncManager.getOrCreateSession(configuration, null);
+        SyncSession session = app.getSync().getSession(configuration);
         try {
             assertFalse(session.downloadAllServerChanges(100, TimeUnit.MILLISECONDS));
         } finally {

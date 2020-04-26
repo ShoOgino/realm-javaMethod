@@ -22,48 +22,35 @@
                 }
             }
 
-            // Check if the user has an identifier, if not, it cannot use /~/.
-            if (serverUrl.toString().contains("/~/") && user.getIdentity() == null) {
-                throw new IllegalStateException("The serverUrl contains a /~/, but the user does not have an identity." +
-                        " Most likely it hasn't been authenticated yet or has been created directly from an" +
-                        " access token. Use a path without /~/.");
-            }
-
             // Set the default Client Resync Mode based on the current type of Realm.
             // Eventually RECOVER_LOCAL_REALM should be the default for all types.
+            // FIXME: We should add support back for this.
             if (clientResyncMode == null) {
-                clientResyncMode = ClientResyncMode.RECOVER_LOCAL_REALM;
+                clientResyncMode = ClientResyncMode.MANUAL;
             }
 
             if (rxFactory == null && isRxJavaAvailable()) {
                 rxFactory = new RealmObservableFactory(true);
             }
 
+            // FIXME: Figure out how to map to on-disk path. Partition key can be up to 16MB in size.
             // Determine location on disk
-            // Use the serverUrl + user to create a unique filepath unless it has been explicitly overridden.
-            // <rootDir>/<userIdentifier>/<serverPath>/<serverFileNameOrOverriddenFileName>
-            URI resolvedServerUrl = resolveServerUrl(serverUrl, user.getIdentity());
-            File rootDir = overrideDefaultFolder ? directory : defaultFolder;
-            String realmPathFromRootDir = user.getIdentity() + "/" + getServerPath(resolvedServerUrl);
-            File realmFileDirectory = new File(rootDir, realmPathFromRootDir);
-
-            String realmFileName = overrideDefaultLocalFileName ? fileName : defaultLocalFileName;
+            // Use the serverUrl + user to create a unique filepath.
+            // The following types of paths can be generated
+            // <rootDir>/<userIdentifier>/default.realm
+            // <rootDir>/<userIdentifier>/<hashedPartionKey>/default.realm
+            URI resolvedServerUrl = serverUrl; // resolveServerUrl(serverUrl, user);
+            syncUrlPrefix = String.format("/api/client/v2.0/app/%s/realm-sync", user.getApp().getConfiguration().getAppId());
+            String realmPathFromRootDir = user.getId() + "/" + getServerPath(user, resolvedServerUrl);
+            File realmFileDirectory = new File(defaultFolder, realmPathFromRootDir);
+            String realmFileName = defaultLocalFileName;
             String fullPathName = realmFileDirectory.getAbsolutePath() + File.pathSeparator + realmFileName;
+
             // full path must not exceed 256 characters (on FAT)
             if (fullPathName.length() > MAX_FULL_PATH_LENGTH) {
-                // path is too long, so we make the file name shorter
-                realmFileName = MD5(realmFileName);
-                fullPathName = realmFileDirectory.getAbsolutePath() + File.pathSeparator + realmFileName;
-                if (fullPathName.length() > MAX_FULL_PATH_LENGTH) {
-                    // use rootDir/userIdentify as directory instead as it is shorter
-                    realmFileDirectory = new File(rootDir, user.getIdentity());
-                    fullPathName = realmFileDirectory.getAbsolutePath() + File.pathSeparator + realmFileName;
-                    if (fullPathName.length() > MAX_FULL_PATH_LENGTH) { // we are out of ideas
-                        throw new IllegalStateException(String.format(Locale.US,
-                                "Full path name must not exceed %d characters: %s",
-                                MAX_FULL_PATH_LENGTH, fullPathName));
-                    }
-                }
+                throw new IllegalStateException(String.format(Locale.US,
+                        "Full path name must not exceed %d characters: %s",
+                        MAX_FULL_PATH_LENGTH, fullPathName));
             }
 
             if (realmFileName.length() > MAX_FILE_NAME_LENGTH) {
@@ -124,7 +111,8 @@
                     sessionStopPolicy,
                     compactOnLaunch,
                     syncUrlPrefix,
-                    clientResyncMode
+                    clientResyncMode,
+                    partitionValue
             );
         }
 

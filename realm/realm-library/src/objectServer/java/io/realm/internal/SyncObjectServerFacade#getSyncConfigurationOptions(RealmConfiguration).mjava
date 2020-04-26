@@ -2,32 +2,50 @@
     public Object[] getSyncConfigurationOptions(RealmConfiguration config) {
         if (config instanceof SyncConfiguration) {
             SyncConfiguration syncConfig = (SyncConfiguration) config;
-            SyncUser user = syncConfig.getUser();
+            RealmUser user = syncConfig.getUser();
+            RealmApp app = user.getApp();
             String rosServerUrl = syncConfig.getServerUrl().toString();
-            String rosUserIdentity = user.getIdentity();
-            String syncRealmAuthUrl = user.getAuthenticationUrl().toString();
-            String syncUserRefreshToken = user.getRefreshToken().toJson().toString();
-            String syncUserAccessToken = user.getAccessToken(((SyncConfiguration) config)).toJson().toString();
+            String rosUserIdentity = user.getId();
+            String syncRealmAuthUrl = user.getApp().getConfiguration().getBaseUrl().toString();
+            String syncUserRefreshToken = user.getRefreshToken();
+            String syncUserAccessToken = user.getAccessToken();
             byte sessionStopPolicy = syncConfig.getSessionStopPolicy().getNativeValue();
             String urlPrefix = syncConfig.getUrlPrefix();
-            String customAuthorizationHeaderName = SyncManager.getAuthorizationHeaderName(syncConfig.getServerUrl());
-            Map<String, String> customHeaders = SyncManager.getCustomRequestHeaders(syncConfig.getServerUrl());
-            return new Object[]{
-                    rosUserIdentity,
-                    rosServerUrl,
-                    syncRealmAuthUrl,
-                    syncUserRefreshToken,
-                    syncUserAccessToken,
-                    syncConfig.syncClientValidateSsl(),
-                    syncConfig.getServerCertificateFilePath(),
-                    sessionStopPolicy,
-                    urlPrefix,
-                    customAuthorizationHeaderName,
-                    customHeaders,
-                    syncConfig.getClientResyncMode().getNativeValue()
-            };
+            String customAuthorizationHeaderName = app.getConfiguration().getAuthorizationHeaderName();
+            Map<String, String> customHeaders = app.getConfiguration().getCustomRequestHeaders();
+
+            // Temporary work-around for serializing supported bson values
+            BsonValue val = syncConfig.getPartitionValue();
+            String partitionValue = null;
+            if (val.isString()) {
+                partitionValue = "\"" + val.asString().getValue() + "\"";
+            } else if (val.isInt32()) {
+                partitionValue = "{ \"$bsonInt\" : " + val.asInt32().intValue() + " }";
+            } else if (val.isInt64()) {
+                partitionValue = "{ \"$bsonLong\" : " + val.asInt64().longValue() + " }";
+            } else if (val.isObjectId()) {
+                partitionValue = "{ \"$oid\" : " + val.asObjectId().toString() + " }";
+            } else {
+                throw new IllegalArgumentException("Unsupported type: " + val);
+            }
+            Object[] configObj = new Object[SYNC_CONFIG_OPTIONS];
+            configObj[0] = rosUserIdentity;
+            configObj[1] = rosServerUrl;
+            configObj[2] = syncRealmAuthUrl;
+            configObj[3] = syncUserRefreshToken;
+            configObj[4] = syncUserAccessToken;
+            configObj[5] = syncConfig.syncClientValidateSsl();
+            configObj[6] = syncConfig.getServerCertificateFilePath();
+            configObj[7] = sessionStopPolicy;
+            configObj[8] = urlPrefix;
+            configObj[9] = customAuthorizationHeaderName;
+            configObj[10] = customHeaders;
+            configObj[11] = OsRealmConfig.CLIENT_RESYNC_MODE_MANUAL;
+            configObj[12] = partitionValue;
+            configObj[13] = app.getSync();
+            return configObj;
         } else {
-            return new Object[12];
+            return new Object[SYNC_CONFIG_OPTIONS];
         }
     }
 

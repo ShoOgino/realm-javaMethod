@@ -1,0 +1,22 @@
+    private String getBindingInfo() {
+        // Setup Realm part of User-Agent string
+        String userAgentBindingInfo = "Unknown"; // Fallback in case of anything going wrong
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("RealmJava/");
+            sb.append(BuildConfig.VERSION_NAME);
+            sb.append(" (");
+            sb.append(Util.isEmptyString(Build.DEVICE) ? "unknown-device" : Build.DEVICE);
+            sb.append(", ");
+            sb.append(Util.isEmptyString(Build.MODEL) ? "unknown-model" : Build.MODEL);
+            sb.append(", v");
+            sb.append(Build.VERSION.SDK_INT);
+            sb.append(")");
+            userAgentBindingInfo = sb.toString();
+        } catch (Exception e) {
+            // Failures to construct the user agent should never cause the system itself to crash.
+            RealmLog.warn("Constructing User-Agent description failed.", e);
+        }
+        return userAgentBindingInfo;
+    }
+
