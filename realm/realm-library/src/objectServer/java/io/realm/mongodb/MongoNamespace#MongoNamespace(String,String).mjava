@@ -1,0 +1,18 @@
+    /**
+     * Construct an instance from the given database name and collection name.
+     *
+     * @param databaseName   the valid database name
+     * @param collectionName the valid collection name
+     * @see #checkDatabaseNameValidity(String)
+     * @see #checkCollectionNameValidity(String)
+     */
+    @BsonCreator
+    public MongoNamespace(@BsonProperty("db") final String databaseName,
+                          @BsonProperty("coll") final String collectionName) {
+        checkDatabaseNameValidity(databaseName);
+        checkCollectionNameValidity(collectionName);
+        this.databaseName = databaseName;
+        this.collectionName = collectionName;
+        this.fullName = databaseName + '.' + collectionName;
+    }
+

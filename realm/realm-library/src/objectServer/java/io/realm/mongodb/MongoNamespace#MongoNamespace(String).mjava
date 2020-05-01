@@ -1,0 +1,16 @@
+    /**
+     * Construct an instance for the given full name.  The database name is the string preceding the first {@code "."} character.
+     *
+     * @param fullName the non-null full namespace
+     * @see #checkDatabaseNameValidity(String)
+     * @see #checkCollectionNameValidity(String)
+     */
+    public MongoNamespace(final String fullName) {
+        notNull("fullName", fullName);
+        this.fullName = fullName;
+        this.databaseName = getDatatabaseNameFromFullName(fullName);
+        this.collectionName = getCollectionNameFullName(fullName);
+        checkDatabaseNameValidity(databaseName);
+        checkCollectionNameValidity(collectionName);
+    }
+
