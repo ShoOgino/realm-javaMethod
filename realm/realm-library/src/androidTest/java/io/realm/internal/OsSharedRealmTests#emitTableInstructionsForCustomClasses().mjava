@@ -1,0 +1,27 @@
+    // Test for https://github.com/realm/realm-core/issues/3707
+    @Test
+    public void emitTableInstructionsForCustomClasses() {
+        final AtomicBoolean listenerCalled = new AtomicBoolean(false);
+        assertFalse(sharedRealm.hasTable("NewTable"));
+        sharedRealm.registerSchemaChangedCallback(new OsSharedRealm.SchemaChangedCallback() {
+            @Override
+            public void onSchemaChanged() {
+                assertTrue(sharedRealm.hasTable("NewTable"));
+                listenerCalled.set(true);
+            }
+        });
+
+        // Change schema using another Realm
+        // Classes not starting with class_ were treated differently by Sync
+        OsSharedRealm bgRealm = OsSharedRealm.getInstance(config, OsSharedRealm.VersionID.LIVE);
+        bgRealm.beginTransaction();
+        bgRealm.createTable("NewTable");
+        bgRealm.commitTransaction();
+        bgRealm.close();
+
+        // Refresh existing instance
+        sharedRealm.refresh();
+        assertTrue(sharedRealm.hasTable("NewTable"));
+        assertFalse(listenerCalled.get()); // TODO: Change to assertTrue once bug is fixed
+    }
+
