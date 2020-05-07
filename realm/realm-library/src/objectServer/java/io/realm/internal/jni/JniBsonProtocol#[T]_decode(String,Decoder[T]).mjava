@@ -1,0 +1,10 @@
+    public static <T> T decode(String string, Decoder<T> decoder) {
+        StringReader stringReader = new StringReader(string);
+        JsonReader jsonReader = new JsonReader(stringReader);
+        jsonReader.readStartDocument();
+        jsonReader.readName(VALUE);
+        T value = decoder.decode(jsonReader, DecoderContext.builder().build());
+        jsonReader.readEndDocument();
+        return value;
+    }
+

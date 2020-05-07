@@ -1,0 +1,10 @@
+    public static <T> String encode(T value, Encoder<T> encoder) {
+        StringWriter stringWriter = new StringWriter();
+        JsonWriter jsonWriter = new JsonWriter(stringWriter, writerSettings);
+        jsonWriter.writeStartDocument();
+        jsonWriter.writeName(VALUE);
+        encoder.encode(jsonWriter, value, EncoderContext.builder().build());
+        jsonWriter.writeEndDocument();
+        return stringWriter.toString();
+    }
+
