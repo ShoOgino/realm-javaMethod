@@ -1,0 +1,21 @@
+    public Long count(@Nullable final Bson filter, @Nullable final RemoteCountOptions options) {
+        AtomicReference<Long> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        OsJNIResultCallback<Long> callback = new OsJNIResultCallback<Long>(success, error) {
+            @Override
+            protected Long mapSuccess(Object result) {
+                return (Long) result;
+            }
+        };
+
+        // no filter means count all
+        String filterString = (filter == null) ?
+                JniBsonProtocol.encode(new Document(), codecRegistry) :
+                JniBsonProtocol.encode(filter, codecRegistry);
+        int limit = (options == null) ? 0 : options.getLimit();
+
+        nativeCount(nativePtr, filterString, limit, callback);
+
+        return ResultHandler.handleResult(success, error);
+    }
+

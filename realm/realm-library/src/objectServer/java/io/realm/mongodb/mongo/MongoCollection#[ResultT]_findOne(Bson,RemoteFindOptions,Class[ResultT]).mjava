@@ -1,0 +1,18 @@
+    /**
+     * Finds a document in the collection.
+     *
+     * @param filter      the query filter
+     * @param options     A RemoteFindOptions struct
+     * @param resultClass the class to decode each document into
+     * @param <ResultT>   the target document type of the iterable.
+     * @return a task containing the result of the find one operation
+     */
+    public <ResultT> Task<ResultT> findOne(
+            final Bson filter,
+            final RemoteFindOptions options,
+            final Class<ResultT> resultClass) {
+        return dispatcher.dispatchTask(() ->
+                osMongoCollection.findOne(filter, options, resultClass)
+        );
+    }
+

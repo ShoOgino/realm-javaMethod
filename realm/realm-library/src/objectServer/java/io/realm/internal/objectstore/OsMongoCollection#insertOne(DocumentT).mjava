@@ -1,0 +1,16 @@
+    public RemoteInsertOneResult insertOne(final DocumentT document) {
+        AtomicReference<RemoteInsertOneResult> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        OsJNIResultCallback<RemoteInsertOneResult> callback = new OsJNIResultCallback<RemoteInsertOneResult>(success, error) {
+            @Override
+            protected RemoteInsertOneResult mapSuccess(Object result) {
+                BsonValue bsonObjectId = new BsonObjectId((ObjectId) result);
+                return new RemoteInsertOneResult(bsonObjectId);
+            }
+        };
+
+        String encodedDocument = JniBsonProtocol.encode(document, codecRegistry);
+        nativeInsertOne(nativePtr, encodedDocument, callback);
+        return ResultHandler.handleResult(success, error);
+    }
+

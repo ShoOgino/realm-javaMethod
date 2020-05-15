@@ -1,0 +1,20 @@
+    public DocumentT findOne(@Nullable final Bson filter, final RemoteFindOptions options) {
+        AtomicReference<DocumentT> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        OsJNIResultCallback<DocumentT> callback = new OsJNIResultCallback<DocumentT>(success, error) {
+            @Override
+            protected DocumentT mapSuccess(Object result) {
+                return findOneSuccessMapper(result, documentClass);
+            }
+        };
+
+        String encodedFilter = filter == null ?
+                JniBsonProtocol.encode(new Document(), codecRegistry) :
+                JniBsonProtocol.encode(filter, codecRegistry);
+        String projectionString = JniBsonProtocol.encode(options.getProjection(), codecRegistry);
+        String sortString = JniBsonProtocol.encode(options.getSort(), codecRegistry);
+        nativeFindOneWithOptions(nativePtr, encodedFilter, projectionString, sortString, options.getLimit(), callback);
+
+        return ResultHandler.handleResult(success, error);
+    }
+

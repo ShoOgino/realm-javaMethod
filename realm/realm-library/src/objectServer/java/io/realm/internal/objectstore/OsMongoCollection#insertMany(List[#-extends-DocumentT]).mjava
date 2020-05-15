@@ -1,0 +1,22 @@
+    public RemoteInsertManyResult insertMany(final List<? extends DocumentT> documents) {
+        AtomicReference<RemoteInsertManyResult> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        OsJNIResultCallback<RemoteInsertManyResult> callback = new OsJNIResultCallback<RemoteInsertManyResult>(success, error) {
+            @Override
+            protected RemoteInsertManyResult mapSuccess(Object result) {
+                Object[] objects = (Object[]) result;
+                Map<Long, BsonValue> insertedIdsMap = new HashMap<>();
+                for (int i = 0; i < objects.length; i++) {
+                    ObjectId objectId = (ObjectId) objects[i];
+                    BsonValue bsonObjectId = new BsonObjectId(objectId);
+                    insertedIdsMap.put((long) i, bsonObjectId);
+                }
+                return new RemoteInsertManyResult(insertedIdsMap);
+            }
+        };
+
+        String encodedDocumentArray = JniBsonProtocol.encode(documents, codecRegistry);
+        nativeInsertMany(nativePtr, encodedDocumentArray, callback);
+        return ResultHandler.handleResult(success, error);
+    }
+

@@ -1,0 +1,15 @@
+    public RemoteDeleteResult deleteMany(final Bson filter) {
+        AtomicReference<RemoteDeleteResult> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        OsJNIResultCallback<RemoteDeleteResult> callback = new OsJNIResultCallback<RemoteDeleteResult>(success, error) {
+            @Override
+            protected RemoteDeleteResult mapSuccess(Object result) {
+                return new RemoteDeleteResult((Long) result);
+            }
+        };
+
+        String jsonDocument = JniBsonProtocol.encode(filter, codecRegistry);
+        nativeDeleteMany(nativePtr, jsonDocument, callback);
+        return ResultHandler.handleResult(success, error);
+    }
+
