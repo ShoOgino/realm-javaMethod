@@ -1,0 +1,26 @@
+    // Tests writeCopyTo result when called in a transaction.
+    @Test
+    public void writeCopyToInTransaction() {
+        String fileName = IDENTIFIER + ".realm";
+        RealmConfiguration conf = configFactory.createConfigurationBuilder()
+                .name(fileName)
+                .build();
+
+        Realm.deleteRealm(conf);
+
+        testRealm.beginTransaction();
+        Dog dog = testRealm.createObject(Dog.class);
+        dog.setName("DinoDog");
+
+        // Write copy to destination file in transaction.
+        // Check if the new data would be written into the file.
+        testRealm.writeCopyTo(new File(configFactory.getRoot(), fileName));
+        Realm onDiskRealm = Realm.getInstance(conf);
+        assertEquals(1, onDiskRealm.where(Dog.class).count());
+
+        testRealm.commitTransaction();
+
+        assertEquals(1, testRealm.where(Dog.class).count());
+        onDiskRealm.close();
+    }
+
