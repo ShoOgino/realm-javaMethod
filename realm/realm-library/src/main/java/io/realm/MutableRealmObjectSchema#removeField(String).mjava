@@ -5,12 +5,12 @@
         if (!hasField(fieldName)) {
             throw new IllegalStateException(fieldName + " does not exist.");
         }
-        long columnIndex = getColumnIndex(fieldName);
+        long columnKey = getColumnKey(fieldName);
         String className = getClassName();
         if (fieldName.equals(OsObjectStore.getPrimaryKeyForObject(realm.sharedRealm, className))) {
             OsObjectStore.setPrimaryKeyForObject(realm.sharedRealm, className, fieldName);
         }
-        table.removeColumn(columnIndex);
+        table.removeColumn(columnKey);
         return this;
     }
 

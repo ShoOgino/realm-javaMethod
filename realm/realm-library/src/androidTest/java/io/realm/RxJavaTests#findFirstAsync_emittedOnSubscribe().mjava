@@ -1,20 +1,24 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void findFirstAsync_emittedOnSubscribe() {
         realm.beginTransaction();
-        realm.createObject(AllTypes.class);
+        realm.createObject(AllTypes.class).setColumnLong(42);
         realm.commitTransaction();
 
-        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         final AllTypes asyncObj = realm.where(AllTypes.class).findFirstAsync();
-        subscription = asyncObj.<AllTypes>asFlowable().subscribe(new Consumer<AllTypes>() {
-            @Override
-            public void accept(AllTypes rxObject) throws Exception {
-                assertTrue(rxObject == asyncObj);
-                subscribedNotified.set(true);
+        subscription = asyncObj.<AllTypes>asFlowable().subscribe(rxObject -> {
+            assertTrue(rxObject.isFrozen());
+            // Because the subscription is run asynchronously. There is a chance
+            // the query resolved before the subscription triggers.
+            // This means it is not deterministic what state is first emitted here.
+            // It can either be a fully loaded object or one that is still loading.
+            if (rxObject.isLoaded()) {
+                assertTrue(rxObject.isValid());
+                assertEquals(42, rxObject.getColumnLong());
+            } else {
+                assertFalse(rxObject.isValid());
             }
+            disposeSuccessfulTest(realm);
         });
-        assertTrue(subscribedNotified.get());
-        subscription.dispose();
     }
 

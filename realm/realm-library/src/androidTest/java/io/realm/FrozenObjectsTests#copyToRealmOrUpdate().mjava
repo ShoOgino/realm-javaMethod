@@ -1,0 +1,21 @@
+    @Test
+    public void copyToRealmOrUpdate() throws InterruptedException {
+        realm.executeTransaction(r -> {
+            r.createObject(AllJavaTypes.class, 42);
+        });
+        AllJavaTypes frozenObject = realm.where(AllJavaTypes.class).equalTo(AllJavaTypes.FIELD_ID, 42).findFirst().freeze();
+
+        Thread t = new Thread(() -> {
+            Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+            bgRealm.beginTransaction();
+            AllJavaTypes copiedObject = bgRealm.copyToRealmOrUpdate(frozenObject);
+            bgRealm.commitTransaction();
+
+            assertEquals(1, bgRealm.where(AllJavaTypes.class).count());
+            assertEquals(frozenObject.getFieldLong(), copiedObject.getFieldLong());
+            bgRealm.close();
+        });
+        t.start();
+        t.join();
+    }
+

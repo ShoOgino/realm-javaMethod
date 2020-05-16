@@ -1,0 +1,20 @@
+    @Test
+    @RunTestInLooperThread
+    public void asChangesetObservable_frozenDynamicRealmList() {
+        realm.beginTransaction();
+        final RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
+        list.add(new Dog("dog"));
+        realm.commitTransaction();
+
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.getConfiguration());
+        RealmList<DynamicRealmObject> frozenList = dynamicRealm.where(AllTypes.CLASS_NAME).findFirst().getList(AllTypes.FIELD_REALMLIST).freeze();
+
+        subscription = frozenList.asChangesetObservable().subscribe(change -> {
+            RealmList<DynamicRealmObject> rxList = change.getCollection();
+            assertTrue(rxList.isFrozen());
+            assertEquals(frozenList, rxList);
+            assertNull(change.getChangeset());
+            disposeSuccessfulTest(dynamicRealm);
+        });
+    }
+

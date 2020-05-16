@@ -1,0 +1,15 @@
+    @Test
+    @RunTestInLooperThread
+    public void addingRealmChangeListenerThrows() {
+        try {
+            frozenRealm.addChangeListener(new RealmChangeListener<Realm>() {
+                @Override
+                public void onChange(Realm realm) {
+                }
+            });
+            fail();
+        } catch (IllegalStateException ignore) {
+            looperThread.testComplete();
+        }
+    }
+

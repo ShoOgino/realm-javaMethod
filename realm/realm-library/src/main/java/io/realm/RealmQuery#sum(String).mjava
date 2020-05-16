@@ -10,14 +10,14 @@
     public Number sum(String fieldName) {
         realm.checkIfValid();
 
-        long columnIndex = schema.getAndCheckFieldIndex(fieldName);
-        switch (table.getColumnType(columnIndex)) {
+        long columnKey = schema.getAndCheckFieldColumnKey(fieldName);
+        switch (table.getColumnType(columnKey)) {
             case INTEGER:
-                return query.sumInt(columnIndex);
+                return query.sumInt(columnKey);
             case FLOAT:
-                return query.sumFloat(columnIndex);
+                return query.sumFloat(columnKey);
             case DOUBLE:
-                return query.sumDouble(columnIndex);
+                return query.sumDouble(columnKey);
             default:
                 throw new IllegalArgumentException(String.format(Locale.US,
                         TYPE_MISMATCH, fieldName, "int, float or double"));

@@ -1,51 +1,63 @@
     @Test
     public void tableNumbers() {
+        final AtomicLong colKey1 = new AtomicLong(-1);
+        final AtomicLong colKey2 = new AtomicLong(-1);
+        final AtomicLong colKey3 = new AtomicLong(-1);
+        final AtomicLong colKey4 = new AtomicLong(-1);
+
+        final AtomicLong rowKey0 = new AtomicLong(-1);
+        final AtomicLong rowKey1 = new AtomicLong(-1);
+        final AtomicLong rowKey2 = new AtomicLong(-1);
+        final AtomicLong rowKey3 = new AtomicLong(-1);
+        final AtomicLong rowKey4 = new AtomicLong(-1);
+        final AtomicLong rowKey5 = new AtomicLong(-1);
+        final AtomicLong rowKey6 = new AtomicLong(-1);
         Table t = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
             @Override
             public void execute(Table t) {
-                t.addColumn(RealmFieldType.INTEGER, "intCol");
-                t.addColumn(RealmFieldType.DOUBLE, "doubleCol");
-                t.addColumn(RealmFieldType.FLOAT, "floatCol");
-                t.addColumn(RealmFieldType.STRING, "StringCol");
+                colKey1.set(t.addColumn(RealmFieldType.INTEGER, "intCol"));
+                colKey2.set(t.addColumn(RealmFieldType.DOUBLE, "doubleCol"));
+                colKey3.set(t.addColumn(RealmFieldType.FLOAT, "floatCol"));
+                colKey4.set(t.addColumn(RealmFieldType.STRING, "StringCol"));
 
                 // Adds 3 rows of data with same values in each column.
-                TestHelper.addRowWithValues(t, 1, 2.0D, 3.0F, "s1");
-                TestHelper.addRowWithValues(t, 1, 2.0D, 3.0F, "s1");
-                TestHelper.addRowWithValues(t, 1, 2.0D, 3.0F, "s1");
+                rowKey0.set(TestHelper.addRowWithValues(t, new long[]{colKey1.get(), colKey2.get(), colKey3.get(), colKey4.get()}, new Object[]{1, 2.0D, 3.0F, "s1"}));
+                rowKey1.set(TestHelper.addRowWithValues(t, new long[]{colKey1.get(), colKey2.get(), colKey3.get(), colKey4.get()}, new Object[]{1, 2.0D, 3.0F, "s1"}));
+                rowKey2.set(TestHelper.addRowWithValues(t, new long[]{colKey1.get(), colKey2.get(), colKey3.get(), colKey4.get()}, new Object[]{1, 2.0D, 3.0F, "s1"}));
 
                 // Adds other values.
-                TestHelper.addRowWithValues(t, 10, 20.0D, 30.0F, "s10");
-                TestHelper.addRowWithValues(t, 100, 200.0D, 300.0F, "s100");
-                TestHelper.addRowWithValues(t, 1000, 2000.0D, 3000.0F, "s1000");
+                rowKey3.set(TestHelper.addRowWithValues(t, new long[]{colKey1.get(), colKey2.get(), colKey3.get(), colKey4.get()}, new Object[]{10, 20.0D, 30.0F, "s10"}));
+                rowKey4.set(TestHelper.addRowWithValues(t, new long[]{colKey1.get(), colKey2.get(), colKey3.get(), colKey4.get()}, new Object[]{100, 200.0D, 300.0F, "s100"}));
+                rowKey5.set(TestHelper.addRowWithValues(t, new long[]{colKey1.get(), colKey2.get(), colKey3.get(), colKey4.get()}, new Object[]{1000, 2000.0D, 3000.0F, "s1000"}));
             }
         });
 
         // Counts instances of values added in the first 3 rows.
-        assertEquals(3, t.count(0, 1));
-        assertEquals(3, t.count(1, 2.0D));
-        assertEquals(3, t.count(2, 3.0F));
-        assertEquals(3, t.count(3, "s1"));
+        assertEquals(3, t.count(colKey1.get(), 1));
+        assertEquals(3, t.count(colKey2.get(), 2.0D));
+        assertEquals(3, t.count(colKey3.get(), 3.0F));
+        assertEquals(3, t.count(colKey4.get(), "s1"));
 
 
-        assertEquals(3, t.findFirstDouble(1, 20.0D)); // Find rows index for first double value of 20.0 in column 1.
-        assertEquals(4, t.findFirstFloat(2, 300.0F)); // Find rows index for first float value of 300.0 in column 2.
+        assertEquals(3, t.findFirstDouble(colKey2.get(), 20.0D)); // Find rows index for first double value of 20.0 in column 1.
+        assertEquals(4, t.findFirstFloat(colKey3.get(), 300.0F)); // Find rows index for first float value of 300.0 in column 2.
 
         // Sets double and float.
         sharedRealm.beginTransaction();
-        t.setDouble(1, 2, -2.0D, false);
-        t.setFloat(2, 2, -3.0F, false);
+        t.setDouble(colKey2.get(), rowKey2.get(), -2.0D, false);
+        t.setFloat(colKey3.get(), rowKey2.get(), -3.0F, false);
         sharedRealm.commitTransaction();
 
         // Gets double tests.
-        assertEquals(-2.0D, t.getDouble(1, 2));
-        assertEquals(20.0D, t.getDouble(1, 3));
-        assertEquals(200.0D, t.getDouble(1, 4));
-        assertEquals(2000.0D, t.getDouble(1, 5));
+        assertEquals(-2.0D, t.getDouble(colKey2.get(), rowKey2.get()));
+        assertEquals(20.0D, t.getDouble(colKey2.get(), rowKey3.get()));
+        assertEquals(200.0D, t.getDouble(colKey2.get(), rowKey4.get()));
+        assertEquals(2000.0D, t.getDouble(colKey2.get(), rowKey5.get()));
 
         // Gets float test.
-        assertEquals(-3.0F, t.getFloat(2, 2));
-        assertEquals(30.0F, t.getFloat(2, 3));
-        assertEquals(300.0F, t.getFloat(2, 4));
-        assertEquals(3000.0F, t.getFloat(2, 5));
+        assertEquals(-3.0F, t.getFloat(colKey3.get(), rowKey2.get()));
+        assertEquals(30.0F, t.getFloat(colKey3.get(), rowKey3.get()));
+        assertEquals(300.0F, t.getFloat(colKey3.get(), rowKey4.get()));
+        assertEquals(3000.0F, t.getFloat(colKey3.get(), rowKey5.get()));
     }
 

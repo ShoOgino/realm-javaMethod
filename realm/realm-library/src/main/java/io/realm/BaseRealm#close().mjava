@@ -8,7 +8,7 @@
      */
     @Override
     public void close() {
-        if (this.threadId != Thread.currentThread().getId()) {
+        if (!frozen && this.threadId != Thread.currentThread().getId()) {
             throw new IllegalStateException(INCORRECT_THREAD_CLOSE_MESSAGE);
         }
 

@@ -1,24 +1,13 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
+    @SuppressWarnings("ReferenceEquality")
     public void dynamicRealm_emittedOnSubscribe() {
         final DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
-        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        subscription = dynamicRealm.asFlowable().subscribe(new Consumer<DynamicRealm>() {
-            @Override
-            public void accept(DynamicRealm rxRealm) throws Exception {
-                assertTrue(rxRealm == dynamicRealm);
-                subscribedNotified.set(true);
-            }
-        }, new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable throwable) throws Exception {
-                throwable.printStackTrace();
-                fail();
-            }
+        subscription = dynamicRealm.asFlowable().subscribe(rxRealm -> {
+            assertTrue(rxRealm.isFrozen());
+            assertEquals(rxRealm.getPath(), dynamicRealm.getPath());
+            assertEquals(rxRealm.sharedRealm.getVersionID(), dynamicRealm.sharedRealm.getVersionID());
+            disposeSuccessfulTest(dynamicRealm);
         });
-
-        assertTrue(subscribedNotified.get());
-        dynamicRealm.close();
-        subscription.dispose();
     }
 

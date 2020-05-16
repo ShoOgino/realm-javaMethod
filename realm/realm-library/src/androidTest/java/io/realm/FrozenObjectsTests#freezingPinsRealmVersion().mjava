@@ -1,0 +1,13 @@
+    @Test
+    public void freezingPinsRealmVersion() {
+        assertTrue(frozenRealm.isEmpty());
+        assertTrue(realm.isEmpty());
+
+        realm.executeTransaction(r -> {
+            r.createObject(AllTypes.class);
+        });
+
+        assertTrue(frozenRealm.isEmpty());
+        assertFalse(realm.isEmpty());
+    }
+

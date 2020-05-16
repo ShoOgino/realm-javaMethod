@@ -10,11 +10,11 @@
     public RealmQuery<E> notEqualTo(String fieldName, @Nullable String value, Case casing) {
         realm.checkIfValid();
 
-        FieldDescriptor fd = schema.getColumnIndices(fieldName, RealmFieldType.STRING);
+        FieldDescriptor fd = schema.getFieldDescriptors(fieldName, RealmFieldType.STRING);
         if (fd.length() > 1 && !casing.getValue()) {
             throw new IllegalArgumentException("Link queries cannot be case insensitive - coming soon.");
         }
-        this.query.notEqualTo(fd.getColumnIndices(), fd.getNativeTablePointers(), value, casing);
+        this.query.notEqualTo(fd.getColumnKeys(), fd.getNativeTablePointers(), value, casing);
         return this;
     }
 

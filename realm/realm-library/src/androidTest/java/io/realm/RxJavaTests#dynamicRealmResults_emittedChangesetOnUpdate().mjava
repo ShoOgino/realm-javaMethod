@@ -1,25 +1,26 @@
     @Test
     @RunTestInLooperThread
     public void dynamicRealmResults_emittedChangesetOnUpdate() {
-        final AtomicInteger subscriberCalled = new AtomicInteger(0);
         final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.getConfiguration());
-        looperThread.closeAfterTest(dynamicRealm);
-        dynamicRealm.beginTransaction();
         RealmResults<DynamicRealmObject> results = dynamicRealm.where(AllTypes.CLASS_NAME).findAll();
-        dynamicRealm.commitTransaction();
 
-        subscription = results.asChangesetObservable().subscribe(new Consumer<CollectionChange<RealmResults<DynamicRealmObject>>>() {
-            @Override
-            public void accept(CollectionChange<RealmResults<DynamicRealmObject>> change) throws Exception {
-                if (subscriberCalled.incrementAndGet() == 2) {
-                    assertEquals(1, change.getChangeset().getInsertions().length);
-                    looperThread.testComplete();
+        subscription = results.asChangesetObservable()
+            .subscribe(change -> {
+                RealmResults<DynamicRealmObject> collection = change.getCollection();
+                if (collection.isLoaded() && collection.isEmpty()) {
+                    looperThread.postRunnable(() -> {
+                        DynamicRealm dynRealm = DynamicRealm.getInstance(looperThread.getConfiguration());
+                        dynRealm.executeTransaction(dr -> {
+                            dr.createObject(AllTypes.CLASS_NAME);
+                        });
+                        dynRealm.close();
+                    });
                 }
-            }
-        });
 
-        dynamicRealm.beginTransaction();
-        dynamicRealm.createObject(AllTypes.CLASS_NAME);
-        dynamicRealm.commitTransaction();
+                if (collection.isLoaded() && collection.size() == 1) {
+                    assertEquals(1, change.getChangeset().getInsertions().length);
+                    disposeSuccessfulTest(dynamicRealm);
+                }
+            });
     }
 

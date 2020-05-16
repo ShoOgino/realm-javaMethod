@@ -1,0 +1,16 @@
+    // aux. method used by sort methods
+    private long getColumnKeyForSort(String fieldName) {
+        //noinspection ConstantConditions
+        if (fieldName == null || fieldName.isEmpty()) {
+            throw new IllegalArgumentException("Non-empty field name required.");
+        }
+        if (fieldName.contains(".")) {
+            throw new IllegalArgumentException("Aggregates on child object fields are not supported: " + fieldName);
+        }
+        long columnKey = osResults.getTable().getColumnKey(fieldName);
+        if (columnKey < 0) {
+            throw new IllegalArgumentException(String.format(Locale.US, "Field '%s' does not exist.", fieldName));
+        }
+        return columnKey;
+    }
+

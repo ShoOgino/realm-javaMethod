@@ -1,0 +1,18 @@
+    @Test
+    public void frozenRealm_equalToFrozenRealmAtSameVersion() throws InterruptedException {
+        Realm otherFrozenRealm = realm.freeze();
+        assertEquals(frozenRealm, otherFrozenRealm); // Same thread
+
+        Thread t = new Thread(() -> {
+            Realm bgRealm = Realm.getInstance(realmConfig);
+            Realm otherThreadFrozenRealm = bgRealm.freeze();
+            try {
+                assertEquals(frozenRealm, otherThreadFrozenRealm);
+            } finally {
+                bgRealm.close();
+            }
+        });
+        t.start();
+        t.join();
+    }
+

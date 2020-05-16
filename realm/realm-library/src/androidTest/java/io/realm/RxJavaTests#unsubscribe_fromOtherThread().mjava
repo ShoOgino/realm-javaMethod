@@ -1,33 +1,23 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
+    @SuppressWarnings("ReferenceEquality")
     public void unsubscribe_fromOtherThread() {
-        final CountDownLatch unsubscribeCompleted = new CountDownLatch(1);
-        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
-        final Disposable subscription = realm.asFlowable().subscribe(new Consumer<Realm>() {
-            @Override
-            public void accept(Realm rxRealm) throws Exception {
-                assertTrue(rxRealm == realm);
-                subscribedNotified.set(true);
-            }
-        });
-        assertTrue(subscribedNotified.get());
-        assertEquals(1, realm.sharedRealm.realmNotifier.getListenersListSize());
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    subscription.dispose();
-                    fail();
-                } catch (IllegalStateException ignored) {
-                } finally {
-                    unsubscribeCompleted.countDown();
+        subscription = realm.asFlowable()
+            .doFinally(() -> {
+                disposeSuccessfulTest(realm);
+            })
+            .subscribe(new Consumer<Realm>() {
+                @Override
+                public void accept(Realm rxRealm) {
+                    assertTrue(rxRealm.isFrozen());
+                    assertEquals(rxRealm.getPath(), realm.getPath());
+                    assertEquals(rxRealm.sharedRealm.getVersionID(), realm.sharedRealm.getVersionID());
+                    looperThread.postRunnable(() -> {
+                        Thread t = new Thread(() -> subscription.dispose());
+                        t.start();
+                        looperThread.keepStrongReference(t);
+                    });
                 }
-            }
-        }).start();
-        TestHelper.awaitOrFail(unsubscribeCompleted);
-        assertEquals(1, realm.sharedRealm.realmNotifier.getListenersListSize());
-        // We cannot call subscription.dispose() again, so manually close the extra Realm instance opened by
-        // the Observable.
-        realm.close();
+            });
     }
 

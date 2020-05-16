@@ -1,0 +1,29 @@
+    /**
+     * The constructor is private to enforce the use of the static one.
+     *
+     * @param cache the {@link RealmCache} associated to this Realm instance.
+     * @throws IllegalArgumentException if trying to open an encrypted Realm with the wrong key.
+     */
+    private Realm(RealmCache cache, OsSharedRealm.VersionID version) {
+        super(cache, createExpectedSchemaInfo(cache.getConfiguration().getSchemaMediator()), version);
+        schema = new ImmutableRealmSchema(this,
+                new ColumnIndices(configuration.getSchemaMediator(), sharedRealm.getSchemaInfo()));
+        // FIXME: This is to work around the different behaviour between the read only Realms in the Object Store and
+        // in current java implementation. Opening a read only Realm with some missing schemas is allowed by Object
+        // Store and realm-cocoa. In that case, any query based on the missing schema should just return an empty
+        // results. Fix this together with https://github.com/realm/realm-java/issues/2953
+        if (configuration.isReadOnly()) {
+            RealmProxyMediator mediator = configuration.getSchemaMediator();
+            Set<Class<? extends RealmModel>> classes = mediator.getModelClasses();
+            for (Class<? extends RealmModel> clazz  : classes) {
+                String tableName = Table.getTableNameForClass(mediator.getSimpleClassName(clazz));
+                if (!sharedRealm.hasTable(tableName)) {
+                    sharedRealm.close();
+                    throw new RealmMigrationNeededException(configuration.getPath(),
+                            String.format(Locale.US, "Cannot open the read only Realm. '%s' is missing.",
+                                    Table.getClassNameForTable(tableName)));
+                }
+            }
+        }
+    }
+

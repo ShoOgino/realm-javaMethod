@@ -1,19 +1,18 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void realmList_emittedChangesetOnSubscribe() {
-        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         realm.beginTransaction();
         final RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
+        list.add(new Dog("dog"));
         realm.commitTransaction();
-        subscription = list.asChangesetObservable().subscribe(new Consumer<CollectionChange<RealmList<Dog>>>() {
-            @Override
-            public void accept(CollectionChange<RealmList<Dog>> change) throws Exception {
-                assertEquals(list, change.getCollection());
-                assertNull(change.getChangeset());
-                subscribedNotified.set(true);
-            }
+
+        subscription = list.asChangesetObservable().subscribe(change -> {
+            RealmList<Dog> rxList = change.getCollection();
+            assertTrue(rxList.isFrozen());
+            assertEquals(1, rxList.size());
+            assertEquals("dog", rxList.first().getName());
+            assertNull(change.getChangeset());
+            disposeSuccessfulTest(realm);
         });
-        assertTrue(subscribedNotified.get());
-        subscription.dispose();
     }
 

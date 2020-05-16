@@ -2,18 +2,18 @@
      * Renames a column in the table. If the column is a primary key column, the corresponding entry
      * in PrimaryKeyTable will be renamed accordingly.
      *
-     * @param columnIndex the column index to be renamed.
+     * @param columnKey the column to be renamed.
      * @param newName a new name replacing the old column name.
      * @throws IllegalArgumentException if {@code newFieldName} is an empty string, or exceeds field name length limit.
      */
-    public void renameColumn(long columnIndex, String newName) {
+    public void renameColumn(long columnKey, String newName) {
         verifyColumnName(newName);
         // Gets the old column name. We'll assume that the old column name is *NOT* an empty string.
-        final String oldName = nativeGetColumnName(nativePtr, columnIndex);
+        final String oldName = nativeGetColumnName(nativeTableRefPtr, columnKey);
         final String pkName = OsObjectStore.getPrimaryKeyForObject(sharedRealm, getClassName());
 
         // Then let's try to rename a column. If an error occurs for some reasons, we'll throw.
-        nativeRenameColumn(nativePtr, columnIndex, newName);
+        nativeRenameColumn(nativeTableRefPtr, columnKey, newName);
 
         // Renames a primary key. At this point, renaming the column name should have been fine.
         if (oldName.equals(pkName)) {
@@ -22,7 +22,7 @@
             } catch (Exception e) {
                 // We failed to rename the pk meta table. roll back the column name, not pk meta table
                 // then rethrow.
-                nativeRenameColumn(nativePtr, columnIndex, oldName);
+                nativeRenameColumn(nativeTableRefPtr, columnKey, oldName);
                 throw new RuntimeException(e);
             }
         }

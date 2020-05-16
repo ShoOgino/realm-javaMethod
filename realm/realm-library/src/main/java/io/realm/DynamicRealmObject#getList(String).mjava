@@ -10,15 +10,15 @@
     public RealmList<DynamicRealmObject> getList(String fieldName) {
         proxyState.getRealm$realm().checkIfValid();
 
-        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
         try {
-            OsList osList = proxyState.getRow$realm().getModelList(columnIndex);
+            OsList osList = proxyState.getRow$realm().getModelList(columnKey);
             //noinspection ConstantConditions
             @Nonnull
             String className = osList.getTargetTable().getClassName();
             return new RealmList<>(className, osList, proxyState.getRealm$realm());
         } catch (IllegalArgumentException e) {
-            checkFieldType(fieldName, columnIndex, RealmFieldType.LIST);
+            checkFieldType(fieldName, columnKey, RealmFieldType.LIST);
             throw e;
         }
     }

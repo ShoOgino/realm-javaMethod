@@ -5,9 +5,9 @@
         if (pkField == null) {
             throw new IllegalStateException(getClassName() + " doesn't have a primary key.");
         }
-        long columnIndex = table.getColumnIndex(pkField);
-        if (table.hasSearchIndex(columnIndex)) {
-            table.removeSearchIndex(columnIndex);
+        long columnKey = table.getColumnKey(pkField);
+        if (table.hasSearchIndex(columnKey)) {
+            table.removeSearchIndex(columnKey);
         }
         OsObjectStore.setPrimaryKeyForObject(realm.sharedRealm, getClassName(), null);
         return this;

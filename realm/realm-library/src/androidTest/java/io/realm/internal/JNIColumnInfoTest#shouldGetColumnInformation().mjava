@@ -1,13 +1,10 @@
     @Test
     public void shouldGetColumnInformation() {
-
         assertEquals(2, table.getColumnCount());
 
-        assertEquals("lastName", table.getColumnName(1));
+        long columnKey = table.getColumnKey("lastName");
+        assertNotSame(Table.NO_MATCH, columnKey);
 
-        assertEquals(1, table.getColumnIndex("lastName"));
-
-        assertEquals(RealmFieldType.STRING, table.getColumnType(1));
-
+        assertEquals(RealmFieldType.STRING, table.getColumnType(columnKey));
     }
 

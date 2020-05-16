@@ -1,18 +1,25 @@
     @Override
     public <E> Observable<CollectionChange<RealmList<E>>> changesetsFrom(DynamicRealm realm, final RealmList<E> list) {
+        if (realm.isFrozen()) {
+            return Observable.just(new CollectionChange<RealmList<E>>(list, null));
+        }
         final RealmConfiguration realmConfig = realm.getConfiguration();
+        Scheduler scheduler = getScheduler();
         return Observable.create(new ObservableOnSubscribe<CollectionChange<RealmList<E>>>() {
             @Override
-            public void subscribe(final ObservableEmitter<CollectionChange<RealmList<E>>> emitter) throws Exception {
+            public void subscribe(final ObservableEmitter<CollectionChange<RealmList<E>>> emitter) {
+                // If the Realm has been closed, just create an empty Observable because we assume it is going to be disposed shortly.
+                if (!list.isValid()) return;
+
                 // Gets instance to make sure that the Realm is open for as long as the
                 // Observable is subscribed to it.
                 final DynamicRealm observableRealm = DynamicRealm.getInstance(realmConfig);
                 listRefs.get().acquireReference(list);
                 final OrderedRealmCollectionChangeListener<RealmList<E>> listener = new OrderedRealmCollectionChangeListener<RealmList<E>>() {
                     @Override
-                    public void onChange(RealmList<E> results, OrderedCollectionChangeSet changeSet) {
+                    public void onChange(RealmList<E> list, OrderedCollectionChangeSet changeSet) {
                         if (!emitter.isDisposed()) {
-                            emitter.onNext(new CollectionChange<>(results, changeSet));
+                            emitter.onNext(new CollectionChange<>(returnFrozenObjects ? list.freeze() : list, changeSet));
                         }
                     }
                 };
@@ -22,15 +29,17 @@
                 emitter.setDisposable(Disposables.fromRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        list.removeChangeListener(listener);
-                        observableRealm.close();
+                        if (!observableRealm.isClosed()) {
+                            list.removeChangeListener(listener);
+                            observableRealm.close();
+                        }
                         listRefs.get().releaseReference(list);
                     }
                 }));
 
                 // Emit current value immediately
-                emitter.onNext(new CollectionChange<>(list, null));
+                emitter.onNext(new CollectionChange<>(returnFrozenObjects ? list.freeze() : list, null));
             }
-        });
+        }).subscribeOn(scheduler).unsubscribeOn(scheduler);
     }
 

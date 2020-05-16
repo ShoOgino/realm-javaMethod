@@ -7,13 +7,13 @@
         long intColumn = table.addColumn(intType, intType.name());
         table.addSearchIndex(intColumn);
 
-        QueryDescriptor sortDescriptor = QueryDescriptor.getInstanceForDistinct(null, table, new String[] {
+        QueryDescriptor sortDescriptor = QueryDescriptor.getInstanceForDistinct(null, table, new String[]{
                 stringType.name(), intType.name()});
-        assertEquals(2, sortDescriptor.getColumnIndices().length);
+        assertEquals(2, sortDescriptor.getColumnKeys().length);
         assertNull(sortDescriptor.getAscendings());
-        assertEquals(1, sortDescriptor.getColumnIndices()[0].length);
-        assertEquals(stringColumn, sortDescriptor.getColumnIndices()[0][0]);
-        assertEquals(1, sortDescriptor.getColumnIndices()[1].length);
-        assertEquals(intColumn, sortDescriptor.getColumnIndices()[1][0]);
+        assertEquals(1, sortDescriptor.getColumnKeys()[0].length);
+        assertEquals(stringColumn, sortDescriptor.getColumnKeys()[0][0]);
+        assertEquals(1, sortDescriptor.getColumnKeys()[1].length);
+        assertEquals(intColumn, sortDescriptor.getColumnKeys()[1][0]);
     }
 

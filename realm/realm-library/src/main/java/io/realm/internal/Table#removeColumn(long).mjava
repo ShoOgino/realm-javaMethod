@@ -1,21 +1,21 @@
     /**
      * Removes a column in the table dynamically.
      * <p>
-     * It should be noted if {@code columnIndex} is the same as the primary key column index,
+     * It should be noted if {@code columnKey} is the same as the primary key column key,
      * the primary key column is removed from the meta table.
      *
-     * @param columnIndex the column index to be removed.
+     * @param columnKey the column key to be removed.
      */
-    public void removeColumn(long columnIndex) {
+    public void removeColumn(long columnKey) {
         final String className = getClassName();
-        // Checks the PK column index before removing a column. We don't know if we're hitting a PK col,
+        // Checks the PK column key before removing a column. We don't know if we're hitting a PK col,
         // but it should be noted that once a column is removed, there is no way we can find whether
         // a PK exists or not.
-        final String columnName = getColumnName(columnIndex);
+        final String columnName = getColumnName(columnKey);
         final String pkName = OsObjectStore.getPrimaryKeyForObject(sharedRealm, getClassName());
 
         // First removes a column. If there is no error, we can proceed. Otherwise, it will stop here.
-        nativeRemoveColumn(nativePtr, columnIndex);
+        nativeRemoveColumn(nativeTableRefPtr, columnKey);
 
         // Checks if a PK exists and takes actions if there is.
         if (columnName.equals(pkName)) {

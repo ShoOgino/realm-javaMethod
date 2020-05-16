@@ -1,0 +1,16 @@
+    private <E extends BaseRealm> ReferenceCounter getRefCounter(Class<E> realmClass, OsSharedRealm.VersionID version) {
+        RealmCacheType cacheType = RealmCacheType.valueOf(realmClass);
+        Pair<RealmCacheType, OsSharedRealm.VersionID> key = new Pair<>(cacheType, version);
+        ReferenceCounter refCounter = refAndCountMap.get(key);
+        if (refCounter == null) {
+            if (version.equals(OsSharedRealm.VersionID.LIVE)) {
+                refCounter = new ThreadConfinedReferenceCounter();
+            } else {
+                refCounter = new GlobalReferenceCounter();
+            }
+
+            refAndCountMap.put(key, refCounter);
+        }
+        return refCounter;
+    }
+

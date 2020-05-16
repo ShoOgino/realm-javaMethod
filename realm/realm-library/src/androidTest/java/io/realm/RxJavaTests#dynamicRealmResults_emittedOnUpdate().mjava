@@ -1,19 +1,13 @@
     @Test
     @RunTestInLooperThread
     public void dynamicRealmResults_emittedOnUpdate() {
-        final AtomicInteger subscriberCalled = new AtomicInteger(0);
         final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.getConfiguration());
-        dynamicRealm.beginTransaction();
         RealmResults<DynamicRealmObject> results = dynamicRealm.where(AllTypes.CLASS_NAME).findAll();
-        dynamicRealm.commitTransaction();
 
-        subscription = results.asFlowable().subscribe(new Consumer<RealmResults<DynamicRealmObject>>() {
-            @Override
-            public void accept(RealmResults<DynamicRealmObject> dynamicRealmObjects) throws Exception {
-                if (subscriberCalled.incrementAndGet() == 2) {
-                    dynamicRealm.close();
-                    looperThread.testComplete();
-                }
+        subscription = results.asFlowable().subscribe(rxResults -> {
+            assertTrue(rxResults.isFrozen());
+            if (rxResults.isLoaded() && rxResults.size() == 1) {
+                disposeSuccessfulTest(dynamicRealm);
             }
         });
 

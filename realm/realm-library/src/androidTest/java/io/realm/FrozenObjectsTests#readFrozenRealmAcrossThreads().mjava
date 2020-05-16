@@ -1,0 +1,10 @@
+    @Test
+    public void readFrozenRealmAcrossThreads() throws InterruptedException {
+        Thread t = new Thread(() -> {
+            assertTrue(frozenRealm.isEmpty());
+            assertTrue(frozenRealm.isFrozen());
+        });
+        t.start();
+        t.join();
+    }
+

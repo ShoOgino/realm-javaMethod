@@ -1,19 +1,16 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void realmList_emittedOnSubscribe() {
-        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         realm.beginTransaction();
         final RealmList<Dog> list = realm.createObject(AllTypes.class).getColumnRealmList();
+        list.add(new Dog("dog"));
         realm.commitTransaction();
-        subscription = list.asFlowable().subscribe(new Consumer<RealmList<Dog>>() {
-            @Override
-            @SuppressWarnings("ReferenceEquality")
-            public void accept(RealmList<Dog> rxList) throws Exception {
-                assertTrue(rxList == list);
-                subscribedNotified.set(true);
-            }
+
+        subscription = list.asFlowable().subscribe(rxList -> {
+            assertTrue(rxList.isFrozen());
+            assertEquals(1, rxList.size());
+            assertEquals("dog", rxList.first().getName());
+            disposeSuccessfulTest(realm);
         });
-        assertTrue(subscribedNotified.get());
-        subscription.dispose();
     }
 

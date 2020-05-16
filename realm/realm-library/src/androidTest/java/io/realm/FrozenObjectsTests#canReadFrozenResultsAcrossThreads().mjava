@@ -1,0 +1,12 @@
+    @Test
+    public void canReadFrozenResultsAcrossThreads() throws InterruptedException {
+        Realm frozenRealm = createDataForFrozenRealm(DATA_SIZE);
+        RealmResults<AllTypes> results = frozenRealm.where(AllTypes.class).findAll();
+        Thread t = new Thread(() -> {
+            assertEquals(DATA_SIZE, results.size());
+            assertTrue(results.isFrozen());
+        });
+        t.start();
+        t.join();
+    }
+

@@ -1,23 +1,19 @@
     @Test
     @RunTestInLooperThread
     public void realmObject_emittedOnUpdate() {
-        final AtomicInteger subscriberCalled = new AtomicInteger(0);
-        Realm realm = looperThread.getRealm();
         realm.beginTransaction();
         final AllTypes obj = realm.createObject(AllTypes.class);
         realm.commitTransaction();
 
-        subscription = obj.<AllTypes>asFlowable().subscribe(new Consumer<AllTypes>() {
-            @Override
-            public void accept(AllTypes allTypes) throws Exception {
-                if (subscriberCalled.incrementAndGet() == 2) {
-                    looperThread.testComplete();
-                }
+        subscription = obj.<AllTypes>asFlowable().subscribe(rxObject -> {
+            assertTrue(rxObject.isFrozen());
+            if (rxObject.isLoaded() && rxObject.getColumnLong() == 0) {
+                realm.beginTransaction();
+                obj.setColumnLong(1);
+                realm.commitTransaction();
+            } else if (rxObject.getColumnLong() == 1) {
+                disposeSuccessfulTest(realm);
             }
         });
-
-        realm.beginTransaction();
-        obj.setColumnLong(1);
-        realm.commitTransaction();
     }
 

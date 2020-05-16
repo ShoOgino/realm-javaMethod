@@ -1,0 +1,101 @@
+    /**
+     * Appends the specified row to the end of the table. For internal testing usage only.
+     *
+     * @param table the table where the object to be added.
+     * @param values values.
+     * @return the row index of the appended row.
+     * @deprecated Remove this functions since it doesn't seem to be useful. And this function does deal with tables
+     * with primary key defined well. Primary key has to be set with `setXxxUnique` as the first thing to do after row
+     * added.
+     */
+    public static long addRowWithValues(Table table, long[] columnKeys, Object[] values) {
+        long rowKey = OsObject.createRow(table);
+
+        // Checks values types.
+        int columns = (int) table.getColumnCount();
+        if (columns != values.length) {
+            throw new IllegalArgumentException("The number of value parameters (" +
+                    String.valueOf(values.length) +
+                    ") does not match the number of columns in the table (" +
+                    String.valueOf(columns) + ").");
+        }
+        RealmFieldType[] colTypes = new RealmFieldType[columns];
+        for (int i = 0; i < columnKeys.length; i++) {
+            Object value = values[i];
+            RealmFieldType colType = table.getColumnType(columnKeys[i]);
+            colTypes[i] = colType;
+            if (!colType.isValid(value)) {
+                // String representation of the provided value type.
+                String providedType;
+                if (value == null) {
+                    providedType = "null";
+                } else {
+                    providedType = value.getClass().toString();
+                }
+
+                throw new IllegalArgumentException("Invalid argument no " + (i + 1) +
+                        ". Expected a value compatible with column type " + colType + ", but got " + providedType + ".");
+            }
+        }
+
+        // Inserts values.
+        for (int i = 0; i < columnKeys.length; i++) {
+            Object value = values[i];
+            switch (colTypes[i]) {
+                case BOOLEAN:
+                    if (value == null) {
+                        table.setNull(columnKeys[i], rowKey, false);
+                    } else {
+                        table.setBoolean(columnKeys[i], rowKey, (Boolean) value, false);
+                    }
+                    break;
+                case INTEGER:
+                    if (value == null) {
+                        table.setNull(columnKeys[i], rowKey, false);
+                    } else {
+                        long longValue = ((Number) value).longValue();
+                        table.setLong(columnKeys[i], rowKey, longValue, false);
+                    }
+                    break;
+                case FLOAT:
+                    if (value == null) {
+                        table.setNull(columnKeys[i], rowKey, false);
+                    } else {
+                        table.setFloat(columnKeys[i], rowKey, (Float) value, false);
+                    }
+                    break;
+                case DOUBLE:
+                    if (value == null) {
+                        table.setNull(columnKeys[i], rowKey, false);
+                    } else {
+                        table.setDouble(columnKeys[i], rowKey, (Double) value, false);
+                    }
+                    break;
+                case STRING:
+                    if (value == null) {
+                        table.setNull(columnKeys[i], rowKey, false);
+                    } else {
+                        table.setString(columnKeys[i], rowKey, (String) value, false);
+                    }
+                    break;
+                case DATE:
+                    if (value == null) {
+                        table.setNull(columnKeys[i], rowKey, false);
+                    } else {
+                        table.setDate(columnKeys[i], rowKey, (Date) value, false);
+                    }
+                    break;
+                case BINARY:
+                    if (value == null) {
+                        table.setNull(columnKeys[i], rowKey, false);
+                    } else {
+                        table.setBinaryByteArray(columnKeys[i], rowKey, (byte[]) value, false);
+                    }
+                    break;
+                default:
+                    throw new RuntimeException("Unexpected columnType: " + String.valueOf(colTypes[i]));
+            }
+        }
+        return rowKey;
+    }
+

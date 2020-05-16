@@ -1,0 +1,21 @@
+    @Test
+    public void copyToRealm() throws InterruptedException {
+        Realm realm = createDataForLiveRealm(DATA_SIZE);
+        AllTypes frozenObject = realm.where(AllTypes.class).sort(AllTypes.FIELD_LONG).findFirst().freeze();
+
+        Thread t = new Thread(() -> {
+            Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+            bgRealm.beginTransaction();
+            AllTypes copiedObject = bgRealm.copyToRealm(frozenObject);
+            bgRealm.commitTransaction();
+
+            assertEquals(DATA_SIZE + 1, bgRealm.where(AllTypes.class).count());
+            assertEquals(frozenObject.getColumnLong(), copiedObject.getColumnLong());
+            assertEquals(frozenObject.getColumnString(), copiedObject.getColumnString());
+            assertEquals(frozenObject.getColumnRealmList().size(), copiedObject.getColumnRealmList().size());
+            bgRealm.close();
+        });
+        t.start();
+        t.join();
+    }
+

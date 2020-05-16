@@ -7,11 +7,11 @@
         some_test_SimpleRealmProxyInterface realmObjectSource = (some_test_SimpleRealmProxyInterface) newObject;
 
         Table table = realm.getTable(some.test.Simple.class);
-        OsObjectBuilder builder = new OsObjectBuilder(table, columnInfo.maxColumnIndexValue, flags);
+        OsObjectBuilder builder = new OsObjectBuilder(table, flags);
 
         // Add all non-"object reference" fields
-        builder.addString(columnInfo.nameIndex, realmObjectSource.realmGet$name());
-        builder.addInteger(columnInfo.ageIndex, realmObjectSource.realmGet$age());
+        builder.addString(columnInfo.nameColKey, realmObjectSource.realmGet$name());
+        builder.addInteger(columnInfo.ageColKey, realmObjectSource.realmGet$age());
 
         // Create the underlying object and cache it before setting any object/objectlist references
         // This will allow us to break any circular dependencies by using the object cache.

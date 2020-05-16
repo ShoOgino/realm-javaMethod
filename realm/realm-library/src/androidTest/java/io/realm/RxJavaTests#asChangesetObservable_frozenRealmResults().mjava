@@ -1,0 +1,13 @@
+    @Test
+    @RunTestInLooperThread
+    public void asChangesetObservable_frozenRealmResults() {
+        final RealmResults<AllTypes> frozenResults = realm.where(AllTypes.class).findAll().freeze();
+        subscription = frozenResults.asChangesetObservable().subscribe(change -> {
+            RealmResults<AllTypes> rxResults = change.getCollection();
+            assertTrue(rxResults.isFrozen());
+            assertEquals(frozenResults, rxResults);
+            assertNull(change.getChangeset());
+            disposeSuccessfulTest(realm);
+        });
+    }
+

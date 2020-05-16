@@ -1,0 +1,13 @@
+    @Test
+    public void deleteFrozenRealm() {
+        RealmConfiguration config = configFactory.createConfigurationBuilder().name("deletable.realm").build();
+        Realm realm = Realm.getInstance(config);
+        frozenRealm = realm.freeze();
+        try {
+            Realm.deleteRealm(config);
+        } catch (IllegalStateException ignore) {
+        }
+        realm.close();
+        assertTrue(Realm.deleteRealm(config));
+    }
+

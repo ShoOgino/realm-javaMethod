@@ -23,14 +23,14 @@
         }
 
         proxyState.getRealm$realm().checkIfValid();
-        OsList osList = proxyState.getRow$realm().getModelList(columnInfo.columnRealmListIndex);
+        OsList osList = proxyState.getRow$realm().getModelList(columnInfo.columnRealmListColKey);
         // For lists of equal lengths, we need to set each element directly as clearing the receiver list can be wrong if the input and target list are the same.
         if (value != null && value.size() == osList.size()) {
             int objects = value.size();
             for (int i = 0; i < objects; i++) {
                 some.test.AllTypes linkedObject = value.get(i);
                 proxyState.checkValidObject(linkedObject);
-                osList.setRow(i, ((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getIndex());
+                osList.setRow(i, ((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getObjectKey());
             }
         } else {
             osList.removeAll();
@@ -41,7 +41,7 @@
             for (int i = 0; i < objects; i++) {
                 some.test.AllTypes linkedObject = value.get(i);
                 proxyState.checkValidObject(linkedObject);
-                osList.addRow(((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getIndex());
+                osList.addRow(((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getObjectKey());
             }
         }
     }

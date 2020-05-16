@@ -1,0 +1,22 @@
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealmList<E> freeze() {
+        if (isManaged()) {
+            if (!isValid()) {
+                throw new IllegalStateException("Only valid, managed RealmLists can be frozen.");
+            }
+
+            BaseRealm frozenRealm = realm.freeze();
+            OsList frozenList = getOsList().freeze(frozenRealm.sharedRealm);
+            if (className != null) {
+                return new RealmList<>(className, frozenList, frozenRealm);
+            } else {
+                return new RealmList<>(clazz, frozenList, frozenRealm);
+            }
+        } else {
+            throw new UnsupportedOperationException(ONLY_IN_MANAGED_MODE_MESSAGE);
+        }
+    }
+

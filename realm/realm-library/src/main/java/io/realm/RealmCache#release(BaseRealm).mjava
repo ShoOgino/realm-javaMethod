@@ -6,11 +6,8 @@
      */
     synchronized void release(BaseRealm realm) {
         String canonicalPath = realm.getPath();
-        RefAndCount refAndCount = refAndCountMap.get(RealmCacheType.valueOf(realm.getClass()));
-        Integer refCount = refAndCount.localCount.get();
-        if (refCount == null) {
-            refCount = 0;
-        }
+        ReferenceCounter referenceCounter = getRefCounter(realm.getClass(), (realm.isFrozen()) ? realm.sharedRealm.getVersionID() : OsSharedRealm.VersionID.LIVE);
+        int refCount = referenceCounter.getThreadLocalCount();
 
         if (refCount <= 0) {
             RealmLog.warn("%s has been closed already. refCount is %s", canonicalPath, refCount);
@@ -21,34 +18,37 @@
         refCount -= 1;
 
         if (refCount == 0) {
-            // The last instance in this thread.
-            // Clears local ref & counter.
-            refAndCount.localCount.set(null);
-            refAndCount.localRealm.set(null);
-
-            // Clears global counter.
-            refAndCount.globalCount--;
-            if (refAndCount.globalCount < 0) {
-                // Should never happen.
-                throw new IllegalStateException("Global reference counter of Realm" + canonicalPath +
-                        " got corrupted.");
-            }
+            referenceCounter.clearThreadLocalCache();
 
             // No more local reference to this Realm in current thread, close the instance.
             realm.doClose();
 
             // No more instance of typed Realm and dynamic Realm.
-            if (getTotalGlobalRefCount() == 0) {
+            if (getTotalLiveRealmGlobalRefCount() == 0) {
                 // We keep the cache in the caches list even when its global counter reaches 0. It will be reused when
                 // next time a Realm instance with the same path is opened. By not removing it, the lock on
                 // cachesList is not needed here.
                 configuration = null;
-                ObjectServerFacade.getFacade(realm.getConfiguration().isSyncConfiguration())
-                        .realmClosed(realm.getConfiguration());
+
+                // Close all frozen Realms. This can introduce race conditions on other
+                // threads if the lifecyle of using Realm data is not correctly controlled.
+                for (ReferenceCounter counter : refAndCountMap.values()) {
+                    if (counter instanceof GlobalReferenceCounter) {
+                        BaseRealm cachedRealm = counter.getRealmInstance();
+                        // Since we don't remove ReferenceCounters, we need to check if the Realm is still open
+                        if (cachedRealm != null) {
+                            // Gracefully close frozen Realms in a similar way to what a user would normally do.
+                            while (!cachedRealm.isClosed()) {
+                                cachedRealm.close();
+                            }
+                        }
+                    }
+                }
+                ObjectServerFacade.getFacade(realm.getConfiguration().isSyncConfiguration()).realmClosed(realm.getConfiguration());
             }
 
         } else {
-            refAndCount.localCount.set(refCount);
+            referenceCounter.setThreadCount(refCount);
         }
     }
 

@@ -1,16 +1,16 @@
     /**
-     * Sets a String value to a cell of Table, pointed by column and row index.
+     * Sets a String value to a cell of Table, pointed by column and row key.
      *
-     * @param columnIndex 0 based index value of the cell column.
-     * @param rowIndex 0 based index value of the cell row.
+     * @param columnKey cell column.
+     * @param rowKey cell row.
      * @param value a String value to set in the cell.
      */
-    public void setString(long columnIndex, long rowIndex, @Nullable String value, boolean isDefault) {
+    public void setString(long columnKey, long rowKey, @Nullable String value, boolean isDefault) {
         checkImmutable();
         if (value == null) {
-            nativeSetNull(nativePtr, columnIndex, rowIndex, isDefault);
+            nativeSetNull(nativeTableRefPtr, columnKey, rowKey, isDefault);
         } else {
-            nativeSetString(nativePtr, columnIndex, rowIndex, value, isDefault);
+            nativeSetString(nativeTableRefPtr, columnKey, rowKey, value, isDefault);
         }
     }
 

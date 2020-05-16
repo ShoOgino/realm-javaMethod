@@ -1,25 +1,24 @@
     @Test
     @RunTestInLooperThread
     public void dynamicRealmObject_emittedChangesetOnUpdate() {
-        final AtomicInteger subscriberCalled = new AtomicInteger(0);
-        DynamicRealm realm = DynamicRealm.getInstance(looperThread.getConfiguration());
-        looperThread.closeAfterTest(realm);
-        realm.beginTransaction();
-        final DynamicRealmObject obj = realm.createObject(AllTypes.CLASS_NAME);
-        realm.commitTransaction();
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.getConfiguration());
 
-        subscription = obj.asChangesetObservable().subscribe(new Consumer<ObjectChange<RealmObject>>() {
-            @Override
-            public void accept(ObjectChange<RealmObject> change) throws Exception {
-                if (subscriberCalled.incrementAndGet() == 2) {
-                    assertNotNull(change.getChangeset());
-                    assertTrue(change.getChangeset().isFieldChanged(AllTypes.FIELD_LONG));
-                    looperThread.testComplete();
-                }
+        dynamicRealm.beginTransaction();
+        final DynamicRealmObject obj = dynamicRealm.createObject(AllTypes.CLASS_NAME);
+        dynamicRealm.commitTransaction();
+
+        subscription = obj.<DynamicRealmObject>asChangesetObservable().subscribe(change -> {
+            DynamicRealmObject rxObject = change.getObject();
+            assertTrue(rxObject.isFrozen());
+            if (rxObject.getLong(AllTypes.FIELD_LONG) == 0) {
+                dynamicRealm.beginTransaction();
+                obj.setLong(AllTypes.FIELD_LONG, 1);
+                dynamicRealm.commitTransaction();
+            } else if (rxObject.getLong(AllTypes.FIELD_LONG) == 1) {
+                assertNotNull(change.getChangeset());
+                assertTrue(change.getChangeset().isFieldChanged(AllTypes.FIELD_LONG));
+                disposeSuccessfulTest(dynamicRealm);
             }
         });
-        realm.beginTransaction();
-        obj.setLong(AllTypes.FIELD_LONG, 1);
-        realm.commitTransaction();
     }
 

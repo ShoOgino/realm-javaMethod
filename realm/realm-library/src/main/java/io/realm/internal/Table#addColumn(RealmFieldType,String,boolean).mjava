@@ -4,7 +4,7 @@
      * @param type the column type.
      * @param name the field/column name.
      * @param isNullable {@code true} if column can contain null values, {@code false} otherwise.
-     * @return the index of the new column.
+     * @return the column key of the new column.
      */
     public long addColumn(RealmFieldType type, String name, boolean isNullable) {
         verifyColumnName(name);
@@ -16,7 +16,7 @@
             case DATE:
             case FLOAT:
             case DOUBLE:
-                return nativeAddColumn(nativePtr, type.getNativeValue(), name, isNullable);
+                return nativeAddColumn(nativeTableRefPtr, type.getNativeValue(), name, isNullable);
 
             case INTEGER_LIST:
             case BOOLEAN_LIST:
@@ -25,7 +25,7 @@
             case DATE_LIST:
             case FLOAT_LIST:
             case DOUBLE_LIST:
-                return nativeAddPrimitiveListColumn(nativePtr, type.getNativeValue() - 128, name, isNullable);
+                return nativeAddPrimitiveListColumn(nativeTableRefPtr, type.getNativeValue() - 128, name, isNullable);
 
             default:
                 throw new IllegalArgumentException("Unsupported type: " + type);

@@ -1,0 +1,16 @@
+    @Test
+    @RunTestInLooperThread
+    public void asChangesetObservable_frozenRealmObject() {
+        realm.beginTransaction();
+        final AllJavaTypes obj = realm.createObject(AllJavaTypes.class, 42);
+        realm.commitTransaction();
+
+        subscription = obj.<AllJavaTypes>freeze().<AllJavaTypes>asChangesetObservable().subscribe(change -> {
+            AllJavaTypes rxObject = change.getObject();
+            assertTrue(rxObject.isFrozen());
+            assertNotEquals(rxObject, obj);
+            assertEquals(rxObject.getFieldId(), obj.getFieldId());
+            disposeSuccessfulTest(realm);
+        });
+    }
+

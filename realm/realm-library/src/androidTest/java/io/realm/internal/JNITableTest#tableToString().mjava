@@ -3,12 +3,12 @@
         Table t = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
             @Override
             public void execute(Table t) {
-                t.addColumn(RealmFieldType.STRING, "stringCol");
-                t.addColumn(RealmFieldType.INTEGER, "intCol");
-                t.addColumn(RealmFieldType.BOOLEAN, "boolCol");
+                long colKey1 = t.addColumn(RealmFieldType.STRING, "stringCol");
+                long colKey2 = t.addColumn(RealmFieldType.INTEGER, "intCol");
+                long colKey3 = t.addColumn(RealmFieldType.BOOLEAN, "boolCol");
 
-                TestHelper.addRowWithValues(t, "s1", 1, true);
-                TestHelper.addRowWithValues(t, "s2", 2, false);
+                TestHelper.addRowWithValues(t, new long[]{colKey1, colKey2, colKey3}, new Object[]{"s1", 1, true});
+                TestHelper.addRowWithValues(t, new long[]{colKey1, colKey2, colKey3}, new Object[]{"s2", 2, false});
             }
         });
 

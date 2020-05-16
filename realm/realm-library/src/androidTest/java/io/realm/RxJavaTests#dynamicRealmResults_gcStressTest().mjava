@@ -6,40 +6,26 @@
     public void dynamicRealmResults_gcStressTest() {
         final int TEST_SIZE = 50;
         final AtomicLong innerCounter = new AtomicLong();
-        final DynamicRealm realm = DynamicRealm.getInstance(looperThread.getConfiguration());
-        looperThread.closeAfterTest(realm);
+        final DynamicRealm dynamicRealm = DynamicRealm.getInstance(looperThread.getConfiguration());
 
-        realm.beginTransaction();
+        dynamicRealm.beginTransaction();
         for (int i = 0; i < TEST_SIZE; i++) {
-            realm.createObject(AllTypes.CLASS_NAME).set(AllTypes.FIELD_LONG, i);
+            dynamicRealm.createObject(AllTypes.CLASS_NAME).set(AllTypes.FIELD_LONG, i);
         }
-        realm.commitTransaction();
+        dynamicRealm.commitTransaction();
 
         for (int i = 0; i < TEST_SIZE; i++) {
             // Doesn't keep a reference to the Observable.
-            realm.where(AllTypes.CLASS_NAME).equalTo(AllTypes.FIELD_LONG, i).findAllAsync().asFlowable()
-                    .filter(new Predicate<RealmResults<DynamicRealmObject>>() {
-                        @Override
-                        public boolean test(RealmResults<DynamicRealmObject> results) throws Exception {
-                            return results.isLoaded();
-                        }
-                    })
+            dynamicRealm.where(AllTypes.CLASS_NAME).equalTo(AllTypes.FIELD_LONG, i).findAllAsync().asFlowable()
+                    .filter(results -> results.isLoaded())
                     .take(1) // Unsubscribes from Realm.
-                    .subscribe(new Consumer<RealmResults<DynamicRealmObject>>() {
-                        @Override
-                        public void accept(RealmResults<DynamicRealmObject> dynamicRealmObjects) throws Exception {
-                            // Not guaranteed, but can result in the GC of other RealmResults waiting for a result.
-                            Runtime.getRuntime().gc();
-                            if (innerCounter.incrementAndGet() == TEST_SIZE) {
-                                looperThread.testComplete();
-                            }
+                    .subscribe(dynamicRealmObjects -> {
+                        // Not guaranteed, but can result in the GC of other RealmResults waiting for a result.
+                        Runtime.getRuntime().gc();
+                        if (innerCounter.incrementAndGet() == TEST_SIZE) {
+                            disposeSuccessfulTest(dynamicRealm);
                         }
-                    }, new Consumer<Throwable>() {
-                        @Override
-                        public void accept(Throwable throwable) throws Exception {
-                            fail(throwable.toString());
-                        }
-                    });
+                    }, throwable -> fail(throwable.toString()));
         }
     }
 

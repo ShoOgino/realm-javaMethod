@@ -1,0 +1,51 @@
+    @Test
+    public void writeToFrozenObjectThrows() {
+        realm.beginTransaction();
+        try {
+            frozenRealm.createObject(AllTypes.class);
+            fail();
+        } catch (IllegalStateException ignore) {
+        } finally {
+            realm.cancelTransaction();
+        }
+
+        realm.beginTransaction();
+        try {
+            frozenRealm.insert(new AllTypes());
+            fail();
+        } catch (IllegalStateException ignore) {
+        } finally {
+            realm.cancelTransaction();
+        }
+
+        realm.beginTransaction();
+        try {
+            frozenRealm.copyToRealm(new AllTypes());
+            fail();
+        } catch (IllegalStateException ignore) {
+        } finally {
+            realm.cancelTransaction();
+        }
+
+        realm.executeTransaction(r -> {
+            r.createObject(AllTypes.class);
+        });
+        Realm frozenRealm = realm.freeze();
+        AllTypes obj = frozenRealm.where(AllTypes.class).findFirst();
+        realm.beginTransaction();
+        try {
+            obj.setColumnString("Foo");
+            fail();
+        } catch (IllegalStateException ignore) {
+        } finally {
+            realm.cancelTransaction();
+        }
+
+        try {
+            frozenRealm.executeTransactionAsync(r -> {  /* Do nothing */ });
+        } catch (IllegalStateException ignore) {
+        } finally {
+            frozenRealm.close();
+        }
+    }
+

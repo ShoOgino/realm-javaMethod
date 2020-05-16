@@ -1,18 +1,12 @@
     @Test
     @RunTestInLooperThread
     public void realmResults_emittedOnUpdate() {
-        final AtomicInteger subscriberCalled = new AtomicInteger(0);
-        Realm realm = looperThread.getRealm();
-        realm.beginTransaction();
         RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
-        realm.commitTransaction();
 
-        subscription = results.asFlowable().subscribe(new Consumer<RealmResults<AllTypes>>() {
-            @Override
-            public void accept(RealmResults<AllTypes> allTypes) throws Exception {
-                if (subscriberCalled.incrementAndGet() == 2) {
-                    looperThread.testComplete();
-                }
+        subscription = results.asFlowable().subscribe(rxResults -> {
+            assertTrue(rxResults.isFrozen());
+            if (rxResults.size() == 1) {
+                disposeSuccessfulTest(realm);
             }
         });
 

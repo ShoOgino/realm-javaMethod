@@ -1,0 +1,18 @@
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DynamicRealm freeze() {
+        // In some cases a Read transaction has not begun for the Realm, which means
+        // we cannot read the current version. In that case, do some work that will create the
+        // read transaction.
+        OsSharedRealm.VersionID version;
+        try {
+            version = sharedRealm.getVersionID();
+        } catch (IllegalStateException e) {
+            getVersion();
+            version = sharedRealm.getVersionID();
+        }
+        return RealmCache.createRealmOrGetFromCache(configuration, DynamicRealm.class, version);
+    }
+

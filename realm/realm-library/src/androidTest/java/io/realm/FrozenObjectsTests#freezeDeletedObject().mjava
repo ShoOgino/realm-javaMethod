@@ -1,0 +1,13 @@
+    @Test
+    public void freezeDeletedObject() {
+        Realm realm = createDataForLiveRealm(DATA_SIZE);
+        AllTypes obj = realm.where(AllTypes.class).sort(AllTypes.FIELD_LONG).findFirst();
+        realm.executeTransaction(r -> {
+            obj.deleteFromRealm();
+        });
+        AllTypes frozenObj = obj.freeze();
+        assertFalse(frozenObj.isValid());
+        assertTrue(frozenObj.isFrozen());
+        assertTrue(frozenObj.isLoaded());
+    }
+

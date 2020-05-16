@@ -15,13 +15,13 @@
         if (primitiveType == null) {
             throw new IllegalArgumentException("Non-null 'primitiveType' required.");
         }
-        long columnIndex = proxyState.getRow$realm().getColumnIndex(fieldName);
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
         RealmFieldType realmType = classToRealmType(primitiveType);
         try {
-            OsList osList = proxyState.getRow$realm().getValueList(columnIndex, realmType);
+            OsList osList = proxyState.getRow$realm().getValueList(columnKey, realmType);
             return new RealmList<>(primitiveType, osList, proxyState.getRealm$realm());
         } catch (IllegalArgumentException e) {
-            checkFieldType(fieldName, columnIndex, realmType);
+            checkFieldType(fieldName, columnKey, realmType);
             throw e;
         }
     }

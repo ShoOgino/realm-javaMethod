@@ -1,0 +1,19 @@
+    @Test
+    public void insertList() throws InterruptedException {
+        Realm realm = createDataForLiveRealm(DATA_SIZE);
+        AllTypes frozenObject1 = realm.where(AllTypes.class).sort(AllTypes.FIELD_LONG, Sort.ASCENDING).findFirst().freeze();
+        AllTypes frozenObject2 = realm.where(AllTypes.class).sort(AllTypes.FIELD_LONG, Sort.DESCENDING).findFirst().freeze();
+
+        Thread t = new Thread(() -> {
+            Realm bgRealm = Realm.getInstance(realm.getConfiguration());
+            bgRealm.beginTransaction();
+            bgRealm.insert(Arrays.asList(frozenObject1, frozenObject2));
+            bgRealm.commitTransaction();
+
+            assertEquals(DATA_SIZE + 2, bgRealm.where(AllTypes.class).count());
+            bgRealm.close();
+        });
+        t.start();
+        t.join();
+    }
+

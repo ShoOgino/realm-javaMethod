@@ -1,16 +1,12 @@
     @Test
-    @UiThreadTest
+    @RunTestInLooperThread
     public void realmResults_emittedChangesetOnSubscribe() {
-        final AtomicBoolean subscribedNotified = new AtomicBoolean(false);
         final RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
-        subscription = results.asChangesetObservable().subscribe(new Consumer<CollectionChange<RealmResults<AllTypes>>>() {
-            @Override
-            public void accept(CollectionChange<RealmResults<AllTypes>> change) throws Exception {
-                assertEquals(results, change.getCollection());
-                subscribedNotified.set(true);
-            }
+        subscription = results.asChangesetObservable().subscribe(change -> {
+            RealmResults<AllTypes> rxResults = change.getCollection();
+            assertTrue(rxResults.isFrozen());
+            assertEquals(results, rxResults);
+            disposeSuccessfulTest(realm);
         });
-        assertTrue(subscribedNotified.get());
-        subscription.dispose();
     }
 

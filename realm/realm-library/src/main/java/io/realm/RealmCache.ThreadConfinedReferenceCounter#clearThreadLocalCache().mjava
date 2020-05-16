@@ -1,0 +1,16 @@
+        @Override
+        public void clearThreadLocalCache() {
+            String canonicalPath = localRealm.get().getPath();
+
+            // The last instance in this thread.
+            // Clears local ref & counter.
+            localCount.set(null);
+            localRealm.set(null);
+
+            // Clears global counter.
+            if (globalCount.decrementAndGet() < 0) {
+                // Should never happen.
+                throw new IllegalStateException("Global reference counter of Realm" + canonicalPath + " can not be negative.");
+            }
+        }
+

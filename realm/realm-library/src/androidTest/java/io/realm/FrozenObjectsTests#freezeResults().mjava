@@ -1,0 +1,19 @@
+    @Test
+    public void freezeResults() throws InterruptedException {
+        Realm realm = createDataForLiveRealm(DATA_SIZE);
+        RealmResults<AllTypes> results = realm.where(AllTypes.class).findAll();
+        RealmResults<AllTypes> frozenResults = results.freeze();
+        assertEquals(DATA_SIZE, frozenResults.size());
+        assertTrue(frozenResults.isFrozen());
+        assertTrue(frozenResults.isValid());
+        assertTrue(frozenResults.isLoaded());
+
+        Thread t = new Thread(() -> {
+            assertEquals(DATA_SIZE, frozenResults.size());
+            assertTrue(frozenResults.isFrozen());
+            assertEquals(1, frozenResults.where().equalTo(AllTypes.FIELD_LONG, 1).findAll().size());
+        });
+        t.start();
+        t.join();
+    }
+

@@ -1,5 +1,5 @@
     public static some.test.AllTypes copyOrUpdate(Realm realm, AllTypesColumnInfo columnInfo, some.test.AllTypes object, boolean update, Map<RealmModel,RealmObjectProxy> cache, Set<ImportFlag> flags) {
-        if (object instanceof RealmObjectProxy && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm() != null) {
+        if (object instanceof RealmObjectProxy && !RealmObject.isFrozen(object) && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm() != null) {
             final BaseRealm otherRealm = ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm();
             if (otherRealm.threadId != realm.threadId) {
                 throw new IllegalArgumentException("Objects which belong to Realm instances in other threads cannot be copied into this Realm instance.");
@@ -18,19 +18,19 @@
         boolean canUpdate = update;
         if (canUpdate) {
             Table table = realm.getTable(some.test.AllTypes.class);
-            long pkColumnIndex = columnInfo.columnStringIndex;
+            long pkColumnKey = columnInfo.columnStringColKey;
             String value = ((some_test_AllTypesRealmProxyInterface) object).realmGet$columnString();
-            long rowIndex = Table.NO_MATCH;
+            long colKey = Table.NO_MATCH;
             if (value == null) {
-                rowIndex = table.findFirstNull(pkColumnIndex);
+                colKey = table.findFirstNull(pkColumnKey);
             } else {
-                rowIndex = table.findFirstString(pkColumnIndex, value);
+                colKey = table.findFirstString(pkColumnKey, value);
             }
-            if (rowIndex == Table.NO_MATCH) {
+            if (colKey == Table.NO_MATCH) {
                 canUpdate = false;
             } else {
                 try {
-                    objectContext.set(realm, table.getUncheckedRow(rowIndex), columnInfo, false, Collections.<String> emptyList());
+                    objectContext.set(realm, table.getUncheckedRow(colKey), columnInfo, false, Collections.<String> emptyList());
                     realmObject = new io.realm.some_test_AllTypesRealmProxy();
                     cache.put(object, (RealmObjectProxy) realmObject);
                 } finally {

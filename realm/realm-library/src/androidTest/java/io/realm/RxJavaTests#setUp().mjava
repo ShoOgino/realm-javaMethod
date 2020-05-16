@@ -1,10 +1,19 @@
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         // For non-LooperThread tests.
-        realm = Realm.getInstance(configFactory.createConfiguration());
+        realm = looperThread.getRealm();
         looperThread.runAfterTest(() -> {
             if (subscription != null && !subscription.isDisposed()) {
                 subscription.dispose();
+                realm.close();
+
+
+
+                // Wait for Realm Observables to fully close
+                while (Realm.getGlobalInstanceCount(realm.configuration) > 0) {
+                    RealmLog.error("Counter: " + Realm.getGlobalInstanceCount(realm.configuration));
+                    SystemClock.sleep(10);
+                }
             }
         });
     }

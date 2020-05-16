@@ -2,11 +2,11 @@
     public void hashCode_withDifferentRxObservableFactory() {
         RealmConfiguration config1 = configFactory.createConfigurationBuilder()
                 .directory(configFactory.getRoot())
-                .rxFactory(new RealmObservableFactory())
+                .rxFactory(new RealmObservableFactory(false))
                 .build();
         RealmConfiguration config2 = configFactory.createConfigurationBuilder()
                 .directory(configFactory.getRoot())
-                .rxFactory(new RealmObservableFactory() {
+                .rxFactory(new RealmObservableFactory(false) {
                     @Override
                     public int hashCode() {
                         return super.hashCode() + 1;

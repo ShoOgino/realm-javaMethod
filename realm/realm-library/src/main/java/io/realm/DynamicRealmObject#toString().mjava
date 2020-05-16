@@ -2,7 +2,7 @@
     public String toString() {
         proxyState.getRealm$realm().checkIfValid();
 
-        if (!proxyState.getRow$realm().isAttached()) {
+        if (!proxyState.getRow$realm().isValid()) {
             return "Invalid object";
         }
 
@@ -10,61 +10,61 @@
         StringBuilder sb = new StringBuilder(className + " = dynamic[");
         String[] fields = getFieldNames();
         for (String field : fields) {
-            long columnIndex = proxyState.getRow$realm().getColumnIndex(field);
-            RealmFieldType type = proxyState.getRow$realm().getColumnType(columnIndex);
+            long columnKey = proxyState.getRow$realm().getColumnKey(field);
+            RealmFieldType type = proxyState.getRow$realm().getColumnType(columnKey);
             sb.append("{");
             sb.append(field).append(":");
             switch (type) {
                 case BOOLEAN:
-                    sb.append(proxyState.getRow$realm().isNull(columnIndex) ? "null" : proxyState.getRow$realm().getBoolean(columnIndex));
+                    sb.append(proxyState.getRow$realm().isNull(columnKey) ? "null" : proxyState.getRow$realm().getBoolean(columnKey));
                     break;
                 case INTEGER:
-                    sb.append(proxyState.getRow$realm().isNull(columnIndex) ? "null" : proxyState.getRow$realm().getLong(columnIndex));
+                    sb.append(proxyState.getRow$realm().isNull(columnKey) ? "null" : proxyState.getRow$realm().getLong(columnKey));
                     break;
                 case FLOAT:
-                    sb.append(proxyState.getRow$realm().isNull(columnIndex) ? "null" : proxyState.getRow$realm().getFloat(columnIndex));
+                    sb.append(proxyState.getRow$realm().isNull(columnKey) ? "null" : proxyState.getRow$realm().getFloat(columnKey));
                     break;
                 case DOUBLE:
-                    sb.append(proxyState.getRow$realm().isNull(columnIndex) ? "null" : proxyState.getRow$realm().getDouble(columnIndex));
+                    sb.append(proxyState.getRow$realm().isNull(columnKey) ? "null" : proxyState.getRow$realm().getDouble(columnKey));
                     break;
                 case STRING:
-                    sb.append(proxyState.getRow$realm().getString(columnIndex));
+                    sb.append(proxyState.getRow$realm().getString(columnKey));
                     break;
                 case BINARY:
-                    sb.append(Arrays.toString(proxyState.getRow$realm().getBinaryByteArray(columnIndex)));
+                    sb.append(Arrays.toString(proxyState.getRow$realm().getBinaryByteArray(columnKey)));
                     break;
                 case DATE:
-                    sb.append(proxyState.getRow$realm().isNull(columnIndex) ? "null" : proxyState.getRow$realm().getDate(columnIndex));
+                    sb.append(proxyState.getRow$realm().isNull(columnKey) ? "null" : proxyState.getRow$realm().getDate(columnKey));
                     break;
                 case OBJECT:
-                    sb.append(proxyState.getRow$realm().isNullLink(columnIndex)
+                    sb.append(proxyState.getRow$realm().isNullLink(columnKey)
                             ? "null"
-                            : proxyState.getRow$realm().getTable().getLinkTarget(columnIndex).getClassName());
+                            : proxyState.getRow$realm().getTable().getLinkTarget(columnKey).getClassName());
                     break;
                 case LIST:
-                    String targetClassName = proxyState.getRow$realm().getTable().getLinkTarget(columnIndex).getClassName();
-                    sb.append(String.format(Locale.US, "RealmList<%s>[%s]", targetClassName, proxyState.getRow$realm().getModelList(columnIndex).size()));
+                    String targetClassName = proxyState.getRow$realm().getTable().getLinkTarget(columnKey).getClassName();
+                    sb.append(String.format(Locale.US, "RealmList<%s>[%s]", targetClassName, proxyState.getRow$realm().getModelList(columnKey).size()));
                     break;
                 case INTEGER_LIST:
-                    sb.append(String.format(Locale.US, "RealmList<Long>[%s]", proxyState.getRow$realm().getValueList(columnIndex, type).size()));
+                    sb.append(String.format(Locale.US, "RealmList<Long>[%s]", proxyState.getRow$realm().getValueList(columnKey, type).size()));
                     break;
                 case BOOLEAN_LIST:
-                    sb.append(String.format(Locale.US, "RealmList<Boolean>[%s]", proxyState.getRow$realm().getValueList(columnIndex, type).size()));
+                    sb.append(String.format(Locale.US, "RealmList<Boolean>[%s]", proxyState.getRow$realm().getValueList(columnKey, type).size()));
                     break;
                 case STRING_LIST:
-                    sb.append(String.format(Locale.US, "RealmList<String>[%s]", proxyState.getRow$realm().getValueList(columnIndex, type).size()));
+                    sb.append(String.format(Locale.US, "RealmList<String>[%s]", proxyState.getRow$realm().getValueList(columnKey, type).size()));
                     break;
                 case BINARY_LIST:
-                    sb.append(String.format(Locale.US, "RealmList<byte[]>[%s]", proxyState.getRow$realm().getValueList(columnIndex, type).size()));
+                    sb.append(String.format(Locale.US, "RealmList<byte[]>[%s]", proxyState.getRow$realm().getValueList(columnKey, type).size()));
                     break;
                 case DATE_LIST:
-                    sb.append(String.format(Locale.US, "RealmList<Date>[%s]", proxyState.getRow$realm().getValueList(columnIndex, type).size()));
+                    sb.append(String.format(Locale.US, "RealmList<Date>[%s]", proxyState.getRow$realm().getValueList(columnKey, type).size()));
                     break;
                 case FLOAT_LIST:
-                    sb.append(String.format(Locale.US, "RealmList<Float>[%s]", proxyState.getRow$realm().getValueList(columnIndex, type).size()));
+                    sb.append(String.format(Locale.US, "RealmList<Float>[%s]", proxyState.getRow$realm().getValueList(columnKey, type).size()));
                     break;
                 case DOUBLE_LIST:
-                    sb.append(String.format(Locale.US, "RealmList<Double>[%s]", proxyState.getRow$realm().getValueList(columnIndex, type).size()));
+                    sb.append(String.format(Locale.US, "RealmList<Double>[%s]", proxyState.getRow$realm().getValueList(columnKey, type).size()));
                     break;
                 default:
                     sb.append("?");

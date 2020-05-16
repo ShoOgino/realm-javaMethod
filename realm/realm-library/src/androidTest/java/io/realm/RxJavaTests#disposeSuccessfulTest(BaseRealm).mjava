@@ -1,0 +1,27 @@
+    private void disposeSuccessfulTest(BaseRealm testRealm) {
+        looperThread.postRunnable(() -> {
+            if (subscription != null) {
+                subscription.dispose();
+            }
+            if (!testRealm.getConfiguration().equals(realm.getConfiguration())) {
+                throw new IllegalStateException("This method only works for Realms with the same configuration as the looper Realm");
+            }
+            testRealm.close();
+            if (!realm.equals(testRealm)) {
+                realm.close();
+            }
+            looperThread.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    // Wait for Subscription to dispose of external resources
+                    if (Realm.getGlobalInstanceCount(testRealm.getConfiguration()) == 0) {
+                        looperThread.testComplete();
+                    } else {
+                        RealmLog.error("" + Realm.getGlobalInstanceCount(testRealm.getConfiguration()));
+                        looperThread.postRunnable(this);
+                    }
+                }
+            });
+        });
+    }
+

@@ -1,17 +1,17 @@
     @Test
     public void minimumDate() {
-
+        final AtomicLong columnKey = new AtomicLong(-1);
         Table table = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
             @Override
             public void execute(Table table) {
-                table.addColumn(RealmFieldType.DATE, "date");
+                columnKey.set(table.addColumn(RealmFieldType.DATE, "date"));
 
-                TestHelper.addRowWithValues(table, new Date(10000));
-                TestHelper.addRowWithValues(table, new Date(0));
-                TestHelper.addRowWithValues(table, new Date(1000));
+                TestHelper.addRowWithValues(table, new long[]{columnKey.get()}, new Object[]{new Date(10000)});
+                TestHelper.addRowWithValues(table, new long[]{columnKey.get()}, new Object[]{new Date(0)});
+                TestHelper.addRowWithValues(table, new long[]{columnKey.get()}, new Object[]{new Date(1000)});
             }
         });
 
-        assertEquals(new Date(0), table.where().minimumDate(0));
+        assertEquals(new Date(0), table.where().minimumDate(columnKey.get()));
     }
 

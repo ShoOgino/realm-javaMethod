@@ -1,0 +1,18 @@
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RealmResults<E> freeze() {
+        if (!isValid()) {
+            throw new IllegalStateException("Only valid, managed RealmResults can be frozen.");
+        }
+
+        BaseRealm frozenRealm = realm.freeze();
+        OsResults frozenResults = osResults.freeze(frozenRealm.sharedRealm);
+        if (className != null) {
+            return new RealmResults<>(frozenRealm, frozenResults, className);
+        } else {
+            return new RealmResults<>(frozenRealm, frozenResults, classSpec);
+        }
+    }
+

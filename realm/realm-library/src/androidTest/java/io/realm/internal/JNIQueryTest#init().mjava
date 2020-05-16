@@ -2,15 +2,15 @@
         table = TestHelper.createTable(sharedRealm, "temp", new TestHelper.AdditionalTableSetup() {
             @Override
             public void execute(Table table) {
-                table.addColumn(RealmFieldType.INTEGER, "number");
-                table.addColumn(RealmFieldType.STRING, "name");
+                long colKey1 = table.addColumn(RealmFieldType.INTEGER, "number");
+                long colKey2 = table.addColumn(RealmFieldType.STRING, "name");
 
-                TestHelper.addRowWithValues(table, 10, "A");
-                TestHelper.addRowWithValues(table, 11, "B");
-                TestHelper.addRowWithValues(table, 12, "C");
-                TestHelper.addRowWithValues(table, 13, "B");
-                TestHelper.addRowWithValues(table, 14, "D");
-                TestHelper.addRowWithValues(table, 16, "D");
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2}, new Object[]{10, "A"});
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2}, new Object[]{11, "B"});
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2}, new Object[]{12, "C"});
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2}, new Object[]{13, "B"});
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2}, new Object[]{14, "D"});
+                TestHelper.addRowWithValues(table, new long[]{colKey1, colKey2}, new Object[]{16, "D"});
             }
         });
 
