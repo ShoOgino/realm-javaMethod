@@ -1,0 +1,21 @@
+    // Invokes actual MongoDB Realm Function in the context of the associated user/app.
+    @Override
+    public <T> T invoke(String name, List<?> args, Class<T> resultClass, CodecRegistry codecRegistry) {
+        Util.checkEmpty(name, "name");
+
+        String encodedArgs = JniBsonProtocol.encode(args, codecRegistry);
+
+        // NativePO calling scheme is actually synchronous
+        AtomicReference<String> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        OsJNIResultCallback<String> callback = new OsJNIResultCallback<String>(success, error) {
+            @Override
+            protected String mapSuccess(Object result) {
+                return (String) result;
+            }
+        };
+        nativeCallFunction(user.getApp().nativePtr, user.osUser.getNativePtr(), name, encodedArgs, callback);
+        String encodedResponse = ResultHandler.handleResult(success, error);
+        return JniBsonProtocol.decode(encodedResponse, resultClass, codecRegistry);
+   }
+
