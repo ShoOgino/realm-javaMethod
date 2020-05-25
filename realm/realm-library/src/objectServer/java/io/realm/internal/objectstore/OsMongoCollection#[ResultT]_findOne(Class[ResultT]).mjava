@@ -1,15 +1,4 @@
     public <ResultT> ResultT findOne(final Class<ResultT> resultClass) {
-        AtomicReference<ResultT> success = new AtomicReference<>(null);
-        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
-        OsJNIResultCallback<ResultT> callback = new OsJNIResultCallback<ResultT>(success, error) {
-            @Override
-            protected ResultT mapSuccess(Object result) {
-                return findOneSuccessMapper(result, resultClass);
-            }
-        };
-
-        nativeFindOne(nativePtr, JniBsonProtocol.encode(new Document(), codecRegistry), callback);
-
-        return ResultHandler.handleResult(success, error);
+        return findOne(null, resultClass);
     }
 

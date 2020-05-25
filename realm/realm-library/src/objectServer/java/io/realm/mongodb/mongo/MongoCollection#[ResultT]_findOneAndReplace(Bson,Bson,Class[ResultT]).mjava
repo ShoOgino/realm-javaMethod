@@ -10,6 +10,8 @@
     public <ResultT> Task<ResultT> findOneAndReplace(final Bson filter,
                                                      final Bson replacement,
                                                      final Class<ResultT> resultClass) {
-        throw new UnsupportedOperationException("Not Implemented");
+        return dispatcher.dispatchTask(() ->
+                osMongoCollection.findOneAndReplace(filter, replacement, resultClass)
+        );
     }
 

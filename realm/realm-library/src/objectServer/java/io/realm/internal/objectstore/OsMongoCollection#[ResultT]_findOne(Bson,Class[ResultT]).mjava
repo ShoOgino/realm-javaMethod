@@ -1,18 +1,4 @@
     public <ResultT> ResultT findOne(final @Nullable Bson filter, final Class<ResultT> resultClass) {
-        AtomicReference<ResultT> success = new AtomicReference<>(null);
-        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
-        OsJNIResultCallback<ResultT> callback = new OsJNIResultCallback<ResultT>(success, error) {
-            @Override
-            protected ResultT mapSuccess(Object result) {
-                return findOneSuccessMapper(result, resultClass);
-            }
-        };
-
-        String encodedFilter = filter == null ?
-                JniBsonProtocol.encode(new Document(), codecRegistry) :
-                JniBsonProtocol.encode(filter, codecRegistry);
-        nativeFindOne(nativePtr, encodedFilter, callback);
-
-        return ResultHandler.handleResult(success, error);
+        return findOneInternal(filter, null, resultClass);
     }
 

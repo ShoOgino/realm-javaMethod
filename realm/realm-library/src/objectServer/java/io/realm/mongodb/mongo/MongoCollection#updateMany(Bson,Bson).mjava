@@ -6,7 +6,9 @@
      *               apply must include only update operators.
      * @return a task containing the result of the update many operation
      */
-    public Task<RemoteUpdateResult> updateMany(final Bson filter, final Bson update) {
-        throw new UnsupportedOperationException("Not Implemented");
+    public Task<UpdateResult> updateMany(final Bson filter, final Bson update) {
+        return dispatcher.dispatchTask(() ->
+                osMongoCollection.updateMany(filter, update)
+        );
     }
 

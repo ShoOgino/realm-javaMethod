@@ -1,9 +1,9 @@
-    public RemoteInsertManyResult insertMany(final List<? extends DocumentT> documents) {
-        AtomicReference<RemoteInsertManyResult> success = new AtomicReference<>(null);
+    public InsertManyResult insertMany(final List<? extends DocumentT> documents) {
+        AtomicReference<InsertManyResult> success = new AtomicReference<>(null);
         AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
-        OsJNIResultCallback<RemoteInsertManyResult> callback = new OsJNIResultCallback<RemoteInsertManyResult>(success, error) {
+        OsJNIResultCallback<InsertManyResult> callback = new OsJNIResultCallback<InsertManyResult>(success, error) {
             @Override
-            protected RemoteInsertManyResult mapSuccess(Object result) {
+            protected InsertManyResult mapSuccess(Object result) {
                 Object[] objects = (Object[]) result;
                 Map<Long, BsonValue> insertedIdsMap = new HashMap<>();
                 for (int i = 0; i < objects.length; i++) {
@@ -11,7 +11,7 @@
                     BsonValue bsonObjectId = new BsonObjectId(objectId);
                     insertedIdsMap.put((long) i, bsonObjectId);
                 }
-                return new RemoteInsertManyResult(insertedIdsMap);
+                return new InsertManyResult(insertedIdsMap);
             }
         };
 

@@ -5,6 +5,8 @@
      * @return a task containing the resulting document
      */
     public Task<DocumentT> findOneAndDelete(final Bson filter) {
-        throw new UnsupportedOperationException("Not Implemented");
+        return dispatcher.dispatchTask(() ->
+                osMongoCollection.findOneAndDelete(filter)
+        );
     }
 

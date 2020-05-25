@@ -5,7 +5,10 @@
      * @param <ResultT>   the target document type of the iterable.
      * @return the find iterable interface
      */
-    <ResultT> RemoteFindIterable<ResultT> find(final Class<ResultT> resultClass) {
-        throw new UnsupportedOperationException("Not Implemented");
+    // FIXME: fix find implementation - ignore this code for code review
+    public <ResultT> Task<Iterable<ResultT>> find(final Class<ResultT> resultClass) {
+        return dispatcher.dispatchTask(() ->
+                osMongoCollection.find(resultClass)
+        );
     }
 
