@@ -69,18 +69,6 @@
                 throw new IllegalStateException("Could not create directory for saving the Realm: " + realmFileDirectory);
             }
 
-            if (!Util.isEmptyString(serverCertificateAssetName)) {
-                if (syncClientValidateSsl) {
-                    // Create the path where the serverCertificateAssetName will be copied
-                    // so we can supply it to the Sync client.
-                    // using getRealmDirectory avoid file collision between same filename from different users (Realms)
-                    String fileName = serverCertificateAssetName.substring(serverCertificateAssetName.lastIndexOf(File.separatorChar) + 1);
-                    serverCertificateFilePath = new File(realmFileDirectory, fileName).getAbsolutePath();
-                } else {
-                    RealmLog.warn("SSL Verification is disabled, the provided server certificate will not be used.");
-                }
-            }
-
             return new SyncConfiguration(
                     // Realm Configuration options
                     realmFileDirectory,
@@ -103,9 +91,6 @@
                     resolvedServerUrl,
                     errorHandler,
                     deleteRealmOnLogout,
-                    syncClientValidateSsl,
-                    serverCertificateAssetName,
-                    serverCertificateFilePath,
                     waitForServerChanges,
                     initialDataTimeoutMillis,
                     sessionStopPolicy,
