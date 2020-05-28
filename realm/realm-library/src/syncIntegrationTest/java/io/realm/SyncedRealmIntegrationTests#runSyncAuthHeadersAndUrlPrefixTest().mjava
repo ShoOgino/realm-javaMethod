@@ -1,0 +1,30 @@
+    private void runSyncAuthHeadersAndUrlPrefixTest() {
+        SyncCredentials credentials = SyncCredentials.usernamePassword(UUID.randomUUID().toString(), "test", true);
+        SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
+        SyncConfiguration config = configurationFactory.createSyncConfigurationBuilder(user, Constants.USER_REALM)
+                .urlPrefix("/foo")
+                .errorHandler(new SyncSession.ErrorHandler() {
+                    @Override
+                    public void onError(SyncSession session, ObjectServerError error) {
+                        RealmLog.error(error.toString());
+                    }
+                })
+                .build();
+
+        RealmLog.setLevel(LogLevel.ALL);
+        RealmLogger logger = (level, tag, throwable, message) -> {
+            if (tag.equals("REALM_SYNC")
+                    && message.contains("GET /foo/")
+                    && message.contains("TestAuth: Realm-Access-Token version=1")
+                    && message.contains("Test: test")) {
+                looperThread.testComplete();
+            }
+        };
+        looperThread.runAfterTest(() -> {
+            RealmLog.remove(logger);
+        });
+        RealmLog.add(logger);
+        Realm realm = Realm.getInstance(config);
+        looperThread.closeAfterTest(realm);
+    }
+

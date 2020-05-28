@@ -1,0 +1,20 @@
+    @Test
+    @UiThreadTest
+    public void waitForInitialRemoteData_mainThreadThrows() {
+        final SyncUser user = SyncTestUtils.createTestUser(Constants.AUTH_URL);
+        SyncConfiguration config = user.createConfiguration(Constants.USER_REALM)
+                .waitForInitialRemoteData()
+                .build();
+
+        Realm realm = null;
+        try {
+            realm = Realm.getInstance(config);
+            fail();
+        } catch (IllegalStateException ignore) {
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+        }
+    }
+

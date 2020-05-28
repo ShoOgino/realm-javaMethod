@@ -1,0 +1,30 @@
+    private void runJavaRequestCustomHeadersTest() {
+        SyncCredentials credentials = SyncCredentials.usernamePassword(UUID.randomUUID().toString(), "test", true);
+
+        AtomicBoolean headerSet = new AtomicBoolean(false);
+        RealmLog.setLevel(LogLevel.ALL);
+        RealmLogger logger = (level, tag, throwable, message) -> {
+            if (level == LogLevel.TRACE
+                    && message.contains("Foo: bar")
+                    && message.contains("RealmAuth: ")) {
+                headerSet.set(true);
+            }
+        };
+        looperThread.runAfterTest(() -> {
+            RealmLog.remove(logger);
+        });
+        RealmLog.add(logger);
+
+        SyncUser user = SyncUser.logIn(credentials, Constants.AUTH_URL);
+        try {
+            user.changePassword("foo");
+        } catch (ObjectServerError e) {
+            if (e.getErrorCode() != ErrorCode.INVALID_CREDENTIALS) {
+                throw e;
+            }
+        }
+
+        assertTrue(headerSet.get());
+        looperThread.testComplete();
+    }
+
