@@ -1,10 +1,17 @@
         /**
-         * FIXME
+         * Sets the encryption key used to encrypt user meta data only. Individual Realms needs to
+         * use {@link SyncConfiguration.Builder#encryptionKey(byte[])} to make them encrypted.
          *
-         * @param key
-         * @return
+         * @param key a 64 byte encryption key.
+         * @throws IllegalArgumentException if the key is not 64 bytes long.
          */
         public Builder encryptionKey(byte[] key) {
+            Util.checkNull(key, "key");
+            if (key.length != Realm.ENCRYPTION_KEY_LENGTH) {
+                throw new IllegalArgumentException(String.format(Locale.US,
+                        "The provided key must be %s bytes. Yours was: %s",
+                        Realm.ENCRYPTION_KEY_LENGTH, key.length));
+            }
             this.encryptionKey = Arrays.copyOf(key, key.length);
             return this;
         }

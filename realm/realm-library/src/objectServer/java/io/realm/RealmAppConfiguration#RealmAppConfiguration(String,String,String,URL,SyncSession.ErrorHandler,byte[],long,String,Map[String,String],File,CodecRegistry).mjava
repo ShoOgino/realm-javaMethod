@@ -1,10 +1,9 @@
     private RealmAppConfiguration(String appId,
                                  String appName,
                                  String appVersion,
-                                 String baseUrl,
+                                 URL baseUrl,
                                  SyncSession.ErrorHandler defaultErrorHandler,
                                  @Nullable byte[] encryptionKey,
-                                 long logLevel,
                                  long requestTimeoutMs,
                                  String authorizationHeaderName,
                                  Map<String, String> customHeaders,
@@ -14,10 +13,9 @@
         this.appId = appId;
         this.appName = appName;
         this.appVersion = appVersion;
-        this.baseUrl = createUrl(baseUrl);
+        this.baseUrl = baseUrl;
         this.defaultErrorHandler = defaultErrorHandler;
         this.encryptionKey = (encryptionKey == null) ? null : Arrays.copyOf(encryptionKey, encryptionKey.length);
-        this.logLevel = logLevel;
         this.requestTimeoutMs = requestTimeoutMs;
         this.authorizationHeaderName = (!Util.isEmptyString(authorizationHeaderName)) ? authorizationHeaderName : "Authorization";
         this.customHeaders = Collections.unmodifiableMap(customHeaders);
