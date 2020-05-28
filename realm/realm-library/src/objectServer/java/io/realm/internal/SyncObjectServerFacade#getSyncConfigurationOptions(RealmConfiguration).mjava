@@ -15,20 +15,6 @@
             String customAuthorizationHeaderName = app.getConfiguration().getAuthorizationHeaderName();
             Map<String, String> customHeaders = app.getConfiguration().getCustomRequestHeaders();
 
-            // Temporary work-around for serializing supported bson values
-            BsonValue val = syncConfig.getPartitionValue();
-            String partitionValue = null;
-            if (val.isString()) {
-                partitionValue = "\"" + val.asString().getValue() + "\"";
-            } else if (val.isInt32()) {
-                partitionValue = "{ \"$bsonInt\" : " + val.asInt32().intValue() + " }";
-            } else if (val.isInt64()) {
-                partitionValue = "{ \"$bsonLong\" : " + val.asInt64().longValue() + " }";
-            } else if (val.isObjectId()) {
-                partitionValue = "{ \"$oid\" : " + val.asObjectId().toString() + " }";
-            } else {
-                throw new IllegalArgumentException("Unsupported type: " + val);
-            }
             int i = 0;
             Object[] configObj = new Object[SYNC_CONFIG_OPTIONS];
             configObj[i++] = rosUserIdentity;
@@ -42,7 +28,7 @@
             configObj[i++] = customAuthorizationHeaderName;
             configObj[i++] = customHeaders;
             configObj[i++] = OsRealmConfig.CLIENT_RESYNC_MODE_MANUAL;
-            configObj[i++] = partitionValue;
+            configObj[i++] = syncConfig.getPartitionValue();
             configObj[i++] = app.getSync();
             return configObj;
         } else {
