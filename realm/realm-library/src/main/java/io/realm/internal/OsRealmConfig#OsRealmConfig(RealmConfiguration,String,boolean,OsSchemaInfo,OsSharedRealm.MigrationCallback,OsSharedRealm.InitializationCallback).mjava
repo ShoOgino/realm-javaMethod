@@ -23,7 +23,7 @@
         //noinspection unchecked
         Map<String, String> customHeadersMap = (Map<String, String>) (syncConfigurationOptions[j++]);
         Byte clientResyncMode = (Byte) syncConfigurationOptions[j++];
-        BsonValue partitionValue = (BsonValue) syncConfigurationOptions[j++];
+        String encodedPartitionValue = (String) syncConfigurationOptions[j++];
         Object syncService = syncConfigurationOptions[j++];
 
         // Convert the headers into a String array to make it easier to send through JNI
@@ -36,20 +36,6 @@
                 customHeaders[i + 1] = entry.getValue();
                 i = i + 2;
             }
-        }
-
-        // TODO Simplify. org.bson serialization only allows writing full documents, so the partition
-        //  key is embedded in a document with key 'value' and unwrapped in JNI.
-        String encodedPartitionValue;
-        switch (partitionValue.getBsonType()) {
-            case STRING:
-            case OBJECT_ID:
-            case INT32:
-            case INT64:
-                encodedPartitionValue = JniBsonProtocol.encode(partitionValue, RealmAppConfiguration.DEFAULT_BSON_CODEC_REGISTRY);
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported type: " + partitionValue);
         }
 
         // Set encryption key
