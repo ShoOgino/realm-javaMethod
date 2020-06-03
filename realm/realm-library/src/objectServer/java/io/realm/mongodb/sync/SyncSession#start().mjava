@@ -1,0 +1,19 @@
+    /**
+     * Attempts to start the session and enable synchronization with the Realm Object Server.
+     * <p>
+     * This happens automatically when opening the Realm instance, so doing it manually should only
+     * be needed if the session was stopped using {@link #stop()}.
+     * <p>
+     * If the session was already started, calling this method will do nothing.
+     * <p>
+     * A session is considered started if {@link #getState()} returns {@link State#ACTIVE}.
+     * If the session is {@link State#DYING}, the session
+     * will be moved back to {@link State#ACTIVE}.
+     *
+     * @see #getState()
+     * @see #stop()
+     */
+    public synchronized void start() {
+        nativeStart(configuration.getPath());
+    }
+

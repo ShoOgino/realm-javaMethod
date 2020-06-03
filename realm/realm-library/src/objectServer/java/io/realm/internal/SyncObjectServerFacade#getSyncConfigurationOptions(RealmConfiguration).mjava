@@ -2,8 +2,8 @@
     public Object[] getSyncConfigurationOptions(RealmConfiguration config) {
         if (config instanceof SyncConfiguration) {
             SyncConfiguration syncConfig = (SyncConfiguration) config;
-            RealmUser user = syncConfig.getUser();
-            RealmApp app = user.getApp();
+            User user = syncConfig.getUser();
+            App app = user.getApp();
             String rosServerUrl = syncConfig.getServerUrl().toString();
             String rosUserIdentity = user.getId();
             String syncRealmAuthUrl = user.getApp().getConfiguration().getBaseUrl().toString();
@@ -24,7 +24,7 @@
                 case OBJECT_ID:
                 case INT32:
                 case INT64:
-                    encodedPartitionValue = JniBsonProtocol.encode(partitionValue, RealmAppConfiguration.DEFAULT_BSON_CODEC_REGISTRY);
+                    encodedPartitionValue = JniBsonProtocol.encode(partitionValue, AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY);
                     break;
                 default:
                     throw new IllegalArgumentException("Unsupported type: " + partitionValue);

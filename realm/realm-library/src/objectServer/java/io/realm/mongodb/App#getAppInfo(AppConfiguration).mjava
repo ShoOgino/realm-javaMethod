@@ -1,0 +1,20 @@
+    private String getAppInfo(AppConfiguration config) {
+        // Create app UserAgent string
+        String appDefinedUserAgent = "Unknown";
+        try {
+            String appName = config.getAppName();
+            String appVersion = config.getAppVersion();
+            if (!Util.isEmptyString(appName) || !Util.isEmptyString(appVersion)) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(Util.isEmptyString(appName) ? "Undefined" : appName);
+                sb.append('/');
+                sb.append(Util.isEmptyString(appName) ? "Undefined" : appVersion);
+                appDefinedUserAgent = sb.toString();
+            }
+        } catch (Exception e) {
+            // Failures to construct the user agent should never cause the system itself to crash.
+            RealmLog.warn("Constructing Binding User-Agent description failed.", e);
+        }
+        return appDefinedUserAgent;
+    }
+
