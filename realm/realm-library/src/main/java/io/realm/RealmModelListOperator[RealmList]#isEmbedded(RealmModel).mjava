@@ -1,0 +1,9 @@
+    private boolean isEmbedded(RealmModel value) {
+        if (realm instanceof Realm) {
+            return realm.getSchema().getSchemaForClass(value.getClass()).isEmbedded();
+        } else {
+            String objectType = ((DynamicRealmObject) value).getType();
+            return realm.getSchema().getSchemaForClass(objectType).isEmbedded();
+        }
+    }
+

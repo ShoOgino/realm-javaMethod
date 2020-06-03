@@ -1,5 +1,4 @@
-    // Transparently copies an unmanaged object or managed object from another Realm to the Realm backing this RealmList.
-    private <E extends RealmModel> E copyToRealmIfNeeded(E object) {
+    private boolean checkCanObjectBeCopied(BaseRealm realm, RealmModel object) {
         if (object instanceof RealmObjectProxy) {
             RealmObjectProxy proxy = (RealmObjectProxy) object;
 
@@ -11,7 +10,7 @@
                     String objectClassName = ((DynamicRealmObject) object).getType();
                     if (listClassName.equals(objectClassName)) {
                         // Same Realm instance and same target table
-                        return object;
+                        return false;
                     } else {
                         // Different target table
                         throw new IllegalArgumentException(String.format(Locale.US,
@@ -32,18 +31,10 @@
                     if (realm != proxy.realmGet$proxyState().getRealm$realm()) {
                         throw new IllegalArgumentException("Cannot copy an object from another Realm instance.");
                     }
-                    return object;
+                    return false;
                 }
             }
         }
-
-        // At this point the object can only be a typed object, so the backing Realm cannot be a DynamicRealm.
-        Realm realm = (Realm) this.realm;
-        if (OsObjectStore.getPrimaryKeyForObject(realm.getSharedRealm(),
-                realm.getConfiguration().getSchemaMediator().getSimpleClassName(object.getClass())) != null) {
-            return realm.copyToRealmOrUpdate(object);
-        } else {
-            return realm.copyToRealm(object);
-        }
+        return true;
     }
 

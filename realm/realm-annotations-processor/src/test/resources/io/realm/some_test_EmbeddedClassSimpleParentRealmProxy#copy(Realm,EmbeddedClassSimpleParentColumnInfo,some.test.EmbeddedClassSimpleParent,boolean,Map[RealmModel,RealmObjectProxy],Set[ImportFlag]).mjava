@@ -1,0 +1,59 @@
+    public static some.test.EmbeddedClassSimpleParent copy(Realm realm, EmbeddedClassSimpleParentColumnInfo columnInfo, some.test.EmbeddedClassSimpleParent newObject, boolean update, Map<RealmModel,RealmObjectProxy> cache, Set<ImportFlag> flags) {
+        RealmObjectProxy cachedRealmObject = cache.get(newObject);
+        if (cachedRealmObject != null) {
+            return (some.test.EmbeddedClassSimpleParent) cachedRealmObject;
+        }
+
+        some_test_EmbeddedClassSimpleParentRealmProxyInterface unmanagedSource = (some_test_EmbeddedClassSimpleParentRealmProxyInterface) newObject;
+
+        Table table = realm.getTable(some.test.EmbeddedClassSimpleParent.class);
+        OsObjectBuilder builder = new OsObjectBuilder(table, flags);
+
+        // Add all non-"object reference" fields
+        builder.addString(columnInfo.idColKey, unmanagedSource.realmGet$id());
+
+        // Create the underlying object and cache it before setting any object/objectlist references
+        // This will allow us to break any circular dependencies by using the object cache.
+        Row row = builder.createNewObject();
+        io.realm.some_test_EmbeddedClassSimpleParentRealmProxy managedCopy = newProxyInstance(realm, row);
+        cache.put(newObject, managedCopy);
+
+        // Finally add all fields that reference other Realm Objects, either directly or through a list
+        some.test.EmbeddedClass childObj = unmanagedSource.realmGet$child();
+        if (childObj == null) {
+            managedCopy.realmSet$child(null);
+        } else {
+            some.test.EmbeddedClass cachechild = (some.test.EmbeddedClass) cache.get(childObj);
+            if (cachechild != null) {
+                throw new IllegalArgumentException("Embedded objects can only have one parent pointing to them. This object was already copied, so another object is pointing to it: cachechild.toString()");
+            } else {
+                long objKey = ((RealmObjectProxy) managedCopy).realmGet$proxyState().getRow$realm().createEmbeddedObject(columnInfo.childColKey);
+                Row linkedObjectRow = realm.getTable(some.test.EmbeddedClass.class).getUncheckedRow(objKey);
+                some.test.EmbeddedClass linkedObject = some_test_EmbeddedClassRealmProxy.newProxyInstance(realm, linkedObjectRow);
+                cache.put(childObj, (RealmObjectProxy) linkedObject);
+                some_test_EmbeddedClassRealmProxy.updateEmbeddedObject(realm, childObj, linkedObject, cache, flags);
+            }
+        }
+
+        RealmList<some.test.EmbeddedClass> childrenUnmanagedList = unmanagedSource.realmGet$children();
+        if (childrenUnmanagedList != null) {
+            RealmList<some.test.EmbeddedClass> childrenManagedList = managedCopy.realmGet$children();
+            childrenManagedList.clear();
+            for (int i = 0; i < childrenUnmanagedList.size(); i++) {
+                some.test.EmbeddedClass childrenUnmanagedItem = childrenUnmanagedList.get(i);
+                some.test.EmbeddedClass cachechildren = (some.test.EmbeddedClass) cache.get(childrenUnmanagedItem);
+                if (cachechildren != null) {
+                    throw new IllegalArgumentException("Embedded objects can only have one parent pointing to them. This object was already copied, so another object is pointing to it: cachechildren.toString()");
+                } else {
+                    long objKey = childrenManagedList.getOsList().createAndAddEmbeddedObject();
+                    Row linkedObjectRow = realm.getTable(some.test.EmbeddedClass.class).getUncheckedRow(objKey);
+                    some.test.EmbeddedClass linkedObject = some_test_EmbeddedClassRealmProxy.newProxyInstance(realm, linkedObjectRow);
+                    cache.put(childrenUnmanagedItem, (RealmObjectProxy) linkedObject);
+                    some_test_EmbeddedClassRealmProxy.updateEmbeddedObject(realm, childrenUnmanagedItem, linkedObject, new HashMap<RealmModel, RealmObjectProxy>(), Collections.EMPTY_SET);
+                }
+            }
+        }
+
+        return managedCopy;
+    }
+

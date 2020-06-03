@@ -1,0 +1,38 @@
+    @Override
+    public void realmSet$child(some.test.EmbeddedClass value) {
+        Realm realm = (Realm) proxyState.getRealm$realm();
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+            if (proxyState.getExcludeFields$realm().contains("child")) {
+                return;
+            }
+            if (value != null && !RealmObject.isManaged(value)) {
+                some.test.EmbeddedClass proxyObject = realm.createEmbeddedObject(some.test.EmbeddedClass.class, this, "child");
+                some_test_EmbeddedClassRealmProxy.updateEmbeddedObject(realm, value, proxyObject, new HashMap<RealmModel, RealmObjectProxy>(), Collections.EMPTY_SET);
+                value = proxyObject;
+            }
+            final Row row = proxyState.getRow$realm();
+            if (value == null) {
+                // Table#nullifyLink() does not support default value. Just using Row.
+                row.nullifyLink(columnInfo.childColKey);
+                return;
+            }
+            proxyState.checkValidObject(value);
+            row.getTable().setLink(columnInfo.childColKey, row.getObjectKey(), ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getObjectKey(), true);
+            return;
+        }
+
+        proxyState.getRealm$realm().checkIfValid();
+        if (value == null) {
+            proxyState.getRow$realm().nullifyLink(columnInfo.childColKey);
+            return;
+        }
+        if (RealmObject.isManaged(value)) {
+            proxyState.checkValidObject(value);
+        }
+        some.test.EmbeddedClass proxyObject = realm.createEmbeddedObject(some.test.EmbeddedClass.class, this, "child");
+        some_test_EmbeddedClassRealmProxy.updateEmbeddedObject(realm, value, proxyObject, new HashMap<RealmModel, RealmObjectProxy>(), Collections.EMPTY_SET);
+    }
+

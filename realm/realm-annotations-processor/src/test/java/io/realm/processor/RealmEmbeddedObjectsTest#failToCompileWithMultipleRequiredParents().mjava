@@ -1,0 +1,14 @@
+    // If a child has multiple potential parents, none of them are allowed to be marked
+    // @Required.
+    @Test
+    public void failToCompileWithMultipleRequiredParents() {
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(
+                        JavaFileObjects.forResource("some/test/EmbeddedClassParent.java"),
+                        JavaFileObjects.forResource("some/test/EmbeddedClassMultipleRequiredParents.java")
+                ))
+                .processedWith(new RealmProcessor())
+                .failsToCompile()
+                .withErrorContaining("@Required cannot be used on @LinkingObjects field if multiple @LinkingParents are defined");
+    }
+
