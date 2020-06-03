@@ -1,0 +1,19 @@
+        /**
+         * Creates an instance of the Builder for the AppConfiguration.
+         *
+         * @param appId the application id of the MongoDB Realm Application.
+         */
+        public Builder(String appId) {
+            Util.checkEmpty(appId, "appId");
+            this.appId = appId;
+            Context context = Realm.getApplicationContext();
+            if (context == null) {
+                throw new IllegalStateException("Call `Realm.init(Context)` before calling this method.");
+            }
+            File rootDir = new File(context.getFilesDir(), "mongodb-realm");
+            if (!rootDir.exists() && !rootDir.mkdir()) {
+                throw new IllegalStateException("Could not create Sync root dir: " + rootDir.getAbsolutePath());
+            }
+            syncRootDir = rootDir;
+        }
+

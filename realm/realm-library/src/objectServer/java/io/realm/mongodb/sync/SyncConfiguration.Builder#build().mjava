@@ -1,0 +1,104 @@
+        /**
+         * Creates the RealmConfiguration based on the builder parameters.
+         *
+         * @return the created {@link SyncConfiguration}.
+         * @throws IllegalStateException if the configuration parameters are invalid or inconsistent.
+         */
+        public SyncConfiguration build() {
+            if (serverUrl == null || user == null) {
+                throw new IllegalStateException("serverUrl() and user() are both required.");
+            }
+
+            // Check that readOnly() was applied to legal configuration. Right now it should only be allowd if
+            // an assetFile is configured
+            if (readOnly) {
+                if (initialDataTransaction != null) {
+                    throw new IllegalStateException("This Realm is marked as read-only. " +
+                            "Read-only Realms cannot use initialData(Realm.Transaction).");
+                }
+                if (!waitForServerChanges) {
+                    throw new IllegalStateException("A read-only Realms must be provided by some source. " +
+                            "'waitForInitialRemoteData()' wasn't enabled which is currently the only supported source.");
+                }
+            }
+
+            // Set the default Client Resync Mode based on the current type of Realm.
+            // Eventually RECOVER_LOCAL_REALM should be the default for all types.
+            // FIXME: We should add support back for this.
+            if (clientResyncMode == null) {
+                clientResyncMode = ClientResyncMode.MANUAL;
+            }
+
+            // FIXME How to get access to this
+            if (rxFactory == null && Util.isRxJavaAvailable()) {
+                rxFactory = new RealmObservableFactory(true);
+            }
+
+            // FIXME: Figure out how to map to on-disk path. Partition key can be up to 16MB in size.
+            // Determine location on disk
+            // Use the serverUrl + user to create a unique filepath.
+            // The following types of paths can be generated
+            // <rootDir>/<userIdentifier>/default.realm
+            // <rootDir>/<userIdentifier>/<hashedPartionKey>/default.realm
+            URI resolvedServerUrl = serverUrl; // resolveServerUrl(serverUrl, user);
+            syncUrlPrefix = String.format("/api/client/v2.0/app/%s/realm-sync", user.getApp().getConfiguration().getAppId());
+            String realmPathFromRootDir = user.getId() + "/" + getServerPath(user, resolvedServerUrl);
+            File realmFileDirectory = new File(defaultFolder, realmPathFromRootDir);
+            String realmFileName = defaultLocalFileName;
+            String fullPathName = realmFileDirectory.getAbsolutePath() + File.pathSeparator + realmFileName;
+
+            // full path must not exceed 256 characters (on FAT)
+            if (fullPathName.length() > MAX_FULL_PATH_LENGTH) {
+                throw new IllegalStateException(String.format(Locale.US,
+                        "Full path name must not exceed %d characters: %s",
+                        MAX_FULL_PATH_LENGTH, fullPathName));
+            }
+
+            if (realmFileName.length() > MAX_FILE_NAME_LENGTH) {
+                throw new IllegalStateException(String.format(Locale.US,
+                        "File name exceed %d characters: %d", MAX_FILE_NAME_LENGTH,
+                        realmFileName.length()));
+            }
+
+            // substitute invalid characters
+            for (char c : INVALID_CHARS) {
+                realmFileName = realmFileName.replace(c, '_');
+            }
+
+            // Create the folder on disk (if needed)
+            if (!realmFileDirectory.exists() && !realmFileDirectory.mkdirs()) {
+                throw new IllegalStateException("Could not create directory for saving the Realm: " + realmFileDirectory);
+            }
+
+            return new SyncConfiguration(
+                    // Realm Configuration options
+                    realmFileDirectory,
+                    realmFileName,
+                    getCanonicalPath(new File(realmFileDirectory, realmFileName)),
+                    null, // assetFile not supported by Sync. See https://github.com/realm/realm-sync/issues/241
+                    key,
+                    schemaVersion,
+                    null, // Custom migrations not supported
+                    false, // MigrationNeededException is never thrown
+                    durability,
+                    createSchemaMediator(modules, debugSchema),
+                    rxFactory,
+                    initialDataTransaction,
+                    readOnly,
+                    maxNumberOfActiveVersions,
+
+                    // Sync Configuration specific
+                    user,
+                    resolvedServerUrl,
+                    errorHandler,
+                    deleteRealmOnLogout,
+                    waitForServerChanges,
+                    initialDataTimeoutMillis,
+                    sessionStopPolicy,
+                    compactOnLaunch,
+                    syncUrlPrefix,
+                    clientResyncMode,
+                    partitionValue
+            );
+        }
+

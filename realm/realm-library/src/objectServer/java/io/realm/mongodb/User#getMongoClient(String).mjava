@@ -1,0 +1,12 @@
+    /**
+     * FIXME Add support for the MongoDB wrapper. Name of Class and method still TBD.
+     */
+    public MongoClient getMongoClient(String serviceName) {
+        Util.checkEmpty(serviceName, "serviceName");
+        if (mongoClient == null) {
+            OsMongoClient osMongoClient = new OsMongoClient(app.nativePtr, serviceName);
+            mongoClient = new MongoClientImpl(osMongoClient, app.getConfiguration().getDefaultCodecRegistry());
+        }
+        return mongoClient;
+    }
+

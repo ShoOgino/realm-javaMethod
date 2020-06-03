@@ -1,0 +1,25 @@
+    /**
+     * Creates a user API key that can be used to authenticate as the user.
+     * <p>
+     * The value of the key must be persisted at this time as this is the only time it is visible.
+     * <p>
+     * The key is enabled when created. It can be disabled by calling {@link #disableApiKey(ObjectId)}.
+     *
+     * @param name the name of the key
+     * @throws ObjectServerError if the server failed to create the API key.
+     * @return the new API key for the user.
+     */
+    public UserApiKey createApiKey(String name) throws ObjectServerError {
+        Util.checkEmpty(name, "name");
+        AtomicReference<UserApiKey> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        OsJNIResultCallback<UserApiKey> callback = new OsJNIResultCallback<UserApiKey>(success, error) {
+            @Override
+            protected UserApiKey mapSuccess(Object result) {
+                return createKeyFromNative((Object[]) result);
+            }
+        };
+        call(TYPE_CREATE, name, callback);
+        return ResultHandler.handleResult(success, error);
+    }
+
