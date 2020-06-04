@@ -1,14 +1,17 @@
     /**
-     * Aggregates documents according to the specified aggregation pipeline.
+     * Aggregates documents according to the specified aggregation pipeline specifying an output
+     * class.
+     * <p>
+     * All documents will be delivered in the form of an {@link AggregateIterable} from which
+     * individual elements can be extracted.
      *
      * @param pipeline    the aggregation pipeline
      * @param resultClass the class to decode each document into
      * @param <ResultT>   the target document type of the iterable.
-     * @return an iterable containing the result of the aggregation operation
+     * @return an {@link AggregateIterable} from which the results can be extracted
      */
-    public <ResultT> Task<ResultT> aggregate(
-            final List<? extends Bson> pipeline,
-            final Class<ResultT> resultClass) {
-        throw new UnsupportedOperationException("Not Implemented");
+    public <ResultT> AggregateIterable<ResultT> aggregate(final List<? extends Bson> pipeline,
+                                                          final Class<ResultT> resultClass) {
+        return osMongoCollection.aggregate(pipeline, resultClass);
     }
 

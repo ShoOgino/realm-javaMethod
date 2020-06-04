@@ -15,6 +15,6 @@
      * @see AppConfiguration#getDefaultCodecRegistry()
      */
     public <ResultT> ResultT callFunction(String name, List<?> args, Class<ResultT> resultClass, CodecRegistry codecRegistry) {
-        return invoke(name, args, codecRegistry, decoder(codecRegistry, resultClass));
+        return invoke(name, args, codecRegistry, JniBsonProtocol.getCodec(resultClass, codecRegistry));
     }
 

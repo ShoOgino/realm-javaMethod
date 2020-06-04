@@ -1,0 +1,14 @@
+    /**
+     * Returns a cursor of the operation represented by this iterable.
+     * <p>
+     * The result is wrapped in a {@link Task} since the iterator should be capable of
+     * asynchronously retrieve documents from the server.
+     *
+     * @return an asynchronous task with cursor of the operation represented by this iterable.
+     */
+    public Task<MongoCursor<ResultT>> iterator() {
+        return dispatcher.dispatchTask(() ->
+                new MongoCursor<>(getCollection().iterator())
+        );
+    }
+

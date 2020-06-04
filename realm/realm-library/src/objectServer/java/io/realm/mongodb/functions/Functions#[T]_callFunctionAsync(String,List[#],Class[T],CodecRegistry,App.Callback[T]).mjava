@@ -23,7 +23,8 @@
         return new Request<T>(App.NETWORK_POOL_EXECUTOR, callback) {
             @Override
             public T run() throws ObjectServerError {
-                return invoke(name, args, codecRegistry, decoder(codecRegistry, resultClass));
+                Decoder<T> decoder = JniBsonProtocol.getCodec(resultClass, codecRegistry);
+                return invoke(name, args, codecRegistry, decoder);
             }
         }.start();
     }

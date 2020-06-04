@@ -1,0 +1,40 @@
+    private UpdateResult updateInternal(final int type,
+                                        final Bson filter,
+                                        final Bson update,
+                                        @Nullable final UpdateOptions options) {
+        AtomicReference<UpdateResult> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        OsJNIResultCallback<UpdateResult> callback = new OsJNIResultCallback<UpdateResult>(success, error) {
+            @Override
+            protected UpdateResult mapSuccess(Object result) {
+                BsonArray array = JniBsonProtocol.decode((String) result, BsonArray.class, codecRegistry);
+                long matchedCount = array.get(0).asInt32().getValue();
+                long modifiedCount = array.get(1).asInt32().getValue();
+                BsonValue upsertedId = array.get(2);
+
+                if (upsertedId instanceof BsonNull) {
+                    upsertedId = null;
+                }
+                return new UpdateResult(matchedCount, modifiedCount, upsertedId);
+            }
+        };
+
+        final String jsonFilter = JniBsonProtocol.encode(filter, codecRegistry);
+        final String jsonUpdate = JniBsonProtocol.encode(update, codecRegistry);
+
+        switch (type) {
+            case UPDATE_ONE:
+            case UPDATE_MANY:
+                nativeUpdate(type, nativePtr, jsonFilter, jsonUpdate, false, callback);
+                break;
+            case UPDATE_ONE_WITH_OPTIONS:
+            case UPDATE_MANY_WITH_OPTIONS:
+                Util.checkNull(options, "options");
+                nativeUpdate(type, nativePtr, jsonFilter, jsonUpdate, options.isUpsert(), callback);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid update type: " + type);
+        }
+        return ResultHandler.handleResult(success, error);
+    }
+

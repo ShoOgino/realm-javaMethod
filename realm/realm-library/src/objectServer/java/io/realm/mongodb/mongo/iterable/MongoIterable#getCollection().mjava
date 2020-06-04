@@ -1,0 +1,15 @@
+    private Collection<ResultT> getCollection() {
+        AtomicReference<Collection<ResultT>> success = new AtomicReference<>(null);
+        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        OsJNIResultCallback<Collection<ResultT>> callback = new OsJNIResultCallback<Collection<ResultT>>(success, error) {
+            @Override
+            protected Collection<ResultT> mapSuccess(Object result) {
+                return mapCollection(result);
+            }
+        };
+
+        callNative(callback);
+
+        return ResultHandler.handleResult(success, error);
+    }
+
