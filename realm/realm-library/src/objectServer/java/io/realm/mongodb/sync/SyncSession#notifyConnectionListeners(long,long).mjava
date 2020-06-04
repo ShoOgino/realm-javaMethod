@@ -3,11 +3,10 @@
      * by the native Sync Client thread. Instead log all exceptions to logcat.
      */
     @SuppressWarnings("unused")
-    private synchronized void notifyConnectionListeners(String localRealmPath, long oldState, long newState) {
-        SyncSession session = sessions.get(localRealmPath);
-        if (session != null) {
+    void notifyConnectionListeners(long oldState, long newState) {
+        for (ConnectionListener listener : connectionListeners) {
             try {
-                session.notifyConnectionListeners(ConnectionState.fromNativeValue(oldState), ConnectionState.fromNativeValue(newState));
+                listener.onChange(ConnectionState.fromNativeValue(oldState), ConnectionState.fromNativeValue(newState));
             } catch (Exception exception) {
                 RealmLog.error(exception);
             }
