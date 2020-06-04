@@ -1,0 +1,58 @@
+    private <ResultT> ResultT findOneAndModify(final int type,
+                                               final Bson filter,
+                                               final Bson update,
+                                               @Nullable final FindOneAndModifyOptions options,
+                                               final Class<ResultT> resultClass) {
+        AtomicReference<ResultT> success = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
+        OsJNIResultCallback<ResultT> callback = new OsJNIResultCallback<ResultT>(success, error) {
+            @Override
+            protected ResultT mapSuccess(Object result) {
+                return findSuccessMapper(result, resultClass);
+            }
+        };
+
+        final String encodedFilter = JniBsonProtocol.encode(filter, codecRegistry);
+        final String encodedUpdate = JniBsonProtocol.encode(update, codecRegistry);
+
+        // default to empty docs or update if needed
+        String encodedProjection = encodedEmptyDocument;
+        String encodedSort = encodedEmptyDocument;
+        if (options != null) {
+            if (options.getProjection() != null) {
+                encodedProjection = JniBsonProtocol.encode(options.getProjection(), codecRegistry);
+            }
+            if (options.getSort() != null) {
+                encodedSort = JniBsonProtocol.encode(options.getSort(), codecRegistry);
+            }
+        }
+
+        switch (type) {
+            case FIND_ONE_AND_UPDATE:
+                nativeFindOneAndUpdate(type, nativePtr, encodedFilter, encodedUpdate, encodedProjection, encodedSort, false, false, callback);
+                break;
+            case FIND_ONE_AND_UPDATE_WITH_OPTIONS:
+                Util.checkNull(options, "options");
+                nativeFindOneAndUpdate(type, nativePtr, encodedFilter, encodedUpdate, encodedProjection, encodedSort, options.isUpsert(), options.isReturnNewDocument(), callback);
+                break;
+            case FIND_ONE_AND_REPLACE:
+                nativeFindOneAndReplace(type, nativePtr, encodedFilter, encodedUpdate, encodedProjection, encodedSort, false, false,callback);
+                break;
+            case FIND_ONE_AND_REPLACE_WITH_OPTIONS:
+                Util.checkNull(options, "options");
+                nativeFindOneAndReplace(type, nativePtr, encodedFilter, encodedUpdate, encodedProjection, encodedSort, options.isUpsert(), options.isReturnNewDocument(), callback);
+                break;
+            case FIND_ONE_AND_DELETE:
+                nativeFindOneAndDelete(type, nativePtr, encodedFilter, encodedProjection, encodedSort, false, false, callback);
+                break;
+            case FIND_ONE_AND_DELETE_WITH_OPTIONS:
+                Util.checkNull(options, "options");
+                nativeFindOneAndDelete(type, nativePtr, encodedFilter, encodedProjection, encodedSort, options.isUpsert(), options.isReturnNewDocument(), callback);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid modify type: " + type);
+        }
+
+        return ResultHandler.handleResult(success, error);
+    }
+

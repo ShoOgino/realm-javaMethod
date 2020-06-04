@@ -1,0 +1,24 @@
+    private DeleteResult deleteInternal(final int type, final Bson filter) {
+        AtomicReference<DeleteResult> success = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
+        OsJNIResultCallback<DeleteResult> callback = new OsJNIResultCallback<DeleteResult>(success, error) {
+            @Override
+            protected DeleteResult mapSuccess(Object result) {
+                return new DeleteResult((Long) result);
+            }
+        };
+
+        final String jsonDocument = JniBsonProtocol.encode(filter, codecRegistry);
+        switch (type) {
+            case DELETE_ONE:
+                nativeDelete(DELETE_ONE, nativePtr, jsonDocument, callback);
+                break;
+            case DELETE_MANY:
+                nativeDelete(DELETE_MANY, nativePtr, jsonDocument, callback);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid delete type: " + type);
+        }
+        return ResultHandler.handleResult(success, error);
+    }
+

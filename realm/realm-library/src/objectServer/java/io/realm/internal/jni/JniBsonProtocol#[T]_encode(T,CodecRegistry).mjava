@@ -1,4 +1,5 @@
     public static <T> String encode(T value, CodecRegistry registry) {
-        return encode(value, (Encoder<T>)registry.get(value.getClass()));
+        // catch possible missing codecs before the actual encoding
+        return encode(value, (Encoder<T>) getCodec(value.getClass(), registry));
     }
 

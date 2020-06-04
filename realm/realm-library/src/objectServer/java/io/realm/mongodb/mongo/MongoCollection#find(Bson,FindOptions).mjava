@@ -1,7 +1,15 @@
-    // FIXME: fix find implementation - ignore this code for code review
-    public Task<Iterable<DocumentT>> find(final Bson filter, final FindOptions options) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.find(filter, options)
-        );
+    /**
+     * Finds all documents in the collection that match the given filter using {@link FindOptions}
+     * to build the query.
+     * <p>
+     * All documents will be delivered in the form of a {@link FindIterable} from which individual
+     * elements can be extracted.
+     *
+     * @param filter the query filter
+     * @param options a {@link FindOptions} struct
+     * @return an iterable containing the result of the find operation
+     */
+    public FindIterable<DocumentT> find(final Bson filter, final FindOptions options) {
+        return osMongoCollection.find(filter, options);
     }
 

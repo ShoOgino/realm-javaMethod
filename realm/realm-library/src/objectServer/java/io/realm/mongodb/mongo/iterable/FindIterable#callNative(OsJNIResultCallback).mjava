@@ -1,0 +1,16 @@
+    @Override
+    void callNative(final OsJNIResultCallback callback) {
+        String filterString = JniBsonProtocol.encode(filter, codecRegistry);
+        String projectionString = encodedEmptyDocument;
+        String sortString = encodedEmptyDocument;
+
+        if (options == null) {
+            nativeFind(FIND, osMongoCollection.getNativePtr(), filterString, projectionString, sortString, 0, callback);
+        } else {
+            projectionString = JniBsonProtocol.encode(options.getProjection(), codecRegistry);
+            sortString = JniBsonProtocol.encode(options.getSort(), codecRegistry);
+
+            nativeFind(FIND_WITH_OPTIONS, osMongoCollection.getNativePtr(), filterString, projectionString, sortString, options.getLimit(), callback);
+        }
+    }
+

@@ -1,11 +1,11 @@
     /**
      * Fetches all API keys associated with the user.
      *
-     * @throws ObjectServerError if the server failed to fetch the API keys.
+     * @throws AppException if the server failed to fetch the API keys.
      */
-    public List<UserApiKey> fetchAllApiKeys() throws ObjectServerError {
+    public List<UserApiKey> fetchAllApiKeys() throws AppException {
         AtomicReference<List<UserApiKey>> success = new AtomicReference<>(null);
-        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
         call(TYPE_FETCH_ALL, null, new OsJNIResultCallback<List<UserApiKey>>(success, error) {
             @Override
             protected List<UserApiKey> mapSuccess(Object result) {

@@ -4,13 +4,13 @@
      * affect the user state on the server.
      *
      * @return user that was removed.
-     * @throws ObjectServerError if called from the UI thread or if the user was logged in, but
+     * @throws AppException if called from the UI thread or if the user was logged in, but
      * could not be logged out.
      */
-    public User remove() throws ObjectServerError {
+    public User remove() throws AppException {
         boolean loggedIn = isLoggedIn();
         AtomicReference<User> success = new AtomicReference<>(null);
-        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
         nativeRemoveUser(app.nativePtr, osUser.getNativePtr(), new OsJNIResultCallback<User>(success, error) {
             @Override
             protected User mapSuccess(Object result) {

@@ -1,10 +1,13 @@
     /**
      * Aggregates documents according to the specified aggregation pipeline.
+     * <p>
+     * All documents will be delivered in the form of an {@link AggregateIterable} from which
+     * individual elements can be extracted.
      *
      * @param pipeline the aggregation pipeline
-     * @return an iterable containing the result of the aggregation operation
+     * @return an {@link AggregateIterable} from which the results can be extracted
      */
-    public Task<DocumentT> aggregate(final List<? extends Bson> pipeline) {
-        throw new UnsupportedOperationException("Not Implemented");
+    public AggregateIterable<DocumentT> aggregate(final List<? extends Bson> pipeline) {
+        return osMongoCollection.aggregate(pipeline);
     }
 

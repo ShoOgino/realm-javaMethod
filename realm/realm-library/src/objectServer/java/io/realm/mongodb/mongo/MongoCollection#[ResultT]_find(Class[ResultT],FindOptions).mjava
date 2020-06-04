@@ -1,7 +1,17 @@
-    // FIXME: fix find implementation - ignore this code for code review
-    public <ResultT> Task<Iterable<ResultT>> find(final Class<ResultT> resultClass, final FindOptions options) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.find(resultClass, options)
-        );
+    /**
+     * Finds all documents in the collection specifying an output class and also using
+     * {@link FindOptions} to build the query.
+     * <p>
+     * All documents will be delivered in the form of a {@link FindIterable} from which individual
+     * elements can be extracted.
+     *
+     * @param resultClass the class to decode each document into
+     * @param options a {@link FindOptions} struct for building the query
+     * @param <ResultT>   the target document type of the iterable.
+     * @return an iterable containing the result of the find operation
+     */
+    public <ResultT> FindIterable<ResultT> find(final Class<ResultT> resultClass,
+                                                final FindOptions options) {
+        return osMongoCollection.find(resultClass, options);
     }
 

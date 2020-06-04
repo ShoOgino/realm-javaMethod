@@ -1,6 +1,6 @@
     public InsertOneResult insertOne(final DocumentT document) {
         AtomicReference<InsertOneResult> success = new AtomicReference<>(null);
-        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
         OsJNIResultCallback<InsertOneResult> callback = new OsJNIResultCallback<InsertOneResult>(success, error) {
             @Override
             protected InsertOneResult mapSuccess(Object result) {
@@ -9,7 +9,7 @@
             }
         };
 
-        String encodedDocument = JniBsonProtocol.encode(document, codecRegistry);
+        final String encodedDocument = JniBsonProtocol.encode(document, codecRegistry);
         nativeInsertOne(nativePtr, encodedDocument, callback);
         return ResultHandler.handleResult(success, error);
     }

@@ -12,12 +12,12 @@
      * and will still be returned by {@link App#allUsers()}. They can be removed completely by calling
      * {@link #remove()}.
      *
-     * @throws ObjectServerError if an error occurred while trying to log the user out of the Realm
+     * @throws AppException if an error occurred while trying to log the user out of the Realm
      * App.
      */
-    public void logOut() throws ObjectServerError {
+    public void logOut() throws AppException {
         boolean loggedIn = isLoggedIn();
-        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
         nativeLogOut(app.nativePtr, osUser.getNativePtr(), new OsJNIVoidResultCallback(error));
         ResultHandler.handleResult(null, error);
         if (loggedIn) {

@@ -1,28 +1,6 @@
-    // FIXME: fix find implementation - ignore this code for code review
-    public <ResultT> Collection<ResultT> find(final Bson filter,
-                                              final Class<ResultT> resultClass,
-                                              @Nullable final FindOptions options) {
-        AtomicReference<Collection<ResultT>> success = new AtomicReference<>(null);
-        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
-        OsJNIResultCallback<Collection<ResultT>> callback = new OsJNIResultCallback<Collection<ResultT>>(success, error) {
-            @Override
-            @SuppressWarnings("unchecked")
-            protected Collection<ResultT> mapSuccess(Object result) {
-                return JniBsonProtocol.decode((String) result, Collection.class, codecRegistry);
-            }
-        };
-
-        String filterString = JniBsonProtocol.encode(filter, codecRegistry);
-
-        if (options == null) {
-            nativeFind(nativePtr, filterString, callback);
-        } else {
-            String projectionString = JniBsonProtocol.encode(options.getProjection(), codecRegistry);
-            String sortString = JniBsonProtocol.encode(options.getSort(), codecRegistry);
-
-            nativeFindWithOptions(nativePtr, filterString, projectionString, sortString, options.getLimit(), callback);
-        }
-
-        return ResultHandler.handleResult(success, error);
+    public <ResultT> FindIterable<ResultT> find(final Bson filter,
+                                                final Class<ResultT> resultClass,
+                                                final FindOptions options) {
+        return findInternal(filter, resultClass, options);
     }
 

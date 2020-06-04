@@ -2,11 +2,11 @@
      * Enables a specific API key created by the user.
      *
      * @param id the id of the key to enable.
-     * @throws ObjectServerError if the server failed to enable the API key.
+     * @throws AppException if the server failed to enable the API key.
      */
-    public void enableApiKey(ObjectId id) throws ObjectServerError {
+    public void enableApiKey(ObjectId id) throws AppException {
         Util.checkNull(id, "id");
-        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
         call(TYPE_ENABLE, id.toHexString(), new OsJNIVoidResultCallback(error));
         ResultHandler.handleResult(null, error);
     }
