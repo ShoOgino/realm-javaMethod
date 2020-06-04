@@ -1,0 +1,12 @@
+    // @PrimaryKey is not allowed inside embedded classes
+    @Test
+    public void failToCompileWithPrimaryKey() {
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(
+                        JavaFileObjects.forResource("some/test/EmbeddedClassPrimaryKey.java")
+                ))
+                .processedWith(new RealmProcessor())
+                .failsToCompile()
+                .withErrorContaining("A model class marked as embedded cannot contain a @PrimaryKey.");
+    }
+

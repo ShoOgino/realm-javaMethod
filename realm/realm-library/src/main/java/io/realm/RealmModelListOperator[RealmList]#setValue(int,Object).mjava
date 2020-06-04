@@ -1,6 +1,16 @@
     @Override
     protected void setValue(int index, Object value) {
-        RealmObjectProxy proxy = (RealmObjectProxy) copyToRealmIfNeeded((RealmModel) value);
-        osList.setRow(index, proxy.realmGet$proxyState().getRow$realm().getObjectKey());
+        RealmModel realmObject = (RealmModel) value;
+        boolean copyObject = checkCanObjectBeCopied(realm, realmObject);
+        if (isEmbedded(realmObject)) {
+            if (value instanceof DynamicRealmObject) {
+                throw new IllegalArgumentException("Embedded objects are not supported by RealmLists of DynamicRealmObjects yet.");
+            }
+            long objKey = osList.createAndSetEmbeddedObject(index);
+            updateEmbeddedObject(realmObject, objKey);
+        } else {
+            RealmObjectProxy proxy = (RealmObjectProxy) ((copyObject) ?  copyToRealm((RealmModel) value) : realmObject);
+            osList.setRow(index, proxy.realmGet$proxyState().getRow$realm().getObjectKey());
+        }
     }
 

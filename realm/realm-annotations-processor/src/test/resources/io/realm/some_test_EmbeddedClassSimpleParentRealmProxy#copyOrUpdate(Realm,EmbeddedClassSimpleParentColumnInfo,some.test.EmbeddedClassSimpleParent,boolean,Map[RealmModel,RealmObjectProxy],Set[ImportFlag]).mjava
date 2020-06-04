@@ -1,0 +1,44 @@
+    public static some.test.EmbeddedClassSimpleParent copyOrUpdate(Realm realm, EmbeddedClassSimpleParentColumnInfo columnInfo, some.test.EmbeddedClassSimpleParent object, boolean update, Map<RealmModel,RealmObjectProxy> cache, Set<ImportFlag> flags) {
+        if (object instanceof RealmObjectProxy && !RealmObject.isFrozen(object) && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm() != null) {
+            final BaseRealm otherRealm = ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm();
+            if (otherRealm.threadId != realm.threadId) {
+                throw new IllegalArgumentException("Objects which belong to Realm instances in other threads cannot be copied into this Realm instance.");
+            }
+            if (otherRealm.getPath().equals(realm.getPath())) {
+                return object;
+            }
+        }
+        final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get();
+        RealmObjectProxy cachedRealmObject = cache.get(object);
+        if (cachedRealmObject != null) {
+            return (some.test.EmbeddedClassSimpleParent) cachedRealmObject;
+        }
+
+        some.test.EmbeddedClassSimpleParent realmObject = null;
+        boolean canUpdate = update;
+        if (canUpdate) {
+            Table table = realm.getTable(some.test.EmbeddedClassSimpleParent.class);
+            long pkColumnKey = columnInfo.idColKey;
+            String value = ((some_test_EmbeddedClassSimpleParentRealmProxyInterface) object).realmGet$id();
+            long objKey = Table.NO_MATCH;
+            if (value == null) {
+                objKey = table.findFirstNull(pkColumnKey);
+            } else {
+                objKey = table.findFirstString(pkColumnKey, value);
+            }
+            if (objKey == Table.NO_MATCH) {
+                canUpdate = false;
+            } else {
+                try {
+                    objectContext.set(realm, table.getUncheckedRow(objKey), columnInfo, false, Collections.<String> emptyList());
+                    realmObject = new io.realm.some_test_EmbeddedClassSimpleParentRealmProxy();
+                    cache.put(object, (RealmObjectProxy) realmObject);
+                } finally {
+                    objectContext.clear();
+                }
+            }
+        }
+
+        return (canUpdate) ? update(realm, columnInfo, realmObject, object, cache, flags) : copy(realm, columnInfo, object, update, cache, flags);
+    }
+
