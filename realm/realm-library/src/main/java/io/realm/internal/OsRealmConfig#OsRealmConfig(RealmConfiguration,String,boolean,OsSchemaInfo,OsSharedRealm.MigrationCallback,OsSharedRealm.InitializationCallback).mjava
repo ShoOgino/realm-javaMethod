@@ -23,7 +23,7 @@
         //noinspection unchecked
         Map<String, String> customHeadersMap = (Map<String, String>) (syncConfigurationOptions[j++]);
         Byte clientResyncMode = (Byte) syncConfigurationOptions[j++];
-        String partitionValue = (String) syncConfigurationOptions[j++];
+        String encodedPartitionValue = (String) syncConfigurationOptions[j++];
         Object syncService = syncConfigurationOptions[j++];
 
         // Convert the headers into a String array to make it easier to send through JNI
@@ -94,7 +94,7 @@
                     customAuthorizationHeaderName,
                     customHeaders,
                     clientResyncMode,
-                    partitionValue,
+                    encodedPartitionValue,
                     syncService);
             try {
                 resolvedSyncRealmUrl = syncRealmAuthUrl + urlPrefix.substring(1); // FIXME
