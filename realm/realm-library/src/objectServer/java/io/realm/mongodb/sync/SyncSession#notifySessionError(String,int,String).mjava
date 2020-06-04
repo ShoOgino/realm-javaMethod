@@ -11,11 +11,11 @@
                     "Read more here: https://realm.io/docs/realm-object-server/#client-recovery-from-a-backup.",
                     configuration, backupRealmConfiguration));
         } else {
-            ObjectServerError wrappedError;
+            AppException wrappedError;
             if (errCode == ErrorCode.UNKNOWN) {
-                wrappedError = new ObjectServerError(nativeErrorCategory, nativeErrorCode, errorMessage);
+                wrappedError = new AppException(nativeErrorCategory, nativeErrorCode, errorMessage);
             } else {
-                wrappedError = new ObjectServerError(errCode, errorMessage);
+                wrappedError = new AppException(errCode, errorMessage);
             }
             errorHandler.onError(this, wrappedError);
         }

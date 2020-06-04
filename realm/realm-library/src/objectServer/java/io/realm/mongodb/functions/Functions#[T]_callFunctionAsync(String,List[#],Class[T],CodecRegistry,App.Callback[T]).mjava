@@ -22,7 +22,7 @@
         Util.checkLooperThread("Asynchronous functions is only possible from looper threads.");
         return new Request<T>(App.NETWORK_POOL_EXECUTOR, callback) {
             @Override
-            public T run() throws ObjectServerError {
+            public T run() throws AppException {
                 Decoder<T> decoder = JniBsonProtocol.getCodec(resultClass, codecRegistry);
                 return invoke(name, args, codecRegistry, decoder);
             }

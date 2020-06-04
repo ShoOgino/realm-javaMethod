@@ -2,11 +2,11 @@
      * Disables a specific API key created by the user.
      *
      * @param id the id of the key to disable.
-     * @throws ObjectServerError if the server failed to disable the API key.
+     * @throws AppException if the server failed to disable the API key.
      */
-    public void disableApiKey(ObjectId id) throws ObjectServerError {
+    public void disableApiKey(ObjectId id) throws AppException {
         Util.checkNull(id, "id");
-        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
         call(TYPE_DISABLE, id.toHexString(), new OsJNIVoidResultCallback(error));
         ResultHandler.handleResult(null, error);
     }

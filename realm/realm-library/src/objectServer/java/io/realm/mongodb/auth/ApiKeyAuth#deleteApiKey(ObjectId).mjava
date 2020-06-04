@@ -2,11 +2,11 @@
      * Deletes a specific API key created by the user.
      *
      * @param id the id of the key to delete.
-     * @throws ObjectServerError if the server failed to delete the API key.
+     * @throws AppException if the server failed to delete the API key.
      */
-    public void deleteApiKey(ObjectId id) throws ObjectServerError {
+    public void deleteApiKey(ObjectId id) throws AppException {
         Util.checkNull(id, "id");
-        AtomicReference<ObjectServerError> error = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
         call(TYPE_DELETE, id.toHexString(), new OsJNIVoidResultCallback(error));
         ResultHandler.handleResult(null, error);
     }
