@@ -9,8 +9,12 @@
     public Task<DocumentT> findOneAndReplace(final Bson filter,
                                              final Bson replacement,
                                              final FindOneAndModifyOptions options) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.findOneAndReplace(filter, replacement, options)
+        return dispatcher.dispatchTask(new Callable<DocumentT>() {
+                                           @Override
+                                           public DocumentT call() throws Exception {
+                                               return osMongoCollection.findOneAndReplace(filter, replacement, options);
+                                           }
+                                       }
         );
     }
 

@@ -7,8 +7,12 @@
      * @return a task containing the result of the remove one operation
      */
     public Task<DeleteResult> deleteOne(final Bson filter) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.deleteOne(filter)
+        return dispatcher.dispatchTask(new Callable<DeleteResult>() {
+                                           @Override
+                                           public DeleteResult call() throws Exception {
+                                               return osMongoCollection.deleteOne(filter);
+                                           }
+                                       }
         );
     }
 

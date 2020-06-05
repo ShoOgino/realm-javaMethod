@@ -4,6 +4,11 @@
      * @return a task containing the number of documents in the collection
      */
     public Task<Long> count() {
-        return dispatcher.dispatchTask(osMongoCollection::count);
+        return dispatcher.dispatchTask(new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                return osMongoCollection.count();
+            }
+        });
     }
 

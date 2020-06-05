@@ -12,8 +12,12 @@
                                                     final Bson update,
                                                     final FindOneAndModifyOptions options,
                                                     final Class<ResultT> resultClass) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.findOneAndUpdate(filter, update, options, resultClass)
+        return dispatcher.dispatchTask(new Callable<ResultT>() {
+                                           @Override
+                                           public ResultT call() throws Exception {
+                                               return osMongoCollection.findOneAndUpdate(filter, update, options, resultClass);
+                                           }
+                                       }
         );
     }
 

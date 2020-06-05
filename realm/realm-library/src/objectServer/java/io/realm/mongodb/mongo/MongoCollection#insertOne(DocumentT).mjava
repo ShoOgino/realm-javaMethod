@@ -6,8 +6,12 @@
      * @return a task containing the result of the insert one operation
      */
     public Task<InsertOneResult> insertOne(final DocumentT document) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.insertOne(document)
+        return dispatcher.dispatchTask(new Callable<InsertOneResult>() {
+                                           @Override
+                                           public InsertOneResult call() throws Exception {
+                                               return osMongoCollection.insertOne(document);
+                                           }
+                                       }
         );
     }
 

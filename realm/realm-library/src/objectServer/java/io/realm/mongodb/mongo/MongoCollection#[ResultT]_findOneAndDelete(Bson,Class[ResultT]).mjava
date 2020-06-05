@@ -8,8 +8,12 @@
      */
     public <ResultT> Task<ResultT> findOneAndDelete(final Bson filter,
                                                     final Class<ResultT> resultClass) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.findOneAndDelete(filter, resultClass)
+        return dispatcher.dispatchTask(new Callable<ResultT>() {
+                                           @Override
+                                           public ResultT call() throws Exception {
+                                               return osMongoCollection.findOneAndDelete(filter, resultClass);
+                                           }
+                                       }
         );
     }
 

@@ -12,8 +12,12 @@
                                                      final Bson replacement,
                                                      final FindOneAndModifyOptions options,
                                                      final Class<ResultT> resultClass) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.findOneAndReplace(filter, replacement, options, resultClass)
+        return dispatcher.dispatchTask(new Callable<ResultT>() {
+                                           @Override
+                                           public ResultT call() throws Exception {
+                                               return osMongoCollection.findOneAndReplace(filter, replacement, options, resultClass);
+                                           }
+                                       }
         );
     }
 

@@ -5,8 +5,12 @@
      * @return a task containing the result of the insert many operation
      */
     public Task<InsertManyResult> insertMany(final List<? extends DocumentT> documents) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.insertMany(documents)
+        return dispatcher.dispatchTask(new Callable<InsertManyResult>() {
+                                           @Override
+                                           public InsertManyResult call() throws Exception {
+                                               return osMongoCollection.insertMany(documents);
+                                           }
+                                       }
         );
     }
 

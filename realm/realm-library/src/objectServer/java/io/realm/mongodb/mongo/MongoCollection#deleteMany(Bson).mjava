@@ -6,8 +6,12 @@
      * @return a task containing the result of the remove many operation
      */
     public Task<DeleteResult> deleteMany(final Bson filter) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.deleteMany(filter)
+        return dispatcher.dispatchTask(new Callable<DeleteResult>() {
+                                           @Override
+                                           public DeleteResult call() throws Exception {
+                                               return osMongoCollection.deleteMany(filter);
+                                           }
+                                       }
         );
     }
 

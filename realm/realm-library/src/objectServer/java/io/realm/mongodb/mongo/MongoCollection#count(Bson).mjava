@@ -5,8 +5,12 @@
      * @return a task containing the number of documents in the collection
      */
     public Task<Long> count(final Bson filter) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.count(filter)
+        return dispatcher.dispatchTask(new Callable<Long>() {
+                                           @Override
+                                           public Long call() throws Exception {
+                                               return osMongoCollection.count(filter);
+                                           }
+                                       }
         );
     }
 

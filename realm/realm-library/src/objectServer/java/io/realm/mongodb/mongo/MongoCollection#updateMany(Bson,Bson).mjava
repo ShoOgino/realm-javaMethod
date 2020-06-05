@@ -7,8 +7,12 @@
      * @return a task containing the result of the update many operation
      */
     public Task<UpdateResult> updateMany(final Bson filter, final Bson update) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.updateMany(filter, update)
+        return dispatcher.dispatchTask(new Callable<UpdateResult>() {
+                                           @Override
+                                           public UpdateResult call() throws Exception {
+                                               return osMongoCollection.updateMany(filter, update);
+                                           }
+                                       }
         );
     }
 

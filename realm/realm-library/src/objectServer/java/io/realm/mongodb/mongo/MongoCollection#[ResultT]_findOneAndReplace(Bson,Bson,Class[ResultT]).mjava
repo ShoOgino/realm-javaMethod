@@ -10,8 +10,12 @@
     public <ResultT> Task<ResultT> findOneAndReplace(final Bson filter,
                                                      final Bson replacement,
                                                      final Class<ResultT> resultClass) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.findOneAndReplace(filter, replacement, resultClass)
+        return dispatcher.dispatchTask(new Callable<ResultT>() {
+                                           @Override
+                                           public ResultT call() throws Exception {
+                                               return osMongoCollection.findOneAndReplace(filter, replacement, resultClass);
+                                           }
+                                       }
         );
     }
 

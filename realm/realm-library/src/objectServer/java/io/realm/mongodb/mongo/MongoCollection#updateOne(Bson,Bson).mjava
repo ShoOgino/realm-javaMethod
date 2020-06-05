@@ -7,8 +7,12 @@
      * @return a task containing the result of the update one operation
      */
     public Task<UpdateResult> updateOne(final Bson filter, final Bson update) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.updateOne(filter, update)
+        return dispatcher.dispatchTask(new Callable<UpdateResult>() {
+                                           @Override
+                                           public UpdateResult call() throws Exception {
+                                               return osMongoCollection.updateOne(filter, update);
+                                           }
+                                       }
         );
     }
 

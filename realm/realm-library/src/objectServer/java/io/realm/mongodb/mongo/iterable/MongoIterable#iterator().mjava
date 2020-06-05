@@ -7,8 +7,12 @@
      * @return an asynchronous task with cursor of the operation represented by this iterable.
      */
     public Task<MongoCursor<ResultT>> iterator() {
-        return dispatcher.dispatchTask(() ->
-                new MongoCursor<>(getCollection().iterator())
+        return dispatcher.dispatchTask(new Callable<MongoCursor<ResultT>>() {
+                                           @Override
+                                           public MongoCursor<ResultT> call() throws Exception {
+                                               return new MongoCursor<>(MongoIterable.this.getCollection().iterator());
+                                           }
+                                       }
         );
     }
 

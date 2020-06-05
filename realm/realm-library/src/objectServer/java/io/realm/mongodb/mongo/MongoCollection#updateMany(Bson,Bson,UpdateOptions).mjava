@@ -11,8 +11,12 @@
             final Bson filter,
             final Bson update,
             final UpdateOptions updateOptions) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.updateMany(filter, update, updateOptions)
+        return dispatcher.dispatchTask(new Callable<UpdateResult>() {
+                                           @Override
+                                           public UpdateResult call() throws Exception {
+                                               return osMongoCollection.updateMany(filter, update, updateOptions);
+                                           }
+                                       }
         );
     }
 

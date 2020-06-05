@@ -5,8 +5,12 @@
      * @return a task containing the resulting document
      */
     public Task<DocumentT> findOneAndDelete(final Bson filter) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.findOneAndDelete(filter)
+        return dispatcher.dispatchTask(new Callable<DocumentT>() {
+                                           @Override
+                                           public DocumentT call() throws Exception {
+                                               return osMongoCollection.findOneAndDelete(filter);
+                                           }
+                                       }
         );
     }
 

@@ -6,8 +6,12 @@
      * @return a task containing the result of the find one operation
      */
     public Task<DocumentT> findOne(final Bson filter, final FindOptions options) {
-        return dispatcher.dispatchTask(() ->
-                osMongoCollection.findOne(filter, options)
+        return dispatcher.dispatchTask(new Callable<DocumentT>() {
+                                           @Override
+                                           public DocumentT call() throws Exception {
+                                               return osMongoCollection.findOne(filter, options);
+                                           }
+                                       }
         );
     }
 
