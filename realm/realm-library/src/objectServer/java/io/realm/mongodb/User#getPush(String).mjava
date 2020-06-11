@@ -1,0 +1,11 @@
+    /**
+     * Returns the {@link Push} instance for managing push notification registrations.
+     */
+    public synchronized Push getPush(String serviceName) {
+        if (push == null) {
+            OsPush osPush = new OsPush(app.nativePtr, osUser, serviceName);
+            push = new PushImpl(osPush);
+        }
+        return push;
+    }
+
