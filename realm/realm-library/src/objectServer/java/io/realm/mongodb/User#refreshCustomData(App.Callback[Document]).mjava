@@ -1,0 +1,20 @@
+    /**
+     * Re-fetch custom user data from the Realm App asynchronously.
+     * <p>
+     * This is the asynchronous variant of {@link #refreshCustomData()}.
+     *
+     * @param callback The callback that will receive the result or any errors from the request.
+     * @return The task representing the ongoing operation.
+     *
+     * @throws IllegalStateException if not called on a looper thread.
+     */
+    public RealmAsyncTask refreshCustomData(App.Callback<Document> callback) {
+        Util.checkLooperThread("Asynchronous functions is only possible from looper threads.");
+        return new Request<Document>(App.NETWORK_POOL_EXECUTOR, callback) {
+            @Override
+            public Document run() throws AppException {
+                return refreshCustomData();
+            }
+        }.start();
+    }
+
