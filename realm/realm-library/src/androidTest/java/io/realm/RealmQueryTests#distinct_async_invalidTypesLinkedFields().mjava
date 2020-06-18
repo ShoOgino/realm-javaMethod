@@ -1,23 +1,21 @@
-    // Smoke test of async distinct invalid types. Underlying mechanism is the same as for sync test
-    // (distinct_allFields), so just verifying async mechanism.
+    // Smoke test of async distinct on unsupported types. Underlying mechanism is the same as for sync test
+    // (distinct_linkedAllFields), so just verifying async mechanism.
     @Test
-    @RunTestInLooperThread
-    public void distinct_async_invalidTypes() {
-        populateTestRealm(realm, TEST_DATA_SIZE);
+    public void distinct_async_invalidTypesLinkedFields() {
+        populateForDistinctInvalidTypesLinked(realm);
 
         RealmObjectSchema schema = realm.getSchema().getSchemaForClass(AllTypes.CLASS_NAME);
-
         Set<String> fieldNames = schema.getFieldNames();
         for (String fieldName : fieldNames) {
-            String field = fieldName;
+            String field = AllTypes.FIELD_REALMLINK + fieldName;
             RealmFieldType type = schema.getFieldType(fieldName);
             if (!supportDistinct(type)) {
                 try {
                     realm.where(AllTypes.class).distinct(field).findAllAsync();
-                } catch (IllegalArgumentException ignored) {
+                    fail(field);
+                } catch (IllegalArgumentException e) {
                 }
             }
         }
-        looperThread.testComplete();
     }
 

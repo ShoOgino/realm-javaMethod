@@ -1,0 +1,76 @@
+    // Helper method to verify distinct behavior an all fields of AllTypes, potentially following
+    // possible multiple indirection links as given by 'prefix'
+    private void distinctAllFields(Realm realm, String prefix) {
+        final long numberOfBlocks = 3;
+        final long numberOfObjects = 3;
+
+        populateForDistinctAllTypes(realm, numberOfBlocks, numberOfObjects);
+
+        // Dynamic realm for verifying distinct query result against naive manual implementation of
+        // distinct
+        DynamicRealm dynamicRealm = DynamicRealm.createInstance(realm.sharedRealm);
+        RealmResults<DynamicRealmObject> all = dynamicRealm.where(AllTypes.CLASS_NAME)
+                .findAll();
+
+        // Bookkeeping to ensure that we are actually testing all types
+        HashSet types = new HashSet(Arrays.asList(RealmFieldType.values()));
+
+        // Iterate all fields of AllTypes table and verify that distinct either:
+        // - Returns correct number of entries, or
+        // - Raises an error that distinct cannot be performed on the specific field types (lists)
+        RealmObjectSchema schema = realm.getSchema().getSchemaForClass(AllTypes.CLASS_NAME);
+        Set<String> fieldNames = schema.getFieldNames();
+        for (String fieldName : fieldNames) {
+            String field = prefix + fieldName;
+            RealmFieldType type = schema.getFieldType(fieldName);
+            if (supportDistinct(type)) {
+                // Actual query
+                RealmResults<AllTypes> distinct = realm.where(AllTypes.class)
+                        .distinct(field)
+                        .findAll();
+
+                // Assert query result
+                // Test against manual distinct implementation
+                Set<List<? super Object>> values = distinct(all, field);
+                assertEquals(field, values.size(), distinct.size());
+                // Test against expected numbers from setup
+                switch (type) {
+                    case BOOLEAN:
+                        assertEquals(field, 2, distinct.size());
+                        break;
+                    case OBJECT:
+                        if (fieldName.equals("columnRealmObject")) {
+                            assertEquals(field, numberOfBlocks, distinct.size());
+                        } else if (fieldName.equals("columnRealmLink")){
+                            assertEquals(field, numberOfBlocks * numberOfObjects, distinct.size());
+                        } else {
+                            fail("Unknown object " + fieldName);
+                        }
+                        break;
+                    default:
+                        assertEquals(field, numberOfObjects, distinct.size());
+                        break;
+                }
+            } else {
+                // Test that unsupported types throw exception as expected
+                try {
+                    realm.where(AllTypes.class)
+                            .distinct(field)
+                            .findAll();
+                    fail();
+                } catch (IllegalArgumentException ignore) {
+                }
+            }
+            types.remove(type);
+        }
+
+        // Verify that we have tested all field types except LinkingObjects which is not part of
+        // the schema lookup
+        assertEquals(types.toString(), Sets.newSet(RealmFieldType.LINKING_OBJECTS), types);
+        // So verify Linking explicitly
+        RealmResults<AllTypes> distinct = realm.where(AllTypes.class)
+                .distinct(prefix + AllTypes.FIELD_REALMBACKLINK)
+                .findAll();
+        assertEquals(numberOfBlocks * numberOfObjects, distinct.size());
+    }
+

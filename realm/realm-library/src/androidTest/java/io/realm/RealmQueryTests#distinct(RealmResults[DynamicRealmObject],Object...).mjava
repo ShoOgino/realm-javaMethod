@@ -1,0 +1,37 @@
+    // Manual distinct method for verification. Uses field value's equals.
+    @NotNull
+    private Set<List<? super Object>> distinct(RealmResults<DynamicRealmObject> all, Object... fields) {
+        Set<List<? super Object>> values = new HashSet();
+
+        // Parsed hierarchical field accessors
+        List<String[]> fieldAccessors = new ArrayList<>();
+        for (Object field : fields) {
+            fieldAccessors.add(((String) field).split("\\."));
+        }
+
+        for (DynamicRealmObject object : all) {
+            List<? super Object> elements = new ArrayList<>(fields.length);
+            for (String[] split : fieldAccessors) {
+                int i = 0;
+                while(i < split.length - 1) {
+                    object = object.get(split[i]);
+                    i++;
+                }
+                String fieldName = split[i];
+                if (!object.isNull(fieldName)) {
+                    Object e = object.get(fieldName);
+                    // Need to convert byte arrays to list to detect duplicates when inserting to values
+                    if (e instanceof byte[]) {
+                        elements.add(convertBytesToList((byte[]) e));
+                    } else {
+                        elements.add(e);
+                    }
+                } else {
+                    elements.add(null);
+                }
+            }
+            values.add(elements);
+        }
+        return values;
+    }
+
