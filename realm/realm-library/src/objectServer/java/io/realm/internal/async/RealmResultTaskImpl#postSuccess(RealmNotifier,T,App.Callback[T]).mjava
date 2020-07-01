@@ -1,0 +1,13 @@
+    private void postSuccess(RealmNotifier handler,
+                             @Nullable final T result,
+                             App.Callback<T> callback) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (!isCancelled) {
+                    callback.onResult((result == null) ? App.Result.success() : App.Result.withResult(result));
+                }
+            }
+        });
+    }
+
