@@ -46,6 +46,21 @@
             }
         }
 
+        // Deep copy of columnRealmFinalList
+        if (currentDepth == maxDepth) {
+            unmanagedCopy.realmSet$columnRealmFinalList(null);
+        } else {
+            RealmList<some.test.AllTypes> managedcolumnRealmFinalListList = realmSource.realmGet$columnRealmFinalList();
+            RealmList<some.test.AllTypes> unmanagedcolumnRealmFinalListList = new RealmList<some.test.AllTypes>();
+            unmanagedCopy.realmSet$columnRealmFinalList(unmanagedcolumnRealmFinalListList);
+            int nextDepth = currentDepth + 1;
+            int size = managedcolumnRealmFinalListList.size();
+            for (int i = 0; i < size; i++) {
+                some.test.AllTypes item = some_test_AllTypesRealmProxy.createDetachedCopy(managedcolumnRealmFinalListList.get(i), nextDepth, maxDepth, cache);
+                unmanagedcolumnRealmFinalListList.add(item);
+            }
+        }
+
         unmanagedCopy.realmSet$columnStringList(new RealmList<java.lang.String>());
         unmanagedCopy.realmGet$columnStringList().addAll(realmSource.realmGet$columnStringList());
 

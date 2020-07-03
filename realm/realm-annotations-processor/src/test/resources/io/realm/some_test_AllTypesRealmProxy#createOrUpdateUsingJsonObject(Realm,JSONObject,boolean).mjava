@@ -1,7 +1,7 @@
     @SuppressWarnings("cast")
     public static some.test.AllTypes createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
             throws JSONException {
-        final List<String> excludeFields = new ArrayList<String>(14);
+        final List<String> excludeFields = new ArrayList<String>(15);
         some.test.AllTypes obj = null;
         if (update) {
             Table table = realm.getTable(some.test.AllTypes.class);
@@ -29,6 +29,9 @@
             }
             if (json.has("columnRealmList")) {
                 excludeFields.add("columnRealmList");
+            }
+            if (json.has("columnRealmFinalList")) {
+                excludeFields.add("columnRealmFinalList");
             }
             if (json.has("columnStringList")) {
                 excludeFields.add("columnStringList");
@@ -177,6 +180,18 @@
                 for (int i = 0; i < array.length(); i++) {
                     some.test.AllTypes item = some_test_AllTypesRealmProxy.createOrUpdateUsingJsonObject(realm, array.getJSONObject(i), update);
                     objProxy.realmGet$columnRealmList().add(item);
+                }
+            }
+        }
+        if (json.has("columnRealmFinalList")) {
+            if (json.isNull("columnRealmFinalList")) {
+                objProxy.realmSet$columnRealmFinalList(null);
+            } else {
+                objProxy.realmGet$columnRealmFinalList().clear();
+                JSONArray array = json.getJSONArray("columnRealmFinalList");
+                for (int i = 0; i < array.length(); i++) {
+                    some.test.AllTypes item = some_test_AllTypesRealmProxy.createOrUpdateUsingJsonObject(realm, array.getJSONObject(i), update);
+                    objProxy.realmGet$columnRealmFinalList().add(item);
                 }
             }
         }

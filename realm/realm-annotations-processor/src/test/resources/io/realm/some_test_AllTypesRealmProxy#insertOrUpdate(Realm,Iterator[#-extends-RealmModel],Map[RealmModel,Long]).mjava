@@ -97,6 +97,33 @@
             }
 
 
+            OsList columnRealmFinalListOsList = new OsList(table.getUncheckedRow(objKey), columnInfo.columnRealmFinalListColKey);
+            RealmList<some.test.AllTypes> columnRealmFinalListList = ((some_test_AllTypesRealmProxyInterface) object).realmGet$columnRealmFinalList();
+            if (columnRealmFinalListList != null && columnRealmFinalListList.size() == columnRealmFinalListOsList.size()) {
+                // For lists of equal lengths, we need to set each element directly as clearing the receiver list can be wrong if the input and target list are the same.
+                int objectCount = columnRealmFinalListList.size();
+                for (int i = 0; i < objectCount; i++) {
+                    some.test.AllTypes columnRealmFinalListItem = columnRealmFinalListList.get(i);
+                    Long cacheItemIndexcolumnRealmFinalList = cache.get(columnRealmFinalListItem);
+                    if (cacheItemIndexcolumnRealmFinalList == null) {
+                        cacheItemIndexcolumnRealmFinalList = some_test_AllTypesRealmProxy.insertOrUpdate(realm, columnRealmFinalListItem, cache);
+                    }
+                    columnRealmFinalListOsList.setRow(i, cacheItemIndexcolumnRealmFinalList);
+                }
+            } else {
+                columnRealmFinalListOsList.removeAll();
+                if (columnRealmFinalListList != null) {
+                    for (some.test.AllTypes columnRealmFinalListItem : columnRealmFinalListList) {
+                        Long cacheItemIndexcolumnRealmFinalList = cache.get(columnRealmFinalListItem);
+                        if (cacheItemIndexcolumnRealmFinalList == null) {
+                            cacheItemIndexcolumnRealmFinalList = some_test_AllTypesRealmProxy.insertOrUpdate(realm, columnRealmFinalListItem, cache);
+                        }
+                        columnRealmFinalListOsList.addRow(cacheItemIndexcolumnRealmFinalList);
+                    }
+                }
+            }
+
+
             OsList columnStringListOsList = new OsList(table.getUncheckedRow(objKey), columnInfo.columnStringListColKey);
             columnStringListOsList.removeAll();
             RealmList<java.lang.String> columnStringListList = ((some_test_AllTypesRealmProxyInterface) object).realmGet$columnStringList();

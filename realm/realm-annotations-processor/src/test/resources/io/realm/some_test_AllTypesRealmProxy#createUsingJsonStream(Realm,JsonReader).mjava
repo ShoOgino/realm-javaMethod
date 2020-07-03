@@ -107,6 +107,19 @@
                     }
                     reader.endArray();
                 }
+            } else if (name.equals("columnRealmFinalList")) {
+                if (reader.peek() == JsonToken.NULL) {
+                    reader.skipValue();
+                    objProxy.realmSet$columnRealmFinalList(null);
+                } else {
+                    objProxy.realmSet$columnRealmFinalList(new RealmList<some.test.AllTypes>());
+                    reader.beginArray();
+                    while (reader.hasNext()) {
+                        some.test.AllTypes item = some_test_AllTypesRealmProxy.createUsingJsonStream(realm, reader);
+                        objProxy.realmGet$columnRealmFinalList().add(item);
+                    }
+                    reader.endArray();
+                }
             } else if (name.equals("columnStringList")) {
                 objProxy.realmSet$columnStringList(ProxyUtils.createRealmListWithJsonStream(java.lang.String.class, reader));
             } else if (name.equals("columnBinaryList")) {

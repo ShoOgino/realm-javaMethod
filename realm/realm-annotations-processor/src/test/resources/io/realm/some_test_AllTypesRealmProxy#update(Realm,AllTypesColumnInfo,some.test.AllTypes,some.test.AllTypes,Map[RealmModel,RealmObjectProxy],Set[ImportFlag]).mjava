@@ -42,6 +42,23 @@
         } else {
             builder.addObjectList(columnInfo.columnRealmListColKey, new RealmList<some.test.AllTypes>());
         }
+
+        RealmList<some.test.AllTypes> columnRealmFinalListUnmanagedList = realmObjectSource.realmGet$columnRealmFinalList();
+        if (columnRealmFinalListUnmanagedList != null) {
+            RealmList<some.test.AllTypes> columnRealmFinalListManagedCopy = new RealmList<some.test.AllTypes>();
+            for (int i = 0; i < columnRealmFinalListUnmanagedList.size(); i++) {
+                some.test.AllTypes columnRealmFinalListItem = columnRealmFinalListUnmanagedList.get(i);
+                some.test.AllTypes cachecolumnRealmFinalList = (some.test.AllTypes) cache.get(columnRealmFinalListItem);
+                if (cachecolumnRealmFinalList != null) {
+                    columnRealmFinalListManagedCopy.add(cachecolumnRealmFinalList);
+                } else {
+                    columnRealmFinalListManagedCopy.add(some_test_AllTypesRealmProxy.copyOrUpdate(realm, (some_test_AllTypesRealmProxy.AllTypesColumnInfo) realm.getSchema().getColumnInfo(some.test.AllTypes.class), columnRealmFinalListItem, true, cache, flags));
+                }
+            }
+            builder.addObjectList(columnInfo.columnRealmFinalListColKey, columnRealmFinalListManagedCopy);
+        } else {
+            builder.addObjectList(columnInfo.columnRealmFinalListColKey, new RealmList<some.test.AllTypes>());
+        }
         builder.addStringList(columnInfo.columnStringListColKey, realmObjectSource.realmGet$columnStringList());
         builder.addByteArrayList(columnInfo.columnBinaryListColKey, realmObjectSource.realmGet$columnBinaryList());
         builder.addBooleanList(columnInfo.columnBooleanListColKey, realmObjectSource.realmGet$columnBooleanList());

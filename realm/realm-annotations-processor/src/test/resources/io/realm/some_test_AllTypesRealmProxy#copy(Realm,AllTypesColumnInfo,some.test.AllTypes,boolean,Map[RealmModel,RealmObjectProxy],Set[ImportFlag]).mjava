@@ -67,6 +67,21 @@
             }
         }
 
+        RealmList<some.test.AllTypes> columnRealmFinalListUnmanagedList = unmanagedSource.realmGet$columnRealmFinalList();
+        if (columnRealmFinalListUnmanagedList != null) {
+            RealmList<some.test.AllTypes> columnRealmFinalListManagedList = managedCopy.realmGet$columnRealmFinalList();
+            columnRealmFinalListManagedList.clear();
+            for (int i = 0; i < columnRealmFinalListUnmanagedList.size(); i++) {
+                some.test.AllTypes columnRealmFinalListUnmanagedItem = columnRealmFinalListUnmanagedList.get(i);
+                some.test.AllTypes cachecolumnRealmFinalList = (some.test.AllTypes) cache.get(columnRealmFinalListUnmanagedItem);
+                if (cachecolumnRealmFinalList != null) {
+                    columnRealmFinalListManagedList.add(cachecolumnRealmFinalList);
+                } else {
+                    columnRealmFinalListManagedList.add(some_test_AllTypesRealmProxy.copyOrUpdate(realm, (some_test_AllTypesRealmProxy.AllTypesColumnInfo) realm.getSchema().getColumnInfo(some.test.AllTypes.class), columnRealmFinalListUnmanagedItem, update, cache, flags));
+                }
+            }
+        }
+
         return managedCopy;
     }
 
