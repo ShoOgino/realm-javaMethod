@@ -1,0 +1,19 @@
+    private void postError(RealmNotifier handler,
+                           final AppException error,
+                           App.Callback<T> callback) {
+        boolean errorHandled;
+        Runnable action = new Runnable() {
+            @Override
+            public void run() {
+                if (!isCancelled) {
+                    callback.onResult(App.Result.withError(error));
+                }
+            }
+        };
+        errorHandled = handler.post(action);
+
+        if (!errorHandled) {
+            RealmLog.error(error, "An error was thrown, but could not be posted: \n" + error.toString());
+        }
+    }
+
