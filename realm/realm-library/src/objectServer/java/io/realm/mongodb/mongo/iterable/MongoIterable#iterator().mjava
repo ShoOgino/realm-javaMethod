@@ -6,13 +6,13 @@
      *
      * @return an asynchronous task with cursor of the operation represented by this iterable.
      */
-    public Task<MongoCursor<ResultT>> iterator() {
-        return dispatcher.dispatchTask(new Callable<MongoCursor<ResultT>>() {
-                                           @Override
-                                           public MongoCursor<ResultT> call() throws Exception {
-                                               return new MongoCursor<>(MongoIterable.this.getCollection().iterator());
-                                           }
-                                       }
-        );
+    public RealmResultTask<MongoCursor<ResultT>> iterator() {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<MongoCursor<ResultT>>() {
+            @Nullable
+            @Override
+            public MongoCursor<ResultT> run() {
+                return new MongoCursor<>(MongoIterable.this.getCollection().iterator());
+            }
+        });
     }
 

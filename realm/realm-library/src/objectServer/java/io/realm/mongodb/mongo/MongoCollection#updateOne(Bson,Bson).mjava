@@ -6,13 +6,13 @@
      *               apply must include only update operators.
      * @return a task containing the result of the update one operation
      */
-    public Task<UpdateResult> updateOne(final Bson filter, final Bson update) {
-        return dispatcher.dispatchTask(new Callable<UpdateResult>() {
-                                           @Override
-                                           public UpdateResult call() throws Exception {
-                                               return osMongoCollection.updateOne(filter, update);
-                                           }
-                                       }
-        );
+    public RealmResultTask<UpdateResult> updateOne(final Bson filter, final Bson update) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<UpdateResult>() {
+            @Nullable
+            @Override
+            public UpdateResult run() {
+                return osMongoCollection.updateOne(filter, update);
+            }
+        });
     }
 

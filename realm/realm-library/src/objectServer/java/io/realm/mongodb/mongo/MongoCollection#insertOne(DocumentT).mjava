@@ -5,13 +5,13 @@
      * @param document the document to insert
      * @return a task containing the result of the insert one operation
      */
-    public Task<InsertOneResult> insertOne(final DocumentT document) {
-        return dispatcher.dispatchTask(new Callable<InsertOneResult>() {
-                                           @Override
-                                           public InsertOneResult call() throws Exception {
-                                               return osMongoCollection.insertOne(document);
-                                           }
-                                       }
-        );
+    public RealmResultTask<InsertOneResult> insertOne(final DocumentT document) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<InsertOneResult>() {
+            @Nullable
+            @Override
+            public InsertOneResult run() {
+                return osMongoCollection.insertOne(document);
+            }
+        });
     }
 

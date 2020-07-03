@@ -6,13 +6,13 @@
      * @param filter the query filter to apply the the delete operation
      * @return a task containing the result of the remove one operation
      */
-    public Task<DeleteResult> deleteOne(final Bson filter) {
-        return dispatcher.dispatchTask(new Callable<DeleteResult>() {
-                                           @Override
-                                           public DeleteResult call() throws Exception {
-                                               return osMongoCollection.deleteOne(filter);
-                                           }
-                                       }
-        );
+    public RealmResultTask<DeleteResult> deleteOne(final Bson filter) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<DeleteResult>() {
+            @Nullable
+            @Override
+            public DeleteResult run() {
+                return osMongoCollection.deleteOne(filter);
+            }
+        });
     }
 

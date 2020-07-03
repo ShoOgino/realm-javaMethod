@@ -4,13 +4,13 @@
      * @param filter the query filter
      * @return a task containing the number of documents in the collection
      */
-    public Task<Long> count(final Bson filter) {
-        return dispatcher.dispatchTask(new Callable<Long>() {
-                                           @Override
-                                           public Long call() throws Exception {
-                                               return osMongoCollection.count(filter);
-                                           }
-                                       }
-        );
+    public RealmResultTask<Long> count(final Bson filter) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<Long>() {
+            @Nullable
+            @Override
+            public Long run() {
+                return osMongoCollection.count(filter);
+            }
+        });
     }
 

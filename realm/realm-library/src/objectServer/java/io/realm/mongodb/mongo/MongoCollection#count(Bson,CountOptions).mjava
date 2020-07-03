@@ -5,13 +5,13 @@
      * @param options the options describing the count
      * @return a task containing the number of documents in the collection
      */
-    public Task<Long> count(final Bson filter, final CountOptions options) {
-        return dispatcher.dispatchTask(new Callable<Long>() {
-                                           @Override
-                                           public Long call() throws Exception {
-                                               return osMongoCollection.count(filter, options);
-                                           }
-                                       }
-        );
+    public RealmResultTask<Long> count(final Bson filter, final CountOptions options) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<Long>() {
+            @Nullable
+            @Override
+            public Long run() {
+                return osMongoCollection.count(filter, options);
+            }
+        });
     }
 

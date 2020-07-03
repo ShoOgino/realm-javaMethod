@@ -2,7 +2,7 @@
                                                          final Class<ResultT> resultClass,
                                                          @Nullable final FindOptions options) {
         FindIterable<ResultT> findIterable =
-                new FindIterable<>(this, codecRegistry, resultClass, dispatcher);
+                new FindIterable<>(threadPoolExecutor, this, codecRegistry, resultClass);
         findIterable.filter(filter);
 
         if (options != null) {

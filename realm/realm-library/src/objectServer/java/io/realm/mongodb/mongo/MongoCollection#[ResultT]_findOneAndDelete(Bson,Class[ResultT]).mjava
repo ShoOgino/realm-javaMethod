@@ -6,14 +6,14 @@
      * @param <ResultT>   the target document type of the iterable.
      * @return a task containing the resulting document
      */
-    public <ResultT> Task<ResultT> findOneAndDelete(final Bson filter,
-                                                    final Class<ResultT> resultClass) {
-        return dispatcher.dispatchTask(new Callable<ResultT>() {
-                                           @Override
-                                           public ResultT call() throws Exception {
-                                               return osMongoCollection.findOneAndDelete(filter, resultClass);
-                                           }
-                                       }
-        );
+    public <ResultT> RealmResultTask<ResultT> findOneAndDelete(final Bson filter,
+                                                               final Class<ResultT> resultClass) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<ResultT>() {
+            @Nullable
+            @Override
+            public ResultT run() {
+                return osMongoCollection.findOneAndDelete(filter, resultClass);
+            }
+        });
     }
 

@@ -1,9 +1,9 @@
-    public AggregateIterable(final OsMongoCollection osMongoCollection,
+    public AggregateIterable(final ThreadPoolExecutor threadPoolExecutor,
+                             final OsMongoCollection<?> osMongoCollection,
                              final CodecRegistry codecRegistry,
-                             final TaskDispatcher dispatcher,
                              final Class<ResultT> resultClass,
                              final List<? extends Bson> pipeline) {
-        super(osMongoCollection, codecRegistry, resultClass, dispatcher);
+        super(threadPoolExecutor, osMongoCollection, codecRegistry, resultClass);
         this.pipeline = pipeline;
     }
 

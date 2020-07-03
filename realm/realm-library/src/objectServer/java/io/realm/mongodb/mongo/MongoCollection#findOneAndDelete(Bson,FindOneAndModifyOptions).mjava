@@ -5,14 +5,14 @@
      * @param options a {@link FindOneAndModifyOptions} struct
      * @return a task containing the resulting document
      */
-    public Task<DocumentT> findOneAndDelete(final Bson filter,
-                                            final FindOneAndModifyOptions options) {
-        return dispatcher.dispatchTask(new Callable<DocumentT>() {
-                                           @Override
-                                           public DocumentT call() throws Exception {
-                                               return osMongoCollection.findOneAndDelete(filter, options);
-                                           }
-                                       }
-        );
+    public RealmResultTask<DocumentT> findOneAndDelete(final Bson filter,
+                                                       final FindOneAndModifyOptions options) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<DocumentT>() {
+            @Nullable
+            @Override
+            public DocumentT run() {
+                return osMongoCollection.findOneAndDelete(filter, options);
+            }
+        });
     }
 

@@ -5,13 +5,13 @@
      * @param filter the query filter to apply the the delete operation
      * @return a task containing the result of the remove many operation
      */
-    public Task<DeleteResult> deleteMany(final Bson filter) {
-        return dispatcher.dispatchTask(new Callable<DeleteResult>() {
-                                           @Override
-                                           public DeleteResult call() throws Exception {
-                                               return osMongoCollection.deleteMany(filter);
-                                           }
-                                       }
-        );
+    public RealmResultTask<DeleteResult> deleteMany(final Bson filter) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<DeleteResult>() {
+            @Nullable
+            @Override
+            public DeleteResult run() {
+                return osMongoCollection.deleteMany(filter);
+            }
+        });
     }
 

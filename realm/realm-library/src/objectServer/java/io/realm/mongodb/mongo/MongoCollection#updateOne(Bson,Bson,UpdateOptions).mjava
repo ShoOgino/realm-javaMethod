@@ -7,16 +7,16 @@
      * @param updateOptions the options to apply to the update operation
      * @return a task containing the result of the update one operation
      */
-    public Task<UpdateResult> updateOne(
+    public RealmResultTask<UpdateResult> updateOne(
             final Bson filter,
             final Bson update,
             final UpdateOptions updateOptions) {
-        return dispatcher.dispatchTask(new Callable<UpdateResult>() {
-                                           @Override
-                                           public UpdateResult call() throws Exception {
-                                               return osMongoCollection.updateOne(filter, update, updateOptions);
-                                           }
-                                       }
-        );
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<UpdateResult>() {
+            @Nullable
+            @Override
+            public UpdateResult run() {
+                return osMongoCollection.updateOne(filter, update, updateOptions);
+            }
+        });
     }
 

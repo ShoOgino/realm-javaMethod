@@ -3,10 +3,11 @@
      *
      * @return a task containing the number of documents in the collection
      */
-    public Task<Long> count() {
-        return dispatcher.dispatchTask(new Callable<Long>() {
+    public RealmResultTask<Long> count() {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<Long>() {
+            @Nullable
             @Override
-            public Long call() throws Exception {
+            public Long run() {
                 return osMongoCollection.count();
             }
         });

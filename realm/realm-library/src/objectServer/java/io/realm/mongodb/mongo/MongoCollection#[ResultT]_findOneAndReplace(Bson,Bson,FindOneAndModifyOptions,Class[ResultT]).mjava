@@ -8,16 +8,16 @@
      * @param <ResultT>   the target document type of the iterable.
      * @return a task containing the resulting document
      */
-    public <ResultT> Task<ResultT> findOneAndReplace(final Bson filter,
-                                                     final Bson replacement,
-                                                     final FindOneAndModifyOptions options,
-                                                     final Class<ResultT> resultClass) {
-        return dispatcher.dispatchTask(new Callable<ResultT>() {
-                                           @Override
-                                           public ResultT call() throws Exception {
-                                               return osMongoCollection.findOneAndReplace(filter, replacement, options, resultClass);
-                                           }
-                                       }
-        );
+    public <ResultT> RealmResultTask<ResultT> findOneAndReplace(final Bson filter,
+                                                                final Bson replacement,
+                                                                final FindOneAndModifyOptions options,
+                                                                final Class<ResultT> resultClass) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<ResultT>() {
+            @Nullable
+            @Override
+            public ResultT run() {
+                return osMongoCollection.findOneAndReplace(filter, replacement, options, resultClass);
+            }
+        });
     }
 
