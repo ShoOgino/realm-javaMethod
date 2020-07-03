@@ -1,0 +1,32 @@
+    @SuppressWarnings("cast")
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static some.test.EmbeddedClass createUsingJsonStream(Realm realm, JsonReader reader)
+            throws IOException {
+        final some.test.EmbeddedClass obj = new some.test.EmbeddedClass();
+        final some_test_EmbeddedClassRealmProxyInterface objProxy = (some_test_EmbeddedClassRealmProxyInterface) obj;
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (false) {
+            } else if (name.equals("name")) {
+                if (reader.peek() != JsonToken.NULL) {
+                    objProxy.realmSet$name((String) reader.nextString());
+                } else {
+                    reader.skipValue();
+                    objProxy.realmSet$name(null);
+                }
+            } else if (name.equals("age")) {
+                if (reader.peek() != JsonToken.NULL) {
+                    objProxy.realmSet$age((int) reader.nextInt());
+                } else {
+                    reader.skipValue();
+                    throw new IllegalArgumentException("Trying to set non-nullable field 'age' to null.");
+                }
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+        return realm.copyToRealm(obj);
+    }
+

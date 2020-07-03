@@ -1,0 +1,9 @@
+    static some_test_EmbeddedClassRealmProxy newProxyInstance(BaseRealm realm, Row row) {
+        // Ignore default values to avoid creating unexpected objects from RealmModel/RealmList fields
+        final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get();
+        objectContext.set(realm, row, realm.getSchema().getColumnInfo(some.test.EmbeddedClass.class), false, Collections.<String>emptyList());
+        io.realm.some_test_EmbeddedClassRealmProxy obj = new io.realm.some_test_EmbeddedClassRealmProxy();
+        objectContext.clear();
+        return obj;
+    }
+
