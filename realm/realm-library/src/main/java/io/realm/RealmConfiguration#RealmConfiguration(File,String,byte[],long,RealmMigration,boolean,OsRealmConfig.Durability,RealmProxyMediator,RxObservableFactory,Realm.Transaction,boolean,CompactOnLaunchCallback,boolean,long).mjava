@@ -1,8 +1,6 @@
     // We need to enumerate all parameters since SyncConfiguration and RealmConfiguration supports different
     // subsets of them.
-    protected RealmConfiguration(@Nullable File realmDirectory,
-            @Nullable String realmFileName,
-            String canonicalPath,
+    protected RealmConfiguration(File realmPath,
             @Nullable String assetFilePath,
             @Nullable byte[] key,
             long schemaVersion,
@@ -16,9 +14,9 @@
             @Nullable CompactOnLaunchCallback compactOnLaunch,
             boolean isRecoveryConfiguration,
             long maxNumberOfActiveVersions) {
-        this.realmDirectory = realmDirectory;
-        this.realmFileName = realmFileName;
-        this.canonicalPath = canonicalPath;
+        this.realmDirectory = realmPath.getParentFile();
+        this.realmFileName = realmPath.getName();
+        this.canonicalPath = realmPath.getAbsolutePath();
         this.assetFilePath = assetFilePath;
         this.key = key;
         this.schemaVersion = schemaVersion;

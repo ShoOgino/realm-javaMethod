@@ -33,47 +33,14 @@
                 rxFactory = new RealmObservableFactory(true);
             }
 
-            // FIXME: Figure out how to map to on-disk path. Partition key can be up to 16MB in size.
-            // Determine location on disk
-            // Use the serverUrl + user to create a unique filepath.
-            // The following types of paths can be generated
-            // <rootDir>/<userIdentifier>/default.realm
-            // <rootDir>/<userIdentifier>/<hashedPartionKey>/default.realm
-            URI resolvedServerUrl = serverUrl; // resolveServerUrl(serverUrl, user);
+            URI resolvedServerUrl = serverUrl;
             syncUrlPrefix = String.format("/api/client/v2.0/app/%s/realm-sync", user.getApp().getConfiguration().getAppId());
-            String realmPathFromRootDir = user.getId() + "/" + getServerPath(user, resolvedServerUrl);
-            File realmFileDirectory = new File(defaultFolder, realmPathFromRootDir);
-            String realmFileName = defaultLocalFileName;
-            String fullPathName = realmFileDirectory.getAbsolutePath() + File.pathSeparator + realmFileName;
 
-            // full path must not exceed 256 characters (on FAT)
-            if (fullPathName.length() > MAX_FULL_PATH_LENGTH) {
-                throw new IllegalStateException(String.format(Locale.US,
-                        "Full path name must not exceed %d characters: %s",
-                        MAX_FULL_PATH_LENGTH, fullPathName));
-            }
-
-            if (realmFileName.length() > MAX_FILE_NAME_LENGTH) {
-                throw new IllegalStateException(String.format(Locale.US,
-                        "File name exceed %d characters: %d", MAX_FILE_NAME_LENGTH,
-                        realmFileName.length()));
-            }
-
-            // substitute invalid characters
-            for (char c : INVALID_CHARS) {
-                realmFileName = realmFileName.replace(c, '_');
-            }
-
-            // Create the folder on disk (if needed)
-            if (!realmFileDirectory.exists() && !realmFileDirectory.mkdirs()) {
-                throw new IllegalStateException("Could not create directory for saving the Realm: " + realmFileDirectory);
-            }
+            String absolutePathForRealm = user.getApp().getSync().getAbsolutePathForRealm(user.getId(), partitionValue, filename);
+            File realmFile = new File(absolutePathForRealm);
 
             return new SyncConfiguration(
-                    // Realm Configuration options
-                    realmFileDirectory,
-                    realmFileName,
-                    getCanonicalPath(new File(realmFileDirectory, realmFileName)),
+                    realmFile,
                     null, // assetFile not supported by Sync. See https://github.com/realm/realm-sync/issues/241
                     key,
                     schemaVersion,

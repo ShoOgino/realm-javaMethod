@@ -1,0 +1,24 @@
+        /**
+         * FIXME: Make public once https://github.com/realm/realm-object-store/pull/1049 is merged.
+         *
+         * Sets the filename for the Realm file on this device.
+         */
+        Builder name(String filename) {
+            //noinspection ConstantConditions
+            if (filename == null || filename.isEmpty()) {
+                throw new IllegalArgumentException("A non-empty filename must be provided");
+            }
+
+            // Strip `.realm` suffix as it will be appended by Object Store later
+            if (filename.endsWith(".realm")) {
+                if (filename.length() == 6) {
+                    throw new IllegalArgumentException("'.realm' is not a valid filename");
+                } else {
+                    filename = filename.substring(0, filename.length() - 6);
+                }
+            }
+
+            this.filename = filename;
+            return this;
+        }
+

@@ -1,0 +1,18 @@
+    /**
+     * Returns the absolute path for the location of the Realm file on disk
+     */
+    String getAbsolutePathForRealm(String userId, BsonValue partitionValue, @Nullable String overrideFileName) {
+        String encodedPartitionValue;
+        switch (partitionValue.getBsonType()) {
+            case STRING:
+            case OBJECT_ID:
+            case INT32:
+            case INT64:
+                encodedPartitionValue = JniBsonProtocol.encode(partitionValue, AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY);
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported type: " + partitionValue);
+        }
+        return nativeGetPathForRealm(userId, encodedPartitionValue, overrideFileName);
+    }
+
