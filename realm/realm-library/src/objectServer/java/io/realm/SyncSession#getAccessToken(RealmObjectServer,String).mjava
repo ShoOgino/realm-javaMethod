@@ -1,5 +1,5 @@
     // Return the access token for the Realm this Session is connected to.
-    String getAccessToken(final RealmObjectServer authServer, String refreshToken) {
+    synchronized String getAccessToken(final RealmObjectServer authServer, String refreshToken) {
         // check first if there's a valid access_token we can return immediately
         if (getUser().isRealmAuthenticated(configuration)) {
             Token accessToken = getUser().getAccessToken(configuration);
