@@ -8,10 +8,12 @@
         } catch (IOException e) {
             RealmLog.error(e);
         }
-        //noinspection ResultOfMethodCallIgnored
-        rootFolder.delete();
-        //noinspection ResultOfMethodCallIgnored
-        rootFolder.mkdir();
+        if (rootFolder.exists() && !rootFolder.delete()) {
+            throw new IllegalStateException("Could not delete folder: " + rootFolder.getAbsolutePath());
+        }
+        if (!rootFolder.mkdir()) {
+            throw new IllegalStateException("Could not create folder: " + rootFolder.getAbsolutePath());
+        }
 
         Realm.init(getApplicationContext());
     }

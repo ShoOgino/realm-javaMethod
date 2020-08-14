@@ -12,7 +12,12 @@
                 final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), UTF_8));
                 //noinspection TryFinallyCanBeTryWithResources
                 try {
-                    return reader.readLine().toLowerCase(Locale.ENGLISH).equals("enforcing");
+                    String line = reader.readLine();
+                    if (line != null) {
+                        return line.toLowerCase(Locale.ENGLISH).equals("enforcing");
+                    } else {
+                        return false;
+                    }
                 } finally {
                     try {
                         reader.close();

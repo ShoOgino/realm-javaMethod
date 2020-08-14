@@ -1,14 +1,16 @@
     @Override
     public void run() {
-        int attempt = 0;
         while (!Thread.interrupted()) {
             attempt++;
             long sleep = calculateExponentialDelay(attempt - 1, TimeUnit.MINUTES.toMillis(5));
             if (sleep > 0) {
+                RealmLog.debug(getName() + " Delaying for " + TimeUnit.SECONDS.convert(sleep, TimeUnit.MILLISECONDS) + " sec.");
                 try {
-                    Thread.sleep(sleep);
+                    synchronized (sleepLock) {
+                        sleepLock.wait(sleep);
+                    }
                 } catch (InterruptedException e) {
-                    RealmLog.debug("Incremental backoff was interrupted.");
+                    RealmLog.debug(getName() + " Incremental backoff was interrupted.");
                     return; // Abort if interrupted
                 }
             }

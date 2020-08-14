@@ -1,13 +1,14 @@
     // Authenticate by getting access tokens for the specific Realm
-    private void authenticateRealm(final RealmObjectServer authServer) {
+    synchronized void authenticateRealm(final RealmObjectServer authServer) {
         if (networkRequest != null) {
             networkRequest.cancel();
         }
         clearScheduledAccessTokenRefresh();
 
         onGoingAccessTokenQuery.set(true);
+        final String taskName = "Session[" + configuration.getPath() + "][AuthenticateRealm]";
         // Authenticate in a background thread. This allows incremental backoff and retries in a safe manner.
-        Future<?> task = SyncManager.NETWORK_POOL_EXECUTOR.submit(new ExponentialBackoffTask<AuthenticateResponse>() {
+        networkRequest = new ResetableRealmAsyncTask(new ExponentialBackoffTask<AuthenticateResponse>() {
             @Override
             protected AuthenticateResponse execute() {
                 if (!isClosed && !Thread.currentThread().isInterrupted()) {
@@ -34,6 +35,7 @@
                         onGoingAccessTokenQuery.set(false);
                     }
                 }
+                networkRequest = null;
             }
 
             @Override
@@ -49,8 +51,13 @@
                         && !(response.getError().getException() instanceof InterruptedIOException)) {
                     errorHandler.onError(SyncSession.this, response.getError());
                 }
+                networkRequest = null;
             }
-        });
-        networkRequest = new RealmAsyncTaskImpl(task, SyncManager.NETWORK_POOL_EXECUTOR);
+
+            @Override
+            protected String getName() {
+                return taskName;
+            }
+        }, SyncManager.NETWORK_POOL_EXECUTOR);
     }
 
