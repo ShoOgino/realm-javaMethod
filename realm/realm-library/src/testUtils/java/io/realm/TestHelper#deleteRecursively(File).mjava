@@ -3,9 +3,13 @@
         if (!file.exists()) {
             return;
         }
+
         if (file.isDirectory()) {
-            for (File f : file.listFiles()) {
-                deleteRecursively(f);
+            File[] files = file.listFiles();
+            for (File f : files) {
+                if (f != null) {
+                    deleteRecursively(f);
+                }
             }
         }
 

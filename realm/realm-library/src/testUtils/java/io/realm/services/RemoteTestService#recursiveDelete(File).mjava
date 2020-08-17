@@ -5,7 +5,9 @@
                 recursiveDelete(each);
             }
         }
-        //noinspection ResultOfMethodCallIgnored
-        file.delete();
+
+        if (!file.delete()) {
+            throw new IllegalStateException("Could not delete file: " + file.getAbsolutePath());
+        }
     }
 
