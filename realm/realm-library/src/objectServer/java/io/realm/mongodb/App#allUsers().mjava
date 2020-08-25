@@ -7,10 +7,11 @@
      * @return a map of user identifiers and users known locally.
      */
     public Map<String, User> allUsers() {
-        long[] nativeUsers = nativeGetAllUsers(nativePtr);
-        HashMap<String, User> users = new HashMap<>(nativeUsers.length);
-        for (int i = 0; i < nativeUsers.length; i++) {
-            User user = new User(nativeUsers[i], this);
+        OsSyncUser[] allUsers = osApp.allUsers();
+
+        HashMap<String, User> users = new HashMap<>(allUsers.length);
+        for (int i = 0; i < allUsers.length; i++) {
+            User user = new User(allUsers[i], this);
             users.put(user.getId(), user);
         }
         return users;

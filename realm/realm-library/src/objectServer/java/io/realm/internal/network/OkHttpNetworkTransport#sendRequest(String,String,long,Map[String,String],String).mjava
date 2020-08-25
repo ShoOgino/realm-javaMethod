@@ -1,23 +1,13 @@
     @Override
-    public Response sendRequest(String method, String url, long timeoutMs, Map<String, String> headers, String body) {
+    public OsJavaNetworkTransport.Response sendRequest(String method, String url, long timeoutMs, Map<String, String> headers, String body) {
         try {
             OkHttpClient client = getClient(timeoutMs);
+
             okhttp3.Response response = null;
             try {
-                Request.Builder builder = new Request.Builder().url(url);
-                switch(method) {
-                    case "get": builder.get(); break;
-                    case "delete": builder.delete(RequestBody.create(JSON, body)); break;
-                    case "patch": builder.patch(RequestBody.create(JSON, body)); break;
-                    case "post": builder.post(RequestBody.create(JSON, body)); break;
-                    case "put": builder.put(RequestBody.create(JSON, body)); break;
-                    default: throw new IllegalArgumentException("Unknown method type: "+ method);
-                }
+                okhttp3.Request request = makeRequest(method, url, headers, body);
 
-                for (Map.Entry<String, String> entry : headers.entrySet()) {
-                    builder.addHeader(entry.getKey(), entry.getValue());
-                }
-                Call call = client.newCall(builder.build());
+                Call call = client.newCall(request);
                 response = call.execute();
                 ResponseBody responseBody = response.body();
                 String result = "";

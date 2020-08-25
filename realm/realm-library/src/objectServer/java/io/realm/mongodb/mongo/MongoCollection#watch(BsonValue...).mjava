@@ -1,0 +1,16 @@
+    /**
+     * Watches specified IDs in a collection.
+     *
+     * @param ids the ids to watch.
+     * @return a task that provides access to the stream of change events.
+     */
+    public RealmEventStreamTask<DocumentT> watch(final BsonValue... ids) {
+        return new RealmEventStreamTaskImpl<>(getNamespace().getFullName(),
+                new RealmEventStreamTaskImpl.Executor<DocumentT>() {
+                    @Override
+                    public EventStream<DocumentT> run() throws IOException {
+                        return osMongoCollection.watch(Arrays.asList(ids));
+                    }
+                });
+    }
+

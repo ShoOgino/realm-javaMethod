@@ -1,19 +1,8 @@
-    private long init(AppConfiguration config) {
+    private OsApp init(AppConfiguration config) {
         String userAgentBindingInfo = getBindingInfo();
         String appDefinedUserAgent = getAppInfo(config);
         String syncDir = getSyncBaseDirectory();
-        return nativeCreate(
-                config.getAppId(),
-                config.getBaseUrl().toString(),
-                config.getAppName(),
-                config.getAppVersion(),
-                config.getRequestTimeoutMs(),
-                config.getEncryptionKey(),
-                syncDir,
-                userAgentBindingInfo,
-                appDefinedUserAgent,
-                "android",
-                android.os.Build.VERSION.RELEASE,
-                io.realm.BuildConfig.VERSION_NAME);
+
+        return new OsApp(config, userAgentBindingInfo, appDefinedUserAgent, syncDir);
     }
 

@@ -1,0 +1,10 @@
+        @Override
+        public String readBodyLine() throws IOException {
+            if(!closed){
+                return bufferedSource.readUtf8LineStrict();
+            } else{
+                bufferedSource.close();
+                throw new IOException("Stream closed");
+            }
+        }
+

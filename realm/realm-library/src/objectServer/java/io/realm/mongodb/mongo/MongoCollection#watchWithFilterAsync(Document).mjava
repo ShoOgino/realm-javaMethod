@@ -1,0 +1,23 @@
+    /**
+     * Watches a collection asynchronously. The provided document will be used as a match expression filter on
+     * the change events coming from the stream. This convenience overload supports the use of
+     * non-{@link BsonDocument} instances for the user.
+     * <p>
+     * See <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/match/" target="_blank">how to define a match filter</a>.
+     * <p>
+     * Defining the match expression to filter ChangeEvents is similar to
+     * <a href="https://docs.mongodb.com/realm/triggers/database-triggers/" target="_blank">how to define the match expression for triggers</a>
+     *
+     * @param matchFilter the $match filter to apply to incoming change events
+     * @return a task that provides access to the stream of change events.
+     */
+    public RealmEventStreamAsyncTask<DocumentT> watchWithFilterAsync(Document matchFilter) {
+        return new RealmEventStreamAsyncTaskImpl<>(getNamespace().getFullName(),
+                new RealmEventStreamAsyncTaskImpl.Executor<DocumentT>() {
+                    @Override
+                    public EventStream<DocumentT> run() throws IOException {
+                        return osMongoCollection.watchWithFilter(matchFilter);
+                    }
+                });
+    }
+

@@ -1,0 +1,33 @@
+    /**
+     * Serializes this change event into a {@link BsonDocument}.
+     *
+     * @return the serialized document.
+     */
+    @Override
+    public BsonDocument toBsonDocument() {
+        final BsonDocument asDoc = new BsonDocument();
+        asDoc.put(Fields.ID_FIELD, id);
+
+        asDoc.put(Fields.OPERATION_TYPE_FIELD, new BsonString(toRemote(getOperationType())));
+
+        final BsonDocument nsDoc = new BsonDocument();
+        nsDoc.put(Fields.NS_DB_FIELD, new BsonString(ns.getDatabaseName()));
+        nsDoc.put(Fields.NS_COLL_FIELD, new BsonString(getNamespace().getCollectionName()));
+        asDoc.put(Fields.NS_FIELD, nsDoc);
+
+        asDoc.put(Fields.DOCUMENT_KEY_FIELD, getDocumentKey());
+        DocumentT fullDocument = getFullDocument();
+
+        if ((fullDocument instanceof BsonValue) && ((BsonValue) fullDocument).isDocument()) {
+            asDoc.put(Fields.FULL_DOCUMENT_FIELD, (BsonValue) fullDocument);
+        }
+
+        UpdateDescription updateDescription = getUpdateDescription();
+        if (updateDescription != null) {
+            asDoc.put(Fields.UPDATE_DESCRIPTION_FIELD, updateDescription.toBsonDocument());
+        }
+
+        asDoc.put(Fields.WRITE_PENDING_FIELD, new BsonBoolean(hasUncommittedWrites()));
+        return asDoc;
+    }
+

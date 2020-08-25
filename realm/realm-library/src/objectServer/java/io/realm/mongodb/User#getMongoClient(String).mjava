@@ -6,7 +6,9 @@
     public synchronized MongoClient getMongoClient(String serviceName) {
         Util.checkEmpty(serviceName, "serviceName");
         if (mongoClient == null) {
-            OsMongoClient osMongoClient = new OsMongoClient(app.nativePtr, serviceName);
+            StreamNetworkTransport streamNetworkTransport = new StreamNetworkTransport(app.osApp, this.osUser);
+
+            OsMongoClient osMongoClient = new OsMongoClient(app.osApp, serviceName, streamNetworkTransport);
             mongoClient = new MongoClientImpl(osMongoClient, app.getConfiguration().getDefaultCodecRegistry());
         }
         return mongoClient;

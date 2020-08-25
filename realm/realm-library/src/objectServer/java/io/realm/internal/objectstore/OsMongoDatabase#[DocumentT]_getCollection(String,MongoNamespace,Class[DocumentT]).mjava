@@ -1,0 +1,7 @@
+    public <DocumentT> OsMongoCollection<DocumentT> getCollection(final String collectionName,
+                                                                  final MongoNamespace namespace,
+                                                                  final Class<DocumentT> documentClass) {
+        long nativeCollectionPtr = nativeGetCollection(nativePtr, collectionName);
+        return new OsMongoCollection<>(nativeCollectionPtr, namespace, serviceName, documentClass, codecRegistry, streamNetworkTransport);
+    }
+

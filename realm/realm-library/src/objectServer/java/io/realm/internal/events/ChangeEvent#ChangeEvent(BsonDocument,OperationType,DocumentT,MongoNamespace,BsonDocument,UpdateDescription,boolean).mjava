@@ -1,0 +1,26 @@
+    /**
+     * Constructs a change event.
+     *
+     * @param id                   The id of the change event.
+     * @param operationType        The operation type represented by the change event.
+     * @param fullDocument         The full document at some point after the change is applied.
+     * @param ns                   The namespace (database and collection) of the document.
+     * @param documentKey          The id if the underlying document that changed.
+     * @param updateDescription    The description of what has changed (for updates only).
+     * @param hasUncommittedWrites Whether this represents a local uncommitted write.
+     */
+    private ChangeEvent(
+            final BsonDocument id,
+            final OperationType operationType,
+            final DocumentT fullDocument,
+            final MongoNamespace ns,
+            final BsonDocument documentKey,
+            final UpdateDescription updateDescription,
+            final boolean hasUncommittedWrites
+    ) {
+        super(operationType, fullDocument, documentKey, updateDescription, hasUncommittedWrites);
+
+        this.id = id;
+        this.ns = ns;
+    }
+

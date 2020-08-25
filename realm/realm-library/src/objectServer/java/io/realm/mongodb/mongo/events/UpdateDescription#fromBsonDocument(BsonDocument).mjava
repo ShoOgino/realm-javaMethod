@@ -1,0 +1,25 @@
+    /**
+     * Converts an update description BSON document from a MongoDB Change Event into an
+     * UpdateDescription object.
+     *
+     * @param document the
+     * @return the converted UpdateDescription
+     */
+    public static UpdateDescription fromBsonDocument(final BsonDocument document) {
+        try {
+            checkContainsKey(Fields.UPDATED_FIELDS_FIELD, document, "document");
+            checkContainsKey(Fields.REMOVED_FIELDS_FIELD, document, "document");
+        } catch (IllegalArgumentException exception) {
+            throw new AppException(ErrorCode.EVENT_DESERIALIZING, exception);
+        }
+
+        final BsonArray removedFieldsArr =
+                document.getArray(Fields.REMOVED_FIELDS_FIELD);
+        final Set<String> removedFields = new HashSet<>(removedFieldsArr.size());
+        for (final BsonValue field : removedFieldsArr) {
+            removedFields.add(field.asString().getValue());
+        }
+
+        return new UpdateDescription(document.getDocument(Fields.UPDATED_FIELDS_FIELD), removedFields);
+    }
+

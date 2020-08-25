@@ -1,0 +1,18 @@
+    /**
+     * Watches specified IDs in a collection asynchronously. This convenience overload supports the use case
+     * of non-{@link BsonValue} instances of {@link ObjectId} by wrapping them in
+     * {@link BsonObjectId} instances for the user.
+     *
+     * @param ids unique object identifiers of the IDs to watch.
+     * @return a task that provides access to the stream of change events.
+     */
+    public RealmEventStreamAsyncTask<DocumentT> watchAsync(final ObjectId... ids) {
+        return new RealmEventStreamAsyncTaskImpl<>(getNamespace().getFullName(),
+                new RealmEventStreamAsyncTaskImpl.Executor<DocumentT>() {
+                    @Override
+                    public EventStream<DocumentT> run() throws IOException {
+                        return osMongoCollection.watch(Arrays.asList(ids));
+                    }
+                });
+    }
+

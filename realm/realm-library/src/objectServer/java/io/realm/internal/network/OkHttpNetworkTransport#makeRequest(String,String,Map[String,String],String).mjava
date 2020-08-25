@@ -1,0 +1,29 @@
+    private okhttp3.Request makeRequest(String method, String url, Map<String, String> headers, String body){
+        okhttp3.Request.Builder builder = new okhttp3.Request.Builder().url(url);
+        switch (method) {
+            case "get":
+                builder.get();
+                break;
+            case "delete":
+                builder.delete(RequestBody.create(JSON, body));
+                break;
+            case "patch":
+                builder.patch(RequestBody.create(JSON, body));
+                break;
+            case "post":
+                builder.post(RequestBody.create(JSON, body));
+                break;
+            case "put":
+                builder.put(RequestBody.create(JSON, body));
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown method type: " + method);
+        }
+
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            builder.addHeader(entry.getKey(), entry.getValue());
+        }
+
+        return builder.build();
+    }
+

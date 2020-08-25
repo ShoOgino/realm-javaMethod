@@ -1,0 +1,23 @@
+    /**
+     * Converts this update description to its document representation as it would appear in a
+     * MongoDB Change Event.
+     *
+     * @return the update description document as it would appear in a change event
+     */
+    public BsonDocument toBsonDocument() {
+        final BsonDocument updateDescDoc = new BsonDocument();
+        updateDescDoc.put(
+                Fields.UPDATED_FIELDS_FIELD,
+                this.getUpdatedFields());
+
+        final BsonArray removedFields = new BsonArray();
+        for (final String field : this.getRemovedFields()) {
+            removedFields.add(new BsonString(field));
+        }
+        updateDescDoc.put(
+                Fields.REMOVED_FIELDS_FIELD,
+                removedFields);
+
+        return updateDescDoc;
+    }
+

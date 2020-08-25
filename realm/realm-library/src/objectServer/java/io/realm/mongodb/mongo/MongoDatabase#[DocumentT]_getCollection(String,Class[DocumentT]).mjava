@@ -12,7 +12,8 @@
     ) {
         Util.checkEmpty(collectionName, "collectionName");
         Util.checkNull(documentClass, "documentClass");
-        return new MongoCollection<>(new MongoNamespace(name, collectionName),
-                osMongoDatabase.getCollection(collectionName, documentClass));
+        MongoNamespace namespace = new MongoNamespace(name, collectionName);
+        return new MongoCollection<>(namespace,
+                osMongoDatabase.getCollection(collectionName, namespace, documentClass));
     }
 

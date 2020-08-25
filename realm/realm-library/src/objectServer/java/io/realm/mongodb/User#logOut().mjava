@@ -18,7 +18,7 @@
     public void logOut() throws AppException {
         boolean loggedIn = isLoggedIn();
         AtomicReference<AppException> error = new AtomicReference<>(null);
-        nativeLogOut(app.nativePtr, osUser.getNativePtr(), new OsJNIVoidResultCallback(error));
+        nativeLogOut(app.osApp.getNativePtr(), osUser.getNativePtr(), new OsJNIVoidResultCallback(error));
         ResultHandler.handleResult(null, error);
         if (loggedIn) {
             app.notifyUserLoggedOut(this);
