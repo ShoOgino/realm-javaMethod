@@ -1,0 +1,22 @@
+    /**
+     * Fetches all API keys associated with the user.
+     *
+     * @throws AppException if the server failed to fetch the API keys.
+     */
+    public List<ApiKey> fetchAll() throws AppException {
+        AtomicReference<List<ApiKey>> success = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
+        call(TYPE_FETCH_ALL, null, new OsJNIResultCallback<List<ApiKey>>(success, error) {
+            @Override
+            protected List<ApiKey> mapSuccess(Object result) {
+                Object[] keyData = (Object[]) result;
+                List<ApiKey> list = new ArrayList<>();
+                for (int i = 0; i < keyData.length; i++) {
+                    list.add(createKeyFromNative((Object[]) keyData[i]));
+                }
+                return list;
+            }
+        });
+        return ResultHandler.handleResult(success, error);
+    }
+
