@@ -18,8 +18,8 @@
             waitingForServerChanges.set(wrapper);
             int callbackId = waitCounter.incrementAndGet();
             boolean listenerRegistered = (direction == DIRECTION_DOWNLOAD)
-                    ? nativeWaitForDownloadCompletion(callbackId, realmPath)
-                    : nativeWaitForUploadCompletion(callbackId, realmPath);
+                    ? nativeWaitForDownloadCompletion(appNativePointer, callbackId, realmPath)
+                    : nativeWaitForUploadCompletion(appNativePointer, callbackId, realmPath);
             if (!listenerRegistered) {
                 waitingForServerChanges.set(null);
                 String errorMsg;

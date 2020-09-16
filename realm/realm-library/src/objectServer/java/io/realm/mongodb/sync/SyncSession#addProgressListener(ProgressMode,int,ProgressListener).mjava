@@ -6,7 +6,7 @@
         // A listener might be triggered immediately as part of `nativeAddProgressListener`, so
         // we need to make sure it can be found by SyncManager.notifyProgressListener()
         listenerIdToProgressListenerMap.put(listenerId, new Pair<ProgressListener, Progress>(listener, null));
-        long listenerToken = nativeAddProgressListener(configuration.getPath(), listenerId , direction, isStreaming);
+        long listenerToken = nativeAddProgressListener(appNativePointer, configuration.getPath(), listenerId , direction, isStreaming);
         if (listenerToken == 0) {
             // ObjectStore did not register the listener. This can happen if a
             // listener is registered with ProgressMode.CURRENT_CHANGES and no changes actually
