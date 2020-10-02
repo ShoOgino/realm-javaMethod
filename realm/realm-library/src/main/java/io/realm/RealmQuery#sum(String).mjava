@@ -6,9 +6,11 @@
      * for the given field, {@code 0} will be returned. When computing the sum, objects with {@code null} values
      * are ignored.
      * @throws java.lang.IllegalArgumentException if the field is not a number type.
+     * @throws RealmException if called from the UI thread after opting out via {@link RealmConfiguration.Builder#allowQueriesOnUiThread(boolean)}.
      */
     public Number sum(String fieldName) {
         realm.checkIfValid();
+        realm.checkAllowQueriesOnUiThread();
 
         long columnKey = schema.getAndCheckFieldColumnKey(fieldName);
         switch (table.getColumnType(columnKey)) {

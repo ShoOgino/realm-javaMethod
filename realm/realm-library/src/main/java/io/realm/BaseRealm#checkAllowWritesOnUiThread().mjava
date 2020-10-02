@@ -1,0 +1,12 @@
+    /**
+     * Checks whether writes are allowed from the UI thread in the current RealmConfiguration.
+     */
+    protected void checkAllowWritesOnUiThread() {
+        // Warn on transaction being executed on UI thread if allowWritesOnUiThread is set to true, throw otherwise
+        if (getSharedRealm().capabilities.isMainThread()) {
+            if (!getConfiguration().isAllowWritesOnUiThread()) {
+                throw new RealmException("Running transactions on the UI thread has been disabled. It can be enabled by setting 'RealmConfiguration.Builder.allowWritesOnUiThread(true)'.");
+            }
+        }
+    }
+

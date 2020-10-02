@@ -1,0 +1,28 @@
+    @Test
+    @UiThreadTest
+    public void executeTransaction_mainThreadWritesAllowed() {
+        RealmConfiguration configuration = configFactory.createConfigurationBuilder()
+                .allowWritesOnUiThread(true)
+                .name("ui_realm")
+                .build();
+
+        // Initializes schema. DynamicRealm will not do that, so let a normal Realm create the file first.
+        Realm.getInstance(configuration).close();
+
+        DynamicRealm uiRealm = DynamicRealm.getInstance(configuration);
+        uiRealm.executeTransaction(new DynamicRealm.Transaction() {
+            @Override
+            public void execute(DynamicRealm realm) {
+                DynamicRealmObject owner = realm.createObject(Owner.CLASS_NAME);
+                owner.setString("name", "Mortimer Smith");
+            }
+        });
+
+        RealmResults<DynamicRealmObject> results = uiRealm.where(Owner.CLASS_NAME).equalTo("name", "Mortimer Smith").findAll();
+        assertEquals(1, results.size());
+        assertNotNull(results.first());
+        assertEquals("Mortimer Smith", Objects.requireNonNull(results.first()).getString(Dog.FIELD_NAME));
+
+        uiRealm.close();
+    }
+

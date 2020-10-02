@@ -1,0 +1,13 @@
+    @Test
+    @UiThreadTest
+    public void findFirst_runOnMainThreadAllowed() {
+        RealmConfiguration configuration = configFactory.createConfigurationBuilder()
+                .allowQueriesOnUiThread(true)
+                .name("ui_realm")
+                .build();
+
+        Realm uiRealm = Realm.getInstance(configuration);
+        uiRealm.where(Dog.class).findFirst();
+        uiRealm.close();
+    }
+
