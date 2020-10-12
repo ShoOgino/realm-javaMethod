@@ -4,8 +4,8 @@
         OsJNIResultCallback<InsertOneResult> callback = new OsJNIResultCallback<InsertOneResult>(success, error) {
             @Override
             protected InsertOneResult mapSuccess(Object result) {
-                BsonValue bsonObjectId = new BsonObjectId((ObjectId) result);
-                return new InsertOneResult(bsonObjectId);
+                BsonValue id = JniBsonProtocol.decode((String) result, BsonValue.class, codecRegistry);
+                return new InsertOneResult(id);
             }
         };
 
