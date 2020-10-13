@@ -1,0 +1,15 @@
+    @Test
+    public void invalid_first_half() {
+        realm.beginTransaction();
+
+        // Test invalid first surrogate
+        StringOnly invalidFirstSurrogate = new StringOnly();
+        invalidFirstSurrogate.setChars("\uDC00\uD800");
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Illegal Argument: Failure when converting to UTF-8: Invalid first half of surrogate pair; error_code = 5;  0xdc00 0xd800");
+
+        realm.copyToRealm(invalidFirstSurrogate);
+        realm.commitTransaction();
+    }
+

@@ -1,0 +1,16 @@
+    @Test
+    public void incomplete_surrogate() {
+        realm.beginTransaction();
+
+        // Test incomplete surrogate
+        StringOnly incompleteSurrogate = new StringOnly();
+        incompleteSurrogate.setChars("\u0000\uD800");
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Illegal Argument: Failure when converting to UTF-8: Incomplete surrogate pair; error_code = 6;  0x0000 0xd800");
+
+        realm.copyToRealm(incompleteSurrogate);
+
+        realm.commitTransaction();
+    }
+
