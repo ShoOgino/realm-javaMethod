@@ -1,0 +1,12 @@
+    private synchronized OkHttpClient getStreamClient() {
+        if (streamClient == null) {
+            streamClient = new OkHttpClient.Builder()
+                    .readTimeout(0, TimeUnit.MILLISECONDS)
+                    .followRedirects(true)
+                    .addInterceptor(new LoggingInterceptor(httpLogObfuscator))
+                    .build();
+        }
+
+        return streamClient;
+    }
+

@@ -1,0 +1,19 @@
+    /**
+     * Fetches a specific user API key associated with the user.
+     *
+     * @param id the id of the key to fetch.
+     * @throws AppException if the server failed to fetch the API key.
+     */
+    public ApiKey fetch(ObjectId id) throws AppException {
+        Util.checkNull(id, "id");
+        AtomicReference<ApiKey> success = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
+        call(TYPE_FETCH_SINGLE, id.toHexString(), new OsJNIResultCallback<ApiKey>(success, error) {
+            @Override
+            protected ApiKey mapSuccess(Object result) {
+                return createKeyFromNative((Object[]) result);
+            }
+        });
+        return ResultHandler.handleResult(success, error);
+    }
+

@@ -1,0 +1,14 @@
+    private <ResultT> FindIterable<ResultT> findInternal(final Bson filter,
+                                                         final Class<ResultT> resultClass,
+                                                         @Nullable final FindOptions options) {
+        FindIterable<ResultT> findIterable =
+                new FindIterable<>(threadPoolExecutor, this, codecRegistry, resultClass);
+        findIterable.filter(filter);
+
+        if (options != null) {
+            findIterable.limit(options.getLimit());
+            findIterable.projection(options.getProjection());
+        }
+        return findIterable;
+    }
+

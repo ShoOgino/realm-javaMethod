@@ -1,0 +1,17 @@
+    /**
+     * Inserts the provided document. If the document is missing an identifier, the client should
+     * generate one.
+     *
+     * @param document the document to insert
+     * @return a task containing the result of the insert one operation
+     */
+    public RealmResultTask<InsertOneResult> insertOne(final DocumentT document) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<InsertOneResult>() {
+            @Nullable
+            @Override
+            public InsertOneResult run() {
+                return osMongoCollection.insertOne(document);
+            }
+        });
+    }
+

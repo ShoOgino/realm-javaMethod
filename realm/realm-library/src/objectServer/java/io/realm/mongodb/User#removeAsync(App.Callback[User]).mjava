@@ -1,0 +1,10 @@
+    RealmAsyncTask removeAsync(App.Callback<User> callback) {
+        Util.checkLooperThread("Asynchronous removal of users is only possible from looper threads.");
+        return new Request<User>(App.NETWORK_POOL_EXECUTOR, callback) {
+            @Override
+            public User run() throws AppException {
+                return remove();
+            }
+        }.start();
+    }
+

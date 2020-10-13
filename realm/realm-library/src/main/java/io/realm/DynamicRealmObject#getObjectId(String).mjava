@@ -1,0 +1,19 @@
+    /**
+     * Returns the {@code ObjectId} value for a given field.
+     *
+     * @param fieldName the name of the field.
+     * @return the ObjectId value.
+     * @throws IllegalArgumentException if field name doesn't exist or it doesn't contain ObjectId.
+     */
+    public ObjectId getObjectId(String fieldName) {
+        proxyState.getRealm$realm().checkIfValid();
+
+        long columnKey = proxyState.getRow$realm().getColumnKey(fieldName);
+        checkFieldType(fieldName, columnKey, RealmFieldType.OBJECT_ID);
+        if (proxyState.getRow$realm().isNull(columnKey)) {
+            return null;
+        } else {
+            return proxyState.getRow$realm().getObjectId(columnKey);
+        }
+    }
+

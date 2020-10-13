@@ -1,0 +1,14 @@
+    /**
+     * Gets a collection.
+     *
+     * @param collectionName the name of the collection to return
+     * @return the collection
+     */
+    public MongoCollection<Document> getCollection(final String collectionName) {
+        Util.checkEmpty(collectionName, "collectionName");
+        MongoNamespace namespace = new MongoNamespace(name, collectionName);
+
+        return new MongoCollection<>(namespace,
+                osMongoDatabase.getCollection(collectionName, namespace));
+    }
+

@@ -6,10 +6,12 @@
      * returned. Otherwise the minimum value is returned. When determining the minimum value, objects with {@code null}
      * values are ignored.
      * @throws java.lang.IllegalArgumentException if the field is not a number type.
+     * @throws RealmException if called from the UI thread after opting out via {@link RealmConfiguration.Builder#allowQueriesOnUiThread(boolean)}.
      */
     @Nullable
     public Number min(String fieldName) {
         realm.checkIfValid();
+        realm.checkAllowQueriesOnUiThread();
 
         long columnIndex = schema.getAndCheckFieldColumnKey(fieldName);
         switch (table.getColumnType(columnIndex)) {
@@ -19,6 +21,8 @@
                 return this.query.minimumFloat(columnIndex);
             case DOUBLE:
                 return this.query.minimumDouble(columnIndex);
+            case DECIMAL128:
+                return this.query.minimumDecimal128(columnIndex);
             default:
                 throw new IllegalArgumentException(String.format(Locale.US,
                         TYPE_MISMATCH, fieldName, "int, float or double"));

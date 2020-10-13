@@ -1,0 +1,23 @@
+    private void populateForDistinctAllTypes(Realm realm, long numberOfBlocks, long numberOfObjects) {
+        realm.beginTransaction();
+        for (int i = 0; i < numberOfBlocks; i++) {
+            Dog dog = realm.createObject(Dog.class);
+            for (int j = 0; j < numberOfObjects; j++) {
+                AllTypes obj = realm.createObject(AllTypes.class);
+                obj.setColumnBinary(new byte[j]);
+                obj.setColumnString("Test " + j);
+                obj.setColumnLong(j);
+                obj.setColumnFloat(j/1000f);
+                obj.setColumnDouble(j/1000d);
+                obj.setColumnBoolean(j % 2 == 0);
+                obj.setColumnDate(new Date(1000L * j));
+                obj.setColumnDecimal128(new Decimal128(j));
+                obj.setColumnObjectId(new ObjectId(j, j));
+                obj.setColumnMutableRealmInteger(j);
+                obj.setColumnRealmLink(obj);
+                obj.setColumnRealmObject(dog);
+            }
+        }
+        realm.commitTransaction();
+    }
+

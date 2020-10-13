@@ -1,0 +1,13 @@
+    @Test
+    public void compileWithSingleRequiredParent() {
+        ASSERT.about(javaSources())
+                .that(Arrays.asList(
+                    JavaFileObjects.forResource("some/test/EmbeddedClassParent.java"),
+                    JavaFileObjects.forResource("some/test/EmbeddedClass.java"),
+                    JavaFileObjects.forResource("some/test/EmbeddedClassOptionalParents.java"),
+                    JavaFileObjects.forResource("some/test/EmbeddedClassRequiredParent.java")
+                ))
+                .processedWith(new RealmProcessor())
+                .compilesWithoutError();
+    }
+

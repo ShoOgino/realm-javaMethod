@@ -1,0 +1,10 @@
+    private Collection<ResultT> mapCollection(Object result) {
+        Collection<?> collection = JniBsonProtocol.decode((String) result, Collection.class, codecRegistry);
+        Collection<ResultT> decodedCollection = new ArrayList<>();
+        for (Object collectionElement : collection) {
+            String encodedElement = JniBsonProtocol.encode(collectionElement, codecRegistry);
+            decodedCollection.add(JniBsonProtocol.decode(encodedElement, resultClass, codecRegistry));
+        }
+        return decodedCollection;
+    }
+

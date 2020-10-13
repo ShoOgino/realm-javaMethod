@@ -1,0 +1,27 @@
+    @Override
+    public Response intercept(Chain chain) throws IOException {
+        Request request = chain.request();
+        if (RealmLog.getLevel() <= LogLevel.DEBUG) {
+            StringBuilder sb = new StringBuilder(request.method());
+            sb.append(' ');
+            sb.append(request.url());
+            sb.append('\n');
+            sb.append(request.headers());
+            if (request.body() != null) {
+                // Stripped down version of https://github.com/square/okhttp/blob/master/okhttp-logging-interceptor/src/main/java/okhttp3/logging/HttpLoggingInterceptor.java
+                // We only expect request context to be JSON.
+                Buffer buffer = new Buffer();
+                request.body().writeTo(buffer);
+
+                // Obfuscate sensitive information if applicable
+                String input = buffer.readString(UTF8);
+                if (httpLogObfuscator != null) {
+                    input = httpLogObfuscator.obfuscate(request.url().pathSegments(), input);
+                }
+                sb.append(input);
+            }
+            RealmLog.debug("HTTP Request = \n%s", sb);
+        }
+        return chain.proceed(request);
+    }
+

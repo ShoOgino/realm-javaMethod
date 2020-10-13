@@ -1,0 +1,18 @@
+    private Long countInternal(final Bson filter, @Nullable final CountOptions options) {
+        AtomicReference<Long> success = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
+        OsJNIResultCallback<Long> callback = new OsJNIResultCallback<Long>(success, error) {
+            @Override
+            protected Long mapSuccess(Object result) {
+                return (Long) result;
+            }
+        };
+
+        final String filterString = JniBsonProtocol.encode(filter, codecRegistry);
+        final int limit = (options == null) ? 0 : options.getLimit();
+
+        nativeCount(nativePtr, filterString, limit, callback);
+
+        return ResultHandler.handleResult(success, error);
+    }
+

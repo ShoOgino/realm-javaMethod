@@ -1,0 +1,13 @@
+    @Test
+    public void createObjectFromJson_decimal128AsDouble() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("columnDecimal128", 0.30000001192092896D);
+
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, json);
+        realm.commitTransaction();
+
+        AllTypes obj = realm.where(AllTypes.class).findFirst();
+        assertEquals(new Decimal128(new BigDecimal(0.30000001192092896D)), obj.getColumnDecimal128());
+    }
+

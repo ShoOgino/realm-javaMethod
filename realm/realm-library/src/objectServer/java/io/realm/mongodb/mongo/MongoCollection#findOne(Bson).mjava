@@ -1,0 +1,16 @@
+    /**
+     * Finds a document in the collection.
+     *
+     * @param filter the query filter
+     * @return a task containing the result of the find one operation
+     */
+    public RealmResultTask<DocumentT> findOne(final Bson filter) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<DocumentT>() {
+            @Nullable
+            @Override
+            public DocumentT run() {
+                return osMongoCollection.findOne(filter);
+            }
+        });
+    }
+

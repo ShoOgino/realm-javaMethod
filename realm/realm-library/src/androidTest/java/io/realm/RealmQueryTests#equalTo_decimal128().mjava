@@ -1,0 +1,8 @@
+    @Test
+    public void equalTo_decimal128() {
+        populateTestRealm(realm, 10);
+        RealmResults<AllTypes> resultList = realm.where(AllTypes.class).equalTo(AllTypes.FIELD_DECIMAL128, new Decimal128(new BigDecimal( "7.23456789"))).findAll();
+        assertEquals(1, resultList.size());
+        assertEquals(new Decimal128(new BigDecimal( "7.23456789")), resultList.get(0).getColumnDecimal128());
+    }
+

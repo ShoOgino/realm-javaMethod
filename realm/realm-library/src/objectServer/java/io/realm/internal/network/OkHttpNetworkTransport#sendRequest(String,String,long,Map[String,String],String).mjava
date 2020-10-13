@@ -1,0 +1,32 @@
+    @SuppressFBWarnings("REC_CATCH_EXCEPTION")
+    @Override
+    public OsJavaNetworkTransport.Response sendRequest(String method, String url, long timeoutMs, Map<String, String> headers, String body) {
+        try {
+            OkHttpClient client = getClient(timeoutMs);
+
+            okhttp3.Response response = null;
+            try {
+                okhttp3.Request request = makeRequest(method, url, headers, body);
+
+                Call call = client.newCall(request);
+                response = call.execute();
+                ResponseBody responseBody = response.body();
+                String result = "";
+                if (responseBody != null) {
+                    result = responseBody.string();
+                }
+                return Response.httpResponse(response.code(), parseHeaders(response.headers()), result);
+            } catch (IOException ex) {
+                return Response.ioError(ex.toString());
+            } catch (Exception ex) {
+                return Response.unknownError(ex.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        } catch (Exception e) {
+            return Response.unknownError(e.toString());
+        }
+    }
+

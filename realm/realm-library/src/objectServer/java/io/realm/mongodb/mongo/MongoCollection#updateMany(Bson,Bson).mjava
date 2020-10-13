@@ -1,0 +1,18 @@
+    /**
+     * Update all documents in the collection according to the specified arguments.
+     *
+     * @param filter a document describing the query filter, which may not be null.
+     * @param update a document describing the update, which may not be null. The update to
+     *               apply must include only update operators.
+     * @return a task containing the result of the update many operation
+     */
+    public RealmResultTask<UpdateResult> updateMany(final Bson filter, final Bson update) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<UpdateResult>() {
+            @Nullable
+            @Override
+            public UpdateResult run() {
+                return osMongoCollection.updateMany(filter, update);
+            }
+        });
+    }
+

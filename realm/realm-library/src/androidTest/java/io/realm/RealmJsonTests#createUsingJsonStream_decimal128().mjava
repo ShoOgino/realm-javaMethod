@@ -1,0 +1,13 @@
+    @Test
+    public void createUsingJsonStream_decimal128() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("columnDecimal128", new Decimal128(BigDecimal.TEN));
+
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, json);
+        realm.commitTransaction();
+
+        AllTypes obj = realm.where(AllTypes.class).findFirst();
+        assertEquals(new Decimal128(BigDecimal.TEN), obj.getColumnDecimal128());
+    }
+

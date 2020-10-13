@@ -1,0 +1,10 @@
+    public Decimal128 sumDecimal128(long columnKey) {
+        validateQuery();
+        long[] data = nativeSumDecimal128(nativePtr, columnKey);
+        if (data != null) {
+            return Decimal128.fromIEEE754BIDEncoding(data[1]/*high*/, data[0]/*low*/);
+        } else {
+            return null;
+        }
+    }
+

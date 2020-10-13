@@ -1,0 +1,15 @@
+    /**
+     * Get the current state of the connection used by the session as defined in {@link ConnectionState}.
+     *
+     * @return the state of connection used by the session.
+     * @see ConnectionState
+     */
+    public ConnectionState getConnectionState() {
+        byte state = nativeGetConnectionState(appNativePointer, configuration.getPath());
+        if (state == -1) {
+            // session was not found, probably the Realm was closed
+            throw new IllegalStateException("Could not find session, Realm was probably closed");
+        }
+        return ConnectionState.fromNativeValue(state);
+    }
+

@@ -1,0 +1,28 @@
+    private AppConfiguration(String appId,
+                             String appName,
+                             String appVersion,
+                             URL baseUrl,
+                             SyncSession.ErrorHandler defaultErrorHandler,
+                             SyncSession.ClientResetHandler defaultClientResetHandler,
+                             @Nullable byte[] encryptionKey,
+                             long requestTimeoutMs,
+                             String authorizationHeaderName,
+                             Map<String, String> customHeaders,
+                             File syncRootdir,
+                             CodecRegistry codecRegistry,
+                             @Nullable HttpLogObfuscator httpLogObfuscator) {
+        this.appId = appId;
+        this.appName = appName;
+        this.appVersion = appVersion;
+        this.baseUrl = baseUrl;
+        this.defaultErrorHandler = defaultErrorHandler;
+        this.defaultClientResetHandler = defaultClientResetHandler;
+        this.encryptionKey = (encryptionKey == null) ? null : Arrays.copyOf(encryptionKey, encryptionKey.length);
+        this.requestTimeoutMs = requestTimeoutMs;
+        this.authorizationHeaderName = (!Util.isEmptyString(authorizationHeaderName)) ? authorizationHeaderName : "Authorization";
+        this.customHeaders = Collections.unmodifiableMap(customHeaders);
+        this.syncRootDir = syncRootdir;
+        this.codecRegistry = codecRegistry;
+        this.httpLogObfuscator = httpLogObfuscator;
+    }
+

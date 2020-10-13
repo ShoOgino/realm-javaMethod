@@ -1,0 +1,22 @@
+    /**
+     * Fetch the next event from a given stream
+     *
+     * @return the next event
+     * @throws AppException on a stream error
+     */
+    @Override
+    public BaseChangeEvent<T> getNextEvent() throws AppException, IOException {
+        while (true) {
+            watchStream.feedLine(response.readBodyLine());
+            String watchStreamState = watchStream.getState();
+
+            if (watchStreamState.equals(OsWatchStream.HAVE_EVENT)) {
+                return ChangeEvent.fromBsonDocument(watchStream.getNextEvent(), documentClass, codecRegistry);
+            }
+            if (watchStreamState.equals(OsWatchStream.HAVE_ERROR)) {
+                response.close();
+                throw watchStream.getError();
+            }
+        }
+    }
+

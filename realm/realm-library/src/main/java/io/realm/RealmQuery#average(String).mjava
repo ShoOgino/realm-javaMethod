@@ -7,9 +7,11 @@
      * types of number fields. If no objects exist or they all have {@code null} as the value for the given field,
      * {@code 0} will be returned. When computing the average, objects with {@code null} values are ignored.
      * @throws java.lang.IllegalArgumentException if the field is not a number type.
+     * @throws RealmException if called from the UI thread after opting out via {@link RealmConfiguration.Builder#allowQueriesOnUiThread(boolean)}.
      */
     public double average(String fieldName) {
         realm.checkIfValid();
+        realm.checkAllowQueriesOnUiThread();
 
         long columnIndex = schema.getAndCheckFieldColumnKey(fieldName);
         switch (table.getColumnType(columnIndex)) {
@@ -21,7 +23,7 @@
                 return query.averageFloat(columnIndex);
             default:
                 throw new IllegalArgumentException(String.format(Locale.US,
-                        TYPE_MISMATCH, fieldName, "int, float or double"));
+                        TYPE_MISMATCH, fieldName, "int, float or double. For Decimal128 use `averageDecimal128` method."));
         }
     }
 

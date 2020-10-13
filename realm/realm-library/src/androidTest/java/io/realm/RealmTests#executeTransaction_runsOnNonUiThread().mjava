@@ -1,0 +1,18 @@
+    @Test
+    public void executeTransaction_runsOnNonUiThread() {
+        RealmConfiguration configuration = configFactory.createConfigurationBuilder()
+                .allowWritesOnUiThread(false)
+                .name("ui_realm")
+                .build();
+
+        Realm uiRealm = Realm.getInstance(configuration);
+        uiRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                // no-op
+            }
+        });
+
+        uiRealm.close();
+    }
+

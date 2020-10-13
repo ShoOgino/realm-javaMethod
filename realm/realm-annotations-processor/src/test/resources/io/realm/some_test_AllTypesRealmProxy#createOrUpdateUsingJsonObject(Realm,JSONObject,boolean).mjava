@@ -1,22 +1,22 @@
     @SuppressWarnings("cast")
     public static some.test.AllTypes createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
             throws JSONException {
-        final List<String> excludeFields = new ArrayList<String>(12);
+        final List<String> excludeFields = new ArrayList<String>(15);
         some.test.AllTypes obj = null;
         if (update) {
             Table table = realm.getTable(some.test.AllTypes.class);
             AllTypesColumnInfo columnInfo = (AllTypesColumnInfo) realm.getSchema().getColumnInfo(some.test.AllTypes.class);
             long pkColumnKey = columnInfo.columnStringColKey;
-            long colKey = Table.NO_MATCH;
+            long objKey = Table.NO_MATCH;
             if (json.isNull("columnString")) {
-                colKey = table.findFirstNull(pkColumnKey);
+                objKey = table.findFirstNull(pkColumnKey);
             } else {
-                colKey = table.findFirstString(pkColumnKey, json.getString("columnString"));
+                objKey = table.findFirstString(pkColumnKey, json.getString("columnString"));
             }
-            if (colKey != Table.NO_MATCH) {
+            if (objKey != Table.NO_MATCH) {
                 final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get();
                 try {
-                    objectContext.set(realm, table.getUncheckedRow(colKey), realm.getSchema().getColumnInfo(some.test.AllTypes.class), false, Collections.<String> emptyList());
+                    objectContext.set(realm, table.getUncheckedRow(objKey), realm.getSchema().getColumnInfo(some.test.AllTypes.class), false, Collections.<String> emptyList());
                     obj = new io.realm.some_test_AllTypesRealmProxy();
                 } finally {
                     objectContext.clear();
@@ -29,6 +29,9 @@
             }
             if (json.has("columnRealmList")) {
                 excludeFields.add("columnRealmList");
+            }
+            if (json.has("columnRealmFinalList")) {
+                excludeFields.add("columnRealmFinalList");
             }
             if (json.has("columnStringList")) {
                 excludeFields.add("columnStringList");
@@ -59,6 +62,12 @@
             }
             if (json.has("columnDateList")) {
                 excludeFields.add("columnDateList");
+            }
+            if (json.has("columnDecimal128List")) {
+                excludeFields.add("columnDecimal128List");
+            }
+            if (json.has("columnObjectIdList")) {
+                excludeFields.add("columnObjectIdList");
             }
             if (json.has("columnString")) {
                 if (json.isNull("columnString")) {
@@ -98,6 +107,38 @@
                 throw new IllegalArgumentException("Trying to set non-nullable field 'columnBoolean' to null.");
             } else {
                 objProxy.realmSet$columnBoolean((boolean) json.getBoolean("columnBoolean"));
+            }
+        }
+        if (json.has("columnDecimal128")) {
+            if (json.isNull("columnDecimal128")) {
+                objProxy.realmSet$columnDecimal128(null);
+            } else {
+                Object decimal = json.get("columnDecimal128");
+                if (decimal instanceof org.bson.types.Decimal128) {
+                    objProxy.realmSet$columnDecimal128((org.bson.types.Decimal128) decimal);
+                } else if (decimal instanceof String) {
+                    objProxy.realmSet$columnDecimal128(org.bson.types.Decimal128.parse((String)decimal));
+                } else if (decimal instanceof Integer) {
+                    objProxy.realmSet$columnDecimal128(new org.bson.types.Decimal128((Integer)(decimal)));
+                } else if (decimal instanceof Long) {
+                    objProxy.realmSet$columnDecimal128(new org.bson.types.Decimal128((Long)(decimal)));
+                } else if (decimal instanceof Double) {
+                    objProxy.realmSet$columnDecimal128(new org.bson.types.Decimal128(new java.math.BigDecimal((Double)(decimal))));
+                } else {
+                    throw new UnsupportedOperationException(decimal.getClass() + " is not supported as a Decimal128 value");
+                }
+            }
+        }
+        if (json.has("columnObjectId")) {
+            if (json.isNull("columnObjectId")) {
+                objProxy.realmSet$columnObjectId(null);
+            } else {
+                Object id = json.get("columnObjectId");
+                if (id instanceof org.bson.types.ObjectId) {
+                    objProxy.realmSet$columnObjectId((org.bson.types.ObjectId) id);
+                } else {
+                    objProxy.realmSet$columnObjectId(new org.bson.types.ObjectId((String)id));
+                }
             }
         }
         if (json.has("columnDate")) {
@@ -142,6 +183,18 @@
                 }
             }
         }
+        if (json.has("columnRealmFinalList")) {
+            if (json.isNull("columnRealmFinalList")) {
+                objProxy.realmSet$columnRealmFinalList(null);
+            } else {
+                objProxy.realmGet$columnRealmFinalList().clear();
+                JSONArray array = json.getJSONArray("columnRealmFinalList");
+                for (int i = 0; i < array.length(); i++) {
+                    some.test.AllTypes item = some_test_AllTypesRealmProxy.createOrUpdateUsingJsonObject(realm, array.getJSONObject(i), update);
+                    objProxy.realmGet$columnRealmFinalList().add(item);
+                }
+            }
+        }
         ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$columnStringList(), json, "columnStringList");
         ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$columnBinaryList(), json, "columnBinaryList");
         ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$columnBooleanList(), json, "columnBooleanList");
@@ -152,6 +205,8 @@
         ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$columnDoubleList(), json, "columnDoubleList");
         ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$columnFloatList(), json, "columnFloatList");
         ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$columnDateList(), json, "columnDateList");
+        ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$columnDecimal128List(), json, "columnDecimal128List");
+        ProxyUtils.setRealmListWithJsonObject(objProxy.realmGet$columnObjectIdList(), json, "columnObjectIdList");
         return obj;
     }
 

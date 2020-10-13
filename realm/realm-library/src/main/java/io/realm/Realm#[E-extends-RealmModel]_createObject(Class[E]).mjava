@@ -12,6 +12,10 @@
      */
     public <E extends RealmModel> E createObject(Class<E> clazz) {
         checkIfValid();
+        RealmProxyMediator mediator = configuration.getSchemaMediator();
+        if (mediator.isEmbedded(clazz)) {
+            throw new IllegalArgumentException("This class is marked embedded. Use `createEmbeddedObject(class, parent, property)` instead:  " + mediator.getSimpleClassName(clazz));
+        }
         return createObjectInternal(clazz, true, Collections.<String>emptyList());
     }
 

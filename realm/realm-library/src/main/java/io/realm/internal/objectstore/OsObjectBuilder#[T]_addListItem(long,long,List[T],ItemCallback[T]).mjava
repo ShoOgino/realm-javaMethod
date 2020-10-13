@@ -1,4 +1,4 @@
-    private <T> void addListItem(long builderPtr, long columnIndex, List<T> list, ItemCallback<T> itemCallback) {
+    private <T> void addListItem(long builderPtr, long columnKey, @Nullable List<T> list, ItemCallback<T> itemCallback) {
         if (list != null) {
             long listPtr = nativeStartList(list.size());
             for (int i = 0; i < list.size(); i++) {
@@ -9,9 +9,9 @@
                     itemCallback.handleItem(listPtr, item);
                 }
             }
-            nativeStopList(builderPtr, columnIndex, listPtr);
+            nativeStopList(builderPtr, columnKey, listPtr);
         } else {
-            addEmptyList(columnIndex);
+            addEmptyList(columnKey);
         }
     }
 

@@ -1,0 +1,20 @@
+    /**
+     * Obfuscates a logcat entry or not depending on whether the request being sent matches the
+     * specified feature. If it doesn't, the logcat entry will be returned unmodified.
+     *
+     * @param urlSegments the URL segments of the request to be sent.
+     * @param input       the original logcat entry.
+     * @return the logcat entry to be shown in the logcat.
+     */
+    public String obfuscate(List<String> urlSegments, String input) {
+        int featureIndex = urlSegments.indexOf(feature);
+        if (featureIndex != -1) {
+            String value = urlSegments.get(featureIndex + 1);    // value is in the next segment
+            RegexPatternObfuscator patternObfuscator = patternObfuscatorMap.get(value);
+            if (patternObfuscator != null) {
+                return patternObfuscator.obfuscate(input);
+            }
+        }
+        return input;
+    }
+

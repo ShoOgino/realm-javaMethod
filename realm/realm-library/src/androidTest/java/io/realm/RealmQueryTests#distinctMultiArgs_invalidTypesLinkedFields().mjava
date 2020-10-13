@@ -4,7 +4,9 @@
 
         RealmQuery<AllJavaTypes> query = realm.where(AllJavaTypes.class);
         try {
-            query.distinct(AllJavaTypes.INVALID_LINKED_BINARY_FIELD_FOR_DISTINCT, AllJavaTypes.INVALID_LINKED_TYPES_FIELDS_FOR_DISTINCT).findAll();
+            // Invalid type (binary) mixed with valid types
+            query.distinct(AllJavaTypes.FIELD_STRING, AllJavaTypes.INVALID_FIELD_TYPES_FOR_DISTINCT).findAll();
+            fail();
         } catch (IllegalArgumentException ignored) {
         }
     }

@@ -47,6 +47,15 @@
                         collection.setDate("field_date", new Date(1000));
                         assertElements(collection, obj -> assertEquals(new Date(1000), obj.getDate("field_date")));
                         break;
+                    case DECIMAL128:
+                        collection.setDecimal128("field_decimal128", new Decimal128(1000));
+                        assertElements(collection, obj -> assertEquals(new Decimal128(1000), obj.getDecimal128("field_decimal128")));
+                        break;
+                    case OBJECT_ID:
+                        String hex = TestHelper.randomObjectIdHexString();
+                        collection.setObjectId("field_object_id", new ObjectId(hex));
+                        assertElements(collection, obj -> assertEquals(new ObjectId(hex), obj.getObjectId("field_object_id")));
+                        break;
                     case OBJECT: {
                         DynamicRealmObject childObj = dynamicRealm.createObject("MappedAllJavaTypes", 42);
                         collection.setObject("field_object", childObj);
@@ -141,6 +150,23 @@
                             RealmList<Date> list = obj.getList("field_date_list", Date.class);
                             assertEquals(1, list.size());
                             assertEquals(new Date(1000), list.first());
+                        });
+                        break;
+                    case DECIMAL128_VALUE_LIST:
+                        collection.setList("field_decimal_list", new RealmList<>(new Decimal128(1000)));
+                        assertElements(collection, obj -> {
+                            RealmList<Decimal128> list = obj.getList("field_decimal_list", Decimal128.class);
+                            assertEquals(1, list.size());
+                            assertEquals(new Decimal128(1000), list.first());
+                        });
+                        break;
+                    case OBJECT_ID_VALUE_LIST:
+                        hex = TestHelper.randomObjectIdHexString();
+                        collection.setList("field_object_id_list", new RealmList<>(new ObjectId(hex)));
+                        assertElements(collection, obj -> {
+                            RealmList<ObjectId> list = obj.getList("field_object_id_list", ObjectId.class);
+                            assertEquals(1, list.size());
+                            assertEquals(new ObjectId(hex), list.first());
                         });
                         break;
                     default:

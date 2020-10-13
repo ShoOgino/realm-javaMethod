@@ -1,0 +1,25 @@
+    @Test
+    @UiThreadTest
+    public void executeTransaction_mainThreadWritesNotAllowed() {
+        RealmConfiguration configuration = configFactory.createConfigurationBuilder()
+                .allowWritesOnUiThread(false)
+                .name("ui_realm")
+                .build();
+
+        // Initializes schema. DynamicRealm will not do that, so let a normal Realm create the file first.
+        Realm.getInstance(configuration).close();
+
+        // Try-with-resources
+        try (DynamicRealm uiRealm = DynamicRealm.getInstance(configuration);) {
+            uiRealm.executeTransaction(new DynamicRealm.Transaction() {
+                @Override
+                public void execute(DynamicRealm realm) {
+                    // no-op
+                }
+            });
+            fail("the call to executeTransaction should have failed, this line should not be reached.");
+        } catch (RealmException e) {
+            assertTrue(Objects.requireNonNull(e.getMessage()).contains("allowWritesOnUiThread"));
+        }
+    }
+

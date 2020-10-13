@@ -1,0 +1,21 @@
+    /**
+     * Finds a document in the collection and performs the given update.
+     *
+     * @param filter      the query filter
+     * @param update      the update document
+     * @param resultClass the class to decode each document into
+     * @param <ResultT>   the target document type of the iterable.
+     * @return a task containing the resulting document
+     */
+    public <ResultT> RealmResultTask<ResultT> findOneAndUpdate(final Bson filter,
+                                                               final Bson update,
+                                                               final Class<ResultT> resultClass) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<ResultT>() {
+            @Nullable
+            @Override
+            public ResultT run() {
+                return osMongoCollection.findOneAndUpdate(filter, update, resultClass);
+            }
+        });
+    }
+

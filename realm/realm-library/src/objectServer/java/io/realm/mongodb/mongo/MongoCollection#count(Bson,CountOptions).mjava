@@ -1,0 +1,17 @@
+    /**
+     * Counts the number of documents in the collection according to the given options.
+     *
+     * @param filter  the query filter
+     * @param options the options describing the count
+     * @return a task containing the number of documents in the collection
+     */
+    public RealmResultTask<Long> count(final Bson filter, final CountOptions options) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<Long>() {
+            @Nullable
+            @Override
+            public Long run() {
+                return osMongoCollection.count(filter, options);
+            }
+        });
+    }
+

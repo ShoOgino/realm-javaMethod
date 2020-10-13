@@ -1,0 +1,19 @@
+        /**
+         * Will throw an exception if the wait was terminated with an error. If it was canceled, this method will
+         * do nothing.
+         */
+        public void throwExceptionIfNeeded() {
+            if (resultReceived && errorCode != null) {
+                // Core report errors with int64, so we need to add some extra checks
+                // to make sure the value is within a range of known errors we can map to,
+                // which are all inside Integer range
+                long longErrorCode = errorCode;
+                ErrorCode mappedError = ErrorCode.fromNativeError(errorCategory, (int) longErrorCode);
+                if (longErrorCode >= Integer.MIN_VALUE && longErrorCode <= Integer.MAX_VALUE && mappedError != ErrorCode.UNKNOWN) {
+                    throw new AppException(mappedError, errorMessage);
+                } else {
+                    throw new AppException(mappedError, String.format(Locale.US, "Internal error (%d): %s", errorCode, errorMessage));
+                }
+            }
+        }
+

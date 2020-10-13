@@ -1,0 +1,10 @@
+    @Override
+    public Decimal128 getDecimal128(long columnKey) {
+        long[] data = nativeGetDecimal128(nativePtr, columnKey);
+        if (data != null) {
+            return Decimal128.fromIEEE754BIDEncoding(data[1]/*high*/, data[0]/*low*/);
+        } else {
+            return null;
+        }
+    }
+

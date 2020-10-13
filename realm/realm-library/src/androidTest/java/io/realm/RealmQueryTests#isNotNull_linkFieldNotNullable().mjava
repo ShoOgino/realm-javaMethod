@@ -74,5 +74,21 @@
         } catch (IllegalArgumentException ignored) {
         }
         // 11 Object skipped, RealmObject is always nullable.
+
+        // 10 Decimal128
+        try {
+            realm.where(NullTypes.class)
+                    .isNotNull(NullTypes.FIELD_OBJECT_NULL + "." + NullTypes.FIELD_DECIMAL128_NOT_NULL);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // 10 ObjectId
+        try {
+            realm.where(NullTypes.class)
+                    .isNotNull(NullTypes.FIELD_OBJECT_NULL + "." + NullTypes.FIELD_OBJECT_ID_NOT_NULL);
+            fail();
+        } catch (IllegalArgumentException ignored) {
+        }
     }
 

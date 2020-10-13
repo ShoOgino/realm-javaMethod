@@ -1,5 +1,6 @@
     @Override
     public void realmSet$columnObject(some.test.AllTypes value) {
+        Realm realm = (Realm) proxyState.getRealm$realm();
         if (proxyState.isUnderConstruction()) {
             if (!proxyState.getAcceptDefaultValue$realm()) {
                 return;
@@ -8,7 +9,7 @@
                 return;
             }
             if (value != null && !RealmObject.isManaged(value)) {
-                value = ((Realm) proxyState.getRealm$realm()).copyToRealm(value);
+                value = realm.copyToRealm(value);
             }
             final Row row = proxyState.getRow$realm();
             if (value == null) {

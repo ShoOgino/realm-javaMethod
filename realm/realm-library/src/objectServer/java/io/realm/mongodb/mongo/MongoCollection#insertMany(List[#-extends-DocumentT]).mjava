@@ -1,0 +1,16 @@
+    /**
+     * Inserts one or more documents.
+     *
+     * @param documents the documents to insert
+     * @return a task containing the result of the insert many operation
+     */
+    public RealmResultTask<InsertManyResult> insertMany(final List<? extends DocumentT> documents) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<InsertManyResult>() {
+            @Nullable
+            @Override
+            public InsertManyResult run() {
+                return osMongoCollection.insertMany(documents);
+            }
+        });
+    }
+

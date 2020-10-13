@@ -1,0 +1,26 @@
+    public static void insertOrUpdate(Realm realm, Table parentObjectTable, long parentColumnKey, long parentObjectKey, Iterator<? extends RealmModel> objects, Map<RealmModel,Long> cache) {
+        Table table = realm.getTable(some.test.EmbeddedClass.class);
+        long tableNativePtr = table.getNativePtr();
+        EmbeddedClassColumnInfo columnInfo = (EmbeddedClassColumnInfo) realm.getSchema().getColumnInfo(some.test.EmbeddedClass.class);
+        some.test.EmbeddedClass object = null;
+        while (objects.hasNext()) {
+            object = (some.test.EmbeddedClass) objects.next();
+            if (cache.containsKey(object)) {
+                continue;
+            }
+            if (object instanceof RealmObjectProxy && !RealmObject.isFrozen(object) && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm() != null && ((RealmObjectProxy) object).realmGet$proxyState().getRealm$realm().getPath().equals(realm.getPath())) {
+                cache.put(object, ((RealmObjectProxy) object).realmGet$proxyState().getRow$realm().getObjectKey());
+                continue;
+            }
+            long objKey = OsObject.createEmbeddedObject(parentObjectTable, parentObjectKey, parentColumnKey);
+            cache.put(object, objKey);
+            String realmGet$name = ((some_test_EmbeddedClassRealmProxyInterface) object).realmGet$name();
+            if (realmGet$name != null) {
+                Table.nativeSetString(tableNativePtr, columnInfo.nameColKey, objKey, realmGet$name, false);
+            } else {
+                Table.nativeSetNull(tableNativePtr, columnInfo.nameColKey, objKey, false);
+            }
+            Table.nativeSetLong(tableNativePtr, columnInfo.ageColKey, objKey, ((some_test_EmbeddedClassRealmProxyInterface) object).realmGet$age(), false);
+        }
+    }
+

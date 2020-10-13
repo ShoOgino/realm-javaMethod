@@ -1,0 +1,14 @@
+        @Override
+        public void encode(
+                final BsonWriter writer,
+                final CustomType value,
+                final EncoderContext encoderContext
+        ) {
+            final Document document = new Document();
+            if (value.getId() != null) {
+                document.put("_id", value.getId());
+            }
+            document.put("intValue", value.getIntValue());
+            (new DocumentCodec()).encode(writer, document, encoderContext);
+        }
+

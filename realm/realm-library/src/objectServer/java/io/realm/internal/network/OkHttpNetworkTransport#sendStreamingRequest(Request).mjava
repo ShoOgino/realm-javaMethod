@@ -1,0 +1,16 @@
+    @Override
+    public OsJavaNetworkTransport.Response sendStreamingRequest(Request request) throws IOException, AppException {
+        OkHttpClient client = getStreamClient();
+
+        okhttp3.Request okRequest = makeRequest(request.getMethod(), request.getUrl(), request.getHeaders(), request.getBody());
+
+        Call call = client.newCall(okRequest);
+        okhttp3.Response response = call.execute();
+
+        if ((response.code() >= 300) || ((response.code() < 200) && (response.code() != 0))) {
+            throw new AppException(ErrorCode.fromNativeError(ErrorCode.Type.HTTP, response.code()), response.message());
+        }
+
+        return Response.httpResponse(response.code(), parseHeaders(response.headers()), response.body().source());
+    }
+

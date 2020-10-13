@@ -107,6 +107,26 @@
             fail("Unexpected exception: " + e);
         }
 
+        // 11 Decimal128
+        try {
+            realm.createObjectFromJson(NullTypes.class, array.getJSONObject(10));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+            assertTrue(ignored.getMessage().contains(NullTypes.FIELD_DECIMAL128_NOT_NULL));
+        } catch (Exception e) {
+            fail("Unexpected exception: " + e);
+        }
+
+        // 12 ObjectId
+        try {
+            realm.createObjectFromJson(NullTypes.class, array.getJSONObject(11));
+            fail();
+        } catch (IllegalArgumentException ignored) {
+            assertTrue(ignored.getMessage().contains(NullTypes.FIELD_OBJECT_ID_NOT_NULL));
+        } catch (Exception e) {
+            fail("Unexpected exception: " + e);
+        }
+
         realm.cancelTransaction();
     }
 

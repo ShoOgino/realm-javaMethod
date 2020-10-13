@@ -1,0 +1,24 @@
+    @SuppressWarnings("cast")
+    public static some.test.EmbeddedClass createOrUpdateEmbeddedUsingJsonObject(Realm realm, RealmModel parent, String parentProperty, JSONObject json, boolean update)
+            throws JSONException {
+        final List<String> excludeFields = Collections.<String> emptyList();
+        some.test.EmbeddedClass obj = realm.createEmbeddedObject(some.test.EmbeddedClass.class, parent, parentProperty);
+
+        final some_test_EmbeddedClassRealmProxyInterface objProxy = (some_test_EmbeddedClassRealmProxyInterface) obj;
+        if (json.has("name")) {
+            if (json.isNull("name")) {
+                objProxy.realmSet$name(null);
+            } else {
+                objProxy.realmSet$name((String) json.getString("name"));
+            }
+        }
+        if (json.has("age")) {
+            if (json.isNull("age")) {
+                throw new IllegalArgumentException("Trying to set non-nullable field 'age' to null.");
+            } else {
+                objProxy.realmSet$age((int) json.getInt("age"));
+            }
+        }
+        return obj;
+    }
+

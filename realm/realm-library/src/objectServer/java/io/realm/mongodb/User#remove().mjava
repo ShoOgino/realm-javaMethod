@@ -1,0 +1,17 @@
+    User remove() throws AppException {
+        boolean loggedIn = isLoggedIn();
+        AtomicReference<User> success = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
+        nativeRemoveUser(app.osApp.getNativePtr(), osUser.getNativePtr(), new OsJNIResultCallback<User>(success, error) {
+            @Override
+            protected User mapSuccess(Object result) {
+                return User.this;
+            }
+        });
+        ResultHandler.handleResult(success, error);
+        if (loggedIn) {
+            app.notifyUserLoggedOut(this);
+        }
+        return this;
+    }
+

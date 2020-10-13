@@ -1,0 +1,20 @@
+    /**
+     * Finds a document in the collection and performs the given update.
+     *
+     * @param filter  the query filter
+     * @param update  the update document
+     * @param options a {@link FindOneAndModifyOptions} struct
+     * @return a task containing the resulting document
+     */
+    public RealmResultTask<DocumentT> findOneAndUpdate(final Bson filter,
+                                                       final Bson update,
+                                                       final FindOneAndModifyOptions options) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<DocumentT>() {
+            @Nullable
+            @Override
+            public DocumentT run() {
+                return osMongoCollection.findOneAndUpdate(filter, update, options);
+            }
+        });
+    }
+

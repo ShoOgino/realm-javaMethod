@@ -1,0 +1,23 @@
+    /**
+     * Convert this update description to an update document.
+     *
+     * @return an update document with the appropriate $set and $unset documents.
+     */
+    public BsonDocument toUpdateDocument() {
+        final List<BsonElement> unsets = new ArrayList<>();
+        for (final String removedField : this.removedFields) {
+            unsets.add(new BsonElement(removedField, new BsonBoolean(true)));
+        }
+        final BsonDocument updateDocument = new BsonDocument();
+
+        if (this.updatedFields.size() > 0) {
+            updateDocument.append("$set", this.updatedFields);
+        }
+
+        if (unsets.size() > 0) {
+            updateDocument.append("$unset", new BsonDocument(unsets));
+        }
+
+        return updateDocument;
+    }
+

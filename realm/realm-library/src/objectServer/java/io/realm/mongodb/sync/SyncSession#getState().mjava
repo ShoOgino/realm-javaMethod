@@ -1,0 +1,17 @@
+    /**
+     * Get the current session's state, as defined in {@link SyncSession.State}.
+     * <p>
+     * Note that the state may change after this method returns.
+     *
+     * @return the state of the session.
+     * @see SyncSession.State
+     */
+    public State getState() {
+        byte state = nativeGetState(appNativePointer, configuration.getPath());
+        if (state == -1) {
+            // session was not found, probably the Realm was closed
+            throw new IllegalStateException("Could not find session, Realm was probably closed");
+        }
+        return State.fromNativeValue(state);
+    }
+

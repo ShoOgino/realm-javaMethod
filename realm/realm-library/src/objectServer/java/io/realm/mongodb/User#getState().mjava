@@ -1,0 +1,15 @@
+    /**
+     * Returns the {@link State} the user is in.
+     *
+     * @return the {@link State} of the user.
+     */
+    public State getState() {
+        byte nativeState = osUser.getState();
+        for (State state : State.values()) {
+            if (state.nativeValue == nativeState) {
+                return state;
+            }
+        }
+        throw new IllegalStateException("Unknown state: " + nativeState);
+    }
+

@@ -1,8 +1,9 @@
     private void before(Class<?> serviceClass) throws Throwable {
         // Start the testing remote process.
         serviceStartLatch = new CountDownLatch(1);
-        Intent intent = new Intent(getContext(), serviceClass);
-        getContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        Intent intent = new Intent(instrumentation.getContext(), serviceClass);
+        instrumentation.getContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         TestHelper.awaitOrFail(serviceStartLatch);
     }
 

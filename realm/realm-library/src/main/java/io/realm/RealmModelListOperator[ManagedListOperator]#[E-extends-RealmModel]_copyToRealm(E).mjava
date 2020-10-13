@@ -1,0 +1,12 @@
+    // Transparently copies an unmanaged object or managed object from another Realm to the Realm backing this RealmList.
+    private <E extends RealmModel> E copyToRealm(E object) {
+        // At this point the object can only be a typed object, so the backing Realm cannot be a DynamicRealm.
+        Realm realm = (Realm) this.realm;
+        if (OsObjectStore.getPrimaryKeyForObject(realm.getSharedRealm(),
+                realm.getConfiguration().getSchemaMediator().getSimpleClassName(object.getClass())) != null) {
+            return realm.copyToRealmOrUpdate(object);
+        } else {
+            return realm.copyToRealm(object);
+        }
+    }
+

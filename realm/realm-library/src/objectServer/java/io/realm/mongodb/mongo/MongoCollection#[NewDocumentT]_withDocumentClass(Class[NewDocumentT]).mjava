@@ -1,0 +1,15 @@
+    /**
+     * Creates a new MongoCollection instance with a different default class to cast any
+     * documents returned from the database into.
+     *
+     * @param clazz          the default class to which any documents returned from the database
+     *                       will be cast.
+     * @param <NewDocumentT> The type that the new collection will encode documents from and decode
+     *                       documents to.
+     * @return a new MongoCollection instance with the different default class
+     */
+    public <NewDocumentT> MongoCollection<NewDocumentT> withDocumentClass(
+            final Class<NewDocumentT> clazz) {
+        return new MongoCollection<>(nameSpace, osMongoCollection.withDocumentClass(clazz));
+    }
+

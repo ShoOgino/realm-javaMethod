@@ -3,9 +3,12 @@
      *
      * @return the number of matching objects.
      * @throws java.lang.UnsupportedOperationException if the query is not valid ("syntax error").
+     * @throws RealmException if called from the UI thread after opting out via {@link RealmConfiguration.Builder#allowQueriesOnUiThread(boolean)}.
      */
     public long count() {
         realm.checkIfValid();
+        realm.checkAllowQueriesOnUiThread();
+
         // The fastest way of doing `count()` is going through `TableQuery.count()`. Unfortunately
         // doing this does not correctly apply all side effects of queries (like subscriptions). Also
         // some queries constructs, like doing distinct is not easily supported this way.

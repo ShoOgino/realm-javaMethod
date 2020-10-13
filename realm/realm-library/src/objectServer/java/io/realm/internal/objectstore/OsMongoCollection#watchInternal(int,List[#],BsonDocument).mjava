@@ -1,0 +1,29 @@
+    private EventStream<DocumentT> watchInternal(int type, @Nullable List<?> ids, @Nullable BsonDocument matchFilter) throws IOException {
+        List<Document> args = new ArrayList<>();
+
+        Document watchArgs = new Document("database", namespace.getDatabaseName());
+        watchArgs.put("collection", namespace.getCollectionName());
+
+        switch (type) {
+            case WATCH:
+                break;
+            case WATCH_IDS:
+                watchArgs.put("ids", ids);
+                break;
+            case WATCH_WITH_FILTER:
+                watchArgs.put("filter", matchFilter);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid watch type: " + type);
+        }
+
+        args.add(watchArgs);
+
+        String encodedArguments = JniBsonProtocol.encode(args, codecRegistry);
+
+        OsJavaNetworkTransport.Request request = streamNetworkTransport.makeStreamingRequest("watch", encodedArguments, serviceName);
+        OsJavaNetworkTransport.Response response = streamNetworkTransport.sendRequest(request);
+
+        return new NetworkEventStream<>(response, codecRegistry, documentClass);
+    }
+

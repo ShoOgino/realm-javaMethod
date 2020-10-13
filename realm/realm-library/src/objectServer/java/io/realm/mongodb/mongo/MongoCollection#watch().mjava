@@ -1,0 +1,16 @@
+    /**
+     * Watches a collection. The resulting stream will be notified of all events on this collection
+     * that the active user is authorized to see based on the configured MongoDB Realm rules.
+     *
+     * @return a task that provides access to the stream of change events.
+     */
+    public RealmEventStreamTask<DocumentT> watch() {
+        return new RealmEventStreamTaskImpl<>(getNamespace().getFullName(),
+                new RealmEventStreamTaskImpl.Executor<DocumentT>() {
+                    @Override
+                    public EventStream<DocumentT> run() throws IOException {
+                        return osMongoCollection.watch();
+                    }
+                });
+    }
+

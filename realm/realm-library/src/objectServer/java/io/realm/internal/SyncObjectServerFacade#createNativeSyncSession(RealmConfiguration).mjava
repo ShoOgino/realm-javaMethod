@@ -2,8 +2,8 @@
     public void createNativeSyncSession(RealmConfiguration configuration) {
         if (configuration instanceof SyncConfiguration) {
             SyncConfiguration syncConfig = (SyncConfiguration) configuration;
-            OsRealmConfig config = new OsRealmConfig.Builder(syncConfig).build();
-            SyncManager.getOrCreateSession(syncConfig, config.getResolvedRealmURI());
+            App app = syncConfig.getUser().getApp();
+            app.getSync().getOrCreateSession(syncConfig);
         }
     }
 

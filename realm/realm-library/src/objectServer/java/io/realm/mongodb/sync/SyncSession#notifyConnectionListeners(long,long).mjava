@@ -1,0 +1,15 @@
+    /**
+     * Called from native code. This method is not allowed to throw as it would be swallowed
+     * by the native Sync Client thread. Instead log all exceptions to logcat.
+     */
+    @SuppressWarnings("unused")
+    void notifyConnectionListeners(long oldState, long newState) {
+        for (ConnectionListener listener : connectionListeners) {
+            try {
+                listener.onChange(ConnectionState.fromNativeValue(oldState), ConnectionState.fromNativeValue(newState));
+            } catch (Exception exception) {
+                RealmLog.error(exception);
+            }
+        }
+    }
+

@@ -1,0 +1,16 @@
+    /**
+     * Returns a new list of the user's identities.
+     *
+     * @return the list of identities.
+     * @see UserIdentity
+     */
+    public List<UserIdentity> getIdentities() {
+        Pair<String, String>[] osIdentities = osUser.getIdentities();
+        List<UserIdentity> identities = new ArrayList<>(osIdentities.length);
+        for (int i = 0; i < osIdentities.length; i++) {
+            Pair<String, String> data = osIdentities[i];
+            identities.add(new UserIdentity(data.first, data.second));
+        }
+        return identities;
+    }
+

@@ -1,0 +1,20 @@
+        /**
+         * The prefix that is prepended to the path in the WebSocket request that initiates a sync
+         * connection to MongoDB Realm. The value specified must match the server’s configuration
+         * otherwise the device will not be able to create a connection. This value is optional
+         * and should only be set if a specific firewall rule requires it.
+         *
+         * @param urlPrefix The prefix to append to the sync connection url.
+         * @see <a href="https://docs.realm.io/platform/guides/learn-realm-sync-and-integrate-with-a-proxy#adding-a-custom-proxy">Adding a custom proxy</a>
+         */
+        public SyncConfiguration.Builder urlPrefix(String urlPrefix) {
+            if (Util.isEmptyString(urlPrefix)) {
+                throw new IllegalArgumentException("Non-empty 'urlPrefix' required");
+            }
+            if (urlPrefix.endsWith("/")) {
+                urlPrefix = urlPrefix.substring(0, Math.min(0, urlPrefix.length() - 2));
+            }
+            this.syncUrlPrefix = urlPrefix;
+            return this;
+        }
+

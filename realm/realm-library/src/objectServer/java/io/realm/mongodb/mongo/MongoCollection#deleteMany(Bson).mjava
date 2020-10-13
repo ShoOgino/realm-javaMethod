@@ -1,0 +1,17 @@
+    /**
+     * Removes all documents from the collection that match the given query filter.  If no documents
+     * match, the collection is not modified.
+     *
+     * @param filter the query filter to apply the the delete operation
+     * @return a task containing the result of the remove many operation
+     */
+    public RealmResultTask<DeleteResult> deleteMany(final Bson filter) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<DeleteResult>() {
+            @Nullable
+            @Override
+            public DeleteResult run() {
+                return osMongoCollection.deleteMany(filter);
+            }
+        });
+    }
+

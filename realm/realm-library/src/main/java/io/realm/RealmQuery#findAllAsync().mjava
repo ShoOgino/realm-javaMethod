@@ -1,8 +1,5 @@
     /**
      * Finds all objects that fulfill the query conditions. This method is only available from a Looper thread.
-     * <p>
-     * If the Realm is a Query-based synchronized Realms, this method will also create an anonymous subscription
-     * that will download all server data matching the query.
      *
      * @return immediately an empty {@link RealmResults}. Users need to register a listener
      * {@link io.realm.RealmResults#addChangeListener(RealmChangeListener)} to be notified when the query completes.
@@ -10,16 +7,7 @@
      */
     public RealmResults<E> findAllAsync() {
         realm.checkIfValid();
-
         realm.sharedRealm.capabilities.checkCanDeliverNotification(ASYNC_QUERY_WRONG_THREAD_MESSAGE);
-        SubscriptionAction subscriptionAction;
-        
-        // Don't create subscriptions for list queries as they are always part of an object covered by another query.
-        if (realm.sharedRealm.isPartial() && osList == null) {
-            subscriptionAction = SubscriptionAction.ANONYMOUS_SUBSCRIPTION;
-        }  else {
-            subscriptionAction = SubscriptionAction.NO_SUBSCRIPTION;
-        }
-        return createRealmResults(query, queryDescriptors, false, subscriptionAction);
+        return createRealmResults(query, queryDescriptors, false);
     }
 

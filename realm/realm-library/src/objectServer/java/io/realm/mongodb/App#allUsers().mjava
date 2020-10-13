@@ -1,0 +1,19 @@
+    /**
+     * Returns all known users that are either {@link User.State#LOGGED_IN} or
+     * {@link User.State#LOGGED_OUT}.
+     * <p>
+     * Only users that at some point logged into this device will be returned.
+     *
+     * @return a map of user identifiers and users known locally.
+     */
+    public Map<String, User> allUsers() {
+        OsSyncUser[] allUsers = osApp.allUsers();
+
+        HashMap<String, User> users = new HashMap<>(allUsers.length);
+        for (int i = 0; i < allUsers.length; i++) {
+            User user = new User(allUsers[i], this);
+            users.put(user.getId(), user);
+        }
+        return users;
+    }
+

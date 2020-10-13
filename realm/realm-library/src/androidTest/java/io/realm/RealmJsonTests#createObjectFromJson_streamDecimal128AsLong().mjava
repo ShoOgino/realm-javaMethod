@@ -1,0 +1,14 @@
+    @Test
+    public void createObjectFromJson_streamDecimal128AsLong() throws IOException {
+        assumeThat(Build.VERSION.SDK_INT, greaterThanOrEqualTo(Build.VERSION_CODES.HONEYCOMB));
+
+        InputStream in = TestHelper.loadJsonFromAssets(context, "decimal128_as_long.json");
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, in);
+        realm.commitTransaction();
+        in.close();
+
+        AllTypes obj = realm.where(AllTypes.class).findFirst();
+        assertEquals(new Decimal128(-32361122672259149L), obj.getColumnDecimal128());
+    }
+

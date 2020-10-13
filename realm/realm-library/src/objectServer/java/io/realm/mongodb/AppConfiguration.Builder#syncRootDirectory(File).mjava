@@ -1,0 +1,26 @@
+        /**
+         * Configures the root folder containing all files and Realms used when synchronizing data
+         * between the device and MongoDB Realm.
+         * <p>
+         * The default root dir is {@code Context.getFilesDir()/mongodb-realm}.
+         *
+         * @param rootDir where to store sync related files.
+         */
+        public Builder syncRootDirectory(File rootDir) {
+            Util.checkNull(rootDir, "rootDir");
+            if (rootDir.isFile()) {
+                throw new IllegalArgumentException("'rootDir' is a file, not a directory: " +
+                        rootDir.getAbsolutePath() + ".");
+            }
+            if (!rootDir.exists() && !rootDir.mkdirs()) {
+                throw new IllegalArgumentException("Could not create the specified directory: " +
+                        rootDir.getAbsolutePath() + ".");
+            }
+            if (!rootDir.canWrite()) {
+                throw new IllegalArgumentException("Realm directory is not writable: " +
+                        rootDir.getAbsolutePath() + ".");
+            }
+            syncRootDir = rootDir;
+            return this;
+        }
+

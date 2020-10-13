@@ -1,0 +1,11 @@
+    void notifyUserLoggedOut(User user) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (AuthenticationListener listener : authListeners) {
+                    listener.loggedOut(user);
+                }
+            }
+        });
+    }
+

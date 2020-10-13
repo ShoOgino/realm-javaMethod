@@ -26,6 +26,14 @@
             //noinspection unchecked
             return (ManagedListOperator<E>) new DateListOperator(realm, osList, (Class<Date>) valueClass);
         }
+        if (valueListType == RealmFieldType.DECIMAL128_LIST) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new Decimal128ListOperator(realm, osList, (Class<Decimal128>) valueClass);
+        }
+        if (valueListType == RealmFieldType.OBJECT_ID_LIST) {
+            //noinspection unchecked
+            return (ManagedListOperator<E>) new ObjectIdListOperator(realm, osList, (Class<ObjectId>) valueClass);
+        }
         throw new IllegalArgumentException("Unexpected list type: " + valueListType.name());
     }
 

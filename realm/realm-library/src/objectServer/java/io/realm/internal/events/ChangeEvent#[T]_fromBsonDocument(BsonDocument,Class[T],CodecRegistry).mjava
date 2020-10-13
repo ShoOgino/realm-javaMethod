@@ -1,0 +1,52 @@
+    /**
+     * Deserializes a {@link BsonDocument} into an instance of change event.
+     *
+     * @param document the serialized document
+     * @return the deserialized change event
+     */
+    static <T> ChangeEvent<T> fromBsonDocument(final BsonDocument document, final Class<T> documentClass, CodecRegistry codecRegistry) {
+        try {
+            checkContainsKey(Fields.ID_FIELD, document, "document");
+            checkContainsKey(Fields.OPERATION_TYPE_FIELD, document, "document");
+            checkContainsKey(Fields.NS_FIELD, document, "document");
+            checkContainsKey(Fields.DOCUMENT_KEY_FIELD, document, "document");
+        } catch (IllegalArgumentException exception) {
+            throw new AppException(ErrorCode.EVENT_DESERIALIZING, exception);
+        }
+
+        final BsonDocument nsDoc = document.getDocument(Fields.NS_FIELD);
+
+        final UpdateDescription updateDescription;
+        if (document.containsKey(Fields.UPDATE_DESCRIPTION_FIELD)) {
+            updateDescription = UpdateDescription.fromBsonDocument(
+                    document.getDocument(Fields.UPDATE_DESCRIPTION_FIELD)
+            );
+        } else {
+            updateDescription = null;
+        }
+
+        final T fullDocument;
+
+        if (document.containsKey(Fields.FULL_DOCUMENT_FIELD)) {
+            final BsonValue fdVal = document.get(Fields.FULL_DOCUMENT_FIELD);
+            if (fdVal.isDocument()) {
+                fullDocument = codecRegistry.get(documentClass).decode(fdVal.asDocument().asBsonReader(), DecoderContext.builder().build());
+            } else {
+                fullDocument = null;
+            }
+        } else {
+            fullDocument = null;
+        }
+
+        return new ChangeEvent<>(
+                document.getDocument(Fields.ID_FIELD),
+                fromRemote(document.getString(Fields.OPERATION_TYPE_FIELD).getValue()),
+                fullDocument,
+                new MongoNamespace(
+                        nsDoc.getString(Fields.NS_DB_FIELD).getValue(),
+                        nsDoc.getString(Fields.NS_COLL_FIELD).getValue()),
+                document.getDocument(Fields.DOCUMENT_KEY_FIELD),
+                updateDescription,
+                document.getBoolean(Fields.WRITE_PENDING_FIELD, BsonBoolean.FALSE).getValue());
+    }
+

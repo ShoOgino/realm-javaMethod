@@ -1,0 +1,10 @@
+    @Override
+    String getPropertyClassName(String propertyName) {
+        String linkedClassName = table.getLinkTarget(getColumnKey(propertyName)).getClassName();
+        if (Util.isEmptyString(linkedClassName)) {
+            throw new IllegalArgumentException(String.format("Property '%s' not found.", propertyName));
+        }
+
+        return linkedClassName;
+    }
+

@@ -1,0 +1,76 @@
+    /**
+     * Find the diff between two documents.
+     *
+     * <p>NOTE: This does not do a full diff on {@link BsonArray}. If there is
+     * an inequality between the old and new array, the old array will
+     * simply be replaced by the new one.
+     *
+     * @param beforeDocument original document
+     * @param afterDocument  document to diff on
+     * @param onKey          the key for our depth level
+     * @param updatedFields  contiguous document of updated fields,
+     *                       nested or otherwise
+     * @param removedFields  contiguous list of removedFields,
+     *                       nested or otherwise
+     * @return a description of the updated fields and removed keys between the documents
+     */
+    private static UpdateDescription diff(
+            final BsonDocument beforeDocument,
+            final BsonDocument afterDocument,
+            final @Nullable String onKey,
+            final BsonDocument updatedFields,
+            final Set<String> removedFields) {
+        // for each key in this document...
+        for (final Map.Entry<String, BsonValue> entry : beforeDocument.entrySet()) {
+            final String key = entry.getKey();
+            // don't worry about the _id or version field for now
+            if (key.equals("_id") || key.equals(DOCUMENT_VERSION_FIELD)) {
+                continue;
+            }
+            final BsonValue oldValue = entry.getValue();
+
+            final String actualKey = onKey == null ? key : String.format("%s.%s", onKey, key);
+            // if the key exists in the other document AND both are BsonDocuments
+            // diff the documents recursively, carrying over the keys to keep
+            // updatedFields and removedFields flat.
+            // this will allow us to reference whole objects as well as nested
+            // properties.
+            // else if the key does not exist, the key has been removed.
+            if (afterDocument.containsKey(key)) {
+                final BsonValue newValue = afterDocument.get(key);
+                if ((oldValue instanceof BsonDocument) && (newValue instanceof BsonDocument)) {
+                    diff((BsonDocument) oldValue,
+                            (BsonDocument) newValue,
+                            actualKey,
+                            updatedFields,
+                            removedFields);
+                } else if (!oldValue.equals(newValue)) {
+                    updatedFields.put(actualKey, newValue);
+                }
+            } else {
+                removedFields.add(actualKey);
+            }
+        }
+
+        // for each key in the other document...
+        for (final Map.Entry<String, BsonValue> entry : afterDocument.entrySet()) {
+            final String key = entry.getKey();
+            // don't worry about the _id or version field for now
+            if (key.equals("_id") || key.equals(DOCUMENT_VERSION_FIELD)) {
+                continue;
+            }
+
+            final BsonValue newValue = entry.getValue();
+            // if the key is not in the this document,
+            // it is a new key with a new value.
+            // updatedFields will included keys that must
+            // be newly created.
+            final String actualKey = (onKey == null) ? key : String.format("%s.%s", onKey, key);
+            if (!beforeDocument.containsKey(key)) {
+                updatedFields.put(actualKey, newValue);
+            }
+        }
+
+        return new UpdateDescription(updatedFields, removedFields);
+    }
+

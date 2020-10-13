@@ -1,0 +1,20 @@
+    @Test
+    public void distinctMultiArgs_LinkedFields() {
+        final long numberOfBlocks = 3;
+        final long numberOfObjects = 3;
+        populateForDistinct(realm, numberOfBlocks, numberOfObjects, true);
+
+        DynamicRealm dynamicRealm = DynamicRealm.createInstance(realm.sharedRealm);
+        RealmResults<DynamicRealmObject> all = dynamicRealm.where(AnnotationIndexTypes.CLASS_NAME)
+                .findAll();
+
+        RealmQuery<AnnotationIndexTypes> query = realm.where(AnnotationIndexTypes.class);
+        RealmResults<AnnotationIndexTypes> distinct = query.distinct(AnnotationIndexTypes.INDEX_LINKED_FIELD_STRING, AnnotationIndexTypes.INDEX_LINKED_FIELDS).findAll();
+
+        List<String> fields = new ArrayList();
+        fields.add(AnnotationIndexTypes.INDEX_LINKED_FIELD_STRING);
+        fields.addAll(Arrays.asList(AnnotationIndexTypes.INDEX_LINKED_FIELDS));
+        Set<List<? super Object>> values = distinct(all, fields.toArray());
+        assertEquals(values.size(), distinct.size());
+    }
+

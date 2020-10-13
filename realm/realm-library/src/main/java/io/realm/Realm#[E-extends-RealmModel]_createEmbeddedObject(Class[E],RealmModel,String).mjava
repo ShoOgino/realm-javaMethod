@@ -1,0 +1,36 @@
+    /**
+     * Instantiates and adds a new embedded object to the Realm.
+     * <p>
+     * This method should only be used to create objects of types marked as embedded.
+     *
+     * @param clazz the Class of the object to create. It must be marked with {@code \@RealmClass(embedded = true)}.
+     * @param parentObject The parent object which should hold a reference to the embedded object. If the parent property is a list
+     * the embedded object will be added to the end of that list.
+     * @param parentProperty the property in the parent class which holds the reference.
+     * @return the newly created embedded object.
+     * @throws IllegalArgumentException if {@code clazz} is not an embedded class or if the property
+     * in the parent class cannot hold objects of the appropriate type.
+     * @see RealmClass#embedded()
+     */
+    public <E extends RealmModel> E createEmbeddedObject(Class<E> clazz, RealmModel parentObject, String parentProperty) {
+        checkIfValid();
+        Util.checkNull(parentObject, "parentObject");
+        Util.checkEmpty(parentProperty, "parentProperty");
+        if (!RealmObject.isManaged(parentObject) || !RealmObject.isValid(parentObject)) {
+            throw new IllegalArgumentException("Only valid, managed objects can be a parent to an embedded object.");
+        }
+
+        String className = schema.getSchemaForClass(clazz).getClassName();
+        Class<? extends RealmModel> parentClassName = parentObject.getClass();
+        RealmObjectSchema parentObjectSchema = schema.getSchemaForClass(parentClassName);
+
+        Row embeddedObject = getEmbeddedObjectRow(className, (RealmObjectProxy) parentObject, parentProperty, schema, parentObjectSchema);
+
+        //noinspection unchecked
+        return (E) configuration.getSchemaMediator().newInstance(clazz,
+                this,
+                embeddedObject,
+                schema.getColumnInfo(clazz),
+                true, Collections.EMPTY_LIST);
+    }
+

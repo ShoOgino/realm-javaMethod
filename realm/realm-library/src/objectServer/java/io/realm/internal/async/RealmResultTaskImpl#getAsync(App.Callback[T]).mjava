@@ -1,0 +1,21 @@
+    @Override
+    public void getAsync(App.Callback<T> callback) {
+        Util.checkNull(callback, "callback");
+        Util.checkLooperThread("RealmResultTaskImpl can only run on looper threads.");
+
+        RealmNotifier handler = new AndroidRealmNotifier(null, new AndroidCapabilities());
+
+        pendingTask = service.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    postSuccess(handler, executor.run(), callback);
+                } catch (AppException e) {
+                    postError(handler, e, callback);
+                } catch (Throwable e) {
+                    postError(handler, new AppException(ErrorCode.UNKNOWN, "Unexpected error", e), callback);
+                }
+            }
+        });
+    }
+

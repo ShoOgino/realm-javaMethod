@@ -1,0 +1,12 @@
+    static some.test.EmbeddedClass update(Realm realm, EmbeddedClassColumnInfo columnInfo, some.test.EmbeddedClass realmObject, some.test.EmbeddedClass newObject, Map<RealmModel, RealmObjectProxy> cache, Set<ImportFlag> flags) {
+        some_test_EmbeddedClassRealmProxyInterface realmObjectTarget = (some_test_EmbeddedClassRealmProxyInterface) realmObject;
+        some_test_EmbeddedClassRealmProxyInterface realmObjectSource = (some_test_EmbeddedClassRealmProxyInterface) newObject;
+        Table table = realm.getTable(some.test.EmbeddedClass.class);
+        OsObjectBuilder builder = new OsObjectBuilder(table, flags);
+        builder.addString(columnInfo.nameColKey, realmObjectSource.realmGet$name());
+        builder.addInteger(columnInfo.ageColKey, realmObjectSource.realmGet$age());
+
+        builder.updateExistingEmbeddedObject((RealmObjectProxy) realmObject);
+        return realmObject;
+    }
+

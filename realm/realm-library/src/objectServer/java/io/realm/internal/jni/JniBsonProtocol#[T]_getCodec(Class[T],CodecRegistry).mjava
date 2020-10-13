@@ -1,0 +1,8 @@
+    public static <T> Codec<T> getCodec(Class<T> clz, CodecRegistry registry) {
+        try {
+            return registry.get(clz);
+        } catch (CodecConfigurationException e) {
+            throw new AppException(ErrorCode.BSON_CODEC_NOT_FOUND, "Could not resolve codec for " + clz.getSimpleName(), e);
+        }
+    }
+

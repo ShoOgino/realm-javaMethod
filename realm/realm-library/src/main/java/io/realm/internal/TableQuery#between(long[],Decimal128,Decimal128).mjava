@@ -1,0 +1,10 @@
+    public TableQuery between(long[] columnKey, Decimal128 value1, Decimal128 value2) {
+        //noinspection ConstantConditions
+        if (value1 == null || value2 == null) {
+            throw new IllegalArgumentException("Decimal128 values in query criteria must not be null.");
+        }
+        nativeBetweenDecimal128(nativePtr, columnKey, value1.getLow(), value1.getHigh(), value2.getLow(), value2.getHigh());
+        queryValidated = false;
+        return this;
+    }
+

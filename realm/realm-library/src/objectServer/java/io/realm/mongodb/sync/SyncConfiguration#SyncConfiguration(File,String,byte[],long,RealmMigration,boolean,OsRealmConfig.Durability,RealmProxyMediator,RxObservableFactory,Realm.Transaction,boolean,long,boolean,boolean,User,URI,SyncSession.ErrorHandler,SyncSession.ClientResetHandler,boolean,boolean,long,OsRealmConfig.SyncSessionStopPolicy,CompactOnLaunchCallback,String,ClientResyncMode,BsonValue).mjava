@@ -1,0 +1,57 @@
+    private SyncConfiguration(File realmPath,
+                              @Nullable String assetFilePath,
+                              @Nullable byte[] key,
+                              long schemaVersion,
+                              @Nullable RealmMigration migration,
+                              boolean deleteRealmIfMigrationNeeded,
+                              OsRealmConfig.Durability durability,
+                              RealmProxyMediator schemaMediator,
+                              @Nullable RxObservableFactory rxFactory,
+                              @Nullable Realm.Transaction initialDataTransaction,
+                              boolean readOnly,
+                              long maxNumberOfActiveVersions,
+                              boolean allowWritesOnUiThread,
+                              boolean allowQueriesOnUiThread,
+                              User user,
+                              URI serverUrl,
+                              SyncSession.ErrorHandler errorHandler,
+                              SyncSession.ClientResetHandler clientResetHandler,
+                              boolean deleteRealmOnLogout,
+                              boolean waitForInitialData,
+                              long initialDataTimeoutMillis,
+                              OsRealmConfig.SyncSessionStopPolicy sessionStopPolicy,
+                              CompactOnLaunchCallback compactOnLaunch,
+                              @Nullable String syncUrlPrefix,
+                              ClientResyncMode clientResyncMode,
+                              BsonValue partitionValue) {
+        super(realmPath,
+                assetFilePath,
+                key,
+                schemaVersion,
+                migration,
+                deleteRealmIfMigrationNeeded,
+                durability,
+                schemaMediator,
+                rxFactory,
+                initialDataTransaction,
+                readOnly,
+                compactOnLaunch,
+                false,
+                maxNumberOfActiveVersions,
+                allowWritesOnUiThread,
+                allowQueriesOnUiThread
+        );
+
+        this.user = user;
+        this.serverUrl = serverUrl;
+        this.errorHandler = errorHandler;
+        this.clientResetHandler = clientResetHandler;
+        this.deleteRealmOnLogout = deleteRealmOnLogout;
+        this.waitForInitialData = waitForInitialData;
+        this.initialDataTimeoutMillis = initialDataTimeoutMillis;
+        this.sessionStopPolicy = sessionStopPolicy;
+        this.syncUrlPrefix = syncUrlPrefix;
+        this.clientResyncMode = clientResyncMode;
+        this.partitionValue = partitionValue;
+    }
+

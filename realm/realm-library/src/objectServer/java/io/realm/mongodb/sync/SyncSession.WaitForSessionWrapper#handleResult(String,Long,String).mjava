@@ -1,0 +1,14 @@
+        /**
+         * Process the result of a waiting action. This will also unblock anyone who called {@link #waiter}.
+         *
+         * @param errorCode error code if an error occurred, {@code null} if changes were successfully downloaded.
+         * @param errorMessage error message (if any).
+         */
+        public void handleResult(String errorCategory, Long errorCode, String errorMessage) {
+            this.errorCategory = errorCategory;
+            this.errorCode = errorCode;
+            this.errorMessage = errorMessage;
+            this.resultReceived = true;
+            waiter.countDown();
+        }
+

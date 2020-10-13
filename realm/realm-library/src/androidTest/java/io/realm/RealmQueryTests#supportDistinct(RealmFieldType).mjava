@@ -1,0 +1,31 @@
+    // FIXME Maybe move to QueryDescriptor or maybe even to RealmFieldType?
+    private boolean supportDistinct(RealmFieldType type) {
+        switch (type) {
+            case INTEGER:
+            case BOOLEAN:
+            case STRING:
+            case BINARY:
+            case DATE:
+            case FLOAT:
+            case DOUBLE:
+            case OBJECT:
+            case DECIMAL128:
+            case OBJECT_ID:
+            case LINKING_OBJECTS:
+                return true;
+            case LIST:
+            case INTEGER_LIST:
+            case BOOLEAN_LIST:
+            case STRING_LIST:
+            case BINARY_LIST:
+            case DATE_LIST:
+            case FLOAT_LIST:
+            case DOUBLE_LIST:
+            case DECIMAL128_LIST:
+            case OBJECT_ID_LIST:
+                return false;
+        }
+        // Should never reach here as the above switch is exhaustive
+        throw new UnsupportedOperationException("Unhandled realm field type " + type);
+    }
+

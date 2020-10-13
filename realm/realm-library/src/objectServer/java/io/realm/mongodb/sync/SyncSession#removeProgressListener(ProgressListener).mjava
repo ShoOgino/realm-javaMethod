@@ -1,0 +1,26 @@
+    /**
+     * Removes a progress listener. If the listener wasn't registered, this method will do nothing.
+     *
+     * @param listener listener to remove.
+     */
+    public synchronized void removeProgressListener(ProgressListener listener) {
+        //noinspection ConstantConditions
+        if (listener == null) {
+            return;
+        }
+        // If an exception is thrown somewhere in here, we will most likely leave the various
+        // maps in an inconsistent manner. Not much we can do about it.
+        Long token = progressListenerToOsTokenMap.remove(listener);
+        if (token != null) {
+            Iterator<Map.Entry<Long, Pair<ProgressListener, Progress>>> it = listenerIdToProgressListenerMap.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<Long, Pair<ProgressListener, Progress>> entry = it.next();
+                if (entry.getValue().first.equals(listener)) {
+                    it.remove();
+                    break;
+                }
+            }
+            nativeRemoveProgressListener(appNativePointer, configuration.getPath(), token);
+        }
+    }
+

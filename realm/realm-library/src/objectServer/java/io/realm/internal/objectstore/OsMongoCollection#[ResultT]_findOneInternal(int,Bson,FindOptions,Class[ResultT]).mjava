@@ -1,0 +1,37 @@
+    private <ResultT> ResultT findOneInternal(final int type,
+                                              final Bson filter,
+                                              @Nullable final FindOptions options,
+                                              final Class<ResultT> resultClass) {
+        AtomicReference<ResultT> success = new AtomicReference<>(null);
+        AtomicReference<AppException> error = new AtomicReference<>(null);
+        OsJNIResultCallback<ResultT> callback = new OsJNIResultCallback<ResultT>(success, error) {
+            @Override
+            protected ResultT mapSuccess(Object result) {
+                return findSuccessMapper(result, resultClass);
+            }
+        };
+
+        final String encodedFilter = JniBsonProtocol.encode(filter, codecRegistry);
+
+        // default to empty docs or update if needed
+        String projectionString = encodedEmptyDocument;
+        String sortString = encodedEmptyDocument;
+
+        switch (type) {
+            case FIND_ONE:
+                nativeFindOne(FIND_ONE, nativePtr, encodedFilter, projectionString, sortString, 0, callback);
+                break;
+            case FIND_ONE_WITH_OPTIONS:
+                Util.checkNull(options, "options");
+                projectionString = JniBsonProtocol.encode(options.getProjection(), codecRegistry);
+                sortString = JniBsonProtocol.encode(options.getSort(), codecRegistry);
+
+                nativeFindOne(FIND_ONE_WITH_OPTIONS, nativePtr, encodedFilter, projectionString, sortString, options.getLimit(), callback);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid fineOne type: " + type);
+        }
+
+        return ResultHandler.handleResult(success, error);
+    }
+

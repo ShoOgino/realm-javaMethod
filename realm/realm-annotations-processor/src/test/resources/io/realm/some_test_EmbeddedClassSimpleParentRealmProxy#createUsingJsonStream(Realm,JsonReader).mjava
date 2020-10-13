@@ -1,0 +1,51 @@
+    @SuppressWarnings("cast")
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static some.test.EmbeddedClassSimpleParent createUsingJsonStream(Realm realm, JsonReader reader)
+            throws IOException {
+        boolean jsonHasPrimaryKey = false;
+        final some.test.EmbeddedClassSimpleParent obj = new some.test.EmbeddedClassSimpleParent();
+        final some_test_EmbeddedClassSimpleParentRealmProxyInterface objProxy = (some_test_EmbeddedClassSimpleParentRealmProxyInterface) obj;
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (false) {
+            } else if (name.equals("id")) {
+                if (reader.peek() != JsonToken.NULL) {
+                    objProxy.realmSet$id((String) reader.nextString());
+                } else {
+                    reader.skipValue();
+                    objProxy.realmSet$id(null);
+                }
+                jsonHasPrimaryKey = true;
+            } else if (name.equals("child")) {
+                if (reader.peek() == JsonToken.NULL) {
+                    reader.skipValue();
+                    objProxy.realmSet$child(null);
+                } else {
+                    some.test.EmbeddedClass childObj = some_test_EmbeddedClassRealmProxy.createUsingJsonStream(realm, reader);
+                    objProxy.realmSet$child(childObj);
+                }
+            } else if (name.equals("children")) {
+                if (reader.peek() == JsonToken.NULL) {
+                    reader.skipValue();
+                    objProxy.realmSet$children(null);
+                } else {
+                    objProxy.realmSet$children(new RealmList<some.test.EmbeddedClass>());
+                    reader.beginArray();
+                    while (reader.hasNext()) {
+                        some.test.EmbeddedClass item = some_test_EmbeddedClassRealmProxy.createUsingJsonStream(realm, reader);
+                        objProxy.realmGet$children().add(item);
+                    }
+                    reader.endArray();
+                }
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+        if (!jsonHasPrimaryKey) {
+            throw new IllegalArgumentException("JSON object doesn't have the primary key field 'id'.");
+        }
+        return realm.copyToRealm(obj);
+    }
+

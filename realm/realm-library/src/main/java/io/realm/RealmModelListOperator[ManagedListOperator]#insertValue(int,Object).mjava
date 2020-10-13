@@ -1,0 +1,18 @@
+    @Override
+    public void insertValue(int index, Object value) {
+        // need to check in advance to avoid unnecessary copy of unmanaged object into Realm.
+        checkInsertIndex(index);
+        RealmModel realmObject = (RealmModel) value;
+        boolean copyObject = checkCanObjectBeCopied(realm, realmObject);
+        if (isEmbedded(realmObject)) {
+            if (value instanceof DynamicRealmObject) {
+                throw new IllegalArgumentException("Embedded objects are not supported by RealmLists of DynamicRealmObjects yet.");
+            }
+            long objKey = osList.createAndAddEmbeddedObject(index);
+            updateEmbeddedObject(realmObject, objKey);
+        } else {
+            RealmObjectProxy proxy = (RealmObjectProxy) ((copyObject) ? copyToRealm((RealmModel) value) : realmObject);
+            osList.insertRow(index, proxy.realmGet$proxyState().getRow$realm().getObjectKey());
+        }
+    }
+

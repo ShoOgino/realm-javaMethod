@@ -1,0 +1,18 @@
+    // Lazily creates the client if not already created
+    // TODO: timeOuts are not expected to change between requests. So for now just use the timeout first send.
+    private synchronized OkHttpClient getClient(long timeoutMs) {
+        if (client == null) {
+            client = new OkHttpClient.Builder()
+                    .callTimeout(timeoutMs, TimeUnit.MILLISECONDS)
+                    .followRedirects(true)
+                    .addInterceptor(new LoggingInterceptor(httpLogObfuscator))
+                    // using custom Connection Pool to evict idle connection after 5 seconds rather than 5 minutes (which is the default)
+                    // keeping idle connection on the pool will prevent the ROS to be stopped, since the HttpUtils#stopSyncServer query
+                    // will not return before the tests timeout (ex 10 seconds for AuthTests)
+                    .connectionPool(new ConnectionPool(5, 5, TimeUnit.SECONDS))
+                    .build();
+        }
+
+        return client;
+    }
+

@@ -22,6 +22,8 @@
         unmanagedCopy.realmSet$columnFloat(realmSource.realmGet$columnFloat());
         unmanagedCopy.realmSet$columnDouble(realmSource.realmGet$columnDouble());
         unmanagedCopy.realmSet$columnBoolean(realmSource.realmGet$columnBoolean());
+        unmanagedCopy.realmSet$columnDecimal128(realmSource.realmGet$columnDecimal128());
+        unmanagedCopy.realmSet$columnObjectId(realmSource.realmGet$columnObjectId());
         unmanagedCopy.realmSet$columnDate(realmSource.realmGet$columnDate());
         unmanagedCopy.realmSet$columnBinary(realmSource.realmGet$columnBinary());
         unmanagedCopy.realmGet$columnMutableRealmInteger().set(realmSource.realmGet$columnMutableRealmInteger().get());
@@ -41,6 +43,21 @@
             for (int i = 0; i < size; i++) {
                 some.test.AllTypes item = some_test_AllTypesRealmProxy.createDetachedCopy(managedcolumnRealmListList.get(i), nextDepth, maxDepth, cache);
                 unmanagedcolumnRealmListList.add(item);
+            }
+        }
+
+        // Deep copy of columnRealmFinalList
+        if (currentDepth == maxDepth) {
+            unmanagedCopy.realmSet$columnRealmFinalList(null);
+        } else {
+            RealmList<some.test.AllTypes> managedcolumnRealmFinalListList = realmSource.realmGet$columnRealmFinalList();
+            RealmList<some.test.AllTypes> unmanagedcolumnRealmFinalListList = new RealmList<some.test.AllTypes>();
+            unmanagedCopy.realmSet$columnRealmFinalList(unmanagedcolumnRealmFinalListList);
+            int nextDepth = currentDepth + 1;
+            int size = managedcolumnRealmFinalListList.size();
+            for (int i = 0; i < size; i++) {
+                some.test.AllTypes item = some_test_AllTypesRealmProxy.createDetachedCopy(managedcolumnRealmFinalListList.get(i), nextDepth, maxDepth, cache);
+                unmanagedcolumnRealmFinalListList.add(item);
             }
         }
 
@@ -73,6 +90,12 @@
 
         unmanagedCopy.realmSet$columnDateList(new RealmList<java.util.Date>());
         unmanagedCopy.realmGet$columnDateList().addAll(realmSource.realmGet$columnDateList());
+
+        unmanagedCopy.realmSet$columnDecimal128List(new RealmList<org.bson.types.Decimal128>());
+        unmanagedCopy.realmGet$columnDecimal128List().addAll(realmSource.realmGet$columnDecimal128List());
+
+        unmanagedCopy.realmSet$columnObjectIdList(new RealmList<org.bson.types.ObjectId>());
+        unmanagedCopy.realmGet$columnObjectIdList().addAll(realmSource.realmGet$columnObjectIdList());
 
         return unmanagedObject;
     }

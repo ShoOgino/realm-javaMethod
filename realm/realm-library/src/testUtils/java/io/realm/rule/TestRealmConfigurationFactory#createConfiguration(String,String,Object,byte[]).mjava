@@ -14,13 +14,14 @@
 
         if (module != null) {
             builder.modules(module);
-        } else {
-            ObjectServerFacade.getSyncFacadeIfPossible().addSupportForObjectLevelPermissions(builder);
         }
 
         if (key != null) {
             builder.encryptionKey(key);
         }
+
+        // Allow writes on UI
+        builder.allowWritesOnUiThread(true);
 
         RealmConfiguration configuration = builder.build();
         configurations.add(configuration);

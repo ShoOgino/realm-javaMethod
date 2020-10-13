@@ -1,0 +1,10 @@
+    @Override
+    public void setDecimal128(long columnKey, @Nullable Decimal128 value) {
+        parent.checkImmutable();
+        if (value == null) {
+            nativeSetNull(nativePtr, columnKey);
+        } else {
+            nativeSetDecimal128(nativePtr, columnKey, value.getLow(), value.getHigh());
+        }
+    }
+

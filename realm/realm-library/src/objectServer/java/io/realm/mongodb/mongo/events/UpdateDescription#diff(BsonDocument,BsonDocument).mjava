@@ -1,0 +1,27 @@
+    /**
+     * Find the diff between two documents.
+     *
+     * <p>NOTE: This does not do a full diff on [BsonArray]. If there is
+     * an inequality between the old and new array, the old array will
+     * simply be replaced by the new one.
+     *
+     * @param beforeDocument original document
+     * @param afterDocument  document to diff on
+     * @return a description of the updated fields and removed keys between the documents.
+     */
+    public static UpdateDescription diff(
+            @Nullable final BsonDocument beforeDocument,
+            @Nullable final BsonDocument afterDocument) {
+        if ((beforeDocument == null) || (afterDocument == null)) {
+            return new UpdateDescription(new BsonDocument(), new HashSet<>());
+        }
+
+        return UpdateDescription.diff(
+                beforeDocument,
+                afterDocument,
+                null,
+                new BsonDocument(),
+                new HashSet<>()
+        );
+    }
+

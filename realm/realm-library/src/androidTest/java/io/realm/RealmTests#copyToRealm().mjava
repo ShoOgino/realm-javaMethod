@@ -14,6 +14,8 @@
         allTypes.setColumnBoolean(true);
         allTypes.setColumnDate(date);
         allTypes.setColumnBinary(new byte[] {1, 2, 3});
+        allTypes.setColumnDecimal128(new Decimal128(new BigDecimal("12345")));
+        allTypes.setColumnObjectId(new ObjectId(TestHelper.generateObjectIdHexString(7)));
         allTypes.setColumnRealmObject(dog);
         allTypes.setColumnRealmList(list);
 
@@ -24,6 +26,8 @@
         allTypes.setColumnDoubleList(new RealmList<Double>(1D));
         allTypes.setColumnFloatList(new RealmList<Float>(1F));
         allTypes.setColumnDateList(new RealmList<Date>(new Date(1L)));
+        allTypes.setColumnDecimal128List(new RealmList<Decimal128>(new Decimal128(new BigDecimal("54321"))));
+        allTypes.setColumnObjectIdList(new RealmList<ObjectId>(new ObjectId(TestHelper.generateObjectIdHexString(5))));
 
         realm.beginTransaction();
         AllTypes realmTypes = realm.copyToRealm(allTypes);
@@ -37,6 +41,8 @@
         assertEquals(allTypes.isColumnBoolean(), realmTypes.isColumnBoolean());
         assertEquals(allTypes.getColumnDate(), realmTypes.getColumnDate());
         assertArrayEquals(allTypes.getColumnBinary(), realmTypes.getColumnBinary());
+        assertEquals(allTypes.getColumnDecimal128(), realmTypes.getColumnDecimal128());
+        assertEquals(allTypes.getColumnObjectId(), realmTypes.getColumnObjectId());
         assertEquals(allTypes.getColumnRealmObject().getName(), dog.getName());
         assertEquals(list.size(), realmTypes.getColumnRealmList().size());
         //noinspection ConstantConditions
@@ -55,5 +61,12 @@
         assertEquals((Float) 1F, realmTypes.getColumnFloatList().get(0));
         assertEquals(1, realmTypes.getColumnDateList().size());
         assertEquals(new Date(1), realmTypes.getColumnDateList().get(0));
+
+        assertEquals(1, realmTypes.getColumnDecimal128List().size());
+        assertEquals(new Decimal128(new BigDecimal("54321")), realmTypes.getColumnDecimal128List().get(0));
+
+        assertEquals(1, realmTypes.getColumnObjectIdList().size());
+        assertEquals(new ObjectId(TestHelper.generateObjectIdHexString(5)), realmTypes.getColumnObjectIdList().get(0));
+
     }
 

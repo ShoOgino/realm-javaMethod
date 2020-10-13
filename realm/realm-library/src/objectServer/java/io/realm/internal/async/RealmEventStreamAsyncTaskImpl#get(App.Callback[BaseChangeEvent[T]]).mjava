@@ -1,0 +1,30 @@
+    @Override
+    public synchronized void get(App.Callback<BaseChangeEvent<T>> callback) throws IllegalStateException {
+        Util.checkNull(callback, "callback");
+
+        if (thread != null) {
+            throw new IllegalStateException("Resource already open");
+        } else {
+            thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        eventStream = executor.run();
+
+                        while (true) {
+                            BaseChangeEvent<T> nextEvent = eventStream.getNextEvent();
+                            callback.onResult(App.Result.withResult(nextEvent));
+                        }
+                    } catch (AppException exception) {
+                        callback.onResult(App.Result.withError(exception));
+                    } catch (IOException exception) {
+                        AppException appException = new AppException(ErrorCode.NETWORK_IO_EXCEPTION, exception);
+                        callback.onResult(App.Result.withError(appException));
+                    }
+                }
+            }, String.format("RealmStreamTask|%s", name));
+
+            thread.start();
+        }
+    }
+

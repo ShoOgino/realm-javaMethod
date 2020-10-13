@@ -2,7 +2,6 @@
     @Test
     public void where_equalTo_wrongFieldTypeAsInput() throws IOException {
         populateTestRealm();
-        setColumnData();
 
         for (int i = 0; i < columnData.size(); i++) {
             try {
@@ -48,6 +47,30 @@
             try {
                 realm.where(AllTypes.class).equalTo(columnData.get(i), 1337).findAll();
                 if (i != 5) {
+                    fail("Realm.where should fail with illegal argument");
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+
+            try {
+                realm.where(AllTypes.class).equalTo(columnData.get(i), new byte[] {1, 2, 3}).findAll();
+                if (i != 6) {
+                    fail("Realm.where should fail with illegal argument");
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+
+            try {
+                realm.where(AllTypes.class).equalTo(columnData.get(i), new Decimal128(new BigDecimal(i + "12345"))).findAll();
+                if (i != 7) {
+                    fail("Realm.where should fail with illegal argument");
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+
+            try {
+                realm.where(AllTypes.class).equalTo(columnData.get(i), new ObjectId(TestHelper.generateObjectIdHexString(i))).findAll();
+                if (i != 8) {
                     fail("Realm.where should fail with illegal argument");
                 }
             } catch (IllegalArgumentException ignored) {

@@ -1,0 +1,73 @@
+        /**
+         * Creates the RealmConfiguration based on the builder parameters.
+         *
+         * @return the created {@link SyncConfiguration}.
+         * @throws IllegalStateException if the configuration parameters are invalid or inconsistent.
+         */
+        public SyncConfiguration build() {
+            if (serverUrl == null || user == null) {
+                throw new IllegalStateException("serverUrl() and user() are both required.");
+            }
+
+            // Check that readOnly() was applied to legal configuration. Right now it should only be allowd if
+            // an assetFile is configured
+            if (readOnly) {
+                if (initialDataTransaction != null) {
+                    throw new IllegalStateException("This Realm is marked as read-only. " +
+                            "Read-only Realms cannot use initialData(Realm.Transaction).");
+                }
+                if (!waitForServerChanges) {
+                    throw new IllegalStateException("A read-only Realms must be provided by some source. " +
+                            "'waitForInitialRemoteData()' wasn't enabled which is currently the only supported source.");
+                }
+            }
+
+            // Set the default Client Resync Mode based on the current type of Realm.
+            // Eventually RECOVER_LOCAL_REALM should be the default for all types.
+            // FIXME: We should add support back for this.
+            if (clientResyncMode == null) {
+                clientResyncMode = ClientResyncMode.MANUAL;
+            }
+
+            if (rxFactory == null && Util.isRxJavaAvailable()) {
+                rxFactory = new RealmObservableFactory(true);
+            }
+
+            URI resolvedServerUrl = serverUrl;
+            syncUrlPrefix = String.format("/api/client/v2.0/app/%s/realm-sync", user.getApp().getConfiguration().getAppId());
+
+            String absolutePathForRealm = user.getApp().getSync().getAbsolutePathForRealm(user.getId(), partitionValue, filename);
+            File realmFile = new File(absolutePathForRealm);
+
+            return new SyncConfiguration(
+                    realmFile,
+                    null, // assetFile not supported by Sync. See https://github.com/realm/realm-sync/issues/241
+                    key,
+                    schemaVersion,
+                    null, // Custom migrations not supported
+                    false, // MigrationNeededException is never thrown
+                    durability,
+                    createSchemaMediator(modules, debugSchema),
+                    rxFactory,
+                    initialDataTransaction,
+                    readOnly,
+                    maxNumberOfActiveVersions,
+                    allowWritesOnUiThread,
+                    allowQueriesOnUiThread,
+
+                    // Sync Configuration specific
+                    user,
+                    resolvedServerUrl,
+                    errorHandler,
+                    clientResetHandler,
+                    deleteRealmOnLogout,
+                    waitForServerChanges,
+                    initialDataTimeoutMillis,
+                    sessionStopPolicy,
+                    compactOnLaunch,
+                    syncUrlPrefix,
+                    clientResyncMode,
+                    partitionValue
+            );
+        }
+

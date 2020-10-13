@@ -1,0 +1,17 @@
+    /**
+     * Finds a document in the collection.
+     *
+     * @param resultClass the class to decode each document into
+     * @param <ResultT>   the target document type
+     * @return a task containing the result of the find one operation
+     */
+    public <ResultT> RealmResultTask<ResultT> findOne(final Class<ResultT> resultClass) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<ResultT>() {
+            @Nullable
+            @Override
+            public ResultT run() {
+                return osMongoCollection.findOne(resultClass);
+            }
+        });
+    }
+

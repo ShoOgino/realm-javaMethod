@@ -1,0 +1,10 @@
+    public Pair<String, String>[] getIdentities() {
+        String[] identityData = nativeGetIdentities(nativePtr);
+        @SuppressWarnings("unchecked")
+        Pair<String, String>[] identities = new Pair[identityData.length/2];
+        for (int i = 0; i < identityData.length; i = i + 2) {
+            identities[i/2] = new Pair<>(identityData[i], identityData[i+1]);
+        }
+        return identities;
+    }
+

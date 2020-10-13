@@ -1,0 +1,12 @@
+    /**
+     * Checks whether queries are allowed from the UI thread in the current RealmConfiguration.
+     */
+    protected void checkAllowQueriesOnUiThread() {
+        // Warn on query being executed on UI thread if isAllowQueriesOnUiThread is set to true, throw otherwise
+        if (getSharedRealm().capabilities.isMainThread()) {
+            if (!getConfiguration().isAllowQueriesOnUiThread()) {
+                throw new RealmException("Queries on the UI thread have been disabled. They can be enabled by setting 'RealmConfiguration.Builder.allowQueriesOnUiThread(true)'.");
+            }
+        }
+    }
+

@@ -1,0 +1,16 @@
+    /**
+     * Watches specified IDs in a collection asynchronously.
+     *
+     * @param ids the ids to watch.
+     * @return a task that provides access to the stream of change events.
+     */
+    public RealmEventStreamAsyncTask<DocumentT> watchAsync(final BsonValue... ids) {
+        return new RealmEventStreamAsyncTaskImpl<>(getNamespace().getFullName(),
+                new RealmEventStreamAsyncTaskImpl.Executor<DocumentT>() {
+                    @Override
+                    public EventStream<DocumentT> run() throws IOException {
+                        return osMongoCollection.watch(Arrays.asList(ids));
+                    }
+                });
+    }
+

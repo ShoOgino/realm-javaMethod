@@ -1,0 +1,16 @@
+    /**
+     * Finds a document in the collection and delete it.
+     *
+     * @param filter the query filter
+     * @return a task containing the resulting document
+     */
+    public RealmResultTask<DocumentT> findOneAndDelete(final Bson filter) {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<DocumentT>() {
+            @Nullable
+            @Override
+            public DocumentT run() {
+                return osMongoCollection.findOneAndDelete(filter);
+            }
+        });
+    }
+

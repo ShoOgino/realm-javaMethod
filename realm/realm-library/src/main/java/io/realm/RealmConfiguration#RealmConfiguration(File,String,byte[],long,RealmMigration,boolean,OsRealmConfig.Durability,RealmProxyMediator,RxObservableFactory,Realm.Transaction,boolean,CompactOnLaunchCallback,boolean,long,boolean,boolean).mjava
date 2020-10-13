@@ -1,0 +1,38 @@
+    // We need to enumerate all parameters since SyncConfiguration and RealmConfiguration supports different
+    // subsets of them.
+    protected RealmConfiguration(File realmPath,
+            @Nullable String assetFilePath,
+            @Nullable byte[] key,
+            long schemaVersion,
+            @Nullable RealmMigration migration,
+            boolean deleteRealmIfMigrationNeeded,
+            OsRealmConfig.Durability durability,
+            RealmProxyMediator schemaMediator,
+            @Nullable RxObservableFactory rxObservableFactory,
+            @Nullable Realm.Transaction initialDataTransaction,
+            boolean readOnly,
+            @Nullable CompactOnLaunchCallback compactOnLaunch,
+            boolean isRecoveryConfiguration,
+            long maxNumberOfActiveVersions,
+            boolean allowWritesOnUiThread,
+            boolean allowQueriesOnUiThread) {
+        this.realmDirectory = realmPath.getParentFile();
+        this.realmFileName = realmPath.getName();
+        this.canonicalPath = realmPath.getAbsolutePath();
+        this.assetFilePath = assetFilePath;
+        this.key = key;
+        this.schemaVersion = schemaVersion;
+        this.migration = migration;
+        this.deleteRealmIfMigrationNeeded = deleteRealmIfMigrationNeeded;
+        this.durability = durability;
+        this.schemaMediator = schemaMediator;
+        this.rxObservableFactory = rxObservableFactory;
+        this.initialDataTransaction = initialDataTransaction;
+        this.readOnly = readOnly;
+        this.compactOnLaunch = compactOnLaunch;
+        this.isRecoveryConfiguration = isRecoveryConfiguration;
+        this.maxNumberOfActiveVersions = maxNumberOfActiveVersions;
+        this.allowWritesOnUiThread = allowWritesOnUiThread;
+        this.allowQueriesOnUiThread = allowQueriesOnUiThread;
+    }
+

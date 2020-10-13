@@ -1,0 +1,9 @@
+    public Decimal128 averageDecimal128(long columnKey) {
+        validateQuery();
+        long[] result = nativeAverageDecimal128(nativePtr, columnKey);
+        if (result != null) {
+            return Decimal128.fromIEEE754BIDEncoding(result[1]/*high*/, result[0]/*low*/);
+        }
+        return null;
+    }
+

@@ -1,0 +1,65 @@
+    @SuppressWarnings("cast")
+    public static some.test.EmbeddedClassSimpleParent createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
+            throws JSONException {
+        final List<String> excludeFields = new ArrayList<String>(2);
+        some.test.EmbeddedClassSimpleParent obj = null;
+        if (update) {
+            Table table = realm.getTable(some.test.EmbeddedClassSimpleParent.class);
+            EmbeddedClassSimpleParentColumnInfo columnInfo = (EmbeddedClassSimpleParentColumnInfo) realm.getSchema().getColumnInfo(some.test.EmbeddedClassSimpleParent.class);
+            long pkColumnKey = columnInfo.idColKey;
+            long objKey = Table.NO_MATCH;
+            if (json.isNull("id")) {
+                objKey = table.findFirstNull(pkColumnKey);
+            } else {
+                objKey = table.findFirstString(pkColumnKey, json.getString("id"));
+            }
+            if (objKey != Table.NO_MATCH) {
+                final BaseRealm.RealmObjectContext objectContext = BaseRealm.objectContext.get();
+                try {
+                    objectContext.set(realm, table.getUncheckedRow(objKey), realm.getSchema().getColumnInfo(some.test.EmbeddedClassSimpleParent.class), false, Collections.<String> emptyList());
+                    obj = new io.realm.some_test_EmbeddedClassSimpleParentRealmProxy();
+                } finally {
+                    objectContext.clear();
+                }
+            }
+        }
+        if (obj == null) {
+            if (json.has("child")) {
+                excludeFields.add("child");
+            }
+            if (json.has("children")) {
+                excludeFields.add("children");
+            }
+            if (json.has("id")) {
+                if (json.isNull("id")) {
+                    obj = (io.realm.some_test_EmbeddedClassSimpleParentRealmProxy) realm.createObjectInternal(some.test.EmbeddedClassSimpleParent.class, null, true, excludeFields);
+                } else {
+                    obj = (io.realm.some_test_EmbeddedClassSimpleParentRealmProxy) realm.createObjectInternal(some.test.EmbeddedClassSimpleParent.class, json.getString("id"), true, excludeFields);
+                }
+            } else {
+                throw new IllegalArgumentException("JSON object doesn't have the primary key field 'id'.");
+            }
+        }
+
+        final some_test_EmbeddedClassSimpleParentRealmProxyInterface objProxy = (some_test_EmbeddedClassSimpleParentRealmProxyInterface) obj;
+        if (json.has("child")) {
+            if (json.isNull("child")) {
+                objProxy.realmSet$child(null);
+            } else {
+                some_test_EmbeddedClassRealmProxy.createOrUpdateEmbeddedUsingJsonObject(realm, (RealmModel)objProxy, "child", json.getJSONObject("child"), update);
+            }
+        }
+        if (json.has("children")) {
+            if (json.isNull("children")) {
+                objProxy.realmSet$children(null);
+            } else {
+                objProxy.realmGet$children().clear();
+                JSONArray array = json.getJSONArray("children");
+                for (int i = 0; i < array.length(); i++) {
+                    some_test_EmbeddedClassRealmProxy.createOrUpdateEmbeddedUsingJsonObject(realm, (RealmModel)objProxy, "children", array.getJSONObject(i), update);
+                }
+            }
+        }
+        return obj;
+    }
+

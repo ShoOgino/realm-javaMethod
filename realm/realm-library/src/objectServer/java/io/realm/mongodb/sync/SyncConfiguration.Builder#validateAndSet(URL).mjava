@@ -1,0 +1,38 @@
+        private void validateAndSet(URL baseUrl ) {
+            try {
+                serverUrl = new URI(baseUrl.toString());
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Invalid URI: " + baseUrl.toString(), e);
+            }
+
+            try {
+                // Automatically set scheme based on auth server if not set or wrongly set
+                String serverScheme = serverUrl.getScheme();
+                if (serverScheme == null || serverScheme.equalsIgnoreCase("http")) {
+                    serverScheme = "ws";
+                } else if (serverScheme.equalsIgnoreCase("https")) {
+                    serverScheme = "wss";
+                }
+
+                // Automatically set host if one wasn't defined
+                String host = serverUrl.getHost();
+
+                // Convert relative paths to absolute if required
+                String path = serverUrl.getPath();
+                if (path != null && !path.startsWith("/")) {
+                    path = "/" + path;
+                }
+
+                serverUrl = new URI(serverScheme,
+                        serverUrl.getUserInfo(),
+                        host,
+                        serverUrl.getPort(),
+                        (path != null) ? path.replace(host + "/", "") : null, // Remove host if it accidentially was interpreted as a path segment
+                        serverUrl.getQuery(),
+                        serverUrl.getRawFragment());
+
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("Invalid URI: " + baseUrl, e);
+            }
+        }
+

@@ -1,0 +1,20 @@
+    /**
+     * Call a MongoDB Realm function synchronously with custom codec registry encoding/decoding
+     * arguments/results.
+     *
+     * @param name Name of the Realm function to call.
+     * @param args Arguments to the Realm function.
+     * @param resultClass  The type that the functions result should be converted to.
+     * @param codecRegistry Codec registry to use for argument encoding and result decoding.
+     * @param <ResultT> The type that the response will be decoded as using the {@code codecRegistry}.
+     * @return Result of the Realm function.
+     *
+     * @throws AppException if the request failed in some way.
+     *
+     * @see #callFunctionAsync(String, List, Class, CodecRegistry, App.Callback)
+     * @see AppConfiguration#getDefaultCodecRegistry()
+     */
+    public <ResultT> ResultT callFunction(String name, List<?> args, Class<ResultT> resultClass, CodecRegistry codecRegistry) {
+        return invoke(name, args, codecRegistry, JniBsonProtocol.getCodec(resultClass, codecRegistry));
+    }
+

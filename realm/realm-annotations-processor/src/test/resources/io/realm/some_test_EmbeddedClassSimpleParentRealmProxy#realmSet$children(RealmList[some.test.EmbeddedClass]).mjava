@@ -1,0 +1,48 @@
+    @Override
+    public void realmSet$children(RealmList<some.test.EmbeddedClass> value) {
+        if (proxyState.isUnderConstruction()) {
+            if (!proxyState.getAcceptDefaultValue$realm()) {
+                return;
+            }
+            if (proxyState.getExcludeFields$realm().contains("children")) {
+                return;
+            }
+            // if the list contains unmanaged RealmObjects, convert them to managed.
+            if (value != null && !value.isManaged()) {
+                final Realm realm = (Realm) proxyState.getRealm$realm();
+                final RealmList<some.test.EmbeddedClass> original = value;
+                value = new RealmList<some.test.EmbeddedClass>();
+                for (some.test.EmbeddedClass item : original) {
+                    if (item == null || RealmObject.isManaged(item)) {
+                        value.add(item);
+                    } else {
+                        value.add(realm.copyToRealm(item));
+                    }
+                }
+            }
+        }
+
+        proxyState.getRealm$realm().checkIfValid();
+        OsList osList = proxyState.getRow$realm().getModelList(columnInfo.childrenColKey);
+        // For lists of equal lengths, we need to set each element directly as clearing the receiver list can be wrong if the input and target list are the same.
+        if (value != null && value.size() == osList.size()) {
+            int objects = value.size();
+            for (int i = 0; i < objects; i++) {
+                some.test.EmbeddedClass linkedObject = value.get(i);
+                proxyState.checkValidObject(linkedObject);
+                osList.setRow(i, ((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getObjectKey());
+            }
+        } else {
+            osList.removeAll();
+            if (value == null) {
+                return;
+            }
+            int objects = value.size();
+            for (int i = 0; i < objects; i++) {
+                some.test.EmbeddedClass linkedObject = value.get(i);
+                proxyState.checkValidObject(linkedObject);
+                osList.addRow(((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getObjectKey());
+            }
+        }
+    }
+

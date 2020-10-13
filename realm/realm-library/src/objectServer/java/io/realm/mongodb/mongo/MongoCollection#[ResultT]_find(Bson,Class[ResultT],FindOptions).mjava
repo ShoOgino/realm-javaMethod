@@ -1,0 +1,19 @@
+    /**
+     * Finds all documents in the collection that match the given filter specifying an output class
+     * and also using {@link FindOptions} to build the query.
+     * <p>
+     * All documents will be delivered in the form of a {@link FindIterable} from which individual
+     * elements can be extracted.
+     *
+     * @param filter      the query filter
+     * @param resultClass the class to decode each document into
+     * @param options     a {@link FindOptions} struct
+     * @param <ResultT>   the target document type of the iterable.
+     * @return an iterable containing the result of the find operation
+     */
+    public <ResultT> FindIterable<ResultT> find(final Bson filter,
+                                                final Class<ResultT> resultClass,
+                                                final FindOptions options) {
+        return osMongoCollection.find(filter, resultClass, options);
+    }
+

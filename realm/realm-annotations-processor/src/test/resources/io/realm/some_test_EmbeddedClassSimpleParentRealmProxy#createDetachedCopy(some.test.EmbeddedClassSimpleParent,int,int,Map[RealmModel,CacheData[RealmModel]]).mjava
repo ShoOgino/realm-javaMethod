@@ -1,0 +1,42 @@
+    public static some.test.EmbeddedClassSimpleParent createDetachedCopy(some.test.EmbeddedClassSimpleParent realmObject, int currentDepth, int maxDepth, Map<RealmModel, CacheData<RealmModel>> cache) {
+        if (currentDepth > maxDepth || realmObject == null) {
+            return null;
+        }
+        CacheData<RealmModel> cachedObject = cache.get(realmObject);
+        some.test.EmbeddedClassSimpleParent unmanagedObject;
+        if (cachedObject == null) {
+            unmanagedObject = new some.test.EmbeddedClassSimpleParent();
+            cache.put(realmObject, new RealmObjectProxy.CacheData<RealmModel>(currentDepth, unmanagedObject));
+        } else {
+            // Reuse cached object or recreate it because it was encountered at a lower depth.
+            if (currentDepth >= cachedObject.minDepth) {
+                return (some.test.EmbeddedClassSimpleParent) cachedObject.object;
+            }
+            unmanagedObject = (some.test.EmbeddedClassSimpleParent) cachedObject.object;
+            cachedObject.minDepth = currentDepth;
+        }
+        some_test_EmbeddedClassSimpleParentRealmProxyInterface unmanagedCopy = (some_test_EmbeddedClassSimpleParentRealmProxyInterface) unmanagedObject;
+        some_test_EmbeddedClassSimpleParentRealmProxyInterface realmSource = (some_test_EmbeddedClassSimpleParentRealmProxyInterface) realmObject;
+        unmanagedCopy.realmSet$id(realmSource.realmGet$id());
+
+        // Deep copy of child
+        unmanagedCopy.realmSet$child(some_test_EmbeddedClassRealmProxy.createDetachedCopy(realmSource.realmGet$child(), currentDepth + 1, maxDepth, cache));
+
+        // Deep copy of children
+        if (currentDepth == maxDepth) {
+            unmanagedCopy.realmSet$children(null);
+        } else {
+            RealmList<some.test.EmbeddedClass> managedchildrenList = realmSource.realmGet$children();
+            RealmList<some.test.EmbeddedClass> unmanagedchildrenList = new RealmList<some.test.EmbeddedClass>();
+            unmanagedCopy.realmSet$children(unmanagedchildrenList);
+            int nextDepth = currentDepth + 1;
+            int size = managedchildrenList.size();
+            for (int i = 0; i < size; i++) {
+                some.test.EmbeddedClass item = some_test_EmbeddedClassRealmProxy.createDetachedCopy(managedchildrenList.get(i), nextDepth, maxDepth, cache);
+                unmanagedchildrenList.add(item);
+            }
+        }
+
+        return unmanagedObject;
+    }
+

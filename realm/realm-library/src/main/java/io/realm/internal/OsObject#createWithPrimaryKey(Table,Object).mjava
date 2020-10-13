@@ -24,6 +24,11 @@
             return new UncheckedRow(sharedRealm.context, table,
                     nativeCreateNewObjectWithLongPrimaryKey(sharedRealm.getNativePtr(), table.getNativePtr(),
                             primaryKeyColumnKey, value, primaryKeyValue == null));
+        } else if (type == RealmFieldType.OBJECT_ID) {
+            String objectIdValue = primaryKeyValue == null ? null : primaryKeyValue.toString();
+            return new UncheckedRow(sharedRealm.context, table,
+                    nativeCreateNewObjectWithObjectIdPrimaryKey(sharedRealm.getNativePtr(), table.getNativePtr(),
+                            primaryKeyColumnKey, objectIdValue));
         } else {
             throw new RealmException("Cannot check for duplicate rows for unsupported primary key type: " + type);
         }

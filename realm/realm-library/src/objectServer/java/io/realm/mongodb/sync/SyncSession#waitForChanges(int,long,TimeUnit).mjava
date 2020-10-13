@@ -1,0 +1,55 @@
+    /**
+     * This method should only be called when guarded by the {@link #waitForChangesMutex}.
+     * It will block into all changes have been either uploaded or downloaded depending on the chosen direction.
+     *
+     * @param direction either {@link #DIRECTION_DOWNLOAD} or {@link #DIRECTION_UPLOAD}.
+     * @param timeout timeout parameter.
+     * @param unit timeout unit.
+     * @return {@code true} if the job completed before the timeout was hit, {@code false}
+     */
+    private boolean waitForChanges(int direction, long timeout, TimeUnit unit) throws InterruptedException {
+        if (direction != DIRECTION_DOWNLOAD && direction != DIRECTION_UPLOAD) {
+            throw new IllegalArgumentException("Unknown direction: " + direction);
+        }
+        boolean result = false;
+        if (!isClosed) {
+            String realmPath = configuration.getPath();
+            WaitForSessionWrapper wrapper = new WaitForSessionWrapper();
+            waitingForServerChanges.set(wrapper);
+            int callbackId = waitCounter.incrementAndGet();
+            boolean listenerRegistered = (direction == DIRECTION_DOWNLOAD)
+                    ? nativeWaitForDownloadCompletion(appNativePointer, callbackId, realmPath)
+                    : nativeWaitForUploadCompletion(appNativePointer, callbackId, realmPath);
+            if (!listenerRegistered) {
+                waitingForServerChanges.set(null);
+                String errorMsg;
+                switch (direction) {
+                    case DIRECTION_DOWNLOAD: errorMsg = "It was not possible to download all remote changes."; break;
+                    case DIRECTION_UPLOAD: errorMsg = "It was not possible upload all local changes."; break;
+                    default:
+                        throw new IllegalArgumentException("Unknown direction: " + direction);
+                }
+
+                throw new AppException(ErrorCode.UNKNOWN, errorMsg + " Has the SyncClient been started?");
+            }
+            try {
+                result = wrapper.waitForServerChanges(timeout, unit);
+            } catch(InterruptedException e) {
+                waitingForServerChanges.set(null); // Ignore any results being sent if the wait was interrupted.
+                throw e;
+            }
+
+            // This might return after the session was closed. In that case, just ignore any result
+            try {
+                if (!isClosed) {
+                    if (!wrapper.isSuccess()) {
+                        wrapper.throwExceptionIfNeeded();
+                    }
+                }
+            } finally {
+                waitingForServerChanges.set(null);
+            }
+        }
+        return result;
+    }
+

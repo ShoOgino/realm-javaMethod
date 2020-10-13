@@ -1,0 +1,14 @@
+    @Test
+    public void createObjectFromJson_objectIdAsString() throws JSONException {
+        JSONObject json = new JSONObject();
+        String idHex = TestHelper.generateObjectIdHexString(7);
+        json.put("columnObjectId", idHex);
+
+        realm.beginTransaction();
+        realm.createObjectFromJson(AllTypes.class, json);
+        realm.commitTransaction();
+
+        AllTypes obj = realm.where(AllTypes.class).findFirst();
+        assertEquals(new ObjectId(idHex), obj.getColumnObjectId());
+    }
+

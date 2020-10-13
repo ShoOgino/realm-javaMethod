@@ -47,6 +47,14 @@
                         dObj.setDate(AllJavaTypes.FIELD_DATE, new Date(1000));
                         assertEquals(new Date(1000), dObj.getDate(AllJavaTypes.FIELD_DATE));
                         break;
+                    case DECIMAL128:
+                        dObj.setDecimal128(AllJavaTypes.FIELD_DECIMAL128, new Decimal128(BigDecimal.ONE));
+                        assertEquals(new Decimal128(BigDecimal.ONE), dObj.getDecimal128(AllJavaTypes.FIELD_DECIMAL128));
+                        break;
+                    case OBJECT_ID:
+                        dObj.setObjectId(AllJavaTypes.FIELD_OBJECT_ID, new ObjectId(TestHelper.generateObjectIdHexString(0)));
+                        assertEquals(new ObjectId(TestHelper.generateObjectIdHexString(0)), dObj.getObjectId(AllJavaTypes.FIELD_OBJECT_ID));
+                        break;
                     case OBJECT:
                         dObj.setObject(AllJavaTypes.FIELD_OBJECT, dObj);
                         assertEquals(dObj, dObj.getObject(AllJavaTypes.FIELD_OBJECT));
@@ -71,6 +79,12 @@
                         break;
                     case LIST_DATE:
                         checkSetGetValueList(dObj, AllJavaTypes.FIELD_DATE_LIST, Date.class, new RealmList<>(null, new Date(1000)));
+                        break;
+                    case LIST_DECIMAL128:
+                        checkSetGetValueList(dObj, AllJavaTypes.FIELD_DECIMAL128_LIST, Decimal128.class, new RealmList<>(null, new Decimal128(BigDecimal.ONE)));
+                        break;
+                    case LIST_OBJECT_ID:
+                        checkSetGetValueList(dObj, AllJavaTypes.FIELD_OBJECT_ID_LIST, ObjectId.class, new RealmList<>(null, new ObjectId(TestHelper.generateObjectIdHexString(0))));
                         break;
                     case LIST:
                         // Ignores. See testGetList/testSetList.

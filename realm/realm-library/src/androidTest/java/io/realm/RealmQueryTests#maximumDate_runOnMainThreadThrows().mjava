@@ -1,0 +1,18 @@
+    @Test
+    @UiThreadTest
+    public void maximumDate_runOnMainThreadThrows() {
+        RealmConfiguration configuration = configFactory.createConfigurationBuilder()
+                .allowQueriesOnUiThread(false)
+                .name("ui_realm")
+                .build();
+
+        // Try-with-resources
+        try (Realm uiRealm = Realm.getInstance(configuration)) {
+            uiRealm.where(Dog.class).maximumDate("birthday");
+
+            fail("In this test queries are not allowed to run on the UI thread, so something went awry.");
+        } catch (RealmException e) {
+            assertTrue(Objects.requireNonNull(e.getMessage()).contains("allowQueriesOnUiThread"));
+        }
+    }
+

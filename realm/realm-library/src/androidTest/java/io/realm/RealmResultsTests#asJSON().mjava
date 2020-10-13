@@ -43,6 +43,8 @@
         allTypes.setColumnDouble(0.89123);
         allTypes.setColumnBoolean(false);
         allTypes.setColumnDate(date);
+        allTypes.setColumnDecimal128(new Decimal128(new BigDecimal("0.123456789")));
+        allTypes.setColumnObjectId(new ObjectId(TestHelper.generateObjectIdHexString(7)));
         allTypes.setColumnBinary(new byte[]{1, 2, 3});
         allTypes.setColumnMutableRealmInteger(0);
         allTypes.setColumnRealmObject(dog1);
@@ -60,6 +62,14 @@
         allTypes.getColumnFloatList().add(0.13f);
         allTypes.getColumnDateList().add(date);
         allTypes.getColumnDateList().add(date);
+        allTypes.getColumnDecimal128List().add(new Decimal128(-42));
+        allTypes.getColumnDecimal128List().add(Decimal128.NaN);
+        allTypes.getColumnDecimal128List().add(Decimal128.NEGATIVE_ZERO);
+        allTypes.getColumnDecimal128List().add(Decimal128.POSITIVE_ZERO);
+        allTypes.getColumnDecimal128List().add(Decimal128.NEGATIVE_INFINITY);
+        allTypes.getColumnDecimal128List().add(Decimal128.POSITIVE_INFINITY);
+        allTypes.getColumnObjectIdList().add(new ObjectId(TestHelper.generateObjectIdHexString(1)));
+        allTypes.getColumnObjectIdList().add(new ObjectId(TestHelper.generateObjectIdHexString(2)));
 
         AllTypes allTypes2 = realm.createObject(AllTypes.class);
         allTypes2.setColumnString("alltypes2");
@@ -69,6 +79,7 @@
                 .equalTo("columnString", "alltypes1").findAll();
         assertEquals(1, all.size());
         String json = all.asJSON();
+
         final String expectedJSON = "[\n" +
                 "   {\n" +
                 "      \"_key\":100,\n" +
@@ -79,6 +90,8 @@
                 "      \"columnBoolean\":false,\n" +
                 "      \"columnDate\": \"" + now + "\",\n" +
                 "      \"columnBinary\":\"AQID\",\n" +
+                "      \"columnDecimal128\":\"1.23456789E-1\",\n" +
+                "      \"columnObjectId\":\"789abcdef0123456789abcde\",\n" +
                 "      \"columnMutableRealmInteger\":0,\n" +
                 "      \"columnRealmObject\":{\n" +
                 "         \"_key\":100,\n" +
@@ -145,10 +158,21 @@
                 "      \"columnDateList\":[\n" +
                 "            \"" + now + "\",\n" +
                 "            \"" + now + "\"\n" +
+                "      ],\n" +
+                "      \"columnDecimal128List\":[\n" +
+                "         \"-42\",\n" +
+                "         \"NaN\",\n" +
+                "         \"-0\",\n" +
+                "         \"0\",\n" +
+                "         \"-Inf\",\n" +
+                "         \"Inf\"\n" +
+                "      ],\n" +
+                "      \"columnObjectIdList\":[\n" +
+                "         \"123456789abcdef012345678\",\n" +
+                "         \"23456789abcdef0123456789\"\n" +
                 "      ]\n" +
                 "   }\n" +
                 "]";
-
         JSONAssert.assertEquals(expectedJSON, json, false);
     }
 

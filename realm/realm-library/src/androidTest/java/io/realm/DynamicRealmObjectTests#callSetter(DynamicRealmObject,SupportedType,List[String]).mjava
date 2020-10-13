@@ -12,6 +12,8 @@
                 case STRING: target.setString(fieldName, "foo"); break;
                 case BINARY: target.setBlob(fieldName, new byte[]{}); break;
                 case DATE: target.getDate(fieldName); break;
+                case DECIMAL128: target.getDecimal128(fieldName); break;
+                case OBJECT_ID: target.getObjectId(fieldName); break;
                 case OBJECT: target.setObject(fieldName, null); target.setObject(fieldName, target); break;
                 case LIST: target.setList(fieldName, new RealmList<DynamicRealmObject>()); break;
                 case LIST_INTEGER: target.setList(fieldName, new RealmList<Integer>(1)); break;
@@ -21,6 +23,8 @@
                 case LIST_DOUBLE: target.setList(fieldName, new RealmList<Double>(1.234D)); break;
                 case LIST_BINARY: target.setList(fieldName, new RealmList<byte[]>(new byte[]{})); break;
                 case LIST_DATE: target.setList(fieldName, new RealmList<Date>(new Date())); break;
+                case LIST_DECIMAL128: target.setList(fieldName, new RealmList<>(new Decimal128(BigDecimal.ONE))); break;
+                case LIST_OBJECT_ID: target.setList(fieldName, new RealmList<>(new ObjectId(TestHelper.generateObjectIdHexString(7)))); break;
                 default:
                     fail();
             }

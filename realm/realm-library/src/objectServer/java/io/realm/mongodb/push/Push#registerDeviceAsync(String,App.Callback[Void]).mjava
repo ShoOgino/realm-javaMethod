@@ -1,0 +1,21 @@
+    /**
+     * Registers the given FCM registration token with the currently logged in user's
+     * device on MongoDB Realm.
+     *
+     * @param registrationToken The registration token to register.
+     * @param callback          The callback used when the device has been registered or the call
+     *                          failed - it will always happen on the same thread as this method was
+     *                          called on.
+     */
+    public RealmAsyncTask registerDeviceAsync(String registrationToken,
+                                              App.Callback<Void> callback) {
+        Util.checkLooperThread("Asynchronous registering a device is only possible from looper threads.");
+        return new Request<Void>(App.NETWORK_POOL_EXECUTOR, callback) {
+            @Override
+            public Void run() throws AppException {
+                osPush.registerDevice(registrationToken);
+                return null;
+            }
+        }.start();
+    }
+

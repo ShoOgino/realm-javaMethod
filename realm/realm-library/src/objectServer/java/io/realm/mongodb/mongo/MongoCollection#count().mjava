@@ -1,0 +1,15 @@
+    /**
+     * Counts the number of documents in the collection.
+     *
+     * @return a task containing the number of documents in the collection
+     */
+    public RealmResultTask<Long> count() {
+        return new RealmResultTaskImpl<>(threadPoolExecutor, new RealmResultTaskImpl.Executor<Long>() {
+            @Nullable
+            @Override
+            public Long run() {
+                return osMongoCollection.count();
+            }
+        });
+    }
+

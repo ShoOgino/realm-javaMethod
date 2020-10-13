@@ -7,13 +7,13 @@
             if (removeSessionMethod == null) {
                 synchronized (SyncObjectServerFacade.class) {
                     if (removeSessionMethod == null) {
-                        Method removeSession = SyncManager.class.getDeclaredMethod("removeSession", SyncConfiguration.class);
+                        Method removeSession = Sync.class.getDeclaredMethod("removeSession", SyncConfiguration.class);
                         removeSession.setAccessible(true);
                         removeSessionMethod = removeSession;
                     }
                 }
             }
-            removeSessionMethod.invoke(null, syncConfig);
+            removeSessionMethod.invoke(syncConfig.getUser().getApp().getSync(), syncConfig);
         } catch (NoSuchMethodException e) {
             throw new RealmException("Could not lookup method to remove session: " + syncConfig.toString(), e);
         } catch (InvocationTargetException e) {
