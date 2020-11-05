@@ -1,0 +1,20 @@
+    @Test
+    public void createTableWithObjectIdPrimaryKeyNullable(){
+        sharedRealm = OsSharedRealm.getInstance(config, OsSharedRealm.VersionID.LIVE);
+        sharedRealm.beginTransaction();
+
+        Table t = getTableWithPrimaryKey(RealmFieldType.OBJECT_ID, true);
+
+        Date date = new Date();
+
+        UncheckedRow row = OsObject.createWithPrimaryKey(t, new ObjectId(date, 0));
+        assertEquals(1, t.size());
+        assertEquals(new ObjectId(date, 0), row.getObjectId(row.getColumnKey("colName")));
+
+        row = OsObject.createWithPrimaryKey(t, null);
+        assertEquals(2, t.size());
+        assertTrue(row.isNull(row.getColumnKey("colName")));
+
+        sharedRealm.cancelTransaction();
+    }
+

@@ -1,0 +1,18 @@
+    @Test
+    public void createTableWithStringPrimaryKeyNullable(){
+        sharedRealm = OsSharedRealm.getInstance(config, OsSharedRealm.VersionID.LIVE);
+        sharedRealm.beginTransaction();
+
+        Table t = getTableWithPrimaryKey(RealmFieldType.STRING, true);
+
+        UncheckedRow row = OsObject.createWithPrimaryKey(t, "Foo");
+        assertEquals(1, t.size());
+        assertEquals("Foo", row.getString(row.getColumnKey("colName")));
+
+        row = OsObject.createWithPrimaryKey(t, null);
+        assertEquals(2, t.size());
+        assertTrue(row.isNull(row.getColumnKey("colName")));
+
+        sharedRealm.cancelTransaction();
+    }
+

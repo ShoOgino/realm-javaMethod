@@ -1,0 +1,19 @@
+    @Test
+    public void createTableWithIntegerPrimaryKeyNullable(){
+        sharedRealm = OsSharedRealm.getInstance(config, OsSharedRealm.VersionID.LIVE);
+        sharedRealm.beginTransaction();
+
+        Table t = getTableWithPrimaryKey(RealmFieldType.INTEGER, true);
+
+        UncheckedRow row = OsObject.createWithPrimaryKey(t, 42);
+        assertEquals(1, t.size());
+        assertEquals(42, row.getLong(row.getColumnKey("colName")));
+
+
+        row = OsObject.createWithPrimaryKey(t, null);
+        assertEquals(2, t.size());
+        assertTrue(row.isNull(row.getColumnKey("colName")));
+
+        sharedRealm.cancelTransaction();
+    }
+
