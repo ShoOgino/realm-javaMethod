@@ -1,0 +1,23 @@
+    @Test
+    public void createTableWithObjectIdPrimaryKey(){
+        sharedRealm = OsSharedRealm.getInstance(config, OsSharedRealm.VersionID.LIVE);
+        sharedRealm.beginTransaction();
+
+        Table t = getTableWithPrimaryKey(RealmFieldType.OBJECT_ID, false);
+
+        Date date = new Date();
+
+        UncheckedRow row = OsObject.createWithPrimaryKey(t, new ObjectId(date, 0));
+        assertEquals(1, t.size());
+        assertEquals(new ObjectId(date, 0), row.getObjectId(row.getColumnKey("colName")));
+
+        try {
+            OsObject.createWithPrimaryKey(t, null);
+            fail("Non-nullable primary key created with a null value.");
+        } catch (IllegalArgumentException e){
+            assertEquals("Illegal Argument: This field(colName) is not nullable.", e.getMessage());
+        }
+
+        sharedRealm.cancelTransaction();
+    }
+

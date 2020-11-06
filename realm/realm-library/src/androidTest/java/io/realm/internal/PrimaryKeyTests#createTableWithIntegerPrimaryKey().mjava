@@ -1,0 +1,21 @@
+    @Test
+    public void createTableWithIntegerPrimaryKey(){
+        sharedRealm = OsSharedRealm.getInstance(config, OsSharedRealm.VersionID.LIVE);
+        sharedRealm.beginTransaction();
+
+        Table t = getTableWithPrimaryKey(RealmFieldType.INTEGER, false);
+
+        UncheckedRow row = OsObject.createWithPrimaryKey(t, 42);
+        assertEquals(1, t.size());
+        assertEquals(42, row.getLong(row.getColumnKey("colName")));
+
+        try {
+            OsObject.createWithPrimaryKey(t, null);
+            fail("Non-nullable primary key created with a null value.");
+        } catch (IllegalArgumentException e){
+            assertEquals("Illegal Argument: This field(colName) is not nullable.", e.getMessage());
+        }
+
+        sharedRealm.cancelTransaction();
+    }
+

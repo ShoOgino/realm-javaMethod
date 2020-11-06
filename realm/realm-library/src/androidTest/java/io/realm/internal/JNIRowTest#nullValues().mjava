@@ -1,6 +1,5 @@
     @Test
     public void nullValues() {
-
         Table table = TestHelper.createTable(sharedRealm, "temp");
         long colStringIndex = table.addColumn(RealmFieldType.STRING, "string", true);
         long colIntIndex = table.addColumn(RealmFieldType.INTEGER, "integer", true);
@@ -9,6 +8,9 @@
         long colBoolIndex = table.addColumn(RealmFieldType.BOOLEAN, "boolean", true);
         table.addColumn(RealmFieldType.DATE, "date");
         table.addColumn(RealmFieldType.BINARY, "binary");
+        long colDecimalIndex = table.addColumn(RealmFieldType.DECIMAL128, "decimal128", true);
+        long colObjectIdIndex = table.addColumn(RealmFieldType.OBJECT_ID, "object_id", true);
+
         long rowIndex = OsObject.createRow(table);
 
         UncheckedRow row = table.getUncheckedRow(rowIndex);
@@ -27,5 +29,15 @@
         assertFalse(row.isNull(colBoolIndex));
         row.setNull(colBoolIndex);
         assertTrue(row.isNull(colBoolIndex));
+
+        row.setDecimal128(colDecimalIndex, new Decimal128(0));
+        assertFalse(row.isNull(colDecimalIndex));
+        row.setNull(colDecimalIndex);
+        assertTrue(row.isNull(colDecimalIndex));
+
+        row.setObjectId(colObjectIdIndex, new ObjectId());
+        assertFalse(row.isNull(colObjectIdIndex));
+        row.setNull(colObjectIdIndex);
+        assertTrue(row.isNull(colObjectIdIndex));
     }
 
