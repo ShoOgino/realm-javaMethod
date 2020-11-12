@@ -1,0 +1,14 @@
+    @Test
+    public void createOrUpdateObjectFromJson_objectIdPK() throws JSONException {
+        String stringId = "789ABCDEF0123456789ABCDE";
+        JSONObject jsonObject = new JSONObject("{\"id\": \""+ stringId + "\", \"name\": \"bar\"}");
+        realm.beginTransaction();
+        realm.createOrUpdateObjectFromJson(PrimaryKeyAsObjectId.class, jsonObject);
+        realm.commitTransaction();
+
+        RealmResults<PrimaryKeyAsObjectId> owners = realm.where(PrimaryKeyAsObjectId.class).findAll();
+        assertEquals(1, owners.size());
+        assertEquals(new ObjectId(stringId), owners.get(0).getId());
+        assertEquals("bar", owners.get(0).getName());
+    }
+
