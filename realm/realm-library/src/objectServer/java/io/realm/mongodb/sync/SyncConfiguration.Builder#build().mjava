@@ -33,6 +33,10 @@
                 rxFactory = new RealmObservableFactory(true);
             }
 
+            if (flowFactory == null && Util.isCoroutinesAvailable()) {
+                flowFactory = new RealmFlowFactory(true);
+            }
+
             URI resolvedServerUrl = serverUrl;
             syncUrlPrefix = String.format("/api/client/v2.0/app/%s/realm-sync", user.getApp().getConfiguration().getAppId());
 
@@ -49,6 +53,7 @@
                     durability,
                     createSchemaMediator(modules, debugSchema),
                     rxFactory,
+                    flowFactory,
                     initialDataTransaction,
                     readOnly,
                     maxNumberOfActiveVersions,

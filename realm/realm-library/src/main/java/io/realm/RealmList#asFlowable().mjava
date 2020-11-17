@@ -37,14 +37,14 @@
      */
     @SuppressWarnings("unchecked")
     public Flowable<RealmList<E>> asFlowable() {
-        if (realm instanceof Realm) {
-            return realm.configuration.getRxFactory().from((Realm) realm, this);
-        } else if (realm instanceof DynamicRealm) {
+        if (baseRealm instanceof Realm) {
+            return baseRealm.configuration.getRxFactory().from((Realm) baseRealm, this);
+        } else if (baseRealm instanceof DynamicRealm) {
             @SuppressWarnings("UnnecessaryLocalVariable")
-            Flowable<RealmList<E>> results = realm.configuration.getRxFactory().from((DynamicRealm) realm, this);
+            Flowable<RealmList<E>> results = baseRealm.configuration.getRxFactory().from((DynamicRealm) baseRealm, this);
             return results;
         } else {
-            throw new UnsupportedOperationException(realm.getClass() + " does not support RxJava2.");
+            throw new UnsupportedOperationException(baseRealm.getClass() + " does not support RxJava2.");
         }
     }
 

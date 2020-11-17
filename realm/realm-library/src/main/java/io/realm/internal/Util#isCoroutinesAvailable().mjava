@@ -1,0 +1,17 @@
+    /**
+     * Checks if the coroutines framework is present and can be loaded.
+     *
+     * @return {@code true} if the coroutines dependency exists, {@code false} otherwise.
+     */
+    public static synchronized boolean isCoroutinesAvailable() {
+        if (coroutinesAvailable == null) {
+            try {
+                Class.forName("kotlinx.coroutines.flow.Flow");
+                coroutinesAvailable = true;
+            } catch (ClassNotFoundException ignore) {
+                coroutinesAvailable = false;
+            }
+        }
+        return coroutinesAvailable;
+    }
+

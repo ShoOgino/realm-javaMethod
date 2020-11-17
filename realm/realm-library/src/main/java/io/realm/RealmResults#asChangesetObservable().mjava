@@ -28,14 +28,14 @@
      * @see <a href="https://realm.io/docs/java/latest/#rxjava">RxJava and Realm</a>
      */
     public Observable<CollectionChange<RealmResults<E>>> asChangesetObservable() {
-        if (realm instanceof Realm) {
-            return realm.configuration.getRxFactory().changesetsFrom((Realm) realm, this);
-        } else if (realm instanceof DynamicRealm) {
-            DynamicRealm dynamicRealm = (DynamicRealm) realm;
+        if (baseRealm instanceof Realm) {
+            return baseRealm.configuration.getRxFactory().changesetsFrom((Realm) baseRealm, this);
+        } else if (baseRealm instanceof DynamicRealm) {
+            DynamicRealm dynamicRealm = (DynamicRealm) baseRealm;
             RealmResults<DynamicRealmObject> dynamicResults = (RealmResults<DynamicRealmObject>) this;
-            return (Observable) realm.configuration.getRxFactory().changesetsFrom(dynamicRealm, dynamicResults);
+            return (Observable) baseRealm.configuration.getRxFactory().changesetsFrom(dynamicRealm, dynamicResults);
         } else {
-            throw new UnsupportedOperationException(realm.getClass() + " does not support RxJava2.");
+            throw new UnsupportedOperationException(baseRealm.getClass() + " does not support RxJava2.");
         }
     }
 

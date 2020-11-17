@@ -11,7 +11,7 @@
     public <T> void setList(String fieldName, RealmList<T> list) {
         checkNonEmptyFieldName(fieldName);
         fieldName = mapFieldNameToInternalName(fieldName);
-        realm.checkIfValidAndInTransaction();
+        baseRealm.checkIfValidAndInTransaction();
 
         //noinspection ConstantConditions
         if (list == null) {
@@ -21,7 +21,7 @@
         // Due to type erasure of generics it is not possible to have multiple overloaded methods with the same signature.
         // So instead we fake  it by checking the first element in the list and verifies that
         // against the underlying type.
-        RealmFieldType columnType = realm.getSchema().getSchemaForClass(osResults.getTable().getClassName()).getFieldType(fieldName);
+        RealmFieldType columnType = baseRealm.getSchema().getSchemaForClass(osResults.getTable().getClassName()).getFieldType(fieldName);
         switch (columnType) {
             case LIST:
                 checkTypeOfListElements(list, RealmModel.class);

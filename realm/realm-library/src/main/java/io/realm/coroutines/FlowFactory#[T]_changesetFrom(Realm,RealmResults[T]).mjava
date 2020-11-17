@@ -1,0 +1,15 @@
+    /**
+     * Creates a {@link Flow} for a {@link RealmResults} instance. It should emit the initial results when subscribed to and on each
+     * subsequent update of the results it should emit the results plus the {@link io.realm.rx.CollectionChange} that describes
+     * the update.
+     * <p>
+     * Changeset observables do not support backpressure as a changeset depends on the state of the previous
+     * changeset. Handling backpressure should therefore be left to the user.
+     *
+     * @param realm   {@link Realm} instance from where the object is coming.
+     * @param results {@link RealmResults} instance being observed for changes to be emitted by the flow.
+     * @return {@link Flow} that emits all updates to the RealmResults.
+     */
+    @Beta
+    <T> Flow<CollectionChange<RealmResults<T>>> changesetFrom(@Nonnull Realm realm, @Nonnull RealmResults<T> results);
+

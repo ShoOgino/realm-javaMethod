@@ -1,0 +1,15 @@
+    /**
+     * Creates a {@link Flow} for a {@link DynamicRealmObject}. It should emit the initial object when subscribed to and on each
+     * subsequent update of the object it should emit the object plus the {@link io.realm.ObjectChangeSet} that describes
+     * the update.
+     * <p>
+     * Changeset observables do not support backpressure as a changeset depends on the state of the previous
+     * changeset. Handling backpressure should therefore be left to the user.
+     *
+     * @param dynamicRealm       {@link DynamicRealm} instance from where the object is coming.
+     * @param dynamicRealmObject {@link DynamicRealmObject} instance being observed for changes to be emitted by the flow.
+     * @return {@link Flow} that emits all updates to the DynamicRealmObject.
+     */
+    @Beta
+    Flow<ObjectChange<DynamicRealmObject>> changesetFrom(@Nonnull DynamicRealm dynamicRealm, @Nonnull DynamicRealmObject dynamicRealmObject);
+

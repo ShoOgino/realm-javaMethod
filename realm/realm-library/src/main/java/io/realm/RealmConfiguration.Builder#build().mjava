@@ -25,6 +25,10 @@
                 rxFactory = new RealmObservableFactory(true);
             }
 
+            if (flowFactory == null && Util.isCoroutinesAvailable()) {
+                flowFactory = new RealmFlowFactory(true);
+            }
+
             return new RealmConfiguration(new File(directory, fileName),
                     assetFilePath,
                     key,
@@ -34,6 +38,7 @@
                     durability,
                     createSchemaMediator(modules, debugSchema),
                     rxFactory,
+                    flowFactory,
                     initialDataTransaction,
                     readOnly,
                     compactOnLaunch,
