@@ -1,7 +1,7 @@
     @SuppressWarnings("cast")
     public static some.test.AllTypes createOrUpdateUsingJsonObject(Realm realm, JSONObject json, boolean update)
             throws JSONException {
-        final List<String> excludeFields = new ArrayList<String>(15);
+        final List<String> excludeFields = new ArrayList<String>(18);
         some.test.AllTypes obj = null;
         if (update) {
             Table table = realm.getTable(some.test.AllTypes.class);
@@ -27,11 +27,20 @@
             if (json.has("columnObject")) {
                 excludeFields.add("columnObject");
             }
+            if (json.has("columnObjectWithoutPk")) {
+                excludeFields.add("columnObjectWithoutPk");
+            }
             if (json.has("columnRealmList")) {
                 excludeFields.add("columnRealmList");
             }
+            if (json.has("columnRealmListNoPk")) {
+                excludeFields.add("columnRealmListNoPk");
+            }
             if (json.has("columnRealmFinalList")) {
                 excludeFields.add("columnRealmFinalList");
+            }
+            if (json.has("columnRealmFinalListNoPk")) {
+                excludeFields.add("columnRealmFinalListNoPk");
             }
             if (json.has("columnStringList")) {
                 excludeFields.add("columnStringList");
@@ -171,6 +180,14 @@
                 objProxy.realmSet$columnObject(columnObjectObj);
             }
         }
+        if (json.has("columnObjectWithoutPk")) {
+            if (json.isNull("columnObjectWithoutPk")) {
+                objProxy.realmSet$columnObjectWithoutPk(null);
+            } else {
+                some.test.Simple columnObjectWithoutPkObj = some_test_SimpleRealmProxy.createOrUpdateUsingJsonObject(realm, json.getJSONObject("columnObjectWithoutPk"), update);
+                objProxy.realmSet$columnObjectWithoutPk(columnObjectWithoutPkObj);
+            }
+        }
         if (json.has("columnRealmList")) {
             if (json.isNull("columnRealmList")) {
                 objProxy.realmSet$columnRealmList(null);
@@ -183,6 +200,18 @@
                 }
             }
         }
+        if (json.has("columnRealmListNoPk")) {
+            if (json.isNull("columnRealmListNoPk")) {
+                objProxy.realmSet$columnRealmListNoPk(null);
+            } else {
+                objProxy.realmGet$columnRealmListNoPk().clear();
+                JSONArray array = json.getJSONArray("columnRealmListNoPk");
+                for (int i = 0; i < array.length(); i++) {
+                    some.test.Simple item = some_test_SimpleRealmProxy.createOrUpdateUsingJsonObject(realm, array.getJSONObject(i), update);
+                    objProxy.realmGet$columnRealmListNoPk().add(item);
+                }
+            }
+        }
         if (json.has("columnRealmFinalList")) {
             if (json.isNull("columnRealmFinalList")) {
                 objProxy.realmSet$columnRealmFinalList(null);
@@ -192,6 +221,18 @@
                 for (int i = 0; i < array.length(); i++) {
                     some.test.AllTypes item = some_test_AllTypesRealmProxy.createOrUpdateUsingJsonObject(realm, array.getJSONObject(i), update);
                     objProxy.realmGet$columnRealmFinalList().add(item);
+                }
+            }
+        }
+        if (json.has("columnRealmFinalListNoPk")) {
+            if (json.isNull("columnRealmFinalListNoPk")) {
+                objProxy.realmSet$columnRealmFinalListNoPk(null);
+            } else {
+                objProxy.realmGet$columnRealmFinalListNoPk().clear();
+                JSONArray array = json.getJSONArray("columnRealmFinalListNoPk");
+                for (int i = 0; i < array.length(); i++) {
+                    some.test.Simple item = some_test_SimpleRealmProxy.createOrUpdateUsingJsonObject(realm, array.getJSONObject(i), update);
+                    objProxy.realmGet$columnRealmFinalListNoPk().add(item);
                 }
             }
         }

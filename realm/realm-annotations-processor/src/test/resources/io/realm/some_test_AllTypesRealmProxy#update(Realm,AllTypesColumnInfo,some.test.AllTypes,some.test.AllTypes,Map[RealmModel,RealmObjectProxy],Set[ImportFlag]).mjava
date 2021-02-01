@@ -26,6 +26,18 @@
             }
         }
 
+        some.test.Simple columnObjectWithoutPkObj = realmObjectSource.realmGet$columnObjectWithoutPk();
+        if (columnObjectWithoutPkObj == null) {
+            builder.addNull(columnInfo.columnObjectWithoutPkColKey);
+        } else {
+            some.test.Simple cachecolumnObjectWithoutPk = (some.test.Simple) cache.get(columnObjectWithoutPkObj);
+            if (cachecolumnObjectWithoutPk != null) {
+                builder.addObject(columnInfo.columnObjectWithoutPkColKey, cachecolumnObjectWithoutPk);
+            } else {
+                builder.addObject(columnInfo.columnObjectWithoutPkColKey, some_test_SimpleRealmProxy.copyOrUpdate(realm, (some_test_SimpleRealmProxy.SimpleColumnInfo) realm.getSchema().getColumnInfo(some.test.Simple.class), columnObjectWithoutPkObj, true, cache, flags));
+            }
+        }
+
         RealmList<some.test.AllTypes> columnRealmListUnmanagedList = realmObjectSource.realmGet$columnRealmList();
         if (columnRealmListUnmanagedList != null) {
             RealmList<some.test.AllTypes> columnRealmListManagedCopy = new RealmList<some.test.AllTypes>();
@@ -43,6 +55,23 @@
             builder.addObjectList(columnInfo.columnRealmListColKey, new RealmList<some.test.AllTypes>());
         }
 
+        RealmList<some.test.Simple> columnRealmListNoPkUnmanagedList = realmObjectSource.realmGet$columnRealmListNoPk();
+        if (columnRealmListNoPkUnmanagedList != null) {
+            RealmList<some.test.Simple> columnRealmListNoPkManagedCopy = new RealmList<some.test.Simple>();
+            for (int i = 0; i < columnRealmListNoPkUnmanagedList.size(); i++) {
+                some.test.Simple columnRealmListNoPkItem = columnRealmListNoPkUnmanagedList.get(i);
+                some.test.Simple cachecolumnRealmListNoPk = (some.test.Simple) cache.get(columnRealmListNoPkItem);
+                if (cachecolumnRealmListNoPk != null) {
+                    columnRealmListNoPkManagedCopy.add(cachecolumnRealmListNoPk);
+                } else {
+                    columnRealmListNoPkManagedCopy.add(some_test_SimpleRealmProxy.copyOrUpdate(realm, (some_test_SimpleRealmProxy.SimpleColumnInfo) realm.getSchema().getColumnInfo(some.test.Simple.class), columnRealmListNoPkItem, true, cache, flags));
+                }
+            }
+            builder.addObjectList(columnInfo.columnRealmListNoPkColKey, columnRealmListNoPkManagedCopy);
+        } else {
+            builder.addObjectList(columnInfo.columnRealmListNoPkColKey, new RealmList<some.test.Simple>());
+        }
+
         RealmList<some.test.AllTypes> columnRealmFinalListUnmanagedList = realmObjectSource.realmGet$columnRealmFinalList();
         if (columnRealmFinalListUnmanagedList != null) {
             RealmList<some.test.AllTypes> columnRealmFinalListManagedCopy = new RealmList<some.test.AllTypes>();
@@ -58,6 +87,23 @@
             builder.addObjectList(columnInfo.columnRealmFinalListColKey, columnRealmFinalListManagedCopy);
         } else {
             builder.addObjectList(columnInfo.columnRealmFinalListColKey, new RealmList<some.test.AllTypes>());
+        }
+
+        RealmList<some.test.Simple> columnRealmFinalListNoPkUnmanagedList = realmObjectSource.realmGet$columnRealmFinalListNoPk();
+        if (columnRealmFinalListNoPkUnmanagedList != null) {
+            RealmList<some.test.Simple> columnRealmFinalListNoPkManagedCopy = new RealmList<some.test.Simple>();
+            for (int i = 0; i < columnRealmFinalListNoPkUnmanagedList.size(); i++) {
+                some.test.Simple columnRealmFinalListNoPkItem = columnRealmFinalListNoPkUnmanagedList.get(i);
+                some.test.Simple cachecolumnRealmFinalListNoPk = (some.test.Simple) cache.get(columnRealmFinalListNoPkItem);
+                if (cachecolumnRealmFinalListNoPk != null) {
+                    columnRealmFinalListNoPkManagedCopy.add(cachecolumnRealmFinalListNoPk);
+                } else {
+                    columnRealmFinalListNoPkManagedCopy.add(some_test_SimpleRealmProxy.copyOrUpdate(realm, (some_test_SimpleRealmProxy.SimpleColumnInfo) realm.getSchema().getColumnInfo(some.test.Simple.class), columnRealmFinalListNoPkItem, true, cache, flags));
+                }
+            }
+            builder.addObjectList(columnInfo.columnRealmFinalListNoPkColKey, columnRealmFinalListNoPkManagedCopy);
+        } else {
+            builder.addObjectList(columnInfo.columnRealmFinalListNoPkColKey, new RealmList<some.test.Simple>());
         }
         builder.addStringList(columnInfo.columnStringListColKey, realmObjectSource.realmGet$columnStringList());
         builder.addByteArrayList(columnInfo.columnBinaryListColKey, realmObjectSource.realmGet$columnBinaryList());

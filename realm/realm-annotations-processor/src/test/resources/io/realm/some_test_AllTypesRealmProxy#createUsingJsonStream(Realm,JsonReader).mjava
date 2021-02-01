@@ -94,6 +94,14 @@
                     some.test.AllTypes columnObjectObj = some_test_AllTypesRealmProxy.createUsingJsonStream(realm, reader);
                     objProxy.realmSet$columnObject(columnObjectObj);
                 }
+            } else if (name.equals("columnObjectWithoutPk")) {
+                if (reader.peek() == JsonToken.NULL) {
+                    reader.skipValue();
+                    objProxy.realmSet$columnObjectWithoutPk(null);
+                } else {
+                    some.test.Simple columnObjectWithoutPkObj = some_test_SimpleRealmProxy.createUsingJsonStream(realm, reader);
+                    objProxy.realmSet$columnObjectWithoutPk(columnObjectWithoutPkObj);
+                }
             } else if (name.equals("columnRealmList")) {
                 if (reader.peek() == JsonToken.NULL) {
                     reader.skipValue();
@@ -107,6 +115,19 @@
                     }
                     reader.endArray();
                 }
+            } else if (name.equals("columnRealmListNoPk")) {
+                if (reader.peek() == JsonToken.NULL) {
+                    reader.skipValue();
+                    objProxy.realmSet$columnRealmListNoPk(null);
+                } else {
+                    objProxy.realmSet$columnRealmListNoPk(new RealmList<some.test.Simple>());
+                    reader.beginArray();
+                    while (reader.hasNext()) {
+                        some.test.Simple item = some_test_SimpleRealmProxy.createUsingJsonStream(realm, reader);
+                        objProxy.realmGet$columnRealmListNoPk().add(item);
+                    }
+                    reader.endArray();
+                }
             } else if (name.equals("columnRealmFinalList")) {
                 if (reader.peek() == JsonToken.NULL) {
                     reader.skipValue();
@@ -117,6 +138,19 @@
                     while (reader.hasNext()) {
                         some.test.AllTypes item = some_test_AllTypesRealmProxy.createUsingJsonStream(realm, reader);
                         objProxy.realmGet$columnRealmFinalList().add(item);
+                    }
+                    reader.endArray();
+                }
+            } else if (name.equals("columnRealmFinalListNoPk")) {
+                if (reader.peek() == JsonToken.NULL) {
+                    reader.skipValue();
+                    objProxy.realmSet$columnRealmFinalListNoPk(null);
+                } else {
+                    objProxy.realmSet$columnRealmFinalListNoPk(new RealmList<some.test.Simple>());
+                    reader.beginArray();
+                    while (reader.hasNext()) {
+                        some.test.Simple item = some_test_SimpleRealmProxy.createUsingJsonStream(realm, reader);
+                        objProxy.realmGet$columnRealmFinalListNoPk().add(item);
                     }
                     reader.endArray();
                 }
@@ -152,6 +186,6 @@
         if (!jsonHasPrimaryKey) {
             throw new IllegalArgumentException("JSON object doesn't have the primary key field 'columnString'.");
         }
-        return realm.copyToRealm(obj);
+        return realm.copyToRealmOrUpdate(obj);
     }
 

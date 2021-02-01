@@ -31,6 +31,9 @@
         // Deep copy of columnObject
         unmanagedCopy.realmSet$columnObject(some_test_AllTypesRealmProxy.createDetachedCopy(realmSource.realmGet$columnObject(), currentDepth + 1, maxDepth, cache));
 
+        // Deep copy of columnObjectWithoutPk
+        unmanagedCopy.realmSet$columnObjectWithoutPk(some_test_SimpleRealmProxy.createDetachedCopy(realmSource.realmGet$columnObjectWithoutPk(), currentDepth + 1, maxDepth, cache));
+
         // Deep copy of columnRealmList
         if (currentDepth == maxDepth) {
             unmanagedCopy.realmSet$columnRealmList(null);
@@ -46,6 +49,21 @@
             }
         }
 
+        // Deep copy of columnRealmListNoPk
+        if (currentDepth == maxDepth) {
+            unmanagedCopy.realmSet$columnRealmListNoPk(null);
+        } else {
+            RealmList<some.test.Simple> managedcolumnRealmListNoPkList = realmSource.realmGet$columnRealmListNoPk();
+            RealmList<some.test.Simple> unmanagedcolumnRealmListNoPkList = new RealmList<some.test.Simple>();
+            unmanagedCopy.realmSet$columnRealmListNoPk(unmanagedcolumnRealmListNoPkList);
+            int nextDepth = currentDepth + 1;
+            int size = managedcolumnRealmListNoPkList.size();
+            for (int i = 0; i < size; i++) {
+                some.test.Simple item = some_test_SimpleRealmProxy.createDetachedCopy(managedcolumnRealmListNoPkList.get(i), nextDepth, maxDepth, cache);
+                unmanagedcolumnRealmListNoPkList.add(item);
+            }
+        }
+
         // Deep copy of columnRealmFinalList
         if (currentDepth == maxDepth) {
             unmanagedCopy.realmSet$columnRealmFinalList(null);
@@ -58,6 +76,21 @@
             for (int i = 0; i < size; i++) {
                 some.test.AllTypes item = some_test_AllTypesRealmProxy.createDetachedCopy(managedcolumnRealmFinalListList.get(i), nextDepth, maxDepth, cache);
                 unmanagedcolumnRealmFinalListList.add(item);
+            }
+        }
+
+        // Deep copy of columnRealmFinalListNoPk
+        if (currentDepth == maxDepth) {
+            unmanagedCopy.realmSet$columnRealmFinalListNoPk(null);
+        } else {
+            RealmList<some.test.Simple> managedcolumnRealmFinalListNoPkList = realmSource.realmGet$columnRealmFinalListNoPk();
+            RealmList<some.test.Simple> unmanagedcolumnRealmFinalListNoPkList = new RealmList<some.test.Simple>();
+            unmanagedCopy.realmSet$columnRealmFinalListNoPk(unmanagedcolumnRealmFinalListNoPkList);
+            int nextDepth = currentDepth + 1;
+            int size = managedcolumnRealmFinalListNoPkList.size();
+            for (int i = 0; i < size; i++) {
+                some.test.Simple item = some_test_SimpleRealmProxy.createDetachedCopy(managedcolumnRealmFinalListNoPkList.get(i), nextDepth, maxDepth, cache);
+                unmanagedcolumnRealmFinalListNoPkList.add(item);
             }
         }
 
