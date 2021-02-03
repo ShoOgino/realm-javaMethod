@@ -1,0 +1,15 @@
+    // This method only does extra validation for primary keys that isn't done by Core.
+    // The reason being that ObjectStore currently has more restrictions on primary key types
+    // than what is offered by Core, e.g. Boolean being an allowed primary key in Core, but not
+    // ObjectStore. Since MutableRealmSchemas do not create an ObjectStore schema, we need to
+    // manually encode that difference here to avoid discrepency between allowed schemas for Realm
+    // and DynamicRealm
+    private void checkForObjectStoreInvalidPrimaryKeyTypes(String fieldName, Class<?> fieldType) {
+        if (fieldType == boolean.class || fieldType == Boolean.class) {
+            checkForObjectStoreInvalidPrimaryKeyTypes(fieldName, RealmFieldType.BOOLEAN);
+        }
+        if (fieldType == Date.class) {
+            checkForObjectStoreInvalidPrimaryKeyTypes(fieldName, RealmFieldType.DATE);
+        }
+    }
+
