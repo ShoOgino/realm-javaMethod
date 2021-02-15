@@ -1,0 +1,10 @@
+    @Test
+    public void rawPredicate_invalidTypeThrows() {
+        try {
+            realm.where(AllTypes.class).rawPredicate("columnString = 42.0");
+            fail();
+        } catch (IllegalArgumentException ex) {
+            assertTrue("Error message was: " + ex.getMessage(), ex.getMessage().contains("Unsupported comparison between type 'string' and type 'double'"));
+        }
+    }
+

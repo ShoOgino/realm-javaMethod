@@ -1,16 +1,17 @@
         /**
          * Adds a persisted non-link, non value list property to this builder.
          *
-         * @param name the name of the property.
+         * @param publicName the name of the property as defined in the Java/Kotlin model class.
+         * @param internalName the internal name of the property if different from the public name, otherwise "".
          * @param type the type of the property.
          * @param isPrimaryKey set to true if this property is the primary key.
          * @param isIndexed set to true if this property needs an index.
          * @param isRequired set to true if this property is not nullable.
          * @return this {@code OsObjectSchemaInfo}.
          */
-        public Builder addPersistedProperty(String name, RealmFieldType type, boolean isPrimaryKey, boolean isIndexed,
+        public Builder addPersistedProperty(String publicName, String internalName, RealmFieldType type, boolean isPrimaryKey, boolean isIndexed,
                 boolean isRequired) {
-            long propertyPtr = Property.nativeCreatePersistedProperty(name,
+            long propertyPtr = Property.nativeCreatePersistedProperty(internalName, publicName,
                     Property.convertFromRealmFieldType(type, isRequired), isPrimaryKey, isIndexed);
             persistedPropertyPtrArray[persistedPropertyPtrCurPos] = propertyPtr;
             persistedPropertyPtrCurPos++;

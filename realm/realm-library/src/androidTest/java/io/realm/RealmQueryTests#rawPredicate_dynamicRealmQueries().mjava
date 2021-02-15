@@ -1,0 +1,17 @@
+    @Test
+    public void rawPredicate_dynamicRealmQueries() {
+        // DynamicRealm queries hit a slightly different codepath than typed Realms, so this
+        // is just a smoke test.
+        populateTestRealm();
+        DynamicRealm dynamicRealm = DynamicRealm.getInstance(realm.getConfiguration());
+        try {
+            RealmResults<DynamicRealmObject> results = dynamicRealm
+                    .where(AllTypes.CLASS_NAME)
+                    .rawPredicate(AllTypes.FIELD_LONG +  " >= 5")
+                    .findAll();
+            assertEquals(5, results.size());
+        } finally {
+            dynamicRealm.close();
+        }
+    }
+

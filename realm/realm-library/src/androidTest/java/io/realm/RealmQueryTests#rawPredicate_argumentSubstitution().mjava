@@ -1,0 +1,13 @@
+    @Ignore("Re-Enable when support for Mixed as been added.")
+    @Test
+    public void rawPredicate_argumentSubstitution() {
+        populateTestRealm();
+        RealmQuery<AllTypes> query = realm.where(AllTypes.class);
+        query.rawPredicate("columnString = '$1' " +
+                "AND columnBoolean = $2 " +
+                "AND columnFloat = $3 " +
+                "AND columnInteger = $4", new Object[] {"test data 0", true, 1.2345f, 0});
+        RealmResults<AllTypes> results = query.findAll();
+        assertEquals(1, results.size());
+    }
+

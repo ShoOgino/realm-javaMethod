@@ -2,13 +2,14 @@
          * Adds a persisted link property to this {@code OsObjectSchemaInfo}. A persisted link property will be stored
          * in the Realm file's schema.
          *
-         * @param name the name of the link property.
+         * @param publicName the name of the property as defined in the Java/Kotlin model class.
+         * @param internalName the internal name of the property if different from the public name, otherwise "".
          * @param type the type of the link property. Can only be {@link RealmFieldType#OBJECT} or
          * {@link RealmFieldType#LIST}.
          * @return this {@code OsObjectSchemaInfo.Builder}.
          */
-        public Builder addPersistedLinkProperty(String name, RealmFieldType type, String linkedClassName) {
-            long propertyPtr = Property.nativeCreatePersistedLinkProperty(name,
+        public Builder addPersistedLinkProperty(String publicName, String internalName, RealmFieldType type, String linkedClassName) {
+            long propertyPtr = Property.nativeCreatePersistedLinkProperty(internalName, publicName,
                     Property.convertFromRealmFieldType(type, false), linkedClassName);
             persistedPropertyPtrArray[persistedPropertyPtrCurPos] = propertyPtr;
             persistedPropertyPtrCurPos++;

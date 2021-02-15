@@ -1,0 +1,21 @@
+    @Test
+    public void rawPredicate_rawDescriptors() {
+        realm.beginTransaction();
+        realm.insert(new Dog("Milo"));
+        realm.insert(new Dog("Fido"));
+        realm.insert(new Dog("Bella"));
+        realm.insert(new Dog("Bella"));
+        realm.commitTransaction();
+
+        RealmQuery<Dog> query = realm.where(Dog.class)
+                .rawPredicate("TRUEPREDICATE SORT(name ASC) DISTINCT(name) LIMIT(2)");
+
+        assertEquals("TRUEPREDICATE SORT(name ASC) DISTINCT(name) LIMIT(2)", query.getDescription());
+
+        // Descriptors should be applied in order provided
+        RealmResults<Dog> dogs = query.findAll();
+        assertEquals(2, dogs.size());
+        assertEquals("Bella", dogs.get(0).getName());
+        assertEquals("Fido", dogs.get(1).getName());
+    }
+

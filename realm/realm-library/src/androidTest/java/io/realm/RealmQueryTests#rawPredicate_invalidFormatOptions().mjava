@@ -1,0 +1,26 @@
+    @Ignore("Re-Enable when support for Mixed as been added.")
+    @Test
+    public void rawPredicate_invalidFormatOptions() {
+        RealmQuery<AllTypes> query = realm.where(AllTypes.class);
+        try {
+            // Argument type not valid
+            query.rawPredicate("columnString = '$1'", new Object[] { 42 });
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        try {
+            // Missing number of arguments
+            query.rawPredicate("columnString = '$1' AND columnString  = '$2'", new Object[] { "foo" });
+            RealmLog.error(query.getDescription());
+        } catch (IllegalArgumentException ignore) {
+        }
+
+        try {
+            // Wrong syntax for argument substitution
+            query.rawPredicate("columnString = '%1'", new Object[] {"foo" });
+            fail();
+        } catch (IllegalArgumentException ignore) {
+        }
+    }
+

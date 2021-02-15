@@ -1,0 +1,26 @@
+    // Descriptors defined by raw predicates can be mixed with typed ones and still be applied in order
+    @Test
+    public void rawPredicate_mixTypedAndRawDescriptors() {
+        realm.beginTransaction();
+        realm.insert(new Dog("Milo", 1));
+        realm.insert(new Dog("Fido", 2));
+        realm.insert(new Dog("Bella", 3));
+        realm.insert(new Dog("Bella", 3));
+        realm.insert(new Dog("Bella", 4));
+        realm.commitTransaction();
+
+        RealmQuery<Dog> query = realm.where(Dog.class)
+                .sort("age", Sort.ASCENDING)
+                .rawPredicate("TRUEPREDICATE SORT(name ASC) DISTINCT(name, age) LIMIT(2)")
+                .distinct("age")
+                .limit(1);
+
+        // Descriptors should be applied in order provided throughout the query
+        assertEquals("TRUEPREDICATE SORT(age ASC) SORT(name ASC) DISTINCT(name, age) LIMIT(2) DISTINCT(age) LIMIT(1)", query.getDescription());
+
+        RealmResults<Dog> dogs = query.findAll();
+        assertEquals(1, dogs.size());
+        assertEquals("Bella", dogs.get(0).getName());
+        assertEquals(3, dogs.get(0).getAge());
+    }
+

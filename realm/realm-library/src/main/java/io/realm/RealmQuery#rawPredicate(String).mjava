@@ -1,0 +1,41 @@
+    /**
+     * Create a text-based predicate using the Realm Query Language. This predicate can be combined
+     * with other raw or type safe predicates.
+     * <p>
+     * Class and property names used in the raw predicate can be either the names defined in the
+     * Realm Model classes or the internal names defined using the {@link io.realm.annotations.RealmClass}
+     * or {@link io.realm.annotations.RealmField} annotations.
+     * </p>
+     * See <a href="https://docs.mongodb.com/realm-sdks/js/latest/tutorial-query-language.html">these docs</a>
+     * for a more detailed description of the Realm Query Language.
+     * <p>
+     * <pre>
+     * Examples:
+     * {@code
+     * RealmQuery<Person> query = realm.where(Person.class);
+     *
+     * // Simple query
+     * query.rawPredicate("name = 'Jane'");
+     *
+     * // Multiple predicates
+     * query.rawPredicate("name = 'Jane' OR name = 'John'")
+     *
+     * // Collection queries
+     * query.rawPredicate("children.@count > 3")
+     * query.rawPredicate("ALL children.age > 18")
+     *
+     * // Sub queries
+     * query.rawPredicate("SUBQUERY(children, $child, $child.age > 21 AND $child.gender = 'male'").@count > 0');
+     *
+     * // Sort, Distinct, Limit
+     * query.rawPredicate("name = 'Jane' SORT(lastName) DISTINCT(city) LIMIT(5)");
+     * }
+     * </pre>
+     *
+     * @param predicate A Realm Query Language predicate.
+     * @throws java.lang.IllegalArgumentException if there is an syntax error.
+     */
+    public RealmQuery<E> rawPredicate(String predicate) {
+        return rawPredicate(predicate, new String[0]);
+    }
+
