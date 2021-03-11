@@ -1,33 +1,34 @@
     @Override
-    public void realmSet$columnRealmList(RealmList<some.test.AllTypes> value) {
+    public void realmSet$columnRealmListNoPk(RealmList<some.test.Simple> value) {
         if (proxyState.isUnderConstruction()) {
             if (!proxyState.getAcceptDefaultValue$realm()) {
                 return;
             }
-            if (proxyState.getExcludeFields$realm().contains("columnRealmList")) {
+            if (proxyState.getExcludeFields$realm().contains("columnRealmListNoPk")) {
                 return;
             }
             // if the list contains unmanaged RealmObjects, convert them to managed.
             if (value != null && !value.isManaged()) {
                 final Realm realm = (Realm) proxyState.getRealm$realm();
-                final RealmList<some.test.AllTypes> original = value;
-                value = new RealmList<some.test.AllTypes>();
-                for (some.test.AllTypes item : original) {
+                final RealmList<some.test.Simple> original = value;
+                value = new RealmList<some.test.Simple>();
+                for (some.test.Simple item : original) {
                     if (item == null || RealmObject.isManaged(item)) {
                         value.add(item);
                     } else {
-                        value.add(realm.copyToRealmOrUpdate(item));
+                        value.add(realm.copyToRealm(item));
                     }
                 }
             }
         }
+
         proxyState.getRealm$realm().checkIfValid();
-        OsList osList = proxyState.getRow$realm().getModelList(columnInfo.columnRealmListColKey);
+        OsList osList = proxyState.getRow$realm().getModelList(columnInfo.columnRealmListNoPkColKey);
         // For lists of equal lengths, we need to set each element directly as clearing the receiver list can be wrong if the input and target list are the same.
         if (value != null && value.size() == osList.size()) {
             int objects = value.size();
             for (int i = 0; i < objects; i++) {
-                some.test.AllTypes linkedObject = value.get(i);
+                some.test.Simple linkedObject = value.get(i);
                 proxyState.checkValidObject(linkedObject);
                 osList.setRow(i, ((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getObjectKey());
             }
@@ -38,7 +39,7 @@
             }
             int objects = value.size();
             for (int i = 0; i < objects; i++) {
-                some.test.AllTypes linkedObject = value.get(i);
+                some.test.Simple linkedObject = value.get(i);
                 proxyState.checkValidObject(linkedObject);
                 osList.addRow(((RealmObjectProxy) linkedObject).realmGet$proxyState().getRow$realm().getObjectKey());
             }

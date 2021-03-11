@@ -1,0 +1,27 @@
+    @Test
+    @RunTestInLooperThread
+    public void realmList_parentDeletionCompleteFlowable() {
+        realm.beginTransaction();
+        final AllTypes parent = realm.createObject(AllTypes.class);
+        final RealmList<Dog> list = parent.getColumnRealmList();
+        list.add(new Dog("Fido"));
+        realm.commitTransaction();
+        looperThread.keepStrongReference(parent);
+
+        // We should only emit valid lists. If the parent of the list is invalidated
+        // it should close the stream gracefully resulting in onComplete being called.
+        subscription = list.asFlowable().subscribe(
+                change -> { assertTrue(change.isValid()); },
+                error -> { fail(error.toString()); },
+                () -> {
+                    // Deleting the parent will gracefully close the stream
+                    disposeSuccessfulTest(realm);
+                });
+
+        looperThread.postRunnable(() -> {
+            realm.beginTransaction();
+            parent.deleteFromRealm();
+            realm.commitTransaction();
+        });
+    }
+

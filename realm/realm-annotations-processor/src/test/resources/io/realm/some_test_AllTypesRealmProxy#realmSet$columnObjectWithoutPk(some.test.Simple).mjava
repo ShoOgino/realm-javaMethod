@@ -1,32 +1,33 @@
     @Override
-    public void realmSet$columnObject(some.test.AllTypes value) {
+    public void realmSet$columnObjectWithoutPk(some.test.Simple value) {
         Realm realm = (Realm) proxyState.getRealm$realm();
         if (proxyState.isUnderConstruction()) {
             if (!proxyState.getAcceptDefaultValue$realm()) {
                 return;
             }
-            if (proxyState.getExcludeFields$realm().contains("columnObject")) {
+            if (proxyState.getExcludeFields$realm().contains("columnObjectWithoutPk")) {
                 return;
             }
             if (value != null && !RealmObject.isManaged(value)) {
-                value = realm.copyToRealmOrUpdate(value);
+                value = realm.copyToRealm(value);
             }
             final Row row = proxyState.getRow$realm();
             if (value == null) {
                 // Table#nullifyLink() does not support default value. Just using Row.
-                row.nullifyLink(columnInfo.columnObjectColKey);
+                row.nullifyLink(columnInfo.columnObjectWithoutPkColKey);
                 return;
             }
             proxyState.checkValidObject(value);
-            row.getTable().setLink(columnInfo.columnObjectColKey, row.getObjectKey(), ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getObjectKey(), true);
+            row.getTable().setLink(columnInfo.columnObjectWithoutPkColKey, row.getObjectKey(), ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getObjectKey(), true);
             return;
         }
+
         proxyState.getRealm$realm().checkIfValid();
         if (value == null) {
-            proxyState.getRow$realm().nullifyLink(columnInfo.columnObjectColKey);
+            proxyState.getRow$realm().nullifyLink(columnInfo.columnObjectWithoutPkColKey);
             return;
         }
         proxyState.checkValidObject(value);
-        proxyState.getRow$realm().setLink(columnInfo.columnObjectColKey, ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getObjectKey());
+        proxyState.getRow$realm().setLink(columnInfo.columnObjectWithoutPkColKey, ((RealmObjectProxy) value).realmGet$proxyState().getRow$realm().getObjectKey());
     }
 
