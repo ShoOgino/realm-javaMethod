@@ -14,6 +14,8 @@
         final double fieldDoubleValue = DefaultValueOfField.FIELD_DOUBLE_DEFAULT_VALUE + 1;
         final boolean fieldBooleanValue = !DefaultValueOfField.FIELD_BOOLEAN_DEFAULT_VALUE;
         final Date fieldDateValue = new Date(DefaultValueOfField.FIELD_DATE_DEFAULT_VALUE.getTime() + 1);
+        final ObjectId fieldObjectIdValue = new ObjectId(new Date(20));
+        final Decimal128 fieldDecimal128Value = new Decimal128(20);
         final byte[] fieldBinaryValue = {(byte) (DefaultValueOfField.FIELD_BINARY_DEFAULT_VALUE[0] - 1)};
         final int fieldObjectIntValue = RandomPrimaryKey.FIELD_INT_DEFAULT_VALUE + 1;
         final int fieldListIntValue = RandomPrimaryKey.FIELD_INT_DEFAULT_VALUE + 2;
@@ -31,6 +33,8 @@
         json.put(DefaultValueOfField.FIELD_DOUBLE, fieldDoubleValue);
         json.put(DefaultValueOfField.FIELD_BOOLEAN, fieldBooleanValue);
         json.put(DefaultValueOfField.FIELD_DATE, getISO8601Date(fieldDateValue));
+        json.put(DefaultValueOfField.FIELD_OBJECT_ID, fieldObjectIdValue);
+        json.put(DefaultValueOfField.FIELD_DECIMAL128, fieldDecimal128Value);
         json.put(DefaultValueOfField.FIELD_BINARY, Base64.encodeToString(fieldBinaryValue, Base64.DEFAULT));
         // Value for 'fieldObject'
         final JSONObject fieldObjectJson = new JSONObject();
@@ -67,6 +71,8 @@
         assertEquals(fieldFloatValue, managedObj.getFieldFloat(), 0f);
         assertEquals(fieldDoubleValue, managedObj.getFieldDouble(), 0d);
         assertEquals(fieldBooleanValue, managedObj.isFieldBoolean());
+        assertEquals(fieldObjectIdValue, managedObj.getFieldObjectId());
+        assertEquals(fieldDecimal128Value, managedObj.getFieldDecimal128());
         assertEquals(fieldDateValue, managedObj.getFieldDate());
         assertTrue(Arrays.equals(fieldBinaryValue, managedObj.getFieldBinary()));
         assertEquals(fieldObjectJson.getString(RandomPrimaryKey.FIELD_RANDOM_PRIMARY_KEY),

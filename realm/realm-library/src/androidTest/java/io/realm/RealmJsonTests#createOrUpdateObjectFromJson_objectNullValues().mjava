@@ -4,6 +4,10 @@
     public void createOrUpdateObjectFromJson_objectNullValues() throws IOException {
         AllTypesPrimaryKey obj = new AllTypesPrimaryKey();
         Date date = new Date(0);
+
+        ObjectId objectId = new ObjectId(new Date(20));
+        Decimal128 decimal128 = new Decimal128(300);
+
         obj.setColumnLong(1); // ID
         obj.setColumnBinary(new byte[]{1});
         obj.setColumnBoolean(true);
@@ -11,6 +15,8 @@
         obj.setColumnDouble(1);
         obj.setColumnFloat(1);
         obj.setColumnString("1");
+        obj.setColumnObjectId(objectId);
+        obj.setColumnDecimal128(decimal128);
 
         realm.beginTransaction();
         realm.copyToRealm(obj);
@@ -29,6 +35,8 @@
         assertEquals(1D, obj.getColumnDouble(), 0D);
         assertEquals(true, obj.isColumnBoolean());
         assertEquals(date, obj.getColumnDate());
+        assertEquals(objectId, obj.getColumnObjectId());
+        assertEquals(decimal128, obj.getColumnDecimal128());
         assertArrayEquals(new byte[]{1}, obj.getColumnBinary());
         assertNull(obj.getColumnRealmObject());
         assertEquals(0, obj.getColumnRealmList().size());
