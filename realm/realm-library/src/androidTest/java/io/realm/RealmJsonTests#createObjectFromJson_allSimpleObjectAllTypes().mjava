@@ -1,12 +1,18 @@
     @Test
     public void createObjectFromJson_allSimpleObjectAllTypes() throws JSONException {
         JSONObject json = new JSONObject();
+
+        ObjectId objectId = new ObjectId(new Date(20));
+        Decimal128 decimal128 = new Decimal128(300);
+
         json.put("columnString", "String");
         json.put("columnLong", 1L);
         json.put("columnFloat", 1.23F);
         json.put("columnDouble", 1.23D);
         json.put("columnBoolean", true);
         json.put("columnBinary", new String(Base64.encode(new byte[] {1,2,3}, Base64.DEFAULT), UTF_8));
+        json.put("columnObjectId", objectId);
+        json.put("columnDecimal128", decimal128);
 
         realm.beginTransaction();
         realm.createObjectFromJson(AllTypes.class, json);
@@ -20,5 +26,7 @@
         assertEquals(1.23D, obj.getColumnDouble(), 0D);
         assertEquals(true, obj.isColumnBoolean());
         assertArrayEquals(new byte[]{1, 2, 3}, obj.getColumnBinary());
+        assertEquals(objectId, obj.getColumnObjectId());
+        assertEquals(decimal128, obj.getColumnDecimal128());
     }
 
